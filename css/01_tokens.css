@@ -24,10 +24,18 @@ body.stash-liquid-glass {
     --radius-sm: 12px;
     --radius-pill: 9999px;
 
+    /* Accent palette — orange by default. Override the four `--accent`
+       vars on `body.stash-liquid-glass.refract-<preset>` to retheme the
+       entire UI; the preset classes at the bottom of this file ship
+       seven alternates (blue / pink / red / yellow / purple / green /
+       teal). The plugin's "Accent colour" setting + JS toggle the
+       class on <body> at page load. */
     --accent: #f97316;
     --accent-bright: #fb923c;
-    --accent-glow: rgba(249, 115, 22, 0.28);
-    --accent-tint: rgba(249, 115, 22, 0.12);
+    --accent-light: #ffd4b0;
+    --accent-rgb: 249, 115, 22;
+    --accent-glow: rgba(var(--accent-rgb), 0.28);
+    --accent-tint: rgba(var(--accent-rgb), 0.12);
 
     --nav-btn-size: 2.4rem;
     --nav-icon-size: 1rem;
@@ -44,7 +52,7 @@ body.stash-liquid-glass {
     /* Override Bootstrap's blue link defaults */
     --bs-link-color: rgba(255, 255, 255, 0.85);
     --bs-link-color-rgb: 255, 255, 255;
-    --bs-link-hover-color: #fb923c;
+    --bs-link-hover-color: var(--accent-bright);
     --bs-link-hover-color-rgb: 251, 146, 60;
 
     /* Override Bootstrap table color variables */
@@ -68,7 +76,7 @@ body.stash-liquid-glass {
     color: var(--text);
     background:
         radial-gradient(120% 80% at 20% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
-        radial-gradient(100% 60% at 100% 30%, rgba(249, 115, 22, 0.04) 0%, transparent 50%),
+        radial-gradient(100% 60% at 100% 30%, rgba(var(--accent-rgb), 0.04) 0%, transparent 50%),
         linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
     background-attachment: fixed;
 
@@ -140,3 +148,18 @@ body.stash-liquid-glass .main.container-fluid:has(> .row > .scene-tabs) {
     }
 }
 
+
+/* ───────────────────────────────────────────────────────────────────
+   Accent presets
+   stashTheme.js reads the "accent" plugin setting and adds the
+   matching `refract-<name>` class to <body>. Each preset overrides
+   the 4 accent tokens; everything in the rest of the CSS resolves
+   through them.
+   ─────────────────────────────────────────────────────────────────── */
+body.stash-liquid-glass.refract-blue   { --accent: #3b82f6; --accent-bright: #60a5fa; --accent-light: #bfdbfe; --accent-rgb: 59, 130, 246; }
+body.stash-liquid-glass.refract-pink   { --accent: #ec4899; --accent-bright: #f472b6; --accent-light: #fbcfe8; --accent-rgb: 236, 72, 153; }
+body.stash-liquid-glass.refract-red    { --accent: #ef4444; --accent-bright: #f87171; --accent-light: #fecaca; --accent-rgb: 239, 68, 68; }
+body.stash-liquid-glass.refract-yellow { --accent: #eab308; --accent-bright: #facc15; --accent-light: #fef08a; --accent-rgb: 234, 179, 8; }
+body.stash-liquid-glass.refract-purple { --accent: #a855f7; --accent-bright: #c084fc; --accent-light: #e9d5ff; --accent-rgb: 168, 85, 247; }
+body.stash-liquid-glass.refract-green  { --accent: #22c55e; --accent-bright: #4ade80; --accent-light: #bbf7d0; --accent-rgb: 34, 197, 94; }
+body.stash-liquid-glass.refract-teal   { --accent: #14b8a6; --accent-bright: #2dd4bf; --accent-light: #99f6e4; --accent-rgb: 20, 184, 166; }

@@ -21,9 +21,9 @@ body.stash-liquid-glass .table-list > table {
     --bs-table-striped-color: var(--text);
     --bs-table-striped-bg: transparent;
     --bs-table-active-color: var(--text);
-    --bs-table-active-bg: rgba(249, 115, 22, 0.06);
+    --bs-table-active-bg: rgba(var(--accent-rgb), 0.06);
     --bs-table-hover-color: #fff;
-    --bs-table-hover-bg: rgba(249, 115, 22, 0.06);
+    --bs-table-hover-bg: rgba(var(--accent-rgb), 0.06);
     --bs-table-accent-bg: transparent;
     --bs-table-color-type: initial;
     --bs-table-bg-type: initial;
@@ -87,7 +87,7 @@ body.stash-liquid-glass .table-list tbody > tr {
     transition: background 0.12s ease;
 }
 body.stash-liquid-glass .table-list tbody > tr:hover {
-    background: rgba(249, 115, 22, 0.06) !important;
+    background: rgba(var(--accent-rgb), 0.06) !important;
 }
 
 /* All cells: no borders, no Bootstrap inset-shadow striping */
@@ -128,7 +128,7 @@ body.stash-liquid-glass .table-list td.select-col input[type="checkbox"]:checked
 body.stash-liquid-glass .table-list th.select-col input[type="checkbox"]:checked {
     background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") center / 58% no-repeat !important;
     border-color: var(--accent-bright) !important;
-    box-shadow: 0 0 8px rgba(249, 115, 22, 0.45) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.45) !important;
 }
 
 /* Thumbnail — fixed 16:10 crop so all rows are the same height */
@@ -227,8 +227,8 @@ body.stash-liquid-glass .table-list .comma-list a {
     padding: 0.12rem 0.5rem;
     font-size: 0.7rem;
     border-radius: var(--radius-pill);
-    background: rgba(249, 115, 22, 0.09) !important;
-    border: 1px solid rgba(249, 115, 22, 0.22) !important;
+    background: rgba(var(--accent-rgb), 0.09) !important;
+    border: 1px solid rgba(var(--accent-rgb), 0.22) !important;
     color: rgba(255, 255, 255, 0.75) !important;
     text-decoration: none;
     white-space: nowrap;
@@ -319,8 +319,8 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-link.active {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     box-shadow:
-        0 0 0 1px rgba(249, 115, 22, 0.18) inset,
-        0 0 12px rgba(249, 115, 22, 0.28) !important;
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset,
+        0 0 12px rgba(var(--accent-rgb), 0.28) !important;
 }
 
 /* Separator above the advanced/troubleshooting group. */
@@ -389,8 +389,8 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item:has(.advanced-switc
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     box-shadow:
-        0 0 0 1px rgba(249, 115, 22, 0.18) inset,
-        0 0 12px rgba(249, 115, 22, 0.28) !important;
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset,
+        0 0 12px rgba(var(--accent-rgb), 0.28) !important;
 }
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item:has(.advanced-switch input:checked) .advanced-switch .form-label {
     color: var(--accent-bright) !important;
@@ -495,8 +495,8 @@ body.stash-liquid-glass body.stash-troubleshooting .nav.nav-pills.flex-column .t
     background-color: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     box-shadow:
-        0 0 0 1px rgba(249, 115, 22, 0.18) inset,
-        0 0 12px rgba(249, 115, 22, 0.28) !important;
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset,
+        0 0 12px rgba(var(--accent-rgb), 0.28) !important;
 }
 
 body.stash-liquid-glass .nav.nav-pills.flex-column hr {
@@ -527,7 +527,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     color: var(--accent-bright) !important;
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.26) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.26) !important;
 }
 
 /* Settings danger buttons: align with liquid-glass orange accent language. */
@@ -537,13 +537,13 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     border: 1px solid var(--accent-glow) !important;
     color: var(--accent-bright) !important;
     border-radius: var(--radius-sm) !important;
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.22) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.22) !important;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .btn.btn-danger:hover {
-    background: rgba(249, 115, 22, 0.2) !important;
-    border-color: rgba(249, 115, 22, 0.55) !important;
-    color: #ffd4b0 !important;
-    box-shadow: 0 0 14px rgba(249, 115, 22, 0.32) !important;
+    background: rgba(var(--accent-rgb), 0.2) !important;
+    border-color: rgba(var(--accent-rgb), 0.55) !important;
+    color: var(--accent-light) !important;
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.32) !important;
 }
 
 /* Settings content: primary/action buttons and generic controls. */
@@ -553,13 +553,13 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     border: 1px solid var(--accent-glow) !important;
     color: var(--accent-bright) !important;
     border-radius: var(--radius-sm) !important;
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.24) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.24) !important;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"], #stash-table) .btn.btn-primary:hover {
-    background: rgba(249, 115, 22, 0.2) !important;
-    border-color: rgba(249, 115, 22, 0.55) !important;
-    color: #ffd4b0 !important;
-    box-shadow: 0 0 14px rgba(249, 115, 22, 0.32) !important;
+    background: rgba(var(--accent-rgb), 0.2) !important;
+    border-color: rgba(var(--accent-rgb), 0.55) !important;
+    color: var(--accent-light) !important;
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.32) !important;
 }
 
 /* Beat late-loading Bootstrap .btn-primary (blue) on settings content + dialogs — do not use
@@ -573,16 +573,16 @@ body.stash-liquid-glass #settings-container button.mr-3.btn.btn-primary {
     border: 1px solid var(--accent-glow) !important;
     color: var(--accent-bright) !important;
     border-radius: var(--radius-sm) !important;
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.24) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.24) !important;
 }
 body.stash-liquid-glass :is(#configuration-tabs #settings-container, #settings-container .form-group, .modal-body .form-group, .modal-body, #setting-dialog) :is(.btn.btn-primary, button.btn-primary):hover,
 body.stash-liquid-glass #settings-container button.mr-3.btn.btn-primary:hover {
-    background: rgba(249, 115, 22, 0.2) !important;
-    background-color: rgba(249, 115, 22, 0.2) !important;
+    background: rgba(var(--accent-rgb), 0.2) !important;
+    background-color: rgba(var(--accent-rgb), 0.2) !important;
     background-image: none !important;
-    border-color: rgba(249, 115, 22, 0.55) !important;
-    color: #ffd4b0 !important;
-    box-shadow: 0 0 14px rgba(249, 115, 22, 0.32) !important;
+    border-color: rgba(var(--accent-rgb), 0.55) !important;
+    color: var(--accent-light) !important;
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.32) !important;
 }
 
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .card,
@@ -602,7 +602,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) :is(.form-control, .form-select, .custom-select):focus {
     border-color: var(--accent-glow) !important;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12) !important;
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12) !important;
 }
 
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .input-group-text {
@@ -1125,7 +1125,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     transition: color 0.15s;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) table.scraper-table td a:hover {
-    color: #ffd4b0 !important;
+    color: var(--accent-light) !important;
 }
 
 /* ───────────────────────────────────────────────────────────────────
@@ -1216,7 +1216,7 @@ body.stash-liquid-glass .tagger-container-header .btn.btn-primary {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     color: var(--accent-bright) !important;
-    box-shadow: 0 0 12px rgba(249, 115, 22, 0.3) !important;
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.3) !important;
 }
 
 /* Strong variant overrides for Tagger buttons that Stash styles aggressively. */
@@ -1266,7 +1266,7 @@ body.stash-liquid-glass .search-item .btn.btn-primary {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     color: var(--accent-bright) !important;
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.28) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.28) !important;
 }
 
 body.stash-liquid-glass .search-item .input-group .input-group-text,
@@ -1318,7 +1318,7 @@ body.stash-liquid-glass .tagger-container-header select.form-control {
 body.stash-liquid-glass .tagger-container-header select.input-control:focus,
 body.stash-liquid-glass .tagger-container-header select.form-control:focus {
     border-color: var(--accent-glow) !important;
-    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.12) !important;
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.12) !important;
     outline: none !important;
 }
 body.stash-liquid-glass .tagger-container-header select.input-control option,
