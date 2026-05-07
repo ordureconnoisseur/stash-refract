@@ -23,7 +23,7 @@ body.stash-liquid-glass nav.top-nav.navbar {
     border-radius: var(--radius) !important;
     box-shadow:
         0 12px 36px rgba(0, 0, 0, 0.5),
-        0 0 60px rgba(249, 115, 22, 0.07),
+        0 0 60px rgba(var(--accent-rgb), 0.07),
         0 0 0 1px rgba(0, 0, 0, 0.25),
         inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
     -webkit-backdrop-filter: var(--glass-blur);
@@ -121,16 +121,18 @@ body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-ev
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #desire-nav-container                 { order: 90; }
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plugin_hon)                   { order: 91; }
 
-/* Within `.navbar-buttons` (utility row), put Settings on the LEFT
-   (lowest order = always visible) and Stats on the RIGHT (highest
-   order = first to clip if the buttons row ever overflows). */
-body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href="/settings"]    { order: 1; }
+/* Within `.navbar-buttons` (utility row), Stats on the LEFT (always
+   visible) and Settings on the RIGHT. Logout / Help / Donate cluster
+   between them in their original Stash order. */
+body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href="/stats"]       { order: 1; }
 body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href*="/logout"],
 body.stash-liquid-glass nav.top-nav .navbar-buttons > .logout-button         { order: 50; }
 body.stash-liquid-glass nav.top-nav .navbar-buttons > :has([title="Help"])   { order: 60; }
 body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(.donate),
 body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href*="opencollective"] { order: 70; }
-body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href="/stats"]       { order: 90; }
+body.stash-liquid-glass nav.top-nav .navbar-buttons > #url-switcher-btn,
+body.stash-liquid-glass nav.top-nav .navbar-buttons > .url-switcher-link      { order: 80; }
+body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href="/settings"]    { order: 90; }
 
 /* Strip Stash's solid backgrounds on the nav containers. */
 body.stash-liquid-glass nav.top-nav .navbar-collapse,
@@ -231,7 +233,7 @@ body.stash-liquid-glass nav.top-nav .navbar-toggler {
         transform: translateY(-1px) scale(1.06) !important;
         box-shadow:
             0 6px 18px rgba(0, 0, 0, 0.35),
-            0 0 22px rgba(249, 115, 22, 0.18),
+            0 0 22px rgba(var(--accent-rgb), 0.18),
             inset 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
         -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
         backdrop-filter: blur(14px) saturate(140%) !important;
@@ -322,29 +324,29 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] > :is(button
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     box-shadow:
-        0 0 18px rgba(249, 115, 22, 0.45),
-        0 0 0 1px rgba(249, 115, 22, 0.18) inset !important;
+        0 0 18px rgba(var(--accent-rgb), 0.45),
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
 }
 body.stash-liquid-glass nav.top-nav :is(a.nav-link, a.nav-utility):is(.stash-nav-active, .active) svg,
 body.stash-liquid-glass nav.top-nav .navbar-nav a.btn.stash-nav-active svg,
 body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] svg {
     filter:
-        drop-shadow(0 0 8px rgba(249, 115, 22, 0.65))
-        drop-shadow(0 0 4px rgba(249, 115, 22, 0.45));
+        drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.65))
+        drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.45));
 }
 body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] > button:hover,
 body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] > .btn:hover {
-    background: rgba(249, 115, 22, 0.22) !important;
-    border-color: rgba(249, 115, 22, 0.55) !important;
+    background: rgba(var(--accent-rgb), 0.22) !important;
+    border-color: rgba(var(--accent-rgb), 0.55) !important;
     color: var(--accent-bright) !important;
     box-shadow:
-        0 0 22px rgba(249, 115, 22, 0.52),
-        0 0 0 1px rgba(249, 115, 22, 0.22) inset !important;
+        0 0 22px rgba(var(--accent-rgb), 0.52),
+        0 0 0 1px rgba(var(--accent-rgb), 0.22) inset !important;
 }
 body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] svg {
     filter:
-        drop-shadow(0 0 8px rgba(249, 115, 22, 0.65))
-        drop-shadow(0 0 4px rgba(249, 115, 22, 0.45));
+        drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.65))
+        drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.45));
 }
 
 /* URL switcher: always a full nav icon square (don’t rely on h-100 / % sizing — breaks when “off”). */
@@ -367,6 +369,8 @@ body.stash-liquid-glass nav.top-nav #url-switcher-btn > button {
     max-height: var(--nav-btn-size) !important;
     flex: 0 0 auto !important;
     box-sizing: border-box !important;
+    background: transparent !important;
+    border-color: transparent !important;
 }
 /* Id on the button itself (some builds / modes). */
 body.stash-liquid-glass nav.top-nav .navbar-buttons button#url-switcher-btn.btn,
@@ -389,14 +393,14 @@ body.stash-liquid-glass nav.top-nav button#url-switcher-btn.mode-tunnel.btn {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     box-shadow:
-        0 0 14px rgba(249, 115, 22, 0.34),
-        0 0 0 1px rgba(249, 115, 22, 0.16) inset !important;
+        0 0 14px rgba(var(--accent-rgb), 0.34),
+        0 0 0 1px rgba(var(--accent-rgb), 0.16) inset !important;
 }
 body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel svg,
 body.stash-liquid-glass nav.top-nav button#url-switcher-btn.mode-tunnel svg {
     filter:
-        drop-shadow(0 0 7px rgba(249, 115, 22, 0.55))
-        drop-shadow(0 0 3px rgba(249, 115, 22, 0.4));
+        drop-shadow(0 0 7px rgba(var(--accent-rgb), 0.55))
+        drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.4));
 }
 
 /* Brand — orange glass orb (text cleared in stashTheme.js; aria-label = Home).
@@ -437,14 +441,14 @@ html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button {
     color: transparent !important;
     text-indent: -9999px !important;
     overflow: hidden !important;
-    border: 1.5px solid rgba(249, 115, 22, 0.85) !important;
-    background: rgba(249, 115, 22, 0.2) !important;
+    border: 1.5px solid rgba(var(--accent-rgb), 0.85) !important;
+    background: rgba(var(--accent-rgb), 0.2) !important;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     box-shadow:
-        0 0 8px rgba(249, 115, 22, 0.5),
-        0 0 22px rgba(249, 115, 22, 0.42),
-        0 0 44px rgba(249, 115, 22, 0.26) !important;
+        0 0 8px rgba(var(--accent-rgb), 0.5),
+        0 0 22px rgba(var(--accent-rgb), 0.42),
+        0 0 44px rgba(var(--accent-rgb), 0.26) !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -466,13 +470,13 @@ html.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:hover,
 html.stash-liquid-glass nav.top-nav .navbar-brand > a > button:hover,
 html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link:hover,
 html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:hover {
-    border-color: rgba(249, 115, 22, 1) !important;
+    border-color: rgba(var(--accent-rgb), 1) !important;
     filter: brightness(1.08) saturate(1.05);
     box-shadow:
-        0 0 0 1px rgba(249, 115, 22, 0.28) inset,
-        0 0 10px rgba(249, 115, 22, 0.6),
-        0 0 24px rgba(249, 115, 22, 0.5),
-        0 0 48px rgba(249, 115, 22, 0.32) !important;
+        0 0 0 1px rgba(var(--accent-rgb), 0.28) inset,
+        0 0 10px rgba(var(--accent-rgb), 0.6),
+        0 0 24px rgba(var(--accent-rgb), 0.5),
+        0 0 48px rgba(var(--accent-rgb), 0.32) !important;
     transform: scale(1.04);
 }
 body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:active,
@@ -505,11 +509,11 @@ html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:focus-vi
     outline: none !important;
     box-shadow:
         0 0 0 2px rgba(10, 10, 12, 0.95),
-        0 0 0 4px rgba(249, 115, 22, 0.65),
-        0 0 0 1px rgba(249, 115, 22, 0.28) inset,
-        0 0 10px rgba(249, 115, 22, 0.55),
-        0 0 24px rgba(249, 115, 22, 0.45),
-        0 0 48px rgba(249, 115, 22, 0.3) !important;
+        0 0 0 4px rgba(var(--accent-rgb), 0.65),
+        0 0 0 1px rgba(var(--accent-rgb), 0.28) inset,
+        0 0 10px rgba(var(--accent-rgb), 0.55),
+        0 0 24px rgba(var(--accent-rgb), 0.45),
+        0 0 48px rgba(var(--accent-rgb), 0.3) !important;
 }
 @media (prefers-reduced-transparency: reduce) {
     body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link,

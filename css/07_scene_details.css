@@ -17,7 +17,7 @@ body.stash-liquid-glass .scene-tabs {
     backdrop-filter: blur(10px);
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.35),
-        0 0 60px -10px rgba(249, 115, 22, 0.28),
+        0 0 60px -10px rgba(var(--accent-rgb), 0.28),
         inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
     padding: 1.25rem !important;
 }
@@ -149,7 +149,7 @@ body.stash-liquid-glass .scene-header-container h1.studio-logo > a {
     transition: color 0.15s ease;
 }
 body.stash-liquid-glass .scene-header-container h1.studio-logo > a:hover {
-    color: #ffd4b0 !important;
+    color: var(--accent-light) !important;
 }
 body.stash-liquid-glass .st-studio-name {
     display: inline;
@@ -364,8 +364,8 @@ body.stash-liquid-glass .nav-tabs .nav-link.active {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     box-shadow:
-        0 0 14px rgba(249, 115, 22, 0.35),
-        0 0 0 1px rgba(249, 115, 22, 0.18) inset !important;
+        0 0 14px rgba(var(--accent-rgb), 0.35),
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
 }
 
 body.stash-liquid-glass .scene-tabs .card .card-body,
@@ -393,7 +393,7 @@ body.stash-liquid-glass .markers-panel .marker-card {
 body.stash-liquid-glass .scene-markers-list .marker-card:hover,
 body.stash-liquid-glass .markers-panel .marker-card:hover {
     border-color: var(--accent-glow) !important;
-    box-shadow: 0 0 12px rgba(249, 115, 22, 0.25) !important;
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.25) !important;
 }
 
 body.stash-liquid-glass .scene-file-info table,
@@ -785,7 +785,7 @@ body.stash-liquid-glass #queue-content > ol > li:hover {
 body.stash-liquid-glass #queue-content > ol > li.current {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
-    box-shadow: 0 0 14px rgba(249, 115, 22, 0.2) !important;
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.2) !important;
 }
 body.stash-liquid-glass #queue-content > ol > li > a {
     display: block !important;
