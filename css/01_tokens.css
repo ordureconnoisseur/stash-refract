@@ -1,0 +1,142 @@
+/* ───────────────────────────────────────────────────────────────────
+   Stash Theme — iOS Liquid Glass
+   Minimalist dark theme, glass surfaces, orange accent only.
+   Targets Stash + Bootstrap 5.
+   ─────────────────────────────────────────────────────────────────── */
+
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap");
+
+body.stash-liquid-glass {
+    --theme-font-stack: "Quicksand", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --bg-0: #0a0a0a;
+    --bg-1: #111;
+    --text: rgba(255, 255, 255, 0.92);
+    --text-muted: rgba(255, 255, 255, 0.55);
+
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --glass-bg-strong: rgba(255, 255, 255, 0.10);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-border-bright: rgba(255, 255, 255, 0.22);
+    --glass-blur: blur(24px);
+    --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+
+    --radius: 16px;
+    --radius-sm: 12px;
+    --radius-pill: 9999px;
+
+    --accent: #f97316;
+    --accent-bright: #fb923c;
+    --accent-glow: rgba(249, 115, 22, 0.28);
+    --accent-tint: rgba(249, 115, 22, 0.12);
+
+    --nav-btn-size: 2.4rem;
+    --nav-icon-size: 1rem;
+    --nav-gap: 0.2rem;
+
+    --bs-body-bg: var(--bg-0);
+    --bs-body-color: var(--text);
+    --bs-body-font-family: var(--theme-font-stack);
+    --bs-font-sans-serif: var(--theme-font-stack);
+    --bs-card-bg: var(--glass-bg);
+    --bs-border-color: var(--glass-border);
+    --bs-border-color-translucent: var(--glass-border);
+
+    /* Override Bootstrap's blue link defaults */
+    --bs-link-color: rgba(255, 255, 255, 0.85);
+    --bs-link-color-rgb: 255, 255, 255;
+    --bs-link-hover-color: #fb923c;
+    --bs-link-hover-color-rgb: 251, 146, 60;
+
+    /* Override Bootstrap table color variables */
+    --bs-table-color: var(--text);
+    --bs-table-bg: transparent;
+    --bs-table-striped-color: var(--text);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+    --bs-table-hover-color: #fff;
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.045);
+    --bs-table-border-color: rgba(255, 255, 255, 0.06);
+
+    /* Override Bootstrap popover variables at body level so they cascade everywhere */
+    --bs-popover-bg: rgba(20, 20, 24, 0.97);
+    --bs-popover-border-color: rgba(255, 255, 255, 0.12);
+    --bs-popover-border-radius: 12px;
+    --bs-popover-inner-border-radius: 11px;
+    --bs-popover-body-color: rgba(255, 255, 255, 0.92);
+    --bs-popover-header-bg: rgba(255, 255, 255, 0.05);
+    --bs-popover-header-color: rgba(255, 255, 255, 0.92);
+
+    color: var(--text);
+    background:
+        radial-gradient(120% 80% at 20% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
+        radial-gradient(100% 60% at 100% 30%, rgba(249, 115, 22, 0.04) 0%, transparent 50%),
+        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+    background-attachment: fixed;
+
+    font-family: var(--theme-font-stack);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0.005em;
+}
+
+/* Some Stash views set explicit fonts; force them back to theme font. */
+body.stash-liquid-glass .card-section-title,
+body.stash-liquid-glass .TruncatedText,
+body.stash-liquid-glass .performer-name {
+    font-family: var(--theme-font-stack) !important;
+}
+body.stash-liquid-glass .card-section-title *,
+body.stash-liquid-glass .TruncatedText *,
+body.stash-liquid-glass .performer-name * {
+    font-family: var(--theme-font-stack) !important;
+}
+
+/* Force font cascade across themed UI to beat Stash/Bootstrap component fonts. */
+body.stash-liquid-glass,
+body.stash-liquid-glass *:not(code):not(pre):not(kbd):not(samp) {
+    font-family: var(--theme-font-stack) !important;
+}
+
+body.stash-liquid-glass .min-vh-100,
+body.stash-liquid-glass .main.container-fluid {
+    background: transparent;
+    /* Stash native already provides ~60px top offset for the original
+       fixed navbar. Floating navbar sits 4px lower (top:12) so we add
+       a touch more breathing room below it. Horizontal 12px aligns with
+       the floating navbar's left/right inset for a flush visual gutter. */
+    padding-top: 2.5rem !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+}
+/* Bootstrap rows have -15px horizontal margins that would push content
+   3px outside the container's 12px gutter. Zero them on the top-level row
+   inside .container-fluid so detail-page content respects the inset. */
+body.stash-liquid-glass .main.container-fluid > .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Scene page: only top padding so the row's own 20px padding is the only
+   outer spacing on the sides + bottom. The 1.5rem here adds gap below
+   the floating navbar; sides/bottom symmetry preserved. */
+body.stash-liquid-glass .main.container-fluid:has(> .row > .scene-tabs) {
+    padding: 1.5rem 0 0 0 !important;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    body.stash-liquid-glass {
+        --glass-bg: rgba(28, 28, 30, 0.95);
+        --glass-bg-strong: rgba(36, 36, 40, 0.97);
+    }
+    body.stash-liquid-glass .navbar,
+    body.stash-liquid-glass .card,
+    body.stash-liquid-glass .grid-card,
+    body.stash-liquid-glass .dropdown-menu,
+    body.stash-liquid-glass .modal-content,
+    body.stash-liquid-glass .toast,
+    body.stash-liquid-glass .detail-header,
+    body.stash-liquid-glass .detail-header .detail-group {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+}
+

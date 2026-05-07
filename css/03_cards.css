@@ -1,0 +1,308 @@
+/* ───────────────────────────────────────────────────────────────────
+   Cards (scenes, performers, tags, galleries)
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass .card,
+body.stash-liquid-glass .grid-card {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.2s ease;
+    position: relative;
+}
+body.stash-liquid-glass .card:hover,
+body.stash-liquid-glass .grid-card:hover {
+    border-color: rgba(249, 115, 22, 0.28) !important;
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(249, 115, 22, 0.14),
+        0 0 40px 6px rgba(249, 115, 22, 0.22),
+        0 0 90px 18px rgba(249, 115, 22, 0.09);
+}
+
+/* Card images — fill their container; only round when explicitly inset by a
+   card-type-specific rule (tag cards, etc.). Edge-to-edge images rely on the
+   card's overflow:hidden + border-radius for corner clipping; an extra
+   per-image radius creates a visible card-background gap at the corners. */
+body.stash-liquid-glass .grid-card img,
+body.stash-liquid-glass .card img {
+    display: block;
+    width: 100%;
+}
+
+/* Tilt glare overlay — injected by stashTheme.js */
+body.stash-liquid-glass .stash-tilt-glare {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9;
+    overflow: hidden;
+    border-radius: inherit;
+}
+body.stash-liquid-glass .stash-tilt-glare-inner {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 200%;
+    aspect-ratio: 1 / 1;
+    transform-origin: 0% 0%;
+    transform: rotate(0deg) translate(-50%, -50%);
+    background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.14) 100%);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass .stash-tilt-glare-inner { display: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @keyframes stash-card-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    body.stash-liquid-glass .grid-card {
+        animation: stash-card-in 0.32s ease both;
+    }
+}
+
+/* ── Card selection checkbox ─────────────────────────────────────── */
+body.stash-liquid-glass .card-check {
+    appearance: none;
+    -webkit-appearance: none;
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 10;
+    width: 1.25rem;
+    height: 1.25rem;
+    min-height: unset !important;
+    padding: 0 !important;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+    background: rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    cursor: pointer;
+    opacity: 0;
+    box-shadow: none !important;
+    transition: opacity 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+body.stash-liquid-glass .card:hover .card-check,
+body.stash-liquid-glass .grid-card:hover .card-check,
+body.stash-liquid-glass .card-check:checked {
+    opacity: 1;
+}
+body.stash-liquid-glass .card-check:checked {
+    background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/58% no-repeat !important;
+    border-color: var(--accent-bright) !important;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.55) !important;
+}
+body.stash-liquid-glass .card-check:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3) !important;
+}
+
+/* Rating — fixed square squircle + orange glow; number only (stashTheme.js strips label) */
+body.stash-liquid-glass .performer-card,
+body.stash-liquid-glass .grid-card.performer-card,
+body.stash-liquid-glass .card.performer-card,
+body.stash-liquid-glass #performer-page .image-container {
+    position: relative;
+}
+
+body.stash-liquid-glass .rating-banner {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 3.5rem;
+    height: 3.5rem;
+    min-width: 3.5rem;
+    min-height: 3.5rem;
+    max-width: 3.5rem;
+    max-height: 3.5rem;
+    padding: 0 !important;
+    margin: 0 !important;
+    /* Squircle-like corners on a square */
+    border-radius: clamp(0.85rem, 28%, 1.2rem) !important;
+    background: var(--glass-bg) !important;
+    border: 1px solid rgba(249, 115, 22, 0.35) !important;
+    color: var(--accent-bright) !important;
+    font-size: 1.28rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    white-space: nowrap;
+    -webkit-font-smoothing: antialiased;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    pointer-events: none;
+    box-shadow:
+        0 0 0 1px rgba(249, 115, 22, 0.18) inset,
+        0 0 14px rgba(249, 115, 22, 0.38),
+        0 0 28px rgba(249, 115, 22, 0.22),
+        0 6px 18px rgba(0, 0, 0, 0.35) !important;
+    text-shadow:
+        0 0 14px rgba(249, 115, 22, 0.55),
+        0 1px 0 rgba(0, 0, 0, 0.85),
+        0 2px 4px rgba(0, 0, 0, 0.75);
+}
+
+/* Pin to top-left of performer card / hero with equal inset */
+body.stash-liquid-glass .performer-card .rating-banner,
+body.stash-liquid-glass .grid-card.performer-card .rating-banner,
+body.stash-liquid-glass .card.performer-card .rating-banner,
+body.stash-liquid-glass #performer-page .image-container .rating-banner {
+    position: absolute !important;
+    top: 0.65rem !important;
+    left: 0.65rem !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: 6;
+    transform: none !important;
+}
+
+/* Country flag — keep icon, hide redundant text */
+body.stash-liquid-glass .performer-card .flag-icon {
+    width: 1.2em;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+body.stash-liquid-glass .performer-card__country-string {
+    display: none !important;
+}
+
+/* ── Performer card section redesign ──────────────────────────────── */
+
+/* Favourite heart — match the tag-card behaviour: muted-white when not
+   favorited (force-wins over the global 'pink leaks as orange' issue), explicit
+   pink in both default and hover when favorited. Layered pink-glow + black
+   drop-shadow for legibility. Scoped to grid view so the scene-page performer
+   carousel rules stay untouched. */
+body.stash-liquid-glass .grid-card.performer-card .favorite-button:not(.favorite) {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+body.stash-liquid-glass .grid-card.performer-card .favorite-button:not(.favorite):hover {
+    color: #fff !important;
+}
+body.stash-liquid-glass .grid-card.performer-card .favorite-button.favorite {
+    color: #f472b6 !important;
+}
+body.stash-liquid-glass .grid-card.performer-card .favorite-button.favorite:hover {
+    color: #fbcfe8 !important;
+}
+body.stash-liquid-glass .grid-card.performer-card .favorite-button.favorite svg {
+    filter:
+        drop-shadow(0 0 6px rgba(244, 114, 182, 0.7))
+        drop-shadow(0 1px 4px rgba(0, 0, 0, 0.6)) !important;
+}
+
+/* Tighter section padding */
+body.stash-liquid-glass .performer-card .card-section {
+    padding: 0.5rem 0.65rem 0.45rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+}
+
+/* Name: single line, prominent */
+body.stash-liquid-glass .performer-card .card-section-title {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+}
+
+/* Override React's inline -webkit-line-clamp: 2 */
+body.stash-liquid-glass .performer-card .TruncatedText {
+    display: block !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    -webkit-line-clamp: unset !important;
+    min-width: 0;
+}
+body.stash-liquid-glass .performer-card .TruncatedText > div {
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Gender icon — base */
+body.stash-liquid-glass .performer-card .gender-icon {
+    width: 0.85rem !important;
+    height: 0.85rem !important;
+    flex-shrink: 0 !important;
+    margin-right: 0.2em !important;
+    opacity: 1 !important;
+    vertical-align: middle !important;
+}
+/* Female → pink glow */
+body.stash-liquid-glass .performer-card .gender-icon[data-gender="FEMALE"] {
+    color: #f472b6 !important;
+    filter: drop-shadow(0 0 5px rgba(244, 114, 182, 0.7)) !important;
+}
+/* Trans female → same pink glow */
+body.stash-liquid-glass .performer-card .gender-icon[data-gender="TRANSGENDER_FEMALE"] {
+    color: #f472b6 !important;
+    filter: drop-shadow(0 0 5px rgba(244, 114, 182, 0.7)) !important;
+}
+/* Male → blue glow */
+body.stash-liquid-glass .performer-card .gender-icon[data-gender="MALE"] {
+    color: #60a5fa !important;
+    filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.65)) !important;
+}
+/* Trans male → same blue */
+body.stash-liquid-glass .performer-card .gender-icon[data-gender="TRANSGENDER_MALE"] {
+    color: #60a5fa !important;
+    filter: drop-shadow(0 0 5px rgba(96, 165, 250, 0.65)) !important;
+}
+/* Non-binary / intersex → soft purple */
+body.stash-liquid-glass .performer-card .gender-icon[data-gender="NON_BINARY"],
+body.stash-liquid-glass .performer-card .gender-icon[data-gender="INTERSEX"] {
+    color: #c084fc !important;
+    filter: drop-shadow(0 0 5px rgba(192, 132, 252, 0.65)) !important;
+}
+
+/* Stat row injected by JS */
+body.stash-liquid-glass .stash-perf-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.35rem;
+    margin-top: 0.3rem;
+    border-top: 1px solid var(--glass-border);
+}
+body.stash-liquid-glass .stash-perf-age {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    line-height: 1;
+}
+body.stash-liquid-glass .stash-perf-scenes {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none !important;
+    line-height: 1;
+    transition: color 0.15s;
+}
+body.stash-liquid-glass .stash-perf-scenes svg {
+    flex-shrink: 0;
+    transition: color 0.15s;
+}
+body.stash-liquid-glass .stash-perf-scenes:hover {
+    color: var(--accent-bright) !important;
+}
+

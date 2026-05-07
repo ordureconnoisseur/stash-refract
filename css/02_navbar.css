@@ -1,0 +1,644 @@
+/* ───────────────────────────────────────────────────────────────────
+   Navbar — glass bar, icons-only mode (UI Tweaks behavior built in)
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Floating glass navbar — detached from screen edges with soft shadow,
+   rounded on all sides. Height (~52px content + 12px top margin) gives
+   an effective top offset of ~64px which the scene-page row's calc()
+   already accounts for. Layout lockdown lives in the same block: every
+   viewport width reads the same way and rightmost icons clip first as
+   the window narrows. Stash's DOM puts navbar children in this order
+   (collapse, brand, buttons) and Bootstrap's responsive `order-*`
+   classes shuffle them at breakpoints — explicit `order:` rules below
+   defeat that. */
+body.stash-liquid-glass nav.top-nav.navbar {
+    position: fixed !important;
+    top: 12px !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: auto !important;
+    width: auto !important;
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow:
+        0 12px 36px rgba(0, 0, 0, 0.5),
+        0 0 60px rgba(249, 115, 22, 0.07),
+        0 0 0 1px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    padding: 0.4rem 0.85rem;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    /* Hard horizontal clip with vertical-visible so the active-state
+       box-shadow halo isn't cut off above/below the navbar. */
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    /* Lock navbar content height so Bootstrap's responsive `p-4` →
+       `p-xl-2` flip on inner library links can't make it grow taller
+       below 1200px. */
+    min-height: var(--nav-btn-size) !important;
+    max-height: var(--nav-btn-size) !important;
+    height: var(--nav-btn-size) !important;
+    box-sizing: content-box !important;
+}
+/* Force every library / utility wrapper to the navbar button height so
+   Bootstrap's `flex-column` + responsive padding can't add vertical
+   slack between icon and (hidden) label. */
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > *,
+body.stash-liquid-glass nav.top-nav .navbar-buttons > * {
+    height: var(--nav-btn-size) !important;
+    min-height: var(--nav-btn-size) !important;
+    max-height: var(--nav-btn-size) !important;
+    align-self: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+body.stash-liquid-glass nav.top-nav .navbar-brand    { order: 1 !important; flex-shrink: 0 !important; }
+body.stash-liquid-glass nav.top-nav .navbar-collapse { order: 2 !important; }
+body.stash-liquid-glass nav.top-nav .navbar-buttons  { order: 3 !important; flex-shrink: 0 !important; }
+
+/* Force the collapse always-visible so the library row never disappears
+   into the Bootstrap hamburger collapse. Allow it to shrink, with
+   `overflow: hidden` clipping items off the right edge. */
+body.stash-liquid-glass nav.top-nav .navbar-collapse,
+body.stash-liquid-glass nav.top-nav .navbar-collapse.collapse,
+body.stash-liquid-glass nav.top-nav .navbar-collapse.collapsing,
+body.stash-liquid-glass nav.top-nav .navbar-collapse.show {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    position: static !important;
+    max-height: none !important;
+    height: auto !important;
+    /* Allow box-shadow halos on items at the edges of the library row
+       to bleed past the collapse's bounds (into the brand area on the
+       left, into the buttons area on the right). The outer navbar's
+       overflow-x: clip is what handles real horizontal overflow. */
+    overflow: visible !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    animation: none !important;
+}
+body.stash-liquid-glass nav.top-nav .navbar-collapse .navbar-nav,
+body.stash-liquid-glass nav.top-nav .navbar-buttons {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: var(--nav-gap, 0.4rem);
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+body.stash-liquid-glass nav.top-nav .navbar-collapse > *,
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > *,
+body.stash-liquid-glass nav.top-nav .navbar-buttons > * {
+    flex-shrink: 0 !important;
+}
+
+/* Within the library (.navbar-collapse > .navbar-nav), put plugin icons
+   on the right with high `order` values so they clip first when the
+   library row overflows. */
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/scenes"]         { order: 1; }
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/images"]         { order: 2; }
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/groups"]         { order: 3; }
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/scenes/markers"] { order: 4; }
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/galleries"]      { order: 5; }
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/performers"]     { order: 6; }
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/studios"]        { order: 7; }
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/tags"]           { order: 8; }
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #desire-nav-container                 { order: 90; }
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plugin_hon)                   { order: 91; }
+
+/* Within `.navbar-buttons` (utility row), put Settings on the LEFT
+   (lowest order = always visible) and Stats on the RIGHT (highest
+   order = first to clip if the buttons row ever overflows). */
+body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href="/settings"]    { order: 1; }
+body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href*="/logout"],
+body.stash-liquid-glass nav.top-nav .navbar-buttons > .logout-button         { order: 50; }
+body.stash-liquid-glass nav.top-nav .navbar-buttons > :has([title="Help"])   { order: 60; }
+body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(.donate),
+body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href*="opencollective"] { order: 70; }
+body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href="/stats"]       { order: 90; }
+
+/* Strip Stash's solid backgrounds on the nav containers. */
+body.stash-liquid-glass nav.top-nav .navbar-collapse,
+body.stash-liquid-glass nav.top-nav .navbar-collapse.bg-dark,
+body.stash-liquid-glass nav.top-nav .navbar-nav {
+    background: transparent !important;
+    align-items: center !important;
+}
+
+/* Hide the duplicated utility .navbar-nav (Stats/Settings/...) inside the
+   collapse. It mirrors .navbar-buttons and only adds clutter. */
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav:nth-of-type(2) {
+    display: none !important;
+}
+
+/* Icons-only: kill text labels via font-size: 0 (UI Tweaks pattern). */
+body.stash-liquid-glass nav.top-nav .nav-link,
+body.stash-liquid-glass nav.top-nav .navbar-buttons {
+    font-size: 0 !important;
+}
+body.stash-liquid-glass nav.top-nav span,
+body.stash-liquid-glass nav.top-nav .stash-nav-label {
+    display: none !important;
+}
+
+/* Drop Bootstrap col / list wrappers on library links.
+   Stash may use flat `.navbar-nav > a.nav-link` or `ul > li.nav-item > a.nav-link`. */
+body.stash-liquid-glass nav.top-nav .navbar-nav > * {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 var(--nav-gap) !important;
+}
+body.stash-liquid-glass nav.top-nav .navbar-nav .nav-item > .nav-link {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* All navbar action buttons → consistent icon square.
+   Catches: route links, utility buttons, New, url-switcher, hamburger.
+   Never touch .navbar-brand (home): it may not have .brand-link on some builds.
+   Exclude hidden utilities on anchors (logout/help/donate/sidebar): otherwise display:none
+   loses to this rule’s higher specificity on .btn.
+   On real <button>s, also exclude .nav-utility (those entries are theme-hidden) without
+   breaking anchors like <a class="nav-utility btn"> for Settings.
+   CSS nesting collapses base + ::before + :hover + :hover::before + :active
+   into one selector list (Safari 17.2+, Chrome 120+). */
+body.stash-liquid-glass nav.top-nav a.btn:where(:not(.brand-link):not(.navbar-brand button):not(.logout-button):not([href*="/logout"]):not([title="Help"]):not([aria-label="Help"]):not([href="/help"]):not([href*="/manual"]):not([href*="opencollective"]):not(.sidebar-toggle-button)),
+body.stash-liquid-glass nav.top-nav button.btn:where(:not(.brand-link):not(.navbar-brand button):not(.nav-utility):not(.logout-button):not([href*="/logout"]):not([title="Help"]):not([aria-label="Help"]):not([href="/help"]):not([href*="/manual"]):not([href*="opencollective"]):not(.sidebar-toggle-button)),
+body.stash-liquid-glass nav.top-nav .navbar-toggler {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: var(--nav-btn-size) !important;
+    height: var(--nav-btn-size) !important;
+    min-width: var(--nav-btn-size) !important;
+    min-height: var(--nav-btn-size) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: var(--radius-sm) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+    line-height: 1 !important;
+    overflow: visible !important;
+    transform: translateZ(0);
+    transition:
+        transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background 0.22s ease,
+        border-color 0.22s ease,
+        color 0.22s ease,
+        box-shadow 0.22s ease,
+        backdrop-filter 0.22s ease;
+
+    &::before {
+        content: "" !important;
+        position: absolute !important;
+        inset: 0 !important;
+        border-radius: inherit !important;
+        pointer-events: none !important;
+        background: linear-gradient(
+            to bottom,
+            rgba(255, 255, 255, 0.10) 0%,
+            rgba(255, 255, 255, 0.02) 35%,
+            rgba(255, 255, 255, 0) 100%
+        ) !important;
+        opacity: 0 !important;
+        transition: opacity 0.22s ease !important;
+    }
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.06) !important;
+        border-color: rgba(255, 255, 255, 0.18) !important;
+        color: #fff !important;
+        transform: translateY(-1px) scale(1.06) !important;
+        box-shadow:
+            0 6px 18px rgba(0, 0, 0, 0.35),
+            0 0 22px rgba(249, 115, 22, 0.18),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
+        -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+        backdrop-filter: blur(14px) saturate(140%) !important;
+    }
+    &:hover::before {
+        opacity: 1 !important;
+    }
+    &:active {
+        transform: translateY(0) scale(0.96) !important;
+        transition:
+            transform 0.08s ease,
+            background 0.08s ease,
+            box-shadow 0.08s ease !important;
+    }
+}
+
+/* Library column: some Stash builds use <a.nav-link><button> without .btn — match utility icon tiles. */
+body.stash-liquid-glass nav.top-nav .navbar-nav a.nav-link > button:where(:not(.brand-link):not(.navbar-brand button)) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: var(--nav-btn-size) !important;
+    height: var(--nav-btn-size) !important;
+    min-width: var(--nav-btn-size) !important;
+    min-height: var(--nav-btn-size) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: var(--radius-sm) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+    line-height: 1 !important;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+
+    &:hover {
+        background: var(--glass-bg) !important;
+        border-color: var(--glass-border) !important;
+        color: #fff !important;
+    }
+}
+
+/* Hamburger toggle is dead UI — the navbar is icon-only and small enough
+   that icons fit inline at almost every width; in the rare case they
+   don't, we silently clip via overflow:hidden on the navbar (see narrow
+   viewports block). Hidden at every breakpoint. */
+body.stash-liquid-glass nav.top-nav .nav-menu-toggle.navbar-toggler,
+body.stash-liquid-glass nav.top-nav .navbar-toggler {
+    display: none !important;
+}
+
+/* Wrappers that aren't .nav-link need spacing too. */
+body.stash-liquid-glass nav.top-nav .navbar-buttons > * {
+    margin: 0 var(--nav-gap) !important;
+}
+
+body.stash-liquid-glass nav.top-nav svg {
+    width: var(--nav-icon-size) !important;
+    height: var(--nav-icon-size) !important;
+    margin: 0 !important;
+    display: block !important;
+    font-size: var(--nav-icon-size);
+}
+
+/* Icon shimmer on hover — subtle scale + crisper white. */
+body.stash-liquid-glass nav.top-nav a.btn:hover svg,
+body.stash-liquid-glass nav.top-nav button.btn:hover svg,
+body.stash-liquid-glass nav.top-nav .navbar-toggler:hover svg {
+    transform: scale(1.04);
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.18));
+}
+body.stash-liquid-glass nav.top-nav a.btn svg,
+body.stash-liquid-glass nav.top-nav button.btn svg,
+body.stash-liquid-glass nav.top-nav .navbar-toggler svg {
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease;
+}
+
+/* Active route — orange glow halo. JS adds .stash-nav-active to both left and right nav links.
+   Utilities may be `<a class="nav-utility btn">` (no inner button) — include `.btn` on the anchor.
+   `:is()` takes the highest specificity of its arguments (all class-level here, so 0,1,0
+   per token), preserving cascade behavior of the original 12 selectors. */
+body.stash-liquid-glass nav.top-nav :is(a.nav-link, a.nav-utility):is(.stash-nav-active, .active) > :is(button, .btn),
+body.stash-liquid-glass nav.top-nav :is(a.nav-link, a.nav-utility):is(.stash-nav-active, .active).btn,
+body.stash-liquid-glass nav.top-nav .navbar-nav a.btn.stash-nav-active,
+body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] > :is(button, .btn) {
+    color: var(--accent) !important;
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    box-shadow:
+        0 0 18px rgba(249, 115, 22, 0.45),
+        0 0 0 1px rgba(249, 115, 22, 0.18) inset !important;
+}
+body.stash-liquid-glass nav.top-nav :is(a.nav-link, a.nav-utility):is(.stash-nav-active, .active) svg,
+body.stash-liquid-glass nav.top-nav .navbar-nav a.btn.stash-nav-active svg,
+body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] svg {
+    filter:
+        drop-shadow(0 0 8px rgba(249, 115, 22, 0.65))
+        drop-shadow(0 0 4px rgba(249, 115, 22, 0.45));
+}
+body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] > button:hover,
+body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] > .btn:hover {
+    background: rgba(249, 115, 22, 0.22) !important;
+    border-color: rgba(249, 115, 22, 0.55) !important;
+    color: var(--accent-bright) !important;
+    box-shadow:
+        0 0 22px rgba(249, 115, 22, 0.52),
+        0 0 0 1px rgba(249, 115, 22, 0.22) inset !important;
+}
+body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] svg {
+    filter:
+        drop-shadow(0 0 8px rgba(249, 115, 22, 0.65))
+        drop-shadow(0 0 4px rgba(249, 115, 22, 0.45));
+}
+
+/* URL switcher: always a full nav icon square (don’t rely on h-100 / % sizing — breaks when “off”). */
+body.stash-liquid-glass nav.top-nav a#url-switcher-btn,
+body.stash-liquid-glass nav.top-nav #url-switcher-btn.url-switcher-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    line-height: 0 !important;
+    vertical-align: middle;
+}
+body.stash-liquid-glass nav.top-nav #url-switcher-btn > .btn,
+body.stash-liquid-glass nav.top-nav #url-switcher-btn > button {
+    width: var(--nav-btn-size) !important;
+    height: var(--nav-btn-size) !important;
+    min-width: var(--nav-btn-size) !important;
+    min-height: var(--nav-btn-size) !important;
+    max-width: var(--nav-btn-size) !important;
+    max-height: var(--nav-btn-size) !important;
+    flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+}
+/* Id on the button itself (some builds / modes). */
+body.stash-liquid-glass nav.top-nav .navbar-buttons button#url-switcher-btn.btn,
+body.stash-liquid-glass nav.top-nav .navbar-buttons #url-switcher-btn.btn.minimal {
+    width: var(--nav-btn-size) !important;
+    height: var(--nav-btn-size) !important;
+    min-width: var(--nav-btn-size) !important;
+    min-height: var(--nav-btn-size) !important;
+    max-width: var(--nav-btn-size) !important;
+    max-height: var(--nav-btn-size) !important;
+    flex: 0 0 auto !important;
+}
+
+/* Optional URL switcher: glow only when tunnel mode is active/enabled. */
+body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel > .btn,
+body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel.btn,
+body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel > button,
+body.stash-liquid-glass nav.top-nav button#url-switcher-btn.mode-tunnel.btn {
+    color: var(--accent) !important;
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    box-shadow:
+        0 0 14px rgba(249, 115, 22, 0.34),
+        0 0 0 1px rgba(249, 115, 22, 0.16) inset !important;
+}
+body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel svg,
+body.stash-liquid-glass nav.top-nav button#url-switcher-btn.mode-tunnel svg {
+    filter:
+        drop-shadow(0 0 7px rgba(249, 115, 22, 0.55))
+        drop-shadow(0 0 3px rgba(249, 115, 22, 0.4));
+}
+
+/* Brand — orange glass orb (text cleared in stashTheme.js; aria-label = Home).
+   Stash / react-router variants: optional .top-nav; .brand-link on button or anchor; HashRouter. */
+body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand,
+body.stash-liquid-glass nav.top-nav .navbar-brand,
+body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand,
+html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand,
+html.stash-liquid-glass nav.top-nav .navbar-brand,
+html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand {
+    margin: 0 0.45rem 0 0;
+    display: flex !important;
+    align-items: center !important;
+}
+body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link,
+body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button,
+body.stash-liquid-glass nav.top-nav .navbar-brand .brand-link,
+body.stash-liquid-glass nav.top-nav .navbar-brand > a > button,
+body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link,
+body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button,
+html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link,
+html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button,
+html.stash-liquid-glass nav.top-nav .navbar-brand .brand-link,
+html.stash-liquid-glass nav.top-nav .navbar-brand > a > button,
+html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link,
+html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button {
+    box-sizing: border-box !important;
+    width: var(--nav-btn-size) !important;
+    height: var(--nav-btn-size) !important;
+    min-width: var(--nav-btn-size) !important;
+    min-height: var(--nav-btn-size) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    letter-spacing: 0 !important;
+    color: transparent !important;
+    text-indent: -9999px !important;
+    overflow: hidden !important;
+    border: 1.5px solid rgba(249, 115, 22, 0.85) !important;
+    background: rgba(249, 115, 22, 0.2) !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow:
+        0 0 8px rgba(249, 115, 22, 0.5),
+        0 0 22px rgba(249, 115, 22, 0.42),
+        0 0 44px rgba(249, 115, 22, 0.26) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition:
+        transform 0.2s cubic-bezier(0.34, 1.2, 0.64, 1),
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        filter 0.22s ease;
+}
+body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:hover,
+body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button:hover,
+body.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:hover,
+body.stash-liquid-glass nav.top-nav .navbar-brand > a > button:hover,
+body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link:hover,
+body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:hover,
+html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:hover,
+html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button:hover,
+html.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:hover,
+html.stash-liquid-glass nav.top-nav .navbar-brand > a > button:hover,
+html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link:hover,
+html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:hover {
+    border-color: rgba(249, 115, 22, 1) !important;
+    filter: brightness(1.08) saturate(1.05);
+    box-shadow:
+        0 0 0 1px rgba(249, 115, 22, 0.28) inset,
+        0 0 10px rgba(249, 115, 22, 0.6),
+        0 0 24px rgba(249, 115, 22, 0.5),
+        0 0 48px rgba(249, 115, 22, 0.32) !important;
+    transform: scale(1.04);
+}
+body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:active,
+body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button:active,
+body.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:active,
+body.stash-liquid-glass nav.top-nav .navbar-brand > a > button:active,
+body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link:active,
+body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:active,
+html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:active,
+html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button:active,
+html.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:active,
+html.stash-liquid-glass nav.top-nav .navbar-brand > a > button:active,
+html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link:active,
+html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:active {
+    transform: scale(0.96);
+    filter: brightness(0.98);
+}
+body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:focus-visible,
+body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button:focus-visible,
+body.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:focus-visible,
+body.stash-liquid-glass nav.top-nav .navbar-brand > a > button:focus-visible,
+body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link:focus-visible,
+body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:focus-visible,
+html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:focus-visible,
+html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button:focus-visible,
+html.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:focus-visible,
+html.stash-liquid-glass nav.top-nav .navbar-brand > a > button:focus-visible,
+html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link:focus-visible,
+html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:focus-visible {
+    outline: none !important;
+    box-shadow:
+        0 0 0 2px rgba(10, 10, 12, 0.95),
+        0 0 0 4px rgba(249, 115, 22, 0.65),
+        0 0 0 1px rgba(249, 115, 22, 0.28) inset,
+        0 0 10px rgba(249, 115, 22, 0.55),
+        0 0 24px rgba(249, 115, 22, 0.45),
+        0 0 48px rgba(249, 115, 22, 0.3) !important;
+}
+@media (prefers-reduced-transparency: reduce) {
+    body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link,
+    body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button,
+    body.stash-liquid-glass nav.top-nav .navbar-brand .brand-link,
+    body.stash-liquid-glass nav.top-nav .navbar-brand > a > button,
+    body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link,
+    body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button,
+    html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link,
+    html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button,
+    html.stash-liquid-glass nav.top-nav .navbar-brand .brand-link,
+    html.stash-liquid-glass nav.top-nav .navbar-brand > a > button,
+    html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link,
+    html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link,
+    body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:hover,
+    body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:active,
+    body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button,
+    body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button:hover,
+    body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button:active,
+    body.stash-liquid-glass nav.top-nav .navbar-brand .brand-link,
+    body.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:hover,
+    body.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:active,
+    body.stash-liquid-glass nav.top-nav .navbar-brand > a > button,
+    body.stash-liquid-glass nav.top-nav .navbar-brand > a > button:hover,
+    body.stash-liquid-glass nav.top-nav .navbar-brand > a > button:active,
+    body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link,
+    body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link:hover,
+    body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link:active,
+    body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button,
+    body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:hover,
+    body.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:active,
+    html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link,
+    html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:hover,
+    html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:active,
+    html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button,
+    html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button:hover,
+    html.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button:active,
+    html.stash-liquid-glass nav.top-nav .navbar-brand .brand-link,
+    html.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:hover,
+    html.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:active,
+    html.stash-liquid-glass nav.top-nav .navbar-brand > a > button,
+    html.stash-liquid-glass nav.top-nav .navbar-brand > a > button:hover,
+    html.stash-liquid-glass nav.top-nav .navbar-brand > a > button:active,
+    html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link,
+    html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link:hover,
+    html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand .brand-link:active,
+    html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button,
+    html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:hover,
+    html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:active {
+        transition: none;
+        transform: none;
+    }
+}
+
+/* Hide help, logout, donate, sidebar toggle (keep scoped to top nav; avoids beating .btn rule). */
+body.stash-liquid-glass nav.top-nav button.btn.nav-utility,
+body.stash-liquid-glass nav.top-nav a[href="/logout"],
+body.stash-liquid-glass nav.top-nav a[href*="logout"],
+body.stash-liquid-glass nav.top-nav a.logout-button,
+body.stash-liquid-glass nav.top-nav a[href="/help"],
+body.stash-liquid-glass nav.top-nav a[href*="/manual"],
+body.stash-liquid-glass nav.top-nav [title="Log out"],
+body.stash-liquid-glass nav.top-nav [aria-label="Help"],
+body.stash-liquid-glass nav.top-nav [title="Help"],
+body.stash-liquid-glass nav.top-nav a[href*="opencollective"],
+body.stash-liquid-glass nav.top-nav .sidebar-toggle-button,
+body.stash-liquid-glass nav.top-nav a:has(svg[data-icon="circle-question"]),
+body.stash-liquid-glass nav.top-nav a:has(svg.fa-circle-question) {
+    display: none !important;
+}
+
+/* Scrub orphan label/fallback nodes left over from the previous theme JS. */
+body.stash-liquid-glass nav.top-nav .stash-nav-fallback-icon {
+    display: none !important;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Progressive narrow-width icon hiding.
+   Each breakpoint hides one more low-priority item, in order:
+   stats → ascension → desire → tags → donate → help → studios →
+   logout → performers → galleries → markers → groups → images.
+   Home, Settings and Scenes always remain. Tuned to the typical
+   width each item adds (~46px with gap).
+   ─────────────────────────────────────────────────────────────────── */
+@media (max-width: 740px) {
+    body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href="/stats"] { display: none !important; }
+}
+@media (max-width: 695px) {
+    body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plugin_hon) { display: none !important; }
+}
+@media (max-width: 650px) {
+    body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #desire-nav-container { display: none !important; }
+}
+@media (max-width: 605px) {
+    body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/tags"] { display: none !important; }
+}
+@media (max-width: 560px) {
+    body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(.donate),
+    body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href*="opencollective"] { display: none !important; }
+}
+@media (max-width: 520px) {
+    body.stash-liquid-glass nav.top-nav .navbar-buttons > :has([title="Help"]) { display: none !important; }
+}
+@media (max-width: 480px) {
+    body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/studios"] { display: none !important; }
+}
+@media (max-width: 440px) {
+    body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href*="/logout"],
+    body.stash-liquid-glass nav.top-nav .navbar-buttons > .logout-button { display: none !important; }
+}
+@media (max-width: 405px) {
+    body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/performers"] { display: none !important; }
+}
+@media (max-width: 370px) {
+    body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/galleries"] { display: none !important; }
+}
+@media (max-width: 335px) {
+    body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/scenes/markers"] { display: none !important; }
+}
+@media (max-width: 305px) {
+    body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/groups"] { display: none !important; }
+}
+@media (max-width: 280px) {
+    body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/images"] { display: none !important; }
+}
+

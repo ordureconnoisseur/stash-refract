@@ -1,0 +1,167 @@
+/* ── O-Count / increment-only button group ────────────────────────────── */
+body.stash-liquid-glass .count-button.increment-only {
+    border-radius: var(--radius-pill) !important;
+    overflow: hidden;
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.25),
+        0 0 12px 2px rgba(255, 255, 255, 0.07) !important;
+    transition: box-shadow 0.2s ease, border-color 0.15s !important;
+}
+body.stash-liquid-glass .count-button.increment-only:hover {
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.3),
+        0 0 20px 5px rgba(255, 255, 255, 0.13) !important;
+}
+body.stash-liquid-glass .count-button.increment-only .count-icon,
+body.stash-liquid-glass .count-button.increment-only .count-value {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.65rem !important;
+    color: var(--text) !important;
+    line-height: 1 !important;
+}
+body.stash-liquid-glass .count-button.increment-only .count-icon > span,
+body.stash-liquid-glass .count-button.increment-only .count-value > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+}
+body.stash-liquid-glass .count-button.increment-only .count-icon svg {
+    display: block;
+    vertical-align: middle;
+}
+
+/* ── Stash ID pill (fansDB / stashDB external IDs) ───────────────────── */
+body.stash-liquid-glass .stash-id-pill {
+    display: inline-flex !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    width: auto !important;
+    max-width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: var(--radius-pill) !important;
+    border: 1px solid var(--glass-border) !important;
+    background: var(--glass-bg) !important;
+    overflow: hidden;
+    font-size: 0.72rem !important;
+    line-height: 1.1 !important;
+    vertical-align: middle;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+/* Source label chip — orange-tinted left half */
+body.stash-liquid-glass .stash-id-pill > span:first-child {
+    padding: 0.3rem 0.6rem !important;
+    margin: 0 !important;
+    background: var(--accent-tint) !important;
+    border-right: 1px solid var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    font-weight: 700 !important;
+    font-size: 0.68rem !important;
+    line-height: 1 !important;
+    letter-spacing: 0.04em !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+    flex-grow: 0;
+    align-self: stretch !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    min-height: 0 !important;
+}
+/* UUID link — neutral glass right half (force-clear of any
+   default/blue background bleeding from Stash native rules). */
+body.stash-liquid-glass .stash-id-pill a,
+body.stash-liquid-glass .stash-id-pill a:link,
+body.stash-liquid-glass .stash-id-pill a:visited {
+    padding: 0.3rem 0.65rem !important;
+    margin: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    font-family: ui-monospace, "SF Mono", "Menlo", monospace;
+    font-size: 0.66rem !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    align-self: stretch !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    min-height: 0 !important;
+    transition: color 0.15s, background 0.15s;
+}
+body.stash-liquid-glass .stash-id-pill a:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #fff !important;
+}
+/* Stash IDs <ul> reset — kill the no-gutters bullet/spacing artefacts.
+   <li class="row"> would otherwise stretch the pill via Bootstrap's
+   `.row { display: flex }`; force the <li> back to inline-block so the
+   pill sizes to its content. */
+body.stash-liquid-glass .detail-item-value.stash-ids ul {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+}
+body.stash-liquid-glass .detail-item-value.stash-ids li,
+body.stash-liquid-glass .detail-item-value.stash-ids li.row {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-block !important;
+    width: auto !important;
+    max-width: 100%;
+}
+
+/* ── Scene Tagger search results ─────────────────────────────────────── */
+body.stash-liquid-glass .search-result {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    list-style: none;
+}
+body.stash-liquid-glass .search-result:hover {
+    border-color: rgba(255, 255, 255, 0.11);
+}
+body.stash-liquid-glass .search-result.selected-result,
+body.stash-liquid-glass .search-result.active {
+    border-color: rgba(251, 146, 60, 0.35);
+    box-shadow: 0 0 0 1px rgba(251, 146, 60, 0.1),
+                0 4px 24px rgba(251, 146, 60, 0.07);
+}
+
+/* Scene thumbnail */
+body.stash-liquid-glass .scene-image-container img {
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    display: block;
+    max-width: 100%;
+}
+

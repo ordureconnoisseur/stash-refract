@@ -1,0 +1,1272 @@
+/* ───────────────────────────────────────────────────────────────────
+   Dropdowns
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass .dropdown-menu {
+    background: rgba(20, 20, 24, 0.85) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    padding: 0.4rem;
+    color: var(--text);
+}
+body.stash-liquid-glass .dropdown-menu.bg-secondary.text-white,
+body.stash-liquid-glass .dropdown-menu.show.bg-secondary.text-white {
+    background: rgba(20, 20, 24, 0.9) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--glass-border) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    backdrop-filter: var(--glass-blur) !important;
+}
+body.stash-liquid-glass .dropdown-item {
+    color: var(--text);
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+body.stash-liquid-glass .dropdown-item:hover,
+body.stash-liquid-glass .dropdown-item:focus {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+body.stash-liquid-glass .dropdown-item.bg-secondary.text-white {
+    background: transparent !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .dropdown-item.bg-secondary.text-white:hover,
+body.stash-liquid-glass .dropdown-item.bg-secondary.text-white:focus {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+body.stash-liquid-glass .dropdown-item.active,
+body.stash-liquid-glass .dropdown-item:active {
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .dropdown-divider {
+    border-top: 1px solid var(--glass-border);
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Modals + toasts + popovers
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass .modal-content {
+    /* Neutral grey — avoid (n,n,n+4) mixes that read as blue next to --bg-0 */
+    background: rgba(11, 11, 11, 0.94) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    color: var(--text);
+    color-scheme: dark;
+    box-shadow:
+        var(--glass-shadow),
+        0 0 0 1px rgba(0, 0, 0, 0.35) inset;
+    overflow: hidden;
+}
+body.stash-liquid-glass .modal-dialog {
+    margin: 1.25rem auto;
+}
+body.stash-liquid-glass .modal-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0.85rem 1.05rem !important;
+    background: rgba(255, 255, 255, 0.035) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    border-color: var(--glass-border) !important;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text) !important;
+    line-height: 1.35;
+}
+body.stash-liquid-glass .modal-header .modal-title {
+    font-size: inherit;
+    font-weight: 600;
+    color: inherit !important;
+    margin: 0 !important;
+    flex: 1;
+    min-width: 0;
+}
+body.stash-liquid-glass .modal-header button.close,
+body.stash-liquid-glass .modal-header .close {
+    float: none !important;
+    order: 2;
+    flex-shrink: 0;
+    margin: 0 !important;
+    margin-left: auto !important;
+    padding: 0 !important;
+    width: 2.25rem;
+    height: 2.25rem;
+    min-width: 2.25rem;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-muted) !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+body.stash-liquid-glass .modal-header button.close:hover,
+body.stash-liquid-glass .modal-header .close:hover,
+body.stash-liquid-glass .modal-header button.close:focus,
+body.stash-liquid-glass .modal-header .close:focus,
+body.stash-liquid-glass .modal-header button.close:focus-visible,
+body.stash-liquid-glass .modal-header .close:focus-visible {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: var(--glass-border-bright) !important;
+    color: #fff !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18) !important;
+}
+body.stash-liquid-glass .modal-header .btn-close {
+    width: 2.25rem;
+    height: 2.25rem;
+    min-width: 2.25rem;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: var(--radius-sm) !important;
+    background: rgba(255, 255, 255, 0.06) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3E%3Cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3E%3C/svg%3E") center / 0.65rem no-repeat !important;
+    opacity: 0.75;
+    filter: none;
+}
+body.stash-liquid-glass .modal-header .btn-close:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+body.stash-liquid-glass .modal-body {
+    padding: 1rem 1.05rem !important;
+    background: transparent !important;
+    color: var(--text);
+}
+body.stash-liquid-glass .modal-body .sub-heading,
+body.stash-liquid-glass .modal-content .sub-heading {
+    margin-top: 0.65rem !important;
+    margin-bottom: 0 !important;
+    font-size: 0.82rem !important;
+    line-height: 1.45;
+    color: var(--text-muted) !important;
+    font-weight: 400;
+}
+body.stash-liquid-glass .modal-body .text-input.form-control,
+body.stash-liquid-glass .modal-body input.text-input,
+body.stash-liquid-glass .modal-content .text-input.form-control {
+    margin-top: 0.15rem;
+}
+body.stash-liquid-glass .modal-footer {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.75rem 1.05rem !important;
+    background: rgba(0, 0, 0, 0.18) !important;
+    border-top: 1px solid var(--glass-border) !important;
+    border-color: var(--glass-border) !important;
+}
+body.stash-liquid-glass .modal-footer > * {
+    margin: 0 !important;
+}
+
+/* Modals are often portaled outside .settings — footer buttons otherwise keep default Bootstrap blues. */
+body.stash-liquid-glass .modal .modal-footer .btn,
+body.stash-liquid-glass .modal .modal-footer button.btn {
+    border-radius: var(--radius-sm) !important;
+    padding: 0.42rem 0.95rem !important;
+    min-height: 2.35rem;
+    font-weight: 500;
+    background-image: none !important;
+    box-sizing: border-box;
+}
+body.stash-liquid-glass .modal .modal-footer .btn.btn-secondary,
+body.stash-liquid-glass .modal .modal-footer button.btn-secondary {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass .modal .modal-footer .btn.btn-secondary:hover,
+body.stash-liquid-glass .modal .modal-footer button.btn-secondary:hover {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border-bright) !important;
+    color: #fff !important;
+}
+body.stash-liquid-glass .modal .modal-footer .btn.btn-primary,
+body.stash-liquid-glass .modal .modal-footer button.btn-primary {
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.24) !important;
+}
+body.stash-liquid-glass .modal .modal-footer .btn.btn-primary:hover,
+body.stash-liquid-glass .modal .modal-footer button.btn-primary:hover {
+    background: rgba(249, 115, 22, 0.2) !important;
+    border-color: rgba(249, 115, 22, 0.55) !important;
+    color: #ffd4b0 !important;
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.32) !important;
+}
+body.stash-liquid-glass .modal .modal-footer .btn:focus-visible,
+body.stash-liquid-glass .modal .modal-footer button:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.22) !important;
+}
+
+body.stash-liquid-glass .modal-body .form-control,
+body.stash-liquid-glass .modal-body .text-input,
+body.stash-liquid-glass .modal-content .form-control,
+body.stash-liquid-glass .modal-content input.form-control,
+body.stash-liquid-glass .modal-content textarea.form-control,
+body.stash-liquid-glass .modal-content select.form-control {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass .modal-body .form-control:focus,
+body.stash-liquid-glass .modal-content .form-control:focus {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--accent-glow) !important;
+    color: #fff !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12) !important;
+}
+
+/* Stash settings modals: #setting-dialog is typically outside configuration tab DOM. */
+body.stash-liquid-glass #setting-dialog.modal-dialog {
+    margin: 1.25rem auto;
+}
+body.stash-liquid-glass #setting-dialog .modal-content {
+    background: rgba(11, 11, 11, 0.96) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    color: var(--text) !important;
+    box-shadow:
+        var(--glass-shadow),
+        0 0 0 1px rgba(0, 0, 0, 0.4) inset;
+    overflow: hidden;
+}
+body.stash-liquid-glass #setting-dialog .modal-header {
+    border-bottom-color: var(--glass-border) !important;
+}
+body.stash-liquid-glass #setting-dialog .modal-footer {
+    border-top-color: var(--glass-border) !important;
+}
+
+body.stash-liquid-glass .modal-backdrop.show {
+    opacity: 0.72;
+    background-color: #000;
+}
+
+/* ── Edit Filter / criterion modal ─────────────────────────────── */
+
+/* Header: title + search inline */
+body.stash-liquid-glass .modal-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    flex-wrap: nowrap !important;
+}
+body.stash-liquid-glass .modal-header > div:first-child {
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+}
+body.stash-liquid-glass .modal-header .search-input {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--text) !important;
+    font-size: 0.82rem !important;
+    height: 1.85rem !important;
+    padding: 0 12px !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass .modal-header .search-input:focus {
+    border-color: var(--accent-glow) !important;
+    box-shadow: 0 0 0 2px rgba(249,115,22,0.12) !important;
+    outline: none !important;
+}
+
+/* Search term row */
+body.stash-liquid-glass .search-term-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+    padding: 0 0 0.75rem !important;
+    margin-bottom: 0.25rem !important;
+}
+body.stash-liquid-glass .search-term-row > span {
+    font-size: 0.78rem !important;
+    color: var(--text-muted) !important;
+    white-space: nowrap !important;
+    flex-shrink: 0;
+}
+body.stash-liquid-glass .search-term-row .clearable-input-group {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+body.stash-liquid-glass .search-term-row .clearable-text-field {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--text) !important;
+    font-size: 0.82rem !important;
+    height: 1.85rem !important;
+    padding: 0 12px !important;
+    width: 100% !important;
+    box-shadow: none !important;
+}
+
+/* Criterion accordion — flat list, override glass card styling */
+body.stash-liquid-glass .criterion-list {
+    border-top: 1px solid rgba(255,255,255,0.07) !important;
+    margin-top: 0.25rem !important;
+}
+body.stash-liquid-glass .criterion-list .card {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    animation: none !important;
+    overflow: visible !important;
+    position: relative !important;
+    transition: none !important;
+}
+body.stash-liquid-glass .criterion-list .card:last-child {
+    border-bottom: none !important;
+}
+body.stash-liquid-glass .criterion-list .card:hover {
+    border-color: rgba(255,255,255,0.06) !important;
+    box-shadow: none !important;
+}
+
+/* Criterion row button */
+body.stash-liquid-glass .filter-item-header {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 0.45rem 0.4rem !important;
+    color: var(--text-muted) !important;
+    font-size: 0.84rem !important;
+    cursor: pointer !important;
+    text-align: left !important;
+    box-shadow: none !important;
+    transition: background 0.15s, color 0.15s !important;
+    gap: 0.5rem !important;
+}
+body.stash-liquid-glass .filter-item-header:hover {
+    background: rgba(255,255,255,0.04) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .filter-item-header .mr-auto {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+/* Collapse chevron — small, rotates when open */
+body.stash-liquid-glass .collapse-icon {
+    width: 0.55rem !important;
+    height: 0.55rem !important;
+    opacity: 0.35 !important;
+    flex-shrink: 0 !important;
+    transition: transform 0.18s ease, opacity 0.15s !important;
+}
+body.stash-liquid-glass .filter-item-header:hover .collapse-icon {
+    opacity: 0.65 !important;
+}
+body.stash-liquid-glass .criterion-list .card:has(.collapse.show) .collapse-icon {
+    transform: rotate(90deg) !important;
+    opacity: 0.75 !important;
+}
+
+/* Pin button — hidden until row is hovered */
+body.stash-liquid-glass .pin-criterion-button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0.15rem 0.3rem !important;
+    opacity: 0 !important;
+    color: var(--text-muted) !important;
+    transition: opacity 0.15s, color 0.15s !important;
+    flex-shrink: 0 !important;
+}
+body.stash-liquid-glass .filter-item-header:hover .pin-criterion-button {
+    opacity: 0.45 !important;
+}
+body.stash-liquid-glass .pin-criterion-button:hover {
+    opacity: 1 !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .pin-criterion-button svg {
+    width: 0.7rem !important;
+    height: 0.7rem !important;
+}
+
+/* Criterion expanded body */
+body.stash-liquid-glass .criterion-list .card-body {
+    background: transparent !important;
+    padding: 0.35rem 0.5rem 0.65rem 1.25rem !important;
+}
+
+/* Modifier pills — override global .btn-primary */
+body.stash-liquid-glass .modifier-options {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.3rem !important;
+    margin-bottom: 0.6rem !important;
+}
+body.stash-liquid-glass .modifier-option.btn-primary {
+    background: transparent !important;
+    border: 1px solid rgba(255,255,255,0.11) !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 0.18rem 0.65rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 400 !important;
+    height: auto !important;
+    min-height: unset !important;
+    min-width: unset !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    transition: background 0.14s, border-color 0.14s, color 0.14s !important;
+}
+body.stash-liquid-glass .modifier-option.btn-primary:hover {
+    background: rgba(255,255,255,0.07) !important;
+    border-color: rgba(255,255,255,0.22) !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass .modifier-option.selected {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    box-shadow: 0 0 8px rgba(249,115,22,0.28) !important;
+    font-weight: 500 !important;
+}
+
+/* Criterion text inputs */
+body.stash-liquid-glass .criterion-editor .form-group {
+    margin-bottom: 0 !important;
+}
+body.stash-liquid-glass .criterion-editor input.form-control,
+body.stash-liquid-glass .criterion-editor select.form-control {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    color: var(--text) !important;
+    font-size: 0.82rem !important;
+    height: 2rem !important;
+    padding: 0 10px !important;
+    box-shadow: none !important;
+}
+
+body.stash-liquid-glass .popover,
+body.stash-liquid-glass .popover.show,
+body.stash-liquid-glass .popover.bs-popover-auto,
+body.stash-liquid-glass .popover.bs-popover-top,
+body.stash-liquid-glass .popover.bs-popover-bottom,
+body.stash-liquid-glass .popover.bs-popover-start,
+body.stash-liquid-glass .popover.bs-popover-end,
+body.stash-liquid-glass [data-popper-placement] {
+    background: rgba(20, 20, 24, 0.97) !important;
+    background-color: rgba(20, 20, 24, 0.97) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 12px !important;
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+    color: var(--text) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
+}
+body.stash-liquid-glass .popover-inner {
+    background: rgba(20, 20, 24, 0.97) !important;
+    background-color: rgba(20, 20, 24, 0.97) !important;
+    border-radius: 11px !important;
+    overflow: hidden;
+}
+body.stash-liquid-glass .popover-header {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .popover-body {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: var(--text) !important;
+}
+/* Arrow tinted to match — covers all four directions */
+body.stash-liquid-glass .popover-arrow::before,
+body.stash-liquid-glass .bs-popover-top .popover-arrow::before,
+body.stash-liquid-glass .bs-popover-bottom .popover-arrow::before,
+body.stash-liquid-glass .bs-popover-start .popover-arrow::before,
+body.stash-liquid-glass .bs-popover-end .popover-arrow::before {
+    border-color: transparent !important;
+}
+body.stash-liquid-glass .popover-arrow::after,
+body.stash-liquid-glass .bs-popover-top .popover-arrow::after,
+body.stash-liquid-glass .bs-popover-bottom .popover-arrow::after,
+body.stash-liquid-glass .bs-popover-start .popover-arrow::after,
+body.stash-liquid-glass .bs-popover-end .popover-arrow::after {
+    border-color: transparent !important;
+    border-top-color: rgba(20, 20, 24, 0.97) !important;
+}
+/* Tags inside the overflow popup: same orange pill style */
+body.stash-liquid-glass .popover-body a {
+    display: inline-flex;
+    align-items: center;
+    margin: 0.1rem 0.15rem 0.1rem 0;
+    padding: 0.15rem 0.55rem;
+    font-size: 0.72rem;
+    border-radius: var(--radius-pill);
+    background: rgba(249, 115, 22, 0.09) !important;
+    border: 1px solid rgba(249, 115, 22, 0.22) !important;
+    color: rgba(255, 255, 255, 0.75) !important;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+body.stash-liquid-glass .popover-body a:hover {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .popover-body .comma-list li {
+    display: inline-block;
+    list-style: none;
+    margin: 0;
+}
+body.stash-liquid-glass .popover-body .comma-list li::after {
+    content: none !important;
+}
+body.stash-liquid-glass .toast {
+    background: rgba(20, 20, 24, 0.85) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    color: var(--text);
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Forms
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass .form-control,
+body.stash-liquid-glass .form-select,
+body.stash-liquid-glass select.form-control,
+body.stash-liquid-glass textarea.form-control {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+body.stash-liquid-glass .form-control:focus,
+body.stash-liquid-glass .form-select:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--accent-glow);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.10);
+    color: #fff;
+    outline: none;
+}
+body.stash-liquid-glass .form-control::placeholder {
+    color: var(--text-muted);
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Filter list toolbar — each button is its own rounded rectangle.
+   No capsule pill, no overflow:hidden — dropdowns can't be clipped.
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass .filtered-list-toolbar {
+    background: transparent !important;
+    gap: 0.4rem;
+    padding: 0.6rem 0;
+    align-items: center;
+}
+
+body.stash-liquid-glass .filtered-list-toolbar .btn-group {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 4px;
+}
+
+/* Override Bootstrap's negative margin between btn-group children. */
+body.stash-liquid-glass .filtered-list-toolbar .btn-group > * {
+    margin-left: 0 !important;
+}
+
+/* Every toolbar control: glass rounded rectangle. */
+body.stash-liquid-glass .filtered-list-toolbar .btn-secondary,
+body.stash-liquid-glass .filtered-list-toolbar select.form-control,
+body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group .form-control {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+    border-radius: var(--radius-sm) !important;
+    height: 2.2rem;
+    padding: 0 0.75rem !important;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+body.stash-liquid-glass .filtered-list-toolbar .btn-secondary:hover {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border-bright) !important;
+    color: #fff !important;
+}
+body.stash-liquid-glass .filtered-list-toolbar .btn-secondary.active,
+body.stash-liquid-glass .filtered-list-toolbar .btn-secondary.btn-primary {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.30) !important;
+}
+body.stash-liquid-glass .filtered-list-toolbar .btn-secondary.active svg,
+body.stash-liquid-glass .filtered-list-toolbar .btn-secondary.btn-primary svg {
+    filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.55));
+}
+body.stash-liquid-glass .filtered-list-toolbar .btn-secondary svg {
+    width: 0.95rem;
+    height: 0.95rem;
+}
+
+/* ── Icon-only toolbar buttons: bare icons, no pill chrome ─────────────
+   Pills are reserved for text-bearing controls (Search, Random sort,
+   page-size). Icons are bare with subtle hover. Split into explicit-class
+   and :has() rules so :has() parser failure doesn't invalidate the
+   explicit-class side. */
+
+/* Explicit class list — works in all browsers */
+body.stash-liquid-glass .filtered-list-toolbar .filter-button.btn.btn-secondary,
+body.stash-liquid-glass .filtered-list-toolbar .play-button.btn.btn-secondary,
+body.stash-liquid-glass .filtered-list-toolbar #more-menu.btn.btn-secondary,
+body.stash-liquid-glass .filtered-list-toolbar .saved-filter-dropdown > button.dropdown-toggle.btn.btn-secondary {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    color: var(--text-muted) !important;
+    padding: 0 0.55rem !important;
+    height: 2.2rem;
+    border-radius: var(--radius-sm) !important;
+}
+body.stash-liquid-glass .filtered-list-toolbar .filter-button.btn.btn-secondary:hover,
+body.stash-liquid-glass .filtered-list-toolbar .play-button.btn.btn-secondary:hover,
+body.stash-liquid-glass .filtered-list-toolbar #more-menu.btn.btn-secondary:hover,
+body.stash-liquid-glass .filtered-list-toolbar .saved-filter-dropdown > button.dropdown-toggle.btn.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+/* :has() fallback — catches any other icon-only toolbar buttons (shuffle
+   inside .sort-by-select, etc.) without enumerating them */
+body.stash-liquid-glass .filtered-list-toolbar .btn.btn-secondary:has(> svg:only-child) {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    color: var(--text-muted) !important;
+    padding: 0 0.55rem !important;
+    height: 2.2rem;
+    border-radius: var(--radius-sm) !important;
+}
+body.stash-liquid-glass .filtered-list-toolbar .btn.btn-secondary:has(> svg:only-child):hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+/* The sort-by-select cluster mixes a text dropdown (Random) + caret-down
+   chevron + a separate shuffle icon. Keep ONLY the Random + caret-down
+   halves pilled (they're the actual sort dropdown unit). The shuffle
+   button is a sibling icon-only button and should stay bare like Play,
+   filter, etc. */
+body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .input-group-prepend > .btn.btn-secondary,
+body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .input-group-prepend + .btn.btn-secondary {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .input-group-prepend > .btn.btn-secondary:hover,
+body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .input-group-prepend + .btn.btn-secondary:hover {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border-bright) !important;
+    color: #fff !important;
+}
+
+/* Danger / delete button — red-tinted glass instead of Bootstrap solid red */
+body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger,
+body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger-minimal {
+    background: rgba(239, 68, 68, 0.10) !important;
+    border: 1px solid rgba(239, 68, 68, 0.32) !important;
+    color: #f87171 !important;
+    box-shadow: none !important;
+    border-radius: var(--radius-sm) !important;
+    height: 2.2rem;
+    padding: 0 0.75rem !important;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger:hover,
+body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger-minimal:hover {
+    background: rgba(239, 68, 68, 0.18) !important;
+    border-color: rgba(239, 68, 68, 0.55) !important;
+    color: #fca5a5 !important;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.30) !important;
+}
+body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger svg,
+body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger-minimal svg {
+    width: 0.95rem;
+    height: 0.95rem;
+}
+
+/* Selected-items-info: unified glass pill with X | count | check-all flowing inside */
+body.stash-liquid-glass .filtered-list-toolbar .selected-items-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    height: 2.2rem;
+    padding: 0 0.25rem;
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    border-radius: var(--radius-sm);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.18);
+}
+body.stash-liquid-glass .filtered-list-toolbar .selected-items-info .selected-count {
+    color: var(--accent-bright);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    padding: 0 0.45rem;
+    line-height: 1;
+    min-width: 1.4rem;
+    text-align: center;
+}
+/* Strip the toolbar's glass-button style off the inner minimal buttons —
+   they live inside the pill and should feel like icon-only affordances. */
+body.stash-liquid-glass .filtered-list-toolbar .selected-items-info .btn.btn-secondary.minimal {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    height: 1.7rem;
+    width: 1.7rem;
+    padding: 0 !important;
+    border-radius: var(--radius-sm) !important;
+    color: var(--accent-bright) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+body.stash-liquid-glass .filtered-list-toolbar .selected-items-info .btn.btn-secondary.minimal:hover {
+    background: rgba(249, 115, 22, 0.18) !important;
+    color: #fff !important;
+}
+body.stash-liquid-glass .filtered-list-toolbar .selected-items-info .btn.btn-secondary.minimal svg {
+    width: 0.85rem;
+    height: 0.85rem;
+}
+
+/* Search field */
+body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group .form-control {
+    min-width: clamp(11rem, 18vw, 14rem);
+}
+
+/* Page-size selector */
+body.stash-liquid-glass .filtered-list-toolbar select.form-control {
+    width: auto;
+    padding-right: 1.5rem !important;
+}
+
+/* Filter badge bubble */
+body.stash-liquid-glass .filtered-list-toolbar .filter-button .badge {
+    background: var(--accent) !important;
+    color: #fff !important;
+    box-shadow: 0 0 6px var(--accent-glow);
+}
+
+/* Zoom slider — match toolbar control height (2.2rem), longer track, thumb orange “flow” */
+body.stash-liquid-glass .zoom-slider-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 2.2rem;
+    min-height: 2.2rem;
+    max-height: 2.2rem;
+    padding: 0 0.65rem;
+    border-radius: var(--radius-sm);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: none;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+body.stash-liquid-glass .filtered-list-toolbar .zoom-slider-container {
+    height: 2.2rem;
+    min-height: 2.2rem;
+    max-height: 2.2rem;
+    padding: 0 0.55rem;
+}
+body.stash-liquid-glass input[type="range"].zoom-slider,
+body.stash-liquid-glass input[type="range"].zoom-slider.form-control-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: clamp(12.5rem, 38vw, 23rem);
+    height: 2.2rem;
+    max-height: 2.2rem;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+body.stash-liquid-glass input[type="range"].zoom-slider::-webkit-slider-runnable-track {
+    height: 0.52rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+body.stash-liquid-glass input[type="range"].zoom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: calc((0.52rem - 1.05rem) / 2);
+    border-radius: 50%;
+    /* Translucent orange “light” — bright but soft, no white specular */
+    background:
+        radial-gradient(circle at 50% 50%, rgba(255, 200, 140, 0.68) 0%, rgba(249, 115, 22, 0.48) 40%, rgba(249, 115, 22, 0.2) 68%, rgba(12, 10, 10, 0.28) 100%);
+    border: 1px solid rgba(253, 186, 116, 0.62);
+    box-shadow:
+        0 0 10px rgba(249, 115, 22, 0.55),
+        0 0 22px rgba(249, 115, 22, 0.4),
+        0 0 0 1px rgba(249, 115, 22, 0.28) inset,
+        inset 0 -1px 2px rgba(0, 0, 0, 0.22);
+    filter: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+body.stash-liquid-glass input[type="range"].zoom-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.05);
+    border-color: rgba(254, 215, 170, 0.72);
+    box-shadow:
+        0 0 12px rgba(249, 115, 22, 0.62),
+        0 0 26px rgba(249, 115, 22, 0.48),
+        0 0 0 1px rgba(255, 210, 170, 0.32) inset,
+        inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+}
+body.stash-liquid-glass input[type="range"].zoom-slider:active::-webkit-slider-thumb {
+    transform: scale(1.02);
+}
+body.stash-liquid-glass input[type="range"].zoom-slider::-moz-range-track {
+    height: 0.52rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+body.stash-liquid-glass input[type="range"].zoom-slider::-moz-range-thumb {
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 50%;
+    border: 1px solid rgba(253, 186, 116, 0.62);
+    background:
+        radial-gradient(circle at 50% 50%, rgba(255, 200, 140, 0.68) 0%, rgba(249, 115, 22, 0.48) 40%, rgba(249, 115, 22, 0.2) 68%, rgba(12, 10, 10, 0.28) 100%);
+    box-shadow:
+        0 0 10px rgba(249, 115, 22, 0.55),
+        0 0 22px rgba(249, 115, 22, 0.4),
+        0 0 0 1px rgba(249, 115, 22, 0.28) inset,
+        inset 0 -1px 2px rgba(0, 0, 0, 0.22);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+body.stash-liquid-glass input[type="range"].zoom-slider:hover::-moz-range-thumb {
+    transform: scale(1.05);
+    border-color: rgba(254, 215, 170, 0.72);
+    box-shadow:
+        0 0 12px rgba(249, 115, 22, 0.62),
+        0 0 26px rgba(249, 115, 22, 0.48),
+        0 0 0 1px rgba(255, 210, 170, 0.32) inset,
+        inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+}
+body.stash-liquid-glass input[type="range"].zoom-slider:focus {
+    outline: none;
+}
+body.stash-liquid-glass input[type="range"].zoom-slider:focus-visible {
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.22);
+    border-radius: var(--radius-sm);
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Filter pills (criteria badges)
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass .filter-tags {
+    gap: 0.35rem;
+    margin-bottom: 0.6rem;
+}
+body.stash-liquid-glass .filter-tags .tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 0.25em 0.75em !important;
+    font-size: 0.85rem;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+}
+body.stash-liquid-glass .filter-tags .tag-item .btn,
+body.stash-liquid-glass .filter-tags .tag-item .btn.btn-secondary {
+    background: transparent !important;
+    border: 0 !important;
+    padding: 0 0 0 0.35rem !important;
+    color: var(--text-muted) !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass .filter-tags .tag-item .btn:hover {
+    color: #fff !important;
+    background: transparent !important;
+}
+body.stash-liquid-glass .filter-tags .tag-item .btn svg {
+    width: 0.7rem;
+    height: 0.7rem;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Detail-page tag / entity pills  (.tag-item.badge.badge-secondary)
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass .tag-item.badge,
+body.stash-liquid-glass .tag-item.badge-secondary {
+    display: inline-flex !important;
+    align-items: center !important;
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 0.22em 0.7em !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+    text-decoration: none !important;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+body.stash-liquid-glass .tag-item.badge a,
+body.stash-liquid-glass .tag-item.badge-secondary a {
+    color: inherit !important;
+    text-decoration: none !important;
+}
+body.stash-liquid-glass .tag-item.badge:hover,
+body.stash-liquid-glass .tag-item.badge-secondary:hover {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .tag-item.badge:hover a,
+body.stash-liquid-glass .tag-item.badge-secondary:hover a {
+    color: var(--accent-bright) !important;
+}
+
+/* Vertical separator and folder-tree icon inside tag pills */
+body.stash-liquid-glass .tag-item .vertical-line {
+    color: var(--glass-border-bright) !important;
+    margin: 0 0.3em !important;
+}
+body.stash-liquid-glass .tag-item .tag-icon {
+    width: 0.75rem !important;
+    height: 0.75rem !important;
+    opacity: 0.55;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Pagination — capsule pill (no overflow:hidden)
+   The base `.pagination` capsule is now defined in 09_buttons.css with
+   `!important`s and a more comprehensive declaration set; only the
+   button-based (.pagination.btn-group) variant rules remain here.
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Force Bootstrap's btn-group pagination cluster to center cleanly. */
+body.stash-liquid-glass .pagination.btn-group {
+    width: fit-content;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    float: none !important;
+}
+body.stash-liquid-glass .pagination .btn,
+body.stash-liquid-glass .pagination .page-link {
+    background: transparent !important;
+    border: 0 !important;
+    color: var(--text) !important;
+    height: 2.2rem;
+    padding: 0 0.85rem !important;
+    border-radius: 0 !important;
+}
+body.stash-liquid-glass .pagination > :first-child > .btn,
+body.stash-liquid-glass .pagination > :first-child.btn,
+body.stash-liquid-glass .pagination > :first-child .page-link {
+    border-top-left-radius: var(--radius-pill) !important;
+    border-bottom-left-radius: var(--radius-pill) !important;
+}
+body.stash-liquid-glass .pagination > :last-child > .btn,
+body.stash-liquid-glass .pagination > :last-child.btn,
+body.stash-liquid-glass .pagination > :last-child .page-link {
+    border-top-right-radius: var(--radius-pill) !important;
+    border-bottom-right-radius: var(--radius-pill) !important;
+}
+body.stash-liquid-glass .pagination .btn:hover:not(:disabled),
+body.stash-liquid-glass .pagination .page-link:hover {
+    background: transparent !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+body.stash-liquid-glass .pagination .btn:disabled {
+    opacity: 0.3;
+}
+body.stash-liquid-glass .pagination .btn.btn-primary,
+body.stash-liquid-glass .pagination .btn.active,
+body.stash-liquid-glass .pagination .page-link.active {
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .pagination-footer,
+body.stash-liquid-glass .pagination-footer-container,
+body.stash-liquid-glass .pagination-header,
+body.stash-liquid-glass .pagination-header-container,
+body.stash-liquid-glass .pagination-container {
+    background: transparent !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+body.stash-liquid-glass .pagination-index-container {
+    background: transparent !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    width: 100%;
+    text-align: center;
+}
+
+/* Keep pagination controls + summary centered together as one cluster. */
+body.stash-liquid-glass .pagination-header-container .pagination-index-container,
+body.stash-liquid-glass .pagination-container .pagination-index-container {
+    position: static;
+    right: auto;
+    padding-right: 0;
+}
+
+/* Prevent summary text block from taking a whole row/column slot. */
+body.stash-liquid-glass .pagination-index-container .filter-container.paginationIndex {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    margin: 0 !important;
+    white-space: nowrap;
+    text-align: center !important;
+}
+body.stash-liquid-glass .pagination-index-container .filter-container.text-muted.paginationIndex.center-text {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--text-muted) !important;
+    padding: 0.2rem 0.7rem !important;
+    line-height: 1.25 !important;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Headings + links
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass h1,
+body.stash-liquid-glass h2,
+body.stash-liquid-glass h3 {
+    letter-spacing: 0.02em;
+    font-weight: 600;
+}
+
+body.stash-liquid-glass a:not(.btn):not(.nav-link):not(.dropdown-item):not(.page-link) {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+}
+body.stash-liquid-glass a:not(.btn):not(.nav-link):not(.dropdown-item):hover {
+    color: var(--accent);
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Scrollbars (WebKit)
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+body.stash-liquid-glass ::-webkit-scrollbar-track {
+    background: transparent;
+}
+body.stash-liquid-glass ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.10);
+    border-radius: var(--radius-pill);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+body.stash-liquid-glass ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.20);
+    background-clip: padding-box;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Tables
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass table.table,
+body.stash-liquid-glass .table-striped {
+    color: var(--text);
+}
+body.stash-liquid-glass .table-striped > tbody > tr:nth-of-type(odd) {
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text);
+}
+
+/* Filtered list grid (scenes / movies / performers table view) — glass shell like package manager */
+body.stash-liquid-glass .table-responsive:has(> table.table:has(thead th.select-col)) {
+    background: rgba(10, 10, 12, 0.9) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    overflow: hidden;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+}
+body.stash-liquid-glass .table-responsive:has(> table.table:has(thead th.select-col)) > table.table.table-striped.table-bordered {
+    margin-bottom: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) {
+    background: rgba(10, 10, 12, 0.9) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    overflow: hidden;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+}
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) thead tr:first-child th {
+    background: rgba(255, 255, 255, 0.02) !important;
+    color: var(--text) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    padding-top: 0.62rem !important;
+    padding-bottom: 0.62rem !important;
+}
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) thead .border-row {
+    background: transparent !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    padding: 0 !important;
+    height: 0 !important;
+}
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) tbody > tr {
+    background: rgba(6, 6, 8, 0.34) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) tbody > tr:nth-of-type(odd),
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) tbody > tr:nth-of-type(even) {
+    background: rgba(6, 6, 8, 0.34) !important;
+}
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) tbody > tr:hover {
+    background: rgba(255, 255, 255, 0.045) !important;
+    color: #fff !important;
+}
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) td,
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) th {
+    border-top: 0 !important;
+    vertical-align: middle;
+    color: var(--text) !important;
+    padding-top: 0.48rem !important;
+    padding-bottom: 0.48rem !important;
+}
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) td.select-col,
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) th.select-col {
+    width: 2.25rem;
+    text-align: center;
+    padding-left: 0.35rem !important;
+    padding-right: 0.35rem !important;
+}
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) .cover_image-data img.image-thumbnail {
+    border-radius: var(--radius-sm) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+/* Star rating styling lives in the global block in 08_misc_mid.css. */
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) thead th.select-col div[class*="control"] {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    min-height: 32px !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) thead th.select-col div[class*="control"]:hover {
+    border-color: rgba(255, 255, 255, 0.14) !important;
+}
+

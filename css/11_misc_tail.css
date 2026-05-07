@@ -1,0 +1,683 @@
+/* ── optional-field: strip Stash's grey bubble, keep button left-pinned ── */
+/* Use display:flex (block-level) NOT inline-flex — inline-flex shrinks the   */
+/* element so a parent justify-content:center can shift it to the middle.     */
+body.stash-liquid-glass .search-result .optional-field {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.35rem;
+    max-width: 100%;
+}
+body.stash-liquid-glass .search-result .optional-field-content {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+/* scene-metadata — Stash gives this its own card background; clear it */
+body.stash-liquid-glass .scene-metadata {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* scene-details rows inside scene tagger — cancel the global glass card rule
+   (body.stash-liquid-glass .scene-details → glass-bg) and left-align content */
+body.stash-liquid-glass .search-result .scene-details {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0 !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-self: flex-start;
+}
+
+/* scene-details include-exclude-button: force out of any absolute positioning */
+body.stash-liquid-glass .search-result .scene-details .include-exclude-button {
+    position: static !important;
+    transform: none !important;
+    top: auto !important;
+    left: auto !important;
+}
+
+/* Include / exclude toggle — small inline checkmark, no circle chrome */
+body.stash-liquid-glass .include-exclude-button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 1rem !important;
+    height: 1rem !important;
+    min-width: 1rem !important;
+    flex-shrink: 0;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    opacity: 0.38;
+    transition: opacity 0.15s, color 0.15s !important;
+}
+body.stash-liquid-glass .include-exclude-button svg {
+    width: 0.7rem !important;
+    height: 0.7rem !important;
+}
+body.stash-liquid-glass .include-exclude-button:hover {
+    opacity: 1;
+}
+body.stash-liquid-glass .include-exclude-button.text-success {
+    color: var(--accent-bright) !important;
+    opacity: 0.75;
+}
+body.stash-liquid-glass .include-exclude-button.text-success:hover {
+    opacity: 1;
+}
+
+/* Scene title link */
+body.stash-liquid-glass .search-result .scene-link {
+    color: #fff !important;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+body.stash-liquid-glass .search-result .scene-link:hover {
+    color: var(--accent-bright) !important;
+}
+
+/* Scene metadata text */
+body.stash-liquid-glass .scene-metadata h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: #fff;
+}
+body.stash-liquid-glass .scene-metadata h5 {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+    font-weight: 400;
+}
+body.stash-liquid-glass .scene-metadata .font-weight-bold {
+    font-size: 0.75rem;
+    color: var(--accent-bright);
+    opacity: 0.85;
+}
+
+/* Scene details rows (stash-id-pills, URLs) */
+body.stash-liquid-glass .scene-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+    align-items: center;
+}
+body.stash-liquid-glass .scene-details a {
+    font-size: 0.72rem;
+    color: var(--text-muted) !important;
+    text-decoration: none;
+    transition: color 0.15s;
+    word-break: break-all;
+}
+body.stash-liquid-glass .scene-details a:hover {
+    color: #fff !important;
+}
+body.stash-liquid-glass .search-result > div > h5 {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+    font-weight: 400;
+}
+
+/* Entity name labels (Studio: / Performer:) */
+body.stash-liquid-glass .entity-name {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    font-family: inherit;
+    color: var(--text-muted);
+    margin-top: 0.55rem;
+    margin-bottom: 0.35rem;
+}
+body.stash-liquid-glass .entity-name b {
+    color: #fff;
+    font-weight: 600;
+    font-family: inherit;
+}
+body.stash-liquid-glass .entity-name a {
+    color: var(--accent-bright) !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    text-decoration: none !important;
+    transition: color 0.15s;
+}
+body.stash-liquid-glass .entity-name a:hover {
+    color: #fff !important;
+}
+
+/* ── Create / Skip / Link btn-group: unified glass row ────────────────── */
+/* Target ALL .btn children regardless of primary/secondary class         */
+body.stash-liquid-glass .search-result .btn-group .btn {
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-muted) !important;
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.65rem !important;
+    border-radius: 0 !important;
+    transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass .search-result .btn-group .btn:first-child {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm) !important;
+}
+body.stash-liquid-glass .search-result .btn-group .btn:last-child {
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
+}
+body.stash-liquid-glass .search-result .btn-group .btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+}
+body.stash-liquid-glass .search-result .btn-group .btn:disabled {
+    opacity: 0.35 !important;
+}
+
+/* React-select inside btn-group: no radius, flush against adjacent buttons */
+body.stash-liquid-glass .search-result .btn-group .react-select__control {
+    border-radius: 0 !important;
+    min-height: 31px !important;
+    border-left: none !important;
+}
+
+/* ── Save button (btn-primary that lives outside any btn-group) ──────── */
+body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn) {
+    background: rgba(249, 115, 22, 0.82) !important;
+    border: 1px solid rgba(249, 115, 22, 0.45) !important;
+    color: #fff !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 0.3rem 1.25rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em !important;
+    margin-top: 0.5rem;
+    box-shadow: 0 2px 12px rgba(249, 115, 22, 0.22) !important;
+    transition: background 0.15s, box-shadow 0.15s !important;
+}
+body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn):hover {
+    background: var(--accent-bright) !important;
+    box-shadow: 0 2px 18px rgba(249, 115, 22, 0.4) !important;
+}
+
+/* ── React-select overrides (correct react-select__ prefix) ─────────── */
+body.stash-liquid-glass .search-result .react-select__control--is-focused {
+    border-color: rgba(251, 146, 60, 0.4) !important;
+    box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.1) !important;
+}
+
+/* Tag multi-value chips */
+body.stash-liquid-glass .search-result .react-select__multi-value {
+    background: rgba(249, 115, 22, 0.1) !important;
+    border: 1px solid rgba(249, 115, 22, 0.2) !important;
+    border-radius: var(--radius-pill) !important;
+    margin: 2px !important;
+}
+body.stash-liquid-glass .search-result .react-select__multi-value__label {
+    color: var(--accent-bright) !important;
+    font-size: 0.72rem !important;
+    padding: 0.1rem 0.4rem !important;
+}
+body.stash-liquid-glass .search-result .react-select__multi-value__remove {
+    color: var(--accent-bright) !important;
+    border-radius: 0 var(--radius-pill) var(--radius-pill) 0 !important;
+    padding: 0 0.3rem !important;
+    cursor: pointer;
+}
+body.stash-liquid-glass .search-result .react-select__multi-value__remove:hover {
+    background: rgba(249, 115, 22, 0.22) !important;
+    color: #fff !important;
+}
+
+/* ── Tags / Performers form rows inside scene tagger results ─────────── */
+body.stash-liquid-glass .search-result .form-group {
+    margin-bottom: 0.5rem !important;
+    align-items: flex-start !important;
+}
+body.stash-liquid-glass .search-result .form-group .form-label,
+body.stash-liquid-glass .search-result .form-group .col-form-label {
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: var(--text-muted) !important;
+    font-family: inherit !important;
+    padding-top: 0.45rem !important;
+}
+/* Tag-select control: rounded, not flush like btn-group */
+body.stash-liquid-glass .search-result .tag-select .react-select__control,
+body.stash-liquid-glass .search-result .form-group .react-select__control {
+    border-radius: var(--radius-sm) !important;
+    min-height: 36px !important;
+}
+/* Studio / performer select in entity row — single-value value container */
+body.stash-liquid-glass .search-result .studio-select .react-select__control,
+body.stash-liquid-glass .search-result .performer-select .react-select__control {
+    font-size: 0.78rem !important;
+    font-family: inherit !important;
+    border-radius: 0 !important;
+}
+
+/* Sprite (image preview) button — no useful action in tagger context */
+body.stash-liquid-glass .sprite-button.btn-link {
+    display: none !important;
+}
+
+/* Scene tagger row checkbox */
+body.stash-liquid-glass .search-item-check {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 1rem !important;
+    height: 1rem !important;
+    min-width: 1rem !important;
+    border: 1.5px solid var(--glass-border) !important;
+    border-radius: 4px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s !important;
+    padding: 0 !important;
+    vertical-align: middle;
+}
+body.stash-liquid-glass .search-item-check:checked {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M2 6l3 3 5-5'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 0.7rem !important;
+}
+body.stash-liquid-glass .search-item-check:hover:not(:checked) {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+body.stash-liquid-glass .search-item-check:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.25) !important;
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Lightbox (image viewer for galleries)
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Outer container — full-viewport dark backdrop with heavy blur. Reserve
+   bottom padding for the floating footer slab (which is position:fixed
+   and out of normal flow) so the inner flex child .Lightbox-display
+   sizes to (100vh - footer reservation) and the image centers above
+   the bar instead of disappearing behind it. */
+body.stash-liquid-glass .Lightbox {
+    background: rgba(8, 8, 10, 0.86) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: blur(24px) saturate(140%);
+    padding-top: 28px !important;
+    padding-bottom: 100px !important;
+    box-sizing: border-box !important;
+}
+
+/* Header — emptied by stashTheme.js (its content moves to the footer);
+   hide the now-empty container so only one floating bar shows. */
+body.stash-liquid-glass .Lightbox-header {
+    display: none !important;
+}
+
+/* Page indicator (centre): "Page 1 / 3 | 1 / 40" */
+body.stash-liquid-glass .Lightbox-header-indicator {
+    color: var(--text) !important;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.85rem;
+}
+body.stash-liquid-glass .Lightbox-header-indicator span {
+    color: var(--text-muted) !important;
+    margin-right: 0.5rem;
+}
+body.stash-liquid-glass .Lightbox-header-indicator b {
+    font-weight: 700;
+    color: var(--accent-bright) !important;
+}
+
+/* Header buttons (gear, slideshow, fullscreen, close) — bare icon buttons */
+body.stash-liquid-glass .Lightbox-header .btn.btn-link,
+body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--text-muted) !important;
+    padding: 0.4rem 0.55rem !important;
+    border-radius: var(--radius-sm) !important;
+    text-decoration: none !important;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+body.stash-liquid-glass .Lightbox-header .btn.btn-link:hover,
+body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+body.stash-liquid-glass .Lightbox-header .btn.btn-link svg,
+body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link svg {
+    width: 1rem !important;
+    height: 1rem !important;
+}
+
+/* Nav buttons (chevron-left / chevron-right) — floating glass orbs, vertically
+   centered along the side gutters */
+body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
+    position: fixed !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 3rem !important;
+    height: 3rem !important;
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 50% !important;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.32) !important;
+    color: var(--text) !important;
+    opacity: 0.55;
+    z-index: 1100;
+    transition: opacity 0.18s, background 0.18s, transform 0.18s, border-color 0.18s;
+}
+/* First navbutton in the display = chevron-left, second = chevron-right */
+body.stash-liquid-glass .Lightbox-display .Lightbox-navbutton.btn.btn-link:first-of-type {
+    left: 1.25rem !important;
+}
+body.stash-liquid-glass .Lightbox-display .Lightbox-navbutton.btn.btn-link:last-of-type {
+    right: 1.25rem !important;
+}
+body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link:hover {
+    opacity: 1;
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    transform: translateY(-50%) scale(1.06) !important;
+}
+body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link svg {
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+}
+
+/* Options popover (Bootstrap .popover, portaled to <body> by popper.js).
+   When the lightbox is open, the gear button sits in the bottom footer,
+   so popper's default `placement: bottom` would render the popover off
+   the bottom edge of the viewport. Anchor it via position: fixed to the
+   bottom-right corner above the footer instead. The :has(.Lightbox)
+   guard scopes this so we don't mess with popovers in other contexts. */
+body.stash-liquid-glass:has(.Lightbox) .popover.show {
+    position: fixed !important;
+    inset: auto 1.25rem calc(48px + 0.6rem) auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    z-index: 1500;
+    min-width: 19rem;
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45) !important;
+    color: var(--text) !important;
+}
+/* Hide popper's default arrow — we're not anchored to the trigger any more */
+body.stash-liquid-glass:has(.Lightbox) .popover.show .arrow,
+body.stash-liquid-glass:has(.Lightbox) .popover.show::before,
+body.stash-liquid-glass:has(.Lightbox) .popover.show::after {
+    display: none !important;
+}
+body.stash-liquid-glass:has(.Lightbox) .popover.show .popover-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    color: var(--accent-bright) !important;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.55rem 0.85rem !important;
+}
+body.stash-liquid-glass:has(.Lightbox) .popover.show .popover-body {
+    padding: 0.85rem 1rem !important;
+    color: var(--text);
+}
+body.stash-liquid-glass:has(.Lightbox) .popover.show .form-label {
+    color: var(--text-muted) !important;
+    font-size: 0.8rem;
+}
+body.stash-liquid-glass:has(.Lightbox) .popover.show .form-text {
+    color: var(--text-muted) !important;
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+body.stash-liquid-glass:has(.Lightbox) .popover.show input.form-control,
+body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    border-radius: var(--radius-sm) !important;
+    height: 1.95rem !important;
+    min-height: 1.95rem !important;
+    line-height: 1 !important;
+    padding: 0 0.7rem !important;
+    margin: 0 !important;
+    font-size: 0.8rem !important;
+    box-sizing: border-box !important;
+    vertical-align: middle;
+}
+/* Native select dropdown arrow — replace with themed chevron */
+body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    padding-right: 1.8rem !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23bfbfc4' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.6rem center !important;
+    background-size: 0.62rem !important;
+}
+body.stash-liquid-glass:has(.Lightbox) .popover.show input.form-control:focus,
+body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control:focus {
+    border-color: var(--accent-glow) !important;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.18) !important;
+    outline: none !important;
+}
+/* Custom checkbox — round glass dot, matching the table-list select-col
+   idiom (05_list_views.css). Default = neutral glass; checked = orange
+   fill with embedded SVG check + accent glow. */
+body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-input[type="checkbox"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 1.15rem;
+    height: 1.15rem;
+    min-height: unset !important;
+    margin-top: 0.15rem;
+    margin-right: 0.55rem;
+    border-radius: 50% !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+}
+body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-input[type="checkbox"]:checked {
+    background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") center / 58% no-repeat !important;
+    border-color: var(--accent-bright) !important;
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.45) !important;
+}
+body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-label {
+    color: var(--text) !important;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+/* Number input — hide chunky native spinner; keep clean text input */
+body.stash-liquid-glass:has(.Lightbox) .popover.show input[type="number"].form-control {
+    -moz-appearance: textfield;
+    appearance: textfield;
+    text-align: left;
+}
+body.stash-liquid-glass:has(.Lightbox) .popover.show input[type="number"].form-control::-webkit-outer-spin-button,
+body.stash-liquid-glass:has(.Lightbox) .popover.show input[type="number"].form-control::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    margin: 0 !important;
+    display: none !important;
+}
+
+/* Display area — transparent so the dark backdrop shows through. The
+   parent .Lightbox owns the bottom-padding reservation; flex sizing
+   here naturally honours it. */
+body.stash-liquid-glass .Lightbox-display {
+    background: transparent !important;
+}
+
+/* Footer — floating glass slab, inset from bottom edge.
+   Explicit horizontal flex so left/center/right groups don't stack. */
+body.stash-liquid-glass .Lightbox-footer {
+    position: fixed !important;
+    bottom: 12px !important;
+    left: 12px !important;
+    right: 12px !important;
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.32) !important;
+    padding: 0.4rem 0.85rem !important;
+    color: var(--text) !important;
+    z-index: 1100;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.85rem !important;
+}
+
+/* Image filename + gallery link in footer centre */
+body.stash-liquid-glass .Lightbox-footer-center .image-link {
+    color: var(--text) !important;
+    font-size: 0.82rem;
+    text-decoration: none;
+    margin-right: 0.6rem;
+    transition: color 0.15s;
+}
+body.stash-liquid-glass .Lightbox-footer-center .image-link:hover {
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link {
+    color: var(--accent-bright) !important;
+    font-size: 0.78rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-pill);
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-glow);
+    transition: background 0.15s, color 0.15s;
+}
+body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link:hover {
+    background: rgba(249, 115, 22, 0.22) !important;
+    color: #ffd4b0 !important;
+}
+body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link svg {
+    width: 0.9rem !important;
+    height: 0.9rem !important;
+}
+
+/* Footer left/center/right groups: explicit horizontal flex so the
+   indicator + o-counter + rating-stars (left) and other groups don't
+   wrap or stack. Stash native sets each column to a fixed 1/3 width with
+   internal `justify-content: space-between`, which spreads each column's
+   contents to its column edges. Override: size to content and pack from
+   flex-start, so the parent footer's `space-between` is what anchors
+   footer-right to the right edge of the bar. */
+body.stash-liquid-glass .Lightbox-footer-left,
+body.stash-liquid-glass .Lightbox-footer-center,
+body.stash-liquid-glass .Lightbox-footer-right {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.65rem !important;
+    flex-wrap: nowrap !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+}
+body.stash-liquid-glass .Lightbox-footer-left > *,
+body.stash-liquid-glass .Lightbox-footer-center > *,
+body.stash-liquid-glass .Lightbox-footer-right > * {
+    flex-shrink: 0;
+}
+body.stash-liquid-glass .Lightbox-footer .o-counter {
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+/* Style the relocated indicator + header buttons inside the footer. */
+body.stash-liquid-glass .Lightbox-footer .Lightbox-header-indicator {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: baseline !important;
+    gap: 0.4rem !important;
+    margin-right: 0.6rem;
+    padding-right: 0.6rem;
+    border-right: 1px solid var(--glass-border);
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+body.stash-liquid-glass .Lightbox-footer .Lightbox-header-indicator > span,
+body.stash-liquid-glass .Lightbox-footer .Lightbox-header-indicator > b {
+    display: inline !important;
+    white-space: nowrap !important;
+}
+body.stash-liquid-glass .Lightbox-footer .Lightbox-header-indicator span {
+    color: var(--text-muted) !important;
+}
+body.stash-liquid-glass .Lightbox-footer .Lightbox-header-indicator b {
+    font-weight: 700;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .Lightbox-footer-right .Lightbox-header-options {
+    display: inline-flex;
+    align-items: center;
+}
+body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--text-muted) !important;
+    padding: 0.35rem 0.5rem !important;
+    border-radius: var(--radius-sm) !important;
+    text-decoration: none !important;
+    transition: background 0.15s, color 0.15s;
+}
+body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link svg {
+    width: 0.9rem !important;
+    height: 0.9rem !important;
+}
