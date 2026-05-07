@@ -11,8 +11,8 @@ body.stash-liquid-glass .btn-primary {
 }
 body.stash-liquid-glass .btn-primary:hover,
 body.stash-liquid-glass .btn-primary:focus {
-    background: rgba(249, 115, 22, 0.22) !important;
-    box-shadow: 0 0 14px rgba(249, 115, 22, 0.38) !important;
+    background: rgba(var(--accent-rgb), 0.22) !important;
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.38) !important;
     color: var(--text) !important;
     border-color: var(--accent-bright) !important;
 }
@@ -70,7 +70,7 @@ body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"] {
 }
 body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"]:focus {
     border-color: var(--accent-glow) !important;
-    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15) !important;
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.15) !important;
     outline: none !important;
     background: rgba(255, 255, 255, 0.09) !important;
 }
@@ -130,16 +130,16 @@ body.stash-liquid-glass [data-stash-filter] .btn-primary {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow:
-        0 0 18px rgba(249, 115, 22, 0.45),
-        0 0 0 1px rgba(249, 115, 22, 0.18) inset !important;
+        0 0 18px rgba(var(--accent-rgb), 0.45),
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
 }
 body.stash-liquid-glass [data-stash-filter] .btn-primary svg {
     filter:
-        drop-shadow(0 0 6px rgba(249, 115, 22, 0.65))
-        drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)) !important;
+        drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.65))
+        drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.45)) !important;
 }
 body.stash-liquid-glass [data-stash-filter] .btn-primary:hover {
-    background: rgba(249, 115, 22, 0.2) !important;
+    background: rgba(var(--accent-rgb), 0.2) !important;
     color: var(--text) !important;
 }
 
@@ -174,13 +174,13 @@ body.stash-liquid-glass [data-stash-filter] button[data-filter-active] {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     box-shadow:
-        0 0 18px rgba(249, 115, 22, 0.45),
-        0 0 0 1px rgba(249, 115, 22, 0.18) inset !important;
+        0 0 18px rgba(var(--accent-rgb), 0.45),
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
 }
 body.stash-liquid-glass [data-stash-filter] button[data-filter-active] svg {
     filter:
-        drop-shadow(0 0 6px rgba(249, 115, 22, 0.65))
-        drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)) !important;
+        drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.65))
+        drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.45)) !important;
 }
 
 /* Badge inside filter button — small pill, no box */
@@ -195,7 +195,7 @@ body.stash-liquid-glass [data-stash-filter] button .badge-secondary {
     padding: 1px 4px !important;
     min-width: 14px !important;
     line-height: 1.4 !important;
-    box-shadow: 0 0 6px rgba(249, 115, 22, 0.45) !important;
+    box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.45) !important;
 }
 
 body.stash-liquid-glass .filter-tag-close {
@@ -249,7 +249,7 @@ body.stash-liquid-glass .page-link:hover {
 body.stash-liquid-glass .page-item.active .page-link {
     background: var(--accent-tint) !important;
     color: var(--accent-bright) !important;
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.3) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3) !important;
 }
 body.stash-liquid-glass .page-item.disabled .page-link {
     opacity: 0.25 !important;
@@ -333,19 +333,19 @@ body.stash-liquid-glass .stash-view-active-ind {
     cursor: pointer !important;
     flex-shrink: 0 !important;
     box-shadow:
-        0 0 18px rgba(249, 115, 22, 0.45),
-        0 0 0 1px rgba(249, 115, 22, 0.18) inset !important;
+        0 0 18px rgba(var(--accent-rgb), 0.45),
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
     transition: background 0.15s !important;
 }
 body.stash-liquid-glass .stash-view-active-ind svg {
     width: 16px !important;
     height: 16px !important;
     filter:
-        drop-shadow(0 0 6px rgba(249, 115, 22, 0.65))
-        drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)) !important;
+        drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.65))
+        drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.45)) !important;
 }
 body.stash-liquid-glass .stash-view-active-ind:hover {
-    background: rgba(249, 115, 22, 0.2) !important;
+    background: rgba(var(--accent-rgb), 0.2) !important;
 }
 
 /* ── Page-size selector: compact, coherent ───────────────────────── */
@@ -395,7 +395,7 @@ body.stash-liquid-glass .page-size-selector select:focus {
     border-color: var(--accent-glow) !important;
     color: #fff !important;
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.10) !important;
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.10) !important;
 }
 body.stash-liquid-glass .page-size-selector option {
     background: rgba(20, 20, 24, 0.96) !important;
@@ -487,8 +487,8 @@ body.stash-liquid-glass .stash-view-opt.active {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     box-shadow:
-        0 0 18px rgba(249, 115, 22, 0.45),
-        0 0 0 1px rgba(249, 115, 22, 0.18) inset !important;
+        0 0 18px rgba(var(--accent-rgb), 0.45),
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
 }
 body.stash-liquid-glass .stash-view-opt svg {
     width: 16px !important;
@@ -496,8 +496,8 @@ body.stash-liquid-glass .stash-view-opt svg {
 }
 body.stash-liquid-glass .stash-view-opt.active svg {
     filter:
-        drop-shadow(0 0 6px rgba(249, 115, 22, 0.65))
-        drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)) !important;
+        drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.65))
+        drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.45)) !important;
 }
 
 /* ── Filter button badge: pill number instead of box ─────────────── */
@@ -511,7 +511,7 @@ body.stash-liquid-glass [data-stash-filter] .badge {
     padding: 1px 4px !important;
     min-width: 14px !important;
     line-height: 1.4 !important;
-    box-shadow: 0 0 8px rgba(249, 115, 22, 0.5) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.5) !important;
 }
 
 /* ── Performer Advanced Rating plugin ───────────────────────────────
@@ -544,7 +544,7 @@ body.stash-liquid-glass .adv-rating-btn:hover,
 body.stash-liquid-glass #perf-rating-trigger:hover {
     background: var(--accent-tint);
     border-color: var(--accent-glow);
-    box-shadow: 0 0 14px rgba(249, 115, 22, 0.3), 0 2px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.3), 0 2px 10px rgba(0, 0, 0, 0.3);
     color: var(--accent-bright) !important;
 }
 
@@ -569,9 +569,9 @@ body.stash-liquid-glass .adv-rating-modal-content {
     overflow: hidden;
     box-shadow:
         0 32px 80px rgba(0, 0, 0, 0.7),
-        0 0 0 1px rgba(249, 115, 22, 0.18),
-        0 0 48px 8px rgba(249, 115, 22, 0.18),
-        0 0 100px 24px rgba(249, 115, 22, 0.08) !important;
+        0 0 0 1px rgba(var(--accent-rgb), 0.18),
+        0 0 48px 8px rgba(var(--accent-rgb), 0.18),
+        0 0 100px 24px rgba(var(--accent-rgb), 0.08) !important;
     -webkit-backdrop-filter: blur(32px);
     backdrop-filter: blur(32px);
     min-width: 400px;
@@ -621,8 +621,8 @@ body.stash-liquid-glass .perf-rating-close::before {
     transition: background-image 0.15s;
 }
 body.stash-liquid-glass .perf-rating-close:hover {
-    background: rgba(249, 115, 22, 0.16) !important;
-    border-color: rgba(249, 115, 22, 0.35) !important;
+    background: rgba(var(--accent-rgb), 0.16) !important;
+    border-color: rgba(var(--accent-rgb), 0.35) !important;
 }
 body.stash-liquid-glass .perf-rating-close:hover::before {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 6L6 18M6 6l12 12' stroke='%23fb923c' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
@@ -748,7 +748,7 @@ body.stash-liquid-glass .rating-clear {
 }
 body.stash-liquid-glass .rating-clear:hover {
     color: var(--accent-bright) !important;
-    background: rgba(249, 115, 22, 0.1);
+    background: rgba(var(--accent-rgb), 0.1);
 }
 
 /* Scrollbar inside ratings list */
@@ -763,6 +763,6 @@ body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb {
     border-radius: 4px;
 }
 body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb:hover {
-    background: rgba(249, 115, 22, 0.4);
+    background: rgba(var(--accent-rgb), 0.4);
 }
 

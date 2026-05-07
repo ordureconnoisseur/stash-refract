@@ -201,8 +201,8 @@ body.stash-liquid-glass .search-result .btn-group .react-select__control {
 
 /* ── Save button (btn-primary that lives outside any btn-group) ──────── */
 body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn) {
-    background: rgba(249, 115, 22, 0.82) !important;
-    border: 1px solid rgba(249, 115, 22, 0.45) !important;
+    background: rgba(var(--accent-rgb), 0.82) !important;
+    border: 1px solid rgba(var(--accent-rgb), 0.45) !important;
     color: #fff !important;
     border-radius: var(--radius-pill) !important;
     padding: 0.3rem 1.25rem !important;
@@ -210,12 +210,12 @@ body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn) {
     font-weight: 600 !important;
     letter-spacing: 0.04em !important;
     margin-top: 0.5rem;
-    box-shadow: 0 2px 12px rgba(249, 115, 22, 0.22) !important;
+    box-shadow: 0 2px 12px rgba(var(--accent-rgb), 0.22) !important;
     transition: background 0.15s, box-shadow 0.15s !important;
 }
 body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn):hover {
     background: var(--accent-bright) !important;
-    box-shadow: 0 2px 18px rgba(249, 115, 22, 0.4) !important;
+    box-shadow: 0 2px 18px rgba(var(--accent-rgb), 0.4) !important;
 }
 
 /* ── React-select overrides (correct react-select__ prefix) ─────────── */
@@ -226,8 +226,8 @@ body.stash-liquid-glass .search-result .react-select__control--is-focused {
 
 /* Tag multi-value chips */
 body.stash-liquid-glass .search-result .react-select__multi-value {
-    background: rgba(249, 115, 22, 0.1) !important;
-    border: 1px solid rgba(249, 115, 22, 0.2) !important;
+    background: rgba(var(--accent-rgb), 0.1) !important;
+    border: 1px solid rgba(var(--accent-rgb), 0.2) !important;
     border-radius: var(--radius-pill) !important;
     margin: 2px !important;
 }
@@ -243,7 +243,7 @@ body.stash-liquid-glass .search-result .react-select__multi-value__remove {
     cursor: pointer;
 }
 body.stash-liquid-glass .search-result .react-select__multi-value__remove:hover {
-    background: rgba(249, 115, 22, 0.22) !important;
+    background: rgba(var(--accent-rgb), 0.22) !important;
     color: #fff !important;
 }
 
@@ -310,7 +310,7 @@ body.stash-liquid-glass .search-item-check:hover:not(:checked) {
 }
 body.stash-liquid-glass .search-item-check:focus {
     outline: none !important;
-    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.25) !important;
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.25) !important;
 }
 
 /* ───────────────────────────────────────────────────────────────────
@@ -492,7 +492,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control {
 body.stash-liquid-glass:has(.Lightbox) .popover.show input.form-control:focus,
 body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control:focus {
     border-color: var(--accent-glow) !important;
-    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.18) !important;
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.18) !important;
     outline: none !important;
 }
 /* Custom checkbox — round glass dot, matching the table-list select-col
@@ -518,7 +518,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-input[type="che
 body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-input[type="checkbox"]:checked {
     background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") center / 58% no-repeat !important;
     border-color: var(--accent-bright) !important;
-    box-shadow: 0 0 8px rgba(249, 115, 22, 0.45) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.45) !important;
 }
 body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-label {
     color: var(--text) !important;
@@ -595,8 +595,8 @@ body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link {
     transition: background 0.15s, color 0.15s;
 }
 body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link:hover {
-    background: rgba(249, 115, 22, 0.22) !important;
-    color: #ffd4b0 !important;
+    background: rgba(var(--accent-rgb), 0.22) !important;
+    color: var(--accent-light) !important;
 }
 body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link svg {
     width: 0.9rem !important;
@@ -680,4 +680,138 @@ body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link:hover {
 body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link svg {
     width: 0.9rem !important;
     height: 0.9rem !important;
+}
+
+/* Refract Theme — accent swatch picker (replaces Stash's native input on
+   #plugin-stashTheme-accent in Settings → Plugins → Refract Theme).
+   Stash's `.setting > div:last-child` cell is sized to its content, so
+   we explicitly let the swatch row expand and lock each swatch to its
+   intrinsic 30×30 against flex-shrink. */
+body.stash-liquid-glass #plugin-stashTheme-accent > div:last-child {
+    flex-shrink: 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+body.stash-liquid-glass .refract-accent-swatches {
+    display: flex !important;
+    gap: 10px !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+}
+body.stash-liquid-glass .refract-accent-swatch {
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    border-radius: 50% !important;
+    border: 2px solid rgba(255, 255, 255, 0.18) !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+}
+body.stash-liquid-glass .refract-accent-swatch:hover {
+    transform: scale(1.12) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+body.stash-liquid-glass .refract-accent-swatch.is-active {
+    border-color: #fff !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5), 0 0 14px rgba(var(--accent-rgb), 0.6) !important;
+}
+
+/* Help modal — markdown content (blockquotes, code blocks). Scoped to
+   .modal-dialog.manual so performer bios / scene descriptions aren't
+   affected. */
+body.stash-liquid-glass .modal-dialog.manual .markdown blockquote {
+    margin: 0.85rem 0 !important;
+    padding: 0.7rem 1rem !important;
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-left: 3px solid var(--accent) !important;
+    border-radius: var(--radius-sm) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .modal-dialog.manual .markdown blockquote p {
+    margin: 0 !important;
+}
+body.stash-liquid-glass .modal-dialog.manual .markdown pre {
+    background: rgba(0, 0, 0, 0.35) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 0.75rem 0.95rem !important;
+    margin: 0.7rem 0 !important;
+    overflow-x: auto !important;
+}
+body.stash-liquid-glass .modal-dialog.manual .markdown pre code {
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    color: var(--text) !important;
+    font-size: 0.85rem !important;
+}
+body.stash-liquid-glass .modal-dialog.manual .markdown :not(pre) > code {
+    background: rgba(255, 255, 255, 0.06) !important;
+    padding: 0.1rem 0.35rem !important;
+    border-radius: 4px !important;
+    font-size: 0.88em !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .modal-dialog.manual .markdown table {
+    width: 100% !important;
+    min-width: 100% !important;
+    margin: 0.85rem 0 !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    overflow: hidden !important;
+    color: var(--text) !important;
+    table-layout: auto !important;
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: transparent;
+    --bs-table-striped-color: var(--text);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.04);
+}
+/* Force last cell to absorb leftover space so row dividers reach the
+   right edge regardless of cell content width. */
+body.stash-liquid-glass .modal-dialog.manual .markdown table tr > th:last-child,
+body.stash-liquid-glass .modal-dialog.manual .markdown table tr > td:last-child {
+    width: 100% !important;
+}
+body.stash-liquid-glass .modal-dialog.manual .markdown table tr,
+body.stash-liquid-glass .modal-dialog.manual .markdown table tbody tr:nth-of-type(odd),
+body.stash-liquid-glass .modal-dialog.manual .markdown table tbody tr:nth-of-type(even),
+body.stash-liquid-glass .modal-dialog.manual .markdown table tbody tr:nth-child(odd),
+body.stash-liquid-glass .modal-dialog.manual .markdown table tbody tr:nth-child(even) {
+    background: transparent !important;
+    --bs-table-accent-bg: transparent !important;
+}
+body.stash-liquid-glass .modal-dialog.manual .markdown table th,
+body.stash-liquid-glass .modal-dialog.manual .markdown table td {
+    padding: 0.55rem 0.85rem !important;
+    border: none !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    background: transparent !important;
+    text-align: left;
+    vertical-align: top;
+}
+body.stash-liquid-glass .modal-dialog.manual .markdown table thead th {
+    background: rgba(255, 255, 255, 0.05) !important;
+    font-weight: 600 !important;
+    color: var(--text) !important;
+    border-bottom: 1px solid var(--glass-border-bright) !important;
+}
+body.stash-liquid-glass .modal-dialog.manual .markdown table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+body.stash-liquid-glass .modal-dialog.manual .markdown table tbody tr:hover td,
+body.stash-liquid-glass .modal-dialog.manual .markdown table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+body.stash-liquid-glass .modal-dialog.manual .markdown table a {
+    color: var(--accent-bright) !important;
 }
