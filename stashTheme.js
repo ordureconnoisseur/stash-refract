@@ -19,6 +19,102 @@
         }
     } catch (e) { /* ignore */ }
 
+    var REFRACT_PRESETS = ["blue", "pink", "red", "yellow", "purple", "green", "teal"];
+    var REFRACT_PRESETS_ALL = ["orange", "blue", "pink", "red", "yellow", "purple", "green", "teal"];
+    var ACCENT_STORAGE_KEY = "stashTheme.accent";
+    var REFRACT_SWATCH_COLORS = {
+        orange: "#f97316",
+        blue:   "#3b82f6",
+        pink:   "#ec4899",
+        red:    "#ef4444",
+        yellow: "#eab308",
+        purple: "#a855f7",
+        green:  "#22c55e",
+        teal:   "#14b8a6"
+    };
+
+    function getStoredAccent() {
+        try {
+            var v = localStorage.getItem(ACCENT_STORAGE_KEY);
+            if (v && REFRACT_PRESETS_ALL.indexOf(v) !== -1) { return v; }
+        } catch (e) { /* ignore */ }
+        return "orange";
+    }
+
+    function applyAccentClass(accent) {
+        if (!document.body) { return; }
+        var stale = [];
+        document.body.classList.forEach(function (c) {
+            if (c.indexOf("refract-") === 0) { stale.push(c); }
+        });
+        stale.forEach(function (c) { document.body.classList.remove(c); });
+        if (REFRACT_PRESETS.indexOf(accent) !== -1) {
+            document.body.classList.add("refract-" + accent);
+        }
+    }
+
+    function applyAccentPreset() { applyAccentClass(getStoredAccent()); }
+    applyAccentPreset();
+
+    /* Refract's accent picker. Hooked into Stash's React tree via
+       PluginApi.patch.instead("PluginSettings"), so the plugin panel for
+       Refract Theme renders our React component instead of Stash's broken
+       native string-input row. PluginID prop confirmed at runtime. */
+    function buildAccentSwatchPicker() {
+        var R = PluginApi.React;
+        return function AccentSwatchPicker() {
+            var stored = R.useState(getStoredAccent());
+            var accent = stored[0];
+            var setLocalAccent = stored[1];
+
+            function pick(preset) {
+                try { localStorage.setItem(ACCENT_STORAGE_KEY, preset); } catch (e) { /* ignore */ }
+                applyAccentClass(preset);
+                setLocalAccent(preset);
+            }
+
+            var swatches = REFRACT_PRESETS_ALL.map(function (preset) {
+                var label = preset.charAt(0).toUpperCase() + preset.slice(1);
+                return R.createElement("button", {
+                    key: preset,
+                    type: "button",
+                    className: "refract-accent-swatch" + (preset === accent ? " is-active" : ""),
+                    style: { backgroundColor: REFRACT_SWATCH_COLORS[preset] },
+                    title: label,
+                    "aria-label": label,
+                    onClick: function () { pick(preset); }
+                });
+            });
+
+            return R.createElement("div", { className: "setting", id: "plugin-stashTheme-accent" },
+                R.createElement("div", null,
+                    R.createElement("h3", null, "Accent colour"),
+                    R.createElement("div", { className: "sub-heading" },
+                        "Click a swatch to apply instantly. Saved per browser.")
+                ),
+                R.createElement("div", { className: "refract-accent-swatches" }, swatches)
+            );
+        };
+    }
+
+    function registerAccentPatch() {
+        if (typeof PluginApi === "undefined" || !PluginApi.patch || !PluginApi.React) {
+            setTimeout(registerAccentPatch, 100);
+            return;
+        }
+        var AccentSwatchPicker = buildAccentSwatchPicker();
+        PluginApi.patch.instead("PluginSettings", function () {
+            var args = Array.prototype.slice.call(arguments);
+            var next = args.pop();
+            var props = args[0];
+            if (!props || props.pluginID !== "stashTheme") {
+                return next.apply(null, args);
+            }
+            return PluginApi.React.createElement(AccentSwatchPicker);
+        });
+    }
+    registerAccentPatch();
+
     var CATEGORIES_PATH = "/categories";
     var STORAGE_KEY_API = "stashTheme.apiKey";
     var GRAPHQL_URL = "/graphql";
@@ -234,6 +330,36 @@
         btn.textContent = "Add";
         btn.setAttribute("aria-label", fullLabel);
         btn.setAttribute("title", fullLabel);
+        return true;
+    }
+
+    /* Available Plugins page: Stash renders the "Add source" button at the
+       bottom of the package-sources table, far from the disabled "Install"
+       button at the top — move it next to Install so they form one cluster. */
+    function relocateAddSourceButton() {
+        var addBtn = null;
+        var candidates = document.querySelectorAll("button.btn-success.btn-sm");
+        for (var i = 0; i < candidates.length; i++) {
+            if ((candidates[i].textContent || "").trim() === "Add source") {
+                addBtn = candidates[i];
+                break;
+            }
+        }
+        if (!addBtn) { return false; }
+        var installs = document.querySelectorAll("button.btn-primary:not(.btn-sm)");
+        var installBtn = null;
+        for (var j = 0; j < installs.length; j++) {
+            if ((installs[j].textContent || "").trim() === "Install") {
+                installBtn = installs[j];
+                break;
+            }
+        }
+        if (!installBtn) { return false; }
+        addBtn.classList.remove("btn-sm");
+        addBtn.classList.remove("btn-success");
+        addBtn.classList.add("btn-primary");
+        if (addBtn.previousElementSibling === installBtn) { return true; }
+        installBtn.parentNode.insertBefore(addBtn, installBtn.nextSibling);
         return true;
     }
 
@@ -525,6 +651,7 @@
                 refineBrandHomeOrb();
                 injectNewButtonIcon();
                 normalizeLibraryAddButton();
+                relocateAddSourceButton();
                 normalizeSettingsSidebarNavItems();
                 markActiveUtilityButtons();
                 stripRatingBannerToNumber();
@@ -1178,6 +1305,7 @@
                 refineBrandHomeOrb();
                 injectNewButtonIcon();
                 normalizeLibraryAddButton();
+                relocateAddSourceButton();
                 normalizeSettingsSidebarNavItems();
                 markActiveUtilityButtons();
                 nextTick(stripRatingBannerToNumber);
@@ -1198,6 +1326,7 @@
         refineBrandHomeOrb();
         injectNewButtonIcon();
         normalizeLibraryAddButton();
+        relocateAddSourceButton();
         normalizeSettingsSidebarNavItems();
         markActiveUtilityButtons();
         stripRatingBannerToNumber();

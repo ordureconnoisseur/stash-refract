@@ -128,7 +128,7 @@ body.stash-liquid-glass .modal-header .close:focus-visible {
     border-color: var(--glass-border-bright) !important;
     color: #fff !important;
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18) !important;
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.18) !important;
 }
 body.stash-liquid-glass .modal-header .btn-close {
     width: 2.25rem;
@@ -207,19 +207,19 @@ body.stash-liquid-glass .modal .modal-footer button.btn-primary {
     background: var(--accent-tint) !important;
     border: 1px solid var(--accent-glow) !important;
     color: var(--accent-bright) !important;
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.24) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.24) !important;
 }
 body.stash-liquid-glass .modal .modal-footer .btn.btn-primary:hover,
 body.stash-liquid-glass .modal .modal-footer button.btn-primary:hover {
-    background: rgba(249, 115, 22, 0.2) !important;
-    border-color: rgba(249, 115, 22, 0.55) !important;
-    color: #ffd4b0 !important;
-    box-shadow: 0 0 14px rgba(249, 115, 22, 0.32) !important;
+    background: rgba(var(--accent-rgb), 0.2) !important;
+    border-color: rgba(var(--accent-rgb), 0.55) !important;
+    color: var(--accent-light) !important;
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.32) !important;
 }
 body.stash-liquid-glass .modal .modal-footer .btn:focus-visible,
 body.stash-liquid-glass .modal .modal-footer button:focus-visible {
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.22) !important;
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.22) !important;
 }
 
 body.stash-liquid-glass .modal-body .form-control,
@@ -240,7 +240,7 @@ body.stash-liquid-glass .modal-content .form-control:focus {
     border-color: var(--accent-glow) !important;
     color: #fff !important;
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12) !important;
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12) !important;
 }
 
 /* Stash settings modals: #setting-dialog is typically outside configuration tab DOM. */
@@ -300,7 +300,7 @@ body.stash-liquid-glass .modal-header .search-input {
 }
 body.stash-liquid-glass .modal-header .search-input:focus {
     border-color: var(--accent-glow) !important;
-    box-shadow: 0 0 0 2px rgba(249,115,22,0.12) !important;
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.12) !important;
     outline: none !important;
 }
 
@@ -467,7 +467,7 @@ body.stash-liquid-glass .modifier-option.selected {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     color: var(--accent-bright) !important;
-    box-shadow: 0 0 8px rgba(249,115,22,0.28) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.28) !important;
     font-weight: 500 !important;
 }
 
@@ -544,8 +544,8 @@ body.stash-liquid-glass .popover-body a {
     padding: 0.15rem 0.55rem;
     font-size: 0.72rem;
     border-radius: var(--radius-pill);
-    background: rgba(249, 115, 22, 0.09) !important;
-    border: 1px solid rgba(249, 115, 22, 0.22) !important;
+    background: rgba(var(--accent-rgb), 0.09) !important;
+    border: 1px solid rgba(var(--accent-rgb), 0.22) !important;
     color: rgba(255, 255, 255, 0.75) !important;
     text-decoration: none;
     white-space: nowrap;
@@ -591,7 +591,7 @@ body.stash-liquid-glass .form-control:focus,
 body.stash-liquid-glass .form-select:focus {
     background: rgba(255, 255, 255, 0.06);
     border-color: var(--accent-glow);
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.10);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.10);
     color: #fff;
     outline: none;
 }
@@ -648,11 +648,11 @@ body.stash-liquid-glass .filtered-list-toolbar .btn-secondary.btn-primary {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     color: var(--accent-bright) !important;
-    box-shadow: 0 0 12px rgba(249, 115, 22, 0.30) !important;
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.30) !important;
 }
 body.stash-liquid-glass .filtered-list-toolbar .btn-secondary.active svg,
 body.stash-liquid-glass .filtered-list-toolbar .btn-secondary.btn-primary svg {
-    filter: drop-shadow(0 0 5px rgba(249, 115, 22, 0.55));
+    filter: drop-shadow(0 0 5px rgba(var(--accent-rgb), 0.55));
 }
 body.stash-liquid-glass .filtered-list-toolbar .btn-secondary svg {
     width: 0.95rem;
@@ -771,7 +771,7 @@ body.stash-liquid-glass .filtered-list-toolbar .selected-items-info {
     border-radius: var(--radius-sm);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.18);
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18);
 }
 body.stash-liquid-glass .filtered-list-toolbar .selected-items-info .selected-count {
     color: var(--accent-bright);
@@ -800,7 +800,7 @@ body.stash-liquid-glass .filtered-list-toolbar .selected-items-info .btn.btn-sec
     justify-content: center;
 }
 body.stash-liquid-glass .filtered-list-toolbar .selected-items-info .btn.btn-secondary.minimal:hover {
-    background: rgba(249, 115, 22, 0.18) !important;
+    background: rgba(var(--accent-rgb), 0.18) !important;
     color: #fff !important;
 }
 body.stash-liquid-glass .filtered-list-toolbar .selected-items-info .btn.btn-secondary.minimal svg {
@@ -877,12 +877,12 @@ body.stash-liquid-glass input[type="range"].zoom-slider::-webkit-slider-thumb {
     border-radius: 50%;
     /* Translucent orange “light” — bright but soft, no white specular */
     background:
-        radial-gradient(circle at 50% 50%, rgba(255, 200, 140, 0.68) 0%, rgba(249, 115, 22, 0.48) 40%, rgba(249, 115, 22, 0.2) 68%, rgba(12, 10, 10, 0.28) 100%);
+        radial-gradient(circle at 50% 50%, rgba(255, 200, 140, 0.68) 0%, rgba(var(--accent-rgb), 0.48) 40%, rgba(var(--accent-rgb), 0.2) 68%, rgba(12, 10, 10, 0.28) 100%);
     border: 1px solid rgba(253, 186, 116, 0.62);
     box-shadow:
-        0 0 10px rgba(249, 115, 22, 0.55),
-        0 0 22px rgba(249, 115, 22, 0.4),
-        0 0 0 1px rgba(249, 115, 22, 0.28) inset,
+        0 0 10px rgba(var(--accent-rgb), 0.55),
+        0 0 22px rgba(var(--accent-rgb), 0.4),
+        0 0 0 1px rgba(var(--accent-rgb), 0.28) inset,
         inset 0 -1px 2px rgba(0, 0, 0, 0.22);
     filter: none;
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
@@ -891,8 +891,8 @@ body.stash-liquid-glass input[type="range"].zoom-slider:hover::-webkit-slider-th
     transform: scale(1.05);
     border-color: rgba(254, 215, 170, 0.72);
     box-shadow:
-        0 0 12px rgba(249, 115, 22, 0.62),
-        0 0 26px rgba(249, 115, 22, 0.48),
+        0 0 12px rgba(var(--accent-rgb), 0.62),
+        0 0 26px rgba(var(--accent-rgb), 0.48),
         0 0 0 1px rgba(255, 210, 170, 0.32) inset,
         inset 0 -1px 2px rgba(0, 0, 0, 0.2);
 }
@@ -912,11 +912,11 @@ body.stash-liquid-glass input[type="range"].zoom-slider::-moz-range-thumb {
     border-radius: 50%;
     border: 1px solid rgba(253, 186, 116, 0.62);
     background:
-        radial-gradient(circle at 50% 50%, rgba(255, 200, 140, 0.68) 0%, rgba(249, 115, 22, 0.48) 40%, rgba(249, 115, 22, 0.2) 68%, rgba(12, 10, 10, 0.28) 100%);
+        radial-gradient(circle at 50% 50%, rgba(255, 200, 140, 0.68) 0%, rgba(var(--accent-rgb), 0.48) 40%, rgba(var(--accent-rgb), 0.2) 68%, rgba(12, 10, 10, 0.28) 100%);
     box-shadow:
-        0 0 10px rgba(249, 115, 22, 0.55),
-        0 0 22px rgba(249, 115, 22, 0.4),
-        0 0 0 1px rgba(249, 115, 22, 0.28) inset,
+        0 0 10px rgba(var(--accent-rgb), 0.55),
+        0 0 22px rgba(var(--accent-rgb), 0.4),
+        0 0 0 1px rgba(var(--accent-rgb), 0.28) inset,
         inset 0 -1px 2px rgba(0, 0, 0, 0.22);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -924,8 +924,8 @@ body.stash-liquid-glass input[type="range"].zoom-slider:hover::-moz-range-thumb 
     transform: scale(1.05);
     border-color: rgba(254, 215, 170, 0.72);
     box-shadow:
-        0 0 12px rgba(249, 115, 22, 0.62),
-        0 0 26px rgba(249, 115, 22, 0.48),
+        0 0 12px rgba(var(--accent-rgb), 0.62),
+        0 0 26px rgba(var(--accent-rgb), 0.48),
         0 0 0 1px rgba(255, 210, 170, 0.32) inset,
         inset 0 -1px 2px rgba(0, 0, 0, 0.2);
 }
@@ -933,7 +933,7 @@ body.stash-liquid-glass input[type="range"].zoom-slider:focus {
     outline: none;
 }
 body.stash-liquid-glass input[type="range"].zoom-slider:focus-visible {
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.22);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.22);
     border-radius: var(--radius-sm);
 }
 

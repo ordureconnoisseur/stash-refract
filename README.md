@@ -1,6 +1,6 @@
 # Refract Theme
 
-Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass panels, floating navbar, dark base, orange accent.
+Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass panels, floating navbar, dark base, configurable accent.
 
 > Screenshots coming soon.
 
@@ -32,18 +32,24 @@ These plugins have UI integrations themed in Refract; they're not required:
 
 ## Customisation
 
-Refract's colour and layout tokens are CSS variables on `body.stash-liquid-glass`. To override (e.g. swap the orange accent for indigo), paste into Stash's **Settings → Interface → Custom CSS**:
+### Accent colour presets
+
+Refract ships with seven alternate accents in addition to the default orange. Open **Settings → Plugins → Refract Theme**, expand its panel, and click one of the eight colour swatches in the **Accent colour** row — orange (default), blue, pink, red, yellow, purple, green, or teal. The change applies instantly and is saved per browser; no refresh needed.
+
+### Custom colour
+
+For an accent that isn't in the preset list, override the four CSS variables via **Settings → Interface → Custom CSS**:
 
 ```css
 body.stash-liquid-glass {
     --accent: #6366f1;
     --accent-bright: #818cf8;
-    --accent-glow: rgba(99, 102, 241, 0.28);
-    --accent-tint: rgba(99, 102, 241, 0.12);
+    --accent-light: #c7d2fe;
+    --accent-rgb: 99, 102, 241;
 }
 ```
 
-See [`css/01_tokens.css`](./css/01_tokens.css) for the full variable list.
+`--accent-glow` and `--accent-tint` derive from `--accent-rgb` automatically. See [`css/01_tokens.css`](./css/01_tokens.css) for the full variable list.
 
 ## Known limitations
 
