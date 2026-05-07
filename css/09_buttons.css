@@ -1,0 +1,768 @@
+/* ── .btn-primary: glass orange button ───────────────────────────── */
+body.stash-liquid-glass .btn-primary {
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 600 !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s !important;
+}
+body.stash-liquid-glass .btn-primary:hover,
+body.stash-liquid-glass .btn-primary:focus {
+    background: rgba(249, 115, 22, 0.22) !important;
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.38) !important;
+    color: var(--text) !important;
+    border-color: var(--accent-bright) !important;
+}
+/* Minimal icon-only buttons (e.g. favorite heart) — no square background */
+body.stash-liquid-glass .btn.minimal.btn-primary,
+body.stash-liquid-glass button.minimal.btn-primary {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+body.stash-liquid-glass .btn.minimal.btn-primary:hover,
+body.stash-liquid-glass button.minimal.btn-primary:hover,
+body.stash-liquid-glass .btn.minimal.btn-primary:focus,
+body.stash-liquid-glass button.minimal.btn-primary:focus {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* ── Filter / search toolbar redesign ───────────────────────────────
+   JS marks the container with [data-stash-filter] so these rules
+   work regardless of Stash's internal component class names.
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Container — no background; buttons float on the page like the navbar */
+body.stash-liquid-glass [data-stash-filter] {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-bottom: 10px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 5px !important;
+}
+
+/* Search input */
+body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"] {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--text) !important;
+    height: 30px !important;
+    font-size: 0.82rem !important;
+    padding: 0 14px !important;
+    min-width: 140px !important;
+    flex: 1 1 auto !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"]:focus {
+    border-color: var(--accent-glow) !important;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.15) !important;
+    outline: none !important;
+    background: rgba(255, 255, 255, 0.09) !important;
+}
+
+/* Secondary buttons — same base style as navbar buttons.
+   Excludes .sort-by-select children (sort dropdown + direction + shuffle)
+   which need full glass styling, not the navbar-style transparent treatment. */
+body.stash-liquid-glass [data-stash-filter] .btn-secondary {
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-sm) !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    padding: 0 8px !important;
+    font-size: 0.78rem !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+}
+body.stash-liquid-glass [data-stash-filter] .btn-secondary:hover {
+    background: var(--glass-bg) !important;
+    border-color: var(--glass-border) !important;
+    color: var(--text) !important;
+}
+/* Sort dropdown override — needs full glass styling like the page-size
+   selector, not the transparent navbar style applied to view-mode buttons. */
+body.stash-liquid-glass [data-stash-filter] .sort-by-select .btn.btn-secondary,
+body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .btn.btn-secondary {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    height: 30px !important;
+    padding: 0 0.7rem !important;
+    border-radius: var(--radius-sm) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    backdrop-filter: blur(12px) !important;
+}
+body.stash-liquid-glass [data-stash-filter] .sort-by-select .btn.btn-secondary:hover,
+body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .btn.btn-secondary:hover {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--accent-glow) !important;
+    color: #fff !important;
+}
+
+/* Active view-mode button — exact navbar glow pattern */
+body.stash-liquid-glass [data-stash-filter] .btn-primary {
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    color: var(--accent) !important;
+    border-radius: var(--radius-sm) !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    padding: 0 8px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow:
+        0 0 18px rgba(249, 115, 22, 0.45),
+        0 0 0 1px rgba(249, 115, 22, 0.18) inset !important;
+}
+body.stash-liquid-glass [data-stash-filter] .btn-primary svg {
+    filter:
+        drop-shadow(0 0 6px rgba(249, 115, 22, 0.65))
+        drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)) !important;
+}
+body.stash-liquid-glass [data-stash-filter] .btn-primary:hover {
+    background: rgba(249, 115, 22, 0.2) !important;
+    color: var(--text) !important;
+}
+
+/* Number/text inputs (per-page count etc.) */
+body.stash-liquid-glass [data-stash-filter] input:not([placeholder*="Search"]):not([type="range"]),
+body.stash-liquid-glass [data-stash-filter] select {
+    background: transparent !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-sm) !important;
+    height: 30px !important;
+    font-size: 0.78rem !important;
+    padding: 0 8px !important;
+}
+
+/* Hide zoom range slider — rarely adjusted mid-session */
+body.stash-liquid-glass [data-stash-filter] input[type="range"],
+body.stash-liquid-glass .zoom-slider-container,
+body.stash-liquid-glass .zoom-slider {
+    display: none !important;
+}
+
+/* ── Active filter chips — hidden (filter button badge shows count) ── */
+body.stash-liquid-glass .filter-tags,
+body.stash-liquid-glass .wrap-tags {
+    display: none !important;
+}
+
+/* ── Filter button: orange glow when active (JS sets data-filter-active) */
+body.stash-liquid-glass [data-stash-filter] button[data-filter-active] {
+    color: var(--accent) !important;
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    box-shadow:
+        0 0 18px rgba(249, 115, 22, 0.45),
+        0 0 0 1px rgba(249, 115, 22, 0.18) inset !important;
+}
+body.stash-liquid-glass [data-stash-filter] button[data-filter-active] svg {
+    filter:
+        drop-shadow(0 0 6px rgba(249, 115, 22, 0.65))
+        drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)) !important;
+}
+
+/* Badge inside filter button — small pill, no box */
+body.stash-liquid-glass [data-stash-filter] button .badge,
+body.stash-liquid-glass [data-stash-filter] button .badge-secondary {
+    background: var(--accent) !important;
+    border: none !important;
+    border-radius: var(--radius-pill) !important;
+    color: #fff !important;
+    font-size: 0.58rem !important;
+    font-weight: 700 !important;
+    padding: 1px 4px !important;
+    min-width: 14px !important;
+    line-height: 1.4 !important;
+    box-shadow: 0 0 6px rgba(249, 115, 22, 0.45) !important;
+}
+
+body.stash-liquid-glass .filter-tag-close {
+    display: none !important;
+}
+body.stash-liquid-glass .filter-tag button:hover {
+    opacity: 1 !important;
+    background: none !important;
+    border: none !important;
+}
+
+/* ── Pagination: minimal, clean ──────────────────────────────────── */
+
+/* Hide double-jump arrows (first/last page) — rarely useful */
+body.stash-liquid-glass .pagination .page-item:first-child,
+body.stash-liquid-glass .pagination .page-item:last-child {
+    display: none !important;
+}
+
+body.stash-liquid-glass .pagination {
+    gap: 0 !important;
+    margin: 0 !important;
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 3px 6px !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+}
+body.stash-liquid-glass .page-link {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-pill) !important;
+    font-size: 0.78rem !important;
+    min-width: 26px !important;
+    height: 26px !important;
+    padding: 0 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background 0.15s, color 0.15s !important;
+}
+body.stash-liquid-glass .page-link:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .page-item.active .page-link {
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.3) !important;
+}
+body.stash-liquid-glass .page-item.disabled .page-link {
+    opacity: 0.25 !important;
+    pointer-events: none !important;
+}
+
+/* "1-40 of N" count — tiny muted label, no pill */
+body.stash-liquid-glass .pagination-index,
+body.stash-liquid-glass .filter-container + * .text-muted,
+body.stash-liquid-glass [class*="list-count"],
+body.stash-liquid-glass [class*="total-count"] {
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.07em !important;
+    text-transform: uppercase !important;
+    color: var(--text-muted) !important;
+    opacity: 0.6 !important;
+}
+
+/* Page-of-N select in pagination row */
+body.stash-liquid-glass .pagination select,
+body.stash-liquid-glass .pagination-container select {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    font-size: 0.78rem !important;
+    height: 24px !important;
+    padding: 0 4px !important;
+    cursor: pointer !important;
+}
+
+/* ── View-mode expand (macOS Hidden Bar style) ───────────────────── */
+body.stash-liquid-glass .stash-view-wrap {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    position: static !important;
+}
+
+/* Chevron trigger — always visible at the right edge */
+body.stash-liquid-glass .stash-view-trigger {
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-sm) !important;
+    width: 22px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    transition: color 0.15s !important;
+}
+body.stash-liquid-glass .stash-view-trigger svg {
+    width: 14px !important;
+    height: 14px !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+/* Closed = › (right), open rotates to ‹ (left) */
+body.stash-liquid-glass .stash-view-trigger.open svg {
+    transform: rotate(180deg) !important;
+}
+body.stash-liquid-glass .stash-view-trigger:hover {
+    color: var(--text) !important;
+}
+
+/* Always-visible current view indicator — orange glow, same as active nav */
+body.stash-liquid-glass .stash-view-active-ind {
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    color: var(--accent) !important;
+    border-radius: var(--radius-sm) !important;
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    box-shadow:
+        0 0 18px rgba(249, 115, 22, 0.45),
+        0 0 0 1px rgba(249, 115, 22, 0.18) inset !important;
+    transition: background 0.15s !important;
+}
+body.stash-liquid-glass .stash-view-active-ind svg {
+    width: 16px !important;
+    height: 16px !important;
+    filter:
+        drop-shadow(0 0 6px rgba(249, 115, 22, 0.65))
+        drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)) !important;
+}
+body.stash-liquid-glass .stash-view-active-ind:hover {
+    background: rgba(249, 115, 22, 0.2) !important;
+}
+
+/* ── Page-size selector: compact, coherent ───────────────────────── */
+body.stash-liquid-glass .page-size-selector {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+}
+/* Chevron rendered as a ::after on the parent so it doesn't interfere
+   with the select's symmetric padding (which is required for proper
+   text-align: center). pointer-events:none lets clicks fall through. */
+body.stash-liquid-glass .page-size-selector::after {
+    content: "" !important;
+    position: absolute !important;
+    right: 0.45rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 9px !important;
+    height: 9px !important;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path fill='none' stroke='%23ffffff99' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M2.5 4.5 L6 8 L9.5 4.5'/></svg>") no-repeat center / contain;
+    pointer-events: none !important;
+}
+body.stash-liquid-glass .page-size-selector select {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    border-radius: var(--radius-sm) !important;
+    height: 30px !important;
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    padding: 0 1.1rem 0 1.1rem !important;
+    cursor: pointer !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    text-align: center !important;
+    text-align-last: center !important;
+    background-image: none !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(10px) !important;
+    transition: border-color 0.15s, color 0.15s, box-shadow 0.15s !important;
+}
+body.stash-liquid-glass .page-size-selector select:hover,
+body.stash-liquid-glass .page-size-selector select:focus {
+    border-color: var(--accent-glow) !important;
+    color: #fff !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.10) !important;
+}
+body.stash-liquid-glass .page-size-selector option {
+    background: rgba(20, 20, 24, 0.96) !important;
+    color: var(--text) !important;
+}
+
+/* ── Floating pagination ─────────────────────────────────────────── */
+
+/* Hide duplicate pager rows (top of page) */
+body.stash-liquid-glass [data-pager-row="hide"],
+body.stash-liquid-glass .pagination[data-pager-role="hide"] {
+    display: none !important;
+}
+
+/* Float the bottom pager row — fixed to viewport bottom center */
+body.stash-liquid-glass [data-pager-row="float"] {
+    position: fixed !important;
+    bottom: 1.5rem !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 400 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 6px !important;
+    pointer-events: auto !important;
+}
+
+/* Glass pill around the floated pagination */
+body.stash-liquid-glass [data-pager-row="float"] .pagination {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 3px 8px !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    box-shadow: var(--glass-shadow) !important;
+}
+
+/* When a floating pager is present, reserve bottom space inside the
+   main scrollable container so the last row of cards can scroll past
+   the pager island instead of sitting hidden behind it. The pager
+   sits at bottom: 1.5rem with ~50px content + gap → ~6rem total. */
+body.stash-liquid-glass:has([data-pager-row="float"]) .main.container-fluid {
+    padding-bottom: 6rem !important;
+}
+
+/* Panel — slides out horizontally to the left of the chevron */
+body.stash-liquid-glass .stash-view-panel {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    max-width: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    transition:
+        max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.2s ease !important;
+}
+body.stash-liquid-glass .stash-view-panel.open {
+    max-width: 220px !important;
+    opacity: 1 !important;
+}
+
+/* Individual view icon buttons inside the panel */
+body.stash-liquid-glass .stash-view-opt {
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-sm) !important;
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+}
+body.stash-liquid-glass .stash-view-opt:hover {
+    background: var(--glass-bg) !important;
+    border-color: var(--glass-border) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .stash-view-opt.active {
+    color: var(--accent) !important;
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    box-shadow:
+        0 0 18px rgba(249, 115, 22, 0.45),
+        0 0 0 1px rgba(249, 115, 22, 0.18) inset !important;
+}
+body.stash-liquid-glass .stash-view-opt svg {
+    width: 16px !important;
+    height: 16px !important;
+}
+body.stash-liquid-glass .stash-view-opt.active svg {
+    filter:
+        drop-shadow(0 0 6px rgba(249, 115, 22, 0.65))
+        drop-shadow(0 0 3px rgba(249, 115, 22, 0.45)) !important;
+}
+
+/* ── Filter button badge: pill number instead of box ─────────────── */
+body.stash-liquid-glass [data-stash-filter] .badge {
+    background: var(--accent) !important;
+    border: none !important;
+    border-radius: var(--radius-pill) !important;
+    color: #fff !important;
+    font-size: 0.6rem !important;
+    font-weight: 700 !important;
+    padding: 1px 4px !important;
+    min-width: 14px !important;
+    line-height: 1.4 !important;
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.5) !important;
+}
+
+/* ── Performer Advanced Rating plugin ───────────────────────────────
+   Styles the trigger button and modal injected by the plugin.
+   Safe to include without the plugin — selectors simply don't match.
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass .adv-rating-btn,
+body.stash-liquid-glass #perf-rating-trigger {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.3rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--text) !important;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1 !important;
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    vertical-align: middle;
+}
+body.stash-liquid-glass .adv-rating-btn:hover,
+body.stash-liquid-glass #perf-rating-trigger:hover {
+    background: var(--accent-tint);
+    border-color: var(--accent-glow);
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.3), 0 2px 10px rgba(0, 0, 0, 0.3);
+    color: var(--accent-bright) !important;
+}
+
+/* Overlay backdrop */
+body.stash-liquid-glass .adv-rating-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.52);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+/* Modal glass card */
+body.stash-liquid-glass .adv-rating-modal-content {
+    background: rgba(28, 28, 28, 0.97) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    border-radius: 18px !important;
+    overflow: hidden;
+    box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(249, 115, 22, 0.18),
+        0 0 48px 8px rgba(249, 115, 22, 0.18),
+        0 0 100px 24px rgba(249, 115, 22, 0.08) !important;
+    -webkit-backdrop-filter: blur(32px);
+    backdrop-filter: blur(32px);
+    min-width: 400px;
+    max-width: 520px;
+    width: 100%;
+    color: var(--text);
+}
+
+/* Header — same bg as card so it doesn't look like a separate box */
+body.stash-liquid-glass .adv-rating-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+    background: transparent !important;
+}
+body.stash-liquid-glass .adv-rating-header h3 {
+    margin: 0 !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: var(--text-muted) !important;
+}
+/* Close button — SVG × via pseudo-element, orange on hover */
+body.stash-liquid-glass .perf-rating-close {
+    width: 1.75rem;
+    height: 1.75rem;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    cursor: pointer;
+    font-size: 0 !important;         /* hide × glyph */
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+}
+body.stash-liquid-glass .perf-rating-close::before {
+    content: '';
+    display: block;
+    width: 11px;
+    height: 11px;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 6L6 18M6 6l12 12' stroke='rgba(255,255,255,0.55)' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
+    transition: background-image 0.15s;
+}
+body.stash-liquid-glass .perf-rating-close:hover {
+    background: rgba(249, 115, 22, 0.16) !important;
+    border-color: rgba(249, 115, 22, 0.35) !important;
+}
+body.stash-liquid-glass .perf-rating-close:hover::before {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 6L6 18M6 6l12 12' stroke='%23fb923c' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* Ratings list scroll container */
+body.stash-liquid-glass .ratings-list {
+    padding: 0.4rem 0 !important;
+    overflow-y: auto;
+    max-height: 72vh;
+    background: transparent !important;
+}
+
+/* Individual row */
+body.stash-liquid-glass .rating-row {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1.25rem !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    gap: 1rem;
+    transition: background 0.12s;
+}
+body.stash-liquid-glass .rating-row:last-child {
+    border-bottom: none !important;
+}
+body.stash-liquid-glass .rating-row:hover {
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Category label */
+body.stash-liquid-glass .rating-label {
+    display: flex !important;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text) !important;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Info icon ⓘ — character already has circle built in, so no extra border */
+body.stash-liquid-glass .rating-info-icon {
+    position: relative;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: var(--text-muted) !important;
+    cursor: help;
+    flex-shrink: 0;
+    transition: color 0.15s;
+    z-index: 1;
+}
+body.stash-liquid-glass .rating-info-icon:hover {
+    color: var(--accent-bright) !important;
+}
+
+/* Tooltip — shown on hover */
+body.stash-liquid-glass .rating-tooltip {
+    display: none;
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 0.5rem);
+    transform: translateX(-50%);
+    z-index: 10001;
+    width: 230px;
+    padding: 0.6rem 0.75rem;
+    background: rgba(18, 18, 22, 0.98) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 10px;
+    font-size: 0.71rem;
+    color: var(--text-muted) !important;
+    line-height: 1.55;
+    box-shadow: 0 10px 36px rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+    white-space: normal;
+    text-align: left;
+}
+body.stash-liquid-glass .rating-info-icon:hover .rating-tooltip {
+    display: block;
+}
+
+/* Stars row */
+body.stash-liquid-glass .rating-stars-modal {
+    display: flex !important;
+    align-items: center;
+    gap: 0.15rem;
+    flex-shrink: 0;
+}
+
+/* Star glyphs — empty state */
+body.stash-liquid-glass .rating-star {
+    font-size: 1.35rem;
+    color: rgba(255, 255, 255, 0.2) !important;
+    cursor: pointer;
+    line-height: 1;
+    user-select: none;
+    transition: color 0.1s, filter 0.1s, transform 0.1s;
+}
+/* .filled is added by JS (plugin uses no class, just swaps ☆→★) */
+body.stash-liquid-glass .rating-star.filled,
+body.stash-liquid-glass .rating-star:hover {
+    color: #fbbf24 !important;
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.7)) !important;
+}
+body.stash-liquid-glass .rating-star:hover {
+    transform: scale(1.18);
+}
+
+/* Clear × */
+body.stash-liquid-glass .rating-clear {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.2) !important;
+    cursor: pointer;
+    padding: 0.1rem 0.3rem;
+    border-radius: 4px;
+    margin-left: 0.2rem;
+    user-select: none;
+    transition: color 0.15s, background 0.15s;
+    line-height: 1;
+}
+body.stash-liquid-glass .rating-clear:hover {
+    color: var(--accent-bright) !important;
+    background: rgba(249, 115, 22, 0.1);
+}
+
+/* Scrollbar inside ratings list */
+body.stash-liquid-glass .ratings-list::-webkit-scrollbar {
+    width: 4px;
+}
+body.stash-liquid-glass .ratings-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+}
+body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(249, 115, 22, 0.4);
+}
+
