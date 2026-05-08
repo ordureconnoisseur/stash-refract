@@ -2,7 +2,22 @@
 
 Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass panels, floating navbar, dark base, configurable accent.
 
-> Screenshots coming soon.
+![Refract — desktop overview](./screenshots/01-desktop-overview.png)
+<!-- TODO: home / scenes wall at full desktop width -->
+
+## Features
+
+- Glass-morphism re-skin of every Stash surface (cards, filters, scene player, settings, lightbox, scene tagger)
+- 8 built-in accent presets + custom override via CSS variables
+- Touch-only mobile burger menu — Stash's default nav is unusable on phones; Refract replaces the library row with a 3-column icon grid dropdown on `pointer: coarse` devices
+- Horizontally-scrollable navbar at narrow desktop widths instead of icons collapsing one-by-one
+- Donate link relocated from navbar into the settings sidebar (still discoverable, no longer cluttering the navbar at small widths)
+
+![Accent picker](./screenshots/02-accent-picker.png)
+<!-- TODO: settings panel with the 8 swatches visible -->
+
+![Mobile burger menu](./screenshots/03-mobile-burger.png)
+<!-- TODO: phone screenshot, burger open with the icon grid showing -->
 
 ## Install
 
@@ -20,7 +35,8 @@ Then restart Stash and enable the plugin in Settings → Plugins.
 ## Compatibility
 
 - **Stash**: tested on 0.27.x. Older versions may work but aren't tested.
-- **Browsers**: Chrome ≥105, Edge ≥105, Safari ≥15.4, Firefox ≥121. Refract uses `:has()` extensively for context-aware styling, which gates the minimum.
+- **Desktop browsers**: Chrome ≥105, Edge ≥105, Safari ≥15.4, Firefox ≥121. Refract uses `:has()` extensively for context-aware styling, which gates the minimum.
+- **Mobile**: iOS Safari 15.4+ and Chrome on Android. The burger menu is gated on `@media (pointer: coarse)` and only shows on touch-input devices.
 
 ## Recommended companion plugins
 
@@ -53,8 +69,9 @@ body.stash-liquid-glass {
 
 ## Known limitations
 
-- Stash's pre-auth login page can't be themed — Stash plugins don't load until after login.
-- A brief flash of Stash's default blue may appear on initial page load before the plugin CSS arrives. Frame-bound, not fixable from a plugin.
+- **Older Stash / older browsers**: Refract relies on `:has()` for context-aware styling. Stash 0.26 and earlier, or browsers older than the versions in [Compatibility](#compatibility), will get only partial styling.
+- **`backdrop-filter` cost**: the frosted-glass look uses `backdrop-filter` heavily. Low-end GPUs and integrated graphics may notice scroll/animation jank, especially with the lightbox open over a busy page.
+- **Third-party plugin UIs**: plugins that inject their own modals or panels (and don't reuse Stash's standard Bootstrap classes) won't be themed until Refract gets a rule for them. File an issue with the plugin name if you want one added.
 
 ## License
 
