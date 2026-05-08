@@ -609,6 +609,10 @@ body.stash-liquid-glass .filtered-list-toolbar {
     gap: 0.4rem;
     padding: 0.6rem 0;
     align-items: center;
+    /* Don't pin to the top while scrolling — let it scroll away with
+       the list content. Overrides Stash's default `position: sticky`. */
+    position: static !important;
+    top: auto !important;
 }
 
 body.stash-liquid-glass .filtered-list-toolbar .btn-group {
