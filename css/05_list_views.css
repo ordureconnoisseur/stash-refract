@@ -323,6 +323,31 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-link.active {
         0 0 12px rgba(var(--accent-rgb), 0.28) !important;
 }
 
+/* "Support Stash" link injected by stashTheme.js at the bottom of the
+   settings sidebar — replaces the navbar donate button (which we hide
+   because it's off-theme). Subtle, matches sidebar nav-pills aesthetic. */
+body.stash-liquid-glass .nav.nav-pills.flex-column .refract-support-stash-item {
+    margin-top: 0.15rem !important;
+}
+body.stash-liquid-glass .nav.nav-pills.flex-column a.refract-support-stash {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    color: var(--text-muted) !important;
+    font-weight: 400 !important;
+    transition: color 0.18s ease, background 0.18s ease !important;
+}
+body.stash-liquid-glass .nav.nav-pills.flex-column a.refract-support-stash:hover {
+    color: var(--accent-bright) !important;
+    background: var(--accent-tint) !important;
+}
+body.stash-liquid-glass .nav.nav-pills.flex-column a.refract-support-stash svg {
+    width: 0.95rem !important;
+    height: 0.95rem !important;
+    color: var(--accent) !important;
+    flex: 0 0 auto !important;
+}
+
 /* Separator above the advanced/troubleshooting group. */
 body.stash-liquid-glass .nav.nav-pills.flex-column .stash-theme-settings-divider {
     display: block;
