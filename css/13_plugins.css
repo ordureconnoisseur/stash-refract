@@ -1,0 +1,284 @@
+/* ───────────────────────────────────────────────────────────────────
+   Third-party plugin integrations
+
+   These rules style DOM created by other Stash plugins (stash-multiview,
+   url-switcher, Ascension/Desire, etc.). On a vanilla Stash install with
+   none of these plugins active, every selector below matches no DOM and
+   the file is inert — Refract works without them.
+
+   Loaded last in the cascade (after 12_mobile.css) so plugin-specific
+   overrides win over generic theme rules.
+
+   Note: a few mixed-selector rules in 07_scene_details.css that bundle
+   `.mv-scene-page-btn` together with Stash core toolbar buttons
+   (.organized-button, .dropdown-toggle) are intentionally left in place;
+   extracting them would require triplicating the rule bodies.
+   ─────────────────────────────────────────────────────────────────── */
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   stash-multiview
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Filter-add button: glass base (handled by .btn.btn-secondary rules already),
+   active orange glow when at least one filter slot is queued. Glow intensity
+   matches the active state of Stash's native .filter-button (the funnel). */
+body.stash-liquid-glass #mv-filter-add-btn.mv-filter-has-slots {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    box-shadow:
+        0 0 18px rgba(var(--accent-rgb), 0.55),
+        0 0 0 1px rgba(var(--accent-rgb), 0.22) inset !important;
+}
+/* Position the badge so the slot count sits as an orange pill on the
+   button corner — match `.filter-button .badge` exactly. */
+body.stash-liquid-glass .mv-filter-add-btn {
+    position: relative !important;
+}
+/* When at least one filter slot is queued, hide the + icon and render
+   the count as the button's centerpiece. The .mv-filter-badge element
+   is only added by multiview when count > 0, so its presence is the
+   "has count" signal. */
+body.stash-liquid-glass .mv-filter-add-btn.mv-filter-has-slots > svg {
+    display: none !important;
+}
+body.stash-liquid-glass .mv-filter-badge {
+    position: static !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: auto !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: var(--accent-bright) !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    font-variant-numeric: tabular-nums !important;
+    box-shadow: none !important;
+}
+
+/* Picking toggle button — active glow matched to .stash-view-active-ind.
+   Class doubled (`.mv-picking-toggle-btn.mv-picking-toggle-btn`) to bump
+   specificity above my new toolbar `:has(> svg:only-child)` rule at
+   (0,5,2), which would otherwise strip the active state. */
+body.stash-liquid-glass .btn.btn-secondary.mv-picking-toggle-btn.mv-picking-toggle-btn.active {
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent) !important;
+    box-shadow:
+        0 0 18px rgba(var(--accent-rgb), 0.45),
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
+}
+body.stash-liquid-glass .btn.btn-secondary.mv-picking-toggle-btn.mv-picking-toggle-btn.active svg {
+    filter:
+        drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.65))
+        drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.45)) !important;
+}
+
+/* Scene card add buttons — only shown when multiview picking mode is active */
+body.stash-liquid-glass:not(.mv-picking-mode) .mv-add-btn {
+    display: none !important;
+}
+body.stash-liquid-glass.mv-picking-mode .mv-add-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    font-size: 0 !important;
+    background: rgba(0, 0, 0, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: var(--radius-sm) !important;
+    backdrop-filter: blur(8px) !important;
+    color: #fff !important;
+}
+body.stash-liquid-glass.mv-picking-mode .mv-add-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+    flex-shrink: 0;
+}
+body.stash-liquid-glass.mv-picking-mode .mv-add-btn:hover {
+    background: rgba(0, 0, 0, 0.75) !important;
+}
+body.stash-liquid-glass .mv-add-btn.mv-queued {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.38) !important;
+}
+
+/* Scene-page queue toggle button — when the current scene is in the
+   multiview queue. The scene-toolbar has `overflow-x: auto` so any
+   outer box-shadow extending past the button gets clipped at the
+   toolbar bounds. We rely on a strong inset glow + bright accent
+   border to convey "active" without a halo extending outside. The
+   SVG itself gets a drop-shadow which is rendered by the SVG layer
+   and isn't clipped by the toolbar overflow. */
+body.stash-liquid-glass .mv-scene-page-btn.active,
+body.stash-liquid-glass .scene-tabs .scene-toolbar .mv-scene-page-btn.active {
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-bright) !important;
+    border-color: var(--accent-bright) !important;
+    color: var(--accent) !important;
+    box-shadow:
+        0 0 0 1px rgba(var(--accent-rgb), 0.3) inset,
+        0 0 12px rgba(var(--accent-rgb), 0.35) inset !important;
+}
+body.stash-liquid-glass .scene-tabs .scene-toolbar .mv-scene-page-btn.active svg {
+    filter:
+        drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.75))
+        drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.5)) !important;
+}
+
+/* Floating launcher widget — themed pill shell */
+body.stash-liquid-glass #mv-launcher {
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.32) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    padding: 5px 6px !important;
+    gap: 5px !important;
+}
+
+/* Open button: orange-tinted glass affordance */
+body.stash-liquid-glass #mv-open-btn {
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.28) !important;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+body.stash-liquid-glass #mv-open-btn:hover {
+    background: rgba(var(--accent-rgb), 0.22) !important;
+    border-color: rgba(var(--accent-rgb), 0.55) !important;
+    color: var(--accent-light) !important;
+    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.46) !important;
+}
+
+/* Count badges — neutral glass with optional accent text for filter count.
+   Reserves the orange visual weight for the primary action (open button). */
+body.stash-liquid-glass .mv-launcher-count {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    border-radius: var(--radius-sm) !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    font-variant-numeric: tabular-nums !important;
+}
+body.stash-liquid-glass .mv-launcher-filter-count {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+
+/* Clear queue × button — replace the × text with a pseudo so we can
+   position the glyph optically (the U+00D7 character sits below the line-box
+   midline in most fonts, which is why the original looked bottom-aligned). */
+body.stash-liquid-glass #mv-clear-queue {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-sm) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0 !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+body.stash-liquid-glass #mv-clear-queue::before {
+    content: "×";
+    font-size: 18px;
+    line-height: 1;
+    display: block;
+    margin-top: -1px;
+}
+body.stash-liquid-glass #mv-clear-queue:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   url-switcher
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Navbar order — slot the URL switcher into the right-side cluster. */
+body.stash-liquid-glass nav.top-nav .navbar-buttons > #url-switcher-btn,
+body.stash-liquid-glass nav.top-nav .navbar-buttons > .url-switcher-link      { order: 80; }
+
+/* URL switcher: always a full nav icon square (don’t rely on h-100 / % sizing — breaks when “off”). */
+body.stash-liquid-glass nav.top-nav a#url-switcher-btn,
+body.stash-liquid-glass nav.top-nav #url-switcher-btn.url-switcher-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    line-height: 0 !important;
+    vertical-align: middle;
+}
+body.stash-liquid-glass nav.top-nav #url-switcher-btn > .btn,
+body.stash-liquid-glass nav.top-nav #url-switcher-btn > button {
+    width: var(--nav-btn-size) !important;
+    height: var(--nav-btn-size) !important;
+    min-width: var(--nav-btn-size) !important;
+    min-height: var(--nav-btn-size) !important;
+    max-width: var(--nav-btn-size) !important;
+    max-height: var(--nav-btn-size) !important;
+    flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+    background: transparent !important;
+    border-color: transparent !important;
+}
+/* Id on the button itself (some builds / modes). */
+body.stash-liquid-glass nav.top-nav .navbar-buttons button#url-switcher-btn.btn,
+body.stash-liquid-glass nav.top-nav .navbar-buttons #url-switcher-btn.btn.minimal {
+    width: var(--nav-btn-size) !important;
+    height: var(--nav-btn-size) !important;
+    min-width: var(--nav-btn-size) !important;
+    min-height: var(--nav-btn-size) !important;
+    max-width: var(--nav-btn-size) !important;
+    max-height: var(--nav-btn-size) !important;
+    flex: 0 0 auto !important;
+}
+
+/* Optional URL switcher: glow only when tunnel mode is active/enabled. */
+body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel > .btn,
+body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel.btn,
+body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel > button,
+body.stash-liquid-glass nav.top-nav button#url-switcher-btn.mode-tunnel.btn {
+    color: var(--accent) !important;
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    box-shadow:
+        0 0 14px rgba(var(--accent-rgb), 0.34),
+        0 0 0 1px rgba(var(--accent-rgb), 0.16) inset !important;
+}
+body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel svg,
+body.stash-liquid-glass nav.top-nav button#url-switcher-btn.mode-tunnel svg {
+    filter:
+        drop-shadow(0 0 7px rgba(var(--accent-rgb), 0.55))
+        drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.4));
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   Other plugin navbar slot ordering
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Ascension/Desire plugin nav item — sits at the end of the library row. */
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #desire-nav-container                 { order: 90; }
+/* Generic plugin nav element (#plugin_hon) — slotted just after Desire. */
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plugin_hon)                   { order: 91; }
