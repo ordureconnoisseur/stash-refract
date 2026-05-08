@@ -51,6 +51,51 @@
         if (REFRACT_PRESETS.indexOf(accent) !== -1) {
             document.body.classList.add("refract-" + accent);
         }
+        broadcastAccentToPlugins();
+    }
+
+    /* Mirror the resolved accent CSS vars + the URL of Refract's
+       multiview-player overlay stylesheet to localStorage under a
+       multiview-namespaced contract. Plugin pages served outside
+       Stash's theme cascade (multiview's player at
+       /plugin/multiView/assets/index.html) can't see Refract's CSS,
+       but they CAN read this handoff on load: replay the vars onto
+       their own :root, and inject our overlay <link> alongside. */
+    function broadcastAccentToPlugins() {
+        setTimeout(function () {
+            try {
+                var cs = getComputedStyle(document.body);
+                var a = cs.getPropertyValue("--accent").trim();
+                var b = cs.getPropertyValue("--accent-bright").trim();
+                var t = cs.getPropertyValue("--accent-tint").trim();
+                var r = cs.getPropertyValue("--accent-rgb").trim();
+                if (a) { localStorage.setItem("mv.theme.accent", a); }
+                if (b) { localStorage.setItem("mv.theme.accentBright", b); }
+                if (t) { localStorage.setItem("mv.theme.accentTint", t); }
+                if (r) { localStorage.setItem("mv.theme.accentRgb", r); }
+
+                /* Locate Refract's plugin asset prefix by introspecting
+                   the URL of Stash's bundled CSS endpoint for this plugin.
+                   Stash injects ONE <link> per plugin, served at
+                   /plugin/<id>/css (concatenated bundle), and serves
+                   individual asset files at /plugin/<id>/assets/<path>.
+                   We rewrite the bundle URL to point at our standalone
+                   multiview-player.css that lives in css/. */
+                var REFRACT_PLUGIN_ID = "stashTheme";
+                var refractStyleUrl = null;
+                var links = document.querySelectorAll('link[rel="stylesheet"]');
+                for (var i = 0; i < links.length; i++) {
+                    var href = links[i].href || "";
+                    if (href.indexOf("/plugin/" + REFRACT_PLUGIN_ID + "/css") !== -1) {
+                        refractStyleUrl = href.replace(/\/css(\?.*)?$/, "/assets/css/multiview-player.css");
+                        break;
+                    }
+                }
+                if (refractStyleUrl) {
+                    localStorage.setItem("mv.theme.styleUrl", refractStyleUrl);
+                }
+            } catch (e) { /* ignore */ }
+        }, 0);
     }
 
     function applyAccentPreset() { applyAccentClass(getStoredAccent()); }

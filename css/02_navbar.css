@@ -118,8 +118,8 @@ body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-ev
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/performers"]     { order: 6; }
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/studios"]        { order: 7; }
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-event-key="/tags"]           { order: 8; }
-body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #desire-nav-container                 { order: 90; }
-body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plugin_hon)                   { order: 91; }
+/* Third-party plugin nav-order rules (Ascension/Desire, #plugin_hon)
+   live in 13_plugins.css. */
 
 /* Within `.navbar-buttons` (utility row), Stats on the LEFT (always
    visible) and Settings on the RIGHT. Logout / Help / Donate cluster
@@ -130,8 +130,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons > .logout-button         { o
 body.stash-liquid-glass nav.top-nav .navbar-buttons > :has([title="Help"])   { order: 60; }
 body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(.donate),
 body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href*="opencollective"] { order: 70; }
-body.stash-liquid-glass nav.top-nav .navbar-buttons > #url-switcher-btn,
-body.stash-liquid-glass nav.top-nav .navbar-buttons > .url-switcher-link      { order: 80; }
+/* url-switcher order: 80 — see 13_plugins.css */
 body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href="/settings"]    { order: 90; }
 
 /* Strip Stash's solid backgrounds on the nav containers. */
@@ -349,59 +348,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] svg {
         drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.45));
 }
 
-/* URL switcher: always a full nav icon square (don’t rely on h-100 / % sizing — breaks when “off”). */
-body.stash-liquid-glass nav.top-nav a#url-switcher-btn,
-body.stash-liquid-glass nav.top-nav #url-switcher-btn.url-switcher-link {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    box-sizing: border-box !important;
-    line-height: 0 !important;
-    vertical-align: middle;
-}
-body.stash-liquid-glass nav.top-nav #url-switcher-btn > .btn,
-body.stash-liquid-glass nav.top-nav #url-switcher-btn > button {
-    width: var(--nav-btn-size) !important;
-    height: var(--nav-btn-size) !important;
-    min-width: var(--nav-btn-size) !important;
-    min-height: var(--nav-btn-size) !important;
-    max-width: var(--nav-btn-size) !important;
-    max-height: var(--nav-btn-size) !important;
-    flex: 0 0 auto !important;
-    box-sizing: border-box !important;
-    background: transparent !important;
-    border-color: transparent !important;
-}
-/* Id on the button itself (some builds / modes). */
-body.stash-liquid-glass nav.top-nav .navbar-buttons button#url-switcher-btn.btn,
-body.stash-liquid-glass nav.top-nav .navbar-buttons #url-switcher-btn.btn.minimal {
-    width: var(--nav-btn-size) !important;
-    height: var(--nav-btn-size) !important;
-    min-width: var(--nav-btn-size) !important;
-    min-height: var(--nav-btn-size) !important;
-    max-width: var(--nav-btn-size) !important;
-    max-height: var(--nav-btn-size) !important;
-    flex: 0 0 auto !important;
-}
-
-/* Optional URL switcher: glow only when tunnel mode is active/enabled. */
-body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel > .btn,
-body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel.btn,
-body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel > button,
-body.stash-liquid-glass nav.top-nav button#url-switcher-btn.mode-tunnel.btn {
-    color: var(--accent) !important;
-    background: var(--accent-tint) !important;
-    border-color: var(--accent-glow) !important;
-    box-shadow:
-        0 0 14px rgba(var(--accent-rgb), 0.34),
-        0 0 0 1px rgba(var(--accent-rgb), 0.16) inset !important;
-}
-body.stash-liquid-glass nav.top-nav #url-switcher-btn.mode-tunnel svg,
-body.stash-liquid-glass nav.top-nav button#url-switcher-btn.mode-tunnel svg {
-    filter:
-        drop-shadow(0 0 7px rgba(var(--accent-rgb), 0.55))
-        drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.4));
-}
+/* url-switcher styling (sizing + mode-tunnel glow) lives in 13_plugins.css. */
 
 /* Brand — orange glass orb (text cleared in stashTheme.js; aria-label = Home).
    Stash / react-router variants: optional .top-nav; .brand-link on button or anchor; HashRouter. */
