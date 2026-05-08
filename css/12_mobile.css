@@ -1,0 +1,302 @@
+/* ───────────────────────────────────────────────────────────────────
+   Mobile-only overrides. Loaded LAST so rules here win over desktop
+   defaults. Anything that should only apply on phone-sized viewports
+   (≤600px) goes here. Narrow-but-not-mobile rules (e.g. the navbar
+   fade) live in their topic partials, scoped by their own @media.
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Navbar — library row becomes horizontally scrollable so every icon
+   is reachable via touch swipe. Scrollbar hidden visually; the
+   narrow-width fade in 02_navbar.css doubles as a "more content →"
+   hint. */
+@media (max-width: 600px) {
+    body.stash-liquid-glass nav.top-nav .navbar-collapse .navbar-nav {
+        overflow-x: auto !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    body.stash-liquid-glass nav.top-nav .navbar-collapse .navbar-nav::-webkit-scrollbar {
+        display: none !important;
+    }
+}
+
+/* Narrow viewports — bump top padding on the main content container
+   so content (especially settings-page sidebar tabs that collapse to
+   the top of the column on narrow widths) doesn't slide under the
+   floating navbar. The navbar's effective bottom is ~56px from the
+   top of the viewport (12px top inset + 2.4rem nav-btn-size + a few
+   px shadow). 4rem (≈64px) gives a safe gap. */
+@media (max-width: 991px) {
+    body.stash-liquid-glass .main.container-fluid {
+        padding-top: 5rem !important;
+    }
+}
+
+/* Narrow-width settings page — sidebar collapses to top; hide the
+   Bootstrap-native divider hr that appears at narrow widths and add
+   breathing room above the content panel. */
+@media (max-width: 767.98px) {
+    body.stash-liquid-glass.stash-route-settings .row > [class*="col-"]:not(:first-child) {
+        padding-top: 1.5rem !important;
+    }
+    body.stash-liquid-glass.stash-route-settings .col-md-3 hr,
+    body.stash-liquid-glass.stash-route-settings .col-md-3 .nav.nav-pills > hr,
+    body.stash-liquid-glass.stash-route-settings .row > [class*="col-"]:first-child hr {
+        display: none !important;
+    }
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Mobile burger menu — touch-only.
+   JS injects `.refract-burger` into the navbar always. CSS gates its
+   visibility on (pointer: coarse) so it only shows on touch devices
+   (phones / tablets), never on desktop browsers — squeezing a desktop
+   window down does NOT trigger the burger.
+
+   Closed state: library row hidden, burger visible.
+   Open state (body.refract-burger-open): library row repositioned as
+   an absolute dropdown panel below the navbar, items full-width with
+   labels visible.
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Default: hidden everywhere. Only reveal under the touch-only media
+   query below. */
+body.stash-liquid-glass nav.top-nav .refract-burger {
+    display: none;
+}
+
+@media (pointer: coarse) and (max-width: 900px) {
+    body.stash-liquid-glass nav.top-nav .refract-burger {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: var(--nav-btn-size) !important;
+        height: var(--nav-btn-size) !important;
+        flex: 0 0 auto !important;
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: var(--radius-sm) !important;
+        color: var(--text) !important;
+        padding: 0 !important;
+        cursor: pointer;
+        transition: background 0.18s ease, border-color 0.18s ease;
+        /* Push to the far right of the navbar — brand is order:1,
+           collapse is 2, buttons is 3; we sit at 99. */
+        order: 99 !important;
+        margin-left: auto !important;
+    }
+    body.stash-liquid-glass nav.top-nav .refract-burger:hover {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(255, 255, 255, 0.20) !important;
+    }
+    body.stash-liquid-glass nav.top-nav .refract-burger svg {
+        width: 1.1rem !important;
+        height: 1.1rem !important;
+    }
+    /* Burger glow when dropdown is open — match the active-route halo. */
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .refract-burger,
+    body.stash-liquid-glass nav.top-nav .refract-burger[aria-expanded="true"] {
+        color: var(--accent) !important;
+        background: var(--accent-tint) !important;
+        border-color: var(--accent-glow) !important;
+        box-shadow:
+            0 0 18px rgba(var(--accent-rgb), 0.45),
+            0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
+    }
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .refract-burger svg,
+    body.stash-liquid-glass nav.top-nav .refract-burger[aria-expanded="true"] svg {
+        filter:
+            drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.65))
+            drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.45));
+    }
+
+    /* Closed state — hide everything except the brand (home) and the
+       burger. Selectors are qualified with `.collapse` / `.show` to
+       beat the existing force-display rule's specificity in 02_navbar.
+       Direct-child combinator for buttons so the rule doesn't track
+       the cluster after JS moves it into the dropdown. */
+    body.stash-liquid-glass nav.top-nav > .navbar-collapse,
+    body.stash-liquid-glass nav.top-nav > .navbar-collapse.collapse,
+    body.stash-liquid-glass nav.top-nav > .navbar-collapse.show,
+    body.stash-liquid-glass nav.top-nav > .navbar-buttons {
+        display: none !important;
+    }
+
+    /* (See open-state grid rules below — navbar-buttons flattens into
+       the grid via `display: contents`.) */
+
+    /* Force the navbar's clip to allow the dropdown to render below
+       its bounds. backdrop-filter on the navbar creates a containing
+       block that traps position: absolute/fixed children — overriding
+       overflow lets vertical extension show through. */
+    body.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top {
+        overflow: visible !important;
+    }
+
+    /* Open state — single 3-col grid containing library + utility
+       items mixed together, flattened via display:contents on the
+       intermediate .navbar-nav / .navbar-buttons containers. */
+    body.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top > .navbar-collapse,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top > .navbar-collapse.collapse,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top > .navbar-collapse.show {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 0.5rem !important;
+        position: fixed !important;
+        top: 64px !important;
+        left: 12px !important;
+        right: 12px !important;
+        background: rgba(18, 18, 22, 0.96) !important;
+        -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+        backdrop-filter: blur(16px) saturate(140%) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: var(--radius) !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55) !important;
+        padding: 0.7rem !important;
+        z-index: 100 !important;
+        max-height: calc(100vh - 80px) !important;
+        overflow-y: auto !important;
+        overflow-x: visible !important;
+        -webkit-mask-image: none !important;
+        mask-image: none !important;
+    }
+
+    /* Flatten the wrapper containers so their children become direct
+       grid cells of .navbar-collapse. */
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons {
+        display: contents !important;
+    }
+
+    /* Stash renders multiple .navbar-nav siblings inside .navbar-collapse —
+       library (first), an intermediate duplicate utility row (varies),
+       and .navbar-buttons (last, also has .navbar-nav class). Keep the
+       library + .navbar-buttons; hide anything else. */
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse > .navbar-nav:not(:first-child):not(.navbar-buttons) {
+        display: none !important;
+    }
+
+    /* Hide unwanted buttons in the dropdown — both the cell wrapper
+       AND its inner contents. Specificity bumped via duplicate body
+       class chains so this beats my display:flex reset above
+       regardless of source order. */
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *:has(.donate),
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *:has(.logout-button),
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *:has([href*="logout"]),
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *:has([href*="opencollective"]),
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *:has([title="Help"]),
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *[title="Help"],
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *[title="Log out"],
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *.logout-button,
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *.donate,
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *.navbar-toggler,
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *.nav-menu-toggle,
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *.sidebar-toggle-button,
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > a[href*="logout"],
+    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > a[href*="opencollective"] {
+        display: none !important;
+    }
+
+    /* Each grid cell = a glassy icon tile with on-theme curve and
+       inner highlight. Active route gets the accent halo. */
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav > *,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > * {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        height: auto !important;
+        max-width: none !important;
+        max-height: none !important;
+        aspect-ratio: 1 / 1 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: var(--glass-bg) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: var(--radius) !important;
+        overflow: hidden !important;
+        flex: initial !important;
+        order: 0 !important;
+        position: relative !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.05),
+            0 4px 12px rgba(0, 0, 0, 0.25) !important;
+        transition:
+            background 0.18s ease,
+            border-color 0.18s ease,
+            transform 0.18s cubic-bezier(0.34, 1.2, 0.64, 1),
+            box-shadow 0.22s ease !important;
+    }
+    /* :active only — tap feedback that ends as soon as the touch
+       releases. Avoids iOS Safari's sticky :hover, which would leave
+       the previous tile glowing accent after navigation. */
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav > *:active,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > *:active {
+        background: var(--accent-tint) !important;
+        border-color: var(--accent-glow) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 0 18px rgba(var(--accent-rgb), 0.3),
+            0 0 0 1px rgba(var(--accent-rgb), 0.15) inset !important;
+        transform: scale(0.97) !important;
+    }
+
+    /* Active route (current page) — strong accent halo so the user
+       knows where they are. */
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .stash-nav-active,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .active {
+        background: var(--accent-tint) !important;
+        border-color: var(--accent-glow) !important;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 0 22px rgba(var(--accent-rgb), 0.45),
+            0 0 0 1px rgba(var(--accent-rgb), 0.25) inset !important;
+    }
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .stash-nav-active svg,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .active svg {
+        color: var(--accent) !important;
+        filter:
+            drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.55))
+            drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.4)) !important;
+    }
+
+    /* Inner clickable elements (a / button / .btn) — strip their own
+       chrome so all variants render identically inside the tile.
+       Scoped to direct descendants of grid cells so we don't override
+       Stash's existing `display: none` on logout/help/donate links. */
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav > * > a,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav > * > a > .btn,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav > * > button,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > * > .btn,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > .btn,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > * > a > .btn,
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > * > a {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: var(--text) !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        text-decoration: none !important;
+        font-size: 0 !important;
+        text-indent: 0 !important;
+        filter: none !important;
+    }
+
+    /* Hide labels — icon-only grid. */
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse span {
+        display: none !important;
+    }
+    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse svg {
+        width: 1.6rem !important;
+        height: 1.6rem !important;
+        color: var(--text) !important;
+    }
+}

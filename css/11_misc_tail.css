@@ -200,7 +200,8 @@ body.stash-liquid-glass .search-result .btn-group .react-select__control {
 }
 
 /* ── Save button (btn-primary that lives outside any btn-group) ──────── */
-body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn) {
+/* Exclude tag-item icon buttons (Create / Link beside an unmatched tag pill) */
+body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn):not(.tag-item .btn) {
     background: rgba(var(--accent-rgb), 0.82) !important;
     border: 1px solid rgba(var(--accent-rgb), 0.45) !important;
     color: #fff !important;
@@ -213,15 +214,38 @@ body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn) {
     box-shadow: 0 2px 12px rgba(var(--accent-rgb), 0.22) !important;
     transition: background 0.15s, box-shadow 0.15s !important;
 }
-body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn):hover {
+body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn):not(.tag-item .btn):hover {
     background: var(--accent-bright) !important;
     box-shadow: 0 2px 18px rgba(var(--accent-rgb), 0.4) !important;
 }
 
+/* Create / Link icon buttons inside an unmatched tag pill — small inline glyphs
+   that match the surrounding badge instead of the big Save button. */
+body.stash-liquid-glass .search-result .tag-item.badge .btn.btn-primary {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 0.2rem !important;
+    margin: 0 0 0 0.15rem !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-sm) !important;
+    line-height: 1 !important;
+    font-size: 0.7rem !important;
+    transition: color 0.15s, background 0.15s !important;
+}
+body.stash-liquid-glass .search-result .tag-item.badge .btn.btn-primary:hover {
+    color: var(--accent-bright) !important;
+    background: var(--accent-tint) !important;
+}
+body.stash-liquid-glass .search-result .tag-item.badge .btn.btn-primary svg {
+    width: 0.7rem !important;
+    height: 0.7rem !important;
+}
+
 /* ── React-select overrides (correct react-select__ prefix) ─────────── */
 body.stash-liquid-glass .search-result .react-select__control--is-focused {
-    border-color: rgba(251, 146, 60, 0.4) !important;
-    box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.1) !important;
+    border-color: rgba(var(--accent-rgb), 0.4) !important;
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.1) !important;
 }
 
 /* Tag multi-value chips */

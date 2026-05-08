@@ -363,6 +363,126 @@
         return true;
     }
 
+    /* Custom mobile burger button — injected into the navbar via JS. CSS
+       (12_mobile.css) gates visibility on (pointer: coarse) so it only
+       shows on touch devices. Toggles `refract-burger-open` on <body>;
+       CSS re-styles `.navbar-collapse` as a dropdown panel in that state. */
+    function injectMobileBurger() {
+        var nav = document.querySelector("nav.top-nav");
+        if (!nav) { return false; }
+        if (nav.querySelector(".refract-burger")) { return true; }
+
+        var burger = document.createElement("button");
+        burger.type = "button";
+        burger.className = "refract-burger";
+        burger.setAttribute("aria-label", "Toggle navigation menu");
+        burger.setAttribute("aria-expanded", "false");
+        burger.innerHTML =
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+            'stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
+            '<path d="M4 6h16M4 12h16M4 18h16"/></svg>';
+
+        burger.addEventListener("click", function (e) {
+            e.stopPropagation();
+            var willOpen = !document.body.classList.contains("refract-burger-open");
+            if (willOpen) {
+                refractRelocateButtonsIntoDropdown();
+            } else {
+                refractRestoreButtonsFromDropdown();
+            }
+            document.body.classList.toggle("refract-burger-open", willOpen);
+            burger.setAttribute("aria-expanded", willOpen ? "true" : "false");
+        });
+
+        // Insert at the end so it sits on the far right of the navbar.
+        nav.appendChild(burger);
+        return true;
+    }
+
+    /* On open: move .navbar-buttons (sibling of .navbar-collapse in
+       Stash's mobile DOM) inside the collapse panel so the utility
+       cluster renders as the bottom row of the dropdown grid. Restore
+       on close so desktop layout is preserved. */
+    function refractRelocateButtonsIntoDropdown() {
+        var nav = document.querySelector("nav.top-nav");
+        if (!nav) { return; }
+        var collapse = nav.querySelector(".navbar-collapse");
+        var buttons = nav.querySelector(".navbar-buttons");
+        if (!collapse || !buttons) { return; }
+        if (buttons.parentNode === collapse) { return; }
+        buttons.setAttribute("data-refract-relocated", "1");
+        collapse.appendChild(buttons);
+    }
+    function refractRestoreButtonsFromDropdown() {
+        var nav = document.querySelector("nav.top-nav");
+        if (!nav) { return; }
+        var buttons = nav.querySelector('[data-refract-relocated="1"]');
+        if (!buttons) { return; }
+        buttons.removeAttribute("data-refract-relocated");
+        if (buttons.parentNode !== nav) {
+            nav.appendChild(buttons);
+        }
+    }
+
+    function refractBindBurgerGlobalHandlers() {
+        if (window.__refractBurgerHandlersBound) { return; }
+        window.__refractBurgerHandlersBound = true;
+
+        function closeBurger() {
+            refractRestoreButtonsFromDropdown();
+            document.body.classList.remove("refract-burger-open");
+            var b = document.querySelector(".refract-burger");
+            if (b) { b.setAttribute("aria-expanded", "false"); }
+        }
+
+        document.addEventListener("click", function (e) {
+            if (!document.body.classList.contains("refract-burger-open")) { return; }
+            var t = e.target;
+            if (!t || !t.closest) { return; }
+            if (t.closest(".refract-burger")) { return; }
+            if (t.closest("nav.top-nav .navbar-collapse")) {
+                if (t.closest("a, button")) { closeBurger(); }
+                return;
+            }
+            closeBurger();
+        });
+
+        if (typeof PluginApi !== "undefined" && PluginApi && PluginApi.Event && PluginApi.Event.addEventListener) {
+            PluginApi.Event.addEventListener("stash:location", closeBurger);
+        }
+        window.addEventListener("popstate", closeBurger);
+    }
+
+    /* Inject a "Support Stash" link at the bottom of the settings sidebar
+       so users can still find the donate page (we hide the navbar donate
+       button because it's off-theme). External link → opens in new tab. */
+    var DONATE_HREF = "https://opencollective.com/stashapp";
+    var HEART_SVG =
+        '<svg viewBox="0 0 512 512" fill="currentColor" aria-hidden="true">' +
+        '<path d="M225.8 468.2l-2.5-2.3L48.1 303.2C17.4 274.7 0 234.7 0 192.8l0-3.3c0-70.4 50-130.8 119.2-144 39.1-7.4 79.4 .9 109.4 22.8c12.2 8.9 19.4 18.2 27.4 28.5 8-10.3 15.3-19.6 27.4-28.5 30-21.9 70.3-30.2 109.4-22.8C462 53.5 512 113.9 512 184.3l0 3.5c0 41.9-17.4 81.9-48.1 110.4L289.6 466c-.8 .8-1.7 1.5-2.5 2.3-9.5 8.8-22 13.7-35 13.7s-25.5-4.9-35-13.7z"/>' +
+        '</svg>';
+
+    function injectSupportStashLink() {
+        var navs = document.querySelectorAll(".nav.nav-pills.flex-column");
+        if (!navs.length) { return false; }
+        var did = false;
+        navs.forEach(function (nav) {
+            if (nav.querySelector(".refract-support-stash")) { return; }
+            // Only inject in the settings sidebar, not in the help-modal sidebar.
+            if (!nav.closest("[class*='settings'], #settings-menu-container, .settings-section, .col-md-3, .col-lg-3")) { return; }
+
+            var item = document.createElement("div");
+            item.className = "nav-item refract-support-stash-item";
+            item.innerHTML =
+                '<a href="' + DONATE_HREF + '" target="_blank" rel="noopener noreferrer" ' +
+                'class="nav-link refract-support-stash">' +
+                HEART_SVG + '<span>Support Stash</span></a>';
+            nav.appendChild(item);
+            did = true;
+        });
+        return did;
+    }
+
     /* Stash renders <div class="troubleshooting-mode-button"> as a direct child of .nav, not inside
        <div class="nav-item"> like tab links — wrap it so layout matches Tools / About, etc. */
     function normalizeSettingsSidebarNavItems() {
@@ -652,7 +772,9 @@
                 injectNewButtonIcon();
                 normalizeLibraryAddButton();
                 relocateAddSourceButton();
+                injectMobileBurger();
                 normalizeSettingsSidebarNavItems();
+                injectSupportStashLink();
                 markActiveUtilityButtons();
                 stripRatingBannerToNumber();
                 initCardTilts();
@@ -1298,6 +1420,7 @@
         setRouteClass();
         cleanupLegacyArtifacts();
         initHistory();
+        refractBindBurgerGlobalHandlers();
         document.addEventListener("keydown", onKey);
 
         if (typeof PluginApi !== "undefined" && PluginApi && PluginApi.Event && PluginApi.Event.addEventListener) {
@@ -1306,7 +1429,9 @@
                 injectNewButtonIcon();
                 normalizeLibraryAddButton();
                 relocateAddSourceButton();
+                injectMobileBurger();
                 normalizeSettingsSidebarNavItems();
+                injectSupportStashLink();
                 markActiveUtilityButtons();
                 nextTick(stripRatingBannerToNumber);
                 nextTick(syncRoute);
@@ -1327,7 +1452,9 @@
         injectNewButtonIcon();
         normalizeLibraryAddButton();
         relocateAddSourceButton();
+                injectMobileBurger();
         normalizeSettingsSidebarNavItems();
+                injectSupportStashLink();
         markActiveUtilityButtons();
         stripRatingBannerToNumber();
         initCardTilts();
