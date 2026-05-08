@@ -289,6 +289,11 @@ body.stash-liquid-glass .scene-tabs .scene-toolbar .count-button svg {
     width: 11px !important;
     height: 11px !important;
 }
+/* `.mv-scene-page-btn` (multiview plugin) shares this size/shape rule
+   with Stash core toolbar buttons; reference intentionally retained
+   so the multiview button matches the rest. Plugin-specific styling
+   (active state, glow) lives in 13_plugins.css. Same applies to the
+   :hover and svg rules below. */
 body.stash-liquid-glass .scene-tabs .scene-toolbar .organized-button,
 body.stash-liquid-glass .scene-tabs .scene-toolbar .dropdown-toggle,
 body.stash-liquid-glass .scene-tabs .scene-toolbar .mv-scene-page-btn,

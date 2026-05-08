@@ -1,0 +1,239 @@
+/* ───────────────────────────────────────────────────────────────────
+   Refract → multiview player overlay
+
+   This stylesheet is NOT loaded by Stash's plugin manifest. It's served
+   at /plugin/stashTheme/assets/css/multiview-player.css and pulled into
+   multiview's standalone player page (index.html) via a <link> injected
+   from a localStorage URL handoff (mv.theme.styleUrl).
+
+   Multiview is the generic loader; Refract owns this stylesheet. Other
+   themes can publish their own equivalent at their own asset endpoint
+   and write the URL to mv.theme.styleUrl.
+
+   Accent vars (--accent, --accent-bright, --accent-tint, --accent-rgb)
+   are set on the player's :root by the inline handoff script in
+   index.html before this file loads.
+   ─────────────────────────────────────────────────────────────────── */
+
+
+/* ── Topbar — dark tinted glass ─────────────────────────────────────────── */
+
+#mv-topbar {
+    background: rgba(20, 20, 24, 0.78) !important;
+    backdrop-filter: blur(24px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.mv-topbar-sep {
+    background: rgba(255, 255, 255, 0.10) !important;
+}
+
+#mv-back-btn {
+    color: rgba(255, 255, 255, 0.70) !important;
+    border-radius: 6px !important;
+}
+#mv-back-btn:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+
+#mv-title {
+    color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.mv-topbar-icon-btn {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(255, 255, 255, 0.10) !important;
+    color: rgba(255, 255, 255, 0.65) !important;
+    border-radius: 6px !important;
+}
+.mv-topbar-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.10) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: #fff !important;
+}
+
+/* Selected/active state — focus button (.active class), settings button
+   when modal open (:has detection), and roulette button when menu panel
+   open. All get the same accent halo as Refract's active navbar buttons. */
+#mv-focus-btn.active,
+body:has(#mv-settings-modal) #mv-settings-btn,
+body:has(#mv-menu-panel) #mv-roulette-btn {
+    background: var(--accent-tint) !important;
+    border-color: rgba(var(--accent-rgb), 0.45) !important;
+    color: var(--accent) !important;
+    box-shadow:
+        0 0 14px rgba(var(--accent-rgb), 0.40),
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
+}
+#mv-focus-btn.active:hover,
+body:has(#mv-settings-modal) #mv-settings-btn:hover,
+body:has(#mv-menu-panel) #mv-roulette-btn:hover {
+    background: rgba(var(--accent-rgb), 0.22) !important;
+    border-color: rgba(var(--accent-rgb), 0.55) !important;
+}
+
+
+/* ── Settings modal ─────────────────────────────────────────────────────── */
+
+#mv-settings-modal {
+    background: rgba(8, 8, 10, 0.45) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.mv-settings-card {
+    background: rgba(28, 28, 32, 0.62) !important;
+    backdrop-filter: blur(32px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(32px) saturate(140%) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    border-radius: 14px !important;
+    box-shadow:
+        0 0 60px rgba(var(--accent-rgb), 0.22),
+        0 0 0 1px rgba(var(--accent-rgb), 0.08),
+        0 16px 48px rgba(0, 0, 0, 0.60) !important;
+}
+
+.mv-settings-header {
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.mv-settings-title {
+    color: rgba(255, 255, 255, 0.92) !important;
+    letter-spacing: 0.01em !important;
+}
+
+.mv-settings-close {
+    color: rgba(255, 255, 255, 0.55) !important;
+    border-radius: 5px !important;
+}
+.mv-settings-close:hover {
+    background: rgba(255, 255, 255, 0.10) !important;
+    color: #fff !important;
+}
+
+.mv-settings-dp-row {
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.mv-settings-dp-label {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.mv-settings-dp-desc {
+    color: rgba(255, 255, 255, 0.50) !important;
+}
+
+.mv-settings-section-heading,
+.mv-menu-heading {
+    color: rgba(255, 255, 255, 0.50) !important;
+}
+
+.mv-settings-qual-row label {
+    color: rgba(255, 255, 255, 0.78) !important;
+}
+
+/* Toggle — Refract's gradient track + glassy thumb pattern, adapted from
+   .custom-switch in 08_misc_mid.css. Sized to multiview's 36×20 slot. */
+.mv-toggle {
+    width: 36px !important;
+    height: 20px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.14) 0%,
+        rgba(255, 255, 255, 0.05) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+        0 4px 12px rgba(0, 0, 0, 0.28) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    backdrop-filter: blur(8px) !important;
+    transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease !important;
+}
+.mv-toggle::after {
+    width: 14px !important;
+    height: 14px !important;
+    top: 2px !important;
+    left: 2px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(220, 224, 232, 0.82) 100%) !important;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(255, 255, 255, 0.40) inset !important;
+    transition: left 0.22s ease, background 0.22s ease, box-shadow 0.22s ease !important;
+}
+.mv-toggle:checked {
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.22) 0%,
+        rgba(255, 255, 255, 0.10) 100%) !important;
+    border-color: rgba(255, 255, 255, 0.32) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 0 14px rgba(var(--accent-rgb), 0.42),
+        0 0 0 1px rgba(var(--accent-rgb), 0.22) !important;
+}
+.mv-toggle:checked::after {
+    left: 19px !important;
+    background: linear-gradient(180deg,
+        var(--accent-bright) 0%,
+        var(--accent) 100%) !important;
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.35),
+        0 0 10px rgba(var(--accent-rgb), 0.50),
+        0 0 0 1px rgba(255, 255, 255, 0.35) inset !important;
+}
+
+/* Quality select dropdowns — match Refract's form-control language */
+.mv-quality-select {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+    border-radius: 6px !important;
+    padding: 5px 10px !important;
+}
+.mv-quality-select:hover {
+    border-color: rgba(var(--accent-rgb), 0.45) !important;
+}
+.mv-quality-select:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.18) !important;
+    outline: none !important;
+}
+
+
+/* ── Roulette / menu panel ──────────────────────────────────────────────── */
+
+#mv-menu-panel {
+    background: rgba(28, 28, 32, 0.62) !important;
+    backdrop-filter: blur(32px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(32px) saturate(140%) !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    border-radius: 14px !important;
+    box-shadow:
+        0 0 60px rgba(var(--accent-rgb), 0.22),
+        0 0 0 1px rgba(var(--accent-rgb), 0.08),
+        0 16px 48px rgba(0, 0, 0, 0.60) !important;
+}
+
+.mv-menu-count {
+    color: var(--accent) !important;
+    text-shadow: 0 0 12px rgba(var(--accent-rgb), 0.45) !important;
+}
+
+.mv-menu-slider {
+    background: rgba(255, 255, 255, 0.10) !important;
+}
+
+.mv-menu-roll-btn {
+    background: var(--accent) !important;
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.30) !important;
+    border-radius: 6px !important;
+}
+.mv-menu-roll-btn:hover {
+    background: var(--accent-bright) !important;
+    box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.45) !important;
+}
