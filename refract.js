@@ -112,10 +112,36 @@
             var accent = stored[0];
             var setLocalAccent = stored[1];
 
+            var minimiserState = R.useState(isViewMinimiserEnabled());
+            var minimiserOn = minimiserState[0];
+            var setMinimiserOn = minimiserState[1];
+
+            var logoState = R.useState(getStoredLogoUrl());
+            var logoUrl = logoState[0];
+            var setLogoUrl = logoState[1];
+
             function pick(preset) {
                 try { localStorage.setItem(ACCENT_STORAGE_KEY, preset); } catch (e) { /* ignore */ }
                 applyAccentClass(preset);
                 setLocalAccent(preset);
+            }
+
+            function toggleMinimiser() {
+                var next = !minimiserOn;
+                try { localStorage.setItem(VIEW_MINIMISER_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                setMinimiserOn(next);
+                if (next) { initViewModeDropdown(); }
+                else { teardownViewModeDropdown(); }
+            }
+
+            function updateLogoUrl(value) {
+                var trimmed = (value || "").trim();
+                try {
+                    if (trimmed) { localStorage.setItem(LOGO_URL_STORAGE_KEY, trimmed); }
+                    else { localStorage.removeItem(LOGO_URL_STORAGE_KEY); }
+                } catch (e) { /* ignore */ }
+                setLogoUrl(value);
+                refineBrandHomeOrb();
             }
 
             var swatches = REFRACT_PRESETS_ALL.map(function (preset) {
@@ -131,13 +157,55 @@
                 });
             });
 
-            return R.createElement("div", { className: "setting", id: "plugin-refract-accent" },
-                R.createElement("div", null,
-                    R.createElement("h3", null, "Accent colour"),
-                    R.createElement("div", { className: "sub-heading" },
-                        "Click a swatch to apply instantly. Saved per browser.")
+            return R.createElement("div", { className: "plugin-settings" },
+                R.createElement("div", { className: "setting", id: "plugin-refract-accent" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "Accent colour"),
+                        R.createElement("div", { className: "sub-heading" },
+                            "Click a swatch to apply instantly. Saved per browser.")
+                    ),
+                    R.createElement("div", { className: "refract-accent-swatches" }, swatches)
                 ),
-                R.createElement("div", { className: "refract-accent-swatches" }, swatches)
+                R.createElement("div", { className: "setting", id: "plugin-refract-view-minimiser" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "View-mode minimiser"),
+                        R.createElement("div", { className: "sub-heading" },
+                            "Collapse the row of view-mode buttons into a single icon + expand chevron. Disable to use Stash's original button group.")
+                    ),
+                    R.createElement("div", { className: "refract-setting-control" },
+                        R.createElement("div", { className: "custom-control custom-switch" },
+                            R.createElement("input", {
+                                type: "checkbox",
+                                className: "custom-control-input",
+                                id: "refract-view-minimiser-toggle",
+                                checked: minimiserOn,
+                                onChange: toggleMinimiser
+                            }),
+                            R.createElement("label", {
+                                className: "custom-control-label",
+                                htmlFor: "refract-view-minimiser-toggle"
+                            })
+                        )
+                    )
+                ),
+                R.createElement("div", { className: "setting", id: "plugin-refract-custom-logo" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "Custom logo"),
+                        R.createElement("div", { className: "sub-heading" },
+                            "Image URL displayed in the navbar home button. Leave empty for the default Refract orb. Hosted URLs and ",
+                            R.createElement("code", null, "data:image/..."),
+                            " URIs are both supported.")
+                    ),
+                    R.createElement("div", { className: "refract-setting-control" },
+                        R.createElement("input", {
+                            type: "text",
+                            className: "form-control refract-logo-input",
+                            placeholder: "https://example.com/logo.png",
+                            value: logoUrl,
+                            onChange: function (e) { updateLogoUrl(e.target.value); }
+                        })
+                    )
+                )
             );
         };
     }
@@ -162,7 +230,32 @@
 
     var CATEGORIES_PATH = "/categories";
     var STORAGE_KEY_API = "refract.apiKey";
+    var VIEW_MINIMISER_STORAGE_KEY = "refract.viewMinimiser";
+    var LOGO_URL_STORAGE_KEY = "refract.customLogoUrl";
     var GRAPHQL_URL = "/graphql";
+
+    /* View-mode minimiser feature toggle. Default enabled — Refract
+       collapses Stash's row of view-mode buttons into a single icon +
+       expand chevron to reduce toolbar clutter. Users who prefer the
+       original Stash btn-group can disable this in plugin settings. */
+    function isViewMinimiserEnabled() {
+        try {
+            var v = localStorage.getItem(VIEW_MINIMISER_STORAGE_KEY);
+            if (v === "0") { return false; }
+        } catch (e) { /* ignore */ }
+        return true;
+    }
+
+    /* Custom navbar home-orb logo. Empty/null = default Refract orb;
+       any URL (including data:image/...) renders as an <img> inside the
+       brand button. */
+    function getStoredLogoUrl() {
+        try {
+            var v = localStorage.getItem(LOGO_URL_STORAGE_KEY);
+            return (typeof v === "string" && v.trim()) ? v.trim() : "";
+        } catch (e) { /* ignore */ }
+        return "";
+    }
 
     var QUERY_ROOT_TAGS =
         'query StashThemeRootTags { findTags(' +
@@ -221,6 +314,23 @@
         if (p === CATEGORIES_PATH) { return true; }
         var h = window.location.hash || "";
         return h === "#/categories" || h.indexOf("#/categories/") === 0;
+    }
+
+    /* Insert newNode into parent before referenceNode. Falls back to
+       appendChild if referenceNode isn't actually a child of parent —
+       React re-renders can detach references between query and call,
+       causing "Child to insert before is not a child of this node"
+       errors that break unrelated DOM work in the same cycle. */
+    function safeInsertBefore(parent, newNode, referenceNode) {
+        if (!parent || !newNode) { return null; }
+        try {
+            if (referenceNode && parent.contains(referenceNode)) {
+                return parent.insertBefore(newNode, referenceNode);
+            }
+            return parent.appendChild(newNode);
+        } catch (e) {
+            try { return parent.appendChild(newNode); } catch (e2) { return null; }
+        }
     }
 
     function nextTick(fn) {
@@ -288,17 +398,41 @@
         if (!btn) {
             return false;
         }
-        if (btn.tagName === "A") {
-            var aText = (btn.textContent || "").replace(/\s+/g, " ").trim();
-            if (aText || btn.querySelector("svg, img")) {
-                while (btn.firstChild) {
-                    btn.removeChild(btn.firstChild);
+        var logoUrl = getStoredLogoUrl();
+        var existingLogo = btn.querySelector(".refract-custom-logo");
+        if (logoUrl) {
+            /* Custom logo set — render a masked <span> tinted to the same
+               --text white as the rest of the navbar icons. The image is
+               used as a CSS mask, not a foreground bitmap, so any
+               opaque pixel paints in the accent-aware text colour. Skip
+               rebuild if URL unchanged. */
+            if (!existingLogo || existingLogo.dataset.src !== logoUrl) {
+                if (btn.tagName === "A") {
+                    while (btn.firstChild) { btn.removeChild(btn.firstChild); }
+                } else {
+                    btn.innerHTML = "";
                 }
+                var logo = document.createElement("span");
+                logo.className = "refract-custom-logo";
+                logo.dataset.src = logoUrl;
+                var maskUrl = 'url("' + logoUrl.replace(/"/g, '\\"') + '")';
+                logo.style.maskImage = maskUrl;
+                logo.style.webkitMaskImage = maskUrl;
+                btn.appendChild(logo);
             }
         } else {
-            var text = (btn.textContent || "").replace(/\s+/g, " ").trim();
-            if (text || btn.querySelector("svg, img")) {
-                btn.innerHTML = "";
+            /* Default orb — strip any text/svg/img so Refract's CSS
+               renders the empty styled circle. */
+            if (btn.tagName === "A") {
+                var aText = (btn.textContent || "").replace(/\s+/g, " ").trim();
+                if (aText || btn.querySelector("svg, img")) {
+                    while (btn.firstChild) { btn.removeChild(btn.firstChild); }
+                }
+            } else {
+                var text = (btn.textContent || "").replace(/\s+/g, " ").trim();
+                if (text || btn.querySelector("svg, img")) {
+                    btn.innerHTML = "";
+                }
             }
         }
         var aria = (btn.getAttribute("aria-label") || "").trim();
@@ -404,7 +538,7 @@
         addBtn.classList.remove("btn-success");
         addBtn.classList.add("btn-primary");
         if (addBtn.previousElementSibling === installBtn) { return true; }
-        installBtn.parentNode.insertBefore(addBtn, installBtn.nextSibling);
+        safeInsertBefore(installBtn.parentNode, addBtn, installBtn.nextSibling);
         return true;
     }
 
@@ -546,14 +680,14 @@
             if (advancedItem && !(prevSib && prevSib.classList.contains("stash-theme-settings-divider"))) {
                 var hr = document.createElement("li");
                 hr.className = "nav-item stash-theme-settings-divider";
-                par.insertBefore(hr, advancedItem);
+                safeInsertBefore(par, hr, advancedItem);
                 did = true;
             }
 
             /* Wrap troubleshooting in a .nav-item. */
             var wrap = document.createElement("div");
             wrap.className = "nav-item stash-theme-settings-troubleshooting-item";
-            par.insertBefore(wrap, tb);
+            safeInsertBefore(par, wrap, tb);
             wrap.appendChild(tb);
             did = true;
         });
@@ -807,31 +941,39 @@
 
     /* ── Watch for nav re-renders so the + icon survives ─────────── */
 
+    /* Run an init in isolation so one throw doesn't skip the rest of the
+       cycle (e.g. a stale-reference NotFoundError from one init breaking
+       sibling initializers running in the same MutationObserver callback). */
+    function safeRun(fn) {
+        try { fn(); } catch (e) { /* swallow — Stash re-renders will trigger another cycle */ }
+    }
+
     function watchForReinjection() {
         var observer = new MutationObserver(function () {
             /* Disconnect while mutating so our DOM updates do not synchronously re-trigger this observer
                (can freeze the tab / block Stash from finishing load). */
             observer.disconnect();
             try {
-                refineBrandHomeOrb();
-                injectNewButtonIcon();
-                normalizeLibraryAddButton();
-                relocateAddSourceButton();
-                injectMobileBurger();
-                normalizeSettingsSidebarNavItems();
-                injectSupportStashLink();
-                markActiveUtilityButtons();
-                stripRatingBannerToNumber();
-                initCardTilts();
-                initSceneCards();
-                initPerformerCards();
-                initSlickCarousels();
-                initFilterBar();
-                initFilterButtonBadge();
-                initViewModeDropdown();
-                initFloatingPager();
-                disableTableOverflowable();
-                markFilledStars();
+                safeRun(refineBrandHomeOrb);
+                safeRun(injectNewButtonIcon);
+                safeRun(normalizeLibraryAddButton);
+                safeRun(relocateAddSourceButton);
+                safeRun(injectMobileBurger);
+                safeRun(normalizeSettingsSidebarNavItems);
+                safeRun(injectSupportStashLink);
+                safeRun(markActiveUtilityButtons);
+                safeRun(stripRatingBannerToNumber);
+                safeRun(initCardTilts);
+                safeRun(initSceneCards);
+                safeRun(initPerformerCards);
+                safeRun(initSlickCarousels);
+                safeRun(initFilterBar);
+                safeRun(initFilterButtonBadge);
+                safeRun(initViewModeDropdown);
+                safeRun(initTabScrollChevrons);
+                safeRun(initFloatingPager);
+                safeRun(disableTableOverflowable);
+                safeRun(markFilledStars);
             } finally {
                 observer.observe(document.body, { childList: true, subtree: true });
             }
@@ -1213,6 +1355,7 @@
     /* ── View-mode dropdown: replaces the btn-group in the filter bar ── */
 
     function initViewModeDropdown() {
+        if (!isViewMinimiserEnabled()) { return; }
         document.querySelectorAll("[data-stash-filter]").forEach(function (container) {
             if (container.querySelector(".stash-view-wrap")) { return; }
             /* View-mode buttons are the rightmost btn-group; pick the last one
@@ -1253,7 +1396,7 @@
                     rescued.className = mvBtn.className + " stash-mv-rescued";
                 });
                 mvObs.observe(mvBtn, { attributes: true, attributeFilter: ["class"] });
-                group.parentElement.insertBefore(rescued, group.nextSibling);
+                safeInsertBefore(group.parentElement, rescued, group.nextSibling);
             }
 
             var wrap      = document.createElement("div");
@@ -1366,7 +1509,45 @@
             wrap.appendChild(activeInd);
             wrap.appendChild(panel);
             wrap.appendChild(trigger);
-            group.parentElement.insertBefore(wrap, group);
+            safeInsertBefore(group.parentElement, wrap, group);
+        });
+    }
+
+    /* Tear down the view-mode dropdown and restore Stash's original
+       btn-group of view buttons. Used when the user toggles the
+       minimiser feature off in plugin settings. */
+    function teardownViewModeDropdown() {
+        document.querySelectorAll(".stash-view-wrap").forEach(function (w) { w.remove(); });
+        document.querySelectorAll(".stash-mv-rescued").forEach(function (b) { b.remove(); });
+        document.querySelectorAll(".btn-group[data-stash-view-hidden]").forEach(function (g) {
+            g.style.cssText = "";
+            g.removeAttribute("data-stash-view-hidden");
+        });
+    }
+
+    /* ── Tab-strip wheel scroll ─────────────────────────────────────────
+       Stash's scene/gallery .nav-tabs and .scene-toolbar strips use
+       overflow-x: auto with hidden scrollbars. Trackpad users can
+       side-swipe natively; mouse users with vertical-only wheels have
+       no way to scroll horizontally. This handler converts vertical
+       wheel deltas into horizontal scroll on those strips. Native
+       horizontal-axis events (trackpad horizontal swipe, shift+wheel)
+       pass through untouched. */
+
+    function initTabScrollChevrons() {
+        var strips = document.querySelectorAll(
+            ".scene-tabs .nav-tabs:not([data-refract-wheel-scroll])," +
+            ".gallery-tabs .nav-tabs:not([data-refract-wheel-scroll])," +
+            ".scene-tabs .scene-toolbar:not([data-refract-wheel-scroll])"
+        );
+        strips.forEach(function (strip) {
+            strip.setAttribute("data-refract-wheel-scroll", "1");
+            strip.addEventListener("wheel", function (e) {
+                if (e.deltaY === 0) { return; }
+                if (strip.scrollWidth <= strip.clientWidth) { return; }
+                e.preventDefault();
+                strip.scrollLeft += e.deltaY;
+            }, { passive: false });
         });
     }
 
@@ -1486,6 +1667,7 @@
                 nextTick(initFilterBar);
                 nextTick(initFilterButtonBadge);
                 nextTick(initViewModeDropdown);
+                nextTick(initTabScrollChevrons);
                 nextTick(initFloatingPager);
                 nextTick(disableTableOverflowable);
                 nextTick(markFilledStars);
@@ -1509,6 +1691,7 @@
         initFilterBar();
         initFilterButtonBadge();
         initViewModeDropdown();
+        initTabScrollChevrons();
         initFloatingPager();
         disableTableOverflowable();
         watchForReinjection();
@@ -1789,7 +1972,7 @@
         var indicator = header.querySelector(".Lightbox-header-indicator");
         var headerRight = header.querySelector(".Lightbox-header-right");
         if (indicator && footerLeft) {
-            footerLeft.insertBefore(indicator, footerLeft.firstChild);
+            safeInsertBefore(footerLeft, indicator, footerLeft.firstChild);
         }
         if (headerRight && footerRight) {
             while (headerRight.firstChild) {
@@ -1907,7 +2090,7 @@
             });
 
             // Place toggle as the LEFT-most action item in the right column.
-            rightSide.insertBefore(wrap, rightSide.firstChild);
+            safeInsertBefore(rightSide, wrap, rightSide.firstChild);
         }
     }
     (function watchPluginToggles() {

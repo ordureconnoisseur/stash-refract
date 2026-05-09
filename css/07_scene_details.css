@@ -333,14 +333,20 @@ body.stash-liquid-glass .nav-tabs {
     gap: 2px !important;
     padding: 0.3rem !important;
     flex-wrap: nowrap !important;
+    margin: 0 0 1rem 0 !important;
+}
+/* Horizontal-scroll only for the scene/gallery tab strips (where wheel-scroll
+   matters). Bare .nav-tabs (performer/studio detail page count tabs) keep
+   overflow visible so the active-tab box-shadow glow can extend past the
+   strip's vertical bounds. */
+body.stash-liquid-glass .scene-tabs .nav-tabs,
+body.stash-liquid-glass .gallery-tabs .nav-tabs {
     overflow-x: auto !important;
     -ms-overflow-style: none !important;
     scrollbar-width: none !important;
-    margin: 0 0 1rem 0 !important;
 }
 body.stash-liquid-glass .scene-tabs .nav-tabs::-webkit-scrollbar,
-body.stash-liquid-glass .gallery-tabs .nav-tabs::-webkit-scrollbar,
-body.stash-liquid-glass .nav-tabs::-webkit-scrollbar {
+body.stash-liquid-glass .gallery-tabs .nav-tabs::-webkit-scrollbar {
     display: none !important;
 }
 body.stash-liquid-glass .scene-tabs .nav-tabs .nav-link,
@@ -350,8 +356,8 @@ body.stash-liquid-glass .nav-tabs .nav-link {
     border: 1px solid transparent !important;
     border-radius: var(--radius-sm) !important;
     margin-bottom: 0 !important;
-    padding: 0.35rem 0.65rem !important;
-    font-size: 0.74rem !important;
+    padding: 0.3rem 0.55rem !important;
+    font-size: 0.72rem !important;
     white-space: nowrap !important;
     transition: color 0.15s, background 0.15s, border-color 0.15s !important;
 }
@@ -372,6 +378,7 @@ body.stash-liquid-glass .nav-tabs .nav-link.active {
         0 0 14px rgba(var(--accent-rgb), 0.35),
         0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
 }
+
 
 body.stash-liquid-glass .scene-tabs .card .card-body,
 body.stash-liquid-glass .gallery-tabs .card .card-body {
