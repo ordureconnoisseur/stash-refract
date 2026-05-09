@@ -2,7 +2,7 @@
    Refract → multiview player overlay
 
    This stylesheet is NOT loaded by Stash's plugin manifest. It's served
-   at /plugin/stashTheme/assets/css/multiview-player.css and pulled into
+   at /plugin/refract/assets/css/multiview-player.css and pulled into
    multiview's standalone player page (index.html) via a <link> injected
    from a localStorage URL handoff (mv.theme.styleUrl).
 

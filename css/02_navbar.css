@@ -350,7 +350,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] svg {
 
 /* url-switcher styling (sizing + mode-tunnel glow) lives in 13_plugins.css. */
 
-/* Brand — orange glass orb (text cleared in stashTheme.js; aria-label = Home).
+/* Brand — orange glass orb (text cleared in refract.js; aria-label = Home).
    Stash / react-router variants: optional .top-nav; .brand-link on button or anchor; HashRouter. */
 body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand,
 body.stash-liquid-glass nav.top-nav .navbar-brand,

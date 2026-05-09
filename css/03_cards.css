@@ -34,7 +34,7 @@ body.stash-liquid-glass .card img {
     width: 100%;
 }
 
-/* Tilt glare overlay — injected by stashTheme.js */
+/* Tilt glare overlay — injected by refract.js */
 body.stash-liquid-glass .stash-tilt-glare {
     position: absolute;
     inset: 0;
@@ -107,7 +107,7 @@ body.stash-liquid-glass .card-check:focus {
     box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.3) !important;
 }
 
-/* Rating — fixed square squircle + orange glow; number only (stashTheme.js strips label) */
+/* Rating — fixed square squircle + orange glow; number only (refract.js strips label) */
 body.stash-liquid-glass .performer-card,
 body.stash-liquid-glass .grid-card.performer-card,
 body.stash-liquid-glass .card.performer-card,

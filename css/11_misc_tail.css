@@ -355,7 +355,7 @@ body.stash-liquid-glass .Lightbox {
     box-sizing: border-box !important;
 }
 
-/* Header — emptied by stashTheme.js (its content moves to the footer);
+/* Header — emptied by refract.js (its content moves to the footer);
    hide the now-empty container so only one floating bar shows. */
 body.stash-liquid-glass .Lightbox-header {
     display: none !important;
@@ -707,11 +707,11 @@ body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link svg {
 }
 
 /* Refract Theme — accent swatch picker (replaces Stash's native input on
-   #plugin-stashTheme-accent in Settings → Plugins → Refract Theme).
+   #plugin-refract-accent in Settings → Plugins → Refract Theme).
    Stash's `.setting > div:last-child` cell is sized to its content, so
    we explicitly let the swatch row expand and lock each swatch to its
    intrinsic 30×30 against flex-shrink. */
-body.stash-liquid-glass #plugin-stashTheme-accent > div:last-child {
+body.stash-liquid-glass #plugin-refract-accent > div:last-child {
     flex-shrink: 0 !important;
     width: auto !important;
     min-width: 0 !important;

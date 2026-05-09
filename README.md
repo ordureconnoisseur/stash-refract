@@ -32,7 +32,7 @@ The mobile burger panel only shows on touch-input devices (`@media (pointer: coa
 **Manually**:
 ```bash
 git clone https://github.com/ordureconnoisseur/stash-refract \
-  ~/.stash/plugins/Refract
+  ~/.stash/plugins/refract
 ```
 Then restart Stash and enable the plugin in Settings → Plugins.
 
