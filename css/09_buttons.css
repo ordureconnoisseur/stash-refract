@@ -612,20 +612,25 @@ body.stash-liquid-glass .perf-rating-close {
     flex-shrink: 0;
     transition: background 0.15s, border-color 0.15s;
 }
+/* Use mask-image so the × glyph color comes from background-color and
+   tracks --accent-bright on hover. Stroke value inside the data URI is
+   ignored — only the rendered alpha matters. */
 body.stash-liquid-glass .perf-rating-close::before {
     content: '';
     display: block;
     width: 11px;
     height: 11px;
-    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 6L6 18M6 6l12 12' stroke='rgba(255,255,255,0.55)' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
-    transition: background-image 0.15s;
+    background-color: rgba(255, 255, 255, 0.55);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 6L6 18M6 6l12 12' stroke='%23000' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 6L6 18M6 6l12 12' stroke='%23000' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
+    transition: background-color 0.15s;
 }
 body.stash-liquid-glass .perf-rating-close:hover {
     background: rgba(var(--accent-rgb), 0.16) !important;
     border-color: rgba(var(--accent-rgb), 0.35) !important;
 }
 body.stash-liquid-glass .perf-rating-close:hover::before {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 6L6 18M6 6l12 12' stroke='%23fb923c' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-color: var(--accent-bright);
 }
 
 /* Ratings list scroll container */
