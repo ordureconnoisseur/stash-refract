@@ -2363,7 +2363,7 @@ body.stash-liquid-glass .package-manager-table-container .source-controls .btn {
    button centers against the full row width. Set the row + tds to
    block-level, hide the empty first td, and let the surviving td
    stretch the full width with text-align: center. */
-/* When stashTheme.js relocates the Add source button up next to Install,
+/* When refract.js relocates the Add source button up next to Install,
    the original host row is left empty — collapse it. */
 body.stash-liquid-glass .package-manager-table-container .table tbody tr.add-package-source:not(:has(button)) {
     display: none !important;
@@ -2518,7 +2518,7 @@ body.stash-liquid-glass .stash-performer-link:hover {
     z-index: 20;
 }
 /* Performer-name tooltip — appears centered above the avatar on hover.
-   data-performer-name is set by stashTheme.js; falls back to nothing if
+   data-performer-name is set by refract.js; falls back to nothing if
    the name isn't available. */
 body.stash-liquid-glass .stash-performer-link[data-performer-name]::after {
     content: attr(data-performer-name);
@@ -2616,7 +2616,7 @@ body.stash-liquid-glass .stash-tag-count .stash-tag-icon {
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Categories overlay (injected by stashTheme.js)
+   Categories overlay (injected by refract.js)
    ─────────────────────────────────────────────────────────────────── */
 
 #stash-category-browser {
