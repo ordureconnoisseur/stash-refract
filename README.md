@@ -3,21 +3,25 @@
 Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass panels, floating navbar, dark base, configurable accent.
 
 ![Refract — desktop overview](./screenshots/01-desktop-overview.png)
-<!-- TODO: home / scenes wall at full desktop width -->
 
 ## Features
 
 - Glass-morphism re-skin of every Stash surface (cards, filters, scene player, settings, lightbox, scene tagger)
-- 8 built-in accent presets + custom override via CSS variables
+- 8 built-in accent presets + custom override via CSS variables — applies instantly, saved per browser
 - Touch-only mobile burger menu — Stash's default nav is unusable on phones; Refract replaces the library row with a 3-column icon grid dropdown on `pointer: coarse` devices
 - Horizontally-scrollable navbar at narrow desktop widths instead of icons collapsing one-by-one
 - Donate link relocated from navbar into the settings sidebar (still discoverable, no longer cluttering the navbar at small widths)
+- Theme-aware integration with [stash-multiview](https://github.com/ordureconnoisseur/stash-multiview) — accent flows into the multiview player via a localStorage handoff, including the standalone player page
+
+![Accent cycle](./screenshots/accent-cycle.gif)
+
+The accent picker lives in **Settings → Plugins → Refract Theme** and applies live to every surface — navbar, cards, filter pills, scene tagger, and any companion plugin that's been theme-aware'd.
 
 ![Accent picker](./screenshots/02-accent-picker.png)
-<!-- TODO: settings panel with the 8 swatches visible -->
+
+The mobile burger panel only shows on touch-input devices (`@media (pointer: coarse)`); resizing a desktop window down won't trigger it.
 
 ![Mobile burger menu](./screenshots/03-mobile-burger.png)
-<!-- TODO: phone screenshot, burger open with the icon grid showing -->
 
 ## Install
 
