@@ -118,7 +118,7 @@ body.stash-liquid-glass .scene-header-container {
     box-shadow: none !important;
 }
 /* Hide the studio LOGO IMAGE only. The studio NAME is injected as a
-   <span class="st-studio-name"> child of the <a> by stashTheme.js (the
+   <span class="st-studio-name"> child of the <a> by refract.js (the
    name lives only in the image's alt attribute on this Stash version). */
 body.stash-liquid-glass .scene-tabs .scene-header-container img,
 body.stash-liquid-glass .scene-tabs .scene-header-container .studio-logo img,

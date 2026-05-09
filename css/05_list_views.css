@@ -323,7 +323,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-link.active {
         0 0 12px rgba(var(--accent-rgb), 0.28) !important;
 }
 
-/* "Support Stash" link injected by stashTheme.js at the bottom of the
+/* "Support Stash" link injected by refract.js at the bottom of the
    settings sidebar — replaces the navbar donate button (which we hide
    because it's off-theme). Subtle, matches sidebar nav-pills aesthetic. */
 body.stash-liquid-glass .nav.nav-pills.flex-column .refract-support-stash-item {
@@ -421,7 +421,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item:has(.advanced-switc
     color: var(--accent-bright) !important;
 }
 
-/* Troubleshooting: stashTheme.js wraps in .nav-item; style button like other sidebar links. */
+/* Troubleshooting: refract.js wraps in .nav-item; style button like other sidebar links. */
 body.stash-liquid-glass .troubleshooting-mode-button {
     position: static !important;
     float: none !important;
@@ -921,7 +921,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
    - Description is clamped to 2 lines + ellipsis (no scroll bars).
    - Right action column has a fixed width so the toggle / link / chevron
      line up across every row.
-   - The native Enable/Disable button is hidden (stashTheme.js mirrors it
+   - The native Enable/Disable button is hidden (refract.js mirrors it
      with a toggle switch in the same column). */
 body.stash-liquid-glass .setting-section .setting-group > .setting:has(.st-toggle-injected) {
     flex-wrap: nowrap !important;
@@ -947,7 +947,7 @@ body.stash-liquid-glass .setting-section .setting-group > .setting:has(.st-toggl
     white-space: nowrap;
 }
 /* Project link icon — moved out of the action column into the title row
-   by stashTheme.js. Render it as a small inline icon (no button chrome)
+   by refract.js. Render it as a small inline icon (no button chrome)
    nestled next to the plugin's name + version. */
 body.stash-liquid-glass .setting-section .setting-group h3 > a.st-title-link {
     display: inline-flex !important;
@@ -1004,7 +1004,7 @@ body.stash-liquid-glass .setting-section .setting-group .st-toggle-wrap {
 }
 
 /* Settings → Plugins page: collapsible plugin entries.
-   stashTheme.js injects a chevron button onto each plugin row and tags
+   refract.js injects a chevron button onto each plugin row and tags
    the .setting-group with .st-plugin-collapsed by default. CSS hides
    the inner .collapsible-section in the collapsed state and rotates
    the chevron to communicate state. */

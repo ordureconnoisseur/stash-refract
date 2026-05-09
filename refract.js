@@ -2,7 +2,7 @@
    - Adds body class for theme scope
    - Sweeps v1 DOM artifacts (orphaned label spans, fallback i tags, old Categories link)
    - Replaces the iconless "New" button text with a + SVG
-   - Navbar brand: "Stash" text → empty; home orb styling (see stashTheme.css)
+   - Navbar brand: "Stash" text → empty; home orb styling (see refract.js (CSS partials))
    - Library settings: Add directory control → btn-primary label "Add" (aria keeps full phrase)
    - Settings sidebar: wrap TroubleshootingModeButton in .nav-item (Stash renders it bare under .nav)
    - Renders the /categories overlay if the user navigates there directly
@@ -21,7 +21,7 @@
 
     var REFRACT_PRESETS = ["blue", "pink", "red", "yellow", "purple", "green", "teal"];
     var REFRACT_PRESETS_ALL = ["orange", "blue", "pink", "red", "yellow", "purple", "green", "teal"];
-    var ACCENT_STORAGE_KEY = "stashTheme.accent";
+    var ACCENT_STORAGE_KEY = "refract.accent";
     var REFRACT_SWATCH_COLORS = {
         orange: "#f97316",
         blue:   "#3b82f6",
@@ -81,7 +81,7 @@
                    individual asset files at /plugin/<id>/assets/<path>.
                    We rewrite the bundle URL to point at our standalone
                    multiview-player.css that lives in css/. */
-                var REFRACT_PLUGIN_ID = "stashTheme";
+                var REFRACT_PLUGIN_ID = "refract";
                 var refractStyleUrl = null;
                 var links = document.querySelectorAll('link[rel="stylesheet"]');
                 for (var i = 0; i < links.length; i++) {
@@ -131,7 +131,7 @@
                 });
             });
 
-            return R.createElement("div", { className: "setting", id: "plugin-stashTheme-accent" },
+            return R.createElement("div", { className: "setting", id: "plugin-refract-accent" },
                 R.createElement("div", null,
                     R.createElement("h3", null, "Accent colour"),
                     R.createElement("div", { className: "sub-heading" },
@@ -152,7 +152,7 @@
             var args = Array.prototype.slice.call(arguments);
             var next = args.pop();
             var props = args[0];
-            if (!props || props.pluginID !== "stashTheme") {
+            if (!props || props.pluginID !== "refract") {
                 return next.apply(null, args);
             }
             return PluginApi.React.createElement(AccentSwatchPicker);
@@ -161,7 +161,7 @@
     registerAccentPatch();
 
     var CATEGORIES_PATH = "/categories";
-    var STORAGE_KEY_API = "stashTheme.apiKey";
+    var STORAGE_KEY_API = "refract.apiKey";
     var GRAPHQL_URL = "/graphql";
 
     var QUERY_ROOT_TAGS =
@@ -560,7 +560,7 @@
         return did;
     }
 
-    function stashThemePathFromLocation() {
+    function refractPathFromLocation() {
         var h = window.location.hash || "";
         if (h.indexOf("#/") === 0) {
             return (h.slice(1).split("?")[0] || "/").replace(/\/+$/, "") || "/";
@@ -568,7 +568,7 @@
         return (window.location.pathname || "/").replace(/\/+$/, "") || "/";
     }
 
-    function stashThemePathFromHref(raw) {
+    function refractPathFromHref(raw) {
         if (!raw) { return ""; }
         var s = raw.split("?")[0];
         if (s.indexOf("http://") === 0 || s.indexOf("https://") === 0) {
@@ -586,7 +586,7 @@
     }
 
     function markActiveUtilityButtons() {
-        var currentPath = stashThemePathFromLocation();
+        var currentPath = refractPathFromLocation();
         /* Right-side utility links (exact match) + left-side route links (prefix match).
            Left nav items have no .nav-link class — select all <a href> inside .navbar-nav,
            excluding javascript: pseudo-links. */
@@ -603,7 +603,7 @@
                     if (u.origin !== window.location.origin) { link.classList.remove("stash-nav-active"); return; }
                 } catch (e) { link.classList.remove("stash-nav-active"); return; }
             }
-            var hrefPath = stashThemePathFromHref(rawHref);
+            var hrefPath = refractPathFromHref(rawHref);
             if (!hrefPath || hrefPath === "/") { link.classList.remove("stash-nav-active"); return; }
             /* Left-side route links use prefix match (e.g. /scenes active on /scenes/123).
                Utility links (.nav-utility) use exact match. */

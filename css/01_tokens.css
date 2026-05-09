@@ -151,7 +151,7 @@ body.stash-liquid-glass .main.container-fluid:has(> .row > .scene-tabs) {
 
 /* ───────────────────────────────────────────────────────────────────
    Accent presets
-   stashTheme.js reads the "accent" plugin setting and adds the
+   refract.js reads the "accent" plugin setting and adds the
    matching `refract-<name>` class to <body>. Each preset overrides
    the 4 accent tokens; everything in the rest of the CSS resolves
    through them.
