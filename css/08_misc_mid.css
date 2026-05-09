@@ -1679,9 +1679,17 @@ body.stash-liquid-glass .form-check input[type="checkbox"]:not(.form-switch inpu
     transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
     flex-shrink: 0;
 }
-body.stash-liquid-glass .form-check-input[type="checkbox"]:not(.form-switch .form-check-input):not(.custom-switch .form-check-input):not(.table-list .select-col input):checked,
+/* Checked state — matches the base rule's :not chain so specificity is
+   equal, then source-order wins for the checked override. The base
+   rule's `background:` shorthand (with !important) would otherwise
+   beat a less-specific :checked rule even with !important. */
+body.stash-liquid-glass .form-check-input[type="checkbox"]:not(.form-switch .form-check-input):not(.custom-switch .form-check-input):not(.table-list .select-col input):not(.form-check-input.form-switch):checked,
 body.stash-liquid-glass .form-check input[type="checkbox"]:not(.form-switch input):not(.custom-switch input):checked {
-    background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") center / 58% no-repeat !important;
+    background-color: var(--accent) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E") !important;
+    background-position: center !important;
+    background-size: 58% !important;
+    background-repeat: no-repeat !important;
     border-color: var(--accent-bright) !important;
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.45) !important;
 }
@@ -2861,9 +2869,13 @@ body.stash-liquid-glass .stash-carousel-fill {
     transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ── Slick carousel: minimal SVG arrow buttons ───────────────────── */
+/* ── Slick carousel: minimal SVG arrow buttons ───────────────────────────
+   Use mask-image (not background-image) so the chevron color is driven
+   by background-color, which can reference --accent-bright. The SVG
+   stroke value inside the data URI is irrelevant — mask-mode: alpha (the
+   default) only reads the rendered alpha channel. */
 body.stash-liquid-glass .slick-arrow {
-    background: transparent !important;
+    background-color: #fff !important;
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
@@ -2873,28 +2885,28 @@ body.stash-liquid-glass .slick-arrow {
     height: 24px !important;
     z-index: 10 !important;
     opacity: 0.45 !important;
-    transition: opacity 0.2s !important;
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
+    transition: opacity 0.2s, background-color 0.2s !important;
+    -webkit-mask-size: contain !important;
+            mask-size: contain !important;
+    -webkit-mask-repeat: no-repeat !important;
+            mask-repeat: no-repeat !important;
+    -webkit-mask-position: center !important;
+            mask-position: center !important;
 }
 body.stash-liquid-glass .slick-arrow::before {
     display: none !important;
 }
 body.stash-liquid-glass .slick-prev {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M15 7L10 12L15 17' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M15 7L10 12L15 17' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M15 7L10 12L15 17' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
 }
 body.stash-liquid-glass .slick-next {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M10 7L15 12L10 17' stroke='%23ffffff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M10 7L15 12L10 17' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M10 7L15 12L10 17' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
 }
 body.stash-liquid-glass .slick-arrow:hover {
     opacity: 1 !important;
-}
-body.stash-liquid-glass .slick-prev:hover {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M15 7L10 12L15 17' stroke='%23fb923c' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
-}
-body.stash-liquid-glass .slick-next:hover {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M10 7L15 12L10 17' stroke='%23fb923c' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    background-color: var(--accent-bright) !important;
 }
 
 /* ── Recommendation row head ─────────────────────────────────────── */
