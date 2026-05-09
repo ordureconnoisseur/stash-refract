@@ -859,7 +859,8 @@ body.stash-liquid-glass .detail-header {
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
     padding: 1rem 1.25rem;
-    overflow: hidden;
+    margin-bottom: 0.85rem;
+    overflow: visible;
 }
 
 body.stash-liquid-glass .detail-header .detail-container {
@@ -870,6 +871,8 @@ body.stash-liquid-glass .detail-header .detail-header-image img.logo {
     border-radius: var(--radius-sm) !important;
     border: 1px solid var(--glass-border) !important;
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.32);
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
 }
 
 body.stash-liquid-glass .detail-header .detail-group {

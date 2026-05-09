@@ -1309,6 +1309,29 @@ body.stash-liquid-glass .tagger-container-header .input-group > .input-group-pre
     border-bottom-right-radius: 0 !important;
 }
 
+/* Single-button .input-group-prepend / .input-group-append (e.g. scrape
+   comparison accept/reject icon buttons). Two issues:
+   (1) Bootstrap flattens one side via LONGHAND border-top/bottom-right-
+       radius:0 etc — defeats shorthand overrides. Set longhand explicitly.
+   (2) The PARENT div often has bg-secondary + border-secondary classes
+       painting a colored rectangle behind the button. The button's
+       rounded corners can't hide it. Neutralise the parent. */
+body.stash-liquid-glass .input-group-prepend:has(> .btn:only-child),
+body.stash-liquid-glass .input-group-append:has(> .btn:only-child) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    margin: 0 !important;
+}
+body.stash-liquid-glass .input-group-prepend > .btn:only-child,
+body.stash-liquid-glass .input-group-append > .btn:only-child {
+    border-radius: var(--radius-sm) !important;
+    border-top-right-radius: var(--radius-sm) !important;
+    border-bottom-right-radius: var(--radius-sm) !important;
+    border-top-left-radius: var(--radius-sm) !important;
+    border-bottom-left-radius: var(--radius-sm) !important;
+}
+
 body.stash-liquid-glass .search-item .input-group > .form-control,
 body.stash-liquid-glass .tagger-container-header .input-group > .form-control {
     border-radius: 0 !important;
