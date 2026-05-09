@@ -21,6 +21,10 @@ jobs:
           # Strip dirs that ship only on GitHub (README assets, dev workflows)
           # — keeps install zip lean.
           rm -rf plugins-repo/plugins/refract/.github
+          # Strip the cloned plugins-repo that cp -r picked up — leaving it
+          # creates an embedded git submodule reference. Refract additionally
+          # strips screenshots/ here for install-zip size.
+          rm -rf plugins-repo/plugins/refract/plugins-repo
           rm -rf plugins-repo/plugins/refract/screenshots
 
       - name: Commit and push
