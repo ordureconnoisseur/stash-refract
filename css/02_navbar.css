@@ -405,6 +405,22 @@ html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button {
         border-color 0.22s ease,
         filter 0.22s ease;
 }
+/* Custom logo (refract.customLogoUrl) — masked span tinted to --text so
+   the logo matches the soft-white tone of the surrounding navbar icons.
+   65% of the brand button leaves visible padding around it. */
+body.stash-liquid-glass nav .navbar-brand .refract-custom-logo {
+    display: block !important;
+    width: 65% !important;
+    height: 65% !important;
+    background-color: var(--text) !important;
+    mask-size: contain !important;
+    -webkit-mask-size: contain !important;
+    mask-position: center !important;
+    -webkit-mask-position: center !important;
+    mask-repeat: no-repeat !important;
+    -webkit-mask-repeat: no-repeat !important;
+}
+
 body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand .brand-link:hover,
 body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand > a > button:hover,
 body.stash-liquid-glass nav.top-nav .navbar-brand .brand-link:hover,

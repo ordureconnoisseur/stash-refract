@@ -261,8 +261,11 @@ body.stash-liquid-glass .video-js .vjs-spacer {
 
 /* Reorder children: prev / play / next on the far left, then times,
    progress fills the middle, controls on the right.
-   The progress-control's full sizing (flex + position reset) lives
-   below in the consolidated block, after the order rules. */
+   Any un-listed control (Loop button from third-party plugins,
+   captions, audio tracks etc) defaults to order: 100 so it lands
+   AFTER the explicitly-ordered set instead of being pushed to the
+   leftmost position by flexbox's default order: 0. */
+body.stash-liquid-glass .video-js .vjs-control-bar > * { order: 100 !important; }
 body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-skip-button.vjs-icon-previous-item { order: 1 !important; }
 body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-play-control      { order: 2 !important; }
 body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-skip-button.vjs-icon-next-item     { order: 3 !important; }
@@ -669,5 +672,186 @@ body.stash-liquid-glass .scrubber-item-time {
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     font-variant-numeric: tabular-nums !important;
+}
+
+/* ── Scene-tabs Video Filter panel ──────────────────────────────────
+   Stash renders Brightness/Contrast/Gamma/Saturation/Hue/Warmth/RGB/Blur
+   sliders + Rotate/Scale/Aspect transforms inside .scene-video-filter.
+   The label is a <span class="col-sm-3"> (not a real <label>), the slider
+   sits in <span class="col-sm-7">, and the live value in <span class
+   ="col-sm-2 filter-slider-value">. */
+
+/* Section headers (Filters / Transforms / Actions) */
+body.stash-liquid-glass .scene-video-filter h5 {
+    color: var(--text-muted) !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    margin: 0.5rem 0 0.4rem 0 !important;
+    padding-bottom: 0.35rem !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+
+/* Force horizontal row layout regardless of viewport width — Bootstrap's
+   col-sm-* only kicks in ≥576px, so at scene-tabs panel widths the rows
+   stack vertically by default. Override with explicit flex row + gap. */
+body.stash-liquid-glass .scene-video-filter .row.form-group {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    margin: 0 0 0.5rem 0 !important;
+    padding: 0 0.25rem !important;
+}
+
+/* Label column — full word visible, fixed width so labels align
+   vertically across rows. */
+body.stash-liquid-glass .scene-video-filter .row.form-group > .col-sm-3 {
+    flex: 0 0 5.5rem !important;
+    max-width: 5.5rem !important;
+    color: var(--text) !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: keep-all !important;
+    padding: 0 !important;
+}
+
+/* Slider column — fill remaining space */
+body.stash-liquid-glass .scene-video-filter .row.form-group > .col-sm-7 {
+    flex: 1 1 auto !important;
+    max-width: none !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider {
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+/* Value column — fixed 3rem so values like "100%" / "360°" fit fully. */
+body.stash-liquid-glass .scene-video-filter .row.form-group > .col-sm-2.filter-slider-value,
+body.stash-liquid-glass .scene-video-filter .filter-slider-value {
+    flex: 0 0 3rem !important;
+    max-width: 3rem !important;
+    text-align: right !important;
+    font-family: var(--font-mono, ui-monospace, monospace) !important;
+    font-size: 0.74rem !important;
+    color: var(--accent-bright) !important;
+    font-variant-numeric: tabular-nums !important;
+    padding: 0 !important;
+}
+
+/* Header rows + button rows — let them be normal full-width rows. */
+body.stash-liquid-glass .scene-video-filter .row.form-group:has(> .col-12),
+body.stash-liquid-glass .scene-video-filter .row.form-group:has(> .col-6) {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass .scene-video-filter .row.form-group > .col-12 {
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass .scene-video-filter .row.form-group > .col-6 {
+    flex: 1 1 calc(50% - 0.25rem) !important;
+    max-width: calc(50% - 0.25rem) !important;
+    padding: 0 !important;
+}
+
+/* Defeat Stash's inline -webkit-line-clamp on .TruncatedText inside the
+   value cell — that was clipping "100%" → "1...". Override the line
+   clamp + display:-webkit-box so text flows naturally on a single line. */
+body.stash-liquid-glass .scene-video-filter .filter-slider-value .TruncatedText {
+    -webkit-line-clamp: unset !important;
+    display: block !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+}
+
+/* Slider input — same accent-tracking pattern as the zoom slider in
+   04_filters.css. Track is a thin glass channel; thumb fills the left
+   side via box-shadow on webkit, ::-moz-range-progress on firefox. */
+body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider,
+body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider.form-control-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 1.4rem;
+    background: transparent;
+    cursor: pointer;
+    accent-color: var(--accent);
+}
+body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider:focus {
+    outline: none;
+}
+body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+}
+body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -5px;
+    border-radius: 50%;
+    background: rgba(var(--accent-rgb), 0.78);
+    border: none;
+    box-shadow:
+        -100vw 0 0 calc(100vw - 6px) rgba(var(--accent-rgb), 0.45),
+        0 0 8px rgba(var(--accent-rgb), 0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.15);
+    box-shadow:
+        -100vw 0 0 calc(100vw - 6px) rgba(var(--accent-rgb), 0.6),
+        0 0 12px rgba(var(--accent-rgb), 0.55);
+}
+body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider::-moz-range-progress {
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(var(--accent-rgb), 0.45);
+    box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.25);
+}
+body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(var(--accent-rgb), 0.78);
+    border: none;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider:hover::-moz-range-thumb {
+    transform: scale(1.15);
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.55);
+}
+
+/* Action buttons row — slightly tighter than default Refract buttons */
+body.stash-liquid-glass .scene-video-filter .btn {
+    width: 100% !important;
+    font-size: 0.74rem !important;
+    padding: 0.4rem 0.6rem !important;
 }
 

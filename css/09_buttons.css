@@ -155,13 +155,6 @@ body.stash-liquid-glass [data-stash-filter] select {
     padding: 0 8px !important;
 }
 
-/* Hide zoom range slider — rarely adjusted mid-session */
-body.stash-liquid-glass [data-stash-filter] input[type="range"],
-body.stash-liquid-glass .zoom-slider-container,
-body.stash-liquid-glass .zoom-slider {
-    display: none !important;
-}
-
 /* ── Active filter chips — hidden (filter button badge shows count) ── */
 body.stash-liquid-glass .filter-tags,
 body.stash-liquid-glass .wrap-tags {
