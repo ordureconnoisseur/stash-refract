@@ -1928,13 +1928,17 @@
        theme card styling on these builds. Route the image click to
        whichever underlying trigger Stash renders for that card. */
     function findImageLightboxTrigger(card) {
-        return card.querySelector(
-            ".preview-button button, .preview-button, .image-card-preview .btn-primary, " +
-            ".image-card-preview, .zoom-link, .preview-link, " +
-            ".card-popovers button, .card-popovers a, " +
-            "button[title*='preview' i], button[aria-label*='preview' i], button[title*='zoom' i], " +
-            "a[title*='preview' i]"
-        );
+        /* querySelector matches by document order, not selector order — so we
+           query for the most specific actual <button> first, then fall back
+           to wrapper elements. Otherwise the wrapping DIV.preview-button is
+           returned instead of the BUTTON inside (the latter has the React
+           click handler that opens the lightbox). */
+        return card.querySelector(".preview-button button") ||
+               card.querySelector(".image-card-preview .btn-primary") ||
+               card.querySelector(".card-popovers button") ||
+               card.querySelector(".zoom-link, .preview-link") ||
+               card.querySelector("button[title*='preview' i], button[aria-label*='preview' i], button[title*='zoom' i]") ||
+               card.querySelector("a[title*='preview' i]");
     }
 
     /* Delegated handler — one body-level click listener catches every
