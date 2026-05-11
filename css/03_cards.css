@@ -19,6 +19,11 @@ body.stash-liquid-glass .grid-card {
        near-opaque dark page background where the blur is barely visible,
        and a gallery page can render 40+ cards = 40+ GPU compositor
        layers. Strip them to keep gallery scrolling cool. */
+    /* CSS containment: tell the browser each card is an isolated render
+       box — its layout/style can't affect siblings. `paint` is omitted
+       deliberately so per-card tooltips (e.g. performer-link hover label)
+       can escape the card border, which they do via position:absolute. */
+    contain: layout style;
     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.2s ease;
     position: relative;
 }
