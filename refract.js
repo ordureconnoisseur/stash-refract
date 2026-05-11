@@ -478,6 +478,7 @@
     }
 
     function normalizeLibraryAddButton() {
+        if (!/^\/settings(\/|$)/.test(refractPathFromLocation())) return false;
         var table = document.getElementById("stash-table");
         if (!table) { return false; }
         var btn = table.querySelector("button.btn.mt-2");
@@ -516,6 +517,7 @@
        bottom of the package-sources table, far from the disabled "Install"
        button at the top — move it next to Install so they form one cluster. */
     function relocateAddSourceButton() {
+        if (!/^\/settings(\/|$)/.test(refractPathFromLocation())) return;
         var addBtn = null;
         var candidates = document.querySelectorAll("button.btn-success.btn-sm");
         for (var i = 0; i < candidates.length; i++) {
@@ -642,6 +644,7 @@
         '</svg>';
 
     function injectSupportStashLink() {
+        if (!/^\/settings(\/|$)/.test(refractPathFromLocation())) return false;
         var navs = document.querySelectorAll(".nav.nav-pills.flex-column");
         if (!navs.length) { return false; }
         var did = false;
@@ -665,6 +668,7 @@
     /* Stash renders <div class="troubleshooting-mode-button"> as a direct child of .nav, not inside
        <div class="nav-item"> like tab links — wrap it so layout matches Tools / About, etc. */
     function normalizeSettingsSidebarNavItems() {
+        if (!/^\/settings(\/|$)/.test(refractPathFromLocation())) return false;
         var allTb = document.querySelectorAll(".troubleshooting-mode-button");
         if (!allTb.length) { return false; }
         var did = false;
@@ -1554,6 +1558,8 @@
        pass through untouched. */
 
     function initTabScrollChevrons() {
+        var path = refractPathFromLocation();
+        if (!/^\/scenes\/[^/]/.test(path) && !/^\/galleries\/[^/]/.test(path)) return;
         var strips = document.querySelectorAll(
             ".scene-tabs .nav-tabs:not([data-refract-wheel-scroll])," +
             ".gallery-tabs .nav-tabs:not([data-refract-wheel-scroll])," +
@@ -1875,6 +1881,7 @@
        themselves at the start/end of the scroll range and when no scroll
        is possible (e.g. only one performer). Idempotent. */
     function injectPerformerCarouselChevrons() {
+        if (!/^\/scenes\/[^/]/.test(refractPathFromLocation())) return;
         document.querySelectorAll(".scene-performers-row:not([data-stash-perf-arrows])").forEach(function (wrap) {
             var row = wrap.querySelector(".scene-performers");
             if (!row) { return; }
@@ -1905,7 +1912,13 @@
             wrap.appendChild(prev);
             wrap.appendChild(next);
             row.addEventListener("scroll", syncChevronVisibility, { passive: true });
-            window.addEventListener("resize", syncChevronVisibility, { passive: true });
+            if (typeof ResizeObserver === "function") {
+                var ro = new ResizeObserver(syncChevronVisibility);
+                ro.observe(row);
+                if (wrap.parentElement) { ro.observe(wrap.parentElement); }
+            } else {
+                window.addEventListener("resize", syncChevronVisibility, { passive: true });
+            }
             /* React may still be inserting cards — re-sync once after a beat. */
             syncChevronVisibility();
             setTimeout(syncChevronVisibility, 200);
@@ -2135,6 +2148,7 @@
     // overlay a chevron via ::after without fighting other rules' specificity.
     // Re-runs on mutation so React rehydration doesn't restore the text.
     function tagViewAllLinks() {
+        if (refractPathFromLocation() !== "/") return;
         var anchors = document.querySelectorAll("a");
         for (var i = 0; i < anchors.length; i++) {
             var a = anchors[i];
