@@ -105,6 +105,84 @@ body.stash-liquid-glass .scene-tabs .tab-pane.active.show {
     padding: 0 !important;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   Gallery-detail layout — same viewport-height grid pattern as scene
+   detail. Row children: .gallery-tabs (left details) | .gallery-divider
+   (hidden) | .gallery-container (right tabs + image grid).
+   ─────────────────────────────────────────────────────────────────── */
+body.stash-liquid-glass .main.container-fluid > .row:has(> .gallery-container) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr) !important;
+    grid-template-rows: 1fr !important;
+    gap: 20px !important;
+    padding: 20px !important;
+    min-height: 0 !important;
+    max-height: calc(100vh - 70px) !important;
+    height: calc(100vh - 70px) !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Hide the manual collapse divider — the < 1200px media query below
+   handles narrow widths automatically. */
+body.stash-liquid-glass .gallery-divider {
+    display: none !important;
+}
+
+/* Both panels fill their grid track and scroll internally. min-height:0
+   is critical — without it CSS Grid items default to intrinsic content
+   height and break the parent's overflow:hidden clipping. */
+body.stash-liquid-glass .gallery-tabs,
+body.stash-liquid-glass .gallery-container {
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--glass-border) transparent !important;
+}
+body.stash-liquid-glass .gallery-tabs::-webkit-scrollbar,
+body.stash-liquid-glass .gallery-container::-webkit-scrollbar {
+    width: 6px !important;
+}
+body.stash-liquid-glass .gallery-tabs::-webkit-scrollbar-track,
+body.stash-liquid-glass .gallery-container::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+body.stash-liquid-glass .gallery-tabs::-webkit-scrollbar-thumb,
+body.stash-liquid-glass .gallery-container::-webkit-scrollbar-thumb {
+    background: var(--glass-border) !important;
+    border-radius: 3px !important;
+}
+
+/* Glass card styling for the details panel — matches scene-tabs. */
+body.stash-liquid-glass .gallery-tabs {
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.35),
+        0 0 60px -10px rgba(var(--accent-rgb), 0.28),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+    padding: 1.25rem !important;
+}
+
+/* Narrow viewports: drop the details panel, image grid fills the row. */
+@media (max-width: 1199.98px) {
+    body.stash-liquid-glass .main.container-fluid > .row:has(> .gallery-container) {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+    body.stash-liquid-glass .gallery-tabs {
+        display: none !important;
+    }
+}
+
 /* ── Title row — studio label stacked above the scene title ──────── */
 body.stash-liquid-glass .scene-header-container {
     display: flex !important;
