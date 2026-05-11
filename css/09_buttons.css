@@ -418,8 +418,11 @@ body.stash-liquid-glass [data-pager-row="float"] {
     pointer-events: auto !important;
 }
 
-/* Glass pill around the floated pagination */
-body.stash-liquid-glass [data-pager-row="float"] .pagination {
+/* Glass pill around the floated pagination — covers both the wrapper-row
+   case and the case where the pager itself is the floated element
+   (happens when rowOf() declines to tag a toolbar-containing wrapper). */
+body.stash-liquid-glass [data-pager-row="float"] .pagination,
+body.stash-liquid-glass [data-pager-row="float"].pagination {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
