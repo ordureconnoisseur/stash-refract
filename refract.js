@@ -1334,8 +1334,10 @@
         if (!search) { return; }
         search.setAttribute("data-fb-done", "1");
 
-        /* Don't tag modal dialogs — their search inputs are internal UI, not filter toolbars */
-        if (search.closest && search.closest('.modal, .modal-dialog, .modal-content')) { return; }
+        /* Don't tag modal dialogs (internal UI), and don't tag the sidebar
+           filter panel — it contains a search input + lots of filter-
+           section buttons and gets misidentified as the toolbar otherwise. */
+        if (search.closest && search.closest('.modal, .modal-dialog, .modal-content, .sidebar')) { return; }
 
         /* Walk up until we find a div containing ≥ 4 buttons — that is the
            filter toolbar wrapper, whatever Stash names the class. */
@@ -1975,7 +1977,7 @@
        static + full-width on these toolbars; the CSS sibling rule
        hides the ::before pill. */
     function unstickyGalleryToolbar() {
-        document.querySelectorAll(".image-list .filtered-list-toolbar, .image-list [data-stash-filter]").forEach(function (el) {
+        document.querySelectorAll(".image-list .filtered-list-toolbar").forEach(function (el) {
             el.style.setProperty("position", "static", "important");
             el.style.setProperty("top", "auto", "important");
             el.style.setProperty("bottom", "auto", "important");
@@ -1983,6 +1985,15 @@
             el.style.setProperty("margin-right", "0", "important");
             el.style.setProperty("width", "100%", "important");
             el.style.setProperty("max-width", "none", "important");
+        });
+        /* Clean up any sidebars accidentally tagged by older versions
+           of initFilterBar — the inline-style override we used to apply
+           visually broke the sidebar layout. */
+        document.querySelectorAll(".sidebar[data-stash-filter]").forEach(function (el) {
+            el.removeAttribute("data-stash-filter");
+            ["position", "top", "bottom", "margin-left", "margin-right", "width", "max-width"].forEach(function (p) {
+                el.style.removeProperty(p);
+            });
         });
     }
 
