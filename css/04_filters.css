@@ -699,7 +699,9 @@ body.stash-liquid-glass .filtered-list-toolbar .btn-group > * {
     margin-left: 0 !important;
 }
 
-/* Every toolbar control: glass rounded rectangle. */
+/* Every toolbar control: glass rounded rectangle. No backdrop-filter
+   here — these sit on top of the toolbar's already-blurred ::before
+   pill platform, so re-blurring inside is wasted GPU. */
 body.stash-liquid-glass .filtered-list-toolbar .btn-secondary,
 body.stash-liquid-glass .filtered-list-toolbar select.form-control,
 body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group .form-control {
@@ -710,8 +712,6 @@ body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group .form-cont
     border-radius: var(--radius-sm) !important;
     height: 2.2rem;
     padding: 0 0.75rem !important;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
@@ -799,8 +799,6 @@ body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .input-group-prep
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
 }
 body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .input-group-prepend > .btn.btn-secondary:hover,
 body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .input-group-prepend + .btn.btn-secondary:hover {
@@ -819,8 +817,6 @@ body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger-minimal {
     border-radius: var(--radius-sm) !important;
     height: 2.2rem;
     padding: 0 0.75rem !important;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger:hover,
@@ -846,8 +842,6 @@ body.stash-liquid-glass .filtered-list-toolbar .selected-items-info {
     background: var(--accent-tint) !important;
     border: 1px solid var(--accent-glow) !important;
     border-radius: var(--radius-sm);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18);
 }
 body.stash-liquid-glass .filtered-list-toolbar .selected-items-info .selected-count {
@@ -917,8 +911,6 @@ body.stash-liquid-glass .zoom-slider-container {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     box-shadow: none;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
 }
 body.stash-liquid-glass .filtered-list-toolbar .zoom-slider-container {
     height: 2.2rem;
@@ -929,8 +921,6 @@ body.stash-liquid-glass .filtered-list-toolbar .zoom-slider-container {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: 999px !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
     box-shadow:
         0 1px 0 rgba(255, 255, 255, 0.04) inset,
         0 4px 12px rgba(0, 0, 0, 0.18);
@@ -1048,8 +1038,6 @@ body.stash-liquid-glass .filter-tags .tag-item {
     border-radius: var(--radius-pill) !important;
     padding: 0.25em 0.75em !important;
     font-size: 0.85rem;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
 }
 body.stash-liquid-glass .filter-tags .tag-item .btn,
 body.stash-liquid-glass .filter-tags .tag-item .btn.btn-secondary {
@@ -1088,8 +1076,6 @@ body.stash-liquid-glass .tag-item.badge-secondary {
     font-weight: 500 !important;
     line-height: 1.4 !important;
     text-decoration: none !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
     transition: background 0.15s ease, border-color 0.15s ease;
 }
 body.stash-liquid-glass .tag-item.badge a,
