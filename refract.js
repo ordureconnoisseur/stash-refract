@@ -994,12 +994,18 @@
         if (card._stashTilt) { return; }
         card._stashTilt = true;
 
-        var glareWrap = document.createElement("div");
-        glareWrap.className = "stash-tilt-glare";
-        var glareInner = document.createElement("div");
-        glareInner.className = "stash-tilt-glare-inner";
-        glareWrap.appendChild(glareInner);
-        card.appendChild(glareWrap);
+        /* Skip the glare overlay on image-cards — it paints above Stash's
+           native hover lightbox-trigger icon and hides it from view. */
+        var withGlare = !card.classList.contains("image-card");
+        var glareInner = null;
+        if (withGlare) {
+            var glareWrap = document.createElement("div");
+            glareWrap.className = "stash-tilt-glare";
+            glareInner = document.createElement("div");
+            glareInner.className = "stash-tilt-glare-inner";
+            glareWrap.appendChild(glareInner);
+            card.appendChild(glareWrap);
+        }
 
         var raf = null;
 
@@ -1014,8 +1020,10 @@
                 "perspective(" + TILT_PERSPECTIVE + "px) " +
                 "rotateX(" + tiltY + "deg) rotateY(" + tiltX + "deg) " +
                 "scale3d(" + TILT_SCALE + "," + TILT_SCALE + "," + TILT_SCALE + ")";
-            glareInner.style.transform = "rotate(" + angle + "deg) translate(-50%, -50%)";
-            glareInner.style.opacity = String(((x + y) / 2) * TILT_MAX_GLARE);
+            if (glareInner) {
+                glareInner.style.transform = "rotate(" + angle + "deg) translate(-50%, -50%)";
+                glareInner.style.opacity = String(((x + y) / 2) * TILT_MAX_GLARE);
+            }
         }
 
         var enterTimer = null;
@@ -1050,7 +1058,7 @@
             card.style.transition = "transform " + TILT_RESET_MS + "ms " + TILT_EASING + ", box-shadow 0.22s ease";
             card.style.transform =
                 "perspective(" + TILT_PERSPECTIVE + "px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
-            glareInner.style.opacity = "0";
+            if (glareInner) { glareInner.style.opacity = "0"; }
         }
 
         card.addEventListener("mouseenter", onEnter);
@@ -1263,7 +1271,16 @@
             for (var i = 0; i < 4; i++) {
                 if (!el || el === document.body) { break; }
                 var tag = el.tagName;
-                if (tag !== "NAV" && tag !== "UL" && tag !== "LI") { return el; }
+                if (tag !== "NAV" && tag !== "UL" && tag !== "LI") {
+                    /* Don't tag a wrapper that also contains the filter toolbar —
+                       otherwise the whole toolbar gets position:fixed'd to the
+                       viewport bottom on pages where the pager is embedded in
+                       the toolbar row. Float just the pager itself in that case. */
+                    if (el.querySelector('[data-stash-filter], input[placeholder*="Search" i]')) {
+                        return pager;
+                    }
+                    return el;
+                }
                 el = el.parentElement;
             }
             return pager.parentElement;
@@ -1672,6 +1689,8 @@
                 nextTick(disableTableOverflowable);
                 nextTick(markFilledStars);
                 nextTick(fixSceneTaggerDetails);
+                nextTick(initImageCardLightbox);
+                nextTick(unstickyGalleryToolbar);
             });
         }
 
@@ -1685,6 +1704,8 @@
         markActiveUtilityButtons();
         stripRatingBannerToNumber();
         initCardTilts();
+        initImageCardLightbox();
+        unstickyGalleryToolbar();
         initSceneCards();
         initPerformerCards();
         initSlickCarousels();
@@ -1911,10 +1932,66 @@
         });
     }
 
+    /* ── Gallery image card: click image → open lightbox ─────────────
+       Stash's native hover-revealed lightbox-trigger icon is hidden by
+       theme card styling on these builds. Route the image click to
+       whichever underlying trigger Stash renders for that card. */
+    function findImageLightboxTrigger(card) {
+        return card.querySelector(
+            ".preview-button button, .preview-button, .image-card-preview .btn-primary, " +
+            ".image-card-preview, .zoom-link, .preview-link, " +
+            ".card-popovers button, .card-popovers a, " +
+            "button[title*='preview' i], button[aria-label*='preview' i], button[title*='zoom' i], " +
+            "a[title*='preview' i]"
+        );
+    }
+
+    function bindImageCardLightbox(card) {
+        if (card._stashLbBind) { return; }
+        card._stashLbBind = true;
+        var img = card.querySelector("img");
+        if (!img) { return; }
+        img.style.cursor = "zoom-in";
+        img.addEventListener("click", function (e) {
+            var trigger = findImageLightboxTrigger(card);
+            if (trigger) {
+                e.preventDefault();
+                e.stopPropagation();
+                trigger.click();
+            }
+        }, true);
+    }
+
+    function initImageCardLightbox() {
+        document.querySelectorAll(".image-card:not([data-stash-lb])").forEach(function (card) {
+            card.setAttribute("data-stash-lb", "1");
+            bindImageCardLightbox(card);
+        });
+    }
+
+    /* Image lists (standalone /images, gallery → Images tab): the global
+       sticky-centered toolbar design (top:5rem, margin:0 auto, fit-content
+       pill) detaches visually from image-list content. Force inline
+       static + full-width on these toolbars; the CSS sibling rule
+       hides the ::before pill. */
+    function unstickyGalleryToolbar() {
+        document.querySelectorAll(".image-list .filtered-list-toolbar, .image-list [data-stash-filter]").forEach(function (el) {
+            el.style.setProperty("position", "static", "important");
+            el.style.setProperty("top", "auto", "important");
+            el.style.setProperty("bottom", "auto", "important");
+            el.style.setProperty("margin-left", "0", "important");
+            el.style.setProperty("margin-right", "0", "important");
+            el.style.setProperty("width", "100%", "important");
+            el.style.setProperty("max-width", "none", "important");
+        });
+    }
+
     function applyScenePlayerFixes() {
         injectScenePlayerOverlay();
         fixSceneDetailsLayout();
         wrapSceneTagList();
+        initImageCardLightbox();
+        unstickyGalleryToolbar();
     }
 
     (function watchScenePlayer() {
