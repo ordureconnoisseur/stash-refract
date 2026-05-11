@@ -1217,8 +1217,6 @@ body.stash-liquid-glass .image-card .rating-banner {
     font-weight: 700 !important;
     line-height: 1 !important;
     letter-spacing: 0.04em;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
     text-shadow: none !important;
     transform: none !important;
     clip-path: none !important;
@@ -1523,12 +1521,10 @@ body.stash-liquid-glass .expand-collapse:hover {
    ─────────────────────────────────────────────────────────────────── */
 
 body.stash-liquid-glass .alert {
-    background: rgba(20, 20, 24, 0.8) !important;
+    background: rgba(20, 20, 24, 0.92) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
     border-radius: var(--radius-sm) !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
 }
 body.stash-liquid-glass .alert.alert-success {
     border-color: rgba(52, 211, 153, 0.35) !important;
@@ -1719,8 +1715,6 @@ body.stash-liquid-glass .custom-switch .custom-control-label::before {
         inset 0 1px 0 rgba(255, 255, 255, 0.22),
         inset 0 -1px 0 rgba(0, 0, 0, 0.28),
         0 6px 18px rgba(0, 0, 0, 0.28) !important;
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
 }
 
 body.stash-liquid-glass .custom-switch .custom-control-label::after {
@@ -1766,8 +1760,6 @@ body.stash-liquid-glass .form-switch .form-check-input {
         inset 0 1px 0 rgba(255, 255, 255, 0.2),
         inset 0 -1px 0 rgba(0, 0, 0, 0.22),
         0 6px 18px rgba(0, 0, 0, 0.26) !important;
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
     transition: background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background-position 0.22s ease !important;
 }
 body.stash-liquid-glass .form-switch .form-check-input:focus {
@@ -1809,8 +1801,6 @@ body.stash-liquid-glass .btn.btn-secondary:where(:not(.minimal):not(.page-link):
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
     box-shadow: none !important;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 body.stash-liquid-glass .btn.btn-secondary:where(:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle)):hover,
@@ -2541,8 +2531,6 @@ body.stash-liquid-glass .stash-performer-link[data-performer-name]::after {
     white-space: nowrap;
     pointer-events: none;
     opacity: 0;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
     transition: opacity 0.15s ease, transform 0.15s ease;
     z-index: 30;

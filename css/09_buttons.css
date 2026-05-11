@@ -1,12 +1,14 @@
-/* ── .btn-primary: glass orange button ───────────────────────────── */
+/* ── .btn-primary: glass orange button ─────────────────────────────
+   No backdrop-filter — this rule hits every primary button on the page,
+   which can be 30-50+ on heavy pages. Each blurred button is a GPU
+   compositor layer. Accent-tint background + accent-glow border is
+   readable without blur. */
 body.stash-liquid-glass .btn-primary {
     background: var(--accent-tint) !important;
     border: 1px solid var(--accent-glow) !important;
     color: var(--accent-bright) !important;
     border-radius: var(--radius-sm) !important;
     font-weight: 600 !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
     transition: background 0.2s, box-shadow 0.2s, color 0.2s !important;
 }
 body.stash-liquid-glass .btn-primary:hover,
@@ -379,8 +381,6 @@ body.stash-liquid-glass .page-size-selector select {
     text-align: center !important;
     text-align-last: center !important;
     background-image: none !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    backdrop-filter: blur(10px) !important;
     transition: border-color 0.15s, color 0.15s, box-shadow 0.15s !important;
 }
 body.stash-liquid-glass .page-size-selector select:hover,
@@ -530,8 +530,6 @@ body.stash-liquid-glass #perf-rating-trigger {
     font-weight: 600;
     line-height: 1 !important;
     cursor: pointer;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
     transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
     vertical-align: middle;
