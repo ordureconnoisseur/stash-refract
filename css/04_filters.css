@@ -665,7 +665,9 @@ body.stash-liquid-glass .filtered-list-toolbar::before {
 /* Image lists (standalone /images, gallery → Images tab): the sticky
    centered glass-pill design floats wrong relative to image-card grids.
    Revert to a full-width, static toolbar on these pages. Scene and
-   performer lists keep the pill. */
+   performer lists keep the pill. Scoped to .filtered-list-toolbar only —
+   never use [data-stash-filter] here, that attribute can land on
+   sidebar wrappers and break their layout. */
 body.stash-liquid-glass .image-list .filtered-list-toolbar {
     position: static !important;
     top: auto !important;
