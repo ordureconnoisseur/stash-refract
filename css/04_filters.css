@@ -664,11 +664,16 @@ body.stash-liquid-glass .filtered-list-toolbar::before {
 
 /* Hide Stash's redundant left filter sidebar entirely — the top filter
    toolbar already exposes search/saved-filters/edit-filter/etc., so the
-   sidebar duplicates UI. Also collapse its wrapping column so the main
-   list fills the row. */
+   sidebar duplicates UI. Also kill the sidebar-toggle button and the
+   sidebar-pane-content's hard-coded margin-left so the main list fills
+   the row instead of leaving a 235px reservation for the hidden sidebar. */
 body.stash-liquid-glass .sidebar,
-body.stash-liquid-glass [class*="col-"]:has(> .sidebar) {
+body.stash-liquid-glass [class*="col-"]:has(> .sidebar),
+body.stash-liquid-glass .sidebar-toggle-button-container {
     display: none !important;
+}
+body.stash-liquid-glass .sidebar-pane-content {
+    margin-left: 0 !important;
 }
 
 /* Image lists (standalone /images, gallery → Images tab): the sticky
