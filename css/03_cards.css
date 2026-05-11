@@ -2,6 +2,12 @@
    Cards (scenes, performers, tags, galleries)
    ─────────────────────────────────────────────────────────────────── */
 
+/* Image-card hover affordance — body-delegated click handler in refract.js
+   routes the image click to the underlying lightbox trigger. */
+body.stash-liquid-glass .image-card img {
+    cursor: zoom-in !important;
+}
+
 body.stash-liquid-glass .card,
 body.stash-liquid-glass .grid-card {
     background: var(--glass-bg) !important;
