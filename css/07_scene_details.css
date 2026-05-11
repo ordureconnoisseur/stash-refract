@@ -133,13 +133,19 @@ body.stash-liquid-glass .gallery-divider {
 
 /* Both panels fill their grid track and scroll internally. min-height:0
    is critical — without it CSS Grid items default to intrinsic content
-   height and break the parent's overflow:hidden clipping. */
+   height and break the parent's overflow:hidden clipping. width/max-width
+   defeat Stash's Bootstrap col-style 50%-width rules on the container. */
 body.stash-liquid-glass .gallery-tabs,
 body.stash-liquid-glass .gallery-container {
     height: 100% !important;
     max-height: 100% !important;
     min-height: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    flex: 1 1 auto !important;
     margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     scrollbar-width: thin !important;
