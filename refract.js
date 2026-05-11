@@ -1937,27 +1937,24 @@
         );
     }
 
-    function bindImageCardLightbox(card) {
-        if (card._stashLbBind) { return; }
-        card._stashLbBind = true;
-        var img = card.querySelector("img");
-        if (!img) { return; }
-        img.style.cursor = "zoom-in";
-        img.addEventListener("click", function (e) {
-            var trigger = findImageLightboxTrigger(card);
-            if (trigger) {
-                e.preventDefault();
-                e.stopPropagation();
-                trigger.click();
-            }
-        }, true);
-    }
-
+    /* Delegated handler — one body-level click listener catches every
+       .image-card image click regardless of when React re-renders the
+       cards. Replaces the previous per-card binding which relied on the
+       MutationObserver scheduler firing in time after every re-render. */
     function initImageCardLightbox() {
-        document.querySelectorAll(".image-card:not([data-stash-lb])").forEach(function (card) {
-            card.setAttribute("data-stash-lb", "1");
-            bindImageCardLightbox(card);
-        });
+        if (document.body._stashLbDelegated) { return; }
+        document.body._stashLbDelegated = true;
+        document.body.addEventListener("click", function (e) {
+            var img = e.target.closest && e.target.closest(".image-card img");
+            if (!img) { return; }
+            var card = img.closest(".image-card");
+            if (!card) { return; }
+            var trigger = findImageLightboxTrigger(card);
+            if (!trigger) { return; }
+            e.preventDefault();
+            e.stopPropagation();
+            trigger.click();
+        }, true);
     }
 
     /* Image lists (standalone /images, gallery → Images tab): the global
