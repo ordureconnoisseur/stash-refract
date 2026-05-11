@@ -2892,15 +2892,20 @@ body.stash-liquid-glass .slick-next {
     width: 36px;
     height: 36px;
     z-index: 10;
-    background: transparent !important;
+    /* chevron colour comes from background-color through a mask of the SVG
+       — keeps the arrow on the configurable accent var, not a hardcoded hex */
+    background: var(--accent-bright) !important;
     border: none !important;
     border-radius: 50%;
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-    background-size: 16px 16px !important;
+    -webkit-mask-repeat: no-repeat !important;
+            mask-repeat: no-repeat !important;
+    -webkit-mask-position: center !important;
+            mask-position: center !important;
+    -webkit-mask-size: 16px 16px !important;
+            mask-size: 16px 16px !important;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
     cursor: pointer;
     opacity: 0.85;
@@ -2909,7 +2914,6 @@ body.stash-liquid-glass .slick-next {
     color: transparent !important;
     font-size: 0 !important;
 }
-/* Hide slick's default ::before chevron glyph; we use background-image. */
 body.stash-liquid-glass .slick-arrow::before,
 body.stash-liquid-glass .slick-prev::before,
 body.stash-liquid-glass .slick-next::before {
@@ -2917,11 +2921,13 @@ body.stash-liquid-glass .slick-next::before {
 }
 body.stash-liquid-glass .slick-prev {
     left: -32px !important;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M15 6L9 12L15 18' stroke='%23fb923c' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M15 6L9 12L15 18' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M15 6L9 12L15 18' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
 }
 body.stash-liquid-glass .slick-next {
     right: -32px !important;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M9 6L15 12L9 18' stroke='%23fb923c' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M9 6L15 12L9 18' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M9 6L15 12L9 18' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
 }
 body.stash-liquid-glass .slick-arrow:hover {
     opacity: 1;
