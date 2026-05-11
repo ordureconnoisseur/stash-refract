@@ -662,6 +662,15 @@ body.stash-liquid-glass .filtered-list-toolbar::before {
     pointer-events: none !important;
 }
 
+/* Hide Stash's redundant left filter sidebar entirely — the top filter
+   toolbar already exposes search/saved-filters/edit-filter/etc., so the
+   sidebar duplicates UI. Also collapse its wrapping column so the main
+   list fills the row. */
+body.stash-liquid-glass .sidebar,
+body.stash-liquid-glass [class*="col-"]:has(> .sidebar) {
+    display: none !important;
+}
+
 /* Image lists (standalone /images, gallery → Images tab): the sticky
    centered glass-pill design floats wrong relative to image-card grids.
    Revert to a full-width, static toolbar on these pages. Scene and
