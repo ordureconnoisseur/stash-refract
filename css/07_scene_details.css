@@ -131,6 +131,15 @@ body.stash-liquid-glass .gallery-divider {
     display: none !important;
 }
 
+/* The floating-pager rule in 09_buttons.css adds padding-bottom: 6rem to
+   .main.container-fluid to reserve space for the bottom-pinned pager
+   pill. On gallery-detail pages the pager scrolls inside the grid's
+   internal scroll, so that padding only pushes the layout past the
+   viewport. Zero it when gallery layout is active. */
+body.stash-liquid-glass:has(.main.container-fluid > .row > .gallery-container) .main.container-fluid {
+    padding-bottom: 0 !important;
+}
+
 /* Both panels fill their grid track and scroll internally. min-height:0
    is critical — without it CSS Grid items default to intrinsic content
    height and break the parent's overflow:hidden clipping. width/max-width
