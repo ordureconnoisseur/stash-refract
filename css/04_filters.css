@@ -615,8 +615,8 @@ body.stash-liquid-glass .filtered-list-toolbar {
     display: inline-flex !important;
     flex-wrap: nowrap !important;
     gap: 0.5rem !important;
-    padding: 0.75rem 1.5rem !important;
-    min-height: 3.4rem !important;
+    padding: 0.45rem 1.25rem !important;
+    min-height: 2.9rem !important;
     align-items: center;
     position: sticky !important;
     top: 5rem !important;
@@ -648,16 +648,18 @@ body.stash-liquid-glass .filtered-list-toolbar > * {
 body.stash-liquid-glass .filtered-list-toolbar::before {
     content: "" !important;
     position: absolute !important;
-    top: -0.15rem !important;
-    bottom: -0.15rem !important;
+    top: -0.1rem !important;
+    bottom: -0.1rem !important;
     left: -0.6rem !important;
     right: -0.6rem !important;
-    background: rgba(28, 28, 34, 0.55) !important;
-    border: 1px solid var(--glass-border) !important;
+    background: rgba(28, 28, 34, 0.32) !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
     border-radius: var(--radius-pill) !important;
-    box-shadow: var(--glass-shadow) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
-    backdrop-filter: var(--glass-blur) !important;
+    box-shadow:
+        var(--glass-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
+    backdrop-filter: blur(28px) saturate(170%) !important;
     z-index: -1 !important;
     pointer-events: none !important;
 }
@@ -676,26 +678,14 @@ body.stash-liquid-glass .sidebar-pane-content {
     margin-left: 0 !important;
 }
 
-/* Image lists (standalone /images, gallery → Images tab): the sticky
-   centered glass-pill design floats wrong relative to image-card grids.
-   Revert to a full-width, static toolbar on these pages. Scene and
-   performer lists keep the pill. Scoped to .filtered-list-toolbar only —
-   never use [data-stash-filter] here, that attribute can land on
-   sidebar wrappers and break their layout. */
-body.stash-liquid-glass .image-list .filtered-list-toolbar {
-    position: static !important;
-    top: auto !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    display: flex !important;
-    flex-wrap: wrap !important;
-    width: 100% !important;
-    max-width: none !important;
-    padding: 0.6rem 0 !important;
-    min-height: 0 !important;
-}
-body.stash-liquid-glass .image-list .filtered-list-toolbar::before {
-    display: none !important;
+/* Image lists now use the same sticky-pill toolbar design as scene/
+   performer lists. But inside a gallery → Images tab the panel is its
+   own scroll container (height = grid track), so the viewport-level
+   `top: 5rem` puts the toolbar 80px below the panel top — leaving a
+   visual gap. Pin to `top: 0` in that nested scroll context so the pill
+   sits flush with the tab nav above it. */
+body.stash-liquid-glass .gallery-container .image-list .filtered-list-toolbar {
+    top: 0 !important;
 }
 
 body.stash-liquid-glass .filtered-list-toolbar .btn-group {
