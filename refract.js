@@ -1869,6 +1869,50 @@
         });
     }
 
+    /* Inject prev/next chevron buttons that horizontally scroll the
+       .scene-performers row. The row is restyled (flex-wrap:nowrap +
+       overflow-x:auto) via CSS so cards stay on one line. Chevrons hide
+       themselves at the start/end of the scroll range and when no scroll
+       is possible (e.g. only one performer). Idempotent. */
+    function injectPerformerCarouselChevrons() {
+        document.querySelectorAll(".scene-performers-row:not([data-stash-perf-arrows])").forEach(function (wrap) {
+            var row = wrap.querySelector(".scene-performers");
+            if (!row) { return; }
+            wrap.setAttribute("data-stash-perf-arrows", "1");
+            var prev = document.createElement("button");
+            prev.type = "button";
+            prev.className = "stash-perf-prev";
+            prev.setAttribute("aria-label", "Previous performers");
+            var next = document.createElement("button");
+            next.type = "button";
+            next.className = "stash-perf-next";
+            next.setAttribute("aria-label", "Next performers");
+            function scrollPerf(dir) {
+                var card = row.querySelector(".performer-card");
+                var gap = parseFloat(getComputedStyle(row).columnGap || getComputedStyle(row).gap || "12") || 12;
+                var amount = card ? (card.offsetWidth + gap) : Math.max(row.clientWidth * 0.7, 200);
+                row.scrollBy({ left: dir * amount, behavior: "smooth" });
+            }
+            function syncChevronVisibility() {
+                var noScroll = row.scrollWidth <= row.clientWidth + 1;
+                var atStart = row.scrollLeft <= 1;
+                var atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 1;
+                prev.style.display = (noScroll || atStart) ? "none" : "";
+                next.style.display = (noScroll || atEnd) ? "none" : "";
+            }
+            prev.addEventListener("click", function (e) { e.preventDefault(); scrollPerf(-1); });
+            next.addEventListener("click", function (e) { e.preventDefault(); scrollPerf(1); });
+            wrap.appendChild(prev);
+            wrap.appendChild(next);
+            row.addEventListener("scroll", syncChevronVisibility, { passive: true });
+            window.addEventListener("resize", syncChevronVisibility, { passive: true });
+            /* React may still be inserting cards — re-sync once after a beat. */
+            syncChevronVisibility();
+            setTimeout(syncChevronVisibility, 200);
+            setTimeout(syncChevronVisibility, 800);
+        });
+    }
+
     /* Lift .scene-performers out of its parent .col-12 (where it sits next
        to description/tags) into a new sibling .row, so it visually breaks
        out of the description-tags card on the Details tab. Idempotent. */
@@ -1987,12 +2031,102 @@
         });
     }
 
+    /* Operation-menu modal — when the 3-dots #operation-menu button is
+       clicked, we intercept BEFORE Bootstrap opens its dropdown and
+       instead render a custom overlay panel centered in the details
+       panel. The native dropdown's items are cloned (preserving their
+       original click handlers via proxy clicks) so all operations stay
+       functional. Bypasses Popper entirely. */
+    function buildOperationMenuOverlay(items) {
+        var existing = document.querySelector(".st-op-menu-overlay");
+        if (existing) { existing.remove(); }
+        var overlay = document.createElement("div");
+        overlay.className = "st-op-menu-overlay";
+        var card = document.createElement("div");
+        card.className = "st-op-menu-card";
+        items.forEach(function (origItem) {
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "st-op-menu-item";
+            btn.textContent = origItem.textContent.trim();
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                origItem.click();
+                closeOperationMenuOverlay();
+            });
+            card.appendChild(btn);
+        });
+        overlay.appendChild(card);
+        overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) { closeOperationMenuOverlay(); }
+        });
+        return overlay;
+    }
+    function closeOperationMenuOverlay() {
+        var existing = document.querySelector(".st-op-menu-overlay");
+        if (existing) { existing.remove(); }
+        document.removeEventListener("keydown", onOperationMenuEsc);
+    }
+    function onOperationMenuEsc(e) {
+        if (e.key === "Escape") { closeOperationMenuOverlay(); }
+    }
+    function dismissNativeOperationDropdown(btn) {
+        /* Tell Bootstrap to close: clear .show and aria-expanded on
+           wrapper + button + menu, in case it re-renders. */
+        var dropdownWrap = btn && btn.parentElement;
+        if (dropdownWrap) { dropdownWrap.classList.remove("show"); }
+        if (btn) { btn.setAttribute("aria-expanded", "false"); }
+        var menu = dropdownWrap && dropdownWrap.querySelector(".dropdown-menu.show");
+        if (menu) { menu.classList.remove("show"); }
+    }
+    function initOperationMenuOverlay() {
+        if (document.body._stashOpMenuBound) { return; }
+        document.body._stashOpMenuBound = true;
+        document.body.addEventListener("click", function (e) {
+            var btn = e.target.closest && e.target.closest("#operation-menu");
+            if (!btn) { return; }
+            /* Don't intercept — let Bootstrap open the dropdown first so the
+               .dropdown-menu element actually renders. Then capture it. */
+            var panel = document.querySelector(".scene-tabs, .gallery-tabs");
+            if (!panel) { return; }
+            /* If overlay is already open, dismiss and stop. */
+            if (panel.querySelector(".st-op-menu-overlay")) {
+                closeOperationMenuOverlay();
+                dismissNativeOperationDropdown(btn);
+                return;
+            }
+            /* Wait for Bootstrap to render the menu, then steal items. */
+            setTimeout(function () {
+                var nativeMenu = document.querySelector('.dropdown-menu.show[aria-labelledby="operation-menu"]');
+                if (!nativeMenu) { return; }
+                var items = Array.from(nativeMenu.querySelectorAll(".dropdown-item, a, button"));
+                if (!items.length) { return; }
+                /* Hide the native menu — our overlay is the visible UI now. */
+                nativeMenu.style.setProperty("display", "none", "important");
+                var overlay = buildOperationMenuOverlay(items);
+                /* Override the default close handler so dismissing the
+                   overlay also tells Bootstrap the dropdown is closed. */
+                overlay.addEventListener("click", function (ev) {
+                    if (ev.target === overlay) {
+                        closeOperationMenuOverlay();
+                        dismissNativeOperationDropdown(btn);
+                    }
+                });
+                panel.appendChild(overlay);
+                document.addEventListener("keydown", onOperationMenuEsc);
+            }, 0);
+        }, false);
+    }
+
     function applyScenePlayerFixes() {
         injectScenePlayerOverlay();
         fixSceneDetailsLayout();
         wrapSceneTagList();
         initImageCardLightbox();
         unstickyGalleryToolbar();
+        initOperationMenuOverlay();
+        injectPerformerCarouselChevrons();
     }
 
     applyScenePlayerFixes(); /* initial pass; re-runs via consolidated watcher */
