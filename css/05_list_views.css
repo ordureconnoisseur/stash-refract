@@ -1161,8 +1161,6 @@ body.stash-liquid-glass .search-item {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.24);
 }
 
@@ -1180,8 +1178,6 @@ body.stash-liquid-glass .tagger-container-header .col-12.col-lg.my-1 {
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
     padding: 0.4rem 0.55rem;
 }
 
