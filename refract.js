@@ -2018,24 +2018,16 @@
         }, true);
     }
 
-    /* Image lists (standalone /images, gallery → Images tab): the global
-       sticky-centered toolbar design (top:5rem, margin:0 auto, fit-content
-       pill) detaches visually from image-list content. Force inline
-       static + full-width on these toolbars; the CSS sibling rule
-       hides the ::before pill. */
+    /* Clear leftover inline style overrides from older versions of the
+       theme — back when image-list toolbars were force-pinned to
+       position:static and sidebars were mistakenly tagged data-stash-filter.
+       Image lists now use the same sticky pill design as everywhere else. */
     function unstickyGalleryToolbar() {
         document.querySelectorAll(".image-list .filtered-list-toolbar").forEach(function (el) {
-            el.style.setProperty("position", "static", "important");
-            el.style.setProperty("top", "auto", "important");
-            el.style.setProperty("bottom", "auto", "important");
-            el.style.setProperty("margin-left", "0", "important");
-            el.style.setProperty("margin-right", "0", "important");
-            el.style.setProperty("width", "100%", "important");
-            el.style.setProperty("max-width", "none", "important");
+            ["position", "top", "bottom", "margin-left", "margin-right", "width", "max-width"].forEach(function (p) {
+                el.style.removeProperty(p);
+            });
         });
-        /* Clean up any sidebars accidentally tagged by older versions
-           of initFilterBar — the inline-style override we used to apply
-           visually broke the sidebar layout. */
         document.querySelectorAll(".sidebar[data-stash-filter]").forEach(function (el) {
             el.removeAttribute("data-stash-filter");
             ["position", "top", "bottom", "margin-left", "margin-right", "width", "max-width"].forEach(function (p) {
