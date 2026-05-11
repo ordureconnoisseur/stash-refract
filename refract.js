@@ -1798,20 +1798,9 @@
         });
     }
 
-    (function watchSceneTagger() {
-        /* Debounced so we fire once after React finishes a render burst,
-           not once per individual node insertion.                         */
-        var _t = null;
-        function schedFix() {
-            clearTimeout(_t);
-            _t = setTimeout(fixSceneTaggerDetails, 80);
-        }
-
-        fixSceneTaggerDetails(); /* immediate pass for anything already rendered */
-
-        var obs = new MutationObserver(schedFix);
-        obs.observe(document.body, { childList: true, subtree: true });
-    })();
+    /* Initial fixSceneTaggerDetails pass — subsequent passes run via the
+       consolidated mutation watcher at the end of this file. */
+    fixSceneTaggerDetails();
 
     /* ── Scene player center overlay ─────────────────────────────────────
        Inject back-10 / play-pause / forward-10 buttons centered over the
@@ -2005,16 +1994,7 @@
         unstickyGalleryToolbar();
     }
 
-    (function watchScenePlayer() {
-        var _t = null;
-        function sched() {
-            clearTimeout(_t);
-            _t = setTimeout(applyScenePlayerFixes, 120);
-        }
-        applyScenePlayerFixes();
-        var obs = new MutationObserver(sched);
-        obs.observe(document.body, { childList: true, subtree: true });
-    })();
+    applyScenePlayerFixes(); /* initial pass; re-runs via consolidated watcher */
 
     // Replace home-page "View All" anchor text with an empty content so CSS can
     // overlay a chevron via ::after without fighting other rules' specificity.
@@ -2035,15 +2015,7 @@
             a.textContent = "";
         }
     }
-    (function watchViewAll() {
-        var _t = null;
-        function sched() {
-            clearTimeout(_t);
-            _t = setTimeout(tagViewAllLinks, 16);
-        }
-        tagViewAllLinks();
-        new MutationObserver(sched).observe(document.body, { childList: true, subtree: true });
-    })();
+    tagViewAllLinks(); /* initial pass; re-runs via consolidated watcher */
 
     // Lightbox consolidation: move the page indicator + header buttons (gear,
     // slideshow, fullscreen, close) from the top header bar into the bottom
@@ -2069,15 +2041,7 @@
         }
         lightbox.dataset.stConsolidated = "1";
     }
-    (function watchLightbox() {
-        var _t = null;
-        function sched() {
-            clearTimeout(_t);
-            _t = setTimeout(consolidateLightbox, 50);
-        }
-        consolidateLightbox();
-        new MutationObserver(sched).observe(document.body, { childList: true, subtree: true });
-    })();
+    consolidateLightbox(); /* initial pass; re-runs via consolidated watcher */
 
     // Scene header studio name: Stash renders only the studio logo as an
     // <img> inside <h1.studio-logo><a><img alt="…"></a></h1>; the visible
@@ -2103,15 +2067,7 @@
             a.dataset.stStudioInjected = "1";
         }
     }
-    (function watchStudioName() {
-        var _t = null;
-        function sched() {
-            clearTimeout(_t);
-            _t = setTimeout(injectStudioName, 50);
-        }
-        injectStudioName();
-        new MutationObserver(sched).observe(document.body, { childList: true, subtree: true });
-    })();
+    injectStudioName(); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Plugins page: replace each plugin's native
     // [Enable]/[Disable] btn-sm with a Bootstrap custom-switch toggle so
@@ -2181,15 +2137,7 @@
             safeInsertBefore(rightSide, wrap, rightSide.firstChild);
         }
     }
-    (function watchPluginToggles() {
-        var _t = null;
-        function sched() {
-            clearTimeout(_t);
-            _t = setTimeout(injectPluginToggles, 80);
-        }
-        injectPluginToggles();
-        new MutationObserver(sched).observe(document.body, { childList: true, subtree: true });
-    })();
+    injectPluginToggles(); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Plugins page: each plugin renders its inline settings,
     // hooks, etc. always-expanded, which makes the list very long. Inject
@@ -2235,13 +2183,29 @@
             group.dataset.stCollapsibleInjected = "1";
         }
     }
-    (function watchPluginSettings() {
+    makePluginSettingsCollapsible(); /* initial pass; re-runs via consolidated watcher */
+
+    /* ── Consolidated mutation watcher ──────────────────────────────────
+       Single global MutationObserver feeding all body-wide DOM watchers.
+       Replaces 7 separate body-subtree observers — each used to fire on
+       every DOM mutation, triggering 7 separate setTimeouts and 7 separate
+       full-document scans. Now one observer, one debounce, one pass. */
+    (function consolidatedMutationWatcher() {
         var _t = null;
+        function runAll() {
+            _t = null;
+            try { tagViewAllLinks(); } catch (e) {}
+            try { consolidateLightbox(); } catch (e) {}
+            try { injectStudioName(); } catch (e) {}
+            try { fixSceneTaggerDetails(); } catch (e) {}
+            try { applyScenePlayerFixes(); } catch (e) {}
+            try { injectPluginToggles(); } catch (e) {}
+            try { makePluginSettingsCollapsible(); } catch (e) {}
+        }
         function sched() {
             clearTimeout(_t);
-            _t = setTimeout(makePluginSettingsCollapsible, 80);
+            _t = setTimeout(runAll, 60);
         }
-        makePluginSettingsCollapsible();
         new MutationObserver(sched).observe(document.body, { childList: true, subtree: true });
     })();
 
