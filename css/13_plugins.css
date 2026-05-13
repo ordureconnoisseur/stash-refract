@@ -290,7 +290,10 @@ body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plu
 /* Outer calendar pop — opaque dark glass card. Originally used
    var(--glass-bg-strong) (rgba 255,255,255,0.10) which was too see-
    through over content. Switched to a near-opaque dark base plus a
-   heavy backdrop blur so it reads cleanly against any background. */
+   heavy backdrop blur so it reads cleanly against any background.
+   overflow: visible (NOT hidden) so the month/year picker dropdowns
+   that open from the header can extend below the calendar boundary
+   without being clipped. */
 body.stash-liquid-glass .react-datepicker {
     background: rgba(18, 18, 22, 0.88) !important;
     -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
@@ -302,7 +305,7 @@ body.stash-liquid-glass .react-datepicker {
         0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
     color: var(--text) !important;
     font-family: inherit !important;
-    overflow: hidden;
+    overflow: visible !important;
     padding: 0.25rem;
 }
 /* Pointer triangle — hide; the floating card stands on its own. */
@@ -468,14 +471,34 @@ body.stash-liquid-glass .react-datepicker__navigation:hover .react-datepicker__n
     border-color: var(--accent-bright) !important;
 }
 
-/* Month + year dropdown panels (when user clicks the read-view pills) */
+/* Month + year dropdown panels (when user clicks the read-view pills).
+   Opaque dark background so options are readable; max-height + scroll
+   so a 100-year list doesn't extend off-screen; high z-index so it
+   sits over the rest of the calendar. */
 body.stash-liquid-glass .react-datepicker__month-dropdown,
 body.stash-liquid-glass .react-datepicker__year-dropdown {
-    background: var(--glass-bg-strong) !important;
+    background: rgba(14, 14, 18, 0.98) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+    backdrop-filter: blur(20px) saturate(140%) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
-    padding: 0.25rem !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6) !important;
+    padding: 0.3rem !important;
+    max-height: 240px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--glass-border) transparent !important;
+    z-index: 30 !important;
+}
+body.stash-liquid-glass .react-datepicker__month-dropdown::-webkit-scrollbar,
+body.stash-liquid-glass .react-datepicker__year-dropdown::-webkit-scrollbar {
+    width: 5px !important;
+}
+body.stash-liquid-glass .react-datepicker__month-dropdown::-webkit-scrollbar-thumb,
+body.stash-liquid-glass .react-datepicker__year-dropdown::-webkit-scrollbar-thumb {
+    background: var(--glass-border) !important;
+    border-radius: 3px !important;
 }
 body.stash-liquid-glass .react-datepicker__month-option,
 body.stash-liquid-glass .react-datepicker__year-option {
