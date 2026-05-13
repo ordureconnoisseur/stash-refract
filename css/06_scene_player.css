@@ -855,3 +855,20 @@ body.stash-liquid-glass .scene-video-filter .btn {
     padding: 0.4rem 0.6rem !important;
 }
 
+
+/* Pause-idle hide — refract.js adds .refract-video-idle to a paused
+   .video-js after 2.5s without cursor activity (or immediately when
+   the cursor leaves the player). Fade out everything overlaying the
+   video frame so screenshots stay clean. */
+body.stash-liquid-glass .video-js.refract-video-idle .vjs-control-bar,
+body.stash-liquid-glass .video-js.refract-video-idle .vjs-big-play-button,
+body.stash-liquid-glass .video-js.refract-video-idle .vjs-big-button-group,
+body.stash-liquid-glass .video-js.refract-video-idle .st-player-overlay {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: opacity 0.35s ease, visibility 0.35s ease !important;
+}
+body.stash-liquid-glass .video-js.refract-video-idle {
+    cursor: none !important;
+}
