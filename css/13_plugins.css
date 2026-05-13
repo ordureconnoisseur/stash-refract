@@ -142,7 +142,7 @@ body.stash-liquid-glass #mv-launcher {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.32) !important;
+    box-shadow: var(--shadow-lg) !important;
     -webkit-backdrop-filter: var(--glass-blur) !important;
     backdrop-filter: var(--glass-blur) !important;
     padding: 5px 6px !important;
@@ -482,7 +482,7 @@ body.stash-liquid-glass .react-datepicker__year-dropdown {
     backdrop-filter: blur(20px) saturate(140%) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: var(--shadow-xl) !important;
     padding: 0.3rem !important;
     max-height: 240px !important;
     overflow-y: auto !important;
