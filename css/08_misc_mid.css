@@ -867,12 +867,20 @@ body.stash-liquid-glass .detail-header .detail-container {
     background: transparent !important;
 }
 
+/* Studio logo in the detail header. Logos often have design elements
+   (letters, marks) right up against the edge — clipping the corners
+   directly on the img cuts those off. Padding inside the bordered img
+   gives the logo breathing room from the rounded outline, so we can
+   keep the soft corners without losing content. */
 body.stash-liquid-glass .detail-header .detail-header-image img.logo {
+    box-sizing: content-box !important;
+    padding: 10px !important;
     border-radius: var(--radius-sm) !important;
     border: 1px solid var(--glass-border) !important;
+    background: rgba(0, 0, 0, 0.28);
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.32);
-    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    -webkit-mask-image: none !important;
+            mask-image: none !important;
 }
 
 body.stash-liquid-glass .detail-header .detail-group {
@@ -2553,6 +2561,9 @@ body.stash-liquid-glass .stash-performer-avatar {
     min-height: 32px !important;
     border-radius: 50% !important;
     object-fit: cover !important;
+    /* Bias crop toward the top of the performer image so faces/heads
+       stay visible — default center-center often clipped them off. */
+    object-position: center 25% !important;
     border: 1.5px solid rgba(0, 0, 0, 0.55);
     background: var(--glass-bg-strong);
     display: block !important;

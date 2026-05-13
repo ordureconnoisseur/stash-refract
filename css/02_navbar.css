@@ -141,10 +141,98 @@ body.stash-liquid-glass nav.top-nav .navbar-nav {
     align-items: center !important;
 }
 
-/* Hide the duplicated utility .navbar-nav (Stats/Settings/...) inside the
-   collapse. It mirrors .navbar-buttons and only adds clutter. */
+/* The second .navbar-nav inside .navbar-collapse is Stash's
+   MainNavBar.UtilityItems slot. Stash duplicates utility links there
+   (Stats/Settings/Logout/etc.) which we don't want — but plugins like
+   stashGlobalSearch ALSO inject trigger buttons here. Show the nav
+   container, hide every direct child by default, and unhide ONLY
+   known plugin-trigger classes. Adding new plugin triggers later is
+   one CSS rule per class. */
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav:nth-of-type(2) {
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav:nth-of-type(2) > * {
     display: none !important;
+}
+/* Unhide stashGlobalSearch's magnifying-glass trigger. */
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav:nth-of-type(2) > .gs-trigger,
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav:nth-of-type(2) > :has(> .gs-trigger) {
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+/* Theme the gs-trigger to match the other navbar utility icons.
+   The main `nav.top-nav button.btn:where(... :not(.nav-utility) ...)`
+   rule above explicitly EXCLUDES `.nav-utility` buttons (because
+   Stash's stock .nav-utility entries are theme-hidden). The gs-trigger
+   carries .nav-utility too — but we WANT this one shown + themed, so
+   give it the same glass-button look here. */
+body.stash-liquid-glass nav.top-nav .gs-trigger.btn,
+body.stash-liquid-glass nav.top-nav button.gs-trigger {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: var(--nav-btn-size) !important;
+    height: var(--nav-btn-size) !important;
+    min-width: var(--nav-btn-size) !important;
+    min-height: var(--nav-btn-size) !important;
+    padding: 0 !important;
+    /* Match the horizontal margin every other navbar button gets via the
+       `.navbar-buttons > *` and `.navbar-nav > *` rules above (margin:
+       0 var(--nav-gap)). The gs-trigger lives in the SECOND .navbar-nav
+       which only gets a flex `gap` from its parent — and because the
+       trigger is the only visible child there, the gap can't separate
+       it from .navbar-buttons sibling icons. Explicit margin re-anchors
+       the spacing. */
+    margin: 0 var(--nav-gap) !important;
+    border-radius: var(--radius-sm) !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+    line-height: 1 !important;
+    overflow: visible !important;
+    transition: background 0.22s ease, color 0.22s ease;
+}
+/* Glare-overlay sheen on hover — matches the ::before pattern the
+   main nav-button rule uses (lines ~229-243) for the icons whose
+   selector excludes .nav-utility. */
+body.stash-liquid-glass nav.top-nav .gs-trigger.btn::before,
+body.stash-liquid-glass nav.top-nav button.gs-trigger::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    border-radius: inherit !important;
+    pointer-events: none !important;
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.10) 0%,
+        rgba(255, 255, 255, 0.02) 35%,
+        rgba(255, 255, 255, 0) 100%
+    ) !important;
+    opacity: 0 !important;
+    transition: opacity 0.22s ease !important;
+}
+body.stash-liquid-glass nav.top-nav .gs-trigger.btn:hover,
+body.stash-liquid-glass nav.top-nav button.gs-trigger:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+body.stash-liquid-glass nav.top-nav .gs-trigger.btn:hover::before,
+body.stash-liquid-glass nav.top-nav button.gs-trigger:hover::before {
+    opacity: 1 !important;
+}
+body.stash-liquid-glass nav.top-nav .gs-trigger.btn svg,
+body.stash-liquid-glass nav.top-nav button.gs-trigger svg {
+    width: 0.9rem !important;
+    height: 0.9rem !important;
 }
 
 /* Icons-only: kill text labels via font-size: 0 (UI Tweaks pattern). */

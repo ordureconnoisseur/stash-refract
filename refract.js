@@ -120,6 +120,68 @@
             var logoUrl = logoState[0];
             var setLogoUrl = logoState[1];
 
+            var ratingState = R.useState(getStoredRatingStyle());
+            var ratingStyle = ratingState[0];
+            var setRatingStyle = ratingState[1];
+
+            var liteState = R.useState(isLiteModeEnabled());
+            var liteOn = liteState[0];
+            var setLiteOn = liteState[1];
+
+            /* Custom CSS Source state: { loaded, url } where url is
+               the value Stash currently has set (empty if not set). */
+            var cssSrc = R.useState({ loaded: false, url: "" });
+            var cssSrcState = cssSrc[0];
+            var setCssSrcState = cssSrc[1];
+            R.useEffect(function () {
+                getUiConfig().then(function (ui) {
+                    var key = findCssUrlKey(ui);
+                    setCssSrcState({ loaded: true, url: ui[key] || "" });
+                }).catch(function () {
+                    setCssSrcState({ loaded: true, url: "" });
+                });
+            }, []);
+            var pluginCssUrl = getPluginCssUrl();
+            var cssIsOurs = cssSrcState.url === pluginCssUrl;
+            var cssIsEmpty = !cssSrcState.url;
+            function clickApplyCss() {
+                if (!cssSrcState.loaded) { return; }
+                if (cssIsOurs) {
+                    /* Remove. */
+                    setCustomCssUrl("").then(function () {
+                        setCssSrcState({ loaded: true, url: "" });
+                    });
+                    return;
+                }
+                if (!cssIsEmpty) {
+                    var ok = window.confirm(
+                        "Custom CSS Source is currently set to:\n\n" +
+                        cssSrcState.url + "\n\nReplace it with the Refract theme URL?"
+                    );
+                    if (!ok) { return; }
+                }
+                setCustomCssUrl(pluginCssUrl).then(function () {
+                    setCssSrcState({ loaded: true, url: pluginCssUrl });
+                });
+            }
+
+            function pickRatingStyle(style) {
+                try { localStorage.setItem(RATING_STYLE_STORAGE_KEY, style); } catch (e) { /* ignore */ }
+                applyRatingStyleClass(style);
+                setRatingStyle(style);
+                tagFilledRatings();
+            }
+
+            function toggleLite() {
+                var next = !liteOn;
+                try { localStorage.setItem(LITE_MODE_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                applyLiteModeClass(next);
+                setLiteOn(next);
+                /* Re-run the sidebar performer carousel setup so clones get
+                   added (lite→full) or removed (full→lite) immediately. */
+                try { setupSceneTabsPerformers(); } catch (e) { /* ignore */ }
+            }
+
             function pick(preset) {
                 try { localStorage.setItem(ACCENT_STORAGE_KEY, preset); } catch (e) { /* ignore */ }
                 applyAccentClass(preset);
@@ -205,6 +267,76 @@
                             onChange: function (e) { updateLogoUrl(e.target.value); }
                         })
                     )
+                ),
+                R.createElement("div", { className: "setting", id: "plugin-refract-rating-style" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "Rating badge differentiation"),
+                        R.createElement("div", { className: "sub-heading" },
+                            R.createElement("b", null, "Intensity"), " (default) scales the accent glow with the rating — higher score, brighter halo. ",
+                            R.createElement("b", null, "Tiers"), " replaces the accent glow with a traffic-light tint: red (low) / amber (mid) / green (high).")
+                    ),
+                    R.createElement("div", { className: "refract-setting-control refract-rating-style-toggle" },
+                        ["intensity", "tiers"].map(function (style) {
+                            return R.createElement("button", {
+                                key: style,
+                                type: "button",
+                                className: "refract-segmented-btn" + (ratingStyle === style ? " is-active" : ""),
+                                onClick: function () { pickRatingStyle(style); }
+                            }, style.charAt(0).toUpperCase() + style.slice(1));
+                        })
+                    )
+                ),
+                R.createElement("div", { className: "setting", id: "plugin-refract-lite-mode" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "Lite mode"),
+                        R.createElement("div", { className: "sub-heading" },
+                            "Strip backdrop-blur, glow shadows, animations, hover effects, and the performer carousel loop trick. Lighter on GPU; recommended on older or integrated graphics.")
+                    ),
+                    R.createElement("div", { className: "refract-setting-control" },
+                        R.createElement("div", { className: "custom-control custom-switch" },
+                            R.createElement("input", {
+                                type: "checkbox",
+                                className: "custom-control-input",
+                                id: "refract-lite-mode-toggle",
+                                checked: liteOn,
+                                onChange: toggleLite
+                            }),
+                            R.createElement("label", {
+                                className: "custom-control-label",
+                                htmlFor: "refract-lite-mode-toggle"
+                            })
+                        )
+                    )
+                ),
+                R.createElement("div", { className: "setting", id: "plugin-refract-css-source" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "Theme on login + early load"),
+                        R.createElement("div", { className: "sub-heading" },
+                            "Writes the plugin's CSS endpoint URL into Stash's Custom CSS Source so the theme loads BEFORE plugins ",
+                            R.createElement("—", null),
+                            " on the login page and the first-paint flash of every cold load. Toggle off to remove. ",
+                            cssSrcState.loaded && cssSrcState.url
+                                ? R.createElement("div", { style: { marginTop: "0.4rem", opacity: 0.7, fontSize: "0.75rem", wordBreak: "break-all" } },
+                                    "Current: ", cssSrcState.url)
+                                : null
+                        )
+                    ),
+                    R.createElement("div", { className: "refract-setting-control" },
+                        R.createElement("button", {
+                            type: "button",
+                            className: "refract-segmented-btn" + (cssIsOurs ? " is-active" : ""),
+                            onClick: clickApplyCss,
+                            disabled: !cssSrcState.loaded
+                        },
+                            !cssSrcState.loaded
+                                ? "Loading…"
+                                : cssIsOurs
+                                    ? "Remove"
+                                    : cssIsEmpty
+                                        ? "Apply"
+                                        : "Replace…"
+                        )
+                    )
                 )
             );
         };
@@ -232,7 +364,81 @@
     var STORAGE_KEY_API = "refract.apiKey";
     var VIEW_MINIMISER_STORAGE_KEY = "refract.viewMinimiser";
     var LOGO_URL_STORAGE_KEY = "refract.customLogoUrl";
+    var LITE_MODE_STORAGE_KEY = "refract.liteMode";
+    var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";
+    var RATING_STYLES = ["intensity", "tiers"];
     var GRAPHQL_URL = "/graphql";
+
+    /* Custom CSS Source (Stash interface config) — lets the theme load
+       on login / pre-plugin screens. We expose an "Apply / Remove"
+       button in the plugin settings panel that writes the plugin's
+       CSS endpoint URL into Stash's `cSSURL` (a.k.a. Custom CSS Source
+       field) via the configureUI mutation. */
+    function getPluginCssUrl() {
+        return window.location.origin + "/plugin/refract/css";
+    }
+    function getUiConfig() {
+        return gql("query { configuration { ui } }").then(function (res) {
+            return (res && res.data && res.data.configuration && res.data.configuration.ui) || {};
+        });
+    }
+    function findCssUrlKey(ui) {
+        /* Stash has used different keys across versions; check the most
+           common ones, fall back to cSSURL (current canonical). */
+        var candidates = ["cSSURL", "cssURL", "cSSSource", "cssSource"];
+        for (var i = 0; i < candidates.length; i++) {
+            if (ui && Object.prototype.hasOwnProperty.call(ui, candidates[i])) {
+                return candidates[i];
+            }
+        }
+        return "cSSURL";
+    }
+    function setCustomCssUrl(url) {
+        return getUiConfig().then(function (ui) {
+            var key = findCssUrlKey(ui);
+            var patch = {};
+            patch[key] = url;
+            return gqlWithVars(
+                "mutation ConfigureUI($input: Map!) { configureUI(input: $input) }",
+                { input: patch }
+            );
+        });
+    }
+
+    /* Lite mode — strips backdrop-blur, multi-layer glow shadows,
+       animations / transitions / hover effects, and the performer
+       carousel infinite-loop clones. CSS rules in css/14_lite.css are
+       gated on `body.refract-lite`. JS gates (card tilt, carousel
+       clone setup) read this class at runtime. */
+    function isLiteModeEnabled() {
+        try {
+            return localStorage.getItem(LITE_MODE_STORAGE_KEY) === "1";
+        } catch (e) { return false; }
+    }
+    function applyLiteModeClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-lite", !!on);
+    }
+    applyLiteModeClass(isLiteModeEnabled());
+
+    /* Rating-badge differentiation. "intensity" (default) = accent glow
+       scales with score — uniform-coloured but progressively brighter
+       for higher ratings. "tiers" = traffic-light tint on the glow:
+       red (low) / amber (mid) / green (high). */
+    function getStoredRatingStyle() {
+        try {
+            var v = localStorage.getItem(RATING_STYLE_STORAGE_KEY);
+            if (v && RATING_STYLES.indexOf(v) !== -1) { return v; }
+        } catch (e) { /* ignore */ }
+        return "intensity";
+    }
+    function applyRatingStyleClass(style) {
+        if (!document.body) { return; }
+        RATING_STYLES.forEach(function (s) {
+            document.body.classList.toggle("refract-rating-style-" + s, s === style);
+        });
+    }
+    applyRatingStyleClass(getStoredRatingStyle());
 
     /* View-mode minimiser feature toggle. Default enabled — Refract
        collapses Stash's row of view-mode buttons into a single icon +
@@ -996,6 +1202,8 @@
 
     function cardTiltBind(card) {
         if (card._stashTilt) { return; }
+        /* Lite mode: skip the 3D-tilt + glare entirely. */
+        if (document.body.classList.contains("refract-lite")) { return; }
         card._stashTilt = true;
 
         /* Skip the glare overlay on image-cards — it paints above Stash's
@@ -2053,9 +2261,15 @@
            and last card to the start lets the user scroll past either
            edge and silently land on the equivalent real card. */
 
+        /* Lite mode: skip the clones entirely (and tear any stale ones
+           down). Native scroll-snap takes over with no silent jumps. */
+        var liteOn = document.body.classList.contains("refract-lite");
+
         /* (Re)build loop clones if count changed or clones missing. */
         var existingClones = row.querySelectorAll(":scope > .performer-card.refract-clone").length;
-        if (existingClones !== 2 || state.lastRealCount !== count) {
+        if (liteOn) {
+            if (existingClones > 0) { teardownClones(row, state); }
+        } else if (existingClones !== 2 || state.lastRealCount !== count) {
             teardownClones(row, state);
             var firstClone = realCards[0].cloneNode(true);
             var lastClone = realCards[count - 1].cloneNode(true);
@@ -2291,6 +2505,61 @@
        .image-card image click regardless of when React re-renders the
        cards. Replaces the previous per-card binding which relied on the
        MutationObserver scheduler firing in time after every re-render. */
+    /* Pause-idle controls hide.
+       Stash's video.js keeps controls visible whenever the video is
+       paused — annoying when you want to screenshot a frame. After 2.5s
+       of cursor inactivity (or mouse leaving the player), fade the
+       control bar + big play button + cursor away. Any mouse motion or
+       resume brings them back. */
+    function initVideoIdleHide() {
+        if (document.body._stashVideoIdleBound) { return; }
+        document.body._stashVideoIdleBound = true;
+        var IDLE_DELAY = 2500;
+        var timers = new WeakMap();
+        function clearIdle(c) {
+            var t = timers.get(c);
+            if (t) { clearTimeout(t); }
+            timers.delete(c);
+            c.classList.remove("refract-video-idle");
+        }
+        function schedule(c) {
+            clearIdle(c);
+            var v = c.querySelector("video");
+            if (!v || !v.paused) { return; }
+            timers.set(c, setTimeout(function () {
+                if (v.paused && c.isConnected) { c.classList.add("refract-video-idle"); }
+            }, IDLE_DELAY));
+        }
+        function findContainer(t) {
+            return t && t.closest ? t.closest(".video-js") : null;
+        }
+        document.body.addEventListener("pause", function (e) {
+            var c = findContainer(e.target);
+            if (c) { schedule(c); }
+        }, true);
+        document.body.addEventListener("play", function (e) {
+            var c = findContainer(e.target);
+            if (c) { clearIdle(c); }
+        }, true);
+        document.body.addEventListener("mousemove", function (e) {
+            var c = findContainer(e.target);
+            if (!c) { return; }
+            clearIdle(c);
+            var v = c.querySelector("video");
+            if (v && v.paused) { schedule(c); }
+        }, { passive: true });
+        /* Cursor leaving the player while paused — go idle immediately. */
+        document.body.addEventListener("mouseleave", function (e) {
+            var c = findContainer(e.target);
+            if (!c) { return; }
+            var v = c.querySelector("video");
+            if (v && v.paused) {
+                clearTimeout(timers.get(c));
+                c.classList.add("refract-video-idle");
+            }
+        }, true);
+    }
+
     function initImageCardLightbox() {
         if (document.body._stashLbDelegated) { return; }
         document.body._stashLbDelegated = true;
@@ -2337,7 +2606,10 @@
        value in their span isn't 0/empty. We can't rely on Stash's own
        `.disabled` class to indicate "no rating" — it sometimes stays on
        the element even after a value is set. Re-runs via the body-wide
-       mutation watcher so React re-renders are caught. */
+       mutation watcher so React re-renders are caught.
+       Also tags `.rating-banner` (the small badge on performer cards)
+       with --refract-rating and a tier class so the rating-style modes
+       (intensity / tiers) can react via CSS. */
     function tagFilledRatings() {
         document.querySelectorAll(".rating-number").forEach(function (el) {
             var span = el.querySelector(":scope > span");
@@ -2346,6 +2618,20 @@
             var v = parseFloat(text);
             var rated = !hasInput && isFinite(v) && v > 0;
             el.classList.toggle("refract-rated", rated);
+        });
+        document.querySelectorAll(".rating-banner").forEach(function (el) {
+            var raw = (el.textContent || "").trim();
+            var v = parseFloat(raw);
+            ["refract-tier-low", "refract-tier-mid", "refract-tier-high"]
+                .forEach(function (c) { el.classList.remove(c); });
+            if (!isFinite(v) || v <= 0) {
+                el.style.removeProperty("--refract-rating");
+                return;
+            }
+            el.style.setProperty("--refract-rating", String(v));
+            if (v <= 3.4) { el.classList.add("refract-tier-low"); }
+            else if (v <= 6.7) { el.classList.add("refract-tier-mid"); }
+            else { el.classList.add("refract-tier-high"); }
         });
     }
 
@@ -2549,6 +2835,7 @@
         initRatingInputSelectAll();
         tagFilledRatings();
         syncTagListFade();
+        initVideoIdleHide();
         unstickyGalleryToolbar();
         initOperationMenuOverlay();
         injectPerformerCarouselChevrons();
@@ -2583,26 +2870,38 @@
     // footer so the lightbox shows ONE floating glass bar instead of two.
     // CSS hides the now-empty .Lightbox-header.
     function consolidateLightbox() {
+        /* DOM-MOVING consolidation is DISABLED — moving header content
+           into footer breaks Stash's React lightbox during scroll-wheel
+           zoom on Chromium/Windows (page goes blank, requires reload).
+           Instead this function only sets up a one-way text bridge: read
+           the image count from the header indicator's <b>, mirror it as
+           a muted line below the filename in the footer center. CSS
+           hides the original indicator. Stash's React DOM is never
+           mutated. */
         var lightbox = document.querySelector(".Lightbox");
-        if (!lightbox || lightbox.dataset.stConsolidated === "1") return;
-        var header = lightbox.querySelector(".Lightbox-header");
-        var footer = lightbox.querySelector(".Lightbox-footer");
-        if (!header || !footer) return;
-        var footerLeft = footer.querySelector(".Lightbox-footer-left");
-        var footerRight = footer.querySelector(".Lightbox-footer-right");
-        var indicator = header.querySelector(".Lightbox-header-indicator");
-        var headerRight = header.querySelector(".Lightbox-header-right");
-        if (indicator && footerLeft) {
-            safeInsertBefore(footerLeft, indicator, footerLeft.firstChild);
+        if (!lightbox) { return; }
+        var indicator = lightbox.querySelector(".Lightbox-header-indicator");
+        var footerCenter = lightbox.querySelector(".Lightbox-footer-center");
+        if (!indicator || !footerCenter) { return; }
+
+        var mirror = footerCenter.querySelector(".refract-lb-count");
+        if (!mirror) {
+            mirror = document.createElement("div");
+            mirror.className = "refract-lb-count";
+            footerCenter.appendChild(mirror);
         }
-        if (headerRight && footerRight) {
-            while (headerRight.firstChild) {
-                footerRight.appendChild(headerRight.firstChild);
-            }
+        function sync() {
+            var b = indicator.querySelector("b");
+            mirror.textContent = b ? (b.textContent || "").trim() : "";
         }
-        lightbox.dataset.stConsolidated = "1";
+        sync();
+        if (!indicator.__refractCountObs) {
+            var obs = new MutationObserver(sync);
+            obs.observe(indicator, { childList: true, subtree: true, characterData: true });
+            indicator.__refractCountObs = obs;
+        }
     }
-    consolidateLightbox(); /* initial pass; re-runs via consolidated watcher */
+    consolidateLightbox(); /* initial pass — bridge runs idempotently */
 
     // Scene header studio name: Stash renders only the studio logo as an
     // <img> inside <h1.studio-logo><a><img alt="…"></a></h1>; the visible
@@ -2610,6 +2909,19 @@
     // image, so without intervention nothing shows. Inject a sibling
     // <span class="st-studio-name"> alongside the image carrying the alt
     // text, so it becomes visible (CSS styles it like a label).
+    /* Remove orphan .gs-trigger buttons left over from an earlier
+       JS-relocation experiment that competed with React reconciliation.
+       Idempotent — only deletes buttons that were detached from the
+       React tree (no React fiber, no parent navbar-nav).
+       After the JS approach was abandoned, leftover DOM may stick
+       around once on the user's open tab; this cleans it up.
+       Future React renders no longer produce orphans. */
+    function cleanupOrphanGsTriggers() {
+        document.querySelectorAll("nav.top-nav > .gs-trigger").forEach(function (el) {
+            el.remove();
+        });
+    }
+
     function injectStudioName() {
         var anchors = document.querySelectorAll(".scene-header-container h1.studio-logo > a");
         for (var i = 0; i < anchors.length; i++) {
@@ -2755,8 +3067,19 @@
         var _t = null;
         function runAll() {
             _t = null;
-            try { tagViewAllLinks(); } catch (e) {}
+            /* Lightbox always-run: consolidate runs on first open then is
+               idempotent. */
             try { consolidateLightbox(); } catch (e) {}
+            /* Skip the rest of the handlers while the image lightbox is
+               open. Stash's lightbox emits DOM mutations on zoom (scroll
+               wheel changes image size + indicators), which fires this
+               watcher rapidly. The downstream handlers don't apply to
+               anything visible during zoom, so doing nothing here both
+               saves perf and avoids interfering with Stash's transform-
+               based zoom rendering. */
+            if (document.querySelector(".Lightbox")) { return; }
+            try { tagViewAllLinks(); } catch (e) {}
+            try { cleanupOrphanGsTriggers(); } catch (e) {}
             try { injectStudioName(); } catch (e) {}
             try { fixSceneTaggerDetails(); } catch (e) {}
             try { applyScenePlayerFixes(); } catch (e) {}

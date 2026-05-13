@@ -144,6 +144,10 @@ body.stash-liquid-glass #performer-page .image-container {
     position: relative;
 }
 
+/* Default badge — INTENSITY-mode is the baseline. Outer glow scales
+   with the score (--refract-rating, set by tagFilledRatings()), so a
+   1.0 has a tiny halo and a 10.0 has a wide bright one. The Tiers
+   mode below overrides via .refract-rating-style-tiers body class. */
 body.stash-liquid-glass .rating-banner {
     display: inline-flex !important;
     align-items: center;
@@ -174,8 +178,10 @@ body.stash-liquid-glass .rating-banner {
     pointer-events: none;
     box-shadow:
         0 0 0 1px rgba(var(--accent-rgb), 0.18) inset,
-        0 0 14px rgba(var(--accent-rgb), 0.38),
-        0 0 28px rgba(var(--accent-rgb), 0.22),
+        0 0 calc(6px + var(--refract-rating, 6) * 2.4px)
+            rgba(var(--accent-rgb), calc(0.18 + var(--refract-rating, 6) * 0.045)),
+        0 0 calc(14px + var(--refract-rating, 6) * 3.4px)
+            rgba(var(--accent-rgb), calc(0.10 + var(--refract-rating, 6) * 0.025)),
         0 6px 18px rgba(0, 0, 0, 0.35) !important;
     text-shadow:
         0 0 14px rgba(var(--accent-rgb), 0.55),
@@ -195,6 +201,53 @@ body.stash-liquid-glass #performer-page .image-container .rating-banner {
     bottom: auto !important;
     z-index: 6;
     transform: none !important;
+}
+
+/* ── Rating-badge tiers override ─────────────────────────────────────
+   Intensity mode is the baseline (above). Tiers mode replaces the
+   accent-coloured glow with a traffic-light tint based on the score:
+     refract-tier-low  (≤3.4) → red
+     refract-tier-mid  (3.5–6.7) → amber
+     refract-tier-high (≥6.8) → green
+   Tag classes are set by tagFilledRatings(). */
+body.stash-liquid-glass.refract-rating-style-tiers .rating-banner.refract-tier-low {
+    border-color: rgba(239, 68, 68, 0.55) !important;
+    color: #ff6b6b !important;
+    box-shadow:
+        0 0 0 1px rgba(239, 68, 68, 0.22) inset,
+        0 0 14px rgba(239, 68, 68, 0.42),
+        0 0 28px rgba(239, 68, 68, 0.22),
+        0 6px 18px rgba(0, 0, 0, 0.35) !important;
+    text-shadow:
+        0 0 14px rgba(239, 68, 68, 0.55),
+        0 1px 0 rgba(0, 0, 0, 0.85),
+        0 2px 4px rgba(0, 0, 0, 0.75) !important;
+}
+body.stash-liquid-glass.refract-rating-style-tiers .rating-banner.refract-tier-mid {
+    border-color: rgba(245, 158, 11, 0.55) !important;
+    color: #fbbf24 !important;
+    box-shadow:
+        0 0 0 1px rgba(245, 158, 11, 0.22) inset,
+        0 0 14px rgba(245, 158, 11, 0.42),
+        0 0 28px rgba(245, 158, 11, 0.22),
+        0 6px 18px rgba(0, 0, 0, 0.35) !important;
+    text-shadow:
+        0 0 14px rgba(245, 158, 11, 0.55),
+        0 1px 0 rgba(0, 0, 0, 0.85),
+        0 2px 4px rgba(0, 0, 0, 0.75) !important;
+}
+body.stash-liquid-glass.refract-rating-style-tiers .rating-banner.refract-tier-high {
+    border-color: rgba(16, 185, 129, 0.55) !important;
+    color: #34d399 !important;
+    box-shadow:
+        0 0 0 1px rgba(16, 185, 129, 0.22) inset,
+        0 0 14px rgba(16, 185, 129, 0.42),
+        0 0 28px rgba(16, 185, 129, 0.22),
+        0 6px 18px rgba(0, 0, 0, 0.35) !important;
+    text-shadow:
+        0 0 14px rgba(16, 185, 129, 0.55),
+        0 1px 0 rgba(0, 0, 0, 0.85),
+        0 2px 4px rgba(0, 0, 0, 0.75) !important;
 }
 
 /* Decimal rating display — star icon + number + edit pencil, all inline.
