@@ -5,7 +5,7 @@ body.stash-liquid-glass .table-list {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.26);
+    box-shadow: var(--shadow-lg);
     overflow-x: auto;
     overflow-y: visible;
     -webkit-backdrop-filter: var(--glass-blur);
@@ -272,7 +272,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column {
     padding: 0.5rem;
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.26);
+    box-shadow: var(--shadow-lg);
 }
 
 /* Settings menu column only: single column, no wrap — avoids Troubleshooting sitting on Advanced. */
@@ -1161,7 +1161,7 @@ body.stash-liquid-glass .search-item {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.24);
+    box-shadow: var(--shadow-md);
 }
 
 body.stash-liquid-glass .tagger-container-header {

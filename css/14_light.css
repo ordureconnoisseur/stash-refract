@@ -1,0 +1,660 @@
+/* ───────────────────────────────────────────────────────────────────
+   Refract — Light mode
+   Orthogonal to the accent presets. Activated by JS adding the
+   `refract-light` class to <body> (with `stash-liquid-glass`).
+   Any of the 8 accents pairs with light or dark (16 combinations).
+
+   Loads BEFORE 15_lite.css so lite's !important shadow-strip wins
+   when both modes are enabled together (lite is the final word on
+   performance — always strips effects, regardless of color scheme).
+
+   Architecture:
+   - Shadow tokens (--shadow-xs..2xl, --shadow-inset-track, --shadow-navbar)
+     are defined in 01_tokens.css and consumed throughout. This file
+     overrides them in the .refract-light scope so every shadow flips
+     to soft-light variants automatically — no per-selector dup.
+   - Surface backgrounds (rgba(20,20,24,...) etc.) are NOT tokenized;
+     those still need per-selector overrides below.
+   ─────────────────────────────────────────────────────────────────── */
+
+
+/* ═══════ 1. Base tokens (color + shadow) ═════════════════════════ */
+body.stash-liquid-glass.refract-light {
+    --bg-0: #ffffff;
+    --bg-1: #fafafa;
+    --text: rgba(0, 0, 0, 0.88);
+    /* Grey muted — alpha bumped from the original 0.55 to 0.65 so
+       secondary text (dates, descriptions, file paths) reads cleanly
+       on white. Accent flavor goes on titles, not muted text. */
+    --text-muted: rgba(0, 0, 0, 0.65);
+
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-bg-strong: rgba(255, 255, 255, 0.70);
+    --glass-border: rgba(0, 0, 0, 0.10);
+    --glass-border-bright: rgba(0, 0, 0, 0.18);
+    --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+
+    /* Shadow token overrides — soft variants for light backgrounds.
+       Every var(--shadow-X) consumer across all CSS files inherits
+       these automatically. */
+    --shadow-xs: 0 1px 4px rgba(0, 0, 0, 0.06);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 8px 26px rgba(0, 0, 0, 0.08);
+    --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.10);
+    --shadow-2xl: 0 24px 60px rgba(0, 0, 0, 0.12);
+    --shadow-inset-track:
+        inset 0 1px 2px rgba(0, 0, 0, 0.10),
+        0 1px 0 rgba(255, 255, 255, 0.6);
+    --shadow-navbar:
+        0 12px 36px rgba(0, 0, 0, 0.08),
+        0 0 60px rgba(var(--accent-rgb), 0.22),
+        0 0 0 1px rgba(var(--accent-rgb), 0.10),
+        inset 0 1px 0 rgba(0, 0, 0, 0.03);
+
+    --accent-glow: rgba(var(--accent-rgb), 0.18);
+    --accent-tint: rgba(var(--accent-rgb), 0.08);
+
+    /* Bootstrap re-pegs */
+    --bs-link-color: rgba(0, 0, 0, 0.78);
+    --bs-link-color-rgb: 0, 0, 0;
+    --bs-table-striped-bg: rgba(0, 0, 0, 0.025);
+    --bs-table-hover-color: #000;
+    --bs-table-hover-bg: rgba(0, 0, 0, 0.045);
+    --bs-table-border-color: rgba(0, 0, 0, 0.08);
+    --bs-popover-bg: rgba(255, 255, 255, 0.97);
+    --bs-popover-border-color: rgba(0, 0, 0, 0.10);
+    --bs-popover-body-color: rgba(0, 0, 0, 0.88);
+    --bs-popover-header-bg: rgba(0, 0, 0, 0.04);
+    --bs-popover-header-color: rgba(0, 0, 0, 0.88);
+
+    background:
+        radial-gradient(120% 80% at 20% 0%, rgba(0, 0, 0, 0.025) 0%, transparent 55%),
+        radial-gradient(100% 60% at 100% 30%, rgba(var(--accent-rgb), 0.12) 0%, transparent 50%),
+        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+    background-attachment: fixed;
+}
+
+
+/* ═══════ 2. Accent overrides (deeper hues for contrast on white) ═ */
+body.stash-liquid-glass.refract-light:not(.refract-blue):not(.refract-pink):not(.refract-red):not(.refract-yellow):not(.refract-purple):not(.refract-green):not(.refract-teal) {
+    --accent: #ea580c;
+    --accent-bright: #f97316;
+    --accent-light: #fdba74;
+    --accent-rgb: 234, 88, 12;
+}
+body.stash-liquid-glass.refract-light.refract-blue   { --accent: #2563eb; --accent-bright: #3b82f6; --accent-light: #93c5fd; --accent-rgb: 37, 99, 235; }
+body.stash-liquid-glass.refract-light.refract-pink   { --accent: #db2777; --accent-bright: #ec4899; --accent-light: #f9a8d4; --accent-rgb: 219, 39, 119; }
+body.stash-liquid-glass.refract-light.refract-red    { --accent: #dc2626; --accent-bright: #ef4444; --accent-light: #fca5a5; --accent-rgb: 220, 38, 38; }
+body.stash-liquid-glass.refract-light.refract-yellow { --accent: #a16207; --accent-bright: #ca8a04; --accent-light: #fde047; --accent-rgb: 161, 98, 7; }
+body.stash-liquid-glass.refract-light.refract-purple { --accent: #9333ea; --accent-bright: #a855f7; --accent-light: #d8b4fe; --accent-rgb: 147, 51, 234; }
+body.stash-liquid-glass.refract-light.refract-green  { --accent: #16a34a; --accent-bright: #22c55e; --accent-light: #86efac; --accent-rgb: 22, 163, 74; }
+body.stash-liquid-glass.refract-light.refract-teal   { --accent: #0d9488; --accent-bright: #14b8a6; --accent-light: #5eead4; --accent-rgb: 13, 148, 136; }
+
+/* Yellow and teal read weakest on white — bump halo alpha. */
+body.stash-liquid-glass.refract-light.refract-yellow { --accent-glow: rgba(var(--accent-rgb), 0.24); }
+body.stash-liquid-glass.refract-light.refract-teal   { --accent-glow: rgba(var(--accent-rgb), 0.22); }
+
+
+/* ═══════ 3. Floating glass surfaces (backgrounds — not tokenized) ═ */
+/* Dropdowns, popovers, toasts, react-select menus. Frosted white. */
+body.stash-liquid-glass.refract-light .dropdown-menu,
+body.stash-liquid-glass.refract-light .dropdown-menu.show,
+body.stash-liquid-glass.refract-light .dropdown-menu.bg-secondary.text-white,
+body.stash-liquid-glass.refract-light .dropdown-menu.show.bg-secondary.text-white,
+body.stash-liquid-glass.refract-light .popover,
+body.stash-liquid-glass.refract-light .popover.bs-popover-start,
+body.stash-liquid-glass.refract-light .popover.bs-popover-end,
+body.stash-liquid-glass.refract-light .popover.bs-popover-top,
+body.stash-liquid-glass.refract-light .popover.bs-popover-bottom,
+body.stash-liquid-glass.refract-light [data-popper-placement],
+body.stash-liquid-glass.refract-light .popover-inner,
+body.stash-liquid-glass.refract-light .toast,
+body.stash-liquid-glass.refract-light div.react-select__menu,
+body.stash-liquid-glass.refract-light div.react-select__menu-list {
+    background: rgba(255, 255, 255, 0.82) !important;
+    background-color: rgba(255, 255, 255, 0.82) !important;
+    border-color: var(--glass-border) !important;
+    color: var(--text) !important;
+}
+
+/* Dropdown items — restore readable hover state on white */
+body.stash-liquid-glass.refract-light .dropdown-item {
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light .dropdown-item:hover,
+body.stash-liquid-glass.refract-light .dropdown-item:focus {
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+}
+
+/* react-select option hover/active */
+body.stash-liquid-glass.refract-light .react-select__option {
+    background: transparent !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light .react-select__option--is-focused {
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass.refract-light .react-select__option--is-selected {
+    background: rgba(var(--accent-rgb), 0.12) !important;
+}
+
+
+/* ═══════ 4. Heavy / opaque surfaces ═══════════════════════════════ */
+body.stash-liquid-glass.refract-light .modal-content,
+body.stash-liquid-glass.refract-light #setting-dialog .modal-content,
+body.stash-liquid-glass.refract-light .alert,
+body.stash-liquid-glass.refract-light .cm-editor,
+body.stash-liquid-glass.refract-light .package-manager-table-container,
+body.stash-liquid-glass.refract-light .package-manager .card,
+body.stash-liquid-glass.refract-light .adv-rating-modal-content,
+body.stash-liquid-glass.refract-light .react-datepicker {
+    background: rgba(252, 252, 252, 0.96) !important;
+    color: var(--text) !important;
+    border-color: var(--glass-border) !important;
+}
+
+/* CodeMirror editor — keep monospace text dark on white */
+body.stash-liquid-glass.refract-light .cm-editor,
+body.stash-liquid-glass.refract-light .cm-editor .cm-content,
+body.stash-liquid-glass.refract-light .cm-editor .cm-line {
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light .cm-editor .cm-gutters {
+    background: rgba(0, 0, 0, 0.03) !important;
+    color: var(--text-muted) !important;
+    border-right: 1px solid var(--glass-border) !important;
+}
+
+
+/* ═══════ 5. Filter container / list tables ════════════════════════ */
+body.stash-liquid-glass.refract-light .table-responsive:has(> table.table:has(thead th.select-col)),
+body.stash-liquid-glass.refract-light table.table.table-striped.table-bordered:has(thead th.select-col) {
+    background: rgba(252, 252, 252, 0.94) !important;
+    border-color: var(--glass-border) !important;
+}
+body.stash-liquid-glass.refract-light table.table.table-striped.table-bordered:has(thead th.select-col) thead tr:first-child th {
+    background: rgba(0, 0, 0, 0.025) !important;
+    color: var(--text) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+body.stash-liquid-glass.refract-light table.table.table-striped.table-bordered:has(thead th.select-col) tbody > tr,
+body.stash-liquid-glass.refract-light table.table.table-striped.table-bordered:has(thead th.select-col) tbody > tr:nth-of-type(odd),
+body.stash-liquid-glass.refract-light table.table.table-striped.table-bordered:has(thead th.select-col) tbody > tr:nth-of-type(even) {
+    background: rgba(252, 252, 252, 0.6) !important;
+    color: var(--text) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+body.stash-liquid-glass.refract-light table.table.table-striped.table-bordered:has(thead th.select-col) tbody > tr:hover {
+    background: var(--accent-tint) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light table.table.table-striped.table-bordered:has(thead th.select-col) td,
+body.stash-liquid-glass.refract-light table.table.table-striped.table-bordered:has(thead th.select-col) th {
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light table.table.table-striped.table-bordered:has(thead th.select-col) .cover_image-data img.image-thumbnail {
+    border-color: var(--glass-border) !important;
+}
+
+/* Package-manager table thead row + striped rows */
+body.stash-liquid-glass.refract-light .package-manager-table-container .table thead tr:first-child th {
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light .package-manager-table-container .table tbody tr:nth-child(odd) {
+    background: rgba(0, 0, 0, 0.025) !important;
+}
+
+
+/* ═══════ 6. Filter dialog + dropdown chrome ═══════════════════════ */
+body.stash-liquid-glass.refract-light .dropdown-menu .filter-container,
+body.stash-liquid-glass.refract-light .filter-container {
+    background: rgba(250, 250, 252, 0.94) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light .filter-item {
+    background: rgba(0, 0, 0, 0.03) !important;
+    color: var(--text) !important;
+}
+
+body.stash-liquid-glass.refract-light .filter-dialog,
+body.stash-liquid-glass.refract-light .filter-dialog .modal-content {
+    background: rgba(252, 252, 252, 0.96) !important;
+    color: var(--text) !important;
+}
+
+
+/* ═══════ 7. Scene player chrome (background overrides; shadows from
+              tokens or kept-inline composites) ═══════════════════ */
+body.stash-liquid-glass.refract-light .video-js .vjs-menu .vjs-menu-content,
+body.stash-liquid-glass.refract-light .video-js .vjs-mouse-display .vjs-time-tooltip,
+body.stash-liquid-glass.refract-light .video-js .vjs-volume-panel-vertical .vjs-volume-control,
+body.stash-liquid-glass.refract-light .scrubber-item-time {
+    background: rgba(255, 255, 255, 0.88) !important;
+    color: var(--text) !important;
+}
+
+
+/* ═══════ 8. Scene details / wall items ════════════════════════════ */
+body.stash-liquid-glass.refract-light .scene-wall-item-text-container {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(252, 252, 252, 0.92) 100%) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light .detail-header .tooltip-inner,
+body.stash-liquid-glass.refract-light .detail-header [class*="tooltip"] {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: var(--text) !important;
+}
+
+
+/* ═══════ 9. Buttons ═══════════════════════════════════════════════ */
+/* Custom select option fallback — page-size, dropdown <option>s */
+body.stash-liquid-glass.refract-light .page-size-selector option,
+body.stash-liquid-glass.refract-light select option {
+    background: rgba(252, 252, 252, 1) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light .btn,
+body.stash-liquid-glass.refract-light button.btn {
+    color: var(--text);
+}
+
+
+/* ═══════ 10. Misc tail — lightbox, modal markdown, side panels ═══ */
+body.stash-liquid-glass.refract-light .Lightbox {
+    background: rgba(248, 248, 250, 0.97) !important;
+}
+body.stash-liquid-glass.refract-light .modal-dialog.manual .markdown pre {
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--glass-border) !important;
+}
+
+
+/* ═══════ 11. Scrims, overlays, drop targets ═══════════════════════
+   These intentionally darken content. Keep dark with much lower
+   alpha so they still register as "this element is overlaid". */
+body.stash-liquid-glass.refract-light.mv-picking-mode .mv-add-btn {
+    background: rgba(0, 0, 0, 0.18) !important;
+}
+body.stash-liquid-glass.refract-light.mv-picking-mode .mv-add-btn:hover {
+    background: rgba(0, 0, 0, 0.32) !important;
+}
+body.stash-liquid-glass.refract-light .scene-card-preview {
+    background: rgba(0, 0, 0, 0.18) !important;
+}
+
+
+/* ═══════ 12. Borders — invisible-on-white fixes ═══════════════════
+   Many subtle borders use rgba(255,255,255, 0.04-0.08) which is
+   invisible on white. Re-peg them to dark low-alpha. */
+body.stash-liquid-glass.refract-light .card,
+body.stash-liquid-glass.refract-light .grid-card,
+body.stash-liquid-glass.refract-light .detail-header,
+body.stash-liquid-glass.refract-light .detail-header .detail-group,
+body.stash-liquid-glass.refract-light .scene-tabs .tab-content,
+body.stash-liquid-glass.refract-light .filter-item {
+    border-color: var(--glass-border) !important;
+}
+
+
+/* ═══════ 13. Hardcoded text-on-glass restorations ═════════════════ */
+body.stash-liquid-glass.refract-light .navbar a,
+body.stash-liquid-glass.refract-light .navbar button:not(.btn-primary):not([class*="accent"]),
+body.stash-liquid-glass.refract-light .dropdown-menu .dropdown-item,
+body.stash-liquid-glass.refract-light .scene-tabs .nav-link:not(.active),
+body.stash-liquid-glass.refract-light .filter-container,
+body.stash-liquid-glass.refract-light .filter-container * {
+    color: var(--text) !important;
+}
+
+
+/* ═══════ 14. Filtered-list toolbar pill platform ══════════════════
+   `.filtered-list-toolbar::before` is the dark glass pill that sits
+   behind the toolbar buttons. Hardcoded rgba(28,28,34,0.32) bypasses
+   tokens — re-do it as light frosted glass with subtle accent rim. */
+body.stash-liquid-glass.refract-light .filtered-list-toolbar::before {
+    background: rgba(255, 255, 255, 0.55) !important;
+    border-color: rgba(var(--accent-rgb), 0.18) !important;
+    box-shadow:
+        var(--glass-shadow),
+        0 0 50px rgba(var(--accent-rgb), 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Toolbar button hover states — original uses `color: #fff` which is
+   invisible on white. Lean into accent on hover instead. */
+body.stash-liquid-glass.refract-light .filtered-list-toolbar .btn-secondary:hover {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass.refract-light .filtered-list-toolbar .filter-button.btn.btn-secondary:hover,
+body.stash-liquid-glass.refract-light .filtered-list-toolbar .play-button.btn.btn-secondary:hover,
+body.stash-liquid-glass.refract-light .filtered-list-toolbar #more-menu.btn.btn-secondary:hover,
+body.stash-liquid-glass.refract-light .filtered-list-toolbar .saved-filter-dropdown > button.dropdown-toggle.btn.btn-secondary:hover,
+body.stash-liquid-glass.refract-light .filtered-list-toolbar .btn.btn-secondary:has(> svg:only-child):hover {
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+}
+
+
+/* ═══════ 15. Tag count badges + popup ═════════════════════════════
+   Tag-count badge itself already uses --accent-bright (works fine).
+   Force it explicitly in case any rule with higher specificity wins.
+   Popup background hardcodes dark — needs full light re-skin. */
+body.stash-liquid-glass.refract-light .stash-tag-count,
+body.stash-liquid-glass.refract-light .stash-tag-count * {
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass.refract-light .stash-o-count,
+body.stash-liquid-glass.refract-light .stash-o-count * {
+    color: var(--text-muted) !important;
+}
+body.stash-liquid-glass.refract-light .stash-o-count:hover,
+body.stash-liquid-glass.refract-light .stash-o-count:hover * {
+    color: var(--text) !important;
+}
+
+/* Tag list popup — flip dark glass to light glass */
+body.stash-liquid-glass.refract-light .stash-tag-popup {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: var(--glass-border) !important;
+}
+body.stash-liquid-glass.refract-light .stash-tag-popup-chip {
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: var(--text) !important;
+    border-color: var(--glass-border) !important;
+}
+body.stash-liquid-glass.refract-light .stash-tag-popup-chip:hover {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+
+
+/* ═══════ 16. Accent presence on glass surfaces ════════════════════
+   Light mode leans into accent more than dark mode does. Borders on
+   prominent glass surfaces pick up a subtle accent tint so the UI
+   feels themed (matches the radial accent gradient under everything)
+   rather than purely neutral. */
+body.stash-liquid-glass.refract-light .card,
+body.stash-liquid-glass.refract-light .grid-card,
+body.stash-liquid-glass.refract-light .modal-content,
+body.stash-liquid-glass.refract-light .alert,
+body.stash-liquid-glass.refract-light .scene-tabs .tab-content {
+    border-color: rgba(var(--accent-rgb), 0.18) !important;
+}
+
+
+/* ═══════ 17. Navbar icons — soft accent at rest ═══════════════════
+   Dark navbar icons (var(--text) = black) read as harsh on white.
+   Tint them with a transparent accent so the navbar reads as
+   "subtly themed" rather than monochrome. Active route already gets
+   full --accent via existing rules; just override resting + hover. */
+body.stash-liquid-glass.refract-light nav.top-nav a.btn,
+body.stash-liquid-glass.refract-light nav.top-nav button.btn,
+body.stash-liquid-glass.refract-light nav.top-nav .navbar-toggler,
+body.stash-liquid-glass.refract-light nav.top-nav a.nav-link,
+body.stash-liquid-glass.refract-light nav.top-nav a.nav-utility {
+    color: rgba(var(--accent-rgb), 0.65) !important;
+}
+body.stash-liquid-glass.refract-light nav.top-nav a.btn:hover,
+body.stash-liquid-glass.refract-light nav.top-nav button.btn:hover,
+body.stash-liquid-glass.refract-light nav.top-nav .navbar-toggler:hover,
+body.stash-liquid-glass.refract-light nav.top-nav a.nav-link:hover,
+body.stash-liquid-glass.refract-light nav.top-nav a.nav-utility:hover {
+    color: var(--accent-bright) !important;
+}
+/* Icon hover shimmer — original uses white drop-shadow; swap to
+   accent for visibility on white background. */
+body.stash-liquid-glass.refract-light nav.top-nav a.btn:hover svg,
+body.stash-liquid-glass.refract-light nav.top-nav button.btn:hover svg,
+body.stash-liquid-glass.refract-light nav.top-nav .navbar-toggler:hover svg {
+    filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.45)) !important;
+}
+
+
+/* ═══════ 18. Performer circles — accent halo at rest ══════════════ */
+body.stash-liquid-glass.refract-light .stash-performer-avatar {
+    border: 1.5px solid rgba(var(--accent-rgb), 0.35) !important;
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.18);
+}
+body.stash-liquid-glass.refract-light .stash-performer-link:hover .stash-performer-avatar {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.40);
+}
+body.stash-liquid-glass.refract-light .stash-performer-more {
+    border-color: rgba(var(--accent-rgb), 0.35) !important;
+    color: var(--accent-bright) !important;
+}
+/* Performer-name tooltip — hardcoded dark bg, restyle for light */
+body.stash-liquid-glass.refract-light .stash-performer-link[data-performer-name]::after {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: var(--text) !important;
+    border-color: var(--glass-border) !important;
+}
+
+
+/* ═══════ 19. Card titles — animated accent gradient + glow ══════════
+   A "shimmer band" of brighter accent sweeps across the title text
+   continuously. background-size: 200% makes the gradient wider than
+   the text, and animating background-position slides the bright
+   middle stop horizontally — read as a soft moving sheen.
+
+   On hover the cycle speeds up (7s → 2.5s) so the card feels alive
+   when you target it. Reduced-motion users get a static mid-position
+   gradient, no animation, same accent fill. */
+body.stash-liquid-glass.refract-light .scene-card .card-section-title,
+body.stash-liquid-glass.refract-light .grid-card .card-section-title,
+body.stash-liquid-glass.refract-light .performer-card .card-section-title {
+    /* Wide gradient with a narrow --accent-light peak at 50% of the
+       gradient. At rest the peak sits in the middle of the element
+       (background-position: 50% 50% with size: 300%); on hover the
+       position animates so the peak sweeps across like a sheen. */
+    background: linear-gradient(
+        110deg,
+        var(--accent) 0%,
+        var(--accent) 40%,
+        var(--accent-bright) 47%,
+        var(--accent-light) 50%,
+        var(--accent-bright) 53%,
+        var(--accent) 60%,
+        var(--accent) 100%
+    );
+    background-size: 300% 100%;
+    background-position: 50% 50%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 14px rgba(var(--accent-rgb), 0.18);
+    transition: text-shadow 0.18s ease;
+}
+@keyframes refract-title-shimmer {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+body.stash-liquid-glass.refract-light .scene-card:hover .card-section-title,
+body.stash-liquid-glass.refract-light .grid-card:hover .card-section-title,
+body.stash-liquid-glass.refract-light .performer-card:hover .card-section-title {
+    text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.40);
+    animation: refract-title-shimmer 2.2s linear infinite;
+    will-change: background-position;
+}
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass.refract-light .scene-card .card-section-title,
+    body.stash-liquid-glass.refract-light .grid-card .card-section-title,
+    body.stash-liquid-glass.refract-light .performer-card .card-section-title {
+        animation: none;
+        background-position: 50% 50%;
+    }
+}
+
+
+/* ═══════ 20. Bootstrap text-muted utility override ════════════════
+   `.text-muted` class is applied directly to elements (not via var)
+   in some places — make sure it picks up the accent-muted too. */
+body.stash-liquid-glass.refract-light .text-muted {
+    color: var(--text-muted) !important;
+}
+
+
+/* ═══════ 21. Scene detail header + toolbar ════════════════════════
+   `.scene-header` hardcodes `color: #fff !important` — invisible on
+   white. Toolbar buttons use rgba(255,255,255, low) backgrounds that
+   vanish on light bg, leaving the dark icons looking like floating
+   black silhouettes. Restore proper light-mode visibility. */
+body.stash-liquid-glass.refract-light h3.scene-header,
+body.stash-liquid-glass.refract-light h2.scene-header,
+body.stash-liquid-glass.refract-light .scene-header {
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light .scene-header .TruncatedText,
+body.stash-liquid-glass.refract-light .scene-header > div {
+    color: var(--text) !important;
+}
+
+/* Toolbar button frames — flip invisible white-tint bg to dark-tint */
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .adv-rating-btn,
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: var(--glass-border) !important;
+}
+/* Force inner count buttons fully transparent — Bootstrap .btn-secondary
+   default grey was leaking through and rendering as a dark circular
+   blob behind each icon. The original L539 rule sets background:
+   transparent in dark mode; we re-assert with extra force in light. */
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button,
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button.btn,
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button.btn.btn-secondary,
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button.btn-secondary.minimal {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: rgba(var(--accent-rgb), 0.7) !important;
+}
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button:hover {
+    background: var(--accent-tint) !important;
+    background-color: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+}
+
+/* Toolbar icons that aren't rating-stars (eye/O-count icon, organized
+   box, ellipsis menu, mv-scene-btn) — were inheriting dark text and
+   reading as black silhouettes. Tint accent like navbar icons. */
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button,
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .organized-button,
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar #operation-menu,
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .mv-scene-page-btn {
+    color: rgba(var(--accent-rgb), 0.7) !important;
+}
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .organized-button:hover,
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar #operation-menu:hover,
+body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .mv-scene-page-btn:hover {
+    color: var(--accent-bright) !important;
+}
+
+
+/* ═══════ 22. Rating stars — visible unfilled state ════════════════
+   Global rule sets unfilled stars to rgba(255,255,255,0.22) — totally
+   invisible on white. Flip to a dark muted equivalent. Filled stars
+   stay gold (#fbbf24) which works on both backgrounds. */
+body.stash-liquid-glass.refract-light .rating-stars .unfilled-star {
+    color: rgba(0, 0, 0, 0.22) !important;
+    fill: rgba(0, 0, 0, 0.22) !important;
+}
+
+
+/* ═══════ 22.5. Increment-only count button (external plugin) ═════
+   An external plugin paints `.count-button.increment-only` with a
+   hardcoded `box-shadow: 0 2px 10px rgba(0,0,0,0.25)` that reads as
+   a black halo behind every count button on white. Same plugin adds
+   a white inner glow that's invisible on light bg. Replace both. */
+body.stash-liquid-glass.refract-light .count-button.increment-only {
+    box-shadow: var(--shadow-sm) !important;
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border) !important;
+}
+
+
+/* ═══════ 22.7. Card stat counts — accent-tinted ═══════════════════
+   Scene count + O count on performer cards, and O count on scene
+   cards. Defaults to var(--text-muted) which renders inconsistently
+   (some pull from a Stash-native popover element with its own color,
+   producing a "one is white, one is black" effect). Force accent. */
+body.stash-liquid-glass.refract-light .performer-card .stash-perf-scenes,
+body.stash-liquid-glass.refract-light .performer-card .stash-perf-ocount,
+body.stash-liquid-glass.refract-light .scene-card .stash-o-count,
+body.stash-liquid-glass.refract-light .grid-card .stash-o-count {
+    color: rgba(var(--accent-rgb), 0.78) !important;
+}
+body.stash-liquid-glass.refract-light .performer-card .stash-perf-scenes *,
+body.stash-liquid-glass.refract-light .performer-card .stash-perf-ocount *,
+body.stash-liquid-glass.refract-light .scene-card .stash-o-count *,
+body.stash-liquid-glass.refract-light .grid-card .stash-o-count * {
+    color: inherit !important;
+    fill: currentColor !important;
+}
+body.stash-liquid-glass.refract-light .performer-card .stash-perf-scenes:hover,
+body.stash-liquid-glass.refract-light .performer-card .stash-perf-ocount:hover,
+body.stash-liquid-glass.refract-light .scene-card .stash-o-count:hover,
+body.stash-liquid-glass.refract-light .grid-card .stash-o-count:hover {
+    color: var(--accent-bright) !important;
+}
+
+
+/* ═══════ 23. Advanced ratings badge (external plugin) ════════════
+   `.adv-rating-btn-badge` is styled by the Advanced Scene Ratings
+   plugin, not by Refract — its dark pill bypasses our tokens and
+   looks like a black blob on white. Force light styling. Same for
+   any other badge the plugin paints. */
+body.stash-liquid-glass.refract-light .adv-rating-btn-badge {
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+    border: 1px solid var(--accent-glow) !important;
+}
+
+
+/* ═══════ 23.5. Favorite heart — replace dark drop-shadow ═════════
+   Stash core paints `button.btn.favorite-button.favorite` with a
+   `filter: drop-shadow(0 0 2px rgba(0,0,0,.9))` — designed to make
+   the pink heart pop against busy photos. On a white card / page
+   background it reads as a dark halo around the heart. Replace
+   with a pink glow that works on light AND on photos. */
+body.stash-liquid-glass.refract-light button.btn.favorite-button.favorite,
+body.stash-liquid-glass.refract-light .favorite-button.favorite {
+    filter: drop-shadow(0 0 6px rgba(244, 114, 182, 0.6)) !important;
+}
+
+
+/* ═══════ 24. View Transition crossfade duration ═══════════════════
+   refract.js wraps the light-mode DOM change in startViewTransition.
+   The browser snapshots the page, applies the change, and crossfades.
+   These pseudo-elements tune the fade — slower than the default 250ms
+   so the eye eases into the new palette rather than getting flashed. */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.55s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation-duration: 0.001s;
+    }
+}
+
+
+/* ═══════ 25. Edge case: prefers-reduced-transparency ══════════════ */
+@media (prefers-reduced-transparency: reduce) {
+    body.stash-liquid-glass.refract-light {
+        --glass-bg: rgba(248, 248, 250, 0.97);
+        --glass-bg-strong: rgba(240, 240, 244, 0.98);
+    }
+}
