@@ -511,7 +511,7 @@ body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
        causes Chromium on Windows to crash/blank the page on Ctrl+Wheel. */
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.32) !important;
+    box-shadow: var(--shadow-lg) !important;
     color: var(--text) !important;
     opacity: 0.55;
     z-index: 1100;
@@ -554,7 +554,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show {
     border-radius: var(--radius-sm) !important;
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45) !important;
+    box-shadow: var(--shadow-xl) !important;
     color: var(--text) !important;
 }
 /* Hide popper's default arrow — we're not anchored to the trigger any more */
@@ -684,7 +684,7 @@ body.stash-liquid-glass .Lightbox-footer {
        crash as .Lightbox-navbutton. Solid background compensates. */
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.32) !important;
+    box-shadow: var(--shadow-lg) !important;
     padding: 0.4rem 0.85rem !important;
     color: var(--text) !important;
     z-index: 1100;
@@ -930,6 +930,28 @@ body.stash-liquid-glass .refract-accent-swatch:hover {
 body.stash-liquid-glass .refract-accent-swatch.is-active {
     border-color: #fff !important;
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5), 0 0 14px rgba(var(--accent-rgb), 0.6) !important;
+}
+
+/* Light/dark mode toggle — sun (light on) / moon (light off) icon
+   sitting alongside the 8 accent swatches. Distinct visual: glass
+   background with icon inside, warm sun-gradient when active so
+   users can tell at a glance which mode is on. */
+body.stash-liquid-glass .refract-light-toggle {
+    background: var(--glass-bg-strong) !important;
+    color: var(--text) !important;
+    font-size: 0.95rem !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+body.stash-liquid-glass .refract-light-toggle.is-active {
+    background: linear-gradient(135deg, #fef3c7, #fbbf24) !important;
+    border-color: #f59e0b !important;
+    color: #78350f !important;
+    box-shadow:
+        0 0 0 2px rgba(0, 0, 0, 0.15),
+        0 0 14px rgba(251, 191, 36, 0.6) !important;
 }
 
 /* Right-align Refract's per-setting controls within their .setting

@@ -43,11 +43,12 @@
 
     function applyAccentClass(accent) {
         if (!document.body) { return; }
-        var stale = [];
-        document.body.classList.forEach(function (c) {
-            if (c.indexOf("refract-") === 0) { stale.push(c); }
+        /* Only strip the 7 accent classes — not refract-light or
+           refract-lite, which are orthogonal axes that the accent
+           picker must not clobber. */
+        REFRACT_PRESETS.forEach(function (p) {
+            document.body.classList.remove("refract-" + p);
         });
-        stale.forEach(function (c) { document.body.classList.remove(c); });
         if (REFRACT_PRESETS.indexOf(accent) !== -1) {
             document.body.classList.add("refract-" + accent);
         }
@@ -128,6 +129,10 @@
             var liteOn = liteState[0];
             var setLiteOn = liteState[1];
 
+            var lightState = R.useState(isLightModeEnabled());
+            var lightOn = lightState[0];
+            var setLightOn = lightState[1];
+
             /* Custom CSS Source state: { loaded, url } where url is
                the value Stash currently has set (empty if not set). */
             var cssSrc = R.useState({ loaded: false, url: "" });
@@ -170,6 +175,27 @@
                 applyRatingStyleClass(style);
                 setRatingStyle(style);
                 tagFilledRatings();
+            }
+
+            function toggleLight() {
+                var next = !lightOn;
+                /* Use View Transitions when supported (Chromium 111+,
+                   Safari 18+, Firefox 137+) — browser snapshots the
+                   current state, runs the DOM change, then crossfades.
+                   Handles all the visual deltas (bg gradient, shadows,
+                   accent glow, text colors) in one smooth fade rather
+                   than instant flash. Fall back to instant on older
+                   browsers. */
+                function commit() {
+                    try { localStorage.setItem(LIGHT_MODE_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                    applyLightModeClass(next);
+                    setLightOn(next);
+                }
+                if (typeof document.startViewTransition === "function") {
+                    document.startViewTransition(commit);
+                } else {
+                    commit();
+                }
             }
 
             function toggleLite() {
@@ -218,6 +244,22 @@
                     onClick: function () { pick(preset); }
                 });
             });
+            /* Light/dark mode toggle — disabled for this release while
+               light-mode CSS is still being refined. Flip the flag to
+               re-enable. All state (lightOn/setLightOn/toggleLight) +
+               body-class bootstrap stays in place so the underlying
+               feature is one-line ship-able when ready. */
+            var SHOW_LIGHT_MODE_TOGGLE = false;
+            if (SHOW_LIGHT_MODE_TOGGLE) {
+                swatches.push(R.createElement("button", {
+                    key: "__light",
+                    type: "button",
+                    className: "refract-accent-swatch refract-light-toggle" + (lightOn ? " is-active" : ""),
+                    title: lightOn ? "Switch to dark mode" : "Switch to light mode",
+                    "aria-label": "Toggle light/dark mode",
+                    onClick: toggleLight
+                }, lightOn ? "☀" : "☾"));
+            }
 
             return R.createElement("div", { className: "plugin-settings" },
                 R.createElement("div", { className: "setting", id: "plugin-refract-accent" },
@@ -270,19 +312,22 @@
                 ),
                 R.createElement("div", { className: "setting", id: "plugin-refract-rating-style" },
                     R.createElement("div", null,
-                        R.createElement("h3", null, "Rating badge differentiation"),
+                        R.createElement("h3", null, "Rating badge style"),
                         R.createElement("div", { className: "sub-heading" },
-                            R.createElement("b", null, "Intensity"), " (default) scales the accent glow with the rating — higher score, brighter halo. ",
-                            R.createElement("b", null, "Tiers"), " replaces the accent glow with a traffic-light tint: red (low) / amber (mid) / green (high).")
+                            R.createElement("b", null, "Mono"), " (default) — accent-coloured halo for every rating; brightness scales with score. ",
+                            R.createElement("b", null, "Coloured"), " — red / amber / green tint by rating tier.")
                     ),
                     R.createElement("div", { className: "refract-setting-control refract-rating-style-toggle" },
-                        ["intensity", "tiers"].map(function (style) {
+                        [
+                            { key: "intensity", label: "Mono" },
+                            { key: "tiers", label: "Coloured" }
+                        ].map(function (item) {
                             return R.createElement("button", {
-                                key: style,
+                                key: item.key,
                                 type: "button",
-                                className: "refract-segmented-btn" + (ratingStyle === style ? " is-active" : ""),
-                                onClick: function () { pickRatingStyle(style); }
-                            }, style.charAt(0).toUpperCase() + style.slice(1));
+                                className: "refract-segmented-btn" + (ratingStyle === item.key ? " is-active" : ""),
+                                onClick: function () { pickRatingStyle(item.key); }
+                            }, item.label);
                         })
                     )
                 ),
@@ -308,36 +353,44 @@
                         )
                     )
                 ),
-                R.createElement("div", { className: "setting", id: "plugin-refract-css-source" },
-                    R.createElement("div", null,
-                        R.createElement("h3", null, "Theme on login + early load"),
-                        R.createElement("div", { className: "sub-heading" },
-                            "Writes the plugin's CSS endpoint URL into Stash's Custom CSS Source so the theme loads BEFORE plugins ",
-                            R.createElement("—", null),
-                            " on the login page and the first-paint flash of every cold load. Toggle off to remove. ",
-                            cssSrcState.loaded && cssSrcState.url
-                                ? R.createElement("div", { style: { marginTop: "0.4rem", opacity: 0.7, fontSize: "0.75rem", wordBreak: "break-all" } },
-                                    "Current: ", cssSrcState.url)
-                                : null
+                /* Custom CSS Source setting — disabled for this release.
+                   Flip the flag to re-enable. Supporting code (cssSrc
+                   state, getUiConfig/setCustomCssUrl helpers) stays in
+                   place so the underlying flow is intact. */
+                (function () {
+                    var SHOW_CUSTOM_CSS_SOURCE = false;
+                    if (!SHOW_CUSTOM_CSS_SOURCE) { return null; }
+                    return R.createElement("div", { className: "setting", id: "plugin-refract-css-source" },
+                        R.createElement("div", null,
+                            R.createElement("h3", null, "Theme on login + early load"),
+                            R.createElement("div", { className: "sub-heading" },
+                                "Writes the plugin's CSS endpoint URL into Stash's Custom CSS Source so the theme loads BEFORE plugins ",
+                                R.createElement("—", null),
+                                " on the login page and the first-paint flash of every cold load. Toggle off to remove. ",
+                                cssSrcState.loaded && cssSrcState.url
+                                    ? R.createElement("div", { style: { marginTop: "0.4rem", opacity: 0.7, fontSize: "0.75rem", wordBreak: "break-all" } },
+                                        "Current: ", cssSrcState.url)
+                                    : null
+                            )
+                        ),
+                        R.createElement("div", { className: "refract-setting-control" },
+                            R.createElement("button", {
+                                type: "button",
+                                className: "refract-segmented-btn" + (cssIsOurs ? " is-active" : ""),
+                                onClick: clickApplyCss,
+                                disabled: !cssSrcState.loaded
+                            },
+                                !cssSrcState.loaded
+                                    ? "Loading…"
+                                    : cssIsOurs
+                                        ? "Remove"
+                                        : cssIsEmpty
+                                            ? "Apply"
+                                            : "Replace…"
+                            )
                         )
-                    ),
-                    R.createElement("div", { className: "refract-setting-control" },
-                        R.createElement("button", {
-                            type: "button",
-                            className: "refract-segmented-btn" + (cssIsOurs ? " is-active" : ""),
-                            onClick: clickApplyCss,
-                            disabled: !cssSrcState.loaded
-                        },
-                            !cssSrcState.loaded
-                                ? "Loading…"
-                                : cssIsOurs
-                                    ? "Remove"
-                                    : cssIsEmpty
-                                        ? "Apply"
-                                        : "Replace…"
-                        )
-                    )
-                )
+                    );
+                })()
             );
         };
     }
@@ -365,6 +418,7 @@
     var VIEW_MINIMISER_STORAGE_KEY = "refract.viewMinimiser";
     var LOGO_URL_STORAGE_KEY = "refract.customLogoUrl";
     var LITE_MODE_STORAGE_KEY = "refract.liteMode";
+    var LIGHT_MODE_STORAGE_KEY = "refract.lightMode";
     var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";
     var RATING_STYLES = ["intensity", "tiers"];
     var GRAPHQL_URL = "/graphql";
@@ -420,6 +474,22 @@
         document.body.classList.toggle("refract-lite", !!on);
     }
     applyLiteModeClass(isLiteModeEnabled());
+
+    /* Light mode — orthogonal to accents. Toggles a white/paper base
+       via the `refract-light` body class; CSS rules in css/14_light.css
+       override tokens + hardcoded shadows. Pairs with any accent.
+       Loads BEFORE 15_lite.css so lite's !important shadow-strip wins
+       when both modes are enabled together. */
+    function isLightModeEnabled() {
+        try {
+            return localStorage.getItem(LIGHT_MODE_STORAGE_KEY) === "1";
+        } catch (e) { return false; }
+    }
+    function applyLightModeClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-light", !!on);
+    }
+    applyLightModeClass(isLightModeEnabled());
 
     /* Rating-badge differentiation. "intensity" (default) = accent glow
        scales with score — uniform-coloured but progressively brighter
@@ -1292,7 +1362,7 @@
 
     var QUERY_SCENE_CARDS =
         'query SceneCards($ids: [Int]) { findScenes(scene_ids: $ids) {' +
-        '  scenes { id o_counter performers { id name } tags { id name } }' +
+        '  scenes { id o_counter rating100 performers { id name } tags { id name } }' +
         '} }';
 
     var MAX_PERFORMER_CIRCLES = 5;
@@ -1423,7 +1493,7 @@
         if (!ids.length) { return; }
 
         var q = 'query { findScenes(scene_ids: [' + ids.join(',') + ']) {' +
-                '  scenes { id o_counter performers { id name } tags { id name } }' +
+                '  scenes { id o_counter rating100 performers { id name } tags { id name } }' +
                 '} }';
         gql(q)
             .then(function (res) {
@@ -1435,10 +1505,28 @@
                     var tagInfo = tags.map(function (t) { return { id: t.id, name: t.name }; })
                                       .filter(function (t) { return t.id && t.name; });
                     var oCount = parseInt(scene.o_counter, 10) || 0;
+                    var rating = parseInt(scene.rating100, 10) || 0;
                     injectPerformerCircles(card, scene.performers || [], tags.length, scene.id, oCount, tagInfo);
+                    injectSceneRating(card, rating);
                 });
+                /* Re-tag freshly-injected banners so tier classes + the
+                   --refract-rating var land for intensity/tiers modes. */
+                try { tagFilledRatings(); } catch (e) { /* ignore */ }
             })
             .catch(function () { /* ignore */ });
+    }
+
+    /* Inject a .rating-banner inside a scene card (mirrors the badge
+       Stash renders on performer cards). Hidden by default if there's
+       no rating; idempotent so repeated initSceneCards calls don't
+       duplicate. Rating is 0-100 in Stash, displayed as 0.0-10.0. */
+    function injectSceneRating(card, rating100) {
+        if (!card || !rating100 || rating100 <= 0) { return; }
+        if (card.querySelector(":scope > .rating-banner")) { return; }
+        var banner = document.createElement("div");
+        banner.className = "rating-banner";
+        banner.textContent = (rating100 / 10).toFixed(1);
+        card.appendChild(banner);
     }
 
     /* ── Performer card redesign ─────────────────────────────────────── */
