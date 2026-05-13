@@ -341,24 +341,112 @@ body.stash-liquid-glass .search-item-check:focus {
    Lightbox (image viewer for galleries)
    ─────────────────────────────────────────────────────────────────── */
 
-/* Outer container — full-viewport dark backdrop with heavy blur. Reserve
+/* When the lightbox is open, kill ALL backdrop-filter / filter / mix-
+   blend-mode / contain rules on the page. Chromium on Windows has a
+   long-standing rendering bug where transformed content (scroll-wheel
+   zoom on the lightbox image) interacts pathologically with
+   backdrop-filter ancestors and CSS containment in the same stacking
+   pipeline, blanking the entire page. We've already stripped
+   backdrop-filter from the lightbox chrome itself; this rule covers
+   ANY element underneath the body (cards, panels, navbar, etc.) so
+   no remaining filter can poison the render tree while zoom is
+   active. Selectors are deliberately broad and !important. */
+body.stash-liquid-glass:has(.Lightbox) *,
+body.stash-liquid-glass:has(.Lightbox) *::before,
+body.stash-liquid-glass:has(.Lightbox) *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+body.stash-liquid-glass:has(.Lightbox) .card,
+body.stash-liquid-glass:has(.Lightbox) .grid-card {
+    contain: none !important;
+    animation: none !important;
+}
+
+/* Outer container — full-viewport dark backdrop. backdrop-filter is
+   intentionally omitted: Stash's Ctrl+Wheel image zoom applies
+   transform:scale() to the lightbox image, and Chromium has a known
+   issue where transformed children inside a backdrop-filter ancestor
+   can render blank or vanish entirely. With the background already at
+   ~0.95 opacity, the blur barely contributed visually anyway. Reserve
    bottom padding for the floating footer slab (which is position:fixed
    and out of normal flow) so the inner flex child .Lightbox-display
    sizes to (100vh - footer reservation) and the image centers above
    the bar instead of disappearing behind it. */
 body.stash-liquid-glass .Lightbox {
-    background: rgba(8, 8, 10, 0.86) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(140%);
-    backdrop-filter: blur(24px) saturate(140%);
+    background: rgba(6, 6, 8, 0.96) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     padding-top: 28px !important;
     padding-bottom: 100px !important;
     box-sizing: border-box !important;
 }
 
-/* Header — emptied by refract.js (its content moves to the footer);
-   hide the now-empty container so only one floating bar shows. */
+/* CSS-only consolidation: lift the header into the same position:fixed
+   slot as the footer with a transparent background. Its children
+   (page indicator on the left, control buttons on the right) visually
+   appear INSIDE the footer's glass slab while the footer keeps the
+   filename/link in the center. No DOM is moved — Stash's React
+   lightbox stays intact, so scroll-wheel zoom doesn't blank the page. */
 body.stash-liquid-glass .Lightbox-header {
+    position: fixed !important;
+    bottom: 12px !important;
+    left: 12px !important;
+    right: 12px !important;
+    top: auto !important;
+    height: auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    padding: 0.4rem 0.85rem !important;
+    box-sizing: border-box !important;
+    pointer-events: none !important;
+    z-index: 1102 !important;
+    /* Match the footer's 3-column grid so the header-right cluster
+       lands at the same right edge as the footer-right cluster — both
+       column sets align identically over the same bar. */
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr !important;
+    align-items: center !important;
+    gap: 0.85rem !important;
+    margin: 0 !important;
+    /* Same min-height as the footer so the header occupies the SAME
+       slab area — without this the header is shorter than the footer
+       and its children visually drop to the bottom edge of the bar. */
+    min-height: 60px !important;
+}
+body.stash-liquid-glass .Lightbox-header > * {
+    pointer-events: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    align-self: center !important;
+}
+/* Empty Lightbox-header-left slot (Stash renders a 3-cell layout) —
+   collapse it so the indicator becomes the leftmost visible element. */
+body.stash-liquid-glass .Lightbox-header > .Lightbox-header-left {
     display: none !important;
+}
+/* Hide the native indicator entirely — refract.js mirrors its image
+   count text into a `.refract-lb-count` element under the filename in
+   the footer center. */
+body.stash-liquid-glass .Lightbox-header > .Lightbox-header-indicator {
+    display: none !important;
+}
+body.stash-liquid-glass .Lightbox-header > .Lightbox-header-right {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0.3rem !important;
+    justify-self: end !important;
+    grid-column: 3 !important;
+}
+/* Buttons inside header-right — explicit vertical centering on every
+   button regardless of native button defaults / line-height. */
+body.stash-liquid-glass .Lightbox-header-right > .btn,
+body.stash-liquid-glass .Lightbox-header-right > * > .btn {
+    align-self: center !important;
+    margin: 0 !important;
 }
 
 /* Page indicator (centre): "Page 1 / 3 | 1 / 40" */
@@ -377,15 +465,23 @@ body.stash-liquid-glass .Lightbox-header-indicator b {
 }
 
 /* Header buttons (gear, slideshow, fullscreen, close) — bare icon buttons */
-body.stash-liquid-glass .Lightbox-header .btn.btn-link,
+/* Theme ANY button inside the header / navbuttons. Stash uses .btn,
+   .btn-link, .btn-secondary, .minimal in different combos — catch them
+   all so the gear/play/fullscreen/close icons consistently match. */
+body.stash-liquid-glass .Lightbox-header button,
+body.stash-liquid-glass .Lightbox-header .btn,
 body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     color: var(--text-muted) !important;
-    padding: 0.4rem 0.55rem !important;
+    padding: 0.35rem 0.5rem !important;
     border-radius: var(--radius-sm) !important;
     text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
     transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 body.stash-liquid-glass .Lightbox-header .btn.btn-link:hover,
@@ -407,11 +503,14 @@ body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
     transform: translateY(-50%) !important;
     width: 3rem !important;
     height: 3rem !important;
-    background: var(--glass-bg-strong) !important;
+    background: rgba(20, 20, 24, 0.78) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: 50% !important;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    /* backdrop-filter intentionally omitted — combination of position:fixed
+       + transform + backdrop-filter on a sibling-of-a-zoom-transformed-img
+       causes Chromium on Windows to crash/blank the page on Ctrl+Wheel. */
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     box-shadow: 0 8px 26px rgba(0, 0, 0, 0.32) !important;
     color: var(--text) !important;
     opacity: 0.55;
@@ -578,21 +677,32 @@ body.stash-liquid-glass .Lightbox-footer {
     bottom: 12px !important;
     left: 12px !important;
     right: 12px !important;
-    background: var(--glass-bg-strong) !important;
+    background: rgba(18, 18, 22, 0.92) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    /* backdrop-filter intentionally omitted — same Chromium/Windows zoom
+       crash as .Lightbox-navbutton. Solid background compensates. */
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     box-shadow: 0 8px 26px rgba(0, 0, 0, 0.32) !important;
     padding: 0.4rem 0.85rem !important;
     color: var(--text) !important;
     z-index: 1100;
-    display: flex !important;
-    flex-direction: row !important;
+    /* 3-column grid so footer-center is TRULY centred in the bar
+       regardless of left/right cluster widths. (flex space-between only
+       balances when both end-clusters happen to be the same width.) */
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr !important;
     align-items: center !important;
-    justify-content: space-between !important;
     gap: 0.85rem !important;
+    /* Lock height so the overlaid header bar (single-row buttons) can
+       match it and vertically centre its children within the same
+       visual slab. */
+    min-height: 60px !important;
 }
+body.stash-liquid-glass .Lightbox-footer-left { justify-self: start !important; }
+body.stash-liquid-glass .Lightbox-footer-center { justify-self: center !important; }
+body.stash-liquid-glass .Lightbox-footer-right { justify-self: end !important; }
 
 /* Image filename + gallery link in footer centre */
 body.stash-liquid-glass .Lightbox-footer-center .image-link {
@@ -635,7 +745,6 @@ body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link svg {
    flex-start, so the parent footer's `space-between` is what anchors
    footer-right to the right edge of the bar. */
 body.stash-liquid-glass .Lightbox-footer-left,
-body.stash-liquid-glass .Lightbox-footer-center,
 body.stash-liquid-glass .Lightbox-footer-right {
     display: inline-flex !important;
     flex-direction: row !important;
@@ -647,14 +756,92 @@ body.stash-liquid-glass .Lightbox-footer-right {
     width: auto !important;
     max-width: none !important;
 }
+/* Footer center is a 2-row grid: filename + gallery link sit inline on
+   row 1, the mirrored image count spans row 2 centered. */
+body.stash-liquid-glass .Lightbox-footer-center {
+    display: grid !important;
+    grid-template-columns: auto auto !important;
+    grid-template-rows: auto auto !important;
+    column-gap: 0.5rem !important;
+    row-gap: 0.05rem !important;
+    align-items: center !important;
+    justify-items: center !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+}
+body.stash-liquid-glass .Lightbox-footer-center > .image-link {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+}
+body.stash-liquid-glass .Lightbox-footer-center > .image-gallery-link {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    justify-self: start !important;
+}
+body.stash-liquid-glass .Lightbox-footer-center > .refract-lb-count {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    justify-self: center !important;
+}
+/* Mirrored image count from the (hidden) header indicator — small,
+   muted, sits directly under the filename / gallery link. */
+body.stash-liquid-glass .refract-lb-count {
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    color: var(--text-muted) !important;
+    font-variant-numeric: tabular-nums !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+}
 body.stash-liquid-glass .Lightbox-footer-left > *,
 body.stash-liquid-glass .Lightbox-footer-center > *,
 body.stash-liquid-glass .Lightbox-footer-right > * {
     flex-shrink: 0;
 }
+/* O-counter on the lightbox footer — slim glass pill matching the
+   adjacent .rating-number sizing. The native Stash markup wraps the
+   icon + value in inner Bootstrap btn-group with their own paddings;
+   zero those out so total height matches a single-line pill. */
 body.stash-liquid-glass .Lightbox-footer .o-counter {
     display: inline-flex !important;
     align-items: center !important;
+    gap: 0.2rem !important;
+    height: 26px !important;
+    padding: 0 0.55rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--text) !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    font-variant-numeric: tabular-nums !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+body.stash-liquid-glass .Lightbox-footer .o-counter:hover {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .Lightbox-footer .o-counter button,
+body.stash-liquid-glass .Lightbox-footer .o-counter > * {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    line-height: 1 !important;
+    color: inherit !important;
+}
+body.stash-liquid-glass .Lightbox-footer .o-counter svg {
+    width: 11px !important;
+    height: 11px !important;
+    flex-shrink: 0;
 }
 
 /* Style the relocated indicator + header buttons inside the footer. */
@@ -749,12 +936,44 @@ body.stash-liquid-glass .refract-accent-swatch.is-active {
    rows — matches the accent-swatches alignment so each control sits
    next to its heading instead of dropping to a new line. */
 body.stash-liquid-glass .setting#plugin-refract-view-minimiser > .refract-setting-control,
-body.stash-liquid-glass .setting#plugin-refract-custom-logo > .refract-setting-control {
+body.stash-liquid-glass .setting#plugin-refract-custom-logo > .refract-setting-control,
+body.stash-liquid-glass .setting#plugin-refract-rating-style > .refract-setting-control {
     display: flex !important;
     justify-content: flex-end !important;
     align-items: center !important;
     flex-shrink: 0 !important;
     margin-left: auto !important;
+}
+
+/* Refract segmented control — used for the 3-way rating-style toggle.
+   Three glass-pill buttons; the active one fills with accent tint. */
+body.stash-liquid-glass .refract-rating-style-toggle {
+    display: inline-flex !important;
+    gap: 4px !important;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-pill);
+    padding: 3px;
+}
+body.stash-liquid-glass .refract-segmented-btn {
+    appearance: none;
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+body.stash-liquid-glass .refract-segmented-btn:hover {
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .refract-segmented-btn.is-active {
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.25);
 }
 
 /* Custom-logo URL input — glass styling matching Refract's other text
