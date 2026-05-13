@@ -2209,6 +2209,93 @@
         }, true);
     }
 
+    /* Rating-input typing shim.
+       Stash's <input type="number" min="0" step="0.1" max="10"> is wired
+       to a React controlled-value handler that re-parses every keystroke
+       through the step engine, making it impossible to type multi-char
+       values like "5.5" or "10" — React rewrites the value back to a
+       clamped/rounded snapshot on every keypress. The shim detaches React
+       while the user is typing and commits the parsed final value on
+       blur / Enter / Tab:
+         1. On focus, switch type to "text" so the browser stops native
+            number-input validation per keystroke.
+         2. Capture-phase listeners on `input` + `change` stop the events
+            from propagating to React's delegated handler at document root.
+         3. On blur/Enter, parse the raw text, clamp 0-10, round to step
+            0.1, write back via the native value setter, and dispatch
+            input + change so React picks up the FINAL value (just once). */
+    function initRatingInputSelectAll() {
+        if (document.body._stashRatingDelegated) { return; }
+        document.body._stashRatingDelegated = true;
+        var valueSetter = Object.getOwnPropertyDescriptor(
+            window.HTMLInputElement.prototype, "value"
+        ).set;
+        function stop(ev) { ev.stopPropagation(); }
+        document.body.addEventListener("focusin", function (e) {
+            var t = e.target;
+            if (!t || !t.matches || !t.matches(".rating-number input")) { return; }
+            if (t.dataset.refractRatingShim === "1") { return; }
+            t.dataset.refractRatingShim = "1";
+            var originalType = t.type;
+            t.type = "text";
+            t.setAttribute("inputmode", "decimal");
+            t.setAttribute("maxlength", "4");
+            /* Last value that was a valid rating in 0-10 range. Used to
+               revert any keystroke that would push it out of bounds. */
+            var lastValid = "";
+            function validate(ev) {
+                ev.stopPropagation();
+                var raw = t.value;
+                /* Allow empty / partial decimals during typing. */
+                if (raw === "" || raw === "." || /^\d{0,2}\.?\d{0,2}$/.test(raw)) {
+                    var v = parseFloat(raw);
+                    if (raw === "" || !isFinite(v) || (v >= 0 && v <= 10)) {
+                        lastValid = raw;
+                        return;
+                    }
+                }
+                /* Reject — restore caret to end of last valid value. */
+                t.value = lastValid;
+            }
+            t.addEventListener("input", validate, true);
+            t.addEventListener("change", stop, true);
+            function commit() {
+                t.removeEventListener("input", validate, true);
+                t.removeEventListener("change", stop, true);
+                t.removeEventListener("blur", commit, true);
+                t.removeEventListener("keydown", onKey, true);
+                t.type = originalType;
+                t.removeAttribute("inputmode");
+                t.removeAttribute("maxlength");
+                delete t.dataset.refractRatingShim;
+                var raw = (t.value || "").trim();
+                var v = parseFloat(raw);
+                if (!isFinite(v)) v = 0;
+                if (v < 0) v = 0;
+                if (v > 10) v = 10;
+                v = Math.round(v * 10) / 10;
+                valueSetter.call(t, v.toFixed(1));
+                t.dispatchEvent(new Event("input", { bubbles: true }));
+                t.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            function onKey(ev) {
+                if (ev.key === "Enter" || ev.key === "Tab") {
+                    ev.preventDefault();
+                    t.blur();
+                } else if (ev.key === "Escape") {
+                    t.value = "";
+                    t.blur();
+                }
+            }
+            t.addEventListener("blur", commit, true);
+            t.addEventListener("keydown", onKey, true);
+            /* Clear current value + select on focus so typing replaces. */
+            setTimeout(function () {
+                try { t.value = ""; t.focus(); t.select(); } catch (e2) {}
+            }, 10);
+        });
+    }
+
     /* Clear leftover inline style overrides from older versions of the
        theme — back when image-list toolbars were force-pinned to
        position:static and sidebars were mistakenly tagged data-stash-filter.
@@ -2320,6 +2407,7 @@
         setupSceneTabsPerformers();
         wrapSceneTagList();
         initImageCardLightbox();
+        initRatingInputSelectAll();
         unstickyGalleryToolbar();
         initOperationMenuOverlay();
         injectPerformerCarouselChevrons();
