@@ -9,7 +9,7 @@ body.stash-liquid-glass .wall-item {
 body.stash-liquid-glass .wall-item:hover {
     box-shadow:
         0 0 0 2px var(--accent),
-        0 24px 60px rgba(0, 0, 0, 0.55),
+        var(--shadow-2xl),
         0 0 0 1px rgba(var(--accent-rgb), 0.14),
         0 0 40px 6px rgba(var(--accent-rgb), 0.22),
         0 0 90px 18px rgba(var(--accent-rgb), 0.09);
@@ -854,7 +854,7 @@ body.stash-liquid-glass .detail-header {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     box-shadow:
-        0 4px 24px rgba(0, 0, 0, 0.25),
+        var(--shadow-md),
         0 0 0 1px rgba(0, 0, 0, 0.15) inset;
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
@@ -878,7 +878,7 @@ body.stash-liquid-glass .detail-header .detail-header-image img.logo {
     border-radius: var(--radius-sm) !important;
     border: 1px solid var(--glass-border) !important;
     background: rgba(0, 0, 0, 0.28);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.32);
+    box-shadow: var(--shadow-lg);
     -webkit-mask-image: none !important;
             mask-image: none !important;
 }
@@ -1875,7 +1875,7 @@ body.stash-liquid-glass #select_page_popover {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.32) !important;
+    box-shadow: var(--shadow-lg) !important;
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
     padding: 4px !important;
@@ -2101,7 +2101,7 @@ body.stash-liquid-glass #tasks-panel .tasks-panel-queue {
 body.stash-liquid-glass #tasks-panel .tasks-panel-queue:hover {
     border-color: rgba(var(--accent-rgb), 0.28) !important;
     box-shadow:
-        0 24px 60px rgba(0, 0, 0, 0.55),
+        var(--shadow-2xl),
         0 0 0 1px rgba(var(--accent-rgb), 0.14),
         0 0 40px 6px rgba(var(--accent-rgb), 0.22),
         0 0 90px 18px rgba(var(--accent-rgb), 0.09) !important;
@@ -2446,6 +2446,13 @@ body.stash-liquid-glass .scene-card .scene-card__details:not(:has(:not(:empty)))
 body.stash-liquid-glass .scene-card .card-popovers {
     display: none !important;
 }
+/* Also hide the divider hr that Stash renders alongside .card-popovers
+   — orphaned once we hide the popovers, otherwise reads as a stray
+   grey line at the bottom of every scene card. */
+body.stash-liquid-glass .scene-card hr,
+body.stash-liquid-glass .grid-card.scene-card hr {
+    display: none !important;
+}
 
 /* Tighter card section with room for performer row */
 body.stash-liquid-glass .scene-card .card-section {
@@ -2564,9 +2571,15 @@ body.stash-liquid-glass .stash-performer-avatar {
     /* Bias crop toward the top of the performer image so faces/heads
        stay visible — default center-center often clipped them off. */
     object-position: center 25% !important;
-    border: 1.5px solid rgba(0, 0, 0, 0.55);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.45);
     background: var(--glass-bg-strong);
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.22);
     display: block !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+body.stash-liquid-glass .stash-performer-link:hover .stash-performer-avatar {
+    border-color: var(--accent);
+    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.45);
 }
 body.stash-liquid-glass .stash-performer-more {
     width: 32px !important;
@@ -2574,8 +2587,8 @@ body.stash-liquid-glass .stash-performer-more {
     min-width: 32px !important;
     border-radius: 50% !important;
     background: var(--glass-bg-strong);
-    border: 1.5px solid var(--glass-border-bright);
-    color: var(--text-muted);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.45);
+    color: var(--accent-bright);
     font-size: 0.62rem;
     font-weight: 700;
     display: inline-flex !important;
@@ -2843,7 +2856,7 @@ body.stash-liquid-glass .grid-card:has(.stash-tag-count:hover) {
 #stash-category-browser .stash-cat-tile:hover {
     transform: scale(1.02);
     border-color: var(--glass-border-bright, rgba(255, 255, 255, 0.20));
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-xl);
 }
 #stash-category-browser .stash-cat-tile::before {
     content: "";

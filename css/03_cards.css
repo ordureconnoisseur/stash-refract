@@ -13,7 +13,7 @@ body.stash-liquid-glass .grid-card {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-md);
     overflow: hidden;
     /* backdrop-filter intentionally OMITTED on cards — they sit on a
        near-opaque dark page background where the blur is barely visible,
@@ -31,7 +31,7 @@ body.stash-liquid-glass .card:hover,
 body.stash-liquid-glass .grid-card:hover {
     border-color: rgba(var(--accent-rgb), 0.28) !important;
     box-shadow:
-        0 24px 60px rgba(0, 0, 0, 0.55),
+        var(--shadow-2xl),
         0 0 0 1px rgba(var(--accent-rgb), 0.14),
         0 0 40px 6px rgba(var(--accent-rgb), 0.22),
         0 0 90px 18px rgba(var(--accent-rgb), 0.09);
@@ -189,10 +189,38 @@ body.stash-liquid-glass .rating-banner {
         0 2px 4px rgba(0, 0, 0, 0.75);
 }
 
-/* Pin to top-left of performer card / hero with equal inset */
+/* Stash renders its own .rating-banner inside scene cards (nested
+   somewhere in the Stash subtree). Hide every banner that isn't a
+   direct child of the card — refract.js injects exactly one direct-
+   child banner per scene card as the single source of truth. */
+body.stash-liquid-glass .scene-card .rating-banner,
+body.stash-liquid-glass .grid-card.scene-card .rating-banner {
+    display: none !important;
+}
+body.stash-liquid-glass .scene-card > .rating-banner,
+body.stash-liquid-glass .grid-card.scene-card > .rating-banner {
+    display: inline-flex !important;
+    /* Scene cards have wide 16:9 thumbnails where the full 3.5rem
+       badge feels oversized. Trim ~23% so it reads as a compact
+       corner badge while performer cards keep the larger size. */
+    width: 2.7rem !important;
+    height: 2.7rem !important;
+    min-width: 2.7rem !important;
+    min-height: 2.7rem !important;
+    max-width: 2.7rem !important;
+    max-height: 2.7rem !important;
+    font-size: 1rem !important;
+}
+
+/* Pin to top-left of performer / scene card / hero with equal inset.
+   Scene cards: rating-banner is injected by refract.js (Stash doesn't
+   render one natively on scene cards — only inside the hidden
+   .card-popovers). Performer cards: native. */
 body.stash-liquid-glass .performer-card .rating-banner,
 body.stash-liquid-glass .grid-card.performer-card .rating-banner,
 body.stash-liquid-glass .card.performer-card .rating-banner,
+body.stash-liquid-glass .scene-card > .rating-banner,
+body.stash-liquid-glass .grid-card.scene-card > .rating-banner,
 body.stash-liquid-glass #performer-page .image-container .rating-banner {
     position: absolute !important;
     top: 0.65rem !important;
@@ -270,7 +298,7 @@ body.stash-liquid-glass .rating-number {
     line-height: 1 !important;
     font-variant-numeric: tabular-nums;
     vertical-align: middle;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-sm);
     transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 body.stash-liquid-glass .rating-number:hover {
@@ -433,7 +461,7 @@ body.stash-liquid-glass .edit-rating-button:focus > svg {
 body.stash-liquid-glass .performer-card .flag-icon {
     width: 1.2em;
     border-radius: 2px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    box-shadow: var(--shadow-xs);
 }
 body.stash-liquid-glass .performer-card__country-string {
     display: none !important;
