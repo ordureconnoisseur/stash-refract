@@ -322,6 +322,45 @@ body.stash-liquid-glass .search-term-row .clearable-input-group {
     flex: 1 !important;
     min-width: 0 !important;
 }
+
+/* Clear (×) button inside any .clearable-input-group — fill the parent
+   vertically (top:0 + bottom:0 + height:100%) and flex-center the SVG
+   inside, so Bootstrap's .btn padding can't offset it. */
+body.stash-liquid-glass .clearable-input-group {
+    position: relative !important;
+}
+body.stash-liquid-glass .clearable-text-field-clear,
+body.stash-liquid-glass .clearable-text-field-clear.btn,
+body.stash-liquid-glass .clearable-text-field-clear.btn.btn-secondary {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: 100% !important;
+    width: 2rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--text-muted) !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: color 0.15s ease;
+}
+body.stash-liquid-glass .clearable-text-field-clear:hover {
+    color: var(--text) !important;
+    background: transparent !important;
+}
+body.stash-liquid-glass .clearable-text-field-clear svg {
+    width: 11px !important;
+    height: 11px !important;
+    flex-shrink: 0;
+    display: block !important;
+    margin: 0 !important;
+}
 body.stash-liquid-glass .search-term-row .clearable-text-field {
     background: rgba(255,255,255,0.05) !important;
     border: 1px solid var(--glass-border) !important;

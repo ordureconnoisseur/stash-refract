@@ -636,10 +636,14 @@ body.stash-liquid-glass .nav-tabs .nav-link {
    not .nav-link). `flex: 1 1 auto` makes tabs grow proportionally from
    their natural content width to fill the available navbar — the panel
    width is no longer pinned to the sum of tab widths; any extra space
-   is absorbed by the tabs instead of leaving a trailing gap. */
+   is absorbed by the tabs instead of leaving a trailing gap.
+
+   IMPORTANT: scoped to the SIDEBAR tab strips (.scene-tabs / .gallery-
+   tabs) only. The previous version also matched bare `.nav-tabs
+   .nav-item`, which stretched main-page tab strips (performer detail,
+   gallery image-list, etc.) into unnaturally wide buttons. */
 body.stash-liquid-glass .scene-tabs .nav-tabs .nav-item,
-body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-item,
-body.stash-liquid-glass .nav-tabs .nav-item {
+body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-item {
     flex: 1 1 auto !important;
     min-width: 0 !important;
 }
@@ -1040,9 +1044,8 @@ body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card .perform
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
-    /* Bias toward the top-third of the image — Stash performer photos
-       are usually portraits with the face in the upper portion. */
-    object-position: center 30% !important;
+    /* Default center-center crop — matches vanilla Stash behaviour. */
+    object-position: center center !important;
 }
 
 /* Shrink rating banner + favorite icon on the small (160px) cards in the
