@@ -2023,12 +2023,16 @@
     function applyAdaptiveLayout(wrap) {
         var row = wrap.querySelector(".scene-performers");
         if (!row) return;
-        var cards = row.querySelectorAll(":scope > .performer-card");
-        var count = cards.length;
+        /* Real (non-clone) cards. Clones are added BY US for infinite
+           loop in count="many" mode; always count and operate on real
+           cards only. */
+        var realCards = row.querySelectorAll(":scope > .performer-card:not(.refract-clone)");
+        var count = realCards.length;
         var state = wrap.__refractPerf || {};
 
         if (count === 0) {
             wrap.removeAttribute("data-perf-count");
+            teardownClones(row, state);
             teardownCarouselExtras(wrap, state);
             installScopedRowObserver(wrap, row);
             return;
@@ -2038,14 +2042,39 @@
         wrap.setAttribute("data-perf-count", bucket);
 
         if (bucket !== "many") {
+            teardownClones(row, state);
             teardownCarouselExtras(wrap, state);
             installScopedRowObserver(wrap, row);
             return;
         }
 
-        /* count >= 5: pagination dots + IntersectionObserver + keyboard nav */
+        /* count >= 5: pagination dots + IntersectionObserver + keyboard
+           nav + infinite-loop clones. Cloning the first card to the end
+           and last card to the start lets the user scroll past either
+           edge and silently land on the equivalent real card. */
 
-        /* Rebuild dots only if count changed */
+        /* (Re)build loop clones if count changed or clones missing. */
+        var existingClones = row.querySelectorAll(":scope > .performer-card.refract-clone").length;
+        if (existingClones !== 2 || state.lastRealCount !== count) {
+            teardownClones(row, state);
+            var firstClone = realCards[0].cloneNode(true);
+            var lastClone = realCards[count - 1].cloneNode(true);
+            firstClone.classList.add("refract-clone");
+            lastClone.classList.add("refract-clone");
+            firstClone.setAttribute("aria-hidden", "true");
+            lastClone.setAttribute("aria-hidden", "true");
+            row.insertBefore(lastClone, realCards[0]);
+            row.appendChild(firstClone);
+            state.firstClone = firstClone;
+            state.lastClone = lastClone;
+            state.lastRealCount = count;
+            state.initialized = false; /* re-seed initial scroll */
+        }
+
+        /* Refresh real-cards reference after clone insertion. */
+        realCards = row.querySelectorAll(":scope > .performer-card:not(.refract-clone)");
+
+        /* Rebuild dots only if count changed. */
         var existingDotCount = state.dots ? state.dots.children.length : 0;
         if (existingDotCount !== count) {
             if (state.dots && state.dots.parentNode) state.dots.parentNode.removeChild(state.dots);
@@ -2058,8 +2087,8 @@
                 dot.setAttribute("aria-label", "Go to performer " + (i + 1));
                 (function (idx) {
                     dot.addEventListener("click", function () {
-                        var c = row.querySelectorAll(":scope > .performer-card")[idx];
-                        if (c) c.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                        var rc = row.querySelectorAll(":scope > .performer-card:not(.refract-clone)")[idx];
+                        if (rc) rc.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
                     });
                 })(i);
                 dotsEl.appendChild(dot);
@@ -2068,7 +2097,9 @@
             state.dots = dotsEl;
         }
 
-        /* (Re)wire IntersectionObserver — disconnect any prior one. */
+        /* (Re)wire IntersectionObserver — observes REAL cards only and
+           uses their stored realIdx for dot mapping (so the active dot
+           reflects the underlying performer, not a clone). */
         if (state.io) state.io.disconnect();
         state.io = new IntersectionObserver(function (entries) {
             var bestEntry = null;
@@ -2078,44 +2109,111 @@
                 }
             });
             if (!bestEntry) return;
-            var idx = Array.prototype.indexOf.call(row.children, bestEntry.target);
-            if (idx < 0 || !state.dots) return;
+            var idx = parseInt(bestEntry.target.dataset.refractRealIdx, 10);
+            if (isNaN(idx) || !state.dots) return;
             for (var j = 0; j < state.dots.children.length; j++) {
                 state.dots.children[j].classList.toggle("active", j === idx);
             }
         }, { root: row, threshold: [0.6, 0.9] });
-        cards.forEach(function (c) { state.io.observe(c); });
+        realCards.forEach(function (c, idx) {
+            c.dataset.refractRealIdx = String(idx);
+            state.io.observe(c);
+        });
 
-        /* Seed first dot active if none active yet (IO is async). */
+        /* Initial scroll: center the first real card. The lastClone sits
+           to its left so the user has visual context that there's
+           something before "card 1". */
+        if (!state.initialized) {
+            var seedFirst = realCards[0];
+            /* Wait a tick for layout to settle (offsetLeft accurate). */
+            setTimeout(function () {
+                if (!seedFirst.isConnected) return;
+                row.scrollLeft = seedFirst.offsetLeft -
+                    (row.clientWidth - seedFirst.offsetWidth) / 2;
+            }, 0);
+            state.initialized = true;
+        }
+
+        /* Scroll handler — silent jump when user lands on a clone.
+           Hysteresis: only jump when scrollLeft is essentially AT the
+           clone center (within 1px to avoid mid-scroll false positives). */
+        if (state.onScroll) row.removeEventListener("scroll", state.onScroll);
+        state.jumping = false;
+        var jumpTimer = null;
+        state.onScroll = function () {
+            if (state.jumping) return;
+            clearTimeout(jumpTimer);
+            /* Debounce to settle-time: only act once scroll-snap finishes. */
+            jumpTimer = setTimeout(function () {
+                var c = state.firstClone, l = state.lastClone;
+                if (!c || !l || !c.isConnected || !l.isConnected) return;
+                var center = row.scrollLeft + row.clientWidth / 2;
+                var firstCloneCenter = c.offsetLeft + c.offsetWidth / 2;
+                var lastCloneCenter = l.offsetLeft + l.offsetWidth / 2;
+                var threshold = c.offsetWidth / 3;
+                var realList = row.querySelectorAll(":scope > .performer-card:not(.refract-clone)");
+                var realFirst = realList[0];
+                var realLast = realList[realList.length - 1];
+                if (Math.abs(center - firstCloneCenter) < threshold && realFirst) {
+                    /* Past the end, on firstClone → jump to real first. */
+                    state.jumping = true;
+                    row.scrollLeft = realFirst.offsetLeft - (row.clientWidth - realFirst.offsetWidth) / 2;
+                    setTimeout(function () { state.jumping = false; }, 80);
+                } else if (Math.abs(center - lastCloneCenter) < threshold && realLast) {
+                    /* Before the start, on lastClone → jump to real last. */
+                    state.jumping = true;
+                    row.scrollLeft = realLast.offsetLeft - (row.clientWidth - realLast.offsetWidth) / 2;
+                    setTimeout(function () { state.jumping = false; }, 80);
+                }
+            }, 120);
+        };
+        row.addEventListener("scroll", state.onScroll, { passive: true });
+
+        /* Seed first dot active. */
         if (state.dots && !state.dots.querySelector(".active") && state.dots.children[0]) {
             state.dots.children[0].classList.add("active");
         }
 
-        /* Keyboard arrows — bind once per wrapper. */
-        if (!state.onKey) {
-            state.onKey = function (e) {
-                if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
-                if (!wrap.isConnected) return;
-                var panel = wrap.closest(".scene-tabs");
-                if (!panel) return;
-                var active = document.activeElement;
-                var inPanel = active && panel.contains(active);
-                var hovered = panel.matches(":hover");
-                if (!inPanel && !hovered) return;
-                if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable)) return;
-                e.preventDefault();
-                var curDot = state.dots ? state.dots.querySelector(".active") : null;
-                var curIdx = curDot ? Array.prototype.indexOf.call(state.dots.children, curDot) : 0;
-                var max = row.querySelectorAll(":scope > .performer-card").length - 1;
-                var nextIdx = e.key === "ArrowRight" ? Math.min(curIdx + 1, max) : Math.max(curIdx - 1, 0);
-                var c = row.querySelectorAll(":scope > .performer-card")[nextIdx];
-                if (c) c.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-            };
-            document.addEventListener("keydown", state.onKey);
-        }
+        /* Keyboard arrows — wrap around at boundaries. */
+        if (state.onKey) document.removeEventListener("keydown", state.onKey);
+        state.onKey = function (e) {
+            if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+            if (!wrap.isConnected) return;
+            var panel = wrap.closest(".scene-tabs");
+            if (!panel) return;
+            var active = document.activeElement;
+            var inPanel = active && panel.contains(active);
+            var hovered = panel.matches(":hover");
+            if (!inPanel && !hovered) return;
+            if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable)) return;
+            e.preventDefault();
+            var curDot = state.dots ? state.dots.querySelector(".active") : null;
+            var curIdx = curDot ? Array.prototype.indexOf.call(state.dots.children, curDot) : 0;
+            var n = state.dots ? state.dots.children.length : count;
+            var nextIdx = e.key === "ArrowRight" ? (curIdx + 1) % n : (curIdx - 1 + n) % n;
+            var rc = row.querySelectorAll(":scope > .performer-card:not(.refract-clone)")[nextIdx];
+            if (rc) rc.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        };
+        document.addEventListener("keydown", state.onKey);
 
         wrap.__refractPerf = state;
         installScopedRowObserver(wrap, row);
+    }
+
+    function teardownClones(row, state) {
+        row.querySelectorAll(":scope > .performer-card.refract-clone").forEach(function (c) {
+            c.remove();
+        });
+        if (state) {
+            state.firstClone = null;
+            state.lastClone = null;
+            state.lastRealCount = 0;
+            state.initialized = false;
+            if (state.onScroll) {
+                row.removeEventListener("scroll", state.onScroll);
+                state.onScroll = null;
+            }
+        }
     }
 
     function teardownCarouselExtras(wrap, state) {
