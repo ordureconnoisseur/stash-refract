@@ -1084,7 +1084,7 @@
 
     var QUERY_SCENE_CARDS =
         'query SceneCards($ids: [Int]) { findScenes(scene_ids: $ids) {' +
-        '  scenes { id performers { id name } tags { id } }' +
+        '  scenes { id o_counter performers { id name } tags { id name } }' +
         '} }';
 
     var MAX_PERFORMER_CIRCLES = 5;
@@ -1092,6 +1092,12 @@
     var TAG_ICON_SVG =
         '<svg class="stash-tag-icon" viewBox="0 0 512 512" aria-hidden="true">' +
         '<path fill="currentColor" d="M32.5 96l0 149.5c0 17 6.7 33.3 18.7 45.3l192 192c25 25 65.5 25 90.5 0L483.2 333.3c25-25 25-65.5 0-90.5l-192-192C279.2 38.7 263 32 246 32L96.5 32c-35.3 0-64 28.7-64 64zm112 16a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>' +
+        '</svg>';
+
+    /* O count icon — stylized rotated O glyph matching Stash native. */
+    var O_ICON_SVG =
+        '<svg viewBox="0 0 36 36" aria-hidden="true">' +
+        '<path fill="currentColor" d="M22.855.758L7.875 7.024l12.537 9.733c2.633 2.224 6.377 2.937 9.77 1.518c4.826-2.018 7.096-7.576 5.072-12.413C33.232 1.024 27.68-1.261 22.855.758zm-9.962 17.924L2.05 10.284L.137 23.529a7.993 7.993 0 0 0 2.958 7.803a8.001 8.001 0 0 0 9.798-12.65zm15.339 7.015l-8.156-4.69l-.033 9.223c-.088 2 .904 3.98 2.75 5.041a5.462 5.462 0 0 0 7.479-2.051c1.499-2.644.589-6.013-2.04-7.523z"/>' +
         '</svg>';
 
     function extractSceneId(card) {
@@ -1103,7 +1109,7 @@
 
     function stopProp(e) { e.stopPropagation(); }
 
-    function injectPerformerCircles(card, performers, tagCount, sceneId) {
+    function injectPerformerCircles(card, performers, tagCount, sceneId, oCount, tagInfo) {
         if (card.querySelector(".stash-performer-circles")) { return; }
         var section = card.querySelector(".card-section");
         if (!section) { return; }
@@ -1145,13 +1151,46 @@
 
         row.appendChild(avatarWrap);
 
+        /* Right-side count cluster — holds O count + tag count badges so
+           they share consistent spacing when both are present. */
+        var counts = document.createElement("div");
+        counts.className = "stash-card-counts";
+
+        if (oCount && oCount > 0) {
+            var oBadge = document.createElement("span");
+            oBadge.className = "stash-o-count";
+            oBadge.title = oCount + " O";
+            oBadge.innerHTML = O_ICON_SVG + "<span>" + oCount + "</span>";
+            counts.appendChild(oBadge);
+        }
+
         if (tagCount > 0) {
             var badge = document.createElement("a");
             badge.className = "stash-tag-count";
             badge.href = sceneId ? "/scenes/" + sceneId : "/tags";
             badge.addEventListener("click", stopProp);
-            badge.innerHTML = TAG_ICON_SVG + String(tagCount);
-            row.appendChild(badge);
+            badge.innerHTML = TAG_ICON_SVG + "<span>" + tagCount + "</span>";
+            /* Hover popup — clickable tag chips, each linking to /tags/:id.
+               Built as a sibling-anchored sibling node (not via attr()) so
+               we can attach event handlers and per-chip hover states. */
+            if (tagInfo && tagInfo.length) {
+                var popup = document.createElement("div");
+                popup.className = "stash-tag-popup";
+                tagInfo.forEach(function (t) {
+                    var chip = document.createElement("a");
+                    chip.className = "stash-tag-popup-chip";
+                    chip.href = "/tags/" + t.id;
+                    chip.textContent = t.name;
+                    chip.addEventListener("click", stopProp);
+                    popup.appendChild(chip);
+                });
+                badge.appendChild(popup);
+            }
+            counts.appendChild(badge);
+        }
+
+        if (counts.firstChild) {
+            row.appendChild(counts);
         }
 
         section.appendChild(row);
@@ -1176,7 +1215,7 @@
         if (!ids.length) { return; }
 
         var q = 'query { findScenes(scene_ids: [' + ids.join(',') + ']) {' +
-                '  scenes { id performers { id name } tags { id } }' +
+                '  scenes { id o_counter performers { id name } tags { id name } }' +
                 '} }';
         gql(q)
             .then(function (res) {
@@ -1184,7 +1223,11 @@
                 scenes.forEach(function (scene) {
                     var card = cardMap[String(scene.id)] || cardMap[parseInt(scene.id, 10)];
                     if (!card) { return; }
-                    injectPerformerCircles(card, scene.performers || [], (scene.tags || []).length, scene.id);
+                    var tags = scene.tags || [];
+                    var tagInfo = tags.map(function (t) { return { id: t.id, name: t.name }; })
+                                      .filter(function (t) { return t.id && t.name; });
+                    var oCount = parseInt(scene.o_counter, 10) || 0;
+                    injectPerformerCircles(card, scene.performers || [], tags.length, scene.id, oCount, tagInfo);
                 });
             })
             .catch(function () { /* ignore */ });
@@ -1228,6 +1271,24 @@
                     row.appendChild(ageSpan);
                 }
                 ageEl.style.display = "none";
+            }
+
+            /* O count — Stash renders it as a two-button group:
+                 .count-button > [button title="O Count"] + [button.count-value > span]
+               Find the title="O Count" button, walk to its parent group,
+               read the .count-value span. Only inject when non-zero. */
+            var oTitleBtn = popovers ? popovers.querySelector('button[title="O Count"]') : null;
+            if (oTitleBtn) {
+                var oGroup = oTitleBtn.closest(".count-button");
+                var oValueSpan = oGroup ? oGroup.querySelector(".count-value span") : null;
+                var oText = oValueSpan ? oValueSpan.textContent.trim() : "";
+                if (oText && oText !== "0") {
+                    var oEl = document.createElement("span");
+                    oEl.className = "stash-perf-ocount";
+                    oEl.title = oText + " O";
+                    oEl.innerHTML = O_ICON_SVG + "<span>" + escapeHtml(oText) + "</span>";
+                    row.appendChild(oEl);
+                }
             }
 
             /* Scene count */
@@ -1883,6 +1944,9 @@
     function injectPerformerCarouselChevrons() {
         if (!/^\/scenes\/[^/]/.test(refractPathFromLocation())) return;
         document.querySelectorAll(".scene-performers-row:not([data-stash-perf-arrows])").forEach(function (wrap) {
+            /* Sidebar wrappers use the adaptive setupSceneTabsPerformers()
+               instead — no chevrons there, dots + keyboard nav. */
+            if (wrap.closest(".scene-tabs")) return;
             var row = wrap.querySelector(".scene-performers");
             if (!row) { return; }
             wrap.setAttribute("data-stash-perf-arrows", "1");
@@ -1926,15 +1990,19 @@
         });
     }
 
-    /* Lift .scene-performers out of its parent .col-12 (where it sits next
-       to description/tags) into a new sibling .row, so it visually breaks
-       out of the description-tags card on the Details tab. Idempotent. */
-    function fixSceneDetailsLayout() {
+    /* Sidebar performer carousel — count-adaptive layout.
+       (1) Lifts the native .scene-performers row out of .col-12 into a sibling
+           .scene-performers-row wrapper (same as the old fixSceneDetailsLayout).
+       (2) Counts cards, tags wrapper with data-perf-count="1|2|3|4|many".
+           CSS in css/07_scene_details.css picks the layout per count.
+       (3) For count >= 5: appends pagination dots, IntersectionObserver tracks
+           which card is in view, scoped MutationObserver watches for card
+           count changes, single delegated keydown listener for arrow keys.
+       Fully idempotent — guards via data-sthMoved and wrap.__refractPerf state. */
+    function setupSceneTabsPerformers() {
+        /* Step 1 — lift native row into our wrapper. */
         document.querySelectorAll(".tab-pane .col-12 > .scene-performers").forEach(function (el) {
             if (el.dataset.sthMoved === "1") return;
-            /* `.scene-performers` is itself a `.row`, so .closest(".row") would
-               return the element itself. Walk up to the outer row that wraps the
-               .col-12 instead. */
             var col = el.parentElement;
             if (!col || !col.classList.contains("col-12")) return;
             var outerRow = col.parentElement;
@@ -1945,6 +2013,129 @@
             outerRow.insertAdjacentElement("afterend", newRow);
             el.dataset.sthMoved = "1";
         });
+
+        /* Step 2-6 — apply adaptive layout per wrapper. */
+        document.querySelectorAll(".scene-tabs .scene-performers-row").forEach(function (wrap) {
+            applyAdaptiveLayout(wrap);
+        });
+    }
+
+    function applyAdaptiveLayout(wrap) {
+        var row = wrap.querySelector(".scene-performers");
+        if (!row) return;
+        var cards = row.querySelectorAll(":scope > .performer-card");
+        var count = cards.length;
+        var state = wrap.__refractPerf || {};
+
+        if (count === 0) {
+            wrap.removeAttribute("data-perf-count");
+            teardownCarouselExtras(wrap, state);
+            installScopedRowObserver(wrap, row);
+            return;
+        }
+
+        var bucket = count >= 5 ? "many" : String(count);
+        wrap.setAttribute("data-perf-count", bucket);
+
+        if (bucket !== "many") {
+            teardownCarouselExtras(wrap, state);
+            installScopedRowObserver(wrap, row);
+            return;
+        }
+
+        /* count >= 5: pagination dots + IntersectionObserver + keyboard nav */
+
+        /* Rebuild dots only if count changed */
+        var existingDotCount = state.dots ? state.dots.children.length : 0;
+        if (existingDotCount !== count) {
+            if (state.dots && state.dots.parentNode) state.dots.parentNode.removeChild(state.dots);
+            var dotsEl = document.createElement("div");
+            dotsEl.className = "stash-perf-dots";
+            for (var i = 0; i < count; i++) {
+                var dot = document.createElement("button");
+                dot.type = "button";
+                dot.className = "dot";
+                dot.setAttribute("aria-label", "Go to performer " + (i + 1));
+                (function (idx) {
+                    dot.addEventListener("click", function () {
+                        var c = row.querySelectorAll(":scope > .performer-card")[idx];
+                        if (c) c.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+                    });
+                })(i);
+                dotsEl.appendChild(dot);
+            }
+            wrap.appendChild(dotsEl);
+            state.dots = dotsEl;
+        }
+
+        /* (Re)wire IntersectionObserver — disconnect any prior one. */
+        if (state.io) state.io.disconnect();
+        state.io = new IntersectionObserver(function (entries) {
+            var bestEntry = null;
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting && (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio)) {
+                    bestEntry = entry;
+                }
+            });
+            if (!bestEntry) return;
+            var idx = Array.prototype.indexOf.call(row.children, bestEntry.target);
+            if (idx < 0 || !state.dots) return;
+            for (var j = 0; j < state.dots.children.length; j++) {
+                state.dots.children[j].classList.toggle("active", j === idx);
+            }
+        }, { root: row, threshold: [0.6, 0.9] });
+        cards.forEach(function (c) { state.io.observe(c); });
+
+        /* Seed first dot active if none active yet (IO is async). */
+        if (state.dots && !state.dots.querySelector(".active") && state.dots.children[0]) {
+            state.dots.children[0].classList.add("active");
+        }
+
+        /* Keyboard arrows — bind once per wrapper. */
+        if (!state.onKey) {
+            state.onKey = function (e) {
+                if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+                if (!wrap.isConnected) return;
+                var panel = wrap.closest(".scene-tabs");
+                if (!panel) return;
+                var active = document.activeElement;
+                var inPanel = active && panel.contains(active);
+                var hovered = panel.matches(":hover");
+                if (!inPanel && !hovered) return;
+                if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable)) return;
+                e.preventDefault();
+                var curDot = state.dots ? state.dots.querySelector(".active") : null;
+                var curIdx = curDot ? Array.prototype.indexOf.call(state.dots.children, curDot) : 0;
+                var max = row.querySelectorAll(":scope > .performer-card").length - 1;
+                var nextIdx = e.key === "ArrowRight" ? Math.min(curIdx + 1, max) : Math.max(curIdx - 1, 0);
+                var c = row.querySelectorAll(":scope > .performer-card")[nextIdx];
+                if (c) c.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+            };
+            document.addEventListener("keydown", state.onKey);
+        }
+
+        wrap.__refractPerf = state;
+        installScopedRowObserver(wrap, row);
+    }
+
+    function teardownCarouselExtras(wrap, state) {
+        if (state.io) { state.io.disconnect(); state.io = null; }
+        if (state.onKey) { document.removeEventListener("keydown", state.onKey); state.onKey = null; }
+        if (state.dots && state.dots.parentNode) state.dots.parentNode.removeChild(state.dots);
+        state.dots = null;
+        wrap.__refractPerf = state;
+    }
+
+    function installScopedRowObserver(wrap, row) {
+        var state = wrap.__refractPerf || {};
+        if (state.scopedMo) return;
+        var debounce = null;
+        state.scopedMo = new MutationObserver(function () {
+            clearTimeout(debounce);
+            debounce = setTimeout(function () { applyAdaptiveLayout(wrap); }, 80);
+        });
+        state.scopedMo.observe(row, { childList: true, subtree: false });
+        wrap.__refractPerf = state;
     }
 
     /* Wrap the run of `.tag-item` pills that follows the "Tags" <h6> on the
@@ -2126,7 +2317,7 @@
 
     function applyScenePlayerFixes() {
         injectScenePlayerOverlay();
-        fixSceneDetailsLayout();
+        setupSceneTabsPerformers();
         wrapSceneTagList();
         initImageCardLightbox();
         unstickyGalleryToolbar();

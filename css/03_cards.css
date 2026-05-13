@@ -47,6 +47,22 @@ body.stash-liquid-glass .card img {
     width: 100%;
 }
 
+/* Top-corner rounding for thumbnail containers as a belt-and-braces in
+   case the card-level overflow:hidden clip leaves a 1px square edge
+   visible (depends on image positioning context). Matches card radius
+   so corners stay flush. */
+body.stash-liquid-glass .scene-card .scene-card-preview,
+body.stash-liquid-glass .scene-card .preview-image,
+body.stash-liquid-glass .scene-card .video-section,
+body.stash-liquid-glass .performer-card .thumbnail-section,
+body.stash-liquid-glass .gallery-card .thumbnail-section,
+body.stash-liquid-glass .image-card .thumbnail-section,
+body.stash-liquid-glass .scene-marker-card .thumbnail-section {
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
+    overflow: hidden;
+}
+
 /* Tilt glare overlay — injected by refract.js */
 body.stash-liquid-glass .stash-tilt-glare {
     position: absolute;
@@ -320,5 +336,28 @@ body.stash-liquid-glass .stash-perf-scenes svg {
 }
 body.stash-liquid-glass .stash-perf-scenes:hover {
     color: var(--accent-bright) !important;
+}
+
+/* O count on performer cards — same muted style as scene-count; sits
+   left of scene-count in the stats row. Stash exposes performer.o_counter
+   in the native popover, refract extracts it before hiding popovers. */
+body.stash-liquid-glass .stash-perf-ocount {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    line-height: 1;
+    margin-right: 0.5rem;
+    transition: color 0.15s;
+}
+body.stash-liquid-glass .stash-perf-ocount svg {
+    width: 0.85em;
+    height: 0.85em;
+    flex-shrink: 0;
+}
+body.stash-liquid-glass .stash-perf-ocount:hover {
+    color: var(--text);
 }
 
