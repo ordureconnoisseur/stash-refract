@@ -28,7 +28,7 @@ body.stash-liquid-glass .scene-tabs {
    padding give consistent spacing between tiles and from screen edges. */
 body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs) {
     display: grid !important;
-    grid-template-columns: minmax(0, 340px) minmax(0, 1fr) !important;
+    grid-template-columns: minmax(0, clamp(385px, 22.5vw, 405px)) minmax(0, 1fr) !important;
     grid-template-rows: 1fr !important;
     gap: 20px !important;
     padding: 20px !important;
@@ -38,7 +38,11 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs) {
     min-height: 0 !important;
     max-height: calc(100vh - 70px) !important;
     height: calc(100vh - 70px) !important;
-    overflow: hidden !important;
+    /* `overflow: clip` instead of `hidden` so card hover/tilt effects in
+       the sidebar can extend past the row's viewport-height bounds (via
+       `overflow-clip-margin`) instead of being snipped at the panel edge. */
+    overflow: clip !important;
+    overflow-clip-margin: 80px !important;
     margin: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
@@ -75,9 +79,17 @@ body.stash-liquid-glass .scene-tabs {
     min-height: 0 !important;
     margin: 0 !important;
     overflow-y: auto !important;
-    overflow-x: hidden !important;
+    /* `clip` (not `hidden`) + `overflow-clip-margin` gives cards a bleed
+       area where their hover/tilt/glow can extend past the panel edge
+       without enabling a horizontal scrollbar. The margin is generous
+       enough to accommodate scale-up + outer glow. */
+    overflow-x: clip !important;
+    overflow-clip-margin: 80px !important;
     scrollbar-width: thin !important;
     scrollbar-color: var(--glass-border) transparent !important;
+    /* Reserve scrollbar space at all times so content (cards, description)
+       doesn't reflow / get clipped when the scrollbar appears or hides. */
+    scrollbar-gutter: stable !important;
 }
 body.stash-liquid-glass .scene-tabs::-webkit-scrollbar {
     width: 6px !important;
@@ -97,12 +109,30 @@ body.stash-liquid-glass .gallery-container .tab-content {
     box-shadow: none !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+    /* Flex column that fills the remaining panel height — required so
+       .tab-pane.active can also flex-grow and the lifted performer row
+       inside can be pushed to the bottom via margin-top: auto. */
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
 }
 body.stash-liquid-glass .scene-tabs .tab-pane.active.show {
     display: flex !important;
     flex-direction: column !important;
     gap: 0.75rem !important;
     padding: 0 !important;
+    /* Fill .tab-content's height so margin-top: auto on the performer
+       row pushes it to the visible bottom of the panel. */
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+}
+/* Anchor the lifted performer row to the bottom of the tab pane.
+   When content above is short, the auto-margin consumes the gap so
+   the cards sit flush at the panel bottom. When content overflows,
+   the row stays at its natural position (no negative margin). */
+body.stash-liquid-glass .scene-tabs .scene-performers-row {
+    margin-top: auto !important;
 }
 
 /* ───────────────────────────────────────────────────────────────────
@@ -112,7 +142,7 @@ body.stash-liquid-glass .scene-tabs .tab-pane.active.show {
    ─────────────────────────────────────────────────────────────────── */
 body.stash-liquid-glass .main.container-fluid > .row:has(> .gallery-container) {
     display: grid !important;
-    grid-template-columns: minmax(0, 340px) minmax(0, 1fr) !important;
+    grid-template-columns: minmax(0, clamp(385px, 22.5vw, 405px)) minmax(0, 1fr) !important;
     grid-template-rows: 1fr !important;
     gap: 20px !important;
     padding: 20px !important;
@@ -461,8 +491,8 @@ body.stash-liquid-glass .scene-tabs .scene-toolbar {
     display: flex !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
-    gap: 0.4rem !important;
-    margin: 0 0 1rem 0 !important;
+    gap: 0.35rem !important;
+    margin: 0 0 0.65rem 0 !important;
     overflow-x: auto !important;
     -ms-overflow-style: none !important;
     scrollbar-width: none !important;
@@ -567,10 +597,10 @@ body.stash-liquid-glass .scene-tabs .nav-tabs,
 body.stash-liquid-glass .gallery-tabs .nav-tabs,
 body.stash-liquid-glass .nav-tabs {
     border-bottom-color: var(--glass-border) !important;
-    gap: 2px !important;
-    padding: 0.3rem !important;
+    gap: 0 !important;
+    padding: 0.2rem !important;
     flex-wrap: nowrap !important;
-    margin: 0 0 1rem 0 !important;
+    margin: 0 0 0.85rem 0 !important;
 }
 /* Horizontal-scroll only for the scene/gallery tab strips (where wheel-scroll
    matters). Bare .nav-tabs (performer/studio detail page count tabs) keep
@@ -593,10 +623,25 @@ body.stash-liquid-glass .nav-tabs .nav-link {
     border: 1px solid transparent !important;
     border-radius: var(--radius-sm) !important;
     margin-bottom: 0 !important;
-    padding: 0.3rem 0.55rem !important;
-    font-size: 0.72rem !important;
+    padding: 0.22rem 0.42rem !important;
+    font-size: 0.66rem !important;
+    letter-spacing: 0 !important;
     white-space: nowrap !important;
+    text-align: center !important;
+    display: block !important;
     transition: color 0.15s, background 0.15s, border-color 0.15s !important;
+}
+
+/* Stretch each tab wrapper (.nav-item is the flex child of .nav-tabs,
+   not .nav-link). `flex: 1 1 auto` makes tabs grow proportionally from
+   their natural content width to fill the available navbar — the panel
+   width is no longer pinned to the sum of tab widths; any extra space
+   is absorbed by the tabs instead of leaving a trailing gap. */
+body.stash-liquid-glass .scene-tabs .nav-tabs .nav-item,
+body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-item,
+body.stash-liquid-glass .nav-tabs .nav-item {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
 }
 body.stash-liquid-glass .scene-tabs .nav-tabs .nav-link:hover,
 body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-link:hover,
@@ -696,7 +741,7 @@ body.stash-liquid-glass .scene-tabs .row > .col-12:has(> p.pre) {
 
 /* Section labels (h6 "Details:", "Tags") */
 body.stash-liquid-glass .scene-tabs .col-12 > h6 {
-    margin: 0.25rem 0 0.5rem 0 !important;
+    margin: 0.6rem 0 0.35rem 0 !important;
     font-size: 0.7rem !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
@@ -719,9 +764,9 @@ body.stash-liquid-glass .scene-tabs .col-12 > h6:last-child {
 /* Description text */
 body.stash-liquid-glass .scene-tabs .col-12 > p.pre {
     color: var(--text) !important;
-    font-size: 0.88rem !important;
-    line-height: 1.55 !important;
-    margin: 0 0 0.85rem 0 !important;
+    font-size: 0.85rem !important;
+    line-height: 1.5 !important;
+    margin: 0 0 0.6rem 0 !important;
     white-space: pre-wrap !important;
     font-family: inherit !important;
 }
@@ -761,14 +806,20 @@ body.stash-liquid-glass .scene-tabs .st-tag-list {
     display: flex !important;
     flex-flow: row wrap !important;
     align-content: flex-start !important;
-    max-height: 9.5rem !important;
+    max-height: 7rem !important;
     gap: 4px 6px !important;
-    margin: 0.25rem 0 0.85rem 0 !important;
+    margin: 0.2rem 0 0.65rem 0 !important;
     padding: 2px 2px 4px !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
     scrollbar-width: thin !important;
     scrollbar-color: var(--glass-border) transparent !important;
+    /* Subtle bottom fade — softens the hard cut where the tag strip's
+       max-height clips overflowing rows. The mask fades the last ~22px
+       to transparent so rows dissolve into the background instead of
+       chopping mid-pill. */
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent 100%) !important;
+            mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent 100%) !important;
 }
 body.stash-liquid-glass .scene-tabs .st-tag-list::-webkit-scrollbar {
     width: 6px !important;
@@ -789,6 +840,17 @@ body.stash-liquid-glass .scene-tabs .st-tag-list .tag-item {
    into a new sibling .row.scene-performers-row at the bottom of the
    tab-pane. In the narrow scene-tabs sidebar we render performers as a
    horizontal scrolling strip of small cards instead of a wrapping grid. */
+/* Sidebar performer layout is COUNT-ADAPTIVE.
+   JS (setupSceneTabsPerformers) tags the wrapper with
+   data-perf-count="1" | "2" | "3" | "4" | "many". CSS picks the layout. */
+
+/* Wrapper base.
+   The wrapper has class .row (Bootstrap) so cards-as-row-children inherit
+   `padding-left/right: calc(--bs-gutter-x * 0.5)` (12px each by default)
+   from Bootstrap's `.row > *` rule. That padding inside grid items pushes
+   the visual content right and makes the right column extend past the
+   row's content area. Zero the gutter vars here AND on the inner row so
+   the chain is fully neutralised. */
 body.stash-liquid-glass .scene-tabs .scene-performers-row {
     display: block !important;
     margin: 0 !important;
@@ -798,19 +860,19 @@ body.stash-liquid-glass .scene-tabs .scene-performers-row {
     width: 100% !important;
     visibility: visible !important;
     opacity: 1 !important;
+    --bs-gutter-x: 0 !important;
+    --bs-gutter-y: 0 !important;
+    box-sizing: border-box !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row > .scene-performers,
+
+/* Inner container base (rules common to all counts).
+   Explicitly resets overflow/scroll-snap/flex-wrap/justify-content that
+   leak in from the broader `body.stash-liquid-glass .scene-performers`
+   rule (line ~145) for the main-page carousel. Without these resets the
+   sidebar grid (count=2/3/4) inherits overflow-x:auto and clips the
+   right card behind a hidden scrollbar gutter. The count="many" rule
+   re-applies them where actually needed. */
 body.stash-liquid-glass .scene-tabs .scene-performers {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    /* `safe center` centers when content fits, falls back to flex-start
-       when content overflows — so a single performer is centered, but
-       many performers still scroll left-to-right with the first card
-       visible at the left edge. */
-    justify-content: safe center !important;
-    gap: 10px !important;
     margin: 0 !important;
     padding: 4px 2px 8px !important;
     background: transparent !important;
@@ -818,25 +880,140 @@ body.stash-liquid-glass .scene-tabs .scene-performers {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: none !important;
+    gap: 10px !important;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
+    flex-wrap: wrap !important;
+    justify-content: normal !important;
+    --bs-gutter-x: 0 !important;
+    --bs-gutter-y: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Cards as direct children of .scene-performers (a Bootstrap .row) pick
+   up `.row > *` rules — width:100%, padding-left/right from --bs-gutter-x.
+   With gutter zeroed above, padding goes to 0 — but force the reset
+   explicitly on the cards too in case any later rule re-introduces it. */
+body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin: 0 !important;
+}
+
+/* count = 1 → hero card, centered, current 280px size */
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="1"] .scene-performers {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: center !important;
+}
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="1"] .scene-performers > .performer-card {
+    flex: 0 0 280px !important;
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+}
+
+/* count = 2 → equal side-by-side grid */
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="2"] .scene-performers {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+}
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="2"] .scene-performers > .performer-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+/* count = 3 → row of 2 + 1 centered in row 2 */
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="3"] .scene-performers {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-auto-rows: auto !important;
+}
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="3"] .scene-performers > .performer-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="3"] .scene-performers > .performer-card:nth-child(3) {
+    grid-column: 1 / -1 !important;
+    max-width: calc(50% - 5px) !important;
+    justify-self: center !important;
+}
+
+/* count = 4 → 2×2 grid */
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="4"] .scene-performers {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+}
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="4"] .scene-performers > .performer-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+/* count = many (5+) → single-card carousel with snap */
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"] .scene-performers {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    justify-content: safe center !important;
+    scroll-snap-type: x mandatory !important;
     scrollbar-width: thin !important;
     scrollbar-color: var(--glass-border) transparent !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers::-webkit-scrollbar {
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"] .scene-performers > .performer-card {
+    flex: 0 0 280px !important;
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    scroll-snap-align: center !important;
+}
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar {
     height: 6px !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers::-webkit-scrollbar-track {
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar-track {
     background: transparent !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers::-webkit-scrollbar-thumb {
+body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar-thumb {
     background: var(--glass-border) !important;
     border-radius: 3px !important;
 }
-/* Lock individual cards to a fixed width so the strip stays a strip */
-body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card {
-    flex: 0 0 195px !important;
-    width: 195px !important;
-    min-width: 195px !important;
-    max-width: 195px !important;
+
+/* Pagination dots — only present when count="many" (JS only appends them
+   in that case). Active dot is an accent-coloured pill; inactive dots are
+   subtle glass-border circles that brighten on hover. */
+body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin: 0.5rem 0 0.25rem 0 !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots .dot {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background: var(--glass-border) !important;
+    border: none !important;
+    width: 6px !important;
+    height: 6px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    cursor: pointer !important;
+    transition: background 0.18s ease, width 0.22s ease, opacity 0.15s ease !important;
+    opacity: 0.65 !important;
+}
+body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots .dot:hover,
+body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots .dot:focus-visible {
+    opacity: 1 !important;
+    outline: none !important;
+}
+body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots .dot.active {
+    background: var(--accent-bright) !important;
+    width: 18px !important;
+    opacity: 1 !important;
 }
 body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card .thumbnail-section {
     aspect-ratio: 2 / 3 !important;
