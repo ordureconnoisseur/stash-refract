@@ -2606,6 +2606,127 @@ body.stash-liquid-glass .stash-tag-count .stash-tag-icon {
     flex-shrink: 0;
 }
 
+/* Right-side count cluster — wraps .stash-o-count + .stash-tag-count
+   inside .stash-performer-circles so they share consistent spacing. */
+body.stash-liquid-glass .stash-card-counts {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* O count badge on scene cards — muted style, sits next to the accent
+   tag-count pill so consumption metrics group together but don't
+   compete for attention. */
+body.stash-liquid-glass .stash-o-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    line-height: 1;
+    flex-shrink: 0;
+    white-space: nowrap;
+    cursor: default;
+    transition: color 0.15s ease;
+}
+body.stash-liquid-glass .stash-o-count:hover {
+    color: var(--text);
+}
+body.stash-liquid-glass .stash-o-count svg {
+    width: 0.95em;
+    height: 0.95em;
+    display: inline-block;
+    vertical-align: -0.08em;
+    flex-shrink: 0;
+}
+
+/* Tag list popup — anchored to .stash-tag-count, appears above on hover
+   with a fade. Each tag rendered as a small muted chip; popup wraps
+   to multiple lines if many tags. */
+body.stash-liquid-glass .stash-tag-count {
+    position: relative;
+}
+body.stash-liquid-glass .stash-tag-popup {
+    position: absolute;
+    /* Sit flush against the badge (no gap) so the mouse can travel from
+       the badge into the popup without crossing a dead zone that would
+       end :hover and dismiss the popup. The popup has its own padding
+       so visually there's still breathing room. */
+    bottom: 100%;
+    right: 0;
+    min-width: 160px;
+    max-width: 280px;
+    /* Cap height so popups with many tags scroll internally instead of
+       growing off-screen. */
+    max-height: 220px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 0.5rem 0.55rem;
+    margin-bottom: 6px;
+    background: rgba(12, 12, 14, 0.94);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    scrollbar-width: thin;
+    scrollbar-color: var(--glass-border) transparent;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px) scale(0.96);
+    transform-origin: bottom right;
+    /* Quick fade-out on un-hover; instant when hover starts.
+       `visibility` is delayed so the popup stays interactive during the
+       transition. */
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+    z-index: 50;
+}
+body.stash-liquid-glass .stash-tag-popup::-webkit-scrollbar {
+    width: 4px;
+}
+body.stash-liquid-glass .stash-tag-popup::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 2px;
+}
+/* Show popup when EITHER the badge OR the popup itself is hovered, so
+   the mouse can travel from badge → popup → chip without dismissal. */
+body.stash-liquid-glass .stash-tag-count:hover .stash-tag-popup,
+body.stash-liquid-glass .stash-tag-popup:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0s;
+}
+body.stash-liquid-glass .stash-tag-popup-chip {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    border-radius: 999px;
+    padding: 0.22em 0.6em;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+body.stash-liquid-glass .stash-tag-popup-chip:hover {
+    background: var(--accent-tint);
+    border-color: var(--accent-glow);
+    color: var(--accent-bright);
+}
+/* Let the tag popup escape the card's overflow:hidden when hovered,
+   mirroring the existing carve-out for performer-link tooltips. */
+body.stash-liquid-glass .scene-card:has(.stash-tag-count:hover),
+body.stash-liquid-glass .grid-card:has(.stash-tag-count:hover) {
+    overflow: visible !important;
+}
+
 /* ───────────────────────────────────────────────────────────────────
    Categories overlay (injected by refract.js)
    ─────────────────────────────────────────────────────────────────── */
