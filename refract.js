@@ -2224,6 +2224,33 @@
          3. On blur/Enter, parse the raw text, clamp 0-10, round to step
             0.1, write back via the native value setter, and dispatch
             input + change so React picks up the FINAL value (just once). */
+    /* Toggle .refract-overflow on .st-tag-list whenever it has more
+       content than fits in its max-height — CSS gates the bottom fade
+       mask on this class, so lists that fit cleanly don't get the
+       half-faded last row. */
+    function syncTagListFade() {
+        document.querySelectorAll(".scene-tabs .st-tag-list").forEach(function (el) {
+            var overflows = el.scrollHeight > el.clientHeight + 1;
+            el.classList.toggle("refract-overflow", overflows);
+        });
+    }
+
+    /* Tag .rating-number pills with `.refract-rated` when the numeric
+       value in their span isn't 0/empty. We can't rely on Stash's own
+       `.disabled` class to indicate "no rating" — it sometimes stays on
+       the element even after a value is set. Re-runs via the body-wide
+       mutation watcher so React re-renders are caught. */
+    function tagFilledRatings() {
+        document.querySelectorAll(".rating-number").forEach(function (el) {
+            var span = el.querySelector(":scope > span");
+            var text = span ? (span.textContent || "").trim() : "";
+            var hasInput = !!el.querySelector(":scope > input");
+            var v = parseFloat(text);
+            var rated = !hasInput && isFinite(v) && v > 0;
+            el.classList.toggle("refract-rated", rated);
+        });
+    }
+
     function initRatingInputSelectAll() {
         if (document.body._stashRatingDelegated) { return; }
         document.body._stashRatingDelegated = true;
@@ -2237,6 +2264,11 @@
             if (t.dataset.refractRatingShim === "1") { return; }
             t.dataset.refractRatingShim = "1";
             var originalType = t.type;
+            /* Remember the rating that was set BEFORE we cleared the
+               input. If the user blurs without typing anything, we
+               restore this so a stray click-and-click-away doesn't wipe
+               the rating to 0.0. */
+            var originalValue = t.value;
             t.type = "text";
             t.setAttribute("inputmode", "decimal");
             t.setAttribute("maxlength", "4");
@@ -2269,8 +2301,17 @@
                 t.removeAttribute("maxlength");
                 delete t.dataset.refractRatingShim;
                 var raw = (t.value || "").trim();
+                /* Empty / whitespace → user didn't type anything (just
+                   focused then blurred). Restore the original rating
+                   instead of committing 0. */
+                if (raw === "") {
+                    valueSetter.call(t, originalValue);
+                    t.dispatchEvent(new Event("input", { bubbles: true }));
+                    t.dispatchEvent(new Event("change", { bubbles: true }));
+                    return;
+                }
                 var v = parseFloat(raw);
-                if (!isFinite(v)) v = 0;
+                if (!isFinite(v)) v = parseFloat(originalValue) || 0;
                 if (v < 0) v = 0;
                 if (v > 10) v = 10;
                 v = Math.round(v * 10) / 10;
@@ -2408,6 +2449,8 @@
         wrapSceneTagList();
         initImageCardLightbox();
         initRatingInputSelectAll();
+        tagFilledRatings();
+        syncTagListFade();
         unstickyGalleryToolbar();
         initOperationMenuOverlay();
         injectPerformerCarouselChevrons();

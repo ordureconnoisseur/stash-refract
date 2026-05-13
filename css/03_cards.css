@@ -225,17 +225,29 @@ body.stash-liquid-glass .rating-number:hover {
     background: var(--accent-tint) !important;
     color: var(--accent-bright) !important;
 }
-body.stash-liquid-glass .rating-number > svg.fa-star {
-    width: 0.95em;
-    height: 0.95em;
-    color: var(--accent-bright);
-    flex-shrink: 0;
-    filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.45));
+/* Star icon — muted by default, accent-bright with glow when the pill
+   has `.refract-rated` (added by tagFilledRatings() when span value > 0).
+   Path `fill: currentColor` so the SVG picks up the chosen color. */
+body.stash-liquid-glass .rating-number > svg.fa-star,
+body.stash-liquid-glass .rating-number > svg.fa-star path {
+    color: var(--text-muted) !important;
+    fill: currentColor !important;
 }
-body.stash-liquid-glass .rating-number.disabled > svg.fa-star {
-    color: var(--text-muted);
-    filter: none;
+body.stash-liquid-glass .rating-number > svg.fa-star {
+    width: 0.95em !important;
+    height: 0.95em !important;
+    flex-shrink: 0;
     opacity: 0.7;
+    filter: none;
+    transition: color 0.18s ease, opacity 0.18s ease, filter 0.18s ease;
+}
+body.stash-liquid-glass .rating-number.refract-rated > svg.fa-star,
+body.stash-liquid-glass .rating-number.refract-rated > svg.fa-star path {
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .rating-number.refract-rated > svg.fa-star {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.45));
 }
 body.stash-liquid-glass .rating-number.disabled {
     color: var(--text-muted) !important;
@@ -347,10 +359,21 @@ body.stash-liquid-glass .edit-rating-button:focus {
     box-shadow: none !important;
     outline: none !important;
 }
-body.stash-liquid-glass .edit-rating-button > svg.fa-pencil {
-    width: 0.85em;
-    height: 0.85em;
+/* Override Bootstrap's `.text-primary` (blue) on the pencil SVG so it
+   inherits color from the button. Without this the icon stays bright
+   blue against the theme glass pill. */
+body.stash-liquid-glass .edit-rating-button > svg.fa-pencil,
+body.stash-liquid-glass .edit-rating-button > svg.text-primary,
+body.stash-liquid-glass .edit-rating-button svg.fa-icon {
+    width: 0.85em !important;
+    height: 0.85em !important;
     flex-shrink: 0;
+    color: inherit !important;
+    fill: currentColor !important;
+}
+body.stash-liquid-glass .edit-rating-button:hover > svg,
+body.stash-liquid-glass .edit-rating-button:focus > svg {
+    color: var(--accent-bright) !important;
 }
 
 /* Country flag — keep icon, hide redundant text */

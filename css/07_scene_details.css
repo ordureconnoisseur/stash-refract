@@ -814,10 +814,11 @@ body.stash-liquid-glass .scene-tabs .st-tag-list {
     overflow-y: auto !important;
     scrollbar-width: thin !important;
     scrollbar-color: var(--glass-border) transparent !important;
-    /* Subtle bottom fade — softens the hard cut where the tag strip's
-       max-height clips overflowing rows. The mask fades the last ~22px
-       to transparent so rows dissolve into the background instead of
-       chopping mid-pill. */
+}
+/* Subtle bottom fade — only when the strip actually overflows its
+   max-height (toggled by syncTagListFade in refract.js). Short tag
+   lists stay sharply rendered with no half-faded last row. */
+body.stash-liquid-glass .scene-tabs .st-tag-list.refract-overflow {
     -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent 100%) !important;
             mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent 100%) !important;
 }
