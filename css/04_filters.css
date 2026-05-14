@@ -871,6 +871,14 @@ body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger-minimal svg {
     height: 0.95rem;
 }
 
+/* Zoom slider container — Stash renders an empty <div class="zoom-slider-container"></div>
+   on list views that don't have a zoom slider (no children). Hide the
+   empty wrapper so it doesn't reserve dead space in the toolbar row. */
+body.stash-liquid-glass .filtered-list-toolbar .zoom-slider-container:empty,
+body.stash-liquid-glass .zoom-slider-container:empty {
+    display: none !important;
+}
+
 /* Selected-items-info: unified glass pill with X | count | check-all flowing inside */
 body.stash-liquid-glass .filtered-list-toolbar .selected-items-info {
     display: inline-flex;
