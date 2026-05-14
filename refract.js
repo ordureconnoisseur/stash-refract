@@ -1254,6 +1254,7 @@
                 safeRun(initFloatingPager);
                 safeRun(disableTableOverflowable);
                 safeRun(markFilledStars);
+                safeRun(initRefractTagEditor);
             } finally {
                 observer.observe(document.body, { childList: true, subtree: true });
             }
@@ -2056,6 +2057,7 @@
                 nextTick(fixSceneTaggerDetails);
                 nextTick(initImageCardLightbox);
                 nextTick(unstickyGalleryToolbar);
+                nextTick(initRefractTagEditor);
             });
         }
 
@@ -2080,6 +2082,7 @@
         initTabScrollChevrons();
         initFloatingPager();
         disableTableOverflowable();
+        initRefractTagEditor();
         watchForReinjection();
         syncRoute();
     }
@@ -2164,6 +2167,633 @@
     /* Initial fixSceneTaggerDetails pass — subsequent passes run via the
        consolidated mutation watcher at the end of this file. */
     fixSceneTaggerDetails();
+
+    /* ── Performer Tagger: relocate batch buttons into header ──────────
+       The PerformerTagger page renders three action buttons (Batch Add,
+       Batch Update, Search All) in their own .ml-auto.mb-3 row above
+       the performer grid. We move them into the .tagger-container-header
+       so they share the row with the Source select + gear icon. */
+    function relocateTaggerBatchButtons(root) {
+        var r = root || document;
+        r.querySelectorAll(".tagger-container-header").forEach(function (header) {
+            if (header.dataset.refractBatchMoved === "1") { return; }
+            /* Find the sibling .card that contains .PerformerTagger and
+               the batch-button row. */
+            var sibling = header.nextElementSibling;
+            while (sibling && !(sibling.classList && sibling.classList.contains("card"))) {
+                sibling = sibling.nextElementSibling;
+            }
+            if (!sibling || !sibling.querySelector(":scope > .PerformerTagger")) { return; }
+            var batchRow = sibling.querySelector(":scope > .ml-auto.mb-3");
+            if (!batchRow) { return; }
+            /* Place inside the right-side flex column (which wraps the
+               gear button), before the gear, so the batch buttons and
+               gear group together on the right edge of the header. */
+            var headerRow = header.querySelector(":scope > .d-flex.justify-content-between");
+            if (!headerRow) { return; }
+            var rightCol = headerRow.lastElementChild;
+            rightCol.insertBefore(batchRow, rightCol.firstElementChild);
+            header.dataset.refractBatchMoved = "1";
+        });
+    }
+    relocateTaggerBatchButtons();
+
+    /* PerformerTagger search results — inject a close X button so the
+       user can dismiss the result overlay without picking a match.
+       The close handler HIDES via class rather than removing the
+       element, because removing a React-managed element corrupts
+       its virtual DOM tracking and breaks subsequent re-renders.
+       Clicking Search again removes the hide class so new results
+       can show through. */
+    function injectTaggerSearchClose(root) {
+        var r = root || document;
+        r.querySelectorAll(".PerformerTagger-performer-search:not([data-refract-close])").forEach(function (results) {
+            results.dataset.refractClose = "1";
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "refract-search-close";
+            btn.setAttribute("aria-label", "Close search results");
+            btn.title = "Close";
+            /* Chevron-up SVG icon */
+            btn.innerHTML =
+                '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" ' +
+                'stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+                '<polyline points="18 15 12 9 6 15"/></svg>';
+            btn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                results.classList.add("refract-search-hidden");
+            });
+            results.appendChild(btn);
+        });
+    }
+    injectTaggerSearchClose();
+
+    /* Global capture-phase listener: when the user clicks the
+       "Search" button inside a PerformerTagger card, un-hide any
+       previously-dismissed search results in that same card so
+       Stash's incoming React update can render them again. */
+    document.addEventListener("click", function (e) {
+        var btn = e.target.closest && e.target.closest(".PerformerTagger-performer .PerformerTagger-details .input-group .btn-primary");
+        if (!btn) { return; }
+        var card = btn.closest(".PerformerTagger-performer");
+        if (!card) { return; }
+        card.querySelectorAll(".PerformerTagger-performer-search.refract-search-hidden")
+            .forEach(function (el) { el.classList.remove("refract-search-hidden"); });
+    }, true);
+
+    /* ── Performer Edit Tags Tab — native hierarchical taxonomy editor ────
+       Injects an "Edit Tags" tab into #performer-tabs. When clicked, hides
+       the native .tab-content via a body class and renders our own pane:
+         • GraphQL fetch of the full tag taxonomy + this performer's tags
+         • Hierarchy: top-level tags with children → Group;
+           their children that themselves have children → Subgroup;
+           remaining leaf tags → toggleable buttons
+         • Leaves without an intermediate subgroup are grouped under
+           a "General" pseudo-section. Tags with no parents and no
+           children fall under an "Ungrouped" trailing section.
+         • Click a leaf to toggle on/off. aria-pressed drives the
+           selected style. Group/subgroup chevrons collapse sections.
+         • Search filter — auto-expands groups containing matches.
+         • Save → performerUpdate mutation; Discard reverts to
+           original. No plugin dependency. */
+
+    var refractTagEditorState = {
+        performerId: null,
+        loaded: false,
+        loading: false,
+        saving: false,
+        searchQuery: "",
+        originalTagIds: [],
+        selectedTagIds: new Set(),
+        allTags: [],
+        tagsById: new Map(),
+        rootGroups: [],
+        openGroups: new Set(),
+        openSubgroups: new Set(),
+        focusSearch: false,
+    };
+
+    function refractGetPerformerId() {
+        var m = (window.location.pathname || "").match(/^\/performers\/(\d+)(?:\/|$|\?|#)/);
+        return m ? m[1] : null;
+    }
+
+    function refractIsTagEditorActive() {
+        return document.body.classList.contains("refract-tag-editor-active");
+    }
+
+    function refractFindPerformerTabsNav() {
+        var wrap = document.querySelector(".performer-tabs");
+        if (!wrap) return null;
+        return wrap.querySelector(":scope > nav.nav-tabs, :scope nav.nav-tabs[role='tablist']");
+    }
+
+    function refractActivateTagEditor() {
+        document.body.classList.add("refract-tag-editor-active");
+        var nav = refractFindPerformerTabsNav();
+        if (nav) {
+            nav.querySelectorAll(".nav-link").forEach(function (a) {
+                a.classList.toggle("active", a.classList.contains("refract-tag-editor-tab"));
+                if (!a.classList.contains("refract-tag-editor-tab")) {
+                    a.setAttribute("aria-selected", "false");
+                }
+            });
+            var ours = nav.querySelector(".refract-tag-editor-tab");
+            if (ours) { ours.setAttribute("aria-selected", "true"); }
+        }
+        var pid = refractGetPerformerId();
+        if (pid) { refractLoadTagEditorData(pid); }
+        refractRenderTagEditor();
+    }
+
+    function refractDeactivateTagEditor() {
+        if (!document.body.classList.contains("refract-tag-editor-active")) return;
+        document.body.classList.remove("refract-tag-editor-active");
+        var nav = refractFindPerformerTabsNav();
+        if (nav) {
+            var ours = nav.querySelector(".refract-tag-editor-tab");
+            if (ours) {
+                ours.classList.remove("active");
+                ours.setAttribute("aria-selected", "false");
+            }
+        }
+    }
+
+    function initRefractTagEditor() {
+        var pid = refractGetPerformerId();
+        if (!pid) {
+            refractDeactivateTagEditor();
+            return;
+        }
+        var nav = refractFindPerformerTabsNav();
+        if (!nav) return;
+        var wrap = nav.closest(".performer-tabs");
+        if (!wrap) return;
+
+        /* Reset state when navigating to a different performer. */
+        if (refractTagEditorState.performerId !== pid) {
+            refractTagEditorState.performerId = pid;
+            refractTagEditorState.loaded = false;
+            refractTagEditorState.selectedTagIds = new Set();
+            refractTagEditorState.originalTagIds = [];
+            refractTagEditorState.searchQuery = "";
+            refractTagEditorState.openGroups = new Set();
+            refractTagEditorState.openSubgroups = new Set();
+        }
+
+        if (!nav.querySelector(".refract-tag-editor-tab")) {
+            var a = document.createElement("a");
+            a.className = "nav-item nav-link refract-tag-editor-tab";
+            a.setAttribute("role", "tab");
+            a.setAttribute("href", "#");
+            a.setAttribute("aria-selected", refractIsTagEditorActive() ? "true" : "false");
+            if (refractIsTagEditorActive()) { a.classList.add("active"); }
+            a.textContent = "Edit Tags";
+            nav.appendChild(a);
+            a.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                refractActivateTagEditor();
+            });
+        } else if (refractIsTagEditorActive()) {
+            var existing = nav.querySelector(".refract-tag-editor-tab");
+            if (existing && !existing.classList.contains("active")) {
+                existing.classList.add("active");
+                existing.setAttribute("aria-selected", "true");
+            }
+        }
+
+        /* Inject the pane INSIDE .tab-content (where the React-managed
+           .tab-pane siblings live) so the editor inherits the column
+           width and grid positioning of the rest of the performer tabs.
+           Appending to .performer-tabs directly landed the pane in a
+           different grid cell. */
+        var tabContent = wrap.querySelector(":scope > .tab-content")
+            || wrap.querySelector(".tab-content");
+        if (!tabContent) return;
+        var pane = tabContent.querySelector(":scope > .refract-tag-editor-pane");
+        if (!pane) {
+            pane = document.createElement("div");
+            pane.className = "refract-tag-editor-pane tab-pane";
+            pane.setAttribute("role", "tabpanel");
+            pane.innerHTML = '<div class="refract-tag-editor"></div>';
+            tabContent.appendChild(pane);
+            refractWireTagEditorEvents(pane);
+            if (refractIsTagEditorActive()) { refractRenderTagEditor(); }
+        }
+    }
+
+    function refractWireTagEditorEvents(pane) {
+        pane.addEventListener("input", function (e) {
+            var t = e.target;
+            if (t && t.classList && t.classList.contains("refract-tag-editor__search-input")) {
+                refractTagEditorState.searchQuery = t.value;
+                refractTagEditorState.focusSearch = true;
+                refractRenderTagEditor();
+            }
+        });
+        pane.addEventListener("click", function (e) {
+            /* Tag button toggle */
+            var tagBtn = e.target.closest(".refract-tag-editor__tag");
+            if (tagBtn) {
+                var id = tagBtn.getAttribute("data-tag-id");
+                if (id) {
+                    var s = refractTagEditorState.selectedTagIds;
+                    if (s.has(id)) { s.delete(id); } else { s.add(id); }
+                    refractRenderTagEditor();
+                }
+                return;
+            }
+            /* Subgroup header click — anywhere on the header toggles
+               the section (excluding the static "General"/"Tags"
+               root pseudo-headers). */
+            var sgHeader = e.target.closest(".refract-tag-editor__subgroup-header");
+            if (sgHeader && !sgHeader.classList.contains("refract-tag-editor__subgroup-header--static")) {
+                var sgSection = sgHeader.closest(".refract-tag-editor__subgroup");
+                var sgId = sgSection && sgSection.getAttribute("data-subgroup-id");
+                if (sgId) {
+                    var os = refractTagEditorState.openSubgroups;
+                    if (os.has(sgId)) { os.delete(sgId); } else { os.add(sgId); }
+                    refractRenderTagEditor();
+                }
+                return;
+            }
+            /* Group header click — anywhere on the header toggles. */
+            var gHeader = e.target.closest(".refract-tag-editor__group-header");
+            if (gHeader) {
+                var gSection = gHeader.closest(".refract-tag-editor__group");
+                var gId = gSection && gSection.getAttribute("data-group-id");
+                if (gId) {
+                    var og = refractTagEditorState.openGroups;
+                    if (og.has(gId)) { og.delete(gId); } else { og.add(gId); }
+                    refractRenderTagEditor();
+                }
+                return;
+            }
+            /* Save / Discard */
+            if (e.target.closest(".refract-tag-editor__save")) {
+                refractSaveTagEditor();
+                return;
+            }
+            if (e.target.closest(".refract-tag-editor__discard")) {
+                refractTagEditorState.selectedTagIds = new Set(
+                    refractTagEditorState.originalTagIds.map(String)
+                );
+                refractRenderTagEditor();
+                return;
+            }
+        });
+    }
+
+    function refractLoadTagEditorData(pid) {
+        if (refractTagEditorState.loaded || refractTagEditorState.loading) return;
+        refractTagEditorState.loading = true;
+        refractRenderTagEditor();
+        var perfQ =
+            'query FindPerformerForTagEditor($id: ID!) {' +
+            '  findPerformer(id: $id) { id tags { id name } }' +
+            '}';
+        var tagsQ =
+            'query FindAllTagsForTagEditor {' +
+            '  findTags(filter: { per_page: -1, sort: "name", direction: ASC }) {' +
+            '    tags { id name sort_name parents { id name } children { id } }' +
+            '  }' +
+            '}';
+        Promise.all([
+            gqlWithVars(perfQ, { id: pid }),
+            gql(tagsQ),
+        ]).then(function (results) {
+            var pdata = results[0] && results[0].data && results[0].data.findPerformer;
+            var tdata = results[1] && results[1].data && results[1].data.findTags;
+            if (!pdata || !tdata) throw new Error("Bad GraphQL response");
+            var ids = (pdata.tags || []).map(function (t) { return String(t.id); });
+            refractTagEditorState.originalTagIds = ids.slice();
+            refractTagEditorState.selectedTagIds = new Set(ids);
+            refractTagEditorState.allTags = (tdata.tags || []).map(function (t) {
+                return {
+                    id: String(t.id),
+                    name: t.name || "",
+                    sort_name: t.sort_name || t.name || "",
+                    parents: (t.parents || []).map(function (p) {
+                        return { id: String(p.id), name: p.name || "" };
+                    }),
+                    childrenIds: (t.children || []).map(function (c) { return String(c.id); }),
+                };
+            });
+            refractTagEditorState.tagsById = new Map(
+                refractTagEditorState.allTags.map(function (t) { return [t.id, t]; })
+            );
+            refractBuildTagHierarchy();
+            refractTagEditorState.loaded = true;
+            refractTagEditorState.loading = false;
+            refractRenderTagEditor();
+        }).catch(function () {
+            refractTagEditorState.loading = false;
+            refractRenderTagEditor();
+        });
+    }
+
+    function refractBuildTagHierarchy() {
+        var s = refractTagEditorState;
+        var byId = s.tagsById;
+        var rootGroups = [];
+        var ungrouped = [];
+
+        /* Reverse-map: parent_id -> [child tag ids] from each tag's parents[] */
+        var childrenByParent = new Map();
+        s.allTags.forEach(function (t) {
+            t.parents.forEach(function (p) {
+                if (!childrenByParent.has(p.id)) childrenByParent.set(p.id, []);
+                childrenByParent.get(p.id).push(t.id);
+            });
+        });
+
+        s.allTags.forEach(function (t) {
+            if (t.parents.length !== 0) return;
+            var childIds = childrenByParent.get(t.id) || [];
+            if (childIds.length === 0) {
+                ungrouped.push(t);
+                return;
+            }
+            var subgroups = [];
+            var generalLeaves = [];
+            childIds.forEach(function (cid) {
+                var c = byId.get(cid);
+                if (!c) return;
+                var subChildIds = childrenByParent.get(c.id) || [];
+                if (subChildIds.length > 0) {
+                    var leaves = subChildIds
+                        .map(function (lid) { return byId.get(lid); })
+                        .filter(Boolean)
+                        .sort(function (a, b) { return a.sort_name.localeCompare(b.sort_name); });
+                    subgroups.push({
+                        id: c.id,
+                        name: c.name,
+                        sort_name: c.sort_name,
+                        leaves: leaves,
+                    });
+                } else {
+                    generalLeaves.push(c);
+                }
+            });
+            subgroups.sort(function (a, b) { return a.sort_name.localeCompare(b.sort_name); });
+            if (generalLeaves.length > 0) {
+                generalLeaves.sort(function (a, b) { return a.sort_name.localeCompare(b.sort_name); });
+                subgroups.unshift({
+                    id: null,
+                    name: "General",
+                    sort_name: "",
+                    isRoot: true,
+                    leaves: generalLeaves,
+                });
+            }
+            rootGroups.push({
+                id: t.id,
+                name: t.name,
+                sort_name: t.sort_name,
+                subgroups: subgroups,
+            });
+        });
+
+        rootGroups.sort(function (a, b) { return a.sort_name.localeCompare(b.sort_name); });
+
+        if (ungrouped.length > 0) {
+            ungrouped.sort(function (a, b) { return a.sort_name.localeCompare(b.sort_name); });
+            rootGroups.push({
+                id: "__ungrouped__",
+                name: "Ungrouped",
+                sort_name: "￿",
+                subgroups: [{
+                    id: null,
+                    name: "Tags",
+                    isRoot: true,
+                    leaves: ungrouped,
+                }],
+            });
+        }
+
+        s.rootGroups = rootGroups;
+    }
+
+    function refractSaveTagEditor() {
+        var pid = refractTagEditorState.performerId;
+        if (!pid || refractTagEditorState.saving) return;
+        refractTagEditorState.saving = true;
+        refractRenderTagEditor();
+        var mut =
+            'mutation UpdatePerformerTags($input: PerformerUpdateInput!) {' +
+            '  performerUpdate(input: $input) { id tags { id } }' +
+            '}';
+        gqlWithVars(mut, {
+            input: { id: pid, tag_ids: Array.from(refractTagEditorState.selectedTagIds) }
+        }).then(function (res) {
+            if (res && res.errors && res.errors.length) {
+                throw new Error(res.errors[0].message);
+            }
+            refractTagEditorState.originalTagIds = Array.from(refractTagEditorState.selectedTagIds);
+            refractTagEditorState.saving = false;
+            refractRenderTagEditor();
+        }).catch(function () {
+            refractTagEditorState.saving = false;
+            refractRenderTagEditor();
+        });
+    }
+
+    function refractIsTagEditorDirty() {
+        var orig = refractTagEditorState.originalTagIds.map(String).sort().join(",");
+        var sel = Array.from(refractTagEditorState.selectedTagIds).map(String).sort().join(",");
+        return orig !== sel;
+    }
+
+    function refractCountSelectedInSubgroup(sub) {
+        var sel = refractTagEditorState.selectedTagIds;
+        var n = 0;
+        for (var i = 0; i < sub.leaves.length; i++) {
+            if (sel.has(sub.leaves[i].id)) n++;
+        }
+        return n;
+    }
+
+    function refractCountSelectedInGroup(group) {
+        var n = 0;
+        for (var i = 0; i < group.subgroups.length; i++) {
+            n += refractCountSelectedInSubgroup(group.subgroups[i]);
+        }
+        return n;
+    }
+
+    function refractRenderTagEditor() {
+        var root = document.querySelector(".refract-tag-editor-pane .refract-tag-editor");
+        if (!root) return;
+        var s = refractTagEditorState;
+
+        if (s.loading && !s.loaded) {
+            root.innerHTML = '<div class="refract-tag-editor__status">Loading tag library…</div>';
+            return;
+        }
+        if (!s.loaded && !s.loading) {
+            root.innerHTML = '<div class="refract-tag-editor__status">Select the tab to load tags.</div>';
+            return;
+        }
+
+        var dirty = refractIsTagEditorDirty();
+        var q = (s.searchQuery || "").trim().toLowerCase();
+        var totalSelected = s.selectedTagIds.size;
+
+        function leafMatches(t) { return !q || t.name.toLowerCase().indexOf(q) !== -1; }
+
+        var groupsHtml = s.rootGroups.map(function (group) {
+            var subgroupsHtml = group.subgroups.map(function (sub) {
+                var visibleLeaves = sub.leaves.filter(leafMatches);
+                if (q && visibleLeaves.length === 0) return null;
+                var subgroupOpen = sub.isRoot || !!q || (sub.id && s.openSubgroups.has(sub.id));
+                var subSelected = refractCountSelectedInSubgroup(sub);
+                var leavesHtml = visibleLeaves.map(function (t) {
+                    var sel = s.selectedTagIds.has(t.id);
+                    return '<button type="button" class="refract-tag-editor__tag' +
+                        (sel ? ' is-selected' : '') + '" ' +
+                        'data-tag-id="' + escapeHtml(t.id) + '" ' +
+                        'aria-pressed="' + (sel ? 'true' : 'false') + '" ' +
+                        'title="' + escapeHtml(t.name) + '">' +
+                        '<span class="refract-tag-editor__tag-label">' + escapeHtml(t.name) + '</span>' +
+                        '</button>';
+                }).join("");
+                var headerHtml;
+                if (sub.isRoot) {
+                    headerHtml =
+                        '<div class="refract-tag-editor__subgroup-header refract-tag-editor__subgroup-header--static">' +
+                            '<span class="refract-tag-editor__subgroup-title">' + escapeHtml(sub.name) + '</span>' +
+                        '</div>';
+                } else {
+                    headerHtml =
+                        '<div class="refract-tag-editor__subgroup-header">' +
+                            '<div class="refract-tag-editor__subgroup-header-main">' +
+                                '<span class="refract-tag-editor__subgroup-title">' + escapeHtml(sub.name) + '</span>' +
+                                '<span class="refract-tag-editor__subgroup-meta">' +
+                                    '<span class="refract-tag-editor__subgroup-total">' + sub.leaves.length + '</span>' +
+                                    '<span class="refract-tag-editor__subgroup-selected">' +
+                                        (subSelected > 0 ? (subSelected + ' selected') : '') +
+                                    '</span>' +
+                                '</span>' +
+                            '</div>' +
+                            '<button type="button" class="refract-tag-editor__subgroup-toggle" aria-label="Toggle">' +
+                                '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" ' +
+                                'stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+                                '<polyline points="6 9 12 15 18 9"/></svg>' +
+                            '</button>' +
+                        '</div>';
+                }
+                return '<section class="refract-tag-editor__subgroup' +
+                    (subgroupOpen ? ' is-open' : '') +
+                    (sub.isRoot ? ' refract-tag-editor__subgroup--root' : '') + '"' +
+                    (sub.id ? ' data-subgroup-id="' + escapeHtml(sub.id) + '"' : '') + '>' +
+                    headerHtml +
+                    '<div class="refract-tag-editor__subgroup-body">' +
+                        '<div class="refract-tag-editor__leaf-wrap">' + leavesHtml + '</div>' +
+                    '</div>' +
+                    '</section>';
+            }).filter(Boolean).join("");
+
+            if (q && !subgroupsHtml) return null;
+
+            var groupOpen = !!q || s.openGroups.has(group.id);
+            var groupSelected = refractCountSelectedInGroup(group);
+            var groupTotal = group.subgroups.reduce(function (sum, sub) {
+                return sum + sub.leaves.length;
+            }, 0);
+
+            return '<section class="refract-tag-editor__group' + (groupOpen ? ' is-open' : '') + '" ' +
+                'data-group-id="' + escapeHtml(group.id) + '">' +
+                '<div class="refract-tag-editor__group-header">' +
+                    '<div class="refract-tag-editor__group-header-main">' +
+                        '<span class="refract-tag-editor__group-title">' + escapeHtml(group.name) + '</span>' +
+                        '<span class="refract-tag-editor__group-meta">' +
+                            '<span class="refract-tag-editor__group-total">' + groupTotal + '</span>' +
+                            '<span class="refract-tag-editor__group-selected">' +
+                                (groupSelected > 0 ? (groupSelected + ' selected') : '') +
+                            '</span>' +
+                        '</span>' +
+                    '</div>' +
+                    '<button type="button" class="refract-tag-editor__group-toggle" aria-label="Toggle">' +
+                        '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" ' +
+                        'stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+                        '<polyline points="6 9 12 15 18 9"/></svg>' +
+                    '</button>' +
+                '</div>' +
+                '<div class="refract-tag-editor__group-body">' +
+                    '<div class="refract-tag-editor__subgroup-grid">' + subgroupsHtml + '</div>' +
+                '</div>' +
+                '</section>';
+        }).filter(Boolean).join("");
+
+        if (!groupsHtml) {
+            groupsHtml = '<div class="refract-tag-editor__status">' +
+                (q ? 'No tags match "' + escapeHtml(s.searchQuery) + '".' : 'No tags found.') +
+                '</div>';
+        }
+
+        root.innerHTML =
+            '<header class="refract-tag-editor__header">' +
+                '<div class="refract-tag-editor__title-wrap">' +
+                    '<h6 class="refract-tag-editor__title">Tags</h6>' +
+                    '<span class="refract-tag-editor__summary">' +
+                        s.rootGroups.length + ' groups · ' + totalSelected + ' selected' +
+                    '</span>' +
+                '</div>' +
+                '<div class="refract-tag-editor__actions">' +
+                    '<button type="button" class="refract-tag-editor__discard"' +
+                        (dirty ? '' : ' disabled') + '>Discard</button>' +
+                    '<button type="button" class="refract-tag-editor__save btn btn-primary"' +
+                        (dirty && !s.saving ? '' : ' disabled') + '>' +
+                        (s.saving ? 'Saving…' : 'Save') +
+                    '</button>' +
+                '</div>' +
+            '</header>' +
+            '<div class="refract-tag-editor__search">' +
+                '<svg class="refract-tag-editor__search-icon" viewBox="0 0 24 24" width="14" height="14" ' +
+                'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" ' +
+                'stroke-linejoin="round" aria-hidden="true">' +
+                '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+                '<input type="text" class="refract-tag-editor__search-input" placeholder="Search tags…" ' +
+                'value="' + escapeHtml(s.searchQuery || "") + '" autocomplete="off" />' +
+            '</div>' +
+            '<div class="refract-tag-editor__groups">' + groupsHtml + '</div>';
+
+        if (s.focusSearch) {
+            var input = root.querySelector(".refract-tag-editor__search-input");
+            if (input) {
+                input.focus();
+                try { input.setSelectionRange(input.value.length, input.value.length); } catch (_) {}
+            }
+            s.focusSearch = false;
+        }
+    }
+
+    /* When user clicks a native performer tab, deactivate ours. Native
+       tab <a> elements carry ids like performer-tabs-tab-scenes. */
+    document.addEventListener("click", function (e) {
+        if (!e.target.closest) return;
+        var a = e.target.closest('[id^="performer-tabs-tab-"]:not(.refract-tag-editor-tab)');
+        if (!a) return;
+        refractDeactivateTagEditor();
+    }, true);
+
+    /* Suppress the auto-scroll that happens when a performer tab is
+       activated: React-Bootstrap/Stash scrolls the new pane into view,
+       which yanks the tab strip itself off the top of the viewport.
+       We snapshot the scroll position synchronously on click and
+       restore it for two frames afterwards (one frame is often too
+       early — the focus-induced scroll fires on the next layout). */
+    document.addEventListener("click", function (e) {
+        if (!e.target.closest) return;
+        var tab = e.target.closest(".performer-tabs .nav-tabs .nav-link");
+        if (!tab) return;
+        var x = window.scrollX, y = window.scrollY;
+        requestAnimationFrame(function () {
+            window.scrollTo(x, y);
+            requestAnimationFrame(function () { window.scrollTo(x, y); });
+        });
+    }, true);
 
     /* ── Scene player center overlay ─────────────────────────────────────
        Inject back-10 / play-pause / forward-10 buttons centered over the
@@ -3010,6 +3640,32 @@
         });
     }
 
+    /* Relocate the Stash "Attempt to fix?" link that sits as a SIBLING
+       of an invalid `.date-input-group`. Move it INSIDE the group so
+       it can render as a small "Fix" pill on the right of the error
+       message row (CSS handles the visual). Idempotent via class. */
+    function relocateDateFixLinks() {
+        document.querySelectorAll(".date-input-group:has(input.is-invalid)").forEach(function (group) {
+            if (group.querySelector(":scope > .refract-date-fix-btn")) { return; }
+            var sibling = group.nextElementSibling;
+            if (!sibling) { return; }
+            var link = sibling.matches && sibling.matches("a")
+                ? sibling
+                : (sibling.querySelector ? sibling.querySelector("a") : null);
+            if (!link) { return; }
+            var text = (link.textContent || "").trim().toLowerCase();
+            if (text.indexOf("attempt") !== 0 && text.indexOf("fix") === -1) { return; }
+            link.classList.add("refract-date-fix-btn");
+            link.textContent = "Fix";
+            link.setAttribute("title", "Attempt to fix the date format");
+            /* Hide the now-empty wrapper div if it had only this anchor. */
+            if (sibling !== link) {
+                sibling.style.display = "none";
+            }
+            group.appendChild(link);
+        });
+    }
+
     function injectStudioName() {
         var anchors = document.querySelectorAll(".scene-header-container h1.studio-logo > a");
         for (var i = 0; i < anchors.length; i++) {
@@ -3168,8 +3824,11 @@
             if (document.querySelector(".Lightbox")) { return; }
             try { tagViewAllLinks(); } catch (e) {}
             try { cleanupOrphanGsTriggers(); } catch (e) {}
+            try { relocateDateFixLinks(); } catch (e) {}
             try { injectStudioName(); } catch (e) {}
             try { fixSceneTaggerDetails(); } catch (e) {}
+            try { relocateTaggerBatchButtons(); } catch (e) {}
+            try { injectTaggerSearchClose(); } catch (e) {}
             try { applyScenePlayerFixes(); } catch (e) {}
             try { injectPluginToggles(); } catch (e) {}
             try { makePluginSettingsCollapsible(); } catch (e) {}
