@@ -153,3 +153,37 @@ body.stash-liquid-glass.refract-lite .scene-tabs .scene-toolbar .dropdown-toggle
 body.stash-liquid-glass.refract-lite .scene-tabs .scene-toolbar .mv-scene-page-btn:hover {
     box-shadow: none !important;
 }
+
+/* ── 11. Minimal-cards performer pill + popup solid-dark fallback.
+       The lite-mode universal rules (sections 1-2 above) already strip
+       backdrop-filter, transitions, and shadows. Add a concrete dark
+       background so the pill/popup don't look like transparent ghosts. */
+body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .stash-performer-pill {
+    background: rgba(20, 20, 24, 0.92) !important;
+}
+body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .stash-performer-pill:hover {
+    background: rgba(30, 30, 34, 0.92) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .stash-performer-popup {
+    background: rgba(14, 14, 18, 0.98) !important;
+}
+/* Title gradient — lite mode strips filter (used by some backdrop tricks
+   but not background-clip). Background-clip still works without GPU
+   acceleration. Leave as is, falls back to plain text on browsers that
+   don't support background-clip: text. */
+
+/* Spec pills + studio overlay solid-dark fallback for lite + minimal. */
+body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .scene-specs-overlay > span {
+    background: rgba(20, 20, 24, 0.92) !important;
+    text-shadow: none !important;
+}
+body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .scene-specs-overlay > .overlay-resolution {
+    background: rgba(30, 30, 34, 0.92) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .studio-overlay {
+    background: rgba(20, 20, 24, 0.92) !important;
+}

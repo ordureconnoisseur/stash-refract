@@ -2346,6 +2346,7 @@ body.stash-liquid-glass .refract-tag-editor__tag {
     line-height: 1.25 !important;
     cursor: pointer;
     text-align: center;
+    position: relative !important; /* anchor for hover tooltip */
     transition: background 0.14s, border-color 0.14s, color 0.14s, transform 0.12s, box-shadow 0.14s;
 }
 body.stash-liquid-glass .refract-tag-editor__tag-label {
@@ -2392,5 +2393,96 @@ body.refract-lite.stash-liquid-glass .refract-tag-editor {
 body.refract-lite.stash-liquid-glass .refract-tag-editor__tag.is-selected,
 body.refract-lite.stash-liquid-glass .refract-tag-editor__tag[aria-pressed="true"] {
     box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.45) !important;
+}
+
+/* ── Tag hover tooltip (image + name + description) ─────────────────
+   Inspired by Performer Tags Overhaul by RollainKraus
+   (https://github.com/RollainKraus/stash-plugins) — same "rich hover
+   popup with image + description" pattern, re-implemented here for
+   the refract Edit-Tags tab. Lives at document.body so ancestor
+   `overflow: hidden` / clip can't cut it off. Positioned by JS via
+   getBoundingClientRect() — see refractShowTagTip in refract.js. */
+body.stash-liquid-glass .refract-tag-tooltip-portal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    max-width: 90vw;
+    z-index: 10000;
+    /* Liquid-glass recipe — light-edge highlight, depth shadow, blurred
+       saturated backdrop. Background is a soft top-to-bottom gradient
+       (brighter at the top, suggesting a light source) rather than a
+       flat fill, which reads as more physical. */
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.09) 0%,
+        rgba(255, 255, 255, 0.03) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--radius-sm);
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.55),
+        0 1px 2px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    padding: 0.55rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition:
+        opacity 0.16s ease,
+        transform 0.16s ease,
+        visibility 0s linear 0.16s;
+}
+body.stash-liquid-glass .refract-tag-tooltip-portal.refract-tag-tooltip-portal--show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition:
+        opacity 0.16s ease,
+        transform 0.16s ease,
+        visibility 0s linear 0s;
+}
+body.stash-liquid-glass .refract-tag-tooltip-portal .refract-tag-tooltip__img {
+    width: 100%;
+    height: 140px;  /* reserve space so offsetHeight is correct before image loads */
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.3);
+    display: block;
+}
+body.stash-liquid-glass .refract-tag-tooltip-portal .refract-tag-tooltip__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    text-align: left;
+}
+body.stash-liquid-glass .refract-tag-tooltip-portal .refract-tag-tooltip__name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.25;
+}
+body.stash-liquid-glass .refract-tag-tooltip-portal .refract-tag-tooltip__desc {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* Lite-mode: drop the backdrop-filter for perf */
+body.refract-lite.stash-liquid-glass .refract-tag-tooltip-portal {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
