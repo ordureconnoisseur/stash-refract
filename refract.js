@@ -1255,6 +1255,7 @@
                 safeRun(disableTableOverflowable);
                 safeRun(markFilledStars);
                 safeRun(initRefractTagEditor);
+                safeRun(enhanceDuplicateChecker);
             } finally {
                 observer.observe(document.body, { childList: true, subtree: true });
             }
@@ -2058,6 +2059,7 @@
                 nextTick(initImageCardLightbox);
                 nextTick(unstickyGalleryToolbar);
                 nextTick(initRefractTagEditor);
+                nextTick(enhanceDuplicateChecker);
             });
         }
 
@@ -2083,6 +2085,7 @@
         initFloatingPager();
         disableTableOverflowable();
         initRefractTagEditor();
+        enhanceDuplicateChecker();
         watchForReinjection();
         syncRoute();
     }
@@ -2240,6 +2243,579 @@
         card.querySelectorAll(".PerformerTagger-performer-search.refract-search-hidden")
             .forEach(function (el) { el.classList.remove("refract-search-hidden"); });
     }, true);
+
+    /* ── Scene Duplicate Checker: comparison-card layout ────────────
+       Stash renders /scenes/duplicate-checker as a 10-column Bootstrap
+       table that forces vertical scanning across rows to compare two
+       copies of the same scene. We hide the table (CSS, gated on the
+       route body class) and inject per-group glass panels with side-
+       by-side scene cards. The original <tr>s and their checkboxes /
+       merge / delete buttons stay live in the DOM; our custom UI fires
+       .click() on them so React state and Stash's existing Edit /
+       Delete / Merge / bulk-select flows continue to work.
+
+       React mutates the underlying inputs' `checked` *property* (not
+       the attribute) so neither a `change` event nor a MutationObserver
+       picks up state changes coming from Stash's bulk-select dropdown.
+       A 250ms poll syncs our card's visual checked state to the
+       underlying input — cheap, robust, scoped to the route. */
+
+    var refractDupSync = [];
+    /* null = pre-action default (largest-file heuristic); otherwise one of
+       'largestFile' | 'largestRes' | 'oldest' | 'youngest' | 'none'. Tracked
+       by listening for clicks on Stash's Select-Options dropdown items
+       (we read the visible label since the React state isn't exposed). */
+    var refractDupStrategy = null;
+
+    function refractParseBytes(text) {
+        var m = (text || "").match(/([\d.]+)\s*([KMGT])i?B/i);
+        if (!m) { return 0; }
+        var u = m[2].toUpperCase();
+        var mult = { K: 1024, M: 1048576, G: 1073741824, T: 1099511627776 }[u] || 1;
+        return parseFloat(m[1]) * mult;
+    }
+
+    function refractParseResolution(text) {
+        var m = (text || "").match(/(\d+)\s*x\s*(\d+)/);
+        return m ? parseInt(m[1], 10) * parseInt(m[2], 10) : 0;
+    }
+
+    function refractFormatBytes(bytes) {
+        if (!bytes) { return "0 B"; }
+        var units = ["B", "KB", "MB", "GB", "TB"];
+        var i = 0;
+        var n = bytes;
+        while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+        return (n < 10 ? n.toFixed(1) : Math.round(n).toString()) + " " + units[i];
+    }
+
+    function refractParseDupRow(tr) {
+        var cells = tr.querySelectorAll(":scope > td");
+        if (cells.length < 10) { return null; }
+        var titleLink = cells[2].querySelector("a");
+        var pathEl = cells[2].querySelector(".scene-path");
+        var actionButtons = cells[9].querySelectorAll(".edit-button");
+        var filesizeText = (cells[5].textContent || "").trim();
+        var resolutionText = (cells[6].textContent || "").trim();
+        var spriteImg = cells[1].querySelector("img");
+        return {
+            row: tr,
+            checkInput: cells[0].querySelector("input[type=checkbox]"),
+            spriteSrc: spriteImg ? spriteImg.getAttribute("src") || "" : "",
+            title: titleLink ? (titleLink.textContent || "").trim() : "",
+            href: titleLink ? titleLink.getAttribute("href") : "",
+            path: pathEl ? (pathEl.textContent || "").trim() : "",
+            duration: (cells[4].textContent || "").trim(),
+            filesize: filesizeText,
+            bytes: refractParseBytes(filesizeText),
+            resolution: resolutionText,
+            resolutionPixels: refractParseResolution(resolutionText),
+            bitrate: (cells[7].textContent || "").trim(),
+            codec: (cells[8].textContent || "").trim(),
+            deleteBtn: actionButtons[0] || null,
+            mergeBtn: actionButtons[1] || null
+        };
+    }
+
+    function refractAnalyzeDupGroup(scenes) {
+        var totalBytes = 0;
+        var largest = scenes[0];
+        var highestRes = scenes[0];
+        var codecs = {};
+        var codecCount = 0;
+        scenes.forEach(function (s) {
+            totalBytes += s.bytes || 0;
+            if ((s.bytes || 0) > (largest.bytes || 0)) { largest = s; }
+            if ((s.resolutionPixels || 0) > (highestRes.resolutionPixels || 0)) { highestRes = s; }
+            if (s.codec && !codecs[s.codec]) { codecs[s.codec] = true; codecCount++; }
+        });
+        return {
+            totalBytes: totalBytes,
+            largest: largest,
+            highestRes: highestRes,
+            codecMismatch: codecCount > 1
+        };
+    }
+
+    function refractMakeSpecPill(iconChar, text, isWinner, isWarn) {
+        var pill = document.createElement("span");
+        pill.className = "refract-dup-spec" +
+            (isWinner ? " refract-dup-spec--winner" : "") +
+            (isWarn ? " refract-dup-spec--warn" : "");
+        pill.innerHTML =
+            '<span class="refract-dup-spec__icon" aria-hidden="true">' + iconChar + '</span>' +
+            '<span class="refract-dup-spec__text">' + escapeHtml(text || "—") + '</span>';
+        return pill;
+    }
+
+    function refractBuildDupCard(scene, stats) {
+        var isLargest = scene === stats.largest;
+        var isHighestRes = scene === stats.highestRes;
+
+        var card = document.createElement("div");
+        card.className = "refract-dup-card";
+        /* Stash refs so refractApplyDupSuggestions() can recompute the
+           chip + suggested class whenever the user picks a different
+           strategy from Stash's Select Options dropdown. */
+        card._refractScene = scene;
+        card._refractStats = stats;
+
+        var spriteLink = document.createElement("a");
+        spriteLink.className = "refract-dup-card__sprite";
+        spriteLink.href = scene.href || "#";
+        spriteLink.target = "_blank";
+        spriteLink.rel = "noopener";
+        var img = document.createElement("img");
+        img.src = scene.spriteSrc || "";
+        img.alt = "";
+        img.loading = "lazy";
+        spriteLink.appendChild(img);
+        /* Pure-CSS hover preview — sibling <span> with a 2x sprite that
+           fades in on :hover. Avoids touching Stash's React HoverPopover
+           (moving React-managed nodes corrupts virtual DOM tracking). */
+        var pop = document.createElement("span");
+        pop.className = "refract-dup-card__sprite-pop";
+        pop.innerHTML = '<img src="' + escapeHtml(scene.spriteSrc || "") + '" alt="" loading="lazy">';
+        spriteLink.appendChild(pop);
+        card.appendChild(spriteLink);
+
+        var meta = document.createElement("div");
+        meta.className = "refract-dup-card__meta";
+        var titleA = document.createElement("a");
+        titleA.className = "refract-dup-card__title";
+        titleA.href = scene.href || "#";
+        titleA.target = "_blank";
+        titleA.rel = "noopener";
+        titleA.textContent = scene.title || "(untitled)";
+        titleA.title = scene.title || "";
+        meta.appendChild(titleA);
+        var pathDiv = document.createElement("div");
+        pathDiv.className = "refract-dup-card__path";
+        pathDiv.textContent = scene.path || "";
+        pathDiv.title = scene.path || "";
+        meta.appendChild(pathDiv);
+        card.appendChild(meta);
+
+        var specs = document.createElement("div");
+        specs.className = "refract-dup-card__specs";
+        specs.appendChild(refractMakeSpecPill("⏱", scene.duration, false, false));
+        specs.appendChild(refractMakeSpecPill("⛁", scene.filesize, isLargest, false));
+        specs.appendChild(refractMakeSpecPill("⊞", scene.resolution, isHighestRes, false));
+        specs.appendChild(refractMakeSpecPill("⇡", scene.bitrate, false, false));
+        specs.appendChild(refractMakeSpecPill("◊", scene.codec, false, stats.codecMismatch));
+        card.appendChild(specs);
+
+        var actions = document.createElement("div");
+        actions.className = "refract-dup-card__actions";
+
+        var checkLabel = document.createElement("label");
+        checkLabel.className = "refract-dup-card__check";
+        var cardInput = document.createElement("input");
+        cardInput.type = "checkbox";
+        if (scene.checkInput) { cardInput.checked = scene.checkInput.checked; }
+        checkLabel.appendChild(cardInput);
+        var checkText = document.createElement("span");
+        checkText.textContent = "Mark to delete";
+        checkLabel.appendChild(checkText);
+        cardInput.addEventListener("change", function () {
+            if (scene.checkInput && scene.checkInput.checked !== cardInput.checked) {
+                scene.checkInput.click();
+            }
+            card.classList.toggle("refract-dup-card--checked", cardInput.checked);
+        });
+        if (scene.checkInput && scene.checkInput.checked) {
+            card.classList.add("refract-dup-card--checked");
+        }
+        refractDupSync.push({ input: scene.checkInput, card: card, cardInput: cardInput });
+        actions.appendChild(checkLabel);
+
+        var mergeBtn = document.createElement("button");
+        mergeBtn.type = "button";
+        mergeBtn.className = "refract-dup-card__merge";
+        mergeBtn.textContent = "Merge";
+        if (scene.mergeBtn) {
+            mergeBtn.addEventListener("click", function () { scene.mergeBtn.click(); });
+        } else {
+            mergeBtn.disabled = true;
+        }
+        actions.appendChild(mergeBtn);
+
+        var deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "refract-dup-card__delete";
+        deleteBtn.textContent = "Delete";
+        if (scene.deleteBtn) {
+            deleteBtn.addEventListener("click", function () { scene.deleteBtn.click(); });
+        } else {
+            deleteBtn.disabled = true;
+        }
+        actions.appendChild(deleteBtn);
+
+        card.appendChild(actions);
+        return card;
+    }
+
+    function refractBuildDupPanel(group, groupIndex) {
+        var scenes = group.map(refractParseDupRow).filter(Boolean);
+        if (!scenes.length) { return null; }
+        var stats = refractAnalyzeDupGroup(scenes);
+
+        var panel = document.createElement("div");
+        panel.className = "refract-dup-panel";
+
+        var header = document.createElement("div");
+        header.className = "refract-dup-panel__header";
+        var reclaim = stats.totalBytes - (stats.largest.bytes || 0);
+        var headerHTML =
+            '<span class="refract-dup-panel__num">Group ' + (groupIndex + 1) + '</span>' +
+            '<span class="refract-dup-panel__count">' + scenes.length + ' scenes</span>' +
+            '<span class="refract-dup-panel__size">' + escapeHtml(refractFormatBytes(stats.totalBytes)) + ' total</span>';
+        if (reclaim > 0) {
+            headerHTML += '<span class="refract-dup-panel__reclaim">Delete suggested → reclaim ' + escapeHtml(refractFormatBytes(reclaim)) + '</span>';
+        }
+        if (stats.codecMismatch) {
+            headerHTML += '<span class="refract-dup-panel__warn">⚠ codec mismatch</span>';
+        }
+        header.innerHTML = headerHTML;
+        panel.appendChild(header);
+
+        var grid = document.createElement("div");
+        grid.className = "refract-dup-panel__grid";
+        scenes.forEach(function (s) {
+            var c = refractBuildDupCard(s, stats);
+            if (c) { grid.appendChild(c); }
+        });
+        panel.appendChild(grid);
+
+        return panel;
+    }
+
+    function refractStartDupSyncTimer() {
+        if (window.__refractDupSyncTimer) { return; }
+        window.__refractDupSyncTimer = setInterval(function () {
+            if (!document.body || !document.body.classList.contains("stash-route-sceneduplicatechecker")) {
+                clearInterval(window.__refractDupSyncTimer);
+                window.__refractDupSyncTimer = null;
+                refractDupSync.length = 0;
+                return;
+            }
+            var anyChanged = false;
+            for (var i = refractDupSync.length - 1; i >= 0; i--) {
+                var e = refractDupSync[i];
+                if (!e.card || !e.input || !document.contains(e.card) || !document.contains(e.input)) {
+                    refractDupSync.splice(i, 1);
+                    continue;
+                }
+                var nowChecked = !!e.input.checked;
+                if (e.cardInput.checked !== nowChecked) {
+                    e.cardInput.checked = nowChecked;
+                }
+                if (e.card.classList.contains("refract-dup-card--checked") !== nowChecked) {
+                    e.card.classList.toggle("refract-dup-card--checked", nowChecked);
+                    anyChanged = true;
+                }
+            }
+            /* When checked-state changes from outside (e.g. Stash's bulk
+               Select Options dropdown), and the active strategy is oldest /
+               youngest (which we can't compute from the DOM), recompute
+               chip placement from the new checked set. */
+            if (anyChanged && (refractDupStrategy === "oldest" || refractDupStrategy === "youngest")) {
+                refractApplyDupSuggestions();
+            }
+        }, 250);
+    }
+
+    function refractApplyDupSuggestions() {
+        var suggestedCount = 0;
+        document.querySelectorAll(".refract-dup-card").forEach(function (card) {
+            var scene = card._refractScene;
+            var stats = card._refractStats;
+            if (!scene || !stats) { return; }
+
+            var isLargest = scene === stats.largest;
+            var isHighestRes = scene === stats.highestRes;
+            var isChecked = !!(scene.checkInput && scene.checkInput.checked);
+
+            var suggested = false;
+            var chipText = "Suggested";
+
+            switch (refractDupStrategy) {
+                case "none":
+                    suggested = false;
+                    break;
+                case "largestRes":
+                    suggested = !isHighestRes;
+                    chipText = "Suggested · lower res";
+                    break;
+                case "oldest":
+                    /* mod_time isn't rendered in the table — we can't compute
+                       it ourselves. Mirror whatever Stash just checked. */
+                    suggested = isChecked;
+                    chipText = "Suggested · oldest";
+                    break;
+                case "youngest":
+                    suggested = isChecked;
+                    chipText = "Suggested · youngest";
+                    break;
+                case "largestFile":
+                default: /* null — pre-action default heuristic */
+                    suggested = !isLargest;
+                    chipText = "Suggested · smaller file";
+                    break;
+            }
+
+            card.classList.toggle("refract-dup-card--suggested", suggested);
+            if (suggested) { suggestedCount++; }
+
+            var chip = card.querySelector(":scope > .refract-dup-card__sprite > .refract-dup-card__chip");
+            if (suggested) {
+                if (!chip) {
+                    chip = document.createElement("span");
+                    chip.className = "refract-dup-card__chip";
+                    var sprite = card.querySelector(".refract-dup-card__sprite");
+                    if (sprite) { sprite.appendChild(chip); }
+                }
+                if (chip && chip.textContent !== chipText) { chip.textContent = chipText; }
+            } else if (chip && chip.parentNode) {
+                chip.parentNode.removeChild(chip);
+            }
+        });
+
+        /* Make sure the action pill exists next to the dropdown, then
+           sync its label + disabled state. */
+        var btn = refractEnsureDupToolbarButton();
+        var countEl = document.querySelector("[data-refract-suggested-count]");
+        if (countEl) { countEl.textContent = String(suggestedCount); }
+        if (btn) {
+            btn.disabled = suggestedCount === 0;
+            btn.classList.toggle("refract-dup-toolbar-select--empty", suggestedCount === 0);
+        }
+
+        /* Rewrite Stash's "Select Options…" toggle to show just the
+           current strategy. React may re-render and reset this text;
+           the next applyDupSuggestions / enhance cycle fixes it. */
+        var label;
+        switch (refractDupStrategy) {
+            case "largestRes": label = "Lower res"; break;
+            case "oldest": label = "Oldest"; break;
+            case "youngest": label = "Youngest"; break;
+            case "none": label = "None"; break;
+            case "largestFile":
+            default: label = "Smaller file"; break;
+        }
+        var toggle = document.querySelector("#scene-duplicate-checker .dropdown-toggle, .duplicate-checker .dropdown-toggle");
+        if (toggle && toggle.textContent.trim() !== label) {
+            toggle.textContent = label;
+        }
+    }
+
+    /* Intercept Stash's Select Options dropdown so the strategies repurpose
+       as a *filter for the Suggested chip* instead of immediately checking
+       boxes. "Select None" is allowed through (it still clears checked
+       state natively, which is what users expect). For the four positive
+       strategies we stopImmediatePropagation so React's onClick handler
+       never sees the event — the boxes don't auto-check. A separate
+       "Select N suggested" button in the summary lets the user commit
+       the recommendation when they're ready. */
+    document.addEventListener("click", function (e) {
+        if (!document.body || !document.body.classList.contains("stash-route-sceneduplicatechecker")) { return; }
+        var item = e.target.closest && e.target.closest(".duplicate-checker .dropdown-item, #scene-duplicate-checker .dropdown-item");
+        if (!item) { return; }
+        var t = (item.textContent || "").toLowerCase();
+
+        if (t.indexOf("none") >= 0) {
+            /* Allow native behavior: Stash will uncheck everything; our
+               poll will sync card --checked states; strategy → none. */
+            refractDupStrategy = "none";
+            setTimeout(refractApplyDupSuggestions, 50);
+            return;
+        }
+
+        if (t.indexOf("resolution") >= 0) { refractDupStrategy = "largestRes"; }
+        else if (t.indexOf("largest") >= 0) { refractDupStrategy = "largestFile"; }
+        else if (t.indexOf("oldest") >= 0) { refractDupStrategy = "oldest"; }
+        else if (t.indexOf("youngest") >= 0) { refractDupStrategy = "youngest"; }
+        else { return; /* unknown dropdown item */ }
+
+        /* For oldest/youngest we still need the boxes to be checked
+           (we can't compute file age from the DOM). Native behavior is
+           cheaper than a separate query, so let it through but mark
+           strategy. For largestFile/largestRes we can compute ourselves,
+           so block native and just update chips. */
+        if (refractDupStrategy === "oldest" || refractDupStrategy === "youngest") {
+            /* Let native fire — sync poll will reflect checked state and
+               trigger refractApplyDupSuggestions to flag the right cards. */
+            setTimeout(refractApplyDupSuggestions, 50);
+            return;
+        }
+
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        /* Close the open dropdown menu manually since we ate the click that
+           Bootstrap would have used to dismiss it. Re-toggling the button
+           is the safe path (React-managed state). */
+        var toggleBtn = item.closest(".dropdown") && item.closest(".dropdown").querySelector(".dropdown-toggle");
+        if (toggleBtn) { setTimeout(function () { toggleBtn.click(); }, 0); }
+
+        refractApplyDupSuggestions();
+    }, true);
+
+    /* Walks every currently-suggested card and clicks its hidden Stash
+       checkbox to commit the recommendation (Stash's React state updates,
+       global delete button then operates on the lot). */
+    function refractDupCommitSuggested() {
+        document.querySelectorAll(".refract-dup-card--suggested").forEach(function (card) {
+            var scene = card._refractScene;
+            if (scene && scene.checkInput && !scene.checkInput.checked) {
+                scene.checkInput.click();
+            }
+        });
+    }
+
+    /* Inject our "Select N" action pill next to Stash's now-relabeled
+       dropdown toggle. React may strip extra children when it re-renders
+       this region; the function is idempotent and is called on every
+       enhanceDuplicateChecker + applyDupSuggestions cycle. */
+    function refractEnsureDupToolbarButton() {
+        if (!document.body || !document.body.classList.contains("stash-route-sceneduplicatechecker")) { return null; }
+        var dropdown = document.querySelector("#scene-duplicate-checker .dropdown, .duplicate-checker .dropdown");
+        if (!dropdown) { return null; }
+        var host = dropdown.parentNode;
+        if (!host) { return null; }
+        var existing = host.querySelector(":scope > .refract-dup-toolbar-select");
+        if (existing) { return existing; }
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "refract-dup-toolbar-select";
+        btn.innerHTML = 'Select <b data-refract-suggested-count>0</b>';
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            refractDupCommitSuggested();
+        });
+        /* Place immediately after the dropdown so they read as a pair. */
+        if (dropdown.nextSibling) {
+            host.insertBefore(btn, dropdown.nextSibling);
+        } else {
+            host.appendChild(btn);
+        }
+        return btn;
+    }
+
+    function enhanceDuplicateChecker() {
+        if (!document.body || !document.body.classList.contains("stash-route-sceneduplicatechecker")) {
+            return;
+        }
+        var card = document.querySelector("#scene-duplicate-checker");
+        if (!card) { return; }
+        /* Operate on the inner <div class="duplicate-checker"> — the outer
+           Card's className is rewritten by React on every re-render, which
+           would strip a class flag here. The inner div's className is set
+           statically once by the React component, so we can stash our
+           enhanced marker as a data-attribute on it (React doesn't touch
+           data-* attributes it doesn't own). */
+        var dc = card.querySelector(".duplicate-checker") || card;
+        var table = dc.querySelector(".duplicate-checker-table");
+        if (!table) { return; }
+        var tbody = table.tBodies && table.tBodies[0];
+        if (!tbody) { return; }
+
+        /* Label both pagination rows so CSS can hide the top one and
+           pin the bottom one to the viewport. Data attribute survives
+           React re-renders. Idempotent — safe to call on every cycle. */
+        var pagers = dc.querySelectorAll(":scope > .d-flex.mt-2.mb-2");
+        pagers.forEach(function (p, i) {
+            p.setAttribute("data-refract-pager", i === pagers.length - 1 ? "bottom" : "top");
+        });
+
+        /* Trim Stash's verbose "N sets of duplicates found." h6 down to
+           "N duplicates". React may re-render and reset this; the next
+           mutation cycle calls back here and fixes it. */
+        var pagerH6 = document.querySelector('[data-refract-pager="bottom"] > h6');
+        if (pagerH6) {
+            var numMatch = (pagerH6.textContent || "").match(/[\d,]+/);
+            if (numMatch) {
+                var want = '<b>' + numMatch[0] + '</b> duplicates';
+                if (pagerH6.innerHTML.trim() !== want) {
+                    pagerH6.innerHTML = want;
+                }
+            }
+        }
+
+        /* Signature: row count + first row's title href. Cheap fingerprint
+           for "did the dataset change?". Skips rebuild when React updates
+           something orthogonal (e.g. a checked toggle that doesn't move rows). */
+        var firstA = tbody.querySelector("tr a[href]");
+        var sig = tbody.querySelectorAll(":scope > tr").length + ":" + (firstA ? firstA.getAttribute("href") : "");
+        if (tbody.dataset.refractDupSig === sig) { return; }
+        tbody.dataset.refractDupSig = sig;
+        refractDupSync.length = 0;
+
+        var groups = [];
+        var current = null;
+        tbody.querySelectorAll(":scope > tr").forEach(function (tr) {
+            if (tr.classList.contains("separator")) {
+                current = null;
+                return;
+            }
+            if (tr.classList.contains("duplicate-group") || !current) {
+                current = [];
+                groups.push(current);
+            }
+            current.push(tr);
+        });
+
+        var prior = dc.querySelector(":scope > .refract-dup-panels");
+        if (prior) { prior.parentNode.removeChild(prior); }
+
+        var panels = document.createElement("div");
+        panels.className = "refract-dup-panels";
+
+        if (!groups.length) {
+            var empty = document.createElement("div");
+            empty.className = "refract-dup-empty";
+            empty.innerHTML =
+                '<div class="refract-dup-empty__icon" aria-hidden="true">✓</div>' +
+                '<div class="refract-dup-empty__title">No duplicates found</div>' +
+                '<div class="refract-dup-empty__hint">Try lowering search accuracy below Exact, or run the phash generation task on more scenes.</div>';
+            panels.appendChild(empty);
+        } else {
+            var totalBytes = 0;
+            var reclaimable = 0;
+            groups.forEach(function (g) {
+                var ss = g.map(refractParseDupRow).filter(Boolean);
+                if (!ss.length) { return; }
+                var st = refractAnalyzeDupGroup(ss);
+                totalBytes += st.totalBytes;
+                reclaimable += st.totalBytes - (st.largest.bytes || 0);
+            });
+            var summary = document.createElement("div");
+            summary.className = "refract-dup-summary";
+            summary.innerHTML =
+                '<span class="refract-dup-summary__stat"><b>' + groups.length + '</b> sets</span>' +
+                '<span class="refract-dup-summary__stat"><b>' + escapeHtml(refractFormatBytes(totalBytes)) + '</b> across duplicates</span>' +
+                '<span class="refract-dup-summary__reclaim">Reclaim up to <b>' + escapeHtml(refractFormatBytes(reclaimable)) + '</b> by deleting suggested</span>';
+            panels.appendChild(summary);
+
+            groups.forEach(function (g, gi) {
+                var p = refractBuildDupPanel(g, gi);
+                if (p) { panels.appendChild(p); }
+            });
+        }
+
+        /* Insert panels right before the table (or its .table-responsive
+           wrapper, which Bootstrap adds at narrow widths) so they take
+           the table's visual slot. CSS then hides the original. */
+        var tableSlot = table.closest(".table-responsive") || table;
+        if (tableSlot.parentNode) {
+            tableSlot.parentNode.insertBefore(panels, tableSlot);
+        } else {
+            dc.appendChild(panels);
+        }
+        dc.setAttribute("data-refract-dup-enhanced", "1");
+        refractApplyDupSuggestions();
+        refractStartDupSyncTimer();
+    }
 
     /* ── Performer Edit Tags Tab — native hierarchical taxonomy editor ────
        Injects an "Edit Tags" tab into #performer-tabs. When clicked, hides
