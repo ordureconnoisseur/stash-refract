@@ -133,6 +133,14 @@
             var lightOn = lightState[0];
             var setLightOn = lightState[1];
 
+            var minimalState = R.useState(isMinimalCardsEnabled());
+            var minimalOn = minimalState[0];
+            var setMinimalOn = minimalState[1];
+
+            var showNamesState = R.useState(isShowPerformerNamesEnabled());
+            var showNamesOn = showNamesState[0];
+            var setShowNamesOn = showNamesState[1];
+
             /* Custom CSS Source state: { loaded, url } where url is
                the value Stash currently has set (empty if not set). */
             var cssSrc = R.useState({ loaded: false, url: "" });
@@ -206,6 +214,20 @@
                 /* Re-run the sidebar performer carousel setup so clones get
                    added (lite→full) or removed (full→lite) immediately. */
                 try { setupSceneTabsPerformers(); } catch (e) { /* ignore */ }
+            }
+
+            function toggleMinimal() {
+                var next = !minimalOn;
+                try { localStorage.setItem(MINIMAL_CARDS_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                applyMinimalCardsClass(next);
+                setMinimalOn(next);
+            }
+
+            function toggleShowNames() {
+                var next = !showNamesOn;
+                try { localStorage.setItem(SHOW_PERF_NAMES_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                applyShowPerformerNamesClass(next);
+                setShowNamesOn(next);
             }
 
             function pick(preset) {
@@ -353,6 +375,50 @@
                         )
                     )
                 ),
+                R.createElement("div", { className: "setting", id: "plugin-refract-minimal-cards" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "Minimal scene cards"),
+                        R.createElement("div", { className: "sub-heading" },
+                            "Hide the description block on scene cards. Tidier grids when some scenes have descriptions and others don't.")
+                    ),
+                    R.createElement("div", { className: "refract-setting-control" },
+                        R.createElement("div", { className: "custom-control custom-switch" },
+                            R.createElement("input", {
+                                type: "checkbox",
+                                className: "custom-control-input",
+                                id: "refract-minimal-cards-toggle",
+                                checked: minimalOn,
+                                onChange: toggleMinimal
+                            }),
+                            R.createElement("label", {
+                                className: "custom-control-label",
+                                htmlFor: "refract-minimal-cards-toggle"
+                            })
+                        )
+                    )
+                ),
+                R.createElement("div", { className: "setting", id: "plugin-refract-show-perf-names" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "Show performer names"),
+                        R.createElement("div", { className: "sub-heading" },
+                            "Display performer names as a comma-separated line under the avatar circles on scene cards. Useful when you don't want to hover each circle.")
+                    ),
+                    R.createElement("div", { className: "refract-setting-control" },
+                        R.createElement("div", { className: "custom-control custom-switch" },
+                            R.createElement("input", {
+                                type: "checkbox",
+                                className: "custom-control-input",
+                                id: "refract-show-perf-names-toggle",
+                                checked: showNamesOn,
+                                onChange: toggleShowNames
+                            }),
+                            R.createElement("label", {
+                                className: "custom-control-label",
+                                htmlFor: "refract-show-perf-names-toggle"
+                            })
+                        )
+                    )
+                ),
                 /* Custom CSS Source setting — disabled for this release.
                    Flip the flag to re-enable. Supporting code (cssSrc
                    state, getUiConfig/setCustomCssUrl helpers) stays in
@@ -419,9 +485,35 @@
     var LOGO_URL_STORAGE_KEY = "refract.customLogoUrl";
     var LITE_MODE_STORAGE_KEY = "refract.liteMode";
     var LIGHT_MODE_STORAGE_KEY = "refract.lightMode";
+    var MINIMAL_CARDS_STORAGE_KEY = "refract.minimalCards";
+    var SHOW_PERF_NAMES_STORAGE_KEY = "refract.showPerformerNames";
     var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";
     var RATING_STYLES = ["intensity", "tiers"];
     var GRAPHQL_URL = "/graphql";
+
+    /* Minimal scene cards — hides the description block on each card.
+       Used for a tidier grid when users don't curate descriptions or
+       have a mix of with/without scenes (looks inconsistent). */
+    function isMinimalCardsEnabled() {
+        try { return localStorage.getItem(MINIMAL_CARDS_STORAGE_KEY) === "1"; }
+        catch (e) { return false; }
+    }
+    function applyMinimalCardsClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-minimal-cards", !!on);
+    }
+    applyMinimalCardsClass(isMinimalCardsEnabled());
+
+    /* Performer names under scene-card avatar circles. */
+    function isShowPerformerNamesEnabled() {
+        try { return localStorage.getItem(SHOW_PERF_NAMES_STORAGE_KEY) === "1"; }
+        catch (e) { return false; }
+    }
+    function applyShowPerformerNamesClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-show-perf-names", !!on);
+    }
+    applyShowPerformerNamesClass(isShowPerformerNamesEnabled());
 
     /* Custom CSS Source (Stash interface config) — lets the theme load
        on login / pre-plugin screens. We expose an "Apply / Remove"
@@ -1380,6 +1472,13 @@
         '<path fill="currentColor" d="M22.855.758L7.875 7.024l12.537 9.733c2.633 2.224 6.377 2.937 9.77 1.518c4.826-2.018 7.096-7.576 5.072-12.413C33.232 1.024 27.68-1.261 22.855.758zm-9.962 17.924L2.05 10.284L.137 23.529a7.993 7.993 0 0 0 2.958 7.803a8.001 8.001 0 0 0 9.798-12.65zm15.339 7.015l-8.156-4.69l-.033 9.223c-.088 2 .904 3.98 2.75 5.041a5.462 5.462 0 0 0 7.479-2.051c1.499-2.644.589-6.013-2.04-7.523z"/>' +
         '</svg>';
 
+    /* People / group icon — used on the minimal-mode performer pill that
+       replaces the avatar circle row. */
+    var PEOPLE_ICON_SVG =
+        '<svg class="stash-performer-icon" viewBox="0 0 640 512" aria-hidden="true">' +
+        '<path fill="currentColor" d="M96 128a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm0 192l192 0c53 0 96 43 96 96l0 32-384 0 0-32c0-53 43-96 96-96zm288-96a80 80 0 1 1 0-160 80 80 0 1 1 0 160zM496 416l0-32c0-44.2-25-83.3-62.9-103.7C440.7 277.3 449 276 457.5 276l13 0c66.3 0 120 53.7 120 120l0 20c0 22.1-17.9 40-40 40l-94.5 0c6.4-7.5 10.3-17.1 10.3-27.7l0-12.3z"/>' +
+        '</svg>';
+
     function extractSceneId(card) {
         var a = card.querySelector('a[href^="/scenes/"]');
         if (!a) { return null; }
@@ -1393,6 +1492,11 @@
         if (card.querySelector(".stash-performer-circles")) { return; }
         var section = card.querySelector(".card-section");
         if (!section) { return; }
+
+        /* Strip the file-extension from the title at the per-card stable
+           point (after GQL data has hydrated). Faster + more reliable
+           than waiting for the body mutation watcher to find it. */
+        stripTitleExt(card.querySelector(".card-section-title"));
 
         var row = document.createElement("div");
         row.className = "stash-performer-circles";
@@ -1436,6 +1540,45 @@
         var counts = document.createElement("div");
         counts.className = "stash-card-counts";
 
+        /* Performer pill — alternative compact representation that lives
+           ALONGSIDE the avatar circles. CSS gates which one is visible:
+           default mode shows circles, minimal mode shows the pill.
+           Pill markup mirrors .stash-tag-count: clickable anchor to the
+           first performer + glass popup (.stash-performer-popup) with
+           every performer's avatar + name. */
+        if (performers && performers.length) {
+            var pillHref = "/performers/" + performers[0].id;
+            var pPill = document.createElement("a");
+            pPill.className = "stash-performer-pill";
+            pPill.href = pillHref;
+            pPill.title = performers.length + " performer" + (performers.length === 1 ? "" : "s");
+            pPill.addEventListener("click", stopProp);
+            pPill.innerHTML = PEOPLE_ICON_SVG + "<span>" + performers.length + "</span>";
+
+            var pPop = document.createElement("div");
+            pPop.className = "stash-performer-popup";
+            performers.forEach(function (p) {
+                if (!p || !p.id) { return; }
+                var chip = document.createElement("a");
+                chip.className = "stash-performer-popup-chip";
+                chip.href = "/performers/" + p.id;
+                chip.addEventListener("click", stopProp);
+                var ava = document.createElement("img");
+                ava.className = "stash-performer-popup-avatar";
+                ava.src = "/performer/" + p.id + "/image";
+                ava.alt = p.name || "";
+                ava.loading = "lazy";
+                chip.appendChild(ava);
+                var nameSpan = document.createElement("span");
+                nameSpan.className = "stash-performer-popup-name";
+                nameSpan.textContent = p.name || "(unknown)";
+                chip.appendChild(nameSpan);
+                pPop.appendChild(chip);
+            });
+            pPill.appendChild(pPop);
+            counts.appendChild(pPill);
+        }
+
         if (oCount && oCount > 0) {
             var oBadge = document.createElement("span");
             oBadge.className = "stash-o-count";
@@ -1474,6 +1617,63 @@
         }
 
         section.appendChild(row);
+
+        /* Tag portrait thumbnails so the minimal-mode cover-fill CSS can
+           opt them out — for vertical scenes the cover behaviour would
+           crop heavily. The image often isn't loaded yet, so check
+           complete + naturalWidth, else listen for load once. */
+        tagOrientation(card);
+
+        /* Performer name labels — comma-separated, with "+N" overflow.
+           Always emitted; CSS gates visibility on body.refract-show-perf-names. */
+        if (performers && performers.length) {
+            var namesEl = document.createElement("div");
+            namesEl.className = "stash-performer-names";
+            var visibleNames = performers.slice(0, MAX_PERFORMER_CIRCLES)
+                .map(function (p) { return p.name; })
+                .filter(Boolean);
+            var leftover = performers.length - visibleNames.length;
+            namesEl.textContent = visibleNames.join(", ") + (leftover > 0 ? " +" + leftover : "");
+            namesEl.title = performers.map(function (p) { return p.name; }).filter(Boolean).join(", ");
+            section.appendChild(namesEl);
+        }
+    }
+
+    /* Add .refract-portrait to a scene-card whose preview image is taller
+       than wide. CSS uses this to swap object-fit: cover (landscape) for
+       object-fit: contain (portrait) so vertical scenes letterbox instead
+       of cropping. Idempotent — early-exits once tagged. */
+    function tagOrientation(card) {
+        if (card.classList.contains("refract-portrait") ||
+            card.classList.contains("refract-landscape-checked")) { return; }
+        var media = card.querySelector(".scene-card-preview img, .scene-card-preview video, .scene-card-preview .preview-image");
+        if (!media) { return; }
+        var check = function () {
+            var w = media.naturalWidth || media.videoWidth || 0;
+            var h = media.naturalHeight || media.videoHeight || 0;
+            if (!w || !h) { return; }
+            if (h > w) { card.classList.add("refract-portrait"); }
+            else { card.classList.add("refract-landscape-checked"); }
+        };
+        if (media.complete && media.naturalWidth) { check(); }
+        else { media.addEventListener("load", check, { once: true }); }
+    }
+
+    /* Strip trailing file extensions from scene-card titles for a tidier
+       grid. NO dataset marker — that previously caused a stick where my
+       "already stripped" flag survived a React re-render that restored
+       the extension, so the strip never re-fired. The regex test is
+       cheap and idempotent (already-clean text doesn't match), so
+       running on every mutation tick is fine. */
+    var FILE_EXT_RE = /\.(mp4|m4v|mkv|mov|avi|webm|wmv|flv|ts|m2ts|mpg|mpeg|3gp|f4v|ogv|asf)$/i;
+    function stripTitleExt(el) {
+        if (!el) { return; }
+        var text = (el.textContent || "").trim();
+        if (!FILE_EXT_RE.test(text)) { return; }
+        el.textContent = text.replace(FILE_EXT_RE, "");
+    }
+    function stripSceneFileExtensions() {
+        document.querySelectorAll(".scene-card .card-section-title").forEach(stripTitleExt);
     }
 
     function initSceneCards() {
@@ -2959,7 +3159,120 @@
         }
     }
 
+    /* ── Tag-button hover tooltip (portaled to document.body) ───────
+       Tag pills live in a deeply-nested scrolling/clipped subtree.
+       Absolute-positioned tooltips inside the button get cut off by
+       ancestor overflow. The reliable fix is to render a single
+       tooltip element at body level (no clipping ancestor) and move
+       it next to the hovered button via getBoundingClientRect(). */
+
+    var refractTagTipEl = null;
+    var refractTagTipTimer = null;
+
+    function refractEnsureTagTip() {
+        if (refractTagTipEl && document.contains(refractTagTipEl)) {
+            return refractTagTipEl;
+        }
+        refractTagTipEl = document.createElement("div");
+        refractTagTipEl.className = "refract-tag-tooltip-portal";
+        refractTagTipEl.setAttribute("aria-hidden", "true");
+        document.body.appendChild(refractTagTipEl);
+        return refractTagTipEl;
+    }
+
+    function refractPositionTagTip(tip, anchorX, anchorY) {
+        var tipW = 240;
+        var cursorOffset = 14;
+        var margin = 8;
+        var left = anchorX - tipW / 2;
+        left = Math.max(margin, Math.min(left, window.innerWidth - tipW - margin));
+        tip.style.left = left + "px";
+        var tipH = tip.offsetHeight;
+        var spaceAbove = anchorY;
+        var spaceBelow = window.innerHeight - anchorY;
+        var top;
+        if (spaceAbove >= tipH + cursorOffset + margin || spaceAbove > spaceBelow) {
+            top = anchorY - tipH - cursorOffset;
+        } else {
+            top = anchorY + cursorOffset;
+        }
+        top = Math.max(margin, Math.min(top, window.innerHeight - tipH - margin));
+        tip.style.top = top + "px";
+    }
+
+    function refractShowTagTip(btn, anchorX, anchorY) {
+        var id = btn.getAttribute("data-tag-id");
+        if (!id) { return; }
+        var tag = refractTagEditorState.tagsById && refractTagEditorState.tagsById.get(id);
+        if (!tag) { return; }
+        var hasImg = !!tag.imagePath;
+        var hasDesc = !!(tag.description && tag.description.trim());
+        /* If there's nothing to show beyond the name (which the button
+           already displays), don't bother with a tooltip. */
+        if (!hasImg && !hasDesc) { return; }
+
+        var tip = refractEnsureTagTip();
+        tip.innerHTML =
+            (hasImg ? '<img class="refract-tag-tooltip__img" src="' + escapeHtml(tag.imagePath) + '" alt="">' : '') +
+            '<div class="refract-tag-tooltip__body">' +
+                '<div class="refract-tag-tooltip__name">' + escapeHtml(tag.name) + '</div>' +
+                (hasDesc ? '<div class="refract-tag-tooltip__desc">' + escapeHtml(tag.description) + '</div>' : '') +
+            '</div>';
+
+        /* Show so the layout settles, position once, then re-position
+           after the image loads in case content height changes (slow
+           networks, late-arriving image dimensions). */
+        tip.classList.add("refract-tag-tooltip-portal--show");
+        refractPositionTagTip(tip, anchorX, anchorY);
+        var img = tip.querySelector(".refract-tag-tooltip__img");
+        if (img && !img.complete) {
+            img.addEventListener("load", function () {
+                if (tip.classList.contains("refract-tag-tooltip-portal--show")) {
+                    refractPositionTagTip(tip, anchorX, anchorY);
+                }
+            }, { once: true });
+        }
+    }
+
+    function refractHideTagTip() {
+        if (refractTagTipTimer) {
+            clearTimeout(refractTagTipTimer);
+            refractTagTipTimer = null;
+        }
+        if (refractTagTipEl) {
+            refractTagTipEl.classList.remove("refract-tag-tooltip-portal--show");
+        }
+    }
+
     function refractWireTagEditorEvents(pane) {
+        /* Delegate hover via mouseover / mouseout with relatedTarget
+           checks (mouseenter / mouseleave don't bubble). 400ms dwell
+           before showing so quick scans don't flash the tooltip. */
+        pane.addEventListener("mouseover", function (e) {
+            var btn = e.target.closest && e.target.closest(".refract-tag-editor__tag");
+            if (!btn) { return; }
+            var related = e.relatedTarget;
+            if (related && btn.contains(related)) { return; }
+            if (refractTagTipTimer) { clearTimeout(refractTagTipTimer); }
+            /* Capture cursor position now; tooltip anchors to it after
+               the dwell delay (rather than chasing the cursor mid-hover). */
+            var cx = e.clientX;
+            var cy = e.clientY;
+            refractTagTipTimer = setTimeout(function () {
+                refractShowTagTip(btn, cx, cy);
+            }, 400);
+        });
+        pane.addEventListener("mouseout", function (e) {
+            var btn = e.target.closest && e.target.closest(".refract-tag-editor__tag");
+            if (!btn) { return; }
+            var related = e.relatedTarget;
+            if (related && btn.contains(related)) { return; }
+            refractHideTagTip();
+        });
+        /* Hide on scroll too — otherwise the tooltip would float in place
+           while the button moves under it. */
+        window.addEventListener("scroll", refractHideTagTip, { passive: true, capture: true });
+
         pane.addEventListener("input", function (e) {
             var t = e.target;
             if (t && t.classList && t.classList.contains("refract-tag-editor__search-input")) {
@@ -3032,7 +3345,7 @@
         var tagsQ =
             'query FindAllTagsForTagEditor {' +
             '  findTags(filter: { per_page: -1, sort: "name", direction: ASC }) {' +
-            '    tags { id name sort_name parents { id name } children { id } }' +
+            '    tags { id name sort_name description image_path parents { id name } children { id } }' +
             '  }' +
             '}';
         Promise.all([
@@ -3050,6 +3363,8 @@
                     id: String(t.id),
                     name: t.name || "",
                     sort_name: t.sort_name || t.name || "",
+                    description: t.description || "",
+                    imagePath: t.image_path || "",
                     parents: (t.parents || []).map(function (p) {
                         return { id: String(p.id), name: p.name || "" };
                     }),
@@ -3226,11 +3541,14 @@
                 var subSelected = refractCountSelectedInSubgroup(sub);
                 var leavesHtml = visibleLeaves.map(function (t) {
                     var sel = s.selectedTagIds.has(t.id);
+                    /* Tooltip content lives in a body-portaled element
+                       managed by refractWireTagEditorEvents; the button
+                       just carries the tag-id so hover handlers can look
+                       up image/description from refractTagEditorState. */
                     return '<button type="button" class="refract-tag-editor__tag' +
                         (sel ? ' is-selected' : '') + '" ' +
                         'data-tag-id="' + escapeHtml(t.id) + '" ' +
-                        'aria-pressed="' + (sel ? 'true' : 'false') + '" ' +
-                        'title="' + escapeHtml(t.name) + '">' +
+                        'aria-pressed="' + (sel ? 'true' : 'false') + '">' +
                         '<span class="refract-tag-editor__tag-label">' + escapeHtml(t.name) + '</span>' +
                         '</button>';
                 }).join("");
@@ -3842,10 +4160,21 @@
             var v = c.querySelector("video");
             if (v && v.paused) { schedule(c); }
         }, { passive: true });
-        /* Cursor leaving the player while paused — go idle immediately. */
+        /* Cursor leaving the player while paused — go idle immediately.
+           IMPORTANT: capture-phase `mouseleave` fires for every
+           descendant's mouseleave (it doesn't bubble, but the capture
+           phase still hits ancestor listeners). So a mouse moving
+           BETWEEN control-bar buttons or seek-bar segments would
+           previously trigger this handler and immediately re-add
+           `.refract-video-idle`, while the next micro-mousemove would
+           clear it — rapid flicker, especially noticeable around the
+           seekbar. Only treat it as a real player-leave when
+           e.target IS the .video-js itself AND relatedTarget (where
+           the cursor went next) is outside it. */
         document.body.addEventListener("mouseleave", function (e) {
             var c = findContainer(e.target);
-            if (!c) { return; }
+            if (!c || e.target !== c) { return; }
+            if (e.relatedTarget && c.contains(e.relatedTarget)) { return; }
             var v = c.querySelector("video");
             if (v && v.paused) {
                 clearTimeout(timers.get(c));
@@ -4129,6 +4458,7 @@
         initRatingInputSelectAll();
         tagFilledRatings();
         syncTagListFade();
+        stripSceneFileExtensions();
         initVideoIdleHide();
         unstickyGalleryToolbar();
         initOperationMenuOverlay();
