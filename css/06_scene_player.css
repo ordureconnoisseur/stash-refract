@@ -130,7 +130,13 @@ body.stash-liquid-glass .video-js .vjs-tech {
         rgba(0, 0, 0, 0.5) 100%
     ) !important;
 }
-body.stash-liquid-glass .scene-player-container:hover .st-player-overlay,
+/* Use video.js's `.vjs-user-active` class (driven by its inactivity
+   timer) instead of `:hover` on the container. In fullscreen the
+   container fills the viewport so `:hover` is ALWAYS true regardless
+   of mouse activity — controls never fade. video.js cycles user-
+   active/inactive correctly in fullscreen, so gating on that class
+   gives the right behaviour in both windowed and fullscreen modes. */
+body.stash-liquid-glass .video-js.vjs-user-active .st-player-overlay,
 body.stash-liquid-glass .video-js.vjs-paused .st-player-overlay {
     opacity: 1 !important;
 }
@@ -456,10 +462,15 @@ body.stash-liquid-glass .video-js .vjs-play-progress > .vjs-time-tooltip {
     display: none !important;
 }
 
-/* Hide the big sprite-thumbnail preview that pops up on scrubber hover —
-   keep just the small time tooltip. */
+/* Sprite-thumbnail preview on scrubber hover. video.js paints the
+   frame as a `background-image` directly on .vjs-vtt-thumbnail-display
+   (NOT inside an <img>). So overriding `background` would wipe the
+   sprite — only style the border / outline / shadow here and leave
+   background untouched. */
 body.stash-liquid-glass .video-js .vjs-vtt-thumbnail-display {
-    display: none !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55) !important;
 }
 body.stash-liquid-glass .video-js .vjs-marker-tooltip {
     display: none !important;
