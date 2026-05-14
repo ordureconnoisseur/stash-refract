@@ -1381,3 +1381,1016 @@ body.stash-liquid-glass .tagger-container-header .form-group .form-label {
     display: block;
 }
 
+
+/* ───────────────────────────────────────────────────────────────────
+   Performer Tagger (StashDB cross-reference page)
+   Stash renders an unstyled bulk-tagging UI under .PerformerTagger
+   with each performer in a .PerformerTagger-performer row containing
+   a thumbnail (.performer-card.p-0.m-0.card > img) and a details
+   column with name (.PerformerTagger-header > h2), status heading,
+   and either a UUID link group (.PerformerTagger-box-link, tagged)
+   or a text-input + Search button (untagged). Refract restyles all
+   of this as glass cards in a responsive grid.
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Outer .card wrapper around the whole PerformerTagger page is
+   redundant — each performer is its own glass card. Strip the
+   wrapper's bg/border/shadow/padding so only the inner cards show. */
+body.stash-liquid-glass .card:has(> .PerformerTagger) {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    contain: none !important;
+}
+
+/* Batch action buttons (Batch Add / Batch Update / Search All) get
+   moved into the .tagger-container-header by refract.js's
+   relocateTaggerBatchButtons. Style them as a tight inline group
+   nested between the Source select and the gear icon. */
+body.stash-liquid-glass .tagger-container-header .ml-auto.mb-3 {
+    margin: 0 !important;
+    display: flex !important;
+    gap: 0.5rem;
+    align-items: center;
+}
+body.stash-liquid-glass .tagger-container-header .ml-auto.mb-3 > .btn {
+    margin: 0 !important;
+}
+
+/* Configuration dropdown — the .collapse.card that drops out of the
+   header's gear icon when clicked. Bootstrap toggles three classes:
+   .collapse (closed) → .collapsing (animating) → .collapse.show (open).
+   We match all three so styling stays consistent throughout the
+   animation rather than reverting to Bootstrap defaults mid-slide. */
+body.stash-liquid-glass .tagger-container-header > :is(.collapse, .collapsing).card {
+    /* Opaque bg + no backdrop-filter — animating height with
+       backdrop-filter active causes expensive recomposition every
+       frame, which reads as stutter. Solid glass keeps the look
+       while staying cheap. */
+    background: rgba(20, 20, 24, 0.92) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow-md) !important;
+    margin-top: 0.85rem !important;
+    padding: 1rem 1.25rem !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    /* Isolate this dropdown's layout/paint from the rest of the page
+       and force a GPU compositor layer so the height animation runs
+       smoothly without invalidating surrounding elements. */
+    contain: layout style paint;
+    transform: translateZ(0);
+}
+/* Smoother easing curve than Bootstrap's default `ease`. Drop
+   box-shadow during the active animation phase — shadows on a
+   resizing box have to be repainted every frame and are the most
+   common single-frame stutter source. */
+body.stash-liquid-glass .tagger-container-header > .collapsing.card {
+    transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: none !important;
+    will-change: height;
+}
+body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card h4 {
+    font-size: 0.78rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted) !important;
+    margin: 0 0 0.7rem 0 !important;
+    font-weight: 600;
+    padding: 0 !important;
+    font-family: var(--theme-font-stack) !important;
+}
+body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card hr {
+    border-top: 1px solid var(--glass-border) !important;
+    border-bottom: none !important;
+    margin: 0 0 1rem 0 !important;
+    opacity: 1;
+}
+body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card h6 {
+    font-size: 0.75rem !important;
+    color: var(--text-muted) !important;
+    margin: 0 0 0.5rem 0 !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-family: var(--theme-font-stack) !important;
+}
+body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card .form-text {
+    color: var(--text-muted) !important;
+    font-size: 0.72rem !important;
+    display: block;
+    margin-top: 0.55rem !important;
+    line-height: 1.45;
+}
+body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card .form-group {
+    margin: 0 !important;
+}
+body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card .form-group > .btn {
+    margin-top: 0.85rem !important;
+}
+body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card .row {
+    margin: 0 !important;
+}
+body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card [class*="col-"] {
+    padding: 0 !important;
+}
+
+/* Grid container — auto-fill 280px+ columns; cards take their natural
+   height (align-items: start) so the full performer photo can render
+   in its native aspect ratio without forcing a uniform card height. */
+body.stash-liquid-glass .PerformerTagger {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    align-items: start;
+    gap: 0.85rem;
+    margin-top: 0.75rem;
+}
+
+/* Card frame — vertical layout: image fills top at 3:4 aspect ratio
+   (image takes the majority of the card visually), details stack
+   below in a compact info block. */
+body.stash-liquid-glass .PerformerTagger-performer {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    overflow: hidden;
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+body.stash-liquid-glass .PerformerTagger-performer:hover {
+    border-color: rgba(var(--accent-rgb), 0.28);
+    box-shadow:
+        var(--shadow-lg),
+        0 0 24px rgba(var(--accent-rgb), 0.18);
+    transform: translateY(-1px);
+}
+
+/* Image wrapper — aggressive reset of ALL inherited .performer-card /
+   .card / Bootstrap rules via `all: unset`, then a 3:4 aspect frame
+   with the img absolute-positioned to fill it (object-fit: cover so
+   the photo crops uniformly, keeping all cards the same height). */
+body.stash-liquid-glass .PerformerTagger-performer > .performer-card {
+    all: unset !important;
+    display: block !important;
+    width: 100% !important;
+    aspect-ratio: 3 / 4 !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: var(--glass-bg-strong) !important;
+}
+body.stash-liquid-glass .PerformerTagger-performer > .performer-card > img {
+    all: unset !important;
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center 20% !important;
+    transition: filter 0.18s, transform 0.3s;
+}
+body.stash-liquid-glass .PerformerTagger-performer:hover > .performer-card > img {
+    filter: saturate(1.15);
+}
+
+/* Details block — sits below the image in a compact info section
+   separated from the image by an accent-tinted top border.
+   `margin: 0` overrides Stash's native `margin-left: 14px` (left over
+   from the horizontal layout the UI was originally designed for) and
+   `width: 100%; flex: none` stops the details from being wider than
+   the card or having any leftover sizing assumptions. */
+body.stash-liquid-glass .PerformerTagger-details {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;             /* spacing applied via margins on each child for consistency */
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: none !important;
+    box-sizing: border-box;
+    padding: 0.7rem 0.8rem 0.85rem;
+    border-top: 1px solid rgba(var(--accent-rgb), 0.18);
+    background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.04) 0%, transparent 100%);
+}
+body.stash-liquid-glass .PerformerTagger-details > .PerformerTagger-header {
+    margin-bottom: 0.5rem;
+}
+body.stash-liquid-glass .PerformerTagger-header {
+    text-decoration: none !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .PerformerTagger-header h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+    transition: color 0.18s;
+}
+body.stash-liquid-glass .PerformerTagger-header:hover h2 {
+    color: var(--accent-bright);
+}
+body.stash-liquid-glass .PerformerTagger-details .performer-disambiguation {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-left: 0.35rem;
+}
+
+/* Tagged-state status badge: convert the verbose h5 into a small
+   green pill with a check glyph. */
+body.stash-liquid-glass .PerformerTagger-details > .text-left:not(.sub-content) {
+    margin: 0 0 0.5rem 0;
+    padding: 0;
+    display: flex;
+    line-height: 0;
+}
+body.stash-liquid-glass .PerformerTagger-details .text-left > h5.text-bold {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    color: #4ade80;
+    border-radius: var(--radius-pill);
+    padding: 0.12rem 0.48rem;  /* rem, not em — parent has font-size:0;
+                                   matches NEEDS MATCH pill's effective size */
+    font-size: 0;              /* hide the verbose Stash text */
+    font-weight: 600;
+    line-height: 1;
+    margin: 0;
+    width: max-content;
+    letter-spacing: 0.04em;
+}
+body.stash-liquid-glass .PerformerTagger-details .text-left > h5.text-bold::before {
+    content: "✓ TAGGED";
+    font-size: 0.68rem;
+    text-transform: uppercase;
+}
+
+/* Untagged-state status badge: synthesize an amber "needs match" pill
+   via a ::before on the search input-group (which is the differentiator
+   from the tagged UUID-link input-group). */
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link)::before {
+    content: "⚠ NEEDS MATCH";
+    display: inline-flex;
+    align-items: center;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #fbbf24;
+    border-radius: var(--radius-pill);
+    padding: 0.12rem 0.48rem;       /* match TAGGED rem-based padding exactly */
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 0.5rem;          /* identical to tagged badge wrapper */
+    width: max-content;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+/* The pseudo-element above sits inside a flex input-group; we need
+   the input-group to switch to flex-column so the badge stacks above
+   the input + button row instead of inline with them. */
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+/* StashDB UUID display (tagged state) */
+body.stash-liquid-glass .PerformerTagger-details .sub-content {
+    margin: 0;
+}
+body.stash-liquid-glass .PerformerTagger-details .sub-content:empty {
+    display: none;
+}
+/* UUID + Refresh control — accent-bordered pill. The raw UUID is
+   hidden (dense monospace string that bloats every card); replaced
+   via a ::before pseudo on the anchor with a clean "↗ StashDB" label
+   that still inherits the link's click target + href. Refresh button
+   sits flush on the right as an accent-tinted action. */
+body.stash-liquid-glass .PerformerTagger-box-link {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: stretch;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: rgba(var(--accent-rgb), 0.06);
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    padding: 0;
+    box-sizing: border-box;
+}
+body.stash-liquid-glass .PerformerTagger-box-link .input-group-text {
+    min-width: 0;
+    min-height: 1.85rem;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 0.95rem !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+/* Hide the raw UUID text and replace with a labeled link. */
+body.stash-liquid-glass .PerformerTagger-box-link .input-group-text a {
+    font-size: 0 !important;
+    display: inline-block;
+    color: transparent !important;
+    text-decoration: none !important;
+    transition: opacity 0.18s;
+}
+body.stash-liquid-glass .PerformerTagger-box-link .input-group-text a::before {
+    content: "↗ View on StashDB";
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent-bright);
+    letter-spacing: 0.02em;
+}
+body.stash-liquid-glass .PerformerTagger-box-link .input-group-text a:hover::before {
+    color: var(--accent-light);
+}
+body.stash-liquid-glass .PerformerTagger-box-link .input-group-append {
+    display: flex !important;
+    align-items: stretch !important;
+}
+body.stash-liquid-glass .PerformerTagger-box-link > .input-group-append > .btn-primary,
+body.stash-liquid-glass .PerformerTagger-box-link .btn-primary.btn {
+    all: unset !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: stretch !important;
+    background: transparent !important;
+    color: var(--accent-bright) !important;
+    padding: 0 0.95rem !important;
+    font-size: 0.7rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    border-left: 1px solid rgba(var(--accent-rgb), 0.18) !important;
+    transition: background 0.18s, color 0.18s;
+}
+body.stash-liquid-glass .PerformerTagger-box-link > .input-group-append > .btn-primary:hover,
+body.stash-liquid-glass .PerformerTagger-box-link .btn-primary.btn:hover {
+    background: rgba(var(--accent-rgb), 0.14) !important;
+    color: var(--accent-light) !important;
+}
+body.stash-liquid-glass .PerformerTagger-box-link .btn-primary:hover {
+    background: rgba(var(--accent-rgb), 0.14) !important;
+    color: var(--accent-light) !important;
+}
+
+/* Untagged-state search input group — same accent-pill design as the
+   tagged StashDB link pill, but with an editable input on the left
+   instead of a fixed link, and a "Search" button on the right.
+   Two-row grid: badge spans full width on row 1, input + button
+   side-by-side as a single visual pill on row 2. */
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 0;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    box-sizing: border-box;
+}
+/* Badge sits on its own row above the input pill */
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link)::before {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-bottom: 0.5rem;
+}
+/* Input + button row: visually one pill via the row's combined
+   background. Each child is transparent; the pill effect comes from
+   the parent's grid cell area + a wrapping pseudo-element. */
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link)::after {
+    content: "";
+    grid-column: 1 / -1;
+    grid-row: 2;
+    background: rgba(var(--accent-rgb), 0.06);
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    border-radius: var(--radius-pill);
+    pointer-events: none;
+    z-index: 0;
+}
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) > .text-input {
+    grid-column: 1;
+    grid-row: 2;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: var(--text) !important;
+    padding: 0 0.95rem !important;
+    font-size: 0.78rem !important;
+    line-height: 1 !important;
+    min-height: 1.85rem;
+    z-index: 1;
+    outline: none !important;
+    box-shadow: none !important;
+    min-width: 0;
+}
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) > .text-input::placeholder {
+    color: var(--text-muted);
+}
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) > .text-input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+/* Focus the parent pill instead — brighter accent border ring */
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link):focus-within::after {
+    border-color: rgba(var(--accent-rgb), 0.55);
+    background: rgba(var(--accent-rgb), 0.10);
+}
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) > .input-group-append {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex !important;
+    align-items: stretch !important;
+    z-index: 1;
+}
+/* Search button — mirrors the Refresh button's integrated styling */
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) .btn-primary,
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) .btn-primary.btn {
+    all: unset !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: stretch !important;
+    background: transparent !important;
+    color: var(--accent-bright) !important;
+    padding: 0 0.95rem !important;
+    font-size: 0.7rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    border-left: 1px solid rgba(var(--accent-rgb), 0.18) !important;
+    transition: background 0.18s, color 0.18s;
+}
+body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) .btn-primary:hover {
+    background: rgba(var(--accent-rgb), 0.14) !important;
+    color: var(--accent-light) !important;
+}
+
+/* ── Search results overlay ─────────────────────────────────────────
+   When the user clicks Search on an untagged performer, Stash renders
+   a list of candidate matches in .PerformerTagger-performer-search.
+   We position this absolutely over the entire card, replacing the
+   image + details with a scrollable list of selectable candidates. */
+body.stash-liquid-glass .PerformerTagger-performer:has(.PerformerTagger-performer-search) {
+    /* Anchor the absolute overlay */
+    position: relative;
+}
+body.stash-liquid-glass .PerformerTagger-performer-search {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    background: rgba(20, 20, 24, 0.96);
+    border-radius: var(--radius);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.6rem 0.6rem 2.4rem;   /* bottom padding leaves room for chevron */
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.4rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--glass-border) transparent;
+    box-sizing: border-box;
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    transition:
+        opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        visibility 0s linear 0s;
+    animation: refract-search-fade-in 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes refract-search-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+/* Hidden state: slides up + fades out. visibility delay matches
+   the transition so the element becomes non-interactive only after
+   the animation completes. */
+body.stash-liquid-glass .PerformerTagger-performer-search.refract-search-hidden {
+    opacity: 0;
+    transform: translateY(-24px);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        visibility 0s linear 0.25s;
+    animation: none;
+}
+
+/* Close chevron — bottom-center, accent-tinted glass pill. Click
+   triggers the slide-up dismiss. */
+body.stash-liquid-glass .PerformerTagger-performer-search .refract-search-close {
+    position: absolute;
+    bottom: 0.55rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2.25rem;
+    height: 1.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--accent-rgb), 0.14);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(var(--accent-rgb), 0.35);
+    border-radius: var(--radius-pill);
+    color: var(--accent-bright);
+    cursor: pointer;
+    z-index: 12;
+    padding: 0;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+}
+body.stash-liquid-glass .PerformerTagger-performer-search .refract-search-close:hover {
+    background: rgba(var(--accent-rgb), 0.28);
+    border-color: var(--accent);
+    color: var(--accent-light);
+    transform: translateX(-50%) translateY(-1px);
+}
+body.stash-liquid-glass .PerformerTagger-performer-search .refract-search-close > svg {
+    pointer-events: none;
+}
+body.stash-liquid-glass .PerformerTagger-performer-search::-webkit-scrollbar {
+    width: 6px;
+}
+body.stash-liquid-glass .PerformerTagger-performer-search::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 3px;
+}
+body.stash-liquid-glass .PerformerTagger-performer-search-item,
+body.stash-liquid-glass .PerformerTagger-performer-search-item.btn {
+    all: unset !important;
+    display: flex !important;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.45rem 0.6rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    box-sizing: border-box !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    color: var(--text) !important;
+    cursor: pointer !important;
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+body.stash-liquid-glass .PerformerTagger-performer-search-item:hover {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    transform: translateX(2px);
+}
+body.stash-liquid-glass .PerformerTagger-performer-search-item > .PerformerTagger-thumb {
+    width: 44px !important;
+    height: 58px !important;
+    object-fit: cover !important;
+    object-position: center 20% !important;
+    border-radius: var(--radius-sm) !important;
+    border: 1.5px solid rgba(var(--accent-rgb), 0.35) !important;
+    flex-shrink: 0;
+    background: var(--glass-bg-strong);
+}
+body.stash-liquid-glass .PerformerTagger-performer-search-item:hover > .PerformerTagger-thumb {
+    border-color: var(--accent) !important;
+}
+body.stash-liquid-glass .PerformerTagger-performer-search-item > span {
+    color: var(--text) !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1 1 0;
+    min-width: 0;       /* allow span to shrink below text intrinsic width */
+}
+
+/* ── Performer Edit Tags Tab — native taxonomy editor ─────────────────
+   Refract-injected "Edit Tags" tab on the performer page. Hierarchical
+   taxonomy editor with groups → subgroups → tag buttons. The native
+   .tab-content is hidden via the body class while our tab is active. */
+
+body.stash-liquid-glass .refract-tag-editor-tab {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.45rem;
+}
+body.stash-liquid-glass .refract-tag-editor-tab .refract-tag-editor-tab-icon {
+    opacity: 0.85;
+    transition: opacity 0.15s, color 0.15s;
+}
+body.stash-liquid-glass .refract-tag-editor-tab.active .refract-tag-editor-tab-icon,
+body.stash-liquid-glass .refract-tag-editor-tab:hover .refract-tag-editor-tab-icon {
+    opacity: 1;
+    color: var(--accent-bright);
+}
+
+/* Our pane is injected as a .tab-pane sibling inside .tab-content,
+   so it inherits Bootstrap's tab-pane width/positioning. Default
+   hidden; shown when our tab is active. */
+body.stash-liquid-glass .refract-tag-editor-pane {
+    display: none;
+    padding: 1.1rem 0 0;
+    width: 100%;
+    min-width: 0;
+}
+body.stash-liquid-glass.refract-tag-editor-active .refract-tag-editor-pane {
+    display: block !important;
+    opacity: 1 !important;
+}
+/* Hide React-Bootstrap's own active tab pane while our tab is active. */
+body.stash-liquid-glass.refract-tag-editor-active .performer-tabs .tab-content > .tab-pane:not(.refract-tag-editor-pane) {
+    display: none !important;
+}
+
+/* Outer frame */
+body.stash-liquid-glass .refract-tag-editor {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    background:
+        radial-gradient(140% 80% at 100% 0%, rgba(var(--accent-rgb), 0.08) 0%, transparent 55%),
+        linear-gradient(160deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.012) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    padding: 1.1rem 1.25rem 1.25rem;
+    margin-bottom: 1.25rem;
+}
+body.stash-liquid-glass .refract-tag-editor > * {
+    width: 100%;
+}
+
+/* Header */
+body.stash-liquid-glass .refract-tag-editor__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.85rem;
+    padding-bottom: 0.85rem;
+    margin-bottom: 0.85rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+body.stash-liquid-glass .refract-tag-editor__title-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+body.stash-liquid-glass .refract-tag-editor__title {
+    font-size: 0.98rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0.015em;
+    color: var(--text);
+}
+body.stash-liquid-glass .refract-tag-editor__summary {
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    font-variant-numeric: tabular-nums;
+}
+body.stash-liquid-glass .refract-tag-editor__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+body.stash-liquid-glass .refract-tag-editor__discard {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 0.35rem 0.6rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+body.stash-liquid-glass .refract-tag-editor__discard:hover:not(:disabled) {
+    color: var(--text);
+}
+body.stash-liquid-glass .refract-tag-editor__discard:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+body.stash-liquid-glass .refract-tag-editor__save {
+    padding: 0.4rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-radius: var(--radius-pill);
+}
+body.stash-liquid-glass .refract-tag-editor__save:disabled {
+    opacity: 0.5;
+}
+
+/* Search */
+body.stash-liquid-glass .refract-tag-editor__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    padding: 0 0.7rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+body.stash-liquid-glass .refract-tag-editor__search:focus-within {
+    border-color: rgba(var(--accent-rgb), 0.45);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
+}
+body.stash-liquid-glass .refract-tag-editor__search-icon {
+    color: var(--text-muted);
+    flex: none;
+}
+body.stash-liquid-glass .refract-tag-editor__search-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    padding: 0.55rem 0;
+    font-size: 0.86rem;
+    outline: none;
+}
+body.stash-liquid-glass .refract-tag-editor__search-input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* Groups */
+body.stash-liquid-glass .refract-tag-editor__groups {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+body.stash-liquid-glass .refract-tag-editor__group {
+    background: rgba(255, 255, 255, 0.022);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: border-color 0.18s, background 0.18s;
+}
+body.stash-liquid-glass .refract-tag-editor__group.is-open {
+    border-color: rgba(var(--accent-rgb), 0.22);
+    background: rgba(255, 255, 255, 0.035);
+}
+body.stash-liquid-glass .refract-tag-editor__group:hover {
+    border-color: rgba(var(--accent-rgb), 0.28);
+}
+body.stash-liquid-glass .refract-tag-editor__group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    padding: 0.6rem 0.85rem;
+    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.06) 0%, transparent 75%);
+    cursor: pointer;
+}
+body.stash-liquid-glass .refract-tag-editor__group-header-main {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+body.stash-liquid-glass .refract-tag-editor__group-title {
+    color: var(--text);
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+body.stash-liquid-glass .refract-tag-editor__group-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    color: var(--text-muted);
+    font-size: 0.74rem;
+    font-variant-numeric: tabular-nums;
+}
+body.stash-liquid-glass .refract-tag-editor__group-selected:not(:empty) {
+    color: var(--accent-bright);
+    font-weight: 600;
+    background: rgba(var(--accent-rgb), 0.10);
+    border: 1px solid rgba(var(--accent-rgb), 0.30);
+    padding: 0.05em 0.55em;
+    border-radius: var(--radius-pill);
+    line-height: 1.45;
+}
+body.stash-liquid-glass .refract-tag-editor__group-toggle,
+body.stash-liquid-glass .refract-tag-editor__subgroup-toggle {
+    all: unset !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--text-muted) !important;
+    cursor: pointer;
+    border-radius: 50% !important;
+    /* Closed: chevron points RIGHT (standard "expandable" affordance).
+       Open: rotates to point DOWN. `!important` needed to beat the
+       `all: unset !important` in this same rule. */
+    transform: rotate(-90deg) !important;
+    transition: background 0.15s, color 0.15s, transform 0.25s !important;
+    pointer-events: none;  /* whole header is clickable; let it through */
+}
+body.stash-liquid-glass .refract-tag-editor__group.is-open .refract-tag-editor__group-toggle,
+body.stash-liquid-glass .refract-tag-editor__subgroup.is-open .refract-tag-editor__subgroup-toggle {
+    transform: rotate(0deg) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .refract-tag-editor__group-header:hover .refract-tag-editor__group-toggle,
+body.stash-liquid-glass .refract-tag-editor__subgroup-header:not(.refract-tag-editor__subgroup-header--static):hover .refract-tag-editor__subgroup-toggle {
+    color: var(--text) !important;
+}
+
+/* Group body — only show when .is-open */
+body.stash-liquid-glass .refract-tag-editor__group-body {
+    display: none;
+    padding: 0.55rem 0.7rem 0.85rem;
+}
+body.stash-liquid-glass .refract-tag-editor__group.is-open .refract-tag-editor__group-body {
+    display: block;
+}
+body.stash-liquid-glass .refract-tag-editor__subgroup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 0.55rem;
+    /* Keep collapsed subgroups at their natural header height instead
+       of stretching to match an expanded sibling in the same row. */
+    align-items: start;
+}
+
+/* Subgroup */
+body.stash-liquid-glass .refract-tag-editor__subgroup {
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: border-color 0.18s;
+}
+body.stash-liquid-glass .refract-tag-editor__subgroup.is-open {
+    border-color: rgba(var(--accent-rgb), 0.20);
+}
+body.stash-liquid-glass .refract-tag-editor__subgroup--root {
+    background: transparent;
+    border-color: rgba(var(--accent-rgb), 0.15);
+}
+body.stash-liquid-glass .refract-tag-editor__subgroup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.55rem;
+    padding: 0.42rem 0.7rem;
+    cursor: pointer;
+}
+body.stash-liquid-glass .refract-tag-editor__subgroup-header--static {
+    cursor: default;
+    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.04) 0%, transparent 80%);
+}
+body.stash-liquid-glass .refract-tag-editor__subgroup-header-main {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+body.stash-liquid-glass .refract-tag-editor__subgroup-title {
+    color: var(--text);
+    font-size: 0.82rem;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+body.stash-liquid-glass .refract-tag-editor__subgroup-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+    flex: 0 0 auto;
+}
+body.stash-liquid-glass .refract-tag-editor__subgroup-selected:not(:empty) {
+    color: var(--accent-bright);
+    font-weight: 600;
+}
+body.stash-liquid-glass .refract-tag-editor__subgroup-body {
+    display: none;
+    padding: 0.4rem 0.55rem 0.6rem;
+}
+body.stash-liquid-glass .refract-tag-editor__subgroup.is-open .refract-tag-editor__subgroup-body {
+    display: block;
+}
+
+/* Leaf tag grid + buttons. Flex-wrap lets pills size to their text
+   content and flow horizontally, packing as many per row as the
+   subgroup width allows. Pairs with `.is-open` spanning the full
+   parent grid row for maximum density. */
+body.stash-liquid-glass .refract-tag-editor__leaf-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.45rem;
+    width: 100%;
+}
+body.stash-liquid-glass .refract-tag-editor__tag {
+    all: unset !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    max-width: 100%;
+    padding: 0.36rem 0.85rem !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--text) !important;
+    font-size: 0.76rem !important;
+    line-height: 1.25 !important;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.14s, border-color 0.14s, color 0.14s, transform 0.12s, box-shadow 0.14s;
+}
+body.stash-liquid-glass .refract-tag-editor__tag-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+}
+body.stash-liquid-glass .refract-tag-editor__tag:hover {
+    background: rgba(var(--accent-rgb), 0.10) !important;
+    border-color: rgba(var(--accent-rgb), 0.35) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+body.stash-liquid-glass .refract-tag-editor__tag.is-selected,
+body.stash-liquid-glass .refract-tag-editor__tag[aria-pressed="true"] {
+    background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.28) 0%, rgba(var(--accent-rgb), 0.16) 100%) !important;
+    border-color: rgba(var(--accent-rgb), 0.55) !important;
+    color: var(--accent-bright) !important;
+    box-shadow:
+        0 0 0 1px rgba(var(--accent-rgb), 0.30),
+        0 0 14px rgba(var(--accent-rgb), 0.22);
+    font-weight: 600 !important;
+}
+body.stash-liquid-glass .refract-tag-editor__tag.is-selected:hover,
+body.stash-liquid-glass .refract-tag-editor__tag[aria-pressed="true"]:hover {
+    background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.38) 0%, rgba(var(--accent-rgb), 0.22) 100%) !important;
+    border-color: var(--accent) !important;
+}
+
+/* Loading / empty status */
+body.stash-liquid-glass .refract-tag-editor__status {
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: 1.5rem 0;
+}
+
+/* Lite-mode: strip blur + multilayer glows */
+body.refract-lite.stash-liquid-glass .refract-tag-editor {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+body.refract-lite.stash-liquid-glass .refract-tag-editor__tag.is-selected,
+body.refract-lite.stash-liquid-glass .refract-tag-editor__tag[aria-pressed="true"] {
+    box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.45) !important;
+}
+

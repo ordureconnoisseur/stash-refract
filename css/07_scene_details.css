@@ -665,6 +665,20 @@ body.stash-liquid-glass .nav-tabs .nav-link.active {
         0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
 }
 
+/* Performer page tab strip — bump padding + font over the compact
+   default so the tab buttons are a more comfortable hit target than
+   the slim sidebar variants on scene/gallery pages. */
+body.stash-liquid-glass .performer-tabs .nav-tabs .nav-link {
+    padding: 0.55rem 1rem !important;
+    font-size: 0.86rem !important;
+    border-radius: var(--radius) !important;
+    letter-spacing: 0.015em !important;
+}
+body.stash-liquid-glass .performer-tabs .nav-tabs .nav-link .badge {
+    font-size: 0.72rem !important;
+    padding: 0.18em 0.5em !important;
+}
+
 
 body.stash-liquid-glass .scene-tabs .card .card-body,
 body.stash-liquid-glass .gallery-tabs .card .card-body {

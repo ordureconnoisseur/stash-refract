@@ -486,10 +486,87 @@ body.stash-liquid-glass .scene-tabs #scene-edit-details .date-input-group .btn s
 }
 
 /* Date picker rows in any edit form — merge the date input and the
-   trailing calendar button into a single pill, same as .string-list-input. */
+   trailing calendar button into a single pill, same as .string-list-input.
+   flex-wrap: wrap so Bootstrap's `.invalid-feedback` (with width:100%
+   below) can take a row of its own when the input is .is-invalid,
+   instead of squashing the input. Input + button never wrap from
+   each other because input is flex: 1 1 auto (shrinks to 0 if needed)
+   and the button is small. */
 body.stash-liquid-glass .date-input-group,
 body.stash-liquid-glass form .date-input-group {
-    flex-wrap: nowrap !important;
+    flex-wrap: wrap !important;
+}
+/* Make `.invalid-feedback` take its own full row in normal flow, so
+   content below the .date-input-group is pushed down (instead of
+   overlapped). Keeps Bootstrap's default `display:none → block` on
+   `.is-invalid` toggling, just forces full-width when shown. */
+body.stash-liquid-glass .date-input-group > .invalid-feedback,
+body.stash-liquid-glass form .date-input-group > .invalid-feedback {
+    /* Take row 2 with the Fix pill — feedback grows to fill, pill is
+       fixed-width on the right. flex-basis is calc(100% - pill) so the
+       two share the row. Order ensures predictable layout regardless
+       of DOM order after refract.js relocates the Fix link. */
+    flex: 1 1 auto !important;
+    width: auto !important;
+    margin-top: 0.3rem !important;
+    margin-right: 0.4rem !important;
+    order: 99 !important;
+    position: static !important;
+    min-width: 0 !important;
+    /* Single-line — smaller font + nowrap + ellipsis if row is narrow. */
+    font-size: 0.72rem !important;
+    line-height: 1.3 !important;
+    letter-spacing: 0.01em !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-variant-numeric: tabular-nums !important;
+    align-self: center !important;
+}
+
+/* Force the error row to break to a new line BEFORE invalid-feedback
+   appears. A zero-height invisible flex item with width:100% forces
+   wrapping so input + button stay on row 1, feedback + Fix on row 2. */
+body.stash-liquid-glass .date-input-group.has-validation::after,
+body.stash-liquid-glass form .date-input-group.has-validation::after {
+    content: "";
+    flex: 0 0 100%;
+    width: 100%;
+    height: 0;
+    order: 98;
+}
+body.stash-liquid-glass .date-input-group:not(:has(.invalid-feedback)):not(:has(.refract-date-fix-btn))::after,
+body.stash-liquid-glass form .date-input-group:not(:has(.invalid-feedback)):not(:has(.refract-date-fix-btn))::after {
+    display: none;
+}
+
+/* Fix pill — small accent-on-danger button to the right of the error
+   message. Refract.js moves the original "Attempt to fix?" anchor
+   into the group and relabels it "Fix" with this class. */
+body.stash-liquid-glass .date-input-group > .refract-date-fix-btn,
+body.stash-liquid-glass form .date-input-group > .refract-date-fix-btn {
+    flex: 0 0 auto !important;
+    order: 100 !important;
+    align-self: center !important;
+    margin-top: 0.3rem !important;
+    padding: 0.18rem 0.65rem !important;
+    background: rgba(220, 53, 69, 0.14) !important;
+    border: 1px solid rgba(220, 53, 69, 0.45) !important;
+    border-radius: 999px !important;
+    color: #ff7a8a !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap !important;
+}
+body.stash-liquid-glass .date-input-group > .refract-date-fix-btn:hover,
+body.stash-liquid-glass form .date-input-group > .refract-date-fix-btn:hover {
+    background: rgba(220, 53, 69, 0.24) !important;
+    border-color: rgba(220, 53, 69, 0.75) !important;
+    color: #ffb0bb !important;
 }
 body.stash-liquid-glass .date-input-group > .form-control,
 body.stash-liquid-glass .date-input-group > input.date-input,
@@ -897,6 +974,19 @@ body.stash-liquid-glass .detail-header .detail-item:not(:first-child) {
     margin-top: 0.35rem;
     padding-top: 0.35rem;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Performer page: keep the header image at a comfortable size when
+   the details panel is collapsed. Stash drops `max-width: 11rem` on
+   the collapsed image AND the image is `height: 100%` of the row, so
+   a short collapsed row shrinks it further. We override both: bump
+   the max-width and force a min-height on the image wrapper so the
+   collapsed image stays roughly the same size as the expanded one. */
+body.stash-liquid-glass #performer-page .detail-header.collapsed .detail-header-image img {
+    max-width: 20rem !important;
+}
+body.stash-liquid-glass #performer-page .detail-header.collapsed .detail-header-image {
+    min-height: 20rem;
 }
 
 body.stash-liquid-glass .detail-header .detail-item-title {
@@ -3333,5 +3423,368 @@ body.stash-liquid-glass .grid-card .preview-button {
     box-shadow: none !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+}
+
+
+/* ───────────────────────────────────────────────────────────────────
+   Stats page (built-in + custom community plugins)
+   The /stats route renders rows of .stats-element pills plus several
+   custom plugin-injected sections (counts, charts, "On this day",
+   country bars, age distribution, scene timeline). Most of these
+   ship with hardcoded inline styles (blue/green buttons, white HRs,
+   grey panels) that bypass our tokens. Overrides below normalize to
+   theme glass + accent throughout.
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Stats row container — force fully transparent so only the inner
+   tiles render. Use CSS grid for auto-fitting layout. */
+body.stash-liquid-glass .stats,
+body.stash-liquid-glass .row.stats,
+body.stash-liquid-glass div.col.row.stats,
+body.stash-liquid-glass .main.container-fluid .stats {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 auto 1.5rem !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+    gap: 1rem;
+    max-width: 1200px;
+}
+body.stash-liquid-glass .main.container-fluid .mt-5 > .stats:first-of-type {
+    margin-top: 1.5rem !important;
+}
+
+/* Stat tile — gradient bg with accent corner glow, larger gradient-
+   filled numbers, more breathing room. */
+body.stash-liquid-glass .stats-element {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(120% 80% at 100% 0%, rgba(var(--accent-rgb), 0.12) 0%, transparent 55%),
+        linear-gradient(155deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.015) 100%) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow:
+        var(--shadow-sm),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    padding: 1.75rem 1.3rem 1.4rem !important;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    transition: border-color 0.22s, box-shadow 0.22s, transform 0.22s;
+    flex: none !important;
+    width: auto !important;
+    max-width: none !important;
+}
+/* Accent bar along bottom edge of tile */
+body.stash-liquid-glass .stats-element::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1.3rem;
+    right: 1.3rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(var(--accent-rgb), 0.35) 50%, transparent 100%);
+    opacity: 0.6;
+    transition: opacity 0.22s, background 0.22s;
+}
+body.stash-liquid-glass .stats-element:hover {
+    border-color: rgba(var(--accent-rgb), 0.45) !important;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.32),
+        0 0 32px rgba(var(--accent-rgb), 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    transform: translateY(-3px);
+}
+body.stash-liquid-glass .stats-element:hover::after {
+    opacity: 1;
+    background: linear-gradient(90deg, transparent 0%, rgba(var(--accent-rgb), 0.7) 50%, transparent 100%);
+}
+
+/* Number — gradient text, larger, tighter spacing */
+body.stash-liquid-glass .stats-element .title {
+    font-size: 2.2rem !important;
+    font-weight: 700;
+    margin: 0 !important;
+    color: var(--text) !important;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent-bright) 120%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Label — small uppercase, accent-tinted muted on hover */
+body.stash-liquid-glass .stats-element .heading {
+    font-size: 0.64rem !important;
+    color: var(--text-muted) !important;
+    margin: 0.55rem 0 0 0 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    font-weight: 600;
+    transition: color 0.22s;
+}
+body.stash-liquid-glass .stats-element:hover .heading {
+    color: var(--accent-bright) !important;
+}
+
+/* Stats page HR — refined section divider with a centered ornament.
+   The inline `border-color: rgba(255,255,255,0.2)` reads as a stray
+   white bar; replaced with a faded accent hairline and a small diamond
+   centered on top to mark the section break clearly. */
+body.stash-liquid-glass .main.container-fluid .mt-5 hr,
+body.stash-liquid-glass .main.container-fluid .mt-5 hr[style] {
+    border: none !important;
+    border-top: 1px solid rgba(var(--accent-rgb), 0.20) !important;
+    background: transparent !important;
+    width: 35% !important;
+    max-width: 400px;
+    margin: 4rem auto !important;
+    position: relative !important;
+    height: 1px;
+    overflow: visible;
+    opacity: 1;
+}
+body.stash-liquid-glass .main.container-fluid .mt-5 hr::before {
+    content: '◆';
+    position: absolute;
+    top: -0.55rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(var(--accent-rgb), 0.55);
+    font-size: 0.55rem;
+    background: var(--bg-0);
+    padding: 0 0.85rem;
+    letter-spacing: 0.3em;
+}
+
+/* Custom stats rows (community plugins) — wrap children in glass */
+body.stash-liquid-glass .custom-stats-row {
+    margin-top: 1.5rem !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass .custom-stats-row > div[style*="max-width"] {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Image-card style stats (Scene with Most O's, Longest Play, etc.) */
+body.stash-liquid-glass .custom-stats-row .stats-element[style*="max-width"] {
+    padding: 0 !important;
+    overflow: hidden;
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+body.stash-liquid-glass .custom-stats-row .stats-element[style*="max-width"]:hover {
+    border-color: rgba(var(--accent-rgb), 0.35) !important;
+    transform: translateY(-2px);
+}
+body.stash-liquid-glass .custom-stats-row .stats-element a {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+body.stash-liquid-glass .custom-stats-row .stats-element a > div[style*="height: 140px"] {
+    background: var(--glass-bg-strong) !important;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
+    margin-bottom: 0 !important;
+}
+body.stash-liquid-glass .custom-stats-row .stats-element .title {
+    font-size: 1.1rem !important;
+    padding: 0.6rem 0.85rem 0.2rem !important;
+}
+body.stash-liquid-glass .custom-stats-row .stats-element .heading {
+    font-size: 0.65rem !important;
+    padding: 0 0.85rem 0.7rem !important;
+    margin-top: 0.2rem !important;
+}
+
+/* Chart header buttons (This Week / This Month / This Year) — were
+   hardcoded blue/green. Theme them as accent segmented controls. */
+body.stash-liquid-glass .custom-stats-row button[style*="rgb(0, 123, 255)"],
+body.stash-liquid-glass .custom-stats-row button[style*="rgb(40, 167, 69)"] {
+    background: var(--accent-tint) !important;
+    background-color: var(--accent-tint) !important;
+    border: 1px solid rgba(var(--accent-rgb), 0.45) !important;
+    color: var(--accent-bright) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.22);
+    font-weight: 600;
+    border-radius: var(--radius-pill) !important;
+}
+body.stash-liquid-glass .custom-stats-row button[style*="rgb(85, 85, 85)"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-pill) !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+body.stash-liquid-glass .custom-stats-row button[style*="rgb(85, 85, 85)"]:hover:not([disabled]) {
+    border-color: rgba(var(--accent-rgb), 0.35) !important;
+    color: var(--accent-bright) !important;
+    background: rgba(var(--accent-rgb), 0.06) !important;
+}
+
+/* Chart bars — blue (O's) and green (Watch time) get accent + secondary */
+body.stash-liquid-glass .custom-stats-row div[style*="background-color: rgb(0, 123, 255)"] {
+    background-color: var(--accent) !important;
+    background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 100%) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.35);
+}
+body.stash-liquid-glass .custom-stats-row div[style*="background-color: rgb(40, 167, 69)"] {
+    background-color: rgba(var(--accent-rgb), 0.65) !important;
+    background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.85) 0%, rgba(var(--accent-rgb), 0.55) 100%) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.22);
+}
+
+/* "On This Day" section */
+body.stash-liquid-glass #on-this-day-section {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+}
+body.stash-liquid-glass #on-this-day-section h4,
+body.stash-liquid-glass #on-this-day-section h5 {
+    color: var(--text) !important;
+}
+body.stash-liquid-glass #on-this-day-section div[style*="border:"] {
+    border-color: var(--glass-border) !important;
+}
+body.stash-liquid-glass #on-this-day-section div[style*="background-color: rgba(0, 0, 0, 0.2)"] {
+    background-color: rgba(var(--accent-rgb), 0.05) !important;
+}
+body.stash-liquid-glass #on-this-day-section div[style*="rgb(85, 85, 85)"] {
+    background-color: rgba(var(--accent-rgb), 0.25) !important;
+}
+
+/* Timeline panels in On This Day */
+body.stash-liquid-glass #on-this-day-section span[style*="rgb(153, 153, 153)"] {
+    color: var(--text-muted) !important;
+    background-color: rgba(0, 0, 0, 0.55) !important;
+}
+
+/* On-This-Day total badges (blue, green, yellow) — use accent + tints */
+body.stash-liquid-glass #on-this-day-section div[style*="color: rgb(0, 123, 255)"] {
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass #on-this-day-section div[style*="color: rgb(40, 167, 69)"] {
+    color: rgba(var(--accent-rgb), 0.85) !important;
+}
+body.stash-liquid-glass #on-this-day-section div[style*="color: rgb(255, 193, 7)"] {
+    color: var(--accent-light) !important;
+}
+body.stash-liquid-glass #on-this-day-section div[style*="rgb(136, 136, 136)"] {
+    color: var(--text-muted) !important;
+}
+
+/* Country chart */
+body.stash-liquid-glass #enhanced-stats-container,
+body.stash-liquid-glass #country-stats-container,
+body.stash-liquid-glass #age-stats-container,
+body.stash-liquid-glass #timeline-stats-container {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.2rem !important;
+    margin-top: 1rem;
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+}
+body.stash-liquid-glass .stats-chart-title {
+    color: var(--text) !important;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+body.stash-liquid-glass .country-row {
+    padding: 0.3rem 0.4rem;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s;
+}
+body.stash-liquid-glass .country-row:hover {
+    background: rgba(var(--accent-rgb), 0.06);
+}
+body.stash-liquid-glass .country-bar-container {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+body.stash-liquid-glass .country-name-dynamic {
+    color: #fff;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+}
+body.stash-liquid-glass .country-count-label {
+    color: #fff;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+body.stash-liquid-glass .chart-stats,
+body.stash-liquid-glass .chart-stats.country-stats {
+    color: var(--text-muted) !important;
+    font-size: 0.75rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--glass-border);
+    margin-top: 0.85rem;
+}
+
+/* Refresh button */
+body.stash-liquid-glass .refresh-btn {
+    background: var(--accent-tint) !important;
+    border: 1px solid rgba(var(--accent-rgb), 0.35) !important;
+    color: var(--accent-bright) !important;
+    border-radius: 50% !important;
+    width: 1.8rem;
+    height: 1.8rem;
+}
+body.stash-liquid-glass .refresh-btn:hover {
+    background: rgba(var(--accent-rgb), 0.22) !important;
+}
+
+/* Timeline chart bars — keep their hsl coloring but constrain the panel */
+body.stash-liquid-glass .timeline-container {
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: var(--radius-sm);
+}
+body.stash-liquid-glass .year-separator {
+    color: var(--text-muted) !important;
+    font-size: 0.7rem !important;
+    font-weight: 600;
+}
+
+/* Export/Import buttons */
+body.stash-liquid-glass .custom-stats-row button[style*="font-size: 1rem"] {
+    padding: 0.55rem 1.1rem !important;
+    border-radius: var(--radius-pill) !important;
+    border: 1px solid var(--glass-border) !important;
+    background: var(--glass-bg-strong) !important;
+    color: var(--text) !important;
+    transition: background 0.15s, border-color 0.15s;
+}
+body.stash-liquid-glass .custom-stats-row button[style*="font-size: 1rem"]:hover {
+    background: var(--accent-tint) !important;
+    border-color: rgba(var(--accent-rgb), 0.45) !important;
+    color: var(--accent-bright) !important;
+}
+
+/* Help (?) bubbles */
+body.stash-liquid-glass div[title*="data is stored"],
+body.stash-liquid-glass div[title*="cached for"],
+body.stash-liquid-glass div[title*="Average minutes"] {
+    background-color: rgba(var(--accent-rgb), 0.14) !important;
+    color: var(--accent-bright) !important;
 }
 
