@@ -3788,3 +3788,871 @@ body.stash-liquid-glass div[title*="Average minutes"] {
     color: var(--accent-bright) !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   Scene Duplicate Checker — comparison-card layout
+   Stash's native page renders a 10-column Bootstrap table that forces
+   vertical scanning to compare two copies of the same scene. We hide
+   the table and inject per-group glass panels with side-by-side cards
+   (refract.js: enhanceDuplicateChecker). The original <tr>s stay live
+   in the DOM (display:none) so React state and Stash's existing
+   Delete / Merge / bulk-select continue to work via .click() relays.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Container + page background ──────────────────────────────────── */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker #scene-duplicate-checker {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 1rem 0.5rem 4rem !important;
+    max-width: 100% !important;
+    /* Strip the .card containment — `contain: layout` creates a
+       containing block for position:fixed descendants, which would
+       trap our floating pager inside this card instead of the
+       viewport. Cards/list-views elsewhere keep their containment. */
+    contain: none !important;
+}
+/* Anchor for the absolutely-positioned phash warning */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker {
+    position: relative;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > h4 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin: 0 0 1.75rem;
+    padding: 0.25rem 0;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent-bright) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ── Hide the original table once we've enhanced ──────────────────── */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker[data-refract-dup-enhanced="1"] .duplicate-checker-table,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker[data-refract-dup-enhanced="1"] > .table-responsive {
+    display: none !important;
+}
+
+/* ── Filter form: collapse 3 stacked form-groups into a horizontal pill ── */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem 1.25rem;
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 1.1rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-md);
+    /* Lift the entire filter form (and any dropdown opened from it) above
+       sibling panels. Panels have backdrop-filter which creates their own
+       stacking contexts; without an explicit z-index on the form, the
+       dropdown-menu (positioned absolute) paints under them. */
+    position: relative;
+    z-index: 100;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .form-group {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.85rem;
+    flex: 0 0 auto;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .form-group .row {
+    margin: 0 !important;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+    display: flex;
+}
+/* Neutralize Bootstrap's column widths inside our compact toolbar — the
+   `.col-12` wrapping the Select-Options dropdown otherwise stretches to
+   100% and breaks the row. The .col-12 also needs to flex its own
+   children (dropdown + our injected select button) so they sit side-by-
+   side instead of stacking. */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .col-auto,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .col-12 {
+    flex: 0 0 auto !important;
+    max-width: none !important;
+    width: auto !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .col-12 {
+    display: flex !important;
+    align-items: center;
+    gap: 0.5rem;
+}
+/* Strip Bootstrap's `ml-4` margin on the select inside .col-auto */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .ml-4 {
+    margin-left: 0 !important;
+}
+/* Hide the helper text — doesn't fit the compact horizontal toolbar */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .form-text {
+    display: none !important;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .form-label,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form label {
+    margin: 0 !important;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form select.input-control,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form select.form-control {
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--text) !important;
+    padding: 0.42rem 2rem 0.42rem 0.95rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    min-width: 8rem;
+    margin: 0 !important;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image:
+        linear-gradient(135deg, transparent 50%, rgba(var(--accent-rgb), 0.7) 50%),
+        linear-gradient(45deg, rgba(var(--accent-rgb), 0.7) 50%, transparent 50%);
+    background-position:
+        calc(100% - 1rem) 50%,
+        calc(100% - 0.6rem) 50%;
+    background-size: 0.4rem 0.4rem;
+    background-repeat: no-repeat;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form select:hover {
+    border-color: rgba(var(--accent-rgb), 0.4) !important;
+    background-color: rgba(var(--accent-rgb), 0.08) !important;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown {
+    margin: 0;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown .dropdown-toggle {
+    background: var(--accent-tint) !important;
+    border: 1px solid rgba(var(--accent-rgb), 0.4) !important;
+    color: var(--accent-bright) !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 0.45rem 1rem !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown .dropdown-toggle:hover {
+    background: rgba(var(--accent-rgb), 0.2) !important;
+    box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.32);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown-menu {
+    background: rgba(20, 22, 28, 0.92) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-xl);
+    padding: 0.35rem !important;
+    z-index: 1060 !important;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown-menu .dropdown-item {
+    color: var(--text) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 0.5rem 0.85rem !important;
+    font-size: 0.85rem !important;
+    transition: background 0.12s, color 0.12s;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown-menu .dropdown-item:hover,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown-menu .dropdown-item:focus {
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .form-check {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .form-check-input {
+    /* Bootstrap defaults this to `position: absolute` with a negative
+       margin-left so the input sits left of the label via .form-check
+       padding-left. We use flex layout instead, so pull it back into
+       normal flow. */
+    position: static !important;
+    margin: 0;
+    width: 1.05rem;
+    height: 1.05rem;
+    accent-color: var(--accent-bright);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .form-check-label {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.82rem;
+    color: var(--text);
+}
+
+/* ── Pagination strip ───────────────────────────────────────────────
+   Stash renders the pager twice — above + below the table. We hide
+   the top copy (redundant) and pin the bottom copy to the viewport
+   so the count / edit-delete / page controls are always reachable
+   regardless of how far the user has scrolled. The bottom of the
+   .duplicate-checker container reserves space so panels aren't
+   obscured by the floating bar. */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker[data-refract-dup-enhanced="1"] {
+    padding-bottom: 5.5rem;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="top"] {
+    display: none !important;
+}
+/* Override the global [data-pager-row="float"] CSS in 09_buttons.css which
+   forces flex-direction: column for the floating pagers on other list
+   views. Here we want a single horizontal pill. Higher specificity + !important. */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] {
+    position: fixed !important;
+    bottom: 1.25rem !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 401 !important;
+    width: auto !important;
+    max-width: calc(100vw - 2rem) !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    padding: 0.4rem 0.65rem !important;
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border-bright) !important;
+    border-radius: var(--radius-pill) !important;
+    box-shadow: var(--glass-shadow) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+}
+/* Strip nested-glass on the inner pagination pill — it's already inside
+   the outer glass bar; double-layering looks heavy. */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .pagination,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .pagination.btn-group {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > h6 {
+    margin: 0 !important;
+    padding: 0 0.2rem 0 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.005em;
+    color: var(--text-muted);
+    white-space: nowrap;
+    align-self: center;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > h6 b {
+    color: var(--text);
+    font-weight: 700;
+    margin-right: 0.18rem;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] select {
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--text) !important;
+    padding: 0.3rem 1.6rem 0.3rem 0.75rem !important;
+    font-size: 0.78rem !important;
+    margin-left: 0.4rem !important;
+}
+
+/* Edit / Delete bulk-action ButtonGroup (appears in pager when items
+   are checked). Bootstrap btn-group uses negative margins to collapse
+   borders — break that out into spaced individual pills. */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .btn-group:not(.pagination) {
+    display: inline-flex !important;
+    gap: 0.35rem !important;
+    margin: 0 !important;
+    padding-left: 0.6rem;
+    border-left: 1px solid var(--glass-border);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .btn-group:not(.pagination) > .btn {
+    margin: 0 !important;
+    padding: 0.34rem 0.7rem !important;
+    border-radius: var(--radius-sm) !important;
+    font-size: 0.78rem !important;
+}
+
+/* Divider before the pagination block, matching the (optional) one
+   before edit/delete. Border-left + padding-left gives consistent
+   spacing on either side of every divider in the bar. */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .pagination {
+    padding-left: 0.6rem !important;
+    border-left: 1px solid var(--glass-border) !important;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .btn-group:not(.pagination) > .btn-danger {
+    background: rgba(239, 68, 68, 0.18) !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    color: #fca5a5 !important;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .btn-group:not(.pagination) > .btn-danger:hover {
+    background: rgba(239, 68, 68, 0.3) !important;
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.4) !important;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .btn-group:not(.pagination) > .btn-secondary {
+    background: var(--accent-tint) !important;
+    border-color: rgba(var(--accent-rgb), 0.4) !important;
+    color: var(--accent-bright) !important;
+}
+
+/* The .mr-auto utility on the "N sets found" h6 forces the rest to
+   push right; reset since the floating pill is auto-width. */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .mr-auto {
+    margin-right: 0 !important;
+}
+
+/* ── Missing-phash warning — float to top-right, vertically centered
+   with the h4's text via fixed-height matching the title's line. ── */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > p.lead {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.5rem;
+    height: calc(1.45rem * 1.2 + 0.5rem); /* matches h4 line + padding */
+    box-sizing: border-box;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.32);
+    border-radius: var(--radius-pill);
+    padding: 0 0.95rem;
+    font-size: 0.78rem;
+    line-height: 1;
+    color: #fbbf24;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    max-width: 60%;
+    z-index: 5;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > p.lead .fa-icon,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > p.lead svg {
+    color: #fbbf24 !important;
+}
+
+/* ── Cross-group summary card ─────────────────────────────────────── */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1.6rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.2rem;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(var(--accent-rgb), 0.16) 0%, transparent 50%),
+        var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.5), transparent 60%);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary__stat {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary__stat b {
+    color: var(--text);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-right: 0.25rem;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary__reclaim {
+    margin-left: auto;
+    font-size: 0.86rem;
+    color: var(--text);
+    padding: 0.4rem 0.9rem;
+    background: var(--accent-tint);
+    border: 1px solid rgba(var(--accent-rgb), 0.32);
+    border-radius: var(--radius-pill);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary__reclaim b {
+    color: var(--accent-bright);
+    font-weight: 700;
+}
+
+/* ── Toolbar action pill: "Select N" — paired with the relabeled
+   dropdown to its left so the two read as filter + action. Uses
+   accent to mirror the suggested-card halo. ──────────────────────── */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-toolbar-select {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: inherit;
+    padding: 0.36rem 0.75rem;
+    background: var(--accent-tint);
+    border: 1px solid rgba(var(--accent-rgb), 0.5);
+    border-radius: var(--radius-pill);
+    color: var(--accent-bright);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.08s;
+    white-space: nowrap;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-toolbar-select b {
+    color: #fff;
+    font-weight: 700;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-toolbar-select:hover {
+    background: rgba(var(--accent-rgb), 0.26);
+    border-color: rgba(var(--accent-rgb), 0.7);
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.4);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-toolbar-select:active {
+    transform: scale(0.97);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-toolbar-select--empty,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-toolbar-select:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none !important;
+}
+
+/* ── Per-group panel ──────────────────────────────────────────────── */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panels {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: border-color 0.18s, box-shadow 0.18s;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel:hover {
+    border-color: rgba(var(--accent-rgb), 0.22);
+}
+
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 1rem;
+    padding: 0.8rem 1.1rem;
+    background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.06), transparent);
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.18);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel__num {
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-bright);
+    background: var(--accent-tint);
+    border: 1px solid rgba(var(--accent-rgb), 0.32);
+    border-radius: var(--radius-pill);
+    padding: 0.22rem 0.65rem;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel__count {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel__size {
+    font-size: 0.82rem;
+    color: var(--text);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel__reclaim {
+    margin-left: auto;
+    font-size: 0.78rem;
+    padding: 0.25rem 0.7rem;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: var(--radius-pill);
+    color: #4ade80;
+    font-weight: 500;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel__warn {
+    font-size: 0.74rem;
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.32);
+    border-radius: var(--radius-pill);
+    padding: 0.22rem 0.6rem;
+    font-weight: 600;
+}
+
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 0.85rem;
+    padding: 1rem;
+}
+
+/* ── Scene card ───────────────────────────────────────────────────── */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card:hover {
+    border-color: rgba(var(--accent-rgb), 0.32);
+    box-shadow:
+        var(--shadow-lg),
+        0 0 0 1px rgba(var(--accent-rgb), 0.14),
+        0 0 36px 6px rgba(var(--accent-rgb), 0.18);
+}
+
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__sprite {
+    display: block;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid var(--glass-border);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__sprite > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: filter 0.2s, transform 0.3s;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__sprite:hover > img {
+    filter: saturate(1.15) brightness(1.05);
+    transform: scale(1.02);
+}
+/* Hover popover: larger sprite fades in over the card after a 250ms dwell */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__sprite-pop {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s;
+    z-index: 2;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__sprite-pop > img {
+    max-width: 92%;
+    max-height: 92%;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid rgba(var(--accent-rgb), 0.32);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__sprite:hover .refract-dup-card__sprite-pop {
+    opacity: 1;
+    transition-delay: 0.25s;
+}
+
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__chip {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.55rem;
+    z-index: 3;
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--accent-bright);
+    background: rgba(var(--accent-rgb), 0.22);
+    border: 1px solid rgba(var(--accent-rgb), 0.6);
+    border-radius: var(--radius-pill);
+    padding: 0.22rem 0.55rem;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__meta {
+    padding: 0.7rem 0.85rem 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__title {
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.15s;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__title:hover {
+    color: var(--accent-bright);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__path {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 0.2rem;
+    opacity: 0.75;
+}
+
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.32rem;
+    padding: 0.6rem 0.85rem;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.32rem;
+    font-size: 0.74rem;
+    font-weight: 500;
+    padding: 0.22rem 0.55rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-pill);
+    color: var(--text-muted);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec__icon {
+    font-size: 0.78rem;
+    opacity: 0.7;
+    line-height: 1;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec__text {
+    color: var(--text);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec--winner {
+    background: var(--accent-tint);
+    border-color: rgba(var(--accent-rgb), 0.4);
+    color: var(--accent-bright);
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.22);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec--winner .refract-dup-spec__icon {
+    opacity: 1;
+    color: var(--accent-bright);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec--winner .refract-dup-spec__text {
+    color: var(--accent-bright);
+    font-weight: 600;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec--winner::after {
+    content: "★";
+    font-size: 0.7rem;
+    margin-left: 0.15rem;
+    color: var(--accent-bright);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec--warn {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.32);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec--warn .refract-dup-spec__text {
+    color: #fbbf24;
+}
+
+/* Suggested state — accent-tinted halo on cards flagged by the active
+   strategy. Distinct from --checked (which is the "marked for delete"
+   destructive red state). Suggested is a soft recommendation that the
+   user hasn't committed yet — clicking Select promotes it to checked. */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--suggested {
+    border-color: rgba(var(--accent-rgb), 0.6);
+    box-shadow:
+        var(--shadow-md),
+        0 0 0 1px rgba(var(--accent-rgb), 0.2),
+        0 0 24px 2px rgba(var(--accent-rgb), 0.18);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--suggested:hover {
+    border-color: rgba(var(--accent-rgb), 0.85);
+    box-shadow:
+        var(--shadow-lg),
+        0 0 0 1px rgba(var(--accent-rgb), 0.32),
+        0 0 36px 6px rgba(var(--accent-rgb), 0.28);
+}
+
+/* Checked-for-delete state — red danger ring + strike title */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--checked {
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow:
+        var(--shadow-md),
+        0 0 0 1px rgba(239, 68, 68, 0.22),
+        0 0 28px 4px rgba(239, 68, 68, 0.2);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--checked .refract-dup-card__title {
+    text-decoration: line-through;
+    text-decoration-color: rgba(239, 68, 68, 0.7);
+    text-decoration-thickness: 2px;
+    color: var(--text-muted);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--checked .refract-dup-card__sprite > img {
+    filter: saturate(0.4) brightness(0.65);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--checked .refract-dup-card__chip {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 0.85rem 0.85rem;
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    margin: 0 auto 0 0;
+    padding: 0.32rem 0.7rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-pill);
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    user-select: none;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__check:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.32);
+    color: #fca5a5;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__check input[type="checkbox"] {
+    margin: 0;
+    width: 0.95rem;
+    height: 0.95rem;
+    accent-color: #ef4444;
+    cursor: pointer;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--checked .refract-dup-card__check {
+    background: rgba(239, 68, 68, 0.14);
+    border-color: rgba(239, 68, 68, 0.45);
+    color: #fca5a5;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__merge,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__delete {
+    border-radius: var(--radius-sm);
+    padding: 0.4rem 0.85rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, color 0.15s;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__merge {
+    background: var(--accent-tint);
+    border: 1px solid rgba(var(--accent-rgb), 0.32);
+    color: var(--accent-bright);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__merge:hover {
+    background: rgba(var(--accent-rgb), 0.22);
+    border-color: rgba(var(--accent-rgb), 0.55);
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.32);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__delete {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.32);
+    color: #fca5a5;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__delete:hover {
+    background: rgba(239, 68, 68, 0.22);
+    border-color: rgba(239, 68, 68, 0.55);
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.32);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__merge:disabled,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__delete:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    box-shadow: none !important;
+}
+
+/* ── Empty state ──────────────────────────────────────────────────── */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3.5rem 2rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-md);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-empty__icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    color: var(--accent-bright);
+    background: var(--accent-tint);
+    border: 1px solid rgba(var(--accent-rgb), 0.32);
+    border-radius: 50%;
+    margin-bottom: 0.9rem;
+    box-shadow: 0 0 24px rgba(var(--accent-rgb), 0.25);
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-empty__title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.3rem;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-empty__hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    max-width: 32rem;
+    line-height: 1.5;
+}
+
+/* Hide Stash's native "No duplicates found." h4 (we render our own empty state) */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker[data-refract-dup-enhanced="1"] > h4.text-center {
+    display: none;
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .form-group {
+        justify-content: space-between;
+        flex: 1;
+    }
+    body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel__grid {
+        grid-template-columns: 1fr;
+    }
+    body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary__reclaim {
+        margin-left: 0;
+    }
+}
+
