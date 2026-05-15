@@ -1,0 +1,735 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Playing-card style for performer cards
+   Active when `body.refract-rating-style-playing-card` is set.
+   Replaces the rating-banner-on-image + chin-name layout with a
+   trading-card layout: slim name banner across the top (glow scales
+   with rating tier) + prominent stats strip across the bottom
+   (rating, age, scenes, O count, country flag).
+
+   Performer cards only. Scene cards keep their normal refract chin
+   regardless of which rating-style mode is active.
+
+   Loaded BEFORE `15_lite.css` so lite-mode overrides still win.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Concert One — rounded blobby display font for the performer name.
+   Inlined as base64-encoded woff2 data URIs because:
+     1) Stash's CSP blocks fonts.gstatic.com (external CDN)
+     2) Self-hosted via plugin assets returned 404/wrong-MIME in
+        this Stash version
+   Inlining the ~17 KB woff2 payload in the CSS sidesteps both — the
+   font is part of the same stylesheet response, no separate request
+   to fail. Two unicode-range subsets keep the latin-ext (accented)
+   payload as a separate face so browsers still skip it when not
+   needed (saves a couple KB of memory). */
+@font-face {
+    font-family: 'Concert One';
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url(data:font/woff2;base64,d09GMgABAAAAADgsAAsAAAAAmwgAADfZAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAABmAAgTwRCAqCnmCB7FALgyoAATYCJAOGUAQgBYRoB4NlG4p/syLYOAAgoY2fjbBh41hg9vgxRkWN2KOI4v+U3DH6E94LNIKQBaLCpYpZTpaZfd/ruV6m+mXpZ+Ufm0NrTxxcGXriiJb2BKIRFiEJi/uP0Ng1ueQAza1DNjZGLKphrNhGrdhgjAVRm7SASghSYiFpIPqCXdivIEZhv1E8VmG8vtk8PH/vzv+7sSyqjwmGlE3SgAJ8oi3wqWl339xeT/yAN6FI2QtFfBvicvxXvylh/D3Y/CT7CApS0Koe+nU/Ovj/BgcY/3+0v29e3a0nsEFVwIZ2JX3jhIdPDxRze55nDAwhmQYyMGzB6LBcCQbBITermRZa4ieanGt371Zf+bVpK+XuHgEPEfDEgYGY7jrS/wT+A/9vrkx2D2eSA1YVqsLUk6XAEWcPIfvN/Ff3xyZcwM0x2TL8//5U1/tlkoty0eWE5fIwKkWeOtGyPN/3rf/f+1/RtwwnlgOyHJLsoAoJ69tK+gzpkV0K8hR7KpBiBaqUnBLzBgRTeRimjF17OowLroXH/73Odltdv51eW9XBdpWtUP/8m4QR8tiKbbFYhPbtY4h5BrH//34upAFxLGEt7tDW0EolFBEpRSVO/d7pfZt31LJopEJIlugWEhlKob4QP6QXKSFSEgd/7bWCeeJuTwPWgPFKm/+zWc0bzrRCyIYQ6rT+eMswNr2/fq90jUikhKCAbjsfgG/x++YCA8CnSgHwWU4N+F4UBVjURpL4BUa4ccb9qxoP6DF+sJB//0UAyCNb0gE+sz8AAHy/VT0AYPi4WH0xzKD5UAbIpruKhwHEzxSrbPVHtXIqv5Xf6TAMEoPGYDF4DB3DzNjKKBb2jwCAYZXVtqtboxkEBsVB+3XBp+DHHDXHD3m2XUwGVc22/12+x987nI+cUGufENwymOtznuFolf+36n/TgUDgyOcqM7ry+gCfc8WoboTg9jXhKJPui0o9FEtkK8XT5Gx2idyhGp/jWTkAqPKBKumKMgoAmc9IIbOyOp90VR8X8FWkCFC9r785YvM5d+D7CJ2PwA6Ifp5eFYDD0fEEqGgurTBB1MD0fN481rEQrASrCABhTaTr8C+ezJTXOwn5rOzVxOomOrENjHlL2PVe4mZ7P83nOcpMMityYpITNnT6oo5gQAUvNYU5sboP7Du1TL/byq9o1wjCbb+EKdEXAkx8Aa1Vy+kL4DOQ2R/KdhZsVqg1lZm4T8NyHZ5MWRrcyOs/mQCB2dOPJSkLWwAoYzECpGJ2QxpIwNAgNqr9IVBlD4LsKNmE5vPikhXyBzA0SA1fB3zxur6lDQmYsGB3PMgRGzWpUBU/K6z/JXT6BKAcjpqsSa7VMvQM0d6QEEGgQRQOL7BmgJtVa/qhiLkNom4HRKPoqwmrsYViqsvwswFmhV45IQTdxsg1S7BTxVhCKveENKhMtBEQO5vzQ3aktCawSdbG5hhiLQZ2Lh2oq5oQLa2HczukNS2flI5iALZI4VS73NKgLrcxZmzIHiKeC4y6qgrxDS1dbDdBG8DEbbbyZ7IBQfSIgp/6lxBLCz9ox/EBe1QiBFTXzbc4pMw0cRLH6ZDBXeu6PSXUdU2IlNrFqFwmAUfp9LmnyzZG1eRFP5vyOQg1rYbLzuVz/KPT/cwTH7cYT4jMQ+DI/UOt/lbnuKG4l8yYXwy0jJfrhtqUuYEHv9JfIJpbO0z1Q4zxvC8v0zvjTGb3lVevAxp+B5c9NLheJFtnAEVjNJwNLAkiZ7rCM1yBYED+Whdg9UpMMla/bEJy9MSTdQEUwRpK4vzhzphfIT/Y0NPnoWbxLU2VTDV58YjWXxx8pzTwwvph+36nUPRl/tZKdhDUPP+t32YZgGGfoZjnI0D3bIw+toiLrHglaovxWRp9MxpzMmir1sWYQ8tCZ//VCZpLYJ4WWlBORDmXs8+GjKowaXvYEC5EU1U2QnoiY3m16ppNlITlDgUdSLQ2JKa87Ui4LA8LqjzxQhX0M4JJyws32OCG5Q1xg6LBzaUceJyJ96g8KEzPlj/JJvuEdvOiU3AWEFr/NVV1UFT4dj35XwhrUxdc7nGuJERov4cGrMypBzwKYimQ/gIEGOLgZeLfiHio89lIKmX8ccBDaGkSAHVvSgZ+5TI1YAREeCbBYW5d/faFJNrPYciaRDecZ/T1EDb7irOiMpaQwyiRIXTMoXQd5MosgghBX/IXgaOYfHSq72kDlSywcQWGIZAJUkW/U5qllM9OVboCqLs+l0gRdTnJw8zoSw/hyDFxP+Xgs2e0tUUSXaTkkOinx6tf81hs35qn60IAP+ot+sxpTCIBXxpIKvQlz8yj1NrywlYgE8DIEqFQu7Y6sVRXyaklbVkmSli/jbZ5l17vCSigJS2L1pb6zRb8qtVChyROity/52TN5acfD24OLEuKuchuTzvFLyfBwkGWoBBr0mZxaYvjcW1XTSQzUFXKP7jubMqYX7VE1mHdaspoIvYbJsyoNu3Di6+ZtufaRuNvtC21yr2+SU3u1Y+s+wBSlglgX0goz2MAxuLiKI5MzSkrqj6MTkXFYuXGY72SMmowrQGEVioTxF5vbtZDWiF8g0sFwZJllTd1up55bKpzNGHYqCKgYKR7S6fbUbWSN5CRwRbq4dJphNAFW1RwiVpxJZaafYxkkgFD72VjCoLGjWogam20u2Dhv9vzT0dakiHsWDz8F8f/eDbx4d94Wi5aA03TSagsdx5QN+eE8yVYF7zd257C80fg6CY+oweE5oE/iJEYcEXFZY9PayGyykMjknEQhysuL8cvf/AfSjUFi0KzAqpQ3jit1Fgsx40X25T9CiDACk4zPVAHtIam4z2C0bv5uyoHVUxrnU6tVzR8KzNwEktZKV8KEJooZAVdVhwDPBCo8+1qPd9mtsXReQ0hZXymBzp9sDBlRSEebub/BYSC3/ozbUQXw9EBh48UjP2Q2CfYg+b/7Ke6UJ62Bgi3RKFBUfuHl+sj9emxnVhng4/SKCJyFJr5JAL+4bxH+/Z0HBDINc1sL6tw37IQMfhRR8F4syZu/4tR+u7hSJkOj8O6I123MeCV4y2scliUnacnOrJF4IA4pI+D9dPjY9REbnjIqHbT/5j+ai5iv3ueKf2EHrFcXyVNpq9cX1BX1toYuUnrKHC9eOUK4J0KhHoQS40chwKofgKx/Mfhl2t2HHB32ZaErcGCytlv4/SfKzRb/LdsFH2oM6fSgi4Olty1ow0cE5p+1E1FrOCTwDRMh0BdCgcqj0/7ihIFLkDTUk/PVu4XorkcHBiOd0N5xP87C4+urAkobsPGmWKQTCBag400kaZE5X9S+T/7ZYxY+vT65gEAfyPjcsc11fX0gHbnWn2U9gO97Pf/GVPY7dwdNJCf6/Jvjh8LOe40byVNiK3nQV4T/ii/g3elk38UQUNjiHp660a7MrLNnbwnZ6FhWbaTtUeRo+fZxYg1Vqszw5se+fGdqEvEFqs1W4MNH0XVYxd+SxqmMu5HrzZHWHpNkBakUzNyFsXzemjppfnfZAmlFbYrUQW8VhQ24cYs+Lwnr+xUbDNbTDiYDp5nvdeVrYio10ILIedBHb/Cd3nAnyRwQmeD3axlkP881wJbdXwpO0QFfnx1yKM61Gs1p+cz6YkHt6wbuRqbm1PhVWBInxKMhiGhu/L2KxgW8jFWRhzuZZcQDWccMOYxNZQgZOsCcE5d0knU5VlMDaFrgRD4PcgClkwXo8M6AydOogaxJOgI0fAVvvFFnPcuKSvcmOMXxXKnLK2cSScto0SIkMe05vuVgs7XlCNKkaahmZ5uuJJKo6i+k2PkwCF8OtGjTAQ8zdHlbPqhYIRHP6M2RlWMSJIBcuNcD9JiGWKlLyZiB5dzsEhe9y61DuAEJ6lapFJ4wsVTFb6LcgaVCs4kTiFniBAsmY5TpIyyg8VEIV46o6e5vemtetwwOgy7hQNn7KzFsHOAcNfF639HQk9qeYEI6qlmn56gJsofShfgaWX7dCasSsBvJx7B6k0TIpo0QAwOoHVy+SQqDeAqN5FwVJMBdo0ZcU2Oiy4pR4RKEG58u217AZh7GAaUbS/jZNRfG9+LQ8azqv4w+ypOOEpitTsqj5VOZ4QDDseRzMBF7Mvn62LBLhqBr4q6ajKe7HNmWSZ/U4RKp9wphjcnWGyJDqKTLtzkGI1kAbikdwcL6r4aY/b+mb3hh1Mc0h139CYliJI1Fx3HToOSxiKkQYaze4RuEBPbydq7M/7F93o6l5Ms6G3ANSwDFhunLda4dSUzwtEqrmNkTJu2EPqOopSTLucdea3XxnXsK60ldsV3iKAcB8rxWpBhdGI4dgN7ch1toi1udIhE/+jbIIUO4mc+hmqs/4fwfeV1pmbqhJDGGUrFpunmg+o8rryQIavl+MJTdA7w9Bb8Tcpl4pWt14FyNzi2uLVcD3bi/08F/T6UtI/FkIISSjQM5/Jr/3WpipF9JYI3TMEGxNZ1e9MTJ16pt3GpXc8Q7leurrPgnfgNeeXZZYyq3TVeyehQe04EfMr66eUJJOqUanXsZ8w5PvdbW2/O40XmeaJPJdmga32b7H6EY5caBeRoUszloaYFEeTNltn9UJ33706CjQcHXPX+RHhgM4upfO/BlNv1si7a/xL/xeIjqdSJryePZhS1UfWUw6gkw2JpTz2f2vYw46ewSsiz52i4aidOyUP4unV/ZGe0OaDFoYCeFjqdFt8tmtrsu/kcRYjUWOqPHdwLD29TppaIpivdTiYDEnDBXietxDvNgePmIAxbFip8sqYhwvYGCyBJRTqdqgqRo1SMZEoELDK+gkuN5yG+qZlpQXGbmMxud/0XPfMwQ0AYraBCq4L+qCdDRvnIaiGcE621CWoAeVrD+Zsbrx2joWW5u10yrgEkEn4RQJbLmW6kklfznDaGlN/CVYqDXVkhtCCayVKeKaeE+Zmc+a04LEXNVSt56Don83nQCDI6R2ZvNlaDYTxw3dkDryyTB3srFYU6nKR5qxSlOb2nM6TRzCkX0qVMkrRn3/3SBJmMgfLRtRp+x6WCgQnj2G+IQLcgwJSoB1HXUKRJILIfO5QopoZtKdj0rurjSZ33kuHF6+q1E0bbOT6KMB2r5bRIDbF3opHONFHEkn1UZdtYaVhh2ljVrKpNLE8YVVlhax9uHIf+sAM71jLEIQUWRVLSNV7aSTKNV7aEfqhWyJCmpbJXvYossCpgxOX733jfS2ln5v+F4P1Zujwfn6t7seknzIG0l6fUJBkYyTFNQ05uTFePFPrko+tSQOkZ2ogBRad5opzJg3cPH+oNzcc4n1rC9JFEJEwZ/43gKtJ07VdqSY/v6XvVPn3ZoYS1J6VORS6rDedPyy7q3VQ3g11WXf/NHc/jxELvrbjaBKX30VLMDsAm4r33q096qJ6adHVOO9VBunqHpHp1t66ZdAqISqIfcFKnwzPq6/QZ/DQeW/Pp8u7ZrkUKqU3V5sL8bVsvZzOp41ecabNsL8+V0rjjdLVuftnlKK1ud66uDwPM+IcuYI+tPyBfzVJH5CREP6lkRJKzCSW5yw/Z0HyQDVqPZGAzAci4IBIJ+evPcHnRZTAex6+mxJkM4gtAZTIyQdaCZwa0II0xoMDpxDjPNO14/kUW3Pfh7efbfVZxfmv+LNcVcKqrJ5GFJD7TEFVwQt2IXOyWyekgCI1yM/5AeCIygqydg1LjSlLbWZANxHxZyhtY0vhFnRGc4YPZpS/hJ2REk3yX9ueiyLRkC2KzvybUtnVQy0ZYRpiUefrHkf9vbOdYd0WTcBbNDVHoRd0p8BLFAdp8ktb+DsQ+RrsGaV9oDk7xrMXNmwf/UVeTwDOjwKGDzZkxS9I73wpbtv63YGi63TPetQlA7xC/4eRRkOKBHmWbfwlCqiyvzwm4yOvT2pe1/i0IMYeZzF3igbqecAm46MUUeaJyyVZfyEIR4z84ifEVVEJ+kbPhoBtrdZbmnbBQnObSlY+XZwzv3yTB/qTWDtx86YLRmZa534az9pv/VpkWihfeq5simxZ9pVh/TOhX/TKHSbAT/1igggGl9sJVeN+ZSLTSYFK9uJZm4+PweYJm6WCB/urcgVfXtggQOHKCbp8niukjYlA+YzpkAdRIIxIU4BqcS0TVX6Z7wz+p9PmHeDqsNd2Xz0PGghGqRQEVhEt8UcwNMAfLh+EINUSwjdslkYeJ7XPsFw7qnCuNO5d1uYGtAuSRyddFpRDSQ8bJLlF1bF/KTkHGb/Xm3Dwg/vzcjAjrtz2nW8RrZ8WLUCSRbXH4haJgB6KWQHU5GPAp0MFgpMsytqUquM4R0ofafGup3Xj9t8mhYSpbUjl/LYbSJtVkNxjJpcPcv7ngSgpaJgx/0U/WzTGuapQgl8T6KS+rYv2W+EjqxSOsDNVl5Q8PSmxIPR93HviWwxg75TyPd37KWIbC9FEU5IzScxWKz9GBTtHnn6mpLocr1ZWalproSnYlAjgOgVLQ/kUgwdclUwaJyfVEieDb9ALisqWKvQ7nP4e7AdRaCbbmKpvO4l4Zj23CTvOfI31CQKceQ1J8obqWyT3bl5WGHv9QxaIrHtWgq/n3U+6BAdWvY3ix/Zj5CQ5tukyn+sJilrX0VCH52OqrbEaPauMRvvn3N/EXrw6w46WFkqqW6IMcSj2/wBpXKDlNwflbIHChvAap5TASAUu/flcDOz4o4nFqOIwlfLQXt8ba62RMMqTaJOkaXTjb9TWTlW4n8u5mjw/IU2rMODubf/70fAq8769jZHQ2NoAM/9u+n8g4msxNJQOhnk7XP3pi4OZnhcF46vc9HFDS1JgJ9zFYASH5F4EmXX0tcd5fM9pmdM/YQHej5kxvlfre2X4Omvz+wnyZTCEPk+VfetLyVxAgaFgZL2pITZsmS49vkuV6NNPc6fk7qhytS6OgcToRf/XGMgJPbL3mLoh1XxPHc7CTxsvmYvhua2Si94lbkI/XjVoeU1qm7UrRCsrMeR4nafwvrhHvxPbEZF7BUiQLcw8iKcu0qgyISY0D5e7D+QnEU707Zh65SiC+uDwA4Au14r8MQP5AQISttCDVZeAUqTE2Up3GqHVs9Rjbq7OWST28JMR3ojzGZNnl82xTygCzk3bBtfGpzy42C3gBxPOJLwAWezVyaK/rAq2TOZDSfx25ms2EvyASvyOSeJ5l0uosY7tnq4NZq06LjZSnSkvBagtyJQygHN+5d12syhYXq7TFrlvYVeAjxs74EoNjFHJ6ywJ3jVYuYOByIIvRouTZOQv7Y5T2WM6Hwb8Z/Qtn5SSLMDMgOTjGAuWu0YG9ZZxCBi7mywws9m0u4EynqqdPEUoq61SU/HxaX0Z+IVHV/pdEuGK6mlhYyI4rV2gHLq0Pw1ZJ8s3GEOQzEtS/e3dzQEDUJcyAUjCg+vy4T1HXgxb2d8aaDqjQ9O41UfHjWFtZeOKraRF86tk2WkttxbusgTAsNzyXxKddaAb8Cp7nqaenZhYr8okOMJqFdoJziUWKlEzV9DxHoWpWirdIkUty7v/fhQOcTypWpHrVswqtCtb3U5bQEPWpF/J18hen1CGhllPfWQCueSAokami8dQGCoXwa+EkhMN06yak2w/lQirP0oyQZPEqCSSFZjijVPXTDJAUCcBqbazsiaws1S7wRDJGKZNNJmFyVAlXauYlMY3iaK8oGWIiLwiVLTRRkyGi93I9I+k1fVWivM1b3pjuoDloIzW8L1SlWFKElh982ULgDx1z4szJtghSgJvpifIUxM+RAszhlGAQKw5yoFgWWnQgDsI6LPivJ52KdHbuFl9NjzbnCJpScwXd5jKvrURagVYLR8K9zBSZwcRLVhDvDOyhCy3SqVmz2ufydDbOAUQCX0pN4OtpLNk+OfY9HQg9viKs4cIklos98eAEWWj9zRnMv9OinegHYnygVXz2UDcqFjxXznm8s4dAGLd5FR7YjzbjMy7QxnKn112dzpp4sAEgsOs7cwN5nHR4Ji81xpDNn5aC1nMd0USrjs7IhuvTCfUKMoxp6bTiuIwHj9+y8Dd1Y9laLvbo5n/Yc7l2yLmiUFnxOTuE+xb6YGMuHJjwXyjQUA8UEHT4WklZTI7DmiVQMC1yMoHJNniv956EtY2Il3d7LuHwFLu/m+JURaXxJqd5C2WzErwjFZkkOxhDTgKPJHkVCd6QWYVsLuLshg8SybUN+xjzGPvWD4slH9efRQAcUFqgjm2DvGyXhba9tEHYBNY/7HKm0IM6KPr/EkULJKBkqkHPj4x4RjGAkiULrH6ZaDPTsANoTadd34OUSX3WnaYdRp7dAJIShKuwWTeRkMdj8HZQOjZDak2WTPGSouFptxeuWAFJwKZFl3tDp9iTR0o9WCcIj3eBsrG5UmdymNeuPBqblgCxLbwNfxkkb8gUW7JXmolNBBWdhtZB0gUD1AUdocCEWiCfkKHc6e2cmmkPS+NTi6d9/8LaN6dYl3CJR5CUlgapA5T2CWAsORnstSrjMzoK6db1H5E5+jyW5X7YkKo9abT1+fS2jxc4tuPAMcqzEl8m7r5bHEvcgqBGL9aGF4FomPl1RTwMjVX06cOHN3UyKka7uCgfQ2XXAdbNzuRoRLTv/dUBmLGvjk3F5Bct1mKosroPbz59KGLRMLyiuvkYGqhIG744morYQoxdDMSY3io5qVqrJcIYNvNq+lus2hhrFY+BXECbpZ5YozMsViU1yoeuq9A61I8yubY/HAyrgQB8VQCc8pLlQpeb69X9dZMP6dtL+xSt1bZDMybrtoysqIosp4wEkYMUBivwwGd1fjnzHdhQCUay4PhHZ9xpu3fbR6T4xAMaqKUT1RRWmZLcFNo7MQ7TKZ+WWt7k3iOt33w/pW1x+FBTBmORq7JVX6h2yFrIGP/aFa3tPHEq2WwQj3YMO8SjzYZUspjX3rqilp9M3YoVvKry07MWKrCC+2sJ9DEZ0PQAYmdJEZ2w5j4fC8zwRHfhcfcn+JjAs400HsiyqFKhrNwIsvI65nbwQNaNlUpl5SJfC49GB2J9rD4WeNi2ssKw7d1k81UrTVMYHke7SjKvA9jc+sxl0mqPcbonlGAve7UTlbfTrSynGV9zEA5ubVSaM7IpT9oAjtMOkfUgt2S7GOQ+MqT1b8bUz3to+nKz9iqL+3T6z6+FvjP4KY2j5pOHdbXw7HP5cYB1srF8RVip01DIKoblsOG263pyJGZPdS1bHZhKPhIaFrf3DrqBfPmgMyy0j2kITA2Fr9TFIiMj9aSrenB5/Na2uv3R41AucAFxtCLNGz6zMCSJP1nvTY7eMyoU4IDrvXEHpdXYEe6x8L9VTdgR77U4kLrvOmoNIFpfL3CDDeRFCsUiA9kNFrxGTBG4QC9qw+Q1L1wgwRTG66NakRbJlZv9/Oma0x2ni7eSbf5pTTeZEAN1SYslBqob4gVN4QPeYItavXT4KdESkJuiH9IgJQN41a5rARPgDTI4ali8PeV5wZGhlu6MMrSTUAdZnCa/iuVhZU5DIZuJWx/SkyKxJ8bXsmwp5MPfF9a9t9GNjOLF7SyBnqUT2L7mDni0z9i859qsYyDIMKRTBPhz5okhbpp+r0p5mqaHuMU6lK7ds1XyuP4ppapvOhI7yl6dPgBrmSeGuhl6A1+nWxGhQ88kY7qRZ+HNWALgIfJetY71WLb238bc8xM4IXpyuyxshp7ihAgWaY18pt7fLf5aEjEny1salo+L9wWgJ7rFEPf9PqVq6A3ELS6pYqQykq5SbRQrybjvwNrw0zRq5e61LBLC8mj3ZnmDzwiiCZ6m7gz4Va92B3B2XNhCZ5rQ9VLhRXGADXdYNs5FVOshlbKP6g7gSwvtF6re7x5YekLohLzKlCuyXjkhQorKDZl9SwGE+ZiprVfiCw6xSUZGXU9ciLL/Vh3jqxjkPnJKM501PKkipDpqj6SZ6CTQCwSTtdvE4ySlg8x5mlNHQE8StLvVrwyJ67kBjZQD7PHaKzUUQGtYQYhm1G+OC1FsulnP+CwBuUn6U+EtocPdMwpQj+WHrKTszxSDksjnT9Mif6rOGgD8mv/PDW9LyyyR5xOdMVZmHrFEvlh1W25agXpGiqdEmfcB+deXMs0TPqMggYt5ecYaJgs/c5vTwb5zWiMLizv9Pxo4xDeLQe5LQzqU9Z2k3Sm2ieA8aZcjIjqNW+sYa1w1pbRPPR7yClUN/bHoGYf1qPrm16TH82oByNoXeeHtaVkl8nxCVPdllFAsT81St+elJLBqLhZk3o1mw28owsYi2fKeitFefVDsuED8bLdPh9usp192gQ53o7S1BnCutNmhi/p9U+NApEQzTZNdigqpVaKN5eQZOgOPpNZVBbCPXOigMU2YOjF/UBIQjz0kG+eQgJLJ+iGt5hRZD0qW9EqRNdAfi59xmY9q/vuS9H5uLUAYJviHGO0ReZqi6Lz4xJGhNT42aBJ/giE9XZPLzA/aCUudyvRoIuPZDngiiz0+N5RCqjg64ONj+xx5WSKziJQhyQnWPP0ofa4lMTlkFKBHAGPUs8ckL2WNInmn8lOiZIn4BLABQ8vNM9IJ70fWYpJ2aMncMcVAyPp6gQtsIE9XyKcbyC4/QVG9o/Joh6Rh1Bd5JL+V5Io8sIAnFwvqhht4Op2RB4e4xRjxw+yI9XYCwbs+IvshWeWQe1uEzgDQFcP3EuPShpIeZXHJZnXDaOPSUYDyZD01edoUchCPIMKbYF0ik//DGRYjR86QmziWGVeQJ/R8kolILq9Mpss2+0tbj5DrydMobRdpXbQlDOYSetdFSht5GrF+5Xyp/2JAub6K4pu/0wM7TmMJB9IXiI+30r7NDGHH8YJwgVg8EY/k6HtpDkv+kZe5elY8iz47TsqYfSxTPVwZzMxJW/wQMaz3PyqxgbggXhw7ZOY3WivsMY2F8oj/kVyU/IPx3nDagOazPya7EC9mYcnPik5zKc9L0N/2hdH2hX1Dl9ygomaPXfCRhFv6AzHu22QUtldP0zPIJ4pPc0ndYS+fnrXSzlqfvmR2E3kL24fJDJpej+8FZj8UQVyOBfqudZfIK0RPELuE5Kftp/k02MTP53onM3onn/s8EUbDThxb7EdG0V1svRgNcFtsfxi2KyupJUTZoaed+2Bez8RYMtyTxWBPucvgOyEGSnuYfLqBIlW+Y1mb2pPJKFsnkPiJoq6fKoh/ntZFemRumjjNqre7L+779pXOA4KeNDKvZr2roLXUtp2l8iOmvSLiWVvlubTC6uYLND4pN5wLtH+aV0pR1VVKBFPr1ZSLbr3dmiZOy42kX7w7F0Aoe3sPiEAa9QpBQRF+Xy4rnl+ty78JKAri1SgSAdRzaPdrfSVm4DXA9InKHJSP7p9A+SjUjXu04Lk7Ix+Q4U9v3G6NukMO7toV6SJRVwNa4JEI7Lrfpw4fHByN6QiIiaOFhZex05PVbQWsQnVbelIZOzwsjhoTMFtONvSVk+V9r6FJYkg7WUEU0PkjyHGwcsBOh7nIViSfLsDLSQCkpVsMTXrdJ1cOnRCSNjsgJo4KGpIyClkFSclAO+MOzOjBwXB1332wSwSZRZLj0R+SbIW56BSAlZPjRtBvfYgKMtCciXBlr+ZK0FXZpKBGihGlUy1cJYfpebkGS2poLrkgIMTZJazKjO0oeJEjabamZ8o8+CQwLbOFmhMWrWdbg610hG7DUhW6yZ3KJtgrQRLuxuR0BKB5wAWeRlv+KdXrRDKaCU2xrkkH8zPZmUvYfe4HW7BmVkzAGiXxmSqNbnCnTVTMxcYkAfP5Vemm2cVIv0ujOtk52vAEsguSxCFzv4eC4qbFhwn/q/UgAbbpuWiXJxIlgbqCn6gU6+9BXBKUhsIrkf9DqphL0WTAu6JKJujGSJ3wXTw+Z07UFhR8OTL44Ww0SgRoV9GyZBMT3F5pBi4ehLbORler7B6QNXDy/iqZ7uqtTnv1AyF3dbYL8UB2LTKSwttH7afwtoyVFQSIOwADSIBVJIw4+kgEdb3pUypPwf1doplSJvWsGIoXNiX+MP/jv403UNL3HJypGvoDvVhpHeScOJosvJyTlqyeXgj4r4WKoM7ffQpF329hiASazfW7F3qb7xKhOUCi0xYX57QlupzWuESbFQjwhYp9LU4o5XterwjEL0YGLY+onKAvlTiRvVoB902gmEsnfONS0aATCQ6bNc5tS3C44+MS4+IB/8IlIrDzUKtC2boN7BTNRFx4h3lPIrLyG+mCXbuvHa9BE+OYjF1Hc0nMmPJ/F1S80mwSgV3bW5WK1sNglwiAnlgigjp/9SqUva+gTtF+EdT1uleJrx8QKPpoJIhrwgtoAizFC5scP0C9zIqlckR+rvun1OEnBjMxHWOPJPJijRNjxNaH8+KZyQihag67TuTv+nNKoTwFMmYyXkNjnKbGwnMFmIHUFwJE5g6L/d3wU8pe7Y7iNkosAYTzjPSfEn+4OluWGOy6dyo8fPDxBOwksjNe/S9ueyGQWOENm+pIzQ0diXeB8XgnOAvvDbWlhk71fvUurbZUojPn6627wCPxuaGO1LCPM4rYwJNrX0tEF9f2UsZQ+9cOiCSP1p4JAqAmv2G2KQnU/XpIuXO3ZP0KIIGRivDot56xfp9cdWr0WhpAVKyyKzwZO8lht1phxmWbdFhDCE0ITfzZq5DP/x+aKJSJoI5X3XJFKdHimyZEXJdmTXnH4AO7FwLTHmL+urjtN2SUOjlemWuMZHm0Rrs4hZgO4ydWEt0iy+39xEhjeKz8E9nXGlyN5kOZFCDTzFOczlLFG6RJKoe8JE/fQc70QbjHkW2SjXEmFK2tTbOTULH3VTC2XYh82vgSQLCf7zQEZBGh7/DOJJKyfY5YOKddTUrKxkiwGiZHFPCOL4j/142UWgupRjXPjsoBlUfZNCRe3RyheE4dhwRACkAKkk4173EC7gM6dWlmdpQSg0vxTsl66Gx/SqYO49P5lGfW3RMrxiKKx5Z0xQmZHMLXfymk45sB8fFqmS2S4hhNRFS0T2zWENgc4rd/KeRHM+4mjnFEKjG4wtIpWcXFiLHFWQ5Jq+d+IvCb+wk0XUA5o+maNbkd4SESHEmRgLT5OdKTeG05iUm3jtv1Yde7fEYsk7Ty2gQW1hD07FPdxokbh64HybCsCYMrnPaM2PyN7zZ+AFP6ikGfLGjoXyb35j0ZCtIDT+ZU5ehj6P43x+Dgf/mjJcPDIRH4QomLWRW9LnItwb7jFY1a2VVIpzyL713eun7q+ll7s75TqbFFo+i0F1vfTIyVVWsrDAXxCUkSQPD4OcXgP0bPQ65+z5zqeXKHbfTTvhOL3uuMEPZMmgEyIUbAYVkTM5/Vt27wi38rEr+zGe5AIGwDjWuA/0eQRZpij7GenU25xpppoZYKEpasXbtEYKeWxu6k30s6/Yw5EBtpkhH8V8YiVaXgFKk86b1cB0MkQ+nC63MwPRh+wUVh+pA09EYefAGZyyTARnjWeCwAvCK1PCAALgIUTecbO825TkR5ZMhBB2OWLaUstyoWudKfQPjvDzL+N/PZ3qR79J2xtFKhHS9DmCBjW2ayrqXse8baxUb++c99v4S7eZ5lkvGZhnbPjdCooXTixQJg/XLdrUCUZskDDBzlN5xBxu78FW+ohlKxcyauj7+7GwR/jA5WYq9sBZC7UOSbgtha9lffFBiUFb0cQD2W0EuLRtZSemogfNpflyh4+KinQYKD43OEl2XGjxf0MxjxavC2jdLY0sX1jhdF8hmutHyJv4Mxz7EtN2iS2ZJByhNFChf82bsbGL4D8qM2VF7/0wHhr1I+psBcIShY2HVe2lVU6PcSXWeWpzQsDxfvG1C+fM5sYb9qwdYTt3TolqRkhi7Ik6NnKlTL/vmDxxaf/gwAzZo0PszUYYjJvjXwa5fdvutXPq2hu2RHIiHG8EysuLfMUL5j15+i0AR303hLMxgIa+1prkR3YkpimjtlS/BquIDK+E6On7mVIZYw5vuZOZ3miPHTa270OVtDNpDw20AmNnEBZsWGxSbKYtOC7Zg2EtsE2oaHE82ffh1rtOA9ERTTQFFOgO10+OfXinlA9MAYHdrDjvu8u/H2CC2tTNdRkbSGUZLTzE7XyuLx8WATgd3UGE0ivi+rwwpvDKygUjhjGlSUCtY6JsEBysJ6pbbk0CleqAaZxbCe6lr5P0dH76o0SWPQ1gunNSrmIfEu0EhsrtSR7n0/KWLFfWvuS0SX1vSRG2h71x0TSa6s2xsCEEHDIUV9K53td2OA/rhEIPnZGQ95r0rAqx/4OJBQzKNXFNjfm5lwsufXUTy+OaEMJcHmJrbj8QNvM/D+zgA/KuXVA6qPip2k12XSVP6VP/izSMawC63Qb+++1/brpk40Hm5Z2e+bOrE/urb2XDVONO1LnzTffmf+Xzets2ffsS78y2m8ce4S5/2Fc++YZ3fTWpg713ofOPAtjeuLL9p07zS0KYuqLmkWErHH5GhCcoX62e73HoB2/CIWe/cyZdnuj5rSGzxu0KQdgZNA7F10uhE+70CYH/J6dm8wwn8tFVOENX27SFCvweHvDZApV+/hcdcCxom+buQymp4RXXH9WjEDPizxyXpiN+iXQPgT1E2cR+n+eEcouPuxmwIwTrjGlav7tNp+tWr6Zk2pkwAoriWuexTxew21CPfPAKBbaz0Z6bbQEMNu6PLBbcabCNTMoHf/qDH4Lz1I5Al0x3BJUHSkLfXZS4syJQBzSpwExTTsUvgj1gWqoNT/sYhes5kHYNb9zg0emPAYifu69BF8E+MTwTeY65yc0sXg4WGsjH1GnDTCwjOuDSbTSFAVtRcBUx4bg4Emx9wj46SrrWjCIUxAZTZABC9ZTSW5Ind1BZPvRN1uvfEUTn4QuXNuMO3eDSDABBMHO6OGZan2qoK64K3scX1S8RthEXp1ZZOtJl1x6o//qP+Obr2cii05dmYzR2hEAz9KHohAru01SsX8w34uERBzslbj4oXi3WIAHBjdBw0dHGo96Gt4mSA9Td3qVXqWVdsllgnDAcMB9/3nwcichtia4xZfKtFoguqk8TZhLlwZm01YSbSEBH1e8RUBe7pDgwqIeL4L799e95VJ1J1vwlGPE/yLOwHMug0BPgQql0T+HOF17DePX//On3TsAhqVhOGcP0Ykrj6AQgL+LRsUZOuhTPuuoKBjEu1yklUxU0GyLteKB4KC/k7IPES2KLfw4WOz5hIIc7PGwv8ByrK6CISurDIAiModKGREQH1MffhDBB4vDBpPXo/CbCBXBT2F5Yv7MKhecQHsvDAIN+uEDvE9KPzvsWjMjGPhwa5OEi9hHGwEOGUzJp5egXMtqaLRXHh49siiXy9PSDN0wcLdHug1CiMq/cyWHf2P8UrfFgZXidehMBtElcHDAXmkPgxqDzk/4PysICq9g0NIz+NyHP8kVbW+CyDuOnen4J5fVaXc0pic/Lwcl1xu+Vd79Mm96hdIzILgsJdWHJF0Lgw9iDnkNybYbHB7TCRKnaUoAPefPd8fN2tADUOepKX602h45Ll6mxB4tTCwityLRveSKgOfBlaS7tY1uSrw/PFRyh95/wIKA3+7AGKYyzzaBZWlPZGVhXOkBfFRHqYnwEWOSLaZcc5jQ3xCy8uDcnSRRKSSS42xKmdYrFGaFYu+ABkjthpj1di36VdnGsMsEVorJw1lwqe5EpNdqYlpqakulyPVVcKBOZ+kbriABLsy1npwUeHh1zJYUaE/5QWO0YcpduLLBd2omL2RBBf9Xftf4MhWrbo3UtuvVvdXamprKsrL6ypq6+pKy6srSoHkb3nbLhXmbTerzRZ5Bk0DKn11Lixs1ZTG5L7Pawqqn7t8cyAG6uLsTQaSrN57+QrEtjVuWjQBB4ifFPie8ILIleXVS+NGwnqd/GtKpl1JCvTQMzXWLMm0zJBFM0MUHbUX8dTLgJ0Yilu2HKX5HjaZb4BGhgH7scP0jFyhP+GNzsi9obb80HX9lxdpmPX7+a0/GFpQkZGn+lfM5PU9fNO/Qza/J528QXBPLm67lHIC0j6Oo4zUv3tpgdu1KS69P6AsXP5ODdCduLP8WLQCOWP9oAuyGfB1M+fstJCiVUIUhfg4srRJ4/EF0pYKcTc8ZuWGuVohCMuUAdtoXlAyJ+jYoDZUq7EoCtYNuG67c4LocidPnj7bfHZSm7eWO3v29MkqKzXAr3kYKeUsR1/aKAvvv41Z8KtX+vDC8RHsRh/S1K2uZNTDg38DYad024/buhZugZJibfZjekAP+HCLAvuRvwMaklWkKv5skn3YaGVW5DHrDxd93QPMxUnlO806igxAiPv9trJGFWbOF4zNiJyZZ+B4xDFDsINumZdqDtYLUC7aJJUnLjqF50WEcG+8OIIVpMvuEYKLmte14hr/FlNiaPaj2Uf/F4QWBFZCSviSSaMYpOAm93o2RbzGKP+6RnPqp8k7LnSVa78MdXVxmBbgKxIsb1DRq/8yCN7g+8XJt+i8oYSKGj9geYMNf3J8dnI57Ldkd12ba3NIBqymgXNEE60TBs9J4N+8vGa7ISjVMbY+shNr4GZCk/EWURh5k4kUG0TNbKRkhZbSDDA9OUQisdaqL3PWQJbYZ+MmDNIwQY3d3C2tIEUf5ea58TYoke/yTyRYxVdbTRIXfqSffOw8ttcg8JgefiZbRYdwoYqaRBJqvMfPEKDECD9NS8IZhMvFzD0M6W7VMBOg+4LKANbVpYb94I4clxfXwB9S5LKeiKnxvjOkJZnR03PWLaQGiE4ihq1g1OPZlx3A1i96lVbiv1CZZSeBV7GwaxsQsJOS/peW9VvfQP/mixtoGI5M4rqfTg0y90+LbDxeMZPWMYSgOwpsfiCQ03lcEYY1hcIOc3aGaiQ5C8LF2EFZuOzQxAxZW/70NN6kmFSXyk2x+1P5Fvi8/r3wQOgIOE3jWko0wMCiPwxj58dm7Ou9JdN73lJIOPtlbvD4xekhnky4O9CPGKSaBKeGCva1B4wGjx5RGrFw7Tr6N8kt8sZtd1iS4fVngRH+ausrgHZigaOOLmn3ojUWQFGrMZ+NXyvwhk1xJOdKR2JdIDzeWQCrufyi9raElqybF9SKWjo9SCKxAiBw8Q/NwsvWD14x6I/N5O1hSsuCKzRCergQv5tNATzGRViHjos4MzdgIkoEhHzvA775w9KWdnfAuaJHVYJj8FPNAScVwUlfqXsPdDHQdnrwJSQ0bsHWAWD0XojUdUp9LQS5Xz/twMXo9LDhfRt1o24lyw75BWNF+itc5PNShEL9+CdrAzdLpNz+yLUKG2jw9Ui9ZhaVE5BEG5J/DoGNpM0W59jWCdZUDdV8Gy1H3JEiCXAHslRPqxKR2UxqnvEnc8oLdBECJ9RCBw6qnqLqPo6lD0gKH3hDOtncHetGhwRaNBsAkO8WqwOAmIeNCW/34GsgcF3ITV8KkzG0IljX7hYYE50zeGUYZMacG25RPBAU1OpULFRiDNd2pDua/gVvfpkra6pta53aMLVtrsJSJ0xtmjwBuH/7GIqZ2h4J4P7exV9HfLjaTrcyccqA+Enj9aYSm8Pej7DxOCMQH3YAVGLw6k+IEbma/SofKilo1cebk8ZHJBywcXS8ue2zsqZapEL6noE7RAUv2WBKkXmZI+FCdQW6ROq1mcsEXXlNSNDcXyTqu7m+yKbcISv4r99E6tuVg+Xxu2PLPbbRj4kBkOlKqhuuR58HszqqXVWXUPefIeEVAAgrYAayfe3sPvYC4GsXEIA6u8+ZZYQHXA/4LMPHx2/KOGdPDjzyE5QKzfzn8n4uZsvzaNJSt37m415DswEAQI1AnX0A39s1/JLH6hbK5jw4eASvkev7nKXFJV151Cbl+6h2FJ13Xv4hlASmqfXeZkW29aiacjicNG09pZQ1dybLshUVRTeOwo2g7gu2LLa9DzT0I1l/yhKWHZJIDUlR3zXWzGEP7kn5Sm5Iy1xsc6lfmqxZtPWWjvboWIsx6zQvS2xakZDV6ugZfz+dZefSvRIl0+lciwZFrM5+ltEhsDLR6T2HeE0Ia6Axmoz3QbHU7G1n5mfc0cu2X6N52a+lP6WoWL2RpeQsaSPgzWsAMS9aNKTKkjOMwX22IDYdz6xtOvOA9zjG04KikhLES9IprUUip1TbUpyrRmiPlHbDYPC4fnQwXntY81xdYFwFfva5pA1ibZNu4Z4bnSUub6Z13SD3Dptemo77rPEGrbu5qjusrXqNY1mXRtOzRFsuajmOPdeovkpfs4g99Y4WZ9EDgIPdag1JfcGtq1UUeqXwPz3HjcCbYKJssFxIVUALiacVxWtAYcUo/un8zYF+E+iNKBpjD3hT6JWix22Cy6t4sV6qxPXOTRuUCIkzCVTfBHheIZVctWU0j2uRaoE3Asb30K2eKotapCkLeLvMmA7reD12doR/0mdTXBZskcPrdmL5Dg6W5XWyYIG+DgD6Q21yRfzKsaa+FfeanbhBHcBijHjpNB9xcKgivnzKXtllbUBo6wNna9sRgq1o60uiSgQp24KRZLT1w6FkwUMAAEpUr1qOoxM64HgFqowWWbWQEWI8K2WsIhWrWCgnCztTHihXYBRYdcXKeUAqySglqzGxvIqnadCFGgZkCBNCthKVvCzCOBO01UU4uxi1GZEoMSW7sdEGrSTNBFomZAE5mbCVKBECDDYVai3v6FgC00r3oo03u8coxLFVQK9YGZcjYQW1t4zQe3QfQ0ai0YGxRimtWZokVblqIJZphNoq0uNgdQlWbdQYkWnjI2K1m2WFGCyx4ZExhwMrS1XHiLI0xAjLwf4Zr1DHwZ85cP7VwX0OlD+YAIGCBINDQEJBw8DCwSMgIiGjoKKhY2BiYePg4uETEBIRk5AKERrPnw9yCkoqauE0tHQiRIoSLYaegZGJWSwLqzjxbBLYJXJwcnFLkixFqjTpMmTK4uE1UrYcufKs1aLVIQs816bTLMttts5MtzTr8t4Hs78RpjvunndW6PHJR5+tsc1Zp22Xr8Bchc4Z5Yx/XHLeBRf9p8g1l12xQ7G3/jJk0L9KvPTKDGOMNlaZUuVWqVBpnCrj1ahWq84L9RpMMNFkk/RbbaopGk3zv9f2u+6Gu27622599jphj14ntdvisCMOfr7efKBmuxktkxlVoNhtVUXQTxL4S/PGlwAAAA==) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Concert One';
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url(data:font/woff2;base64,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) format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ── Reset: hide playing-card-only injected elements in other modes ──
+   These are always injected by initPerformerCards() so we don't have
+   to re-run that function when the mode changes; CSS handles visibility
+   per-mode. In Minimal / Extravagant, the rating still shows as the
+   on-image banner and the country flag stays in its native chin slot,
+   so the duplicate clones below must be hidden. Per-badge `.stash-perf-
+   label` and the cake icon inside `.stash-perf-age` are also hidden so
+   Minimal/Extravagant keep their compact "icon + number" badges. */
+.refract-pc-name-banner,
+.refract-pc-tier-label,
+.stash-perf-rating,
+.stash-perf-country,
+.stash-perf-label {
+    display: none;
+}
+.stash-perf-age > svg {
+    display: none;
+}
+
+/* ── Activate playing-card mode ──────────────────────────────────── */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-pc-name-banner {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* right: 25% — banner only occupies the LEFT 3/4 of the card top,
+       reserving the right quarter for the diagonal tier ribbon so they
+       never overlap. JS shrinks the name's font-size if the natural
+       text width exceeds the available banner space. */
+    right: 25%;
+    padding: 0.5rem 0.75rem;
+    z-index: 6;
+    /* No background strip — name + gender float directly over the image.
+       Legibility comes from the strong text-shadow stack on the name
+       text (below), so the name remains readable over any image.
+       NO overflow:hidden — would clip the name's drop-shadow into a
+       rectangle. The parent card has overflow:hidden so the glow still
+       can't escape the card boundary. */
+    background: transparent;
+    border-bottom: none;
+    color: #fff;
+    text-align: left;
+    pointer-events: none;
+}
+
+/* Gender "type" slot — sits to the left of the name like a Pokemon
+   card type symbol. Bigger than the base rule + a multi-layer neon
+   glow chain that mirrors the name text's drop-shadow structure
+   (white-hot core → bright color cladding → color gas → far halo)
+   so the gender symbol reads as part of the same neon-tube family. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-pc-name-banner .gender-icon {
+    width: 1.35rem !important;
+    height: 1.35rem !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+}
+
+/* ── Favourite heart — large, anchored under the diagonal tier ribbon ─
+   In playing-card mode, blow up the favourite heart so it acts as a
+   backdrop emblem at the top-right corner. The diagonal tier ribbon
+   (z-index 7) crosses ACROSS the heart, giving a layered playing-card
+   look — like a heart suit being struck through by a banner. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .favorite-button {
+    position: absolute !important;
+    /* Generously inset from the card edges so the heart reads as a
+       proper backdrop emblem rather than a corner-stuck icon. */
+    top: 0.75rem !important;
+    right: 1.1rem !important;
+    width: 3.6rem !important;
+    height: 3.6rem !important;
+    /* Below the tier ribbon (z 7) and the name banner (z 6), above the
+       image. */
+    z-index: 3 !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .favorite-button svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Per-gender neon glow chain — mirrors the 7-layer pattern from the
+   name text, using each gender's signature colour as the gas. The
+   icon's `color` property (set by 03_cards.css :1499-1532) feeds the
+   SVG fill via `currentColor`, so we only need to override `filter`
+   here. !important required to beat the base 03_cards rules. */
+/* Each gender glow trimmed from 7 layers to 3 (perf). Inner white-
+   hot + bright gender color stays; outer atmospheric halos (14px+,
+   < 0.85 opacity) cut. */
+/* Female + Trans female — pink */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-pc-name-banner .gender-icon[data-gender="FEMALE"],
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-pc-name-banner .gender-icon[data-gender="TRANSGENDER_FEMALE"] {
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
+        drop-shadow(0 0 2px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 8px rgba(244, 114, 182, 0.95)) !important;
+}
+/* Male + Trans male — blue */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-pc-name-banner .gender-icon[data-gender="MALE"],
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-pc-name-banner .gender-icon[data-gender="TRANSGENDER_MALE"] {
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
+        drop-shadow(0 0 2px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 8px rgba(96, 165, 250, 0.95)) !important;
+}
+/* Non-binary / Intersex — purple */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-pc-name-banner .gender-icon[data-gender="NON_BINARY"],
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-pc-name-banner .gender-icon[data-gender="INTERSEX"] {
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
+        drop-shadow(0 0 2px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 8px rgba(192, 132, 252, 0.95)) !important;
+}
+
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-pc-name-text {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    /* Concert One — rounded blobby display font. `!important` because
+       01_tokens.css:127 has a universal
+       `body.stash-liquid-glass *:not(code) { font-family: var(--theme-font-stack) !important; }`
+       rule that overrides every element's font; without !important here
+       the blanket rule wins and the playing-card name reverts to the
+       theme font. */
+    font-family: "Concert One", "Segoe UI", system-ui, -apple-system, sans-serif !important;
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: 0.015em;
+    text-align: left;
+    white-space: nowrap;
+    /* No overflow:hidden — would clip the drop-shadow glow into a
+       rectangle. Long names overflow visibly; the parent card has
+       overflow:hidden so the name still can't escape the card edge.
+       (No `text-overflow: ellipsis` either — it requires
+       `overflow: hidden` to render.) */
+    /* Solid white text — like a hot neon tube's glass, the inside
+       of the letter is white. The tier color identity lives entirely
+       in the drop-shadow chain below (gas glow radiating outward).
+       This keeps every letter equally readable regardless of which
+       tier's color is in play. Perfect tier overrides with a pastel
+       rainbow gradient below since rainbow is its signature. */
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+    background: none;
+    /* Neon glow stack — 4 layers (down from 8, perf-trimmed). Each
+       drop-shadow() is a full GPU blur pass; on a gallery page with
+       30+ animated cards the outer atmospheric halos (24px+, < 0.55
+       opacity) contribute nearly nothing visually but dominate paint
+       cost. Kept layers:
+         1. Sharp black drop  — legibility against any image
+         2. White-hot inner   — tube interior
+         3. Bright color rim  — gas glow at the tube wall
+         4. Color gas         — bulk of the gas plume
+    */
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
+        drop-shadow(0 0 2px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 6px rgba(var(--badge-color-bright), 1))
+        drop-shadow(0 0 14px rgba(var(--badge-color), 0.6));
+}
+
+/* ── Hide elements that conflict with the playing-card layout ────── */
+/* Native rating banner overlay on the image — rating now lives in the
+   bottom strip as a chip. Descendant selector (no `>`) so the rule
+   catches the banner whether Stash renders it as a direct child of
+   .performer-card or nested inside an image wrapper. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .rating-banner {
+    display: none !important;
+}
+/* Chin name title — moved to the top banner. The native title also
+   carries the country flag inline — hide the title but keep the flag
+   surfaceable; the flag-icon clone lives in the stats strip below. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .card-section-title {
+    display: none !important;
+}
+/* Disambiguation — Stash renders parenthetical disambiguation text
+   after the name (e.g. "John Smith (UK)"). It clutters the playing-card
+   layout. Hide it. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .performer-disambiguation,
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .disambiguation {
+    display: none !important;
+}
+/* Native country flag(s) — hide. The `:not(.stash-perf-country)`
+   exclusion keeps our wrapper (which also has the flag class on it)
+   visible. Covers `.performer-card__country-flag` (modern Stash with
+   the flag-icons CSS library) and legacy `.flag-icon`. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .performer-card__country-flag:not(.stash-perf-country),
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .flag-icon:not(.stash-perf-country) {
+    display: none !important;
+}
+/* Third-party "new-release bell" plugin injects a gold bell at
+   bottom-left of the card via absolute positioning — collides with
+   the playing-card stats strip. Hide it in this mode. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .new-release-bell-icon-wrapper {
+    display: none !important;
+}
+
+/* ── Float the chin over the bottom of the image as an HUD strip ──
+   Position the chin absolutely so the badges overlay the bottom of
+   the image instead of stealing a separate row below it. The chin
+   collapses out of the card's flex flow, so the image area takes
+   the full card height. No background — badges float directly over
+   the image; each badge's own outer drop-shadow handles legibility.
+
+   Flex column: the country name (when present) stacks ABOVE the
+   stat strip as a quiet caption. The chin auto-grows to fit both. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .card-section {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: transparent !important;
+    border-top: none !important;
+    /* Override the inset-1px-white highlight that the base performer
+       chin rule (03_cards.css:1454) paints on its top edge — reads as
+       a faint separator line above the badges in playing-card mode. */
+    box-shadow: none !important;
+    padding: 0.6rem 0.55rem 0.6rem !important;
+    z-index: 6;
+    flex: 0 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.2rem !important;
+    pointer-events: none;
+}
+/* But the badges themselves still need to be interactive (scenes link
+   etc) — re-enable pointer events on direct children. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .card-section > * {
+    pointer-events: auto;
+}
+
+/* ── Stats strip — neon chip-style badges ────────────────────────── */
+/* Default badge color is the accent (unrated cards), with white as
+   the "bright" stop so unrated card names + badges get a white-to-
+   accent metallic gradient (instead of a flat single-color gradient).
+   Tier classes below override these to the tier color pair so the
+   whole strip glows in the rating's hue. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card {
+    --badge-color: var(--accent-rgb);
+    --badge-color-bright: 255, 255, 255;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-card-tier-bronze,
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-card-tier-silver,
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-card-tier-gold,
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-card-tier-diamond,
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-card-tier-legendary,
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-card-tier-perfect {
+    --badge-color: var(--tier-color);
+    --badge-color-bright: var(--tier-color-bright, var(--tier-color));
+}
+
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-stats {
+    display: flex !important;
+    /* --pc-badge-scale is set per-card by initPerformerCards on the
+       next animation frame after badges are injected. Default 1; JS
+       steps it down to 0.85 / 0.7 etc. if the strip overflows (e.g.
+       three-digit scene counts pushing the O-count chip off the card). */
+    --pc-badge-scale: 1;
+    gap: calc(0.4rem * var(--pc-badge-scale)) !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+/* Re-enable the cake icon for age (suppressed in other modes) and
+   the per-badge labels. Labels sit on the TOP row of the grid,
+   spanning both columns. Icon + value sit on the bottom row. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-age > svg {
+    display: inline-block !important;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-label {
+    display: block !important;
+    grid-row: 1 !important;
+    grid-column: 1 / -1 !important;
+    font-size: calc(0.6rem * var(--pc-badge-scale, 1)) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    /* Tier-tinted gradient text on the label so it shares the same
+       metallic-sheen identity as the value, but slightly dimmer to
+       maintain visual hierarchy (label = tag, value = headline). */
+    background: linear-gradient(
+        135deg,
+        rgba(var(--badge-color-bright), 0.85) 0%,
+        rgba(var(--badge-color), 0.85) 100%
+    ) !important;
+    -webkit-background-clip: text !important;
+            background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+}
+/* Icon → column 1 of the bottom row. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > svg {
+    grid-row: 2 !important;
+    grid-column: 1 !important;
+}
+/* Value (the non-label span) → column 2 of the bottom row. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > span:not(.stash-perf-label) {
+    grid-row: 2 !important;
+    grid-column: 2 !important;
+}
+
+/* Each badge: LOUD neon pill — gradient tier-tinted fill, bright
+   2px border, 5-layer tube-light glow (white-hot inner core +
+   tight color cladding + mid color glow + far atmospheric halo +
+   ground drop-shadow for separation from the image). Number is
+   filled with the SAME gradient as the name banner — metallic
+   sheen identity across the whole card.
+
+   Layout: 2-row grid with the label spanning across the top, and
+   the icon + value side-by-side on the bottom row. This keeps
+   each chip narrow enough (label-width) to fit four chips across
+   the card without overflow. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-stats > * {
+    display: inline-grid !important;
+    grid-template-columns: auto auto !important;
+    grid-template-rows: auto auto !important;
+    column-gap: calc(0.3rem * var(--pc-badge-scale, 1)) !important;
+    row-gap: calc(0.05rem * var(--pc-badge-scale, 1)) !important;
+    align-items: center !important;
+    justify-items: center !important;
+    padding:
+        calc(0.4rem * var(--pc-badge-scale, 1))
+        calc(0.7rem * var(--pc-badge-scale, 1))
+        calc(0.45rem * var(--pc-badge-scale, 1)) !important;
+    border-radius: 18px !important;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(var(--badge-color), 0.42) 0%,
+            rgba(var(--badge-color), 0.22) 100%
+        ) !important;
+    border: 2px solid rgba(var(--badge-color-bright), 0.95) !important;
+    font-size: calc(1.1rem * var(--pc-badge-scale, 1)) !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    min-height: calc(2.1rem * var(--pc-badge-scale, 1)) !important;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.35) inset,
+        0 0 10px rgba(255, 255, 255, 0.18) inset,
+        0 0 14px rgba(var(--badge-color), 1),
+        0 0 32px rgba(var(--badge-color), 0.6),
+        0 0 64px rgba(var(--badge-color), 0.28),
+        0 6px 16px rgba(0, 0, 0, 0.6) !important;
+    text-decoration: none !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+}
+/* Badge number — gradient text fill matching the name banner. JS
+   wraps the number in an inner <span> for every badge type (rating,
+   age, scenes, O count) so this selector is reliable. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > span {
+    background: linear-gradient(
+        135deg,
+        rgba(var(--badge-color-bright), 1) 0%,
+        rgba(var(--badge-color), 1) 100%
+    );
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85))
+        drop-shadow(0 0 4px rgba(var(--badge-color), 0.85));
+}
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-stats > *:hover {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(var(--badge-color), 0.6) 0%,
+            rgba(var(--badge-color), 0.35) 100%
+        ) !important;
+    border-color: rgba(var(--badge-color-bright), 1) !important;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+        0 0 16px rgba(255, 255, 255, 0.25) inset,
+        0 0 22px rgba(var(--badge-color), 1),
+        0 0 50px rgba(var(--badge-color), 0.7),
+        0 0 90px rgba(var(--badge-color), 0.35),
+        0 8px 22px rgba(0, 0, 0, 0.6) !important;
+    transform: translateY(-2px);
+}
+
+/* Badge icons — 2 layer glow (down from 3, perf). White-hot core +
+   tier color is enough; the 16px outer halo barely visible against
+   the chip glow anyway. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > svg {
+    width: calc(1.1rem * var(--pc-badge-scale, 1)) !important;
+    height: calc(1.1rem * var(--pc-badge-scale, 1)) !important;
+    flex: 0 0 auto !important;
+    fill: rgba(var(--badge-color-bright), 1) !important;
+    filter:
+        drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
+        drop-shadow(0 0 8px rgba(var(--badge-color), 0.95)) !important;
+}
+
+/* Country name — plain text, left-aligned, in-flow above the stat
+   strip via the chin's `flex-direction: column`. No chip / border /
+   background. Reads as a quiet caption rather than a fifth stat.
+   Dark text-shadow gives legibility over any image. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-country {
+    display: block !important;
+    align-self: flex-start !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.03em !important;
+    line-height: 1 !important;
+    text-align: left !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7) !important;
+    pointer-events: none !important;
+    /* Long names: ellipsis at the chin's content width. */
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+/* Strip order: rating first (left), O count last. Country flag no
+   longer lives in the strip (inline in the name banner instead). */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-rating  { order: 1; }
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-age     { order: 2; }
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-scenes  { order: 3; }
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-ocount  { order: 4; }
+
+/* ── Tier name diagonal ribbon — "BRONZE" / ... / "PERFECT" ─────────
+   Banner crosses the TOP-RIGHT corner of the card on a 45° diagonal.
+   The empty `<div>` is injected by initPerformerCards on every card;
+   per-tier `::after { content: "..." }` rules below populate the
+   text. Card's `overflow: hidden` (from the base card rule) clips
+   the ribbon's overflowing ends, producing the classic "cut corner"
+   sash look. Hidden on unrated cards. */
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card)[class*="refract-card-tier-"] .refract-pc-tier-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    /* Geometry: 11rem wide ribbon rotated 45°, anchored top-right.
+       The ribbon's center sits roughly above the corner; its ends
+       extend ~3rem past each edge so the visible portion is a clean
+       diagonal cut. */
+    top: 1.4rem;
+    right: -3rem;
+    width: 11rem;
+    transform: rotate(45deg);
+    transform-origin: center center;
+    /* z-index 12 — needs to beat Stash's studio-overlay (~z-index 4-5)
+       on scene cards. The ribbon crosses the same top-right corner
+       area where the studio logo sits, so it has to layer over it. */
+    z-index: 12;
+    padding: 0.3rem 0;
+    text-align: center;
+    /* Tier-colored ribbon: bright tier-color body, fading to
+       transparent at both ends so the corner-clip looks soft. */
+    background: linear-gradient(
+        90deg,
+        rgba(var(--tier-color), 0) 0%,
+        rgba(var(--tier-color), 0.75) 14%,
+        rgba(var(--tier-color), 0.95) 50%,
+        rgba(var(--tier-color), 0.75) 86%,
+        rgba(var(--tier-color), 0) 100%);
+    border-top: 1px solid rgba(var(--tier-color-bright, var(--tier-color)), 0.85);
+    border-bottom: 1px solid rgba(var(--tier-color-bright, var(--tier-color)), 0.85);
+    box-shadow:
+        0 0 12px rgba(var(--tier-color), 0.85),
+        0 0 28px rgba(var(--tier-color), 0.4),
+        0 4px 10px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    pointer-events: none;
+}
+
+/* Ribbon text — painted on ::after with gradient text-clip. */
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card)[class*="refract-card-tier-"] .refract-pc-tier-label::after {
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1;
+    background: linear-gradient(
+        135deg,
+        rgba(var(--tier-color-bright, var(--tier-color)), 1) 0%,
+        rgba(255, 255, 255, 0.95) 50%,
+        rgba(var(--tier-color-bright, var(--tier-color)), 1) 100%
+    );
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
+        drop-shadow(0 0 5px rgba(var(--tier-color), 0.85));
+}
+
+/* Fade out the tier ribbon:
+   - Performer cards: when the user hovers the favourite heart. The
+     heart sits BEHIND the ribbon (z-index 3 vs ribbon z-index 7);
+     hiding the ribbon clears the click target.
+   - Scene cards: on ANY hover. Scene cards have a thumbnail preview /
+     hover-scrub action across most of their area, so the ribbon
+     should yield to the underlying card interaction.
+   `:has()` is supported per Refract's browser-compat target (README
+   "Compatibility" section). */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card:has(.favorite-button:hover) .refract-pc-tier-label,
+body.stash-liquid-glass.refract-rating-style-playing-card .scene-card:hover .refract-pc-tier-label {
+    opacity: 0;
+    transition: opacity 0.18s ease-out;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-tier-label {
+    transition: opacity 0.22s ease-in;
+}
+
+/* Per-tier ribbon text content. */
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card).refract-card-tier-bronze    .refract-pc-tier-label::after { content: "BRONZE"; }
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card).refract-card-tier-silver    .refract-pc-tier-label::after { content: "SILVER"; }
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card).refract-card-tier-gold      .refract-pc-tier-label::after { content: "GOLD"; }
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card).refract-card-tier-diamond   .refract-pc-tier-label::after { content: "DIAMOND"; }
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card).refract-card-tier-legendary .refract-pc-tier-label::after { content: "LEGENDARY"; }
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card).refract-card-tier-perfect   .refract-pc-tier-label::after { content: "PERFECT"; }
+
+/* Legendary — triadic ribbon body (pink → blue → purple) */
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card).refract-card-tier-legendary .refract-pc-tier-label {
+    background: linear-gradient(
+        90deg,
+        rgba(var(--tier-color), 0) 0%,
+        rgba(var(--tier-color), 0.75) 12%,
+        rgba(var(--tier-color-2), 0.85) 35%,
+        rgba(var(--tier-color-3, var(--tier-color-2)), 0.9) 50%,
+        rgba(var(--tier-color-2), 0.85) 65%,
+        rgba(var(--tier-color), 0.75) 88%,
+        rgba(var(--tier-color), 0) 100%);
+    border-top-color: rgba(var(--tier-color-bright, var(--tier-color)), 0.95);
+    border-bottom-color: rgba(var(--tier-color-bright, var(--tier-color)), 0.95);
+    box-shadow:
+        0 0 14px rgba(var(--tier-color), 0.85),
+        0 0 30px rgba(var(--tier-color-2), 0.55),
+        0 0 56px rgba(var(--tier-color-3, var(--tier-color-2)), 0.4),
+        0 4px 10px rgba(0, 0, 0, 0.5);
+}
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card).refract-card-tier-legendary .refract-pc-tier-label::after {
+    background: linear-gradient(
+        90deg,
+        rgba(var(--tier-color-bright, var(--tier-color)), 1) 0%,
+        rgba(var(--tier-color-2), 1) 50%,
+        rgba(var(--tier-color-3, var(--tier-color-2)), 1) 100%
+    );
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
+        drop-shadow(0 0 5px rgba(255, 255, 255, 0.6));
+}
+
+/* Perfect — rainbow ribbon body + rainbow gradient on the text */
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .scene-card).refract-card-tier-perfect .refract-pc-tier-label {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 107, 157, 0) 0%,
+        rgba(255, 107, 157, 0.8) 12%,
+        rgba(253, 230, 138, 0.9) 30%,
+        rgba(147, 197, 253, 0.9) 50%,
+        rgba(196, 181, 253, 0.9) 70%,
+        rgba(255, 107, 157, 0.8) 88%,
+        rgba(255, 107, 157, 0) 100%);
+    border-top-color: rgba(255, 255, 255, 0.9);
+    border-bottom-color: rgba(255, 255, 255, 0.9);
+    box-shadow:
+        0 0 14px rgba(255, 255, 255, 0.7),
+        0 0 32px rgba(253, 230, 138, 0.5),
+        0 0 56px rgba(147, 197, 253, 0.35),
+        0 4px 12px rgba(0, 0, 0, 0.5);
+}
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-card-tier-perfect .refract-pc-tier-label::after {
+    background: linear-gradient(
+        90deg,
+        #ff6b9d,
+        #fde68a,
+        #86efac,
+        #93c5fd,
+        #c4b5fd,
+        #ff6b9d);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: refractPcPerfectText 6s linear infinite;
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
+        drop-shadow(0 0 6px rgba(255, 255, 255, 0.75));
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Tier-aware name banner glow
+   The card already has `refract-card-tier-{bronze..perfect}` applied
+   by tagFilledRatings() (in this mode AND tiers mode, per the JS).
+   Tier color tokens (--tier-color, --tier-color-bright, --tier-color-2)
+   are declared on those classes in 03_cards.css and are visible here
+   via inheritance.
+   ───────────────────────────────────────────────────────────────── */
+
+/* Bronze through Diamond — handled by the base .refract-pc-name-text
+   rule above. Each tier sets --badge-color / --badge-color-bright
+   (via the tier-color tokens) so the gradient + glow filters paint
+   in tier-colored hues automatically. No per-tier override needed. */
+
+/* Legendary — white text + triadic glow chain (pink → blue → purple
+   gas radiating outward). Solid white text keeps every letter
+   uniformly readable; the drop-shadow chain carries the tier color
+   identity from inner cladding to far halo. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-card-tier-legendary .refract-pc-name-text {
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+    background: none;
+    /* 5 layers — needs to cover the full triadic (pink → blue → purple)
+       palette that gives Legendary its identity. Cutting tier-color-3
+       (purple) made the glow read as ordinary 2-color, indistinguish-
+       able from a regular accent halo. Far halo layer is what got
+       trimmed for perf instead. */
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
+        drop-shadow(0 0 2px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 6px rgba(var(--tier-color), 1))
+        drop-shadow(0 0 12px rgba(var(--tier-color-2), 0.7))
+        drop-shadow(0 0 24px rgba(var(--tier-color-3, var(--tier-color-2)), 0.45));
+}
+
+/* Perfect — pastel rainbow text gradient + slow hue-cycle. The
+   stops are blended with white so every glyph stays uniformly
+   light/readable while the rainbow identity is preserved (no dark
+   saturated hot-pink starting stop hurting the first letters).
+   Multi-layer rainbow glow chain radiates outward. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-card-tier-perfect .refract-pc-name-text {
+    background: linear-gradient(
+        90deg,
+        #ffd6e4,  /* pale pink */
+        #fff6cf,  /* pale yellow */
+        #d2f5dc,  /* pale green */
+        #cfe1fd,  /* pale blue */
+        #e1d5fd,  /* pale lavender */
+        #ffd6e4); /* pale pink */
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% 100%;
+    animation: refractPcPerfectText 6s linear infinite;
+    text-shadow: none;
+    /* 4 layers (down from 8). Rainbow gradient text fill carries
+       Perfect's identity; the outer pastel-rainbow halos at 36-100px
+       were decorative-only and the dominant paint cost on this tier. */
+    filter:
+        drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
+        drop-shadow(0 0 2px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 6px rgba(255, 255, 255, 0.85))
+        drop-shadow(0 0 18px rgba(253, 230, 138, 0.55));
+}
+@keyframes refractPcPerfectText {
+    from { background-position: 0% 50%; }
+    to   { background-position: 200% 50%; }
+}
+
+/* (Per-tier rating chip override removed — the universal neon badge
+   rule above already inherits the tier color via --badge-color and
+   produces the rating-tier glow on the rating chip automatically.) */
+
+/* ── Make the card slightly taller in playing-card mode so the top
+   banner has room without overlapping the image content. The native
+   chin height plus banner ~32px means the image gets squeezed; let
+   the image render under the banner instead. The banner already sits
+   absolute over the top of the card, so we don't need to add height. */
+
+/* ── Disable the Extravagant-mode tier effects (border-frame, breathing,
+   floating, sheen, sparkles, rotating border, perfect ribbon) so they
+   don't render alongside the playing-card chrome. Those rules are
+   gated on body.refract-rating-style-tiers so they're already off here
+   by virtue of the body class being different — no extra suppression
+   needed. */
