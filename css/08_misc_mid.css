@@ -3284,6 +3284,60 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card:hover {
     z-index: 100 !important;
 }
 
+/* ─── Minimal mode: overlay watched-progress + hover-scrubber ──────────
+   By default Stash renders the watched-progress bar above the hover-
+   scrubber as a separate row, so they stack vertically. In minimal
+   mode we want them at the same vertical position (one bar's worth of
+   space), with the watched portion as a muted background colour and
+   the live scrub marker as the bright accent on top.
+
+   Both elements anchor to bottom: 0 of .scene-card-preview. The hover-
+   scrubber sits one z-index higher so its accent marker paints over
+   the watched bar when the user is scrubbing. */
+body.stash-liquid-glass.refract-minimal-cards .scene-card .progress-bar,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .hover-scrubber {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+}
+body.stash-liquid-glass.refract-minimal-cards .scene-card .progress-bar {
+    z-index: 6 !important;
+    background: rgba(0, 0, 0, 0.35) !important;
+    height: 4px !important;
+    border-radius: 0 !important;
+}
+body.stash-liquid-glass.refract-minimal-cards .scene-card .progress-bar > .progress-indicator {
+    /* Watched portion — muted white so the active accent scrub marker
+       reads as a distinct, brighter layer on top. */
+    background: rgba(255, 255, 255, 0.55) !important;
+    border-radius: 0 !important;
+}
+body.stash-liquid-glass.refract-minimal-cards .scene-card .hover-scrubber {
+    z-index: 7 !important;
+}
+body.stash-liquid-glass.refract-minimal-cards .scene-card .hover-scrubber .hover-scrubber-indicator {
+    /* Transparent track — the watched-progress bar underneath provides
+       the visible base, and the marker paints in accent on top. */
+    background-color: transparent !important;
+    height: 4px !important;
+}
+body.stash-liquid-glass.refract-minimal-cards .scene-card .hover-scrubber .hover-scrubber-indicator-marker {
+    background-color: rgb(var(--accent-rgb)) !important;
+}
+
+/* Hide the title (and the chin's dark gradient) while the seekbar is
+   being hovered, so the scrub action isn't visually competing with the
+   title text. The chin fades back in when the mouse leaves the
+   scrubber. */
+body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section-title {
+    transition: opacity 0.18s ease;
+}
+body.stash-liquid-glass.refract-minimal-cards .scene-card:has(.hover-scrubber:hover) .card-section {
+    opacity: 0;
+}
+
 /* Hover bridge — the badge gets a ::after pseudo that extends upward
    into the gap. While the mouse is anywhere in the gap, it's still
    inside the badge's hit area, so .stash-tag-count:hover stays true
