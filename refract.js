@@ -19,6 +19,7 @@
         }
     } catch (e) { /* ignore */ }
 
+
     var REFRACT_PRESETS = ["blue", "pink", "red", "yellow", "purple", "green", "teal"];
     var REFRACT_PRESETS_ALL = ["orange", "blue", "pink", "red", "yellow", "purple", "green", "teal"];
     var ACCENT_STORAGE_KEY = "refract.accent";
@@ -133,9 +134,9 @@
             var lightOn = lightState[0];
             var setLightOn = lightState[1];
 
-            var minimalState = R.useState(isMinimalCardsEnabled());
-            var minimalOn = minimalState[0];
-            var setMinimalOn = minimalState[1];
+            var cardStyleState = R.useState(getStoredCardStyle());
+            var cardStyle = cardStyleState[0];
+            var setCardStyle = cardStyleState[1];
 
             var showNamesState = R.useState(isShowPerformerNamesEnabled());
             var showNamesOn = showNamesState[0];
@@ -216,11 +217,10 @@
                 try { setupSceneTabsPerformers(); } catch (e) { /* ignore */ }
             }
 
-            function toggleMinimal() {
-                var next = !minimalOn;
-                try { localStorage.setItem(MINIMAL_CARDS_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
-                applyMinimalCardsClass(next);
-                setMinimalOn(next);
+            function pickCardStyle(style) {
+                try { localStorage.setItem(MINIMAL_CARDS_STORAGE_KEY, style); } catch (e) { /* ignore */ }
+                applyCardStyleClass(style);
+                setCardStyle(style);
             }
 
             function toggleShowNames() {
@@ -334,15 +334,17 @@
                 ),
                 R.createElement("div", { className: "setting", id: "plugin-refract-rating-style" },
                     R.createElement("div", null,
-                        R.createElement("h3", null, "Rating badge style"),
+                        R.createElement("h3", null, "Card rating style"),
                         R.createElement("div", { className: "sub-heading" },
-                            R.createElement("b", null, "Mono"), " (default) — accent-coloured halo for every rating; brightness scales with score. ",
-                            R.createElement("b", null, "Coloured"), " — red / amber / green tint by rating tier.")
+                            R.createElement("b", null, "Minimal"), " (default) — accent-coloured halo for every rating; brightness scales with score. ",
+                            R.createElement("b", null, "Extravagant"), " — tier-based card frame, halo, and animations escalating from Bronze through Perfect. ",
+                            R.createElement("b", null, "Playing card"), " — trading-card layout for performer cards: name banner at the top with tier-glow, prominent stat strip along the bottom (rating, age, scenes, O count, country).")
                     ),
                     R.createElement("div", { className: "refract-setting-control refract-rating-style-toggle" },
                         [
-                            { key: "intensity", label: "Mono" },
-                            { key: "tiers", label: "Coloured" }
+                            { key: "intensity",    label: "Minimal" },
+                            { key: "tiers",        label: "Extravagant" },
+                            { key: "playing-card", label: "Playing card" }
                         ].map(function (item) {
                             return R.createElement("button", {
                                 key: item.key,
@@ -375,26 +377,25 @@
                         )
                     )
                 ),
-                R.createElement("div", { className: "setting", id: "plugin-refract-minimal-cards" },
+                R.createElement("div", { className: "setting", id: "plugin-refract-card-style" },
                     R.createElement("div", null,
-                        R.createElement("h3", null, "Minimal scene cards"),
+                        R.createElement("h3", null, "Scene card style"),
                         R.createElement("div", { className: "sub-heading" },
-                            "Hide the description block on scene cards. Tidier grids when some scenes have descriptions and others don't.")
+                            R.createElement("b", null, "Refract"), " (default) — tidier minimal layout; description block hidden so the grid stays consistent across scenes with and without descriptions. ",
+                            R.createElement("b", null, "Classic"), " — Stash's original card layout with description, file path, and details visible.")
                     ),
-                    R.createElement("div", { className: "refract-setting-control" },
-                        R.createElement("div", { className: "custom-control custom-switch" },
-                            R.createElement("input", {
-                                type: "checkbox",
-                                className: "custom-control-input",
-                                id: "refract-minimal-cards-toggle",
-                                checked: minimalOn,
-                                onChange: toggleMinimal
-                            }),
-                            R.createElement("label", {
-                                className: "custom-control-label",
-                                htmlFor: "refract-minimal-cards-toggle"
-                            })
-                        )
+                    R.createElement("div", { className: "refract-setting-control refract-card-style-toggle" },
+                        [
+                            { key: "refract", label: "Refract" },
+                            { key: "classic", label: "Classic" }
+                        ].map(function (item) {
+                            return R.createElement("button", {
+                                key: item.key,
+                                type: "button",
+                                className: "refract-segmented-btn" + (cardStyle === item.key ? " is-active" : ""),
+                                onClick: function () { pickCardStyle(item.key); }
+                            }, item.label);
+                        })
                     )
                 ),
                 R.createElement("div", { className: "setting", id: "plugin-refract-show-perf-names" },
@@ -488,21 +489,29 @@
     var MINIMAL_CARDS_STORAGE_KEY = "refract.minimalCards";
     var SHOW_PERF_NAMES_STORAGE_KEY = "refract.showPerformerNames";
     var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";
-    var RATING_STYLES = ["intensity", "tiers"];
+    var RATING_STYLES = ["intensity", "tiers", "playing-card"];
     var GRAPHQL_URL = "/graphql";
 
-    /* Minimal scene cards — hides the description block on each card.
-       Used for a tidier grid when users don't curate descriptions or
-       have a mix of with/without scenes (looks inconsistent). */
-    function isMinimalCardsEnabled() {
-        try { return localStorage.getItem(MINIMAL_CARDS_STORAGE_KEY) === "1"; }
-        catch (e) { return false; }
+    /* Scene card style. "refract" (the new default) = tidier minimal
+       layout — description block hidden so the grid stays consistent.
+       "classic" = Stash's original layout with description and details.
+       Reuses MINIMAL_CARDS_STORAGE_KEY for backwards compat; legacy
+       boolean values ("1" / "0") are mapped transparently. The body
+       class `refract-minimal-cards` stays on the "refract" branch so
+       the existing CSS that depends on it doesn't need renaming. */
+    function getStoredCardStyle() {
+        try {
+            var v = localStorage.getItem(MINIMAL_CARDS_STORAGE_KEY);
+            if (v === "classic" || v === "0") { return "classic"; }
+            if (v === "refract" || v === "1") { return "refract"; }
+        } catch (e) { /* ignore */ }
+        return "refract";
     }
-    function applyMinimalCardsClass(on) {
+    function applyCardStyleClass(style) {
         if (!document.body) { return; }
-        document.body.classList.toggle("refract-minimal-cards", !!on);
+        document.body.classList.toggle("refract-minimal-cards", style === "refract");
     }
-    applyMinimalCardsClass(isMinimalCardsEnabled());
+    applyCardStyleClass(getStoredCardStyle());
 
     /* Performer names under scene-card avatar circles. */
     function isShowPerformerNamesEnabled() {
@@ -583,10 +592,11 @@
     }
     applyLightModeClass(isLightModeEnabled());
 
-    /* Rating-badge differentiation. "intensity" (default) = accent glow
+    /* Card rating style. "intensity" (default, Minimal) = accent glow
        scales with score — uniform-coloured but progressively brighter
-       for higher ratings. "tiers" = traffic-light tint on the glow:
-       red (low) / amber (mid) / green (high). */
+       for higher ratings. "tiers" (Extravagant) = collectible-card tier
+       system (Bronze → Perfect) with per-tier frame, halo, and escalating
+       animations. */
     function getStoredRatingStyle() {
         try {
             var v = localStorage.getItem(RATING_STYLE_STORAGE_KEY);
@@ -665,6 +675,42 @@
         }).then(function (r) { return r.json(); });
     }
 
+    /* Detect Stash's rating-system type (STARS vs DECIMAL). We can't read
+       this from the rating-banner alone because Stash only writes the
+       legacy `rating-N` class in star FULL precision; star HALF / QUARTER /
+       TENTH precisions all use the same `rating-100-N` class that decimal
+       mode does, so the banner is ambiguous. We cache the last-known
+       value in localStorage so the body class is set synchronously on
+       reload (no flash), then refresh via GraphQL in the background. */
+    var RATING_SYSTEM_STORAGE_KEY = "refract.ratingSystemType";
+    function applyRatingSystemClass(type) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-rating-system-stars",
+            typeof type === "string" && type.toLowerCase() === "stars");
+    }
+    function refractFetchRatingSystem() {
+        try {
+            var cached = localStorage.getItem(RATING_SYSTEM_STORAGE_KEY);
+            if (cached) { applyRatingSystemClass(cached); }
+        } catch (e) { /* ignore */ }
+        /* `configuration.ui` is a Map! scalar in Stash's GraphQL schema —
+           you can't subselect fields on it. Query the whole blob and
+           read ratingSystemOptions.type from the deserialised object.
+
+           If `ratingSystemOptions.type` is missing (Stash's default,
+           decimal mode, doesn't always serialise the field), treat as
+           non-stars and clear the cached value — otherwise a previous
+           "stars" cache would stick across a switch to decimal. */
+        gql("query { configuration { ui } }")
+            .then(function (res) {
+                var ui = res && res.data && res.data.configuration
+                    && res.data.configuration.ui;
+                var t = (ui && ui.ratingSystemOptions && ui.ratingSystemOptions.type) || "";
+                try { localStorage.setItem(RATING_SYSTEM_STORAGE_KEY, t); } catch (e) { /* ignore */ }
+                applyRatingSystemClass(t);
+            }).catch(function () { /* ignore — keep cached value */ });
+    }
+
     function escapeHtml(s) {
         return String(s == null ? "" : s)
             .replace(/&/g, "&amp;")
@@ -706,12 +752,26 @@
     }
 
     function stripRatingBannerToNumber() {
+        /* When the user has the stars rating system, Stash sometimes
+           still renders the banner text in the 0–10 decimal scale.
+           Convert to the user-expected 0–5 scale (so "8" for 4 stars
+           becomes "4"). Detection via the body class set by
+           refractFetchRatingSystem(). */
+        var starsMode = document.body.classList.contains("refract-rating-system-stars");
         document.querySelectorAll(".rating-banner").forEach(function (el) {
             var raw = (el.textContent || "").replace(/\s+/g, " ").trim();
             if (!raw) { return; }
             var m = raw.match(/(\d+(?:\.\d+)?)/);
             if (!m) { return; }
             var num = m[1];
+            if (starsMode) {
+                var parsed = parseFloat(num);
+                /* Only divide if the value is in the 0–10 range — if
+                   Stash is already showing a 0–5 number we leave it. */
+                if (isFinite(parsed) && parsed > 5) {
+                    num = String(Math.round((parsed / 2) * 100) / 100);
+                }
+            }
             if (raw === num) { return; }
             el.setAttribute("data-stash-rating", num);
             el.setAttribute("aria-label", "Rating " + num);
@@ -1404,17 +1464,18 @@
 
         var enterTimer = null;
         function onEnter() {
-            card.style.animation = "none"; /* kill fill-mode that overrides tilt transform */
+            /* Cancel any pending leave-cleanup so the timer doesn't strip
+               the transform we're about to set. */
+            if (leaveTimer) { clearTimeout(leaveTimer); leaveTimer = null; }
             card.style.willChange = "transform";
-            /* Brief enter transition so the lift (scale + tilt) eases in from
-               rest instead of snapping instantly. After it lands we switch
-               to no-transition for snappy mouse tracking. */
             card.style.transition = "transform 0.22s " + TILT_EASING;
-            card.style.zIndex = "10";
+            card.style.zIndex = "1000";
+            card.style.transform =
+                "perspective(" + TILT_PERSPECTIVE + "px) rotateX(0deg) rotateY(0deg) " +
+                "scale3d(" + TILT_SCALE + "," + TILT_SCALE + "," + TILT_SCALE + ")";
             if (enterTimer) { clearTimeout(enterTimer); }
             enterTimer = setTimeout(function () {
-                /* Only drop the transition if the cursor is still on the card. */
-                if (card.style.zIndex === "10") {
+                if (card.style.zIndex === "1000") {
                     card.style.transition = "none";
                 }
                 enterTimer = null;
@@ -1426,6 +1487,7 @@
             raf = requestAnimationFrame(function () { applyTilt(e); });
         }
 
+        var leaveTimer = null;
         function onLeave() {
             if (raf) { cancelAnimationFrame(raf); raf = null; }
             if (enterTimer) { clearTimeout(enterTimer); enterTimer = null; }
@@ -1434,6 +1496,21 @@
             card.style.transition = "transform " + TILT_RESET_MS + "ms " + TILT_EASING + ", box-shadow 0.22s ease";
             card.style.transform =
                 "perspective(" + TILT_PERSPECTIVE + "px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)";
+            /* After the reset transition finishes, drop the inline
+               transform entirely so the card stops holding a permanent
+               GPU compositor layer. The string check guards against
+               clobbering a fresh hover that started within the reset
+               window (onEnter cancels this timer in that case anyway). */
+            if (leaveTimer) { clearTimeout(leaveTimer); }
+            leaveTimer = setTimeout(function () {
+                if (card.style.transform.indexOf("scale3d(1, 1, 1)") !== -1
+                    || card.style.transform.indexOf("scale3d(1,1,1)") !== -1) {
+                    card.style.removeProperty("transform");
+                    card.style.removeProperty("transition");
+                }
+                leaveTimer = null;
+            }, TILT_RESET_MS + 50);
+            card.style.removeProperty("animation");
             if (glareInner) { glareInner.style.opacity = "0"; }
         }
 
@@ -1444,10 +1521,7 @@
 
     function initCardTilts() {
         if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
-        document.querySelectorAll(".grid-card").forEach(function (card) {
-            cardTiltBind(card);
-        });
-        document.querySelectorAll(".wall-item").forEach(function (card) {
+        document.querySelectorAll(".grid-card, .scene-card, .performer-card, .wall-item").forEach(function (card) {
             cardTiltBind(card);
         });
     }
@@ -1686,6 +1760,17 @@
             var id = extractSceneId(card);
             if (id !== null) {
                 card.setAttribute("data-stash-sc", "1");
+                /* Tier label placeholder — empty <div> always present;
+                   CSS reads the card's `refract-card-tier-*` class (set
+                   by tagFilledRatings) and fills the visible text via
+                   `::after { content: "BRONZE"/...PERFECT }`. Hidden in
+                   non-playing-card modes via the default reset block in
+                   16_playing_card.css. */
+                if (!card.querySelector(":scope > .refract-pc-tier-label")) {
+                    var tierLabel = document.createElement("div");
+                    tierLabel.className = "refract-pc-tier-label";
+                    card.appendChild(tierLabel);
+                }
                 ids.push(id);
                 cardMap[id] = card;         /* int key */
                 cardMap[String(id)] = card; /* string key — GQL returns id as string */
@@ -1719,16 +1804,30 @@
     }
 
     /* Inject a .rating-banner inside a scene card (mirrors the badge
-       Stash renders on performer cards). Hidden by default if there's
-       no rating; idempotent so repeated initSceneCards calls don't
-       duplicate. Rating is 0-100 in Stash, displayed as 0.0-10.0. */
+       Stash renders on performer cards). Idempotent — if a banner is
+       already there we just refresh its text (so a user switching
+       between stars and decimal rating systems sees the new value on
+       the next initSceneCards pass). Rating is 0-100 in Stash;
+       displayed as 0.0-10.0 in decimal mode or 0-5 in stars mode. */
     function injectSceneRating(card, rating100) {
         if (!card || !rating100 || rating100 <= 0) { return; }
-        if (card.querySelector(":scope > .rating-banner")) { return; }
-        var banner = document.createElement("div");
-        banner.className = "rating-banner";
-        banner.textContent = (rating100 / 10).toFixed(1);
-        card.appendChild(banner);
+        var v10 = rating100 / 10;
+        var starsMode = document.body.classList.contains("refract-rating-system-stars");
+        var displayValue;
+        if (starsMode) {
+            /* 0-5 scale, trimmed to 2 decimals to dodge float artifacts
+               like 3.7500000001; trailing zeros stripped via String. */
+            displayValue = String(Math.round((v10 / 2) * 100) / 100);
+        } else {
+            displayValue = v10.toFixed(1);
+        }
+        var banner = card.querySelector(":scope > .rating-banner");
+        if (!banner) {
+            banner = document.createElement("div");
+            banner.className = "rating-banner";
+            card.appendChild(banner);
+        }
+        banner.textContent = displayValue;
     }
 
     /* ── Performer card redesign ─────────────────────────────────────── */
@@ -1738,6 +1837,31 @@
         '<path d="M188.3 147.1c-7.6 4.2-12.3 12.3-12.3 20.9l0 176c0 8.7 4.7 16.7 12.3 20.9' +
         's16.8 4.1 24.3-.5l144-88c7.1-4.4 11.5-12.1 11.5-20.5s-4.4-16.1-11.5-20.5l-144-88' +
         'c-7.4-4.5-16.7-4.7-24.3-.5z"/></svg>';
+
+    /* Solid five-point star — used by the playing-card stats strip rating
+       badge. Matches Stash's general star iconography. */
+    var STAR_SVG =
+        '<svg viewBox="0 0 576 512" width="10" height="10" fill="currentColor" aria-hidden="true">' +
+        '<path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5' +
+        'c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2' +
+        ' 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3' +
+        's14.9-19.3 12.9-31.3L438.6 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7' +
+        's-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg>';
+
+    /* Cake-with-candles — used by the playing-card stats strip age
+       badge. Disambiguates the age number (e.g. "27") from any other
+       stat. Simplified FontAwesome cake-candles path. */
+    var CAKE_SVG =
+        '<svg viewBox="0 0 448 512" width="10" height="10" fill="currentColor" aria-hidden="true">' +
+        '<path d="M86.4 5.5L61.8 47.6c-3.9 6.7-5.8 14.4-5.8 22.2C56 94.2 75.6 112 99.2 112' +
+        ' s43.2-17.8 43.2-42.2c0-7.8-1.9-15.5-5.8-22.2L112 5.5C110.3 2 106.9 0 103.2 0H97.2' +
+        ' c-3.7 0-7.1 2-8.8 5.5zm96 0L157.8 47.6c-3.9 6.7-5.8 14.4-5.8 22.2c0 24.4 19.6 42.2' +
+        ' 43.2 42.2s43.2-17.8 43.2-42.2c0-7.8-1.9-15.5-5.8-22.2L208 5.5C206.3 2 202.9 0 199.2 0' +
+        ' h-5.9c-3.7 0-7.1 2-8.8 5.5zm96 0L253.8 47.6c-3.9 6.7-5.8 14.4-5.8 22.2C248 94.2' +
+        ' 267.6 112 291.2 112s43.2-17.8 43.2-42.2c0-7.8-1.9-15.5-5.8-22.2L304 5.5C302.3 2' +
+        ' 298.9 0 295.2 0h-5.9c-3.7 0-7.1 2-8.8 5.5zM32 192c-17.7 0-32 14.3-32 32V416H384V224' +
+        ' c0-17.7-14.3-32-32-32H32zm0 256c-17.7 0-32 14.3-32 32s14.3 32 32 32H352c17.7 0 32-14.3' +
+        ' 32-32s-14.3-32-32-32H32z"/></svg>';
 
     function stripYearsOld() {
         document.querySelectorAll(".performer-card .performer-card__age").forEach(function (el) {
@@ -1754,18 +1878,77 @@
             var sceneLink = card.querySelector(".card-popovers .scene-count");
             var hr       = card.querySelector("hr");
             var popovers = card.querySelector(".card-popovers");
+            var titleEl = card.querySelector(".card-section-title");
+            /* Stash renders the country flag with class
+               `performer-card__country-flag fi fi-XX` (flag-icons CSS
+               library: `fi` = base, `fi-XX` = country code). Older
+               Stash builds used `.flag-icon`; keep that as a fallback
+               so the plugin still surfaces a flag in either layout. */
+            var flagEl   = card.querySelector(".performer-card__country-flag, .flag-icon");
+            var ratingEl = card.querySelector(".rating-banner");
             if (!section) { return; }
 
             var row = document.createElement("div");
             row.className = "stash-perf-stats";
 
-            /* Age */
+            /* Rating badge — gated to playing-card mode via CSS. We always
+               inject the badge if the card has a rated banner; the number
+               comes from the same parse path as tagFilledRatings (className
+               > textContent). Only injected when v > 0. */
+            if (ratingEl) {
+                var ratingNum = null;
+                var mCls = ratingEl.className.match(/\brating-100-(\d+)\b/);
+                if (mCls) {
+                    ratingNum = parseInt(mCls[1], 10) * 5 / 10;
+                } else {
+                    mCls = ratingEl.className.match(/\brating-(\d+)\b/);
+                    if (mCls) { ratingNum = parseInt(mCls[1], 10) * 2; }
+                }
+                if (ratingNum == null) {
+                    var raw = (ratingEl.textContent || "").trim();
+                    var rawV = parseFloat(raw);
+                    if (isFinite(rawV) && rawV > 0) {
+                        ratingNum = rawV <= 5 ? rawV * 2 : rawV;
+                    }
+                }
+                if (ratingNum && ratingNum > 0) {
+                    /* If the user has Stash's rating system set to stars,
+                       show the rating chip on a 0–5 scale to match their
+                       configured UI; otherwise stay on the 0–10 decimal
+                       scale. Detection: `body.refract-rating-system-stars`
+                       is set by refractFetchRatingSystem() on init.
+                       The internal `ratingNum` stays 0–10 so tier
+                       classification (Bronze..Perfect) still works the
+                       same. Math.round to 2 decimals to avoid floating-
+                       point artefacts like "3.7500000000001". */
+                    var displayRating = ratingNum;
+                    var starsMode = document.body.classList.contains("refract-rating-system-stars");
+                    if (starsMode) {
+                        displayRating = Math.round((ratingNum / 2) * 100) / 100;
+                    }
+                    var rEl = document.createElement("span");
+                    rEl.className = "stash-perf-rating";
+                    rEl.title = "Rating " + displayRating + (starsMode ? " / 5" : " / 10");
+                    rEl.innerHTML = STAR_SVG +
+                        '<span class="stash-perf-label">Rating</span>' +
+                        "<span>" + escapeHtml(String(displayRating)) + "</span>";
+                    row.appendChild(rEl);
+                }
+            }
+
+            /* Age — adds a cake icon + "Age" label so the bare number
+               (e.g. "27") isn't ambiguous in the playing-card stats
+               strip. The icon and label are CSS-hidden in Minimal /
+               Extravagant modes so those modes keep the compact
+               icon-less "27" rendering they had before. */
             if (ageEl) {
                 var ageText = ageEl.textContent.replace(/\s*years?\s+old/gi, "").trim();
                 if (ageText) {
                     var ageSpan = document.createElement("span");
                     ageSpan.className = "stash-perf-age";
-                    ageSpan.textContent = ageText;
+                    ageSpan.innerHTML = CAKE_SVG +
+                        '<span class="stash-perf-label">Age</span>' +
+                        "<span>" + escapeHtml(ageText) + "</span>";
                     row.appendChild(ageSpan);
                 }
                 ageEl.style.display = "none";
@@ -1784,12 +1967,16 @@
                     var oEl = document.createElement("span");
                     oEl.className = "stash-perf-ocount";
                     oEl.title = oText + " O";
-                    oEl.innerHTML = O_ICON_SVG + "<span>" + escapeHtml(oText) + "</span>";
+                    oEl.innerHTML = O_ICON_SVG +
+                        '<span class="stash-perf-label">O Count</span>' +
+                        "<span>" + escapeHtml(oText) + "</span>";
                     row.appendChild(oEl);
                 }
             }
 
-            /* Scene count */
+            /* Scene count — wrap the number in an inner <span> for the
+               same reason as age (lets playing-card mode target an inner
+               element for gradient text-clip without clipping the chip). */
             if (sceneLink) {
                 var countEl = sceneLink.querySelector("span");
                 var countText = countEl ? countEl.textContent.trim() : "";
@@ -1797,11 +1984,130 @@
                 scenesA.className = "stash-perf-scenes";
                 scenesA.href = sceneLink.getAttribute("href") || "#";
                 scenesA.addEventListener("click", stopProp);
-                scenesA.innerHTML = PLAY_SVG + escapeHtml(countText);
+                scenesA.innerHTML = PLAY_SVG +
+                    '<span class="stash-perf-label">Scenes</span>' +
+                    "<span>" + escapeHtml(countText) + "</span>";
                 row.appendChild(scenesA);
             }
 
+            /* Country flag — kept around; clone is injected INSIDE the
+               name banner (alongside the gender icon) in playing-card
+               mode. This frees the top-right corner for the diagonal
+               tier banner. The flag clone is added below when we
+               build the name banner. */
+
+            /* Tier label placeholder — empty in DOM. In playing-card
+               mode, CSS reads the card's `refract-card-tier-*` class
+               (applied later by tagFilledRatings) and fills this
+               element via `::after { content: ... }`. Always injected
+               so we don't need to re-run initPerformerCards when the
+               rating changes; CSS handles visibility per tier. */
+            var tierLabel = document.createElement("div");
+            tierLabel.className = "refract-pc-tier-label";
+            card.appendChild(tierLabel);
+
             section.appendChild(row);
+
+            /* Shrink-to-fit for the stat strip — high scene counts
+               (3 digits) push chips off the right edge of the card.
+               All chip sizes (font, padding, gaps, icon, label) are
+               calc'd against `--pc-badge-scale` on the row in CSS;
+               JS measures overflow and steps the scale down. */
+            requestAnimationFrame(function shrinkStripToFit() {
+                if (!document.body.classList.contains("refract-rating-style-playing-card")) { return; }
+                var scales = [1, 0.92, 0.84, 0.76, 0.68, 0.6];
+                for (var i = 0; i < scales.length; i++) {
+                    row.style.setProperty("--pc-badge-scale", scales[i]);
+                    if (row.scrollWidth <= row.clientWidth + 1) { return; }
+                }
+            });
+
+            /* Playing-card mode name banner — Pokemon-style header:
+                 [gender icon (type)]  Name        ← left-aligned
+               Inject a copy of the gender icon (cloned from native
+               .gender-icon under the title) PLUS just the performer name
+               text (from .TruncatedText so we exclude the hidden country
+               string). Display is CSS-gated to playing-card mode. */
+            /* Country indicator — extract the ISO-2 code from the
+               flag-icons class (`fi fi-XX`) and convert it to the
+               full localized country name via `Intl.DisplayNames`
+               (built-in browser API). Inserted into the chin above
+               the stat strip so it stacks naturally as a quiet
+               caption (no absolute positioning to fight). Falls
+               back to the raw uppercase code if DisplayNames isn't
+               available or doesn't know the region. */
+            if (flagEl) {
+                var codeMatch = (flagEl.className || "").match(/\bfi-([a-z]{2})\b/i);
+                if (codeMatch) {
+                    var code = codeMatch[1].toUpperCase();
+                    var countryName = code;
+                    try {
+                        var names = new Intl.DisplayNames(["en"], { type: "region" });
+                        countryName = names.of(code) || code;
+                    } catch (e) { /* fall back to the raw code */ }
+                    var countryWrap = document.createElement("span");
+                    countryWrap.className = "stash-perf-country";
+                    countryWrap.textContent = countryName;
+                    section.insertBefore(countryWrap, row);
+                }
+            }
+
+            if (titleEl) {
+                var banner = document.createElement("div");
+                banner.className = "refract-pc-name-banner";
+                /* Gender — corner "type" slot before the name */
+                var genderEl = titleEl.querySelector(".gender-icon");
+                if (genderEl) {
+                    banner.appendChild(genderEl.cloneNode(true));
+                }
+                /* Name — prefer .TruncatedText child; falls back to title
+                   textContent. Avoid grabbing titleEl.textContent directly
+                   since Stash also renders .performer-card__country-string
+                   inside the title (display:none but textContent-visible).
+                   We clone the element and strip any disambiguation
+                   children before extracting textContent, otherwise the
+                   parenthetical "(Tall)" disambig text would be folded
+                   into the rendered name. */
+                var nameText;
+                var nameSrc = titleEl.querySelector(".TruncatedText") || titleEl;
+                if (nameSrc) {
+                    var nameClone = nameSrc.cloneNode(true);
+                    nameClone.querySelectorAll(".performer-disambiguation, .disambiguation, .performer-card__country-string").forEach(function (el) {
+                        el.remove();
+                    });
+                    nameText = (nameClone.textContent || "").trim();
+                } else {
+                    nameText = "";
+                }
+                var bannerInner = document.createElement("span");
+                bannerInner.className = "refract-pc-name-text";
+                bannerInner.textContent = nameText;
+                banner.appendChild(bannerInner);
+                card.insertBefore(banner, card.firstChild);
+
+                /* Shrink-to-fit — the name banner is constrained to the
+                   left 3/4 of the card top (CSS `right: 25%`). For most
+                   names the default 1.3rem fits comfortably; for unusual
+                   long names we step down through smaller sizes until
+                   the text fits within the available banner width.
+                   Runs on the next animation frame so layout is current.
+                   Only runs once per card (data-stash-pc sentinel above
+                   prevents re-binding on React re-renders). */
+                requestAnimationFrame(function shrinkToFit() {
+                    /* Only do work if we're actually in playing-card mode;
+                       in other modes the banner is display:none and the
+                       measurement is meaningless. */
+                    if (!document.body.classList.contains("refract-rating-style-playing-card")) { return; }
+                    /* Concert One is moderately wide per glyph; this ladder
+                       starts at the CSS default (1.25rem) and steps down to
+                       0.7rem to handle unusual long performer names. */
+                    var sizes = [1.25, 1.1, 0.95, 0.85, 0.75, 0.7];
+                    for (var i = 0; i < sizes.length; i++) {
+                        bannerInner.style.fontSize = sizes[i] + "rem";
+                        if (bannerInner.scrollWidth <= bannerInner.clientWidth + 1) { return; }
+                    }
+                });
+            }
 
             if (hr) { hr.style.display = "none"; }
             if (popovers) { popovers.style.display = "none"; }
@@ -2286,6 +2592,7 @@
         disableTableOverflowable();
         initRefractTagEditor();
         enhanceDuplicateChecker();
+        refractFetchRatingSystem();
         watchForReinjection();
         syncRoute();
     }
@@ -4242,12 +4549,104 @@
             var rated = !hasInput && isFinite(v) && v > 0;
             el.classList.toggle("refract-rated", rated);
         });
+        /* Some plugins (e.g. stash-multiview, alternate-scale displays)
+           inject a SECOND `.rating-banner` element on the same card —
+           often with a different value scale (5/5 stars rendered as a
+           "10/10 decimal" equivalent). Iterating all banners would let
+           the second banner overwrite the first's tier classes,
+           promoting low-rated cards to Perfect. Track which cards
+           have already been tier-classified and skip subsequent
+           banners on the same card. The FIRST banner in DOM order is
+           Stash's canonical overlay (inside the scene-card-link /
+           performer-card image area), so we trust it. */
+        var tieredCards = new WeakSet();
         document.querySelectorAll(".rating-banner").forEach(function (el) {
-            var raw = (el.textContent || "").trim();
-            var v = parseFloat(raw);
+            var dupeCard = el.closest(".performer-card, .scene-card");
+            if (dupeCard && tieredCards.has(dupeCard)) { return; }
+            if (dupeCard) { tieredCards.add(dupeCard); }
+            /* Read rating100 from the banner's className, not text — Stash's
+               RatingBanner.tsx writes one of:
+                 • `rating-100-N`   (N = trunc(rating100 / 5), 0–20)
+                   used for decimal mode + 5-star half/quarter precision
+                 • `rating-N`       (N = 1–5, legacy full-star precision)
+               This works regardless of which rating system the user has
+               configured and avoids depending on locale-formatted text. */
+            var rating100 = null;
+            var mCls = el.className.match(/\brating-100-(\d+)\b/);
+            if (mCls) {
+                /* Stash has shipped multiple `rating-100-N` formats:
+                     • Old: N = floor(rating100/5), range 0-20
+                     • New: N IS rating100 directly, range 0-100
+                   Detect by magnitude — anything > 20 has to be the
+                   new format (since the old format maxes at 20). */
+                var n = parseInt(mCls[1], 10);
+                rating100 = n > 20 ? Math.min(100, n) : n * 5;
+            } else {
+                mCls = el.className.match(/\brating-(\d+)\b/);
+                if (mCls) { rating100 = Math.min(100, parseInt(mCls[1], 10) * 20); }
+            }
+            /* Fallback: parse the visible text in case Stash markup
+               changes or a 3rd-party plugin injects a banner without
+               the `rating-100-N` / `rating-N` class. Use the configured
+               rating system (`body.refract-rating-system-stars`, set
+               by refractFetchRatingSystem) to pick the scale —
+               otherwise a decimal-mode 5/10 would be parsed as 5/5
+               (Perfect) and 4.9/10 as 4.9/5 (Legendary), since the
+               old `rawV <= 5 ? * 20 : * 10` heuristic always assumed
+               low values meant stars. Clamp to 100 so an out-of-range
+               input can't promote to a higher tier.
+
+               Special guard: values >5 can ONLY be decimal (stars max
+               is 5), so always treat them as decimal (×10) regardless
+               of the body class. This makes the parser resilient to a
+               stale `refract-rating-system-stars` class that might
+               persist briefly after a stars→decimal switch. */
+            if (rating100 === null) {
+                var raw = (el.textContent || "").trim();
+                var rawV = parseFloat(raw);
+                if (isFinite(rawV) && rawV > 0) {
+                    if (rawV > 5) {
+                        rating100 = Math.min(100, rawV * 10);
+                    } else {
+                        var starsMode = document.body.classList.contains("refract-rating-system-stars");
+                        rating100 = Math.min(100, starsMode ? rawV * 20 : rawV * 10);
+                    }
+                }
+            }
+            /* Diagnostic logging — temporary. Enable by running
+               `window._refractTierDebug = true` in DevTools, then
+               reload. Logs one line per scene-card rating banner so
+               we can see what classes + text it has + how the parser
+               interpreted it. Remove once tier classification is
+               confirmed correct. */
+            if (window._refractTierDebug) {
+                var dbgCard = el.closest(".scene-card");
+                if (dbgCard) {
+                    console.log("[refract tier]",
+                        "class:", el.className,
+                        "text:", JSON.stringify((el.textContent || "").trim()),
+                        "rating100:", rating100,
+                        "v:", rating100 == null ? null : rating100 / 10,
+                        "starsBodyClass:", document.body.classList.contains("refract-rating-system-stars")
+                    );
+                }
+            }
+            var v = rating100 == null ? 0 : rating100 / 10; /* 0–10 normalized */
+
             ["refract-tier-low", "refract-tier-mid", "refract-tier-high"]
                 .forEach(function (c) { el.classList.remove(c); });
-            if (!isFinite(v) || v <= 0) {
+            /* Also clear any prior card-tier class on the enclosing card so
+               a re-rendered banner with a new value (or no value) doesn't
+               leave the old tier glow lingering. */
+            var card = el.closest(".performer-card, .scene-card");
+            var cardTiers = ["bronze", "silver", "gold", "diamond", "legendary", "perfect"];
+            if (card) {
+                cardTiers.forEach(function (t) {
+                    card.classList.remove("refract-card-tier-" + t);
+                });
+                card.style.removeProperty("--refract-rating");
+            }
+            if (!rating100 || v <= 0) {
                 el.style.removeProperty("--refract-rating");
                 return;
             }
@@ -4255,6 +4654,24 @@
             if (v <= 3.4) { el.classList.add("refract-tier-low"); }
             else if (v <= 6.7) { el.classList.add("refract-tier-mid"); }
             else { el.classList.add("refract-tier-high"); }
+            /* Card-frame tier (Bronze→Perfect). Applied in the "tiers"
+               rating style (full card-frame treatment) AND in the
+               "playing-card" style (drives the name-banner glow at the
+               top of each performer card). The "intensity" (mono) mode
+               is left untouched: just the existing banner glow that
+               scales with --refract-rating. */
+            var inTiersMode = document.body.classList.contains("refract-rating-style-tiers");
+            var inPlayingCardMode = document.body.classList.contains("refract-rating-style-playing-card");
+            if (card && (inTiersMode || inPlayingCardMode) && v >= 5) {
+                var tier;
+                if (v >= 10)      { tier = "perfect"; }
+                else if (v >= 9.5) { tier = "legendary"; }
+                else if (v >= 8.5) { tier = "diamond"; }
+                else if (v >= 7.5) { tier = "gold"; }
+                else if (v >= 6.5) { tier = "silver"; }
+                else               { tier = "bronze"; }
+                card.classList.add("refract-card-tier-" + tier);
+            }
         });
     }
 
