@@ -19,11 +19,18 @@ body.stash-liquid-glass .grid-card {
        near-opaque dark page background where the blur is barely visible,
        and a gallery page can render 40+ cards = 40+ GPU compositor
        layers. Strip them to keep gallery scrolling cool. */
-    /* CSS containment: tell the browser each card is an isolated render
-       box — its layout/style can't affect siblings. `paint` is omitted
-       deliberately so per-card tooltips (e.g. performer-link hover label)
-       can escape the card border, which they do via position:absolute. */
+    /* CSS containment: layout/style isolation so per-card style + layout
+       changes (rating ticks, hover, etc.) don't dirty the whole row.
+       `paint` is omitted deliberately so per-card tooltips can escape
+       the card border via position:absolute. */
     contain: layout style;
+    /* Skip rendering work for cards outside the viewport — paint,
+       layout, and CSS animations are paused on hidden cards. Major win
+       on gallery pages with 40+ tier-animated cards where ~80% are
+       off-screen. `contain-intrinsic-size: auto 320px` lets the browser
+       remember the last-rendered size so scroll position stays stable. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 320px;
     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.2s ease;
     position: relative;
 }
@@ -35,6 +42,14 @@ body.stash-liquid-glass .grid-card:hover {
         0 0 0 1px rgba(var(--accent-rgb), 0.14),
         0 0 40px 6px rgba(var(--accent-rgb), 0.22),
         0 0 90px 18px rgba(var(--accent-rgb), 0.09);
+}
+/* Hover scale is scoped to .grid-card only — the bare .card class is
+   used by Stash for setting-sections, modal panels, etc., and the lift
+   makes sliders + clickable controls jitter under the cursor. Grid
+   cards (scene/performer/etc.) keep the lift as a safety net for when
+   the JS tilt's mousemove handler hasn't fired yet. */
+body.stash-liquid-glass .grid-card:hover {
+    transform: scale3d(1.04, 1.04, 1.04);
 }
 
 /* Card images — fill their container; only round when explicitly inset by a
@@ -95,7 +110,12 @@ body.stash-liquid-glass .stash-tilt-glare-inner {
         to   { opacity: 1; transform: translateY(0); }
     }
     body.stash-liquid-glass .grid-card {
-        animation: stash-card-in 0.32s ease both;
+        /* No fill-mode — `both` would persist the `to` keyframe's
+           `transform: translateY(0)` after the animation ends, and that
+           persisting animation transform cascades ABOVE inline styles,
+           silently blocking the JS hover-tilt's `card.style.transform`
+           on every non-Legendary/Perfect card. */
+        animation: stash-card-in 0.32s ease;
     }
 }
 
@@ -114,8 +134,9 @@ body.stash-liquid-glass .card-check {
     border-radius: 50%;
     border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
     background: rgba(0, 0, 0, 0.3) !important;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    /* backdrop-filter intentionally NOT set here — checkboxes are
+       opacity:0 by default but the blur still costs a compositor layer
+       per card. Apply only when actually shown (hover or :checked). */
     cursor: pointer;
     opacity: 0;
     box-shadow: none !important;
@@ -125,6 +146,8 @@ body.stash-liquid-glass .card:hover .card-check,
 body.stash-liquid-glass .grid-card:hover .card-check,
 body.stash-liquid-glass .card-check:checked {
     opacity: 1;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 body.stash-liquid-glass .card-check:checked {
     background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/58% no-repeat !important;
@@ -223,59 +246,1003 @@ body.stash-liquid-glass .scene-card > .rating-banner,
 body.stash-liquid-glass .grid-card.scene-card > .rating-banner,
 body.stash-liquid-glass #performer-page .image-container .rating-banner {
     position: absolute !important;
-    top: 0.65rem !important;
-    left: 0.65rem !important;
+    top: 0.45rem !important;
+    left: 0.45rem !important;
     right: auto !important;
     bottom: auto !important;
     z-index: 6;
     transform: none !important;
 }
 
-/* ── Rating-badge tiers override ─────────────────────────────────────
-   Intensity mode is the baseline (above). Tiers mode replaces the
-   accent-coloured glow with a traffic-light tint based on the score:
-     refract-tier-low  (≤3.4) → red
-     refract-tier-mid  (3.5–6.7) → amber
-     refract-tier-high (≥6.8) → green
-   Tag classes are set by tagFilledRatings(). */
-body.stash-liquid-glass.refract-rating-style-tiers .rating-banner.refract-tier-low {
-    border-color: rgba(239, 68, 68, 0.55) !important;
-    color: #ff6b6b !important;
-    box-shadow:
-        0 0 0 1px rgba(239, 68, 68, 0.22) inset,
-        0 0 14px rgba(239, 68, 68, 0.42),
-        0 0 28px rgba(239, 68, 68, 0.22),
-        0 6px 18px rgba(0, 0, 0, 0.35) !important;
+/* Tiers (coloured) mode used to repaint the rating-banner with red /
+   amber / green traffic-light tints based on refract-tier-low/-mid/-high.
+   That treatment is now replaced by the card-frame tier system below
+   (see "Card rating tiers" section) — the banner keeps the same accent-
+   glow look in both modes, and the card border conveys the tier. */
+
+/* ── Star-shaped banner for any star rating mode ──────────────────────
+   Gated on `body.refract-rating-system-stars` (set by refractFetchRatingSystem
+   in refract.js after a one-time GraphQL config fetch). This catches
+   STARS at FULL, HALF, QUARTER, and TENTH precisions; DECIMAL mode
+   keeps the rounded pill.
+
+   clip-path: polygon() carves the badge into a 5-point star and clips
+   the box-shadow with it; filter: drop-shadow() then paints a star-
+   shaped halo that follows the silhouette instead of a rounded square.
+
+   Font-size is sized to fit up to 3 characters ("5.0" / "4.5") inside
+   the narrow waist of the star — single-digit FULL ratings render a
+   touch smaller than they could, but the layout stays consistent
+   across precisions. */
+body.stash-liquid-glass.refract-rating-system-stars .rating-banner {
+    /* Square container — the star shape comes from masked pseudo-elements
+       (::before for fill, ::after for outline ring). Keeping the parent
+       unmasked lets the outline ring extend past the fill silhouette
+       without being clipped, which a parent-level mask would force. */
+    width: 4rem !important;
+    height: 4rem !important;
+    min-width: 4rem !important;
+    min-height: 4rem !important;
+    max-width: 4rem !important;
+    max-height: 4rem !important;
+    border-radius: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    /* Force the banner to be a stacking context so the negative z-index
+       pseudo-elements (fill behind text, outline ring just under text)
+       stay scoped inside the badge. */
+    isolation: isolate;
+    overflow: visible !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+    /* Neon-tube text — faint white filament + accent gas glow. Per-tier
+       overrides further down swap accent-rgb for the tier colour. */
     text-shadow:
-        0 0 14px rgba(239, 68, 68, 0.55),
-        0 1px 0 rgba(0, 0, 0, 0.85),
-        0 2px 4px rgba(0, 0, 0, 0.75) !important;
+        0 0 1px rgba(255, 255, 255, 0.35),
+        0 0 6px rgba(var(--accent-rgb), 0.9),
+        0 0 12px rgba(var(--accent-rgb), 0.8),
+        0 0 20px rgba(var(--accent-rgb), 0.55),
+        0 0 32px rgba(var(--accent-rgb), 0.35) !important;
 }
-body.stash-liquid-glass.refract-rating-style-tiers .rating-banner.refract-tier-mid {
-    border-color: rgba(245, 158, 11, 0.55) !important;
-    color: #fbbf24 !important;
-    box-shadow:
-        0 0 0 1px rgba(245, 158, 11, 0.22) inset,
-        0 0 14px rgba(245, 158, 11, 0.42),
-        0 0 28px rgba(245, 158, 11, 0.22),
-        0 6px 18px rgba(0, 0, 0, 0.35) !important;
-    text-shadow:
-        0 0 14px rgba(245, 158, 11, 0.55),
-        0 1px 0 rgba(0, 0, 0, 0.85),
-        0 2px 4px rgba(0, 0, 0, 0.75) !important;
+
+/* ── Star fill (::before) — translucent tier gradient, masked into a
+   filled 5-point polygon. Sits behind the text via negative z-index. */
+body.stash-liquid-glass.refract-rating-system-stars .rating-banner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background: linear-gradient(
+        135deg,
+        rgba(var(--accent-rgb), 0.4) 0%,
+        rgba(var(--accent-rgb), 0.15) 100%
+    );
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='50,7 63,33 92,36 71,58 77,85 50,71 24,85 29,58 8,36 37,33' fill='black' stroke='black' stroke-width='7' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='50,7 63,33 92,36 71,58 77,85 50,71 24,85 29,58 8,36 37,33' fill='black' stroke='black' stroke-width='7' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+    -webkit-mask-size: contain;
+            mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+            mask-position: center;
+    pointer-events: none;
 }
-body.stash-liquid-glass.refract-rating-style-tiers .rating-banner.refract-tier-high {
-    border-color: rgba(16, 185, 129, 0.55) !important;
-    color: #34d399 !important;
+
+/* ── Star outline ring (::after) — a slim coloured neon tube hugging the
+   star silhouette. Trick: SVG polygon with `fill='none'` and a non-zero
+   stroke-width — `mask-image` then reveals only the stroke region. The
+   ring is centred on the polygon edge, so it overlaps the inner fill
+   slightly (no visible seam) and extends past the fill on the outside
+   (visible outline). filter: drop-shadow chain paints the atmospheric
+   gas glow that follows the ring silhouette. */
+body.stash-liquid-glass.refract-rating-system-stars .rating-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    /* White-hot core — the thin masked ring paints in pure white, like
+       the lit glass of a neon tube. The colour comes from the layered
+       drop-shadow chain below, which feathers tier-coloured bloom
+       outward and inward from the white silhouette. */
+    background: rgb(255, 255, 255);
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='50,7 63,33 92,36 71,58 77,85 50,71 24,85 29,58 8,36 37,33' fill='none' stroke='black' stroke-width='4' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='50,7 63,33 92,36 71,58 77,85 50,71 24,85 29,58 8,36 37,33' fill='none' stroke='black' stroke-width='4' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+    -webkit-mask-size: contain;
+            mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+            mask-position: center;
+    /* Neon-tube glow recipe — each drop-shadow filters the previous
+       filter's output, so the chain builds up: thin white core (the
+       mask itself) → tight tier-bright cladding → tier gas plasma →
+       atmospheric bloom → far falloff. */
+    filter:
+        drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.9))
+        drop-shadow(0 0 2px rgba(var(--accent-rgb), 1))
+        drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.85))
+        drop-shadow(0 0 10px rgba(var(--accent-rgb), 0.55))
+        drop-shadow(0 0 22px rgba(var(--accent-rgb), 0.3));
+    pointer-events: none;
+}
+/* The rating text inside is wrapped in nothing — it's a text node child
+   of .rating-banner. Use a slight upward shift on inline text via a
+   pseudo-class layer if needed in future. */
+
+/* Scene cards use a smaller banner — keep proportions */
+body.stash-liquid-glass.refract-rating-system-stars .scene-card .rating-banner {
+    width: 3.1rem !important;
+    height: 3.1rem !important;
+    min-width: 3.1rem !important;
+    min-height: 3.1rem !important;
+    max-width: 3.1rem !important;
+    max-height: 3.1rem !important;
+    font-size: 0.78rem !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Card rating tiers — six-tier "collectible card" treatment
+   Classes added by tagFilledRatings() (refract.js) when the rating-style
+   toggle is on "tiers". Below 5.0 the card stays default-glass; from 5.0
+   up, the frame escalates tier-by-tier — color, glow, animation, and the
+   matching star badge. Each tier inherits the lower tier's energy and
+   adds another layer of drama.
+
+   All animations use transform / opacity / filter / box-shadow — GPU-
+   composited only, no layout. Bronze → Diamond cost a single GPU layer
+   per card; Legendary + Perfect add a rotating ::after for the border,
+   which already shipped on Perfect tier and runs fine at 40+ cards.
+
+   prefers-reduced-motion and refract-lite both strip animations to
+   static (colors / glows preserved).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Tier color tokens (RGB triplets; consumed as rgba(var(--tier-color), N))
+   NOT gated on a rating-style mode — the tokens are just data, and
+   tagFilledRatings() only applies the tier classes in modes that
+   consume the tokens (currently Extravagant + Playing card). Ungating
+   means the playing-card stats strip + name banner can also read
+   --tier-color directly without re-declaring per mode. */
+body.stash-liquid-glass .refract-card-tier-bronze {
+    /* Brighter copper than the literal #B87333 — the original dark
+       copper rendered hard-to-read on the stat-badge text gradient.
+       Keeps the warm-bronze identity but shifts both stops up the
+       luminance scale so values stay legible on dark backdrops. */
+    --tier-color: 215, 148, 92;
+    --tier-color-bright: 245, 197, 145;
+}
+body.stash-liquid-glass .refract-card-tier-silver {
+    --tier-color: 192, 196, 204;
+    --tier-color-bright: 232, 236, 244;
+}
+body.stash-liquid-glass .refract-card-tier-gold {
+    --tier-color: 230, 185, 78;
+    --tier-color-bright: 255, 215, 120;
+}
+/* Diamond — whitish teal (icy/crystal feel). Accent-INDEPENDENT
+   so a 8.5+ rating reads as "premium/cold/crystal" regardless of
+   the user's accent colour. */
+body.stash-liquid-glass .refract-card-tier-diamond {
+    --tier-color: 165, 223, 219;
+    --tier-color-bright: 224, 247, 244;
+}
+/* Legendary — triadic pink → blue → purple palette (accent-INDEPENDENT,
+   like Perfect). A 9.5+ rating reads as "rare/mythic" via the chromatic
+   shift away from the user's chosen accent, the same way Perfect signals
+   "ultra rare" with full-spectrum rainbow. The three tokens drive close
+   border (pink), mid atmosphere (blue), and outer halo (purple). */
+body.stash-liquid-glass .refract-card-tier-legendary {
+    --tier-color: 244, 114, 182;
+    --tier-color-2: 96, 165, 250;
+    --tier-color-3: 192, 132, 252;
+    --tier-color-bright: 251, 207, 232;
+}
+/* Perfect is intentionally accent-INDEPENDENT — a 10/10 should read as
+   "this is THE top tier" regardless of which accent the user has set.
+   --tier-color here is a pure-white core; the rainbow halo comes from
+   the conic-gradient border + multi-color box-shadow layers. */
+body.stash-liquid-glass .refract-card-tier-perfect {
+    --tier-color: 255, 255, 255;
+}
+
+/* ── Tier z-index hierarchy ─────────────────────────────────────────
+   Higher-rated card always sits on top when cards overlap (Legendary/
+   Perfect scale + float push them past their grid cell). Cards are
+   direct flex children of `.row.justify-content-center` — no cell
+   wrapper — so the card's own z-index sorts them.
+
+   No isolation, no will-change: those promote each card to its own
+   compositor layer, which Chrome sometimes paints out of CSS z-order. */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-bronze,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-silver,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-gold,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-diamond,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-legendary,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-perfect {
+    position: relative !important;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-bronze    { z-index: 20 !important; }
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-silver    { z-index: 30 !important; }
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-gold      { z-index: 40 !important; }
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-diamond   { z-index: 50 !important; }
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-legendary { z-index: 60 !important; }
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-perfect   { z-index: 70 !important; }
+
+/* Isolate the grid row so the cards' z-indices stay scoped inside it.
+   Without this, the cards' z-indices (20–70) compete in the global root
+   stacking context against the floating pagination (z-index: 400) — and
+   because the pagination's `position: fixed` is anchored to a transformed
+   ancestor (Stash's main scroll container uses transform), it ends up
+   sharing the cards' stacking context and losing to high-tier cards.
+   `isolation: isolate` makes the row its own stacking context root, so
+   card z-indices can't leak past it. */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .row:has(> [class*="refract-card-tier-"]) {
+    isolation: isolate;
+}
+
+/* ── Animation primitives ───────────────────────────────────────────── */
+@property --refract-rotate {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+}
+@property --refract-star-rotate {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+}
+/* IMPORTANT: every keyframe stop must have the SAME number of box-shadow
+   layers — CSS only interpolates smoothly between matching layer counts,
+   otherwise it cross-fades and looks like a flash.
+
+   The trough (0%/100%) is the STATIC look of the card; the peak (50%)
+   adds a strong overshoot. So the trough opacities are intentionally
+   high — the card is always visibly glowing — and the pulse modulates
+   on top of that already-bright base. */
+/* LED-STRIP / NEON-TUBE recipe — no dark drop shadow at all (real neon
+   emits light, doesn't cast dark shadows). Each shadow layer plays a
+   specific physical role:
+
+     L1  0 0 0 1px [white]         — the white-hot core (filament)
+     L2  0 0 0 2.5px [color-bright] — the colored "plasma" band
+     L3  0 0 8px [color-bright]    — tight emission halo
+     L4  0 0 18px [color]          — mid glow
+     L5  0 0 50px [color]          — wide bloom
+     L6  0 0 100px [color]         — faint atmospheric
+     L7  0 0 12px 1px [color] inset — inner bleed (lit-from-within feel)
+
+   Border is removed entirely on these tiers (border: none) — the
+   shadow stack draws the visible edge. Same 7-layer shape in both
+   keyframe stops so the breathing interpolates smoothly. */
+@keyframes refractCardBreathe {
+    0%, 100% {
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 0.7),
+            0 0 0 2.5px rgba(var(--tier-color-bright, var(--tier-color)), 0.7),
+            0 0 8px rgba(var(--tier-color-bright, var(--tier-color)), 0.85),
+            0 0 18px rgba(var(--tier-color), 0.65),
+            0 0 44px rgba(var(--tier-color), 0.38),
+            0 0 100px rgba(var(--tier-color), 0.18),
+            0 0 12px 1px rgba(var(--tier-color-bright, var(--tier-color)), 0.32) inset;
+    }
+    50% {
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 1),
+            0 0 0 2.5px rgba(var(--tier-color-bright, var(--tier-color)), 1),
+            0 0 12px rgba(var(--tier-color-bright, var(--tier-color)), 1),
+            0 0 26px rgba(var(--tier-color), 0.9),
+            0 0 60px rgba(var(--tier-color), 0.55),
+            0 0 130px rgba(var(--tier-color), 0.32),
+            0 0 18px 2px rgba(var(--tier-color-bright, var(--tier-color)), 0.55) inset;
+    }
+}
+/* Legendary — triadic tube (pink core → blue mid → purple outer halo).
+   Each shadow layer count must match between 0% and 50% so CSS can
+   interpolate cleanly; layer purposes from inner to outer:
+     1. White hairline       (always)
+     2. Pink hard border     (--tier-color)
+     3. Pink inner glow      (--tier-color)
+     4. Blue mid atmosphere  (--tier-color-2)
+     5. Purple outer halo    (--tier-color-3)
+     6. Purple far halo      (--tier-color-3)
+     7. Pink inset           (--tier-color)
+*/
+@keyframes refractCardBreatheLegendary {
+    0%, 100% {
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 0.85),
+            0 0 0 2.5px rgba(var(--tier-color), 0.85),
+            0 0 10px rgba(var(--tier-color), 0.85),
+            0 0 30px rgba(var(--tier-color-2), 0.55),
+            0 0 70px rgba(var(--tier-color-3, var(--tier-color-2)), 0.4),
+            0 0 140px rgba(var(--tier-color-3, var(--tier-color-2)), 0.2),
+            0 0 18px 2px rgba(var(--tier-color), 0.42) inset;
+    }
+    50% {
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 1),
+            0 0 0 2.5px rgba(var(--tier-color), 1),
+            0 0 16px rgba(var(--tier-color), 1),
+            0 0 40px rgba(var(--tier-color-2), 0.85),
+            0 0 90px rgba(var(--tier-color-3, var(--tier-color-2)), 0.6),
+            0 0 180px rgba(var(--tier-color-3, var(--tier-color-2)), 0.35),
+            0 0 24px 3px rgba(var(--tier-color), 0.65) inset;
+    }
+}
+/* Perfect — white-hot core with full rainbow atmospheric layers */
+@keyframes refractCardBreathePerfect {
+    0%, 100% {
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 1),
+            0 0 0 2.5px rgba(255, 235, 200, 0.85),
+            0 0 10px rgba(255, 255, 255, 0.9),
+            0 0 26px rgba(253, 230, 138, 0.7),
+            0 0 60px rgba(147, 197, 253, 0.42),
+            0 0 130px rgba(240, 171, 252, 0.28),
+            0 0 20px 3px rgba(255, 255, 255, 0.55) inset;
+    }
+    50% {
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 1),
+            0 0 0 2.5px rgba(255, 245, 220, 1),
+            0 0 14px rgba(255, 255, 255, 1),
+            0 0 36px rgba(253, 230, 138, 1),
+            0 0 80px rgba(147, 197, 253, 0.68),
+            0 0 180px rgba(240, 171, 252, 0.5),
+            0 0 28px 4px rgba(255, 255, 255, 0.8) inset;
+    }
+}
+/* Sheen: full sweep from off-canvas left to off-canvas right, easing
+   in and out on opacity so there's no hard on/off flash. */
+@keyframes refractCardSheen {
+    0%, 100% { background-position: -150% 0; opacity: 0; }
+    35%      { background-position: -30% 0;  opacity: 0.9; }
+    65%      { background-position: 130% 0;  opacity: 0.9; }
+    100%     { background-position: 150% 0;  opacity: 0; }
+}
+/* Sparkle: stays mostly visible with a pronounced peak twinkle */
+@keyframes refractCardSparkle {
+    0%, 100% { opacity: 0.6; transform: scale(0.95); }
+    50%      { opacity: 1;   transform: scale(1.07); }
+}
+@keyframes refractCardRotateBorder {
+    0%   { --refract-rotate: 0deg; }
+    100% { --refract-rotate: 360deg; }
+}
+@keyframes refractStarRotate {
+    0%   { --refract-star-rotate: 0deg; }
+    100% { --refract-star-rotate: 360deg; }
+}
+/* "Popping out of the screen" animation for Legendary + Perfect.
+   Uses the individual `translate` / `rotate` / `scale` CSS properties
+   (NOT `transform`) so they compose cleanly with the JS hover-tilt's
+   inline `transform`. The KEY ingredient is `scale` — it gives the
+   "this card is bigger / closer to the viewer" depth cue that mere
+   translate-up can't match. Existing hover tilt scales to 1.04
+   (TILT_SCALE in refract.js); Perfect sits at 1.04 at rest so it's
+   already "hover-sized" relative to its neighbors, with a continuous
+   gentle bob breathing on top. */
+@keyframes refractCardFloatLegendary {
+    0%, 100% { translate: 0 -4px; scale: 1.025; rotate: 0 0 -0.35deg; }
+    50%      { translate: 0 -8px; scale: 1.04;  rotate: 0 0 0.35deg; }
+}
+@keyframes refractCardFloatPerfect {
+    0%, 100% { translate: 0 -6px;  scale: 1.04; rotate: 0 0 -0.5deg; }
+    33%      { translate: 0 -12px; scale: 1.06; rotate: 0 0 0.4deg; }
+    66%      { translate: 0 -10px; scale: 1.05; rotate: 0 0 -0.2deg; }
+}
+
+/* Shared base for every tier card — kills every potential dark-band
+   source: the original border, outline, contain clip, and the dark
+   translucent glass-bg. The image still fills the top, but where the
+   image doesn't reach (text area, gaps), we paint a faint tier-colored
+   tint so it reads as "lit" instead of "black". */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card[class*="refract-card-tier-"],
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card[class*="refract-card-tier-"] {
+    border: 0 !important;
+    outline: 0 !important;
+    contain: none !important;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(var(--tier-color), 0.12) 0%,
+            rgba(var(--tier-color), 0.05) 50%,
+            rgba(var(--tier-color), 0.12) 100%
+        ),
+        rgba(20, 22, 28, 0.92) !important;
+    background-clip: padding-box !important;
+}
+
+/* ── Bronze (5.0–6.4): quiet — breathing only ──────────────────────── */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-bronze,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-bronze {
+    animation: refractCardBreathe 7s ease-in-out infinite;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-bronze:hover,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-bronze:hover {
+    border-color: rgba(var(--tier-color-bright), 0.85) !important;
     box-shadow:
-        0 0 0 1px rgba(16, 185, 129, 0.22) inset,
-        0 0 14px rgba(16, 185, 129, 0.42),
-        0 0 28px rgba(16, 185, 129, 0.22),
-        0 6px 18px rgba(0, 0, 0, 0.35) !important;
+        0 8px 26px rgba(0, 0, 0, 0.5),
+        0 0 36px rgba(var(--tier-color), 0.55),
+        0 0 80px rgba(var(--tier-color), 0.28),
+        0 0 0 1px rgba(var(--tier-color), 0.35) inset !important;
+}
+
+/* ── Silver (6.5–7.4): breathing + sheen sweep ─────────────────────── */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-silver,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-silver {
+    animation: refractCardBreathe 6.5s ease-in-out infinite;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-silver:hover,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-silver:hover {
+    border-color: rgba(var(--tier-color-bright), 0.95) !important;
+    box-shadow:
+        0 8px 28px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(var(--tier-color), 0.55),
+        0 0 90px rgba(var(--tier-color), 0.32),
+        0 0 0 1px rgba(var(--tier-color), 0.4) inset !important;
+}
+
+/* ── Gold (7.5–8.4): breathing (faster) + sheen + warm inset ───────── */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-gold,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-gold {
+    animation: refractCardBreathe 6s ease-in-out infinite;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-gold:hover,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-gold:hover {
+    border-color: rgba(var(--tier-color-bright), 1) !important;
+    box-shadow:
+        0 10px 32px rgba(0, 0, 0, 0.55),
+        0 0 48px rgba(var(--tier-color), 0.65),
+        0 0 100px rgba(var(--tier-color), 0.38),
+        0 0 0 1px rgba(var(--tier-color-bright), 0.5) inset !important;
+}
+
+/* ── Diamond (8.5–9.4): breathing + sparkles ──────────────────────── */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-diamond,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-diamond {
+    animation: refractCardBreathe 5.5s ease-in-out infinite;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-diamond:hover,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-diamond:hover {
+    border-color: var(--accent-bright) !important;
+    box-shadow:
+        0 12px 36px rgba(0, 0, 0, 0.55),
+        0 0 56px rgba(var(--tier-color), 0.72),
+        0 0 120px rgba(var(--tier-color), 0.42),
+        0 0 0 1px rgba(var(--tier-color), 0.55) inset !important;
+}
+
+/* ── Legendary (9.5–9.9): breathing + rotating dual-color border ──── */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-legendary,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-legendary {
+    position: relative;
+    /* Two animations: breathing (controls box-shadow) + floating
+       (controls translate / rotate / scale — separate from transform,
+       so the JS hover-tilt's transform composes with these without
+       fighting). !important so the JS's hover-time `animation: none`
+       reset can't freeze the card permanently after a single hover. */
+    animation:
+        refractCardBreatheLegendary 5s ease-in-out infinite,
+        refractCardFloatLegendary 7s ease-in-out infinite !important;
+    /* z-index handled in the shared tier hierarchy block below */
+    transform-origin: center center !important;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-legendary:hover,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-legendary:hover {
+    box-shadow:
+        0 14px 40px rgba(0, 0, 0, 0.6),
+        0 0 50px rgba(var(--tier-color), 0.78),
+        0 0 100px rgba(var(--tier-color-2), 0.5),
+        0 0 160px rgba(var(--tier-color-3, var(--tier-color-2)), 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.22) inset !important;
+}
+
+/* ── Perfect (10.0): rainbow + white core, accent-independent ────────
+   Uses the dedicated refractCardBreathePerfect keyframe so all six
+   halo layers (white core + pink/yellow/blue/violet outer layers) are
+   present at every animation tick — no rainbow disappearing on pulse. */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-perfect,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-perfect {
+    position: relative;
+    animation:
+        refractCardBreathePerfect 4.5s ease-in-out infinite,
+        refractCardFloatPerfect 9s ease-in-out infinite !important;
+    /* z-index handled in the shared tier hierarchy block below */
+    transform-origin: center center !important;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-perfect:hover,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-perfect:hover {
+    box-shadow:
+        0 18px 46px rgba(0, 0, 0, 0.65),
+        0 0 60px rgba(255, 255, 255, 0.85),
+        0 0 110px rgba(253, 230, 138, 0.6),
+        0 0 160px rgba(147, 197, 253, 0.5),
+        0 0 220px rgba(240, 171, 252, 0.42),
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset !important;
+}
+
+/* ── ::before pseudo — sheen sweep (silver+) and ribbon (perfect) ──── */
+/* Silver, Gold, Diamond, Legendary all get a diagonal sheen that
+   sweeps across the card every 8–14 seconds. Stagger durations so they
+   don't all flash in sync. */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-silver::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-silver::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-gold::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-gold::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-diamond::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-diamond::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-legendary::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-legendary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+        110deg,
+        transparent 35%,
+        rgba(var(--tier-color-bright, var(--tier-color)), 0.28) 50%,
+        transparent 65%
+    );
+    background-size: 300% 100%;
+    background-repeat: no-repeat;
+    background-position: -150% 0;
+    pointer-events: none;
+    z-index: 4;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-silver::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-silver::before {
+    animation: refractCardSheen 18s ease-in-out infinite;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-gold::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-gold::before {
+    animation: refractCardSheen 14s ease-in-out infinite;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-diamond::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-diamond::before {
+    animation: refractCardSheen 11s ease-in-out infinite;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-legendary::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-legendary::before {
+    animation: refractCardSheen 9s ease-in-out infinite;
+}
+
+/* ── ::after pseudo — sparkles (diamond) and rotating border (legendary, perfect) */
+
+/* Diamond sparkles — five tiny twinkling dots scattered across the card */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-diamond::after,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-diamond::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image:
+        radial-gradient(circle 2px at 15% 12%, rgba(255, 255, 255, 0.95), transparent 60%),
+        radial-gradient(circle 1.5px at 85% 20%, rgba(255, 255, 255, 0.9), transparent 60%),
+        radial-gradient(circle 1.5px at 78% 75%, rgba(255, 255, 255, 0.85), transparent 60%),
+        radial-gradient(circle 2px at 20% 88%, rgba(255, 255, 255, 0.95), transparent 60%),
+        radial-gradient(circle 1px at 50% 50%, rgba(255, 255, 255, 0.8), transparent 60%);
+    background-size: 100% 100%;
+    pointer-events: none;
+    z-index: 5;
+    animation: refractCardSparkle 6s ease-in-out infinite;
+}
+
+/* Legendary rotating border — triadic conic gradient (pink/blue/purple) */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-legendary::after,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-legendary::after {
+    content: "";
+    position: absolute;
+    inset: -2.5px;
+    border-radius: inherit;
+    padding: 2.5px;
+    background: conic-gradient(
+        from var(--refract-rotate, 0deg),
+        rgba(var(--tier-color), 0.95),
+        rgba(var(--tier-color-2), 0.95),
+        rgba(var(--tier-color-3, var(--tier-color-2)), 0.95),
+        rgba(var(--tier-color), 0.95),
+        rgba(var(--tier-color-2), 0.95),
+        rgba(var(--tier-color-3, var(--tier-color-2)), 0.95),
+        rgba(var(--tier-color), 0.95)
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+    z-index: 2;
+    animation: refractCardRotateBorder 14s linear infinite;
+}
+
+/* Perfect rotating rainbow border — full spectrum, accent-independent */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-perfect::after,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-perfect::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    padding: 3px;
+    background: conic-gradient(
+        from var(--refract-rotate, 0deg),
+        #ff6b9d,
+        #fde68a,
+        #86efac,
+        #93c5fd,
+        #c4b5fd,
+        #f0abfc,
+        #ff6b9d
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+    z-index: 2;
+    animation: refractCardRotateBorder 10s linear infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Star color sync — applies only when refract-rating-system-stars is on.
+   Per-tier overrides so the star's gradient + drop-shadow match the
+   card frame, plus subtle size escalation through the tiers.
+   ───────────────────────────────────────────────────────────────────── */
+/* Bronze / Silver / Gold / Diamond — tier-coloured fill + outline ring */
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-bronze .rating-banner::before,
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-silver .rating-banner::before,
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-gold .rating-banner::before,
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-diamond .rating-banner::before {
+    background: linear-gradient(
+        135deg,
+        rgba(var(--tier-color), 0.4) 0%,
+        rgba(var(--tier-color), 0.15) 100%
+    );
+}
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-bronze .rating-banner::after,
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-silver .rating-banner::after,
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-gold .rating-banner::after,
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-diamond .rating-banner::after {
+    /* Five white-hot "ionisation" hotspots — one at each star point —
+       interspersed with tier-bright and tier-mid in the valleys. Adds
+       hue + brightness variation so the ring reads as live gas instead
+       of a flat painted curve. */
+    background: conic-gradient(
+        from 0deg,
+        #fff,
+        rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        rgba(var(--tier-color), 0.85),
+        rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        #fff,
+        rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        rgba(var(--tier-color), 0.85),
+        rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        #fff,
+        rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        rgba(var(--tier-color), 0.85),
+        rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        #fff,
+        rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        rgba(var(--tier-color), 0.85),
+        rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        #fff,
+        rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        rgba(var(--tier-color), 0.85),
+        rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        #fff
+    );
+    /* Deeper neon glow — 6 layers, with the close ones boosted so the
+       hotspots radiate a brighter halo. */
+    filter:
+        drop-shadow(0 0 1px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 2.5px rgba(255, 255, 255, 0.85))
+        drop-shadow(0 0 5px rgba(var(--tier-color-bright, var(--tier-color)), 1))
+        drop-shadow(0 0 10px rgba(var(--tier-color), 0.85))
+        drop-shadow(0 0 22px rgba(var(--tier-color), 0.5))
+        drop-shadow(0 0 40px rgba(var(--tier-color), 0.25));
+}
+/* Legendary — triadic outline (pink → blue → purple, fused tube light) */
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-legendary .rating-banner::before {
+    background: linear-gradient(
+        135deg,
+        rgba(var(--tier-color), 0.4) 0%,
+        rgba(var(--tier-color-2), 0.3) 50%,
+        rgba(var(--tier-color-3, var(--tier-color-2)), 0.25) 100%
+    );
+}
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-legendary .rating-banner::after {
+    /* Triadic conic — pink → blue → purple → pink ... around the ring */
+    background: conic-gradient(
+        from 0deg,
+        rgb(var(--tier-color)),
+        rgb(var(--tier-color-2)),
+        rgb(var(--tier-color-3, var(--tier-color-2))),
+        rgb(var(--tier-color)),
+        rgb(var(--tier-color-2)),
+        rgb(var(--tier-color-3, var(--tier-color-2))),
+        rgb(var(--tier-color))
+    );
+    filter:
+        drop-shadow(0 0 1.5px rgba(255, 255, 255, 0.85))
+        drop-shadow(0 0 3px rgba(var(--tier-color), 1))
+        drop-shadow(0 0 7px rgba(var(--tier-color-2), 0.8))
+        drop-shadow(0 0 18px rgba(var(--tier-color-3, var(--tier-color-2)), 0.55))
+        drop-shadow(0 0 36px rgba(var(--tier-color-3, var(--tier-color-2)), 0.3));
+}
+/* Perfect — translucent rainbow conic fill + white-hot rainbow outline */
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-perfect .rating-banner::before {
+    background: conic-gradient(
+        from 0deg,
+        rgba(255, 107, 157, 0.4),
+        rgba(253, 230, 138, 0.4),
+        rgba(134, 239, 172, 0.4),
+        rgba(147, 197, 253, 0.4),
+        rgba(196, 181, 253, 0.4),
+        rgba(240, 171, 252, 0.4),
+        rgba(255, 107, 157, 0.4)
+    );
+}
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-perfect .rating-banner::after {
+    background: conic-gradient(
+        from 0deg,
+        #fff5dc,
+        #ffe9a8,
+        #c5f5d5,
+        #cfe4ff,
+        #e2d4ff,
+        #ffcffb,
+        #fff5dc
+    );
+    filter:
+        drop-shadow(0 0 1.5px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 2px rgba(253, 230, 138, 1))
+        drop-shadow(0 0 5px rgba(253, 230, 138, 0.85))
+        drop-shadow(0 0 12px rgba(147, 197, 253, 0.6))
+        drop-shadow(0 0 26px rgba(240, 171, 252, 0.4));
+}
+
+/* Per-tier text neon — swap accent-rgb for tier-color so the digit's
+   halo matches the star fill. Bronze through Diamond share the recipe;
+   Legendary fades to tier-color-2; Perfect uses the rainbow palette. */
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-bronze .rating-banner,
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-silver .rating-banner,
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-gold .rating-banner,
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-diamond .rating-banner {
     text-shadow:
-        0 0 14px rgba(16, 185, 129, 0.55),
-        0 1px 0 rgba(0, 0, 0, 0.85),
-        0 2px 4px rgba(0, 0, 0, 0.75) !important;
+        0 0 1px rgba(255, 255, 255, 0.35),
+        0 0 6px rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        0 0 12px rgba(var(--tier-color), 0.8),
+        0 0 20px rgba(var(--tier-color), 0.55),
+        0 0 32px rgba(var(--tier-color), 0.35) !important;
+}
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-legendary .rating-banner {
+    text-shadow:
+        0 0 1px rgba(255, 255, 255, 0.4),
+        0 0 6px rgba(var(--tier-color), 0.9),
+        0 0 12px rgba(var(--tier-color), 0.8),
+        0 0 22px rgba(var(--tier-color-2), 0.6),
+        0 0 36px rgba(var(--tier-color-2), 0.35) !important;
+}
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-perfect .rating-banner {
+    text-shadow:
+        0 0 1px rgba(255, 255, 255, 0.45),
+        0 0 8px rgba(253, 230, 138, 0.9),
+        0 0 16px rgba(253, 230, 138, 0.7),
+        0 0 26px rgba(147, 197, 253, 0.55),
+        0 0 40px rgba(240, 171, 252, 0.4) !important;
+}
+
+/* Star size escalation by tier */
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-gold .rating-banner,
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-diamond .rating-banner {
+    width: 4.15rem !important;
+    height: 4.15rem !important;
+    min-width: 4.15rem !important;
+    min-height: 4.15rem !important;
+    max-width: 4.15rem !important;
+    max-height: 4.15rem !important;
+}
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-legendary .rating-banner {
+    width: 4.35rem !important;
+    height: 4.35rem !important;
+    min-width: 4.35rem !important;
+    min-height: 4.35rem !important;
+    max-width: 4.35rem !important;
+    max-height: 4.35rem !important;
+}
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-perfect .rating-banner {
+    width: 4.6rem !important;
+    height: 4.6rem !important;
+    min-width: 4.6rem !important;
+    min-height: 4.6rem !important;
+    max-width: 4.6rem !important;
+    max-height: 4.6rem !important;
+}
+
+/* Star number font scales with the star size — base is 0.95rem at
+   4rem star, so each tier bumps proportionally so the number visually
+   fills the same fraction of the star regardless of tier. */
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-gold .rating-banner,
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-diamond .rating-banner {
+    font-size: 1.05rem !important;
+}
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-legendary .rating-banner {
+    font-size: 1.12rem !important;
+}
+body.stash-liquid-glass.refract-rating-system-stars:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-perfect .rating-banner {
+    font-size: 1.2rem !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Decimal-mode badge — tier-coloured squircle (Showcase only)
+   When Stash is in decimal rating mode (no `refract-rating-system-stars`
+   body class), the badge keeps its squircle silhouette but picks up the
+   tier-color tokens so it reads as part of the tier treatment instead of
+   a stranded accent-coloured pill. Mirrors the star version's gradient
+   recipe + size escalation + Perfect rainbow conic.
+   ───────────────────────────────────────────────────────────────────── */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card):not(.refract-rating-system-stars) .refract-card-tier-bronze .rating-banner,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card):not(.refract-rating-system-stars) .refract-card-tier-silver .rating-banner,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card):not(.refract-rating-system-stars) .refract-card-tier-gold .rating-banner,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card):not(.refract-rating-system-stars) .refract-card-tier-diamond .rating-banner {
+    background:
+        radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 45%),
+        linear-gradient(135deg, rgba(var(--tier-color), 0.45) 0%, rgba(var(--tier-color), 0.18) 100%) !important;
+    /* The tier gradient sits over a near-opaque tier-color base — the
+       inherited backdrop-filter blur (12px from the base .rating-banner
+       rule) is mostly invisible here but still costs a per-card
+       compositor layer. Strip it. */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    color: #fff !important;
+    /* Neon-tube glow — same recipe as the card border (refractCardBreathe):
+       crisp white hairline → tier-bright plasma ring → tier mid-glow →
+       tier atmospheric halo → soft inset bleed. Static, no breathing. */
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.85),
+        0 0 0 2px rgba(var(--tier-color-bright, var(--tier-color)), 0.85),
+        0 0 8px rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        0 0 18px rgba(var(--tier-color), 0.65),
+        0 0 36px rgba(var(--tier-color), 0.35),
+        0 0 12px 1px rgba(var(--tier-color-bright, var(--tier-color)), 0.32) inset,
+        0 4px 14px rgba(0, 0, 0, 0.4) !important;
+    /* Neon-tube text — white core ("glass tube") + stacked tier-color
+       shadows ("gas glow"). Two close-in white blurs build the bright
+       core, then four escalating tier-color blurs paint the outward
+       gas halo. Tabular numerals keep the digits the same width so the
+       glow's silhouette stays consistent across ratings. */
+    /* Neon-tube text — faint white pinprick for the "lit filament" + four
+       tier-color blurs for the gas glow. White layers are deliberately
+       low-alpha so the tier colour dominates and the digits don't read
+       as a hot white spot. */
+    text-shadow:
+        0 0 1px rgba(255, 255, 255, 0.35),
+        0 0 6px rgba(var(--tier-color-bright, var(--tier-color)), 0.9),
+        0 0 12px rgba(var(--tier-color), 0.8),
+        0 0 20px rgba(var(--tier-color), 0.55),
+        0 0 32px rgba(var(--tier-color), 0.35) !important;
+}
+/* Legendary — dual-color (tier-color + tier-color-2) neon tube */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card):not(.refract-rating-system-stars) .refract-card-tier-legendary .rating-banner {
+    background:
+        radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 45%),
+        linear-gradient(135deg, rgba(var(--tier-color), 0.45) 0%, rgba(var(--tier-color-2), 0.22) 100%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    color: #fff !important;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.9),
+        0 0 0 2px rgba(var(--tier-color), 0.9),
+        0 0 9px rgba(var(--tier-color), 0.95),
+        0 0 22px rgba(var(--tier-color), 0.65),
+        0 0 44px rgba(var(--tier-color-2), 0.4),
+        0 0 16px 2px rgba(var(--tier-color), 0.4) inset,
+        0 4px 14px rgba(0, 0, 0, 0.45) !important;
+    text-shadow:
+        0 0 1px rgba(255, 255, 255, 0.4),
+        0 0 6px rgba(var(--tier-color), 0.9),
+        0 0 12px rgba(var(--tier-color), 0.8),
+        0 0 22px rgba(var(--tier-color-2), 0.6),
+        0 0 36px rgba(var(--tier-color-2), 0.35) !important;
+}
+/* Perfect — static rainbow conic at low alpha + white-hot neon tube */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card):not(.refract-rating-system-stars) .refract-card-tier-perfect .rating-banner {
+    background:
+        radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 45%),
+        conic-gradient(
+            from 0deg,
+            rgba(255, 107, 157, 0.45),
+            rgba(253, 230, 138, 0.45),
+            rgba(134, 239, 172, 0.45),
+            rgba(147, 197, 253, 0.45),
+            rgba(196, 181, 253, 0.45),
+            rgba(240, 171, 252, 0.45),
+            rgba(255, 107, 157, 0.45)
+        ) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    color: #fff !important;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 1),
+        0 0 0 2px rgba(255, 235, 200, 0.9),
+        0 0 10px rgba(255, 255, 255, 0.95),
+        0 0 26px rgba(253, 230, 138, 0.7),
+        0 0 48px rgba(147, 197, 253, 0.45),
+        0 0 20px 3px rgba(255, 255, 255, 0.55) inset,
+        0 4px 14px rgba(0, 0, 0, 0.5) !important;
+    text-shadow:
+        0 0 1px rgba(255, 255, 255, 0.45),
+        0 0 8px rgba(253, 230, 138, 0.9),
+        0 0 16px rgba(253, 230, 138, 0.7),
+        0 0 26px rgba(147, 197, 253, 0.55),
+        0 0 40px rgba(240, 171, 252, 0.4) !important;
+}
+
+/* Size escalation per tier (decimal mode) — matches the star version's
+   pacing: Bronze/Silver baseline, Gold/Diamond +0.15rem, Legendary +0.35,
+   Perfect +0.6 */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card):not(.refract-rating-system-stars) .refract-card-tier-gold .rating-banner,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card):not(.refract-rating-system-stars) .refract-card-tier-diamond .rating-banner {
+    width: 3.65rem !important;
+    height: 3.65rem !important;
+    min-width: 3.65rem !important;
+    min-height: 3.65rem !important;
+    max-width: 3.65rem !important;
+    max-height: 3.65rem !important;
+    font-size: 1.32rem !important;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card):not(.refract-rating-system-stars) .refract-card-tier-legendary .rating-banner {
+    width: 3.85rem !important;
+    height: 3.85rem !important;
+    min-width: 3.85rem !important;
+    min-height: 3.85rem !important;
+    max-width: 3.85rem !important;
+    max-height: 3.85rem !important;
+    font-size: 1.36rem !important;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card):not(.refract-rating-system-stars) .refract-card-tier-perfect .rating-banner {
+    width: 4.1rem !important;
+    height: 4.1rem !important;
+    min-width: 4.1rem !important;
+    min-height: 4.1rem !important;
+    max-width: 4.1rem !important;
+    max-height: 4.1rem !important;
+    font-size: 1.42rem !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   prefers-reduced-motion + refract-lite: strip animations, keep colors
+   ───────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) [class*="refract-card-tier-"],
+    body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) [class*="refract-card-tier-"]::before,
+    body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) [class*="refract-card-tier-"]::after,
+    body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .refract-card-tier-perfect .rating-banner {
+        animation: none !important;
+    }
+}
+body.refract-lite.stash-liquid-glass.refract-rating-style-tiers [class*="refract-card-tier-"],
+body.refract-lite.stash-liquid-glass.refract-rating-style-tiers [class*="refract-card-tier-"]::before,
+body.refract-lite.stash-liquid-glass.refract-rating-style-tiers [class*="refract-card-tier-"]::after,
+body.refract-lite.stash-liquid-glass.refract-rating-style-tiers .refract-card-tier-perfect .rating-banner {
+    animation: none !important;
+}
+/* Lite mode also drops the most expensive layers: Legendary / Perfect
+   rotating borders use mask-composite which is GPU-heavy at scale. */
+body.refract-lite.stash-liquid-glass.refract-rating-style-tiers .refract-card-tier-legendary::after,
+body.refract-lite.stash-liquid-glass.refract-rating-style-tiers .refract-card-tier-perfect::after {
+    display: none;
 }
 
 /* Decimal rating display — star icon + number + edit pencil, all inline.
@@ -492,12 +1459,68 @@ body.stash-liquid-glass .grid-card.performer-card .favorite-button.favorite svg 
         drop-shadow(0 1px 4px rgba(0, 0, 0, 0.6)) !important;
 }
 
-/* Tighter section padding */
+/* Ensure the chin fills any remaining card height. Without flex-grow,
+   a performer with no age / O count / scene count gives an empty
+   .stash-perf-stats row and the chin collapses to just the name line —
+   leaving a strip of the card's translucent bg below it (reads as a
+   black band over the dark page bg). Growing fills that strip with
+   the chin's tier-tinted background instead. */
 body.stash-liquid-glass .performer-card .card-section {
-    padding: 0.5rem 0.65rem 0.45rem !important;
+    flex: 1 1 auto;
+}
+
+/* Chin layout — same padding + flex column for every performer card
+   regardless of rating-style mode. */
+body.stash-liquid-glass .performer-card .card-section {
+    padding: 0.55rem 0.7rem 0.5rem !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 0 !important;
+}
+
+/* Tier-tinted glass plate chin — uniform tier wash (no gradient fade
+   that made the bottom look darker than the top). Subtle top brightness
+   bias keeps the "lit from above" feel but only over the top ~30%.
+
+   Gated to tiers + playing-card modes only. In intensity (mono) mode
+   the chin keeps the card's default --glass-bg, matching how scene
+   cards and the pre-overhaul performer cards look — no surprise white
+   wash on unrated/intensity cards.
+
+   IMPORTANT: an opaque dark base sits UNDER the translucent tier tint.
+   Without it, when scaled-up Perfect/Legendary cards visually overlap
+   with neighbouring cards, the chin's translucency lets the neighbour's
+   image show through — reads as "the lower-rated card's image is
+   painting over the higher-rated card's chin" even though z-index is
+   correctly sorting them. The page bg + card glass-bg are both near-
+   transparent, so the chin needs to provide its own opaque under-layer. */
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card .card-section {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(var(--tier-color, 255, 255, 255), 0.5) 0%,
+            rgba(var(--tier-color, 255, 255, 255), 0.4) 30%,
+            rgba(var(--tier-color, 255, 255, 255), 0.4) 100%
+        ),
+        rgb(18, 18, 22) !important;
+    border-top: 1px solid rgba(var(--tier-color-bright, var(--tier-color, 255, 255, 255)), 0.55) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+/* Belt-and-braces hide for the Stash-native popovers row + HR below
+   the chin — initPerformerCards() in refract.js also hides these via
+   inline display:none, but the CSS rule covers the brief window
+   before the JS runs and any React re-render that resets them. */
+body.stash-liquid-glass .performer-card > .card-popovers,
+body.stash-liquid-glass .performer-card > hr {
+    display: none !important;
+}
+/* Stash's own .card.performer-card has `padding: 0 0 1rem` which leaves
+   a 1rem strip of the card's base bg below the chin — visible as a
+   darker band at the bottom of the card. Strip the padding so the chin
+   reaches the card's bottom edge. */
+body.stash-liquid-glass .card.performer-card,
+body.stash-liquid-glass .performer-card {
+    padding: 0 !important;
 }
 
 /* Name: single line, prominent */
@@ -559,6 +1582,95 @@ body.stash-liquid-glass .performer-card .gender-icon[data-gender="NON_BINARY"],
 body.stash-liquid-glass .performer-card .gender-icon[data-gender="INTERSEX"] {
     color: #c084fc !important;
     filter: drop-shadow(0 0 5px rgba(192, 132, 252, 0.65)) !important;
+}
+
+/* ── Favorite heart — pulse + glow + hover sparkles + card halo ─────
+   Stash marks favorited performers / scenes with class `.favorite` on
+   the `.favorite-button` element. We use that to:
+     1) Pulse + glow the heart icon itself
+     2) Emit sparkle particles on hover
+     3) Bleed a subtle pink halo into the card from the heart's corner
+   `:has()` lets the CARD react to a descendant's class (already used
+   elsewhere in refract, so the browser-version gate is fine). */
+@keyframes refractHeartbeat {
+    0%, 100% { transform: scale(1); }
+    14%      { transform: scale(1.16); }   /* lub */
+    28%      { transform: scale(0.96); }   /* relax */
+    42%      { transform: scale(1.1); }    /* dub */
+    56%      { transform: scale(1); }      /* rest until next cycle */
+}
+@keyframes refractHeartSparkle {
+    0%, 100% { opacity: 0; transform: scale(0.8); }
+    20%, 80% { opacity: 1; transform: scale(1); }
+}
+
+/* The heart icon when favorited — pink glow + heartbeat. We DON'T set
+   `position` here because Stash applies `position: absolute` to anchor
+   the button to the image corner; overriding it pulls the button into
+   normal flow under the image. `position: absolute` ancestors are
+   already valid containing blocks for our ::before pseudo. */
+body.stash-liquid-glass .performer-card .favorite-button.favorite,
+body.stash-liquid-glass .scene-card .favorite-button.favorite,
+body.stash-liquid-glass .studio-card .favorite-button.favorite,
+body.stash-liquid-glass .tag-card .favorite-button.favorite {
+    color: #f472b6 !important;
+    filter:
+        drop-shadow(0 0 6px rgba(244, 114, 182, 0.85))
+        drop-shadow(0 0 14px rgba(244, 114, 182, 0.45)) !important;
+    animation: refractHeartbeat 1.2s ease-in-out infinite;
+    transform-origin: center center;
+}
+/* Sparkles emanate from around the heart on card hover. The pseudo
+   sits over the button at -10px inset; multiple radial-gradient dots
+   pulse together. Pink + white mix for variety. */
+body.stash-liquid-glass .performer-card .favorite-button.favorite::before,
+body.stash-liquid-glass .scene-card .favorite-button.favorite::before,
+body.stash-liquid-glass .studio-card .favorite-button.favorite::before,
+body.stash-liquid-glass .tag-card .favorite-button.favorite::before {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    background-image:
+        radial-gradient(circle 1.5px at 12% 22%, rgba(255, 255, 255, 1), transparent 60%),
+        radial-gradient(circle 2px at 85% 18%, rgba(244, 114, 182, 0.95), transparent 60%),
+        radial-gradient(circle 1.2px at 50% 5%, rgba(255, 255, 255, 0.95), transparent 60%),
+        radial-gradient(circle 1.5px at 90% 75%, rgba(255, 255, 255, 0.9), transparent 60%),
+        radial-gradient(circle 1.8px at 8% 80%, rgba(244, 114, 182, 0.9), transparent 60%),
+        radial-gradient(circle 1.2px at 55% 95%, rgba(255, 255, 255, 0.85), transparent 60%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+body.stash-liquid-glass .performer-card:hover .favorite-button.favorite::before,
+body.stash-liquid-glass .scene-card:hover .favorite-button.favorite::before,
+body.stash-liquid-glass .studio-card:hover .favorite-button.favorite::before,
+body.stash-liquid-glass .tag-card:hover .favorite-button.favorite::before {
+    animation: refractHeartSparkle 1.4s ease-in-out infinite;
+}
+
+/* Card-level halo when favorited — a soft pink radial bleeds inward
+   from the top-right corner (where the heart sits). Implemented as an
+   ADDITIONAL background layer so it composes with the existing tier
+   gradient without needing another pseudo-element (the card's ::before
+   and ::after are already used by the tier system on legendary/perfect). */
+body.stash-liquid-glass .performer-card:has(.favorite-button.favorite),
+body.stash-liquid-glass .scene-card:has(.favorite-button.favorite),
+body.stash-liquid-glass .studio-card:has(.favorite-button.favorite) {
+    background:
+        radial-gradient(
+            circle at 92% 8%,
+            rgba(244, 114, 182, 0.22) 0%,
+            rgba(244, 114, 182, 0.08) 18%,
+            transparent 38%
+        ),
+        var(--glass-bg) !important;
+}
+/* Honor reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass .favorite-button.favorite,
+    body.stash-liquid-glass .favorite-button.favorite::before {
+        animation: none !important;
+    }
 }
 
 /* Stat row injected by JS — pin scene count to the right; age, when
