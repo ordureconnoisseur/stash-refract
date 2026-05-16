@@ -338,6 +338,23 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash
     color: transparent !important;
     -webkit-text-fill-color: transparent !important;
 }
+/* Footnote-style asterisk after "Age" when the chip is "Age at
+   production" — sits inline with the label, slightly raised, and skips
+   the gradient-fill so it stays a quiet hint rather than competing with
+   the label text. Hover the chip to see the full "Age at production"
+   tooltip. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-label-mark {
+    margin-left: 0.15em !important;
+    opacity: 0.8 !important;
+    /* Override the parent's gradient text-fill so the asterisk paints
+       in a flat tier color (slightly muted) instead of being
+       background-clipped to transparent. */
+    background: none !important;
+    -webkit-background-clip: initial !important;
+            background-clip: initial !important;
+    color: rgba(var(--badge-color-bright), 0.85) !important;
+    -webkit-text-fill-color: rgba(var(--badge-color-bright), 0.85) !important;
+}
 /* Icon → column 1 of the bottom row. */
 body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > svg {
     grid-row: 2 !important;
@@ -703,14 +720,19 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refrac
     background-size: 200% 100%;
     animation: refractPcPerfectText 6s linear infinite;
     text-shadow: none;
-    /* 4 layers (down from 8). Rainbow gradient text fill carries
-       Perfect's identity; the outer pastel-rainbow halos at 36-100px
-       were decorative-only and the dominant paint cost on this tier. */
+    /* 6 layers — Perfect needs the rainbow halo radiating outward
+       around the glyphs (yellow → blue → purple) for its full
+       multi-color identity. The earlier 4-layer perf trim cut the
+       blue/purple/pink halos and the glow read as plain yellow. The
+       longest 100px pink halo stays cut (most expensive single layer
+       and barely visible in the perf trade-off). */
     filter:
         drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
         drop-shadow(0 0 2px rgba(255, 255, 255, 1))
         drop-shadow(0 0 6px rgba(255, 255, 255, 0.85))
-        drop-shadow(0 0 18px rgba(253, 230, 138, 0.55));
+        drop-shadow(0 0 14px rgba(253, 230, 138, 0.65))
+        drop-shadow(0 0 28px rgba(147, 197, 253, 0.5))
+        drop-shadow(0 0 50px rgba(196, 181, 253, 0.32));
 }
 @keyframes refractPcPerfectText {
     from { background-position: 0% 50%; }

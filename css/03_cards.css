@@ -34,6 +34,30 @@ body.stash-liquid-glass .grid-card {
     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.2s ease;
     position: relative;
 }
+/* Slick-carousel exception: the home-page Slick carousels render every
+   slide inside a single `width:30000px` track and translate the track
+   horizontally. The off-screen slides sit inside the viewport-spanning
+   track but are clipped by `.slick-list { overflow: hidden }`, so
+   `content-visibility: auto` keeps them at the 320×320 placeholder. As
+   the chevron-scroll translates them in, each one renders at a
+   different observed size — the visible result is cards that grow
+   bigger and squarer on every click. Opt the carousel cards out of
+   cv:auto so they render at their natural aspect ratio from the start.
+   Gallery-grid cards keep the perf win. */
+body.stash-liquid-glass .slick-slider .card,
+body.stash-liquid-glass .slick-slider .grid-card {
+    content-visibility: visible;
+    contain-intrinsic-size: none;
+    /* clip-path force-clips the diagonal tier ribbon to the card's
+       rounded rectangle in the slick-track context, where plain
+       overflow:hidden doesn't reliably clip transformed descendants.
+       Side effect: box-shadows that extend past the card (tier glow,
+       hover halo) are also clipped, and the rating-banner pill loses
+       its escape via overflow:visible. The user prefers the cleaner
+       look without the outset effects in the carousel. */
+    contain: layout paint style;
+    clip-path: inset(0 round var(--radius));
+}
 body.stash-liquid-glass .card:hover,
 body.stash-liquid-glass .grid-card:hover {
     border-color: rgba(var(--accent-rgb), 0.28) !important;
@@ -865,28 +889,38 @@ body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-pl
     animation: refractCardRotateBorder 14s linear infinite;
 }
 
-/* Perfect rotating rainbow border — full spectrum, accent-independent */
+/* Perfect rotating rainbow border — full spectrum, accent-independent.
+   4.5px ring (up from 3px) with more saturated stops so the rainbow
+   reads clearly even at gallery zoom levels — was looking washed out
+   in playing-card mode where the diagonal tier ribbon was covering
+   the brightest top-right segment. */
 body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .performer-card.refract-card-tier-perfect::after,
 body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .scene-card.refract-card-tier-perfect::after {
     content: "";
     position: absolute;
-    inset: -3px;
+    inset: -4.5px;
     border-radius: inherit;
-    padding: 3px;
+    padding: 4.5px;
     background: conic-gradient(
         from var(--refract-rotate, 0deg),
-        #ff6b9d,
-        #fde68a,
-        #86efac,
-        #93c5fd,
-        #c4b5fd,
-        #f0abfc,
-        #ff6b9d
+        #ff3b87,  /* vivid pink   */
+        #ffd23b,  /* vivid yellow */
+        #3bff7a,  /* vivid green  */
+        #3b9eff,  /* vivid blue   */
+        #b53bff,  /* vivid purple */
+        #ff3bce,  /* vivid magenta */
+        #ff3b87   /* vivid pink (wrap) */
     );
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
             mask-composite: exclude;
     pointer-events: none;
+    /* Drop-shadow halo to make the rainbow bleed slightly outside the
+       ring boundary, so the multi-color identity reads even past the
+       4.5px ring itself. */
+    filter:
+        drop-shadow(0 0 6px rgba(255, 100, 200, 0.55))
+        drop-shadow(0 0 14px rgba(150, 200, 255, 0.4));
     z-index: 2;
     animation: refractCardRotateBorder 10s linear infinite;
 }

@@ -1088,6 +1088,98 @@ body.stash-liquid-glass .setting-group.st-plugin-collapsed > .collapsible-sectio
     display: none !important;
 }
 
+/* Plugin filter input — reuses Stash's .clearable-input-group classes
+   so the theme's existing styles for those (glass bg, accent focus)
+   carry over. Only thing we add: make the wrap fill the hijacked
+   "Reload plugins" row width. Hidden plugins (filter miss) collapse to
+   display:none so the list reflows with no dead space. */
+body.stash-liquid-glass .st-plugin-search.clearable-input-group {
+    width: 100%;
+    margin: 0;
+}
+/* Belt-and-suspenders: also kill the browser focus outline + any
+   leftover focus box-shadow on the plugin search clear button. The X
+   has tabindex=-1 but mouse click can still leave focus on some
+   browsers, and Bootstrap's `.btn:focus` rule adds a faint ring. */
+body.stash-liquid-glass .st-plugin-search-clear,
+body.stash-liquid-glass .st-plugin-search-clear:focus,
+body.stash-liquid-glass .st-plugin-search-clear:active {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+body.stash-liquid-glass .setting-section .setting-group.st-plugin-hidden {
+    display: none !important;
+}
+
+/* The hijacked "Reload plugins" row: tighter vertical padding (search
+   bar is the focus, not a label+button row), and let the title-side div
+   grow so the search input fills the row. */
+body.stash-liquid-glass .setting.st-plugin-reload-row {
+    padding-top: 0.6rem !important;
+    padding-bottom: 0.6rem !important;
+    align-items: center !important;
+}
+body.stash-liquid-glass .setting.st-plugin-reload-row > div:first-child {
+    flex: 1 1 auto !important;
+    min-width: 0;
+    margin-right: 0.75rem;
+}
+body.stash-liquid-glass .setting.st-plugin-reload-row > div:last-child {
+    flex: 0 0 auto !important;
+}
+
+/* Icon-only reload button: same bare-affordance language as the plugin
+   chevron — flat, no pill, accent-on-hover, with the rotate SVG sized
+   to match the chevron. Scoped under the same :is() ancestor list as
+   the chevron so we beat the global `.btn.btn-primary` overrides on
+   specificity. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"], #stash-table) .st-plugin-reload-btn,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"], #stash-table) .st-plugin-reload-btn.btn,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"], #stash-table) .st-plugin-reload-btn.btn.btn-primary {
+    width: 2.1rem !important;
+    height: 2.1rem !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(var(--accent-rgb), 0.14) !important;
+    background-image: none !important;
+    border: 1px solid rgba(var(--accent-rgb), 0.45) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.1),
+                0 0 12px rgba(var(--accent-rgb), 0.18) !important;
+    color: var(--accent-bright) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: color 0.15s, border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"], #stash-table) .st-plugin-reload-btn:hover,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"], #stash-table) .st-plugin-reload-btn.btn.btn-primary:hover {
+    color: #fff !important;
+    border-color: var(--accent-bright) !important;
+    background: rgba(var(--accent-rgb), 0.28) !important;
+    box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.3),
+                0 0 18px rgba(var(--accent-rgb), 0.35) !important;
+}
+/* Tiny extra: spin the icon a half-turn on hover as a subtle hint at
+   what the button does (reload = rotate). */
+body.stash-liquid-glass .st-plugin-reload-btn:hover .fa-icon svg {
+    transform: rotate(180deg);
+    transition: transform 0.4s ease;
+}
+body.stash-liquid-glass .st-plugin-reload-btn .fa-icon {
+    margin: 0 !important;
+}
+body.stash-liquid-glass .st-plugin-reload-btn .fa-icon svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) table.scraper-table thead th {
     font-size: 0.7rem !important;
     font-weight: 600 !important;

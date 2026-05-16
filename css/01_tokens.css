@@ -37,13 +37,18 @@ body.stash-liquid-glass {
         inset 0 1px 2px rgba(0, 0, 0, 0.45),
         0 1px 0 rgba(255, 255, 255, 0.05);
 
-    /* Navbar composite — single token captures the full 4-layer stack
-       because the navbar is unique and reused only on `.navbar`. */
+    /* Navbar composite — depth drop + hairline + inner highlight, plus
+       a tighter accent glow halo so it doesn't extend past the
+       viewport's left/right edges (where Stash's main wrapper / body
+       overflow-x clipping cuts the wide far-halo layer off
+       asymmetrically). Keeps the close + mid layers for the
+       illuminated feel without the visible cutoff. */
     --shadow-navbar:
         0 12px 36px rgba(0, 0, 0, 0.5),
-        0 0 60px rgba(var(--accent-rgb), 0.07),
         0 0 0 1px rgba(0, 0, 0, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 0 18px rgba(var(--accent-rgb), 0.28),
+        0 0 40px rgba(var(--accent-rgb), 0.16);
 
     --radius: 16px;
     --radius-sm: 12px;

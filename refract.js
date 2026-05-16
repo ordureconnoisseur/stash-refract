@@ -1943,11 +1943,24 @@
                icon-less "27" rendering they had before. */
             if (ageEl) {
                 var ageText = ageEl.textContent.replace(/\s*years?\s+old/gi, "").trim();
+                /* Stash appends " at production" when the scene has a
+                   date and the performer's age is being shown relative
+                   to that date. Move the qualifier into the chip label
+                   so the value stays a clean bare number. */
+                var ageAtProduction = /\s*at\s+production\s*$/i.test(ageText);
+                if (ageAtProduction) {
+                    ageText = ageText.replace(/\s*at\s+production\s*$/i, "").trim();
+                }
                 if (ageText) {
                     var ageSpan = document.createElement("span");
                     ageSpan.className = "stash-perf-age";
+                    if (ageAtProduction) {
+                        ageSpan.title = "Age at production";
+                    }
                     ageSpan.innerHTML = CAKE_SVG +
-                        '<span class="stash-perf-label">Age</span>' +
+                        '<span class="stash-perf-label">Age' +
+                            (ageAtProduction ? '<span class="stash-perf-label-mark">*</span>' : '') +
+                        '</span>' +
                         "<span>" + escapeHtml(ageText) + "</span>";
                     row.appendChild(ageSpan);
                 }
@@ -2008,19 +2021,42 @@
 
             section.appendChild(row);
 
-            /* Shrink-to-fit for the stat strip — high scene counts
-               (3 digits) push chips off the right edge of the card.
-               All chip sizes (font, padding, gaps, icon, label) are
-               calc'd against `--pc-badge-scale` on the row in CSS;
-               JS measures overflow and steps the scale down. */
-            requestAnimationFrame(function shrinkStripToFit() {
-                if (!document.body.classList.contains("refract-rating-style-playing-card")) { return; }
-                var scales = [1, 0.92, 0.84, 0.76, 0.68, 0.6];
-                for (var i = 0; i < scales.length; i++) {
-                    row.style.setProperty("--pc-badge-scale", scales[i]);
-                    if (row.scrollWidth <= row.clientWidth + 1) { return; }
-                }
-            });
+            /* Combined shrink-to-fit for the stat strip + name banner.
+               Both passes need to re-run on card resize (window zoom,
+               grid reflow, etc.) — the one-shot rAF that fired only on
+               first inject left the badges cut off after `cmd+`/`cmd-`.
+               `var bannerInner` is hoisted to the forEach scope and is
+               assigned later in the if(titleEl) block — by the time
+               refit() actually runs (rAF / ResizeObserver callback),
+               that assignment has happened or `bannerInner` is
+               undefined and we skip the name pass. */
+            var refitPending = false;
+            function refit() {
+                if (refitPending) { return; }
+                refitPending = true;
+                requestAnimationFrame(function () {
+                    refitPending = false;
+                    if (!document.body.classList.contains("refract-rating-style-playing-card")) { return; }
+                    /* Stat strip — high scene counts (3 digits) push
+                       chips off the right edge. Step --pc-badge-scale
+                       down through the ladder until the row fits. */
+                    var scales = [1, 0.92, 0.84, 0.76, 0.68, 0.6];
+                    for (var i = 0; i < scales.length; i++) {
+                        row.style.setProperty("--pc-badge-scale", scales[i]);
+                        if (row.scrollWidth <= row.clientWidth + 1) { break; }
+                    }
+                    /* Name banner — Concert One is moderately wide;
+                       step font-size down through the ladder until the
+                       text fits the left 3/4 of the banner. */
+                    if (bannerInner) {
+                        var sizes = [1.25, 1.1, 0.95, 0.85, 0.75, 0.7];
+                        for (var j = 0; j < sizes.length; j++) {
+                            bannerInner.style.fontSize = sizes[j] + "rem";
+                            if (bannerInner.scrollWidth <= bannerInner.clientWidth + 1) { break; }
+                        }
+                    }
+                });
+            }
 
             /* Playing-card mode name banner — Pokemon-style header:
                  [gender icon (type)]  Name        ← left-aligned
@@ -2085,28 +2121,19 @@
                 banner.appendChild(bannerInner);
                 card.insertBefore(banner, card.firstChild);
 
-                /* Shrink-to-fit — the name banner is constrained to the
-                   left 3/4 of the card top (CSS `right: 25%`). For most
-                   names the default 1.3rem fits comfortably; for unusual
-                   long names we step down through smaller sizes until
-                   the text fits within the available banner width.
-                   Runs on the next animation frame so layout is current.
-                   Only runs once per card (data-stash-pc sentinel above
-                   prevents re-binding on React re-renders). */
-                requestAnimationFrame(function shrinkToFit() {
-                    /* Only do work if we're actually in playing-card mode;
-                       in other modes the banner is display:none and the
-                       measurement is meaningless. */
-                    if (!document.body.classList.contains("refract-rating-style-playing-card")) { return; }
-                    /* Concert One is moderately wide per glyph; this ladder
-                       starts at the CSS default (1.25rem) and steps down to
-                       0.7rem to handle unusual long performer names. */
-                    var sizes = [1.25, 1.1, 0.95, 0.85, 0.75, 0.7];
-                    for (var i = 0; i < sizes.length; i++) {
-                        bannerInner.style.fontSize = sizes[i] + "rem";
-                        if (bannerInner.scrollWidth <= bannerInner.clientWidth + 1) { return; }
-                    }
-                });
+            }
+
+            /* Initial fit + ResizeObserver re-fit on any card size change
+               (window zoom via cmd+/-, grid reflow on viewport resize,
+               font-loading shift, etc.). Without this the badges got
+               cut off after a zoom because the one-shot rAF that ran on
+               first inject didn't re-measure. ResizeObserver is rAF-
+               coalesced internally so multiple card resizes per frame
+               collapse to one refit. */
+            refit();
+            if (window.ResizeObserver) {
+                var ro = new ResizeObserver(refit);
+                ro.observe(card);
             }
 
             if (hr) { hr.style.display = "none"; }
@@ -5125,6 +5152,103 @@
     }
     makePluginSettingsCollapsible(); /* initial pass; re-runs via consolidated watcher */
 
+    // Settings → Plugins page: take over the "Reload plugins" .setting
+    // row — replace its h3 title with a live search input, and strip
+    // the reload button down to an icon-only affordance. That row is
+    // wasted vertical space otherwise (one button + redundant text),
+    // and putting the search there keeps the page's vertical rhythm.
+    // Search is case-insensitive substring over each plugin's h3 title.
+    function injectPluginSearch() {
+        var settings = document.querySelectorAll(".setting");
+        var reloadRow = null;
+        for (var i = 0; i < settings.length; i++) {
+            var h = settings[i].querySelector(":scope > div:first-child > h3");
+            if (h && h.textContent.trim().toLowerCase() === "reload plugins") {
+                reloadRow = settings[i];
+                break;
+            }
+        }
+        if (!reloadRow || reloadRow.dataset.stSearchInjected === "1") return;
+
+        // Reuse Stash's own .clearable-input-group + .clearable-text-field
+        // markup so the theme's existing styles for those classes (the
+        // glass-bg + accent-focus look used by the package-manager filter
+        // and search-term rows) apply automatically. Adds a "clear" (×)
+        // button alongside since the rest of those clearable rows have
+        // one — keeps the family consistent.
+        var wrap = document.createElement("div");
+        wrap.className = "clearable-input-group st-plugin-search";
+        wrap.innerHTML =
+            "<input type='text' class='clearable-text-field form-control st-plugin-search-input' " +
+                "placeholder='Filter…' aria-label='Search plugins' " +
+                "autocomplete='off' spellcheck='false'>" +
+            /* Intentionally NOT applying `btn btn-secondary` here —
+               those classes would pull in the settings-scoped
+               `.btn.btn-secondary` rule (a glass border + bg) that
+               competes with the bare-icon `.clearable-text-field-clear`
+               styling we actually want. The latter rule alone gives us
+               the right look. */
+            "<button type='button' class='clearable-text-field-clear st-plugin-search-clear' " +
+                "aria-label='Clear search' tabindex='-1' style='display:none'>" +
+                "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' " +
+                    "stroke-width='2' stroke-linecap='round' stroke-linejoin='round' " +
+                    "aria-hidden='true'>" +
+                    "<path d='M18 6L6 18M6 6l12 12'/></svg>" +
+            "</button>";
+
+        var input = wrap.querySelector("input");
+        var clearBtn = wrap.querySelector(".st-plugin-search-clear");
+
+        function applyFilter() {
+            var q = input.value.trim().toLowerCase();
+            clearBtn.style.display = q ? "" : "none";
+            // Use descendant combinator — plugin groups aren't always
+            // direct children of .setting-section depending on Stash
+            // version. Mirror what makePluginSettingsCollapsible uses.
+            var groups = document.querySelectorAll(".setting-section .setting-group");
+            for (var i = 0; i < groups.length; i++) {
+                var g = groups[i];
+                // Find the title h3 anywhere in the header row, not at
+                // a strict 2-level depth — guards against React render
+                // changes.
+                var header = g.querySelector(":scope > .setting");
+                var titleH3 = header ? header.querySelector("h3") : null;
+                var name = titleH3 ? titleH3.textContent.toLowerCase() : "";
+                g.classList.toggle("st-plugin-hidden", !!q && name.indexOf(q) === -1);
+            }
+        }
+        input.addEventListener("input", applyFilter);
+        clearBtn.addEventListener("click", function () {
+            input.value = "";
+            applyFilter();
+            input.focus();
+        });
+
+        // Replace the title-div's contents with the search wrap.
+        var titleDiv = reloadRow.querySelector(":scope > div:first-child");
+        if (titleDiv) {
+            titleDiv.innerHTML = "";
+            titleDiv.appendChild(wrap);
+        }
+
+        // Reduce the reload button to icon-only — drop the inner text
+        // span, keep the .fa-icon span (which holds the rotate SVG).
+        var reloadBtn = reloadRow.querySelector(":scope > div:last-child button");
+        if (reloadBtn) {
+            reloadBtn.classList.add("st-plugin-reload-btn");
+            reloadBtn.setAttribute("title", "Reload plugins");
+            reloadBtn.setAttribute("aria-label", "Reload plugins");
+            var spans = reloadBtn.querySelectorAll(":scope > span");
+            for (var j = 0; j < spans.length; j++) {
+                if (!spans[j].classList.contains("fa-icon")) spans[j].remove();
+            }
+        }
+
+        reloadRow.classList.add("st-plugin-reload-row");
+        reloadRow.dataset.stSearchInjected = "1";
+    }
+    injectPluginSearch(); /* initial pass; re-runs via consolidated watcher */
+
     /* ── Consolidated mutation watcher ──────────────────────────────────
        Single global MutationObserver feeding all body-wide DOM watchers.
        Replaces 7 separate body-subtree observers — each used to fire on
@@ -5155,6 +5279,7 @@
             try { applyScenePlayerFixes(); } catch (e) {}
             try { injectPluginToggles(); } catch (e) {}
             try { makePluginSettingsCollapsible(); } catch (e) {}
+            try { injectPluginSearch(); } catch (e) {}
         }
         function sched() {
             clearTimeout(_t);
