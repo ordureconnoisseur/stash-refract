@@ -2,8 +2,6 @@
 
 Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass panels, floating navbar, dark base, configurable accent.
 
-![Refract — desktop overview](./screenshots/01-desktop-overview.png)
-
 ## Features
 
 - Glass-morphism re-skin of every Stash surface — cards, filters, scene player, lightbox, settings, scene tagger, tag editor
@@ -19,11 +17,7 @@ Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass
 
 ![Scenes page](https://github.com/ordureconnoisseur/stash-refract/releases/download/media-assets/gif-hq-4.gif)
 
-![Accent cycle](./screenshots/accent-cycle.gif)
-
 The accent picker lives in **Settings → Plugins → Refract Theme** and applies live to every surface — navbar, cards, filter pills, scene tagger, and any companion plugin that's been theme-aware'd.
-
-![Accent picker](./screenshots/02-accent-picker.png)
 
 ## Settings
 
@@ -77,20 +71,19 @@ Scene cards keep their normal Refract chin in this mode — the trading-card lay
 
 ![Playing-card performer mode](https://github.com/ordureconnoisseur/stash-refract/releases/download/media-assets/gif-hq-1.gif)
 
-![Performer grid](./screenshots/04-performers-grid.png)
-
 ## Install
 
-**Via Stash's plugin manager** (recommended once listed in CommunityScripts):
-1. Settings → Plugins → Available Plugins
-2. Find "Refract Theme" and click Install
+Recommended — via Stash plugin browser:
 
-**Manually**:
-```bash
-git clone https://github.com/ordureconnoisseur/stash-refract \
-  ~/.stash/plugins/refract
-```
-Then restart Stash and enable the plugin in Settings → Plugins.
+1. **Settings → Plugins → Available Plugins → Add Source**
+2. Paste this URL:
+   ```
+   https://ordureconnoisseur.github.io/plugins/main/index.yml
+   ```
+3. Refresh the available plugins list, find **Refract Theme**, hit **Install**.
+4. Reload Stash. The plugin self-enables.
+
+Updates flow through the plugin browser thereafter.
 
 ## Compatibility
 
