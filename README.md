@@ -6,12 +6,19 @@ Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass
 
 ## Features
 
-- Glass-morphism re-skin of every Stash surface (cards, filters, scene player, settings, lightbox, scene tagger)
+- Glass-morphism re-skin of every Stash surface — cards, filters, scene player, lightbox, settings, scene tagger, tag editor
 - 8 built-in accent presets + custom override via CSS variables — applies instantly, saved per browser
-- Touch-only mobile burger menu — Stash's default nav is unusable on phones; Refract replaces the library row with a 3-column icon grid dropdown on `pointer: coarse` devices
+- Three rating-display styles for scene and performer cards — **Minimal** (accent halo), **Extravagant** (six-tier collectible card frame), **Playing card** (trading-card layout for performer cards)
+- Two scene-card layouts — **Refract** (default — title overlay on thumbnail, glass spec pills, performer / tag / O-count pills, hover-scrubber overlay) or **Classic** (Stash's original card with description and file path)
+- Lite mode — strips backdrop-blur, glow shadows, animations, and hover-tilt for older or integrated GPUs
+- Touch-only mobile burger menu — replaces Stash's nav with a 3-column icon grid dropdown on `pointer: coarse` devices
 - Horizontally-scrollable navbar at narrow desktop widths instead of icons collapsing one-by-one
-- Donate link relocated from navbar into the settings sidebar (still discoverable, no longer cluttering the navbar at small widths)
-- Theme-aware integration with [stash-multiview](https://github.com/ordureconnoisseur/stash-multiview) — accent flows into the multiview player via a localStorage handoff, including the standalone player page
+- Tag editor overhaul (Settings → Tags / performer Edit → Tags tab) — alphabetical taxonomy, hover tooltip with the tag's image + description, themed editing flow
+- Scene player upgrades — controls fade after inactivity (windowed + fullscreen), restored sprite-thumbnail preview on scrubber hover, seekbar flicker fix
+- Duplicate checker comparison-card redesign — at-a-glance highest-resolution / largest-file callouts
+- Theme-aware integration with [stash-multiview](https://github.com/ordureconnoisseur/stash-multiview) — accent flows into the multiview player via a localStorage handoff
+
+![Scenes page](https://github.com/ordureconnoisseur/stash-refract/releases/download/media-assets/gif-hq-4.gif)
 
 ![Accent cycle](./screenshots/accent-cycle.gif)
 
@@ -22,6 +29,60 @@ The accent picker lives in **Settings → Plugins → Refract Theme** and applie
 The mobile burger panel only shows on touch-input devices (`@media (pointer: coarse)`); resizing a desktop window down won't trigger it.
 
 ![Mobile burger menu](./screenshots/03-mobile-burger.png)
+
+## Settings
+
+Open **Settings → Plugins → Refract Theme** and expand the panel. Every option saves per browser and applies instantly — no refresh.
+
+| Setting               | Options                                       | What it does                                                                                                                                       |
+| --------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Accent colour         | 8 swatches                                    | Orange (default), blue, pink, red, yellow, purple, green, teal. Drives every accent surface in the theme.                                          |
+| View-mode minimiser   | On / Off                                      | Collapses Stash's row of view-mode buttons into one icon + chevron to reduce toolbar clutter.                                                      |
+| Custom logo           | Image URL                                     | Replaces the navbar home button's orb. Accepts hosted URLs and inline `data:image/...` URIs.                                                       |
+| Card rating style     | Minimal / Extravagant / Playing card          | How rated scene and performer cards present themselves. See [Rating styles](#rating-styles) below.                                                 |
+| Lite mode             | On / Off                                      | Strips blur, glow, animations, and hover-tilt. Use it if scrolling long grids feels heavy.                                                         |
+| Scene card style      | Refract / Classic                             | **Refract** (default) is the new minimal layout — title overlays the thumbnail, metadata becomes glass pills. **Classic** restores Stash's row with description, file path, and details. |
+| Show performer names  | On / Off                                      | Adds a comma-separated performer-name line under the avatar circles on scene cards.                                                                |
+
+## Rating styles
+
+The **Card rating style** setting changes how rated cards present themselves. The choice applies to both scene and performer cards (with one exception — see Playing card below).
+
+### Minimal (default)
+
+An accent-coloured halo glows around the rating banner; the halo brightness scales with the score, so a 9.2 glows noticeably brighter than a 5.5. Cards otherwise look the same as unrated ones — the rating is informational, not the centrepiece.
+
+### Extravagant
+
+Rated cards earn a tier-coloured frame, glow, and animation that escalates with the score. Both scene and performer cards are tiered.
+
+| Tier      | Rating  | Treatment                                                          |
+| --------- | ------- | ------------------------------------------------------------------ |
+| Bronze    | 5.0–6.4 | Quiet breathing tier-glow                                          |
+| Silver    | 6.5–7.4 | Breathing + slow sheen sweep                                       |
+| Gold      | 7.5–8.4 | Faster breathing + sheen + warm inset                              |
+| Diamond   | 8.5–9.4 | Breathing + sparkle particles                                      |
+| Legendary | 9.5–9.9 | Dual-colour neon tube + subtle float                               |
+| Perfect   | 10.0    | White-hot core, rainbow halo, hue-cycling text, ribbon + float     |
+
+Below 5.0 the card stays default-glass. Long grids with many high-tier cards can be GPU-heavy — flip **Lite mode** on if you notice scroll jank.
+
+![Scene cards across rating tiers](https://github.com/ordureconnoisseur/stash-refract/releases/download/media-assets/gif-hq-3.gif)
+
+![Tier animations](https://github.com/ordureconnoisseur/stash-refract/releases/download/media-assets/gif-hq-2.gif)
+
+### Playing card
+
+Performer cards switch to a trading-card layout:
+
+- Top: name banner with tier-coloured glow (a gender icon sits to the left like a type symbol)
+- Bottom: a neon stat strip overlaying the image — rating, age, scene count, O count, country flag
+
+Scene cards keep their normal Refract chin in this mode — the trading-card layout only applies to performer cards.
+
+![Playing-card performer mode](https://github.com/ordureconnoisseur/stash-refract/releases/download/media-assets/gif-hq-1.gif)
+
+![Performer grid](./screenshots/04-performers-grid.png)
 
 ## Install
 
@@ -41,6 +102,7 @@ Then restart Stash and enable the plugin in Settings → Plugins.
 - **Stash**: tested on 0.27.x. Older versions may work but aren't tested.
 - **Desktop browsers**: Chrome ≥105, Edge ≥105, Safari ≥15.4, Firefox ≥121. Refract uses `:has()` extensively for context-aware styling, which gates the minimum.
 - **Mobile**: iOS Safari 15.4+ and Chrome on Android. The burger menu is gated on `@media (pointer: coarse)` and only shows on touch-input devices.
+- **Rating system**: Refract auto-detects whether Stash is configured for STARS or DECIMAL ratings and adjusts the banner shape (5-point star vs squircle pill) accordingly. No setting needed.
 
 ## Recommended companion plugins
 
@@ -51,6 +113,8 @@ These plugins have UI integrations themed in Refract; they're not required:
 - [stash-advanced-scene-rating](https://github.com/ordureconnoisseur/stash-advanced-scene-rating)
 
 ## Customisation
+
+Most users will be set after picking an accent + a rating style in the [Settings](#settings) panel. The notes below cover the things that aren't surfaced as toggles.
 
 ### Accent colour presets
 
@@ -74,7 +138,8 @@ body.stash-liquid-glass {
 ## Known limitations
 
 - **Older Stash / older browsers**: Refract relies on `:has()` for context-aware styling. Stash 0.26 and earlier, or browsers older than the versions in [Compatibility](#compatibility), will get only partial styling.
-- **`backdrop-filter` cost**: the frosted-glass look uses `backdrop-filter` heavily. Low-end GPUs and integrated graphics may notice scroll/animation jank, especially with the lightbox open over a busy page.
+- **`backdrop-filter` cost**: the frosted-glass look uses `backdrop-filter` heavily. Low-end GPUs and integrated graphics may notice scroll/animation jank, especially with the lightbox open over a busy page — **Lite mode** is the off-switch.
+- **Extravagant on long grids**: tier animations multiply with card count. A page of 60+ rated cards can feel heavy on integrated graphics; **Lite mode** strips the animations while keeping the tier colours.
 - **Third-party plugin UIs**: plugins that inject their own modals or panels (and don't reuse Stash's standard Bootstrap classes) won't be themed until Refract gets a rule for them. File an issue with the plugin name if you want one added.
 
 ## Credits
