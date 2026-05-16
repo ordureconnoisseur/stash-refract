@@ -112,13 +112,24 @@ body.stash-liquid-glass {
 - **Browsers**: Chrome ≥105, Edge ≥105, Safari ≥15.4, Firefox ≥121. Refract uses `:has()` extensively for context-aware styling, which gates the minimum.
 - **Rating system**: Refract auto-detects whether Stash is configured for STARS or DECIMAL ratings and adjusts the banner shape (5-point star vs squircle pill) accordingly. No setting needed.
 
-## Recommended companion plugins
+## Supported plugins
 
-These plugins have UI integrations themed in Refract; they're not required:
+Refract themes the UIs of these plugins so they sit naturally inside the glass aesthetic. None are required — the theme works fine without them — but if you install any, you'll see them re-skinned automatically.
 
-- [stash-multiview](https://github.com/ordureconnoisseur/stash-multiview) — multi-scene player
-- [stash-advanced-performer-rating](https://github.com/ordureconnoisseur/stash-advanced-performer-rating)
-- [stash-advanced-scene-rating](https://github.com/ordureconnoisseur/stash-advanced-scene-rating)
+**Deep integration** (themed UI + custom touches)
+
+- [**stash-multiview**](https://github.com/ordureconnoisseur/stash-multiview) — multi-scene player. The accent picked in Refract flows through to the multiview player page via a localStorage handoff. Multiview's navbar button, picking toggle, queue badge, scene-card add buttons, and floating launcher are all themed.
+- [**stash-advanced-scene-rating**](https://github.com/ordureconnoisseur/stash-advanced-scene-rating) and [**stash-advanced-performer-rating**](https://github.com/ordureconnoisseur/stash-advanced-performer-rating) — the ★+ rating trigger, favourite-heart toggle, and the criterion-rating modal are all re-skinned in accent glass.
+
+**Themed compatibility** (CSS-only re-skin)
+
+- **flexibleDateInput** — react-datepicker calendar fully restyled: header pills, day cells, month/year dropdown panels, prev/next nav arrows.
+- **stashGlobalSearch** — focus colour swapped to accent so search inputs match the rest of the theme.
+- **url-switcher** — navbar slot positioned with the other utility buttons; gets an accent glow when tunnel mode is active.
+
+**Work in progress**
+
+- **FastTagger** — initial compat fix landed (tag-pill dropdowns no longer get clipped by FastTagger's card overflow); broader visual integration is in progress.
 
 ## Known limitations
 
