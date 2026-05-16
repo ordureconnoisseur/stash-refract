@@ -11,7 +11,6 @@ Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass
 - Three rating-display styles for scene and performer cards — **Minimal** (accent halo), **Extravagant** (six-tier collectible card frame), **Playing card** (trading-card layout for performer cards)
 - Two scene-card layouts — **Refract** (default — title overlay on thumbnail, glass spec pills, performer / tag / O-count pills, hover-scrubber overlay) or **Classic** (Stash's original card with description and file path)
 - Lite mode — strips backdrop-blur, glow shadows, animations, and hover-tilt for older or integrated GPUs
-- Touch-only mobile burger menu — replaces Stash's nav with a 3-column icon grid dropdown on `pointer: coarse` devices
 - Horizontally-scrollable navbar at narrow desktop widths instead of icons collapsing one-by-one
 - Tag editor overhaul (Settings → Tags / performer Edit → Tags tab) — alphabetical taxonomy, hover tooltip with the tag's image + description, themed editing flow
 - Scene player upgrades — controls fade after inactivity (windowed + fullscreen), restored sprite-thumbnail preview on scrubber hover, seekbar flicker fix
@@ -25,10 +24,6 @@ Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass
 The accent picker lives in **Settings → Plugins → Refract Theme** and applies live to every surface — navbar, cards, filter pills, scene tagger, and any companion plugin that's been theme-aware'd.
 
 ![Accent picker](./screenshots/02-accent-picker.png)
-
-The mobile burger panel only shows on touch-input devices (`@media (pointer: coarse)`); resizing a desktop window down won't trigger it.
-
-![Mobile burger menu](./screenshots/03-mobile-burger.png)
 
 ## Settings
 
@@ -100,8 +95,7 @@ Then restart Stash and enable the plugin in Settings → Plugins.
 ## Compatibility
 
 - **Stash**: tested on 0.27.x. Older versions may work but aren't tested.
-- **Desktop browsers**: Chrome ≥105, Edge ≥105, Safari ≥15.4, Firefox ≥121. Refract uses `:has()` extensively for context-aware styling, which gates the minimum.
-- **Mobile**: iOS Safari 15.4+ and Chrome on Android. The burger menu is gated on `@media (pointer: coarse)` and only shows on touch-input devices.
+- **Browsers**: Chrome ≥105, Edge ≥105, Safari ≥15.4, Firefox ≥121. Refract uses `:has()` extensively for context-aware styling, which gates the minimum.
 - **Rating system**: Refract auto-detects whether Stash is configured for STARS or DECIMAL ratings and adjusts the banner shape (5-point star vs squircle pill) accordingly. No setting needed.
 
 ## Recommended companion plugins
