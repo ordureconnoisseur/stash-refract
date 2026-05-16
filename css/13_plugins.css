@@ -588,3 +588,155 @@ body.stash-liquid-glass .gs-see-all:hover {
     color: var(--accent) !important;
     text-decoration: underline !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   stash-advanced-scene-rating
+   Sister plugin that injects two buttons next to the scene toolbar
+   rating control:
+     • `.adv-rating-btn` — the ★+ trigger that opens the per-criterion
+       rating modal. Ships with a yellow palette by default; we re-skin
+       it in accent-glass to match Refract's toolbar language.
+     • `.adv-favourite-btn` — the heart toggle that adds/removes the
+       "Favourite ★" tag. Keeps the red identity (favourites are
+       universally red — Stash's own performer-favourite uses red too)
+       but adopts Refract's glass surface + halo style.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Rating ★+ trigger ─────────────────────────────────────────── */
+body.stash-liquid-glass .adv-rating-btn {
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    border-radius: var(--radius-sm) !important;
+    height: 26px !important;
+    padding: 0 8px !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
+    /* Force explicit flex centering — the ★ glyph in most fonts sits
+       below the visual line center because the star's bottom points
+       hang at the baseline while the top point pokes up. Flex centering
+       + line-height:1 + a tiny -1px nudge on the star puts it on the
+       true geometric centre of the pill. */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px;
+    line-height: 1 !important;
+    font-size: 0.9rem !important;
+    transition: background 0.18s ease, border-color 0.18s ease,
+                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+}
+/* Star span — nudge up 1px so it visually centres in the pill (the ★
+   glyph sits low because its bottom points hang at baseline), and bump
+   its size a hair so it pairs in weight with the `+` after it. */
+body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-star,
+body.stash-liquid-glass .adv-rating-btn > span[style*="color"] {
+    display: inline-flex;
+    align-items: center;
+    font-size: 1.05em;
+    line-height: 1;
+    transform: translateY(-1px);
+}
+/* `+` glyph is baseline-aligned in most fonts and renders ~2px below
+   the line's geometric centre. Bump it up to match the star. Also
+   slight bold for weight parity with the ★. */
+/* Plus-icon sizing + flex centering live in the plugin's own CSS so
+   it works without Refract. Refract only needs to ensure the inherited
+   button colour reaches the SVG stroke (currentColor handles that for
+   free) and re-centre vertically alongside the nudged ★. */
+body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-plus {
+    transform: translateY(-1px);
+}
+body.stash-liquid-glass .adv-rating-btn:hover {
+    background: rgba(var(--accent-rgb), 0.22) !important;
+    border-color: var(--accent-bright) !important;
+    color: #fff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.35) !important;
+}
+/* Override the plugin's hard-coded yellow ★ glyph so the star reads
+   in the user's accent colour. The plugin renders `<span style="color:#ffc107">★</span>+`;
+   we re-color it via the descendant span selector + !important. */
+body.stash-liquid-glass .adv-rating-btn > span[style*="color"] {
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .adv-rating-btn:hover > span[style*="color"] {
+    color: #fff !important;
+}
+/* Unrated-count badge (when criteria are still pending) — restyle from
+   the plugin's grey/yellow pill to a glass dark pill with accent text. */
+body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge {
+    background: rgba(0, 0, 0, 0.45) !important;
+    color: var(--accent-bright) !important;
+    border: 1px solid rgba(var(--accent-rgb), 0.4) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    min-height: 18px;
+    padding: 0 6px !important;
+    margin-left: 4px;
+}
+body.stash-liquid-glass .adv-rating-btn--partial .adv-rating-btn-badge {
+    background: rgba(var(--accent-rgb), 0.25) !important;
+    color: #fff !important;
+}
+body.stash-liquid-glass .adv-rating-btn:hover .adv-rating-btn-badge {
+    background: #000 !important;
+    color: var(--accent-bright) !important;
+}
+
+/* ── Favourite heart toggle ─────────────────────────────────────── */
+/* Empty state: same muted-glass language as every other Refract
+   toolbar button — neutral grey heart on the standard glass surface.
+   Hover gives a subtle pink "preview" (just a colour shift on the
+   heart + a hairline pink border tint), no bg change. The activated
+   state is the glass-pink look — pink-tinted glass surface with a
+   solid pink heart, no heavy gradient fill. */
+body.stash-liquid-glass .adv-favourite-btn {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-sm) !important;
+    height: 26px !important;
+    width: 30px !important;
+    margin-left: 6px !important;
+    box-shadow: none !important;
+    transition: background 0.18s ease, border-color 0.18s ease,
+                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+}
+/* Empty + hover: just a subtle pink preview on the heart and a barely
+   visible pink in the border. No background fill, no lift — keeps it
+   quiet so it doesn't pre-empt the activated state visually. */
+body.stash-liquid-glass .adv-favourite-btn:hover {
+    color: rgba(244, 114, 182, 0.85) !important;
+    border-color: rgba(236, 72, 153, 0.28) !important;
+}
+/* Activated: pink-tinted glass surface, solid pink heart inside.
+   The button itself stays "glassy" (translucent pink bg, pink-tinted
+   border, soft pink glow) — only the heart glyph reads as solid pink.
+   Heart is `currentColor` so the button text colour drives the fill;
+   we set it to a strong pink while keeping the surface translucent. */
+body.stash-liquid-glass .adv-favourite-btn.adv-favourite-btn--on {
+    background: rgba(236, 72, 153, 0.14) !important;
+    border-color: rgba(236, 72, 153, 0.6) !important;
+    color: #f472b6 !important;
+    box-shadow: 0 0 12px rgba(236, 72, 153, 0.3) !important;
+}
+body.stash-liquid-glass .adv-favourite-btn.adv-favourite-btn--on:hover {
+    background: rgba(236, 72, 153, 0.22) !important;
+    border-color: rgba(236, 72, 153, 0.8) !important;
+    color: #ec4899 !important;
+    transform: translateY(-1px) !important;
+    box-shadow:
+        0 0 0 1px rgba(244, 114, 182, 0.25),
+        0 0 16px rgba(236, 72, 153, 0.45),
+        0 0 30px rgba(236, 72, 153, 0.2) !important;
+}
+body.stash-liquid-glass .adv-favourite-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+    /* Soft inner drop so the heart still reads against the glass bg
+       in the empty state. In the on-state the bright fill + halo
+       handle contrast on their own. */
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
