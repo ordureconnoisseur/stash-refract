@@ -732,6 +732,62 @@ body.stash-liquid-glass .adv-favourite-btn.adv-favourite-btn--on:hover {
         0 0 16px rgba(236, 72, 153, 0.45),
         0 0 30px rgba(236, 72, 153, 0.2) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FastTagger
+   The plugin's UI puts each tag in a .card.fast-tagger-card with a
+   "Move to" dropdown inside. Two CSS layers clip the dropdown menu:
+
+   1. Refract's `.card { overflow: hidden }` rule wins on specificity
+      against FastTagger's own `.card.fast-tagger-card { overflow:
+      visible }`, so the menu gets cut at the card's rounded bottom
+      corner. Override unconditionally.
+   2. When FastTagger renders inside Stash's `.scrape-dialog` modal,
+      `.modal-content` ALSO has overflow:hidden — which clips the
+      menu again at the modal boundary if it extends past the card.
+      Only flip that one when a FastTagger dropdown is actually open
+      so we don't change modal layout when it's not needed.
+   ═══════════════════════════════════════════════════════════════════ */
+body.stash-liquid-glass .fast-tagger-card,
+body.stash-liquid-glass .card.fast-tagger-card {
+    overflow: visible !important;
+    /* Refract's base .card rule applies `content-visibility: auto`
+       (perf optimization for gallery scenes/performer cards). That
+       adds implicit `contain: layout paint style` even when the
+       card IS in the viewport, and the paint containment clips the
+       absolutely-positioned "Move to" dropdown menu at the card's
+       rounded-corner boundary. Defeat both for FastTagger cards —
+       the perf saving doesn't matter here (no images, ~70px rows). */
+    content-visibility: visible !important;
+    contain: none !important;
+    contain-intrinsic-size: none !important;
+}
+body.stash-liquid-glass .modal-content:has(.fast-tagger-card .dropdown.show) {
+    overflow: visible !important;
+}
+
+/* Menu surface — glass language to match other Refract dropdowns,
+   instead of Bootstrap's flat white default. */
+body.stash-liquid-glass .fast-tagger-card .dropdown-menu.show {
+    background: rgba(20, 20, 24, 0.97) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: var(--shadow-lg) !important;
+    color: var(--text) !important;
+    z-index: 1080 !important;
+}
+body.stash-liquid-glass .fast-tagger-card .dropdown-menu .dropdown-item {
+    color: var(--text) !important;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+body.stash-liquid-glass .fast-tagger-card .dropdown-menu .dropdown-item:hover,
+body.stash-liquid-glass .fast-tagger-card .dropdown-menu .dropdown-item:focus {
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .fast-tagger-card .dropdown-menu .dropdown-divider {
+    border-top-color: var(--glass-border) !important;
+}
 body.stash-liquid-glass .adv-favourite-btn svg {
     width: 15px !important;
     height: 15px !important;
