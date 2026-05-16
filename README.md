@@ -125,7 +125,6 @@ Refract themes the UIs of these plugins so they sit naturally inside the glass a
 
 - **flexibleDateInput** — react-datepicker calendar fully restyled: header pills, day cells, month/year dropdown panels, prev/next nav arrows.
 - **stashGlobalSearch** — focus colour swapped to accent so search inputs match the rest of the theme.
-- **url-switcher** — navbar slot positioned with the other utility buttons; gets an accent glow when tunnel mode is active.
 
 **Work in progress**
 
