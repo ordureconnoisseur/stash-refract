@@ -4,6 +4,10 @@ Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass
 
 ![Refract — accent cycle on the homepage](https://github.com/ordureconnoisseur/stash-refract/releases/download/media-assets/gif-accent-cycle.gif)
 
+> *The GIF above cycles through all eight accents back-to-back to show the range — in normal use you pick one swatch in the plugin settings panel and the theme stays in that accent. Nothing flashes, nothing cycles.*
+
+![Accent picker — Settings → Plugins → Refract Theme](./screenshots/accent-picker.png)
+
 ## Features
 
 - **8 accent presets** (plus custom CSS override) — pick one, applies live to every surface
