@@ -2,6 +2,8 @@
 
 Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass panels, floating navbar, dark base, configurable accent.
 
+![Refract — accent cycle on the homepage](https://github.com/ordureconnoisseur/stash-refract/releases/download/media-assets/gif-accent-cycle.gif)
+
 ## Features
 
 - Glass-morphism re-skin of every Stash surface — cards, filters, scene player, lightbox, settings, scene tagger, tag editor
@@ -15,9 +17,9 @@ Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass
 - Duplicate checker comparison-card redesign — at-a-glance highest-resolution / largest-file callouts
 - Theme-aware integration with [stash-multiview](https://github.com/ordureconnoisseur/stash-multiview) — accent flows into the multiview player via a localStorage handoff
 
-![Scenes page](https://github.com/ordureconnoisseur/stash-refract/releases/download/media-assets/gif-hq-4.gif)
-
 The accent picker lives in **Settings → Plugins → Refract Theme** and applies live to every surface — navbar, cards, filter pills, scene tagger, and any companion plugin that's been theme-aware'd.
+
+![Scene-card hover effects on the scenes page](https://github.com/ordureconnoisseur/stash-refract/releases/download/media-assets/gif-hq-4.gif)
 
 ## Settings
 
