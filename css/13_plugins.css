@@ -870,3 +870,239 @@ body.stash-liquid-glass .adv-favourite-btn svg {
        handle contrast on their own. */
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   stash-scribe — LLM-driven scene-review assistant
+   Sibling plugin that ships its own `--scribe-*` token system (mirrors
+   stash-multiview's pattern). The accent family already auto-retints
+   because the plugin defaults to `var(--accent, …)`. Refract only
+   needs to:
+     1. Re-skin the chrome (chrome-bg + border) so the modal reads as
+        glass instead of solid #1a1a1a.
+     2. Add glass-blur + accent halo to the modal surface.
+     3. Re-style the toolbar trigger button to match the .adv-rating-btn
+        / .mv-scene-page-btn pill family.
+     4. Re-skin the primary/secondary buttons + inputs into the same
+        accent-glass + glass-field language used elsewhere in Refract.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Token re-mapping. Scribe's accent vars chain to var(--accent, …) so
+   they retint for free; we only need to redirect the chrome/border. */
+body.stash-liquid-glass {
+    --scribe-chrome-bg: var(--glass-bg-strong);
+    --scribe-border: var(--glass-border);
+    --scribe-overlay-bg: rgba(0, 0, 0, 0.55);
+}
+
+/* ── Toolbar trigger ────────────────────────────────────────────────
+   Match the .adv-rating-btn pill shape so Scribe sits visually
+   alongside ASR's ★+ trigger as a sibling action. */
+body.stash-liquid-glass .stash-scribe-trigger-btn {
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    border-radius: var(--radius-sm) !important;
+    height: 26px !important;
+    width: 30px !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
+    transition: background 0.18s ease, border-color 0.18s ease,
+                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+}
+body.stash-liquid-glass .stash-scribe-trigger-btn:hover {
+    background: rgba(var(--accent-rgb), 0.22) !important;
+    border-color: var(--accent-bright) !important;
+    color: #fff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.35) !important;
+}
+body.stash-liquid-glass .stash-scribe-trigger-btn svg {
+    width: 15px !important;
+    height: 15px !important;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+/* ── Modal overlay + surface ────────────────────────────────────────
+   Glass-blur backdrop + the standard accent halo around the modal
+   card (same recipe used for the .gs-modal stashGlobalSearch panel). */
+body.stash-liquid-glass .stash-scribe-modal-overlay {
+    backdrop-filter: blur(8px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+}
+body.stash-liquid-glass .stash-scribe-modal {
+    /* Match the ASR/APR modal opacity recipe (.adv-rating-modal-content
+       at 09_buttons.css:559) — near-opaque dark base + heavy blur so the
+       card reads as solid glass, not see-through. */
+    background: rgba(28, 28, 28, 0.97) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    border-radius: var(--radius) !important;
+    -webkit-backdrop-filter: blur(32px) !important;
+    backdrop-filter: blur(32px) !important;
+    color: var(--text) !important;
+    box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(var(--accent-rgb), 0.18),
+        0 0 48px 8px rgba(var(--accent-rgb), 0.18),
+        0 0 100px 24px rgba(var(--accent-rgb), 0.08) !important;
+}
+
+/* Header + context + result divider — let Refract's glass border show
+   through instead of Scribe's hard #333 line. */
+body.stash-liquid-glass .stash-scribe-header,
+body.stash-liquid-glass .stash-scribe-context,
+body.stash-liquid-glass .stash-scribe-input-row,
+body.stash-liquid-glass .stash-scribe-result {
+    border-color: var(--glass-border) !important;
+}
+
+/* ── Inputs / textareas ─────────────────────────────────────────────
+   Standard Refract glass field language — translucent surface, glass
+   border, accent focus glow. */
+body.stash-liquid-glass .stash-scribe-input,
+body.stash-liquid-glass .stash-scribe-review {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .stash-scribe-input:focus,
+body.stash-liquid-glass .stash-scribe-review:focus {
+    border-color: var(--accent-glow) !important;
+    box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.25),
+                0 0 14px rgba(var(--accent-rgb), 0.25) !important;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────
+   Primary action (Send / Save review+scores / active mode tab) uses
+   accent-glass — same recipe as #mv-open-btn / .adv-rating-btn so the
+   three plugins read as siblings. Secondary buttons are neutral
+   glass. */
+body.stash-liquid-glass .stash-scribe-send,
+body.stash-liquid-glass .stash-scribe-primary,
+body.stash-liquid-glass .stash-scribe-mode-tabs .btn.active {
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
+    transition: background 0.18s ease, border-color 0.18s ease,
+                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+}
+body.stash-liquid-glass .stash-scribe-send:hover,
+body.stash-liquid-glass .stash-scribe-primary:hover,
+body.stash-liquid-glass .stash-scribe-mode-tabs .btn.active:hover {
+    background: rgba(var(--accent-rgb), 0.22) !important;
+    border-color: var(--accent-bright) !important;
+    color: #fff !important;
+    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.35) !important;
+}
+body.stash-liquid-glass .stash-scribe-secondary,
+body.stash-liquid-glass .stash-scribe-restart,
+body.stash-liquid-glass .stash-scribe-score-clear {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    border-radius: var(--radius-sm) !important;
+}
+body.stash-liquid-glass .stash-scribe-secondary:hover,
+body.stash-liquid-glass .stash-scribe-restart:hover {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border-bright) !important;
+    color: #fff !important;
+}
+
+/* "Ready to generate" hint — keep the green accent (success colour
+   convention) but soften the border so it's a hint, not a primary. */
+body.stash-liquid-glass .stash-scribe-secondary.is-ready {
+    border-color: rgba(74, 222, 128, 0.55) !important;
+    color: rgba(187, 247, 208, 0.95) !important;
+    box-shadow: 0 0 12px rgba(74, 222, 128, 0.18) !important;
+}
+
+/* ── Rendered review section (below scene/performer details) ──────
+   The section is built to match the surrounding native pattern of
+   each subject page, but lives inside a `.stash-scribe-review-section`
+   wrapper so Refract's `> h6` / `> p.pre` direct-child rules at
+   07_scene_details.css:760-790 don't reach it. We replay those same
+   declarations for the nested case so the heading + body look
+   indistinguishable from native Details/Tags. */
+
+/* Scene page — re-apply 07_scene_details.css:761 (uppercase muted
+   label) for our heading. The section now wraps in its own row/col
+   for React-safety, so we target the heading inside .col-12 inside
+   .stash-scribe-review-section. */
+body.stash-liquid-glass .scene-tabs .stash-scribe-review-section .stash-scribe-review-heading {
+    margin: 0.6rem 0 0.35rem 0 !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: var(--text-muted) !important;
+}
+
+/* Scene page — re-apply 07_scene_details.css:783 (description prose)
+   for our p.pre. */
+body.stash-liquid-glass .scene-tabs .stash-scribe-review-section p.pre {
+    color: var(--text) !important;
+    font-size: 0.85rem !important;
+    line-height: 1.5 !important;
+    margin: 0 0 0.6rem 0 !important;
+    white-space: pre-wrap !important;
+    font-family: inherit !important;
+}
+
+/* Performer-page review section — inherits `.detail-header .detail-item`
+   layout (narrow title column / wide value column) from native Stash.
+   No flex override on the title; the Edit button lives at the end of
+   the value column instead via .stash-scribe-review-edit-row. */
+body.stash-liquid-glass .stash-scribe-review-edit-row {
+    margin-top: 0.5rem !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+}
+
+/* Scene-page heading row — h6 spans full width, so flex the title
+   + Edit button onto a single line with Edit pushed right. */
+body.stash-liquid-glass .scene-tabs .stash-scribe-review-heading {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+/* Edit affordance — small, muted, accent on hover so it stays
+   discoverable without competing with the native section labels. */
+body.stash-liquid-glass .stash-scribe-review-edit {
+    margin-left: auto !important;
+    color: var(--text-muted) !important;
+    font-size: 0.72rem !important;
+    font-weight: 500 !important;
+    padding: 0 0.4rem !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    text-decoration: none !important;
+}
+body.stash-liquid-glass .stash-scribe-review-edit:hover {
+    color: var(--accent-bright) !important;
+    text-decoration: underline !important;
+}
+
+/* ── Transcript bubbles ─────────────────────────────────────────────
+   User bubbles already use --scribe-accent-tint + --scribe-accent so
+   they retint automatically. Sharpen the bubble radius to match
+   Refract's --radius-sm and bump the assistant bubble onto glass. */
+body.stash-liquid-glass .stash-scribe-msg-user .stash-scribe-msg-body,
+body.stash-liquid-glass .stash-scribe-msg-assistant .stash-scribe-msg-body {
+    border-radius: var(--radius-sm) !important;
+}
+body.stash-liquid-glass .stash-scribe-msg-assistant .stash-scribe-msg-body {
+    background: var(--glass-bg) !important;
+}
+/* The "ready to generate" meta-bubble (Scribe emitted [READY_TO_GENERATE]
+   with no prose ahead of it) keeps its green dashed treatment so it reads
+   as a UX hint, not a regular assistant reply. Higher specificity than
+   the assistant-body rule above lets it win. */
+body.stash-liquid-glass .stash-scribe-msg-assistant .stash-scribe-msg-body.stash-scribe-msg-body-ready {
+    background: rgba(74, 222, 128, 0.10) !important;
+    border: 1px dashed rgba(74, 222, 128, 0.5) !important;
+    color: rgba(187, 247, 208, 0.95) !important;
+    font-style: italic;
+}

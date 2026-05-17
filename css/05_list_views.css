@@ -1256,6 +1256,23 @@ body.stash-liquid-glass .search-item {
     box-shadow: var(--shadow-md);
 }
 
+/* Scene tagger row layout: each .search-item has a flex row containing
+   .scene-card (thumbnail) + .scene-link (title) side by side.
+   The card has no natural width constraint so it balloons to fill
+   its half-page column. Cap the card to 150px; let the title fill the rest.
+   .scene-link.overflow-hidden already clips text — min-width:0 lets
+   flex shrink it past content intrinsic size so TruncatedText works. */
+body.stash-liquid-glass .search-item .scene-card {
+    flex: 0 0 150px !important;
+    max-width: 150px !important;
+    width: 150px !important;
+}
+body.stash-liquid-glass .search-item .scene-link {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
 body.stash-liquid-glass .tagger-container-header {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;

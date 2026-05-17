@@ -4295,31 +4295,30 @@
     }
 
     /* Sidebar performer carousel — count-adaptive layout.
-       (1) Lifts the native .scene-performers row out of .col-12 into a sibling
-           .scene-performers-row wrapper (same as the old fixSceneDetailsLayout).
+       (1) Marks the .col-12 that directly contains .scene-performers with the
+           class scene-performers-row so CSS can target it. No node is moved —
+           moving a React-managed child out of its tracked parent causes a
+           NotFoundError on removeChild when React reconciles after a scene save.
        (2) Counts cards, tags wrapper with data-perf-count="1|2|3|4|many".
            CSS in css/07_scene_details.css picks the layout per count.
        (3) For count >= 5: appends pagination dots, IntersectionObserver tracks
            which card is in view, scoped MutationObserver watches for card
            count changes, single delegated keydown listener for arrow keys.
-       Fully idempotent — guards via data-sthMoved and wrap.__refractPerf state. */
+       Fully idempotent — guards via class presence and wrap.__refractPerf state. */
     function setupSceneTabsPerformers() {
-        /* Step 1 — lift native row into our wrapper. */
-        document.querySelectorAll(".tab-pane .col-12 > .scene-performers").forEach(function (el) {
-            if (el.dataset.sthMoved === "1") return;
+        /* Step 1 — mark the col-12 that contains .scene-performers as our wrapper.
+           classList.add is a non-childList mutation so it does not retrigger the
+           MutationObserver (which watches childList only). */
+        document.querySelectorAll(".scene-tabs .tab-pane .col-12 > .scene-performers").forEach(function (el) {
             var col = el.parentElement;
             if (!col || !col.classList.contains("col-12")) return;
-            var outerRow = col.parentElement;
-            if (!outerRow || !outerRow.classList.contains("row") || !outerRow.parentElement) return;
-            var newRow = document.createElement("div");
-            newRow.className = "row scene-performers-row";
-            newRow.appendChild(el);
-            outerRow.insertAdjacentElement("afterend", newRow);
-            el.dataset.sthMoved = "1";
+            if (!col.classList.contains("scene-performers-row")) {
+                col.classList.add("scene-performers-row");
+            }
         });
 
         /* Step 2-6 — apply adaptive layout per wrapper. */
-        document.querySelectorAll(".scene-tabs .scene-performers-row").forEach(function (wrap) {
+        document.querySelectorAll(".scene-tabs .col-12.scene-performers-row").forEach(function (wrap) {
             applyAdaptiveLayout(wrap);
         });
     }
@@ -4549,10 +4548,14 @@
     /* Wrap the run of `.tag-item` pills that follows the "Tags" <h6> on the
        scene-details panel into a single `.st-tag-list` container, so we
        can constrain it to a 5-row column-wrap strip with horizontal
-       overflow scroll (mirrors the performer-card strip below it). */
+       overflow scroll (mirrors the performer-card strip below it).
+       Tag items are CLONED into the wrapper (originals hidden in-place) rather
+       than moved — moving React-managed nodes causes a NotFoundError on
+       removeChild when React reconciles after a scene save. Rebuild is
+       triggered whenever any tag-item in the col lacks data-sth-tag-origin,
+       meaning React has re-rendered fresh nodes. */
     function wrapSceneTagList() {
         document.querySelectorAll(".scene-tabs .tab-pane .col-12").forEach(function (col) {
-            if (col.dataset.sthTagList === "1") return;
             var headings = col.querySelectorAll(":scope > h6");
             var tagsHeading = null;
             for (var i = 0; i < headings.length; i++) {
@@ -4571,11 +4574,26 @@
                 node = node.nextElementSibling;
             }
             if (tagNodes.length === 0) return;
+            /* Only rebuild when React has inserted fresh (unmarked) tag nodes.
+               This prevents infinite loops from our own DOM insertions. */
+            var needsRebuild = tagNodes.some(function (t) { return !t.dataset.sthTagOrigin; });
+            if (!needsRebuild) return;
+            var existing = col.querySelector(":scope > .st-tag-list");
+            if (existing) { existing.remove(); }
             var wrapper = document.createElement("div");
             wrapper.className = "st-tag-list";
             tagsHeading.insertAdjacentElement("afterend", wrapper);
-            tagNodes.forEach(function (t) { wrapper.appendChild(t); });
-            col.dataset.sthTagList = "1";
+            /* Mark originals and hide them in-place so React can removeChild
+               them normally (parent unchanged). Clone into wrapper for display.
+               IMPORTANT: clone BEFORE modifying the original — cloneNode(true)
+               copies inline styles and dataset, so cloning after hiding would
+               give us invisible clones too. */
+            tagNodes.forEach(function (t) {
+                var clone = t.cloneNode(true);
+                t.setAttribute("data-sth-tag-origin", "1");
+                t.style.setProperty("display", "none", "important");
+                wrapper.appendChild(clone);
+            });
         });
     }
 
