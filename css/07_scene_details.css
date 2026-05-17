@@ -127,12 +127,17 @@ body.stash-liquid-glass .scene-tabs .tab-pane.active.show {
     flex: 1 1 auto !important;
     min-height: 0 !important;
 }
-/* Anchor the lifted performer row to the bottom of the tab pane.
-   When content above is short, the auto-margin consumes the gap so
-   the cards sit flush at the panel bottom. When content overflows,
-   the row stays at its natural position (no negative margin). */
-body.stash-liquid-glass .scene-tabs .scene-performers-row {
+/* Anchor the performer row to the bottom of the tab pane.
+   The .col-12 that contains .scene-performers gets class scene-performers-row
+   in-place (no node move). Its Bootstrap .row wrapper gets margin-top:auto so
+   the whole row is pushed to the bottom of the .tab-pane flex column.
+   When content above is short, the auto-margin consumes the gap so the cards
+   sit flush at the panel bottom. When content overflows, the row stays at its
+   natural position (no negative margin). */
+body.stash-liquid-glass .scene-tabs .row:has(> .col-12.scene-performers-row) {
     margin-top: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
 /* ───────────────────────────────────────────────────────────────────
@@ -161,11 +166,13 @@ body.stash-liquid-glass .gallery-divider {
     display: none !important;
 }
 
-/* Scene-performers row → horizontal carousel with chevron buttons.
-   Refract.js wraps the row in .scene-performers-row and injects
-   .stash-perf-prev / .stash-perf-next chevrons that scrollBy() the
-   inner row by one card width. Wrapper has 56px gutters on each side
-   so chevrons sit in their own space, not on top of the cards. */
+/* Scene-performers row → horizontal carousel with chevron buttons (main page).
+   On the main scene page, JS adds scene-performers-row to the standalone wrapper
+   div and injects .stash-perf-prev / .stash-perf-next chevrons that scrollBy()
+   the inner row by one card width. Wrapper has 56px gutters on each side so
+   chevrons sit in their own space, not on top of the cards.
+   Inside .scene-tabs the same class is added to .col-12 in-place; the sidebar
+   block below (with .scene-tabs qualifier) overrides padding/margin there. */
 body.stash-liquid-glass .scene-performers-row {
     position: relative !important;
     overflow: visible !important;
@@ -855,10 +862,12 @@ body.stash-liquid-glass .scene-tabs .st-tag-list .tag-item {
     flex-shrink: 0 !important;
 }
 
-/* Lifted performer-row — JS moves .scene-performers from inside .col-12
-   into a new sibling .row.scene-performers-row at the bottom of the
-   tab-pane. In the narrow scene-tabs sidebar we render performers as a
-   horizontal scrolling strip of small cards instead of a wrapping grid. */
+/* Performer-row — JS adds class scene-performers-row to the .col-12 that
+   directly contains .scene-performers (no node move — avoids React removeChild
+   errors on scene save). The containing .row gets margin-top:auto to anchor the
+   performer strip at the bottom of the .tab-pane flex column.
+   In the narrow scene-tabs sidebar performers render as a count-adaptive layout
+   (grid for 1-4, horizontal scroll carousel for 5+). */
 /* Sidebar performer layout is COUNT-ADAPTIVE.
    JS (setupSceneTabsPerformers) tags the wrapper with
    data-perf-count="1" | "2" | "3" | "4" | "many". CSS picks the layout. */
