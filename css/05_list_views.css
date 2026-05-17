@@ -2578,3 +2578,34 @@ body.refract-lite.stash-liquid-glass .refract-tag-tooltip-portal {
     -webkit-backdrop-filter: none;
 }
 
+/* Performer-name tooltip portal — appended to document.body by
+   initPerformerNameTooltip() in refract.js when a scene-card avatar
+   circle is hovered. Position is set inline via JS (fixed coordinates
+   computed from the avatar's getBoundingClientRect), so no ancestor
+   can clip the tooltip — it can render outside any card / grid edge. */
+body.stash-liquid-glass .refract-performer-name-tooltip-portal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(12, 12, 14, 0.92);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+    padding: 0.22rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    transform: scale(0.92);
+    transform-origin: bottom center;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 10000;
+}
+body.stash-liquid-glass .refract-performer-name-tooltip-portal.refract-performer-name-tooltip-portal--show {
+    opacity: 1;
+    transform: scale(1);
+}
+

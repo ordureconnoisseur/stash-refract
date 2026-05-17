@@ -733,6 +733,80 @@ body.stash-liquid-glass .adv-favourite-btn.adv-favourite-btn--on:hover {
         0 0 30px rgba(236, 72, 153, 0.2) !important;
 }
 
+/* ── Card-variant favourite button ──────────────────────────────────
+   The scene-card overlay variant (.adv-favourite-card-btn) sits at
+   top-right of every scene-card thumbnail. Re-skin it to match the
+   glass-overlay language of stash-multiview's .mv-add-btn so the two
+   read as a consistent pair when both are present on the same card.
+   Empty state: dark glass + white heart. Favourited: pink-tinted
+   glass + solid pink heart (same palette as the toolbar variant). */
+body.stash-liquid-glass .adv-favourite-card-btn {
+    /* Position aligned to .mv-add-btn (top:6/right:6 + 28x28) so when
+       both buttons are visible they sit on the same line. The plugin
+       defaults to 8/8/26x26 for native Stash; Refract bumps the size +
+       tightens the inset to match its sibling overlay. */
+    top: 6px !important;
+    right: 6px !important;
+    background: rgba(0, 0, 0, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: var(--radius-sm) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+            backdrop-filter: blur(8px) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+    box-shadow: none !important;
+    width: 28px !important;
+    height: 28px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transition: background 0.18s ease, border-color 0.18s ease,
+                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+}
+/* Picking-mode shift: when multiview's add button takes top:6/right:6,
+   slide the favourite to right:40 (28 width + 6 gap). Overrides the
+   plugin's default 44px (which assumed an 8px starting offset). */
+body.stash-liquid-glass.mv-picking-mode .adv-favourite-card-btn {
+    right: 40px !important;
+}
+body.stash-liquid-glass .adv-favourite-card-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+}
+body.stash-liquid-glass .adv-favourite-card-btn:hover {
+    /* Clearer glass on hover instead of darker — translucent white
+       tint reads as the surface "lighting up" rather than dimming. */
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #f472b6 !important;
+    border-color: rgba(236, 72, 153, 0.4) !important;
+    transform: none !important;
+}
+body.stash-liquid-glass .adv-favourite-card-btn.adv-favourite-btn--on {
+    background: rgba(236, 72, 153, 0.14) !important;
+    border-color: rgba(236, 72, 153, 0.6) !important;
+    color: #f472b6 !important;
+    box-shadow: 0 0 12px rgba(236, 72, 153, 0.3) !important;
+}
+body.stash-liquid-glass .adv-favourite-card-btn.adv-favourite-btn--on:hover {
+    background: rgba(236, 72, 153, 0.22) !important;
+    border-color: rgba(236, 72, 153, 0.8) !important;
+    color: #ec4899 !important;
+    box-shadow:
+        0 0 0 1px rgba(244, 114, 182, 0.25),
+        0 0 16px rgba(236, 72, 153, 0.45),
+        0 0 30px rgba(236, 72, 153, 0.2) !important;
+}
+/* Refract-only: hide the favourite button even when the scene is
+   already favourited unless the card is hovered. Keeps the grid
+   visually clean — favourited state is still discoverable by hovering
+   the card. Overrides the plugin's default `--on` opacity rule on
+   higher specificity (body.stash-liquid-glass adds one class to the
+   selector). */
+body.stash-liquid-glass .adv-favourite-card-btn.adv-favourite-btn--on {
+    opacity: 0 !important;
+}
+body.stash-liquid-glass .scene-card:hover .adv-favourite-card-btn {
+    opacity: 1 !important;
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    FastTagger
    The plugin's UI puts each tag in a .card.fast-tagger-card with a
