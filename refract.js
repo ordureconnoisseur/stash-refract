@@ -1398,6 +1398,7 @@
                 safeRun(initCardTilts);
                 safeRun(initSceneCards);
                 safeRun(initPerformerCards);
+                safeRun(syncPerformerCardHearts);
                 safeRun(initSlickCarousels);
                 safeRun(initFilterBar);
                 safeRun(initFilterButtonBadge);
@@ -1744,7 +1745,7 @@
                 var particles = document.createElement("div");
                 particles.className = "refract-heart-particles";
                 particles.setAttribute("aria-hidden", "true");
-                for (var hi = 1; hi <= 7; hi++) {
+                for (var hi = 1; hi <= 5; hi++) {
                     var heart = document.createElement("span");
                     heart.className = "refract-heart refract-heart-" + hi;
                     heart.textContent = "♥"; /* ♥ */
@@ -2183,6 +2184,38 @@
 
             if (hr) { hr.style.display = "none"; }
             if (popovers) { popovers.style.display = "none"; }
+        });
+    }
+
+    /* Floating-hearts effect for favourited PERFORMER cards — only in
+       playing-card rating-style mode. Mirrors the scene-card hearts
+       feature, but the source of "is this favourited?" is the native
+       Stash `.favorite-button.favorite` class rather than a tag lookup,
+       so we re-sync on every mutation cycle (Stash applies / removes
+       the class reactively when the user toggles the heart). */
+    function syncPerformerCardHearts() {
+        var inPlayingCard = document.body.classList.contains("refract-rating-style-playing-card");
+        document.querySelectorAll(".performer-card").forEach(function (card) {
+            var isFav = !!card.querySelector(".favorite-button.favorite");
+            var existing = card.querySelector(":scope > .refract-heart-particles");
+            if (inPlayingCard && isFav) {
+                card.classList.add("refract-favourite");
+                if (!existing) {
+                    var particles = document.createElement("div");
+                    particles.className = "refract-heart-particles";
+                    particles.setAttribute("aria-hidden", "true");
+                    for (var hi = 1; hi <= 5; hi++) {
+                        var heart = document.createElement("span");
+                        heart.className = "refract-heart refract-heart-" + hi;
+                        heart.textContent = "♥";
+                        particles.appendChild(heart);
+                    }
+                    card.appendChild(particles);
+                }
+            } else {
+                card.classList.remove("refract-favourite");
+                if (existing) { existing.remove(); }
+            }
         });
     }
 

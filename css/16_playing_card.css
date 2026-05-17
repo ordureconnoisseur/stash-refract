@@ -122,6 +122,22 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .favor
     height: 100% !important;
 }
 
+/* In playing-card mode the floating-heart particles (.refract-heart-
+   particles, injected via syncPerformerCardHearts in refract.js) take
+   over as the visual indicator of "favourited". The favourited heart
+   icon itself is hidden by default + its heartbeat killed; it reveals
+   on card hover so users can still click to unfavourite. Opacity-
+   based hide (not display:none) keeps the layout box live and
+   clickable on hover. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .favorite-button.favorite {
+    opacity: 0 !important;
+    animation: none !important;
+    transform: none !important;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card:hover .favorite-button.favorite {
+    opacity: 1 !important;
+}
+
 /* Per-gender neon glow chain — mirrors the 7-layer pattern from the
    name text, using each gender's signature colour as the gas. The
    icon's `color` property (set by 03_cards.css :1499-1532) feeds the

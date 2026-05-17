@@ -147,61 +147,68 @@ body.stash-liquid-glass .refract-heart-particles {
     overflow: hidden;
     z-index: 8; /* above thumbnail image, below .stash-tilt-glare (z:9) */
     border-radius: inherit;
+    /* Isolate the layer so heart movement doesn't dirty the rest of
+       the card's paint. Major win in playing-card mode where the card
+       already has tier breathing / sheen / sparkle / float animations
+       running — without containment, every heart frame re-paints the
+       full card. */
+    contain: layout paint;
 }
 body.stash-liquid-glass .refract-heart {
     position: absolute;
     bottom: 0;
     left: 0;
     color: #ff5a85;
-    text-shadow:
-        0 0 4px rgba(255, 90, 133, 0.95),
-        0 0 10px rgba(255, 90, 133, 0.6),
-        0 0 22px rgba(255, 90, 133, 0.3);
     opacity: 0;
-    transform: translate(0, 24px);
-    will-change: transform, opacity;
+    /* translate3d forces GPU compositing for the animation without
+       needing will-change (which thrashes on too many elements).
+       text-shadow dropped — animated text shadows force a per-frame
+       raster pass; the bright pink glyph reads fine on its own. */
+    transform: translate3d(0, 24px, 0);
     animation: refractHeartFloat var(--hd, 6s) linear infinite;
     animation-delay: var(--dl, 0s);
     font-size: var(--hs, 14px);
     line-height: 1;
 }
-/* Seven varied trajectories — different start columns, sizes,
-   durations, and delays so the hearts don't rise in lockstep. */
-body.stash-liquid-glass .refract-heart-1 { left: 8%;  --hs: 12px; --hd: 5.4s; --dl: 0s;   }
-body.stash-liquid-glass .refract-heart-2 { left: 22%; --hs: 17px; --hd: 7.2s; --dl: 0.8s; }
-body.stash-liquid-glass .refract-heart-3 { left: 38%; --hs: 11px; --hd: 6s;   --dl: 1.6s; }
-body.stash-liquid-glass .refract-heart-4 { left: 52%; --hs: 19px; --hd: 6.6s; --dl: 2.3s; }
-body.stash-liquid-glass .refract-heart-5 { left: 66%; --hs: 13px; --hd: 5.8s; --dl: 3.1s; }
-body.stash-liquid-glass .refract-heart-6 { left: 80%; --hs: 15px; --hd: 6.4s; --dl: 3.9s; }
-body.stash-liquid-glass .refract-heart-7 { left: 92%; --hs: 12px; --hd: 7s;   --dl: 4.6s; }
+/* Five varied trajectories — reduced from seven for perf. Spread
+   evenly across the card width so coverage stays balanced. */
+body.stash-liquid-glass .refract-heart-1 { left: 10%; --hs: 13px; --hd: 5.6s; --dl: 0s;   }
+body.stash-liquid-glass .refract-heart-2 { left: 32%; --hs: 17px; --hd: 7.0s; --dl: 1.0s; }
+body.stash-liquid-glass .refract-heart-3 { left: 52%; --hs: 12px; --hd: 6.0s; --dl: 2.0s; }
+body.stash-liquid-glass .refract-heart-4 { left: 72%; --hs: 18px; --hd: 6.6s; --dl: 3.0s; }
+body.stash-liquid-glass .refract-heart-5 { left: 90%; --hs: 13px; --hd: 5.8s; --dl: 4.0s; }
+/* refract-heart-6 / -7 are no longer injected; their CSS deleted. */
 
 /* translateY pixel values, not percentages — CSS `translateY(%)` is a
    percentage of the element's OWN height, so `-100%` only moved a 13px
    heart ~13px upward (the original bug, heart never left the bottom).
    Pixel values cover the full card vertically; the parent layer's
-   overflow:hidden clips the heart cleanly off-top. 320px covers nearly
-   every scene card height in the grid; taller cards will see the heart
-   fade out before reaching the very top, which still looks fine. */
+   overflow:hidden clips the heart cleanly off-top. 500px now covers
+   even the taller portrait performer cards in playing-card mode
+   (~400-450px tall) — opacity stays high through ~90% of the arc so
+   the upper third of the card actually sees hearts, then fade-out
+   completes by 100%. On shorter scene cards the heart simply clips
+   off-top before fully fading, which still reads as a natural exit. */
 @keyframes refractHeartFloat {
     0% {
-        transform: translate(0, 24px) rotate(-6deg) scale(0.55);
+        transform: translate3d(0, 24px, 0) rotate(-6deg) scale(0.55);
         opacity: 0;
     }
-    10% {
+    8% {
         opacity: 0.95;
-        transform: translate(6px, -10px) rotate(2deg) scale(1);
+        transform: translate3d(4px, -20px, 0) rotate(2deg) scale(1);
     }
     50% {
-        opacity: 0.85;
-        transform: translate(-8px, -150px) rotate(8deg) scale(1.05);
+        opacity: 0.9;
+        transform: translate3d(-8px, -240px, 0) rotate(8deg) scale(1.05);
     }
-    82% {
-        opacity: 0.6;
-        transform: translate(10px, -260px) rotate(-4deg) scale(0.95);
+    90% {
+        opacity: 0.75;
+        transform: translate3d(10px, -460px, 0) rotate(-4deg) scale(0.95);
     }
     100% {
         opacity: 0;
-        transform: translate(0, -320px) rotate(0deg) scale(0.7);
+        transform: translate3d(0, -500px, 0) rotate(0deg) scale(0.7);
     }
 }
 
