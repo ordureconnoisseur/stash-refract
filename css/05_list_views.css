@@ -1112,6 +1112,58 @@ body.stash-liquid-glass .setting-section .setting-group.st-plugin-hidden {
     display: none !important;
 }
 
+/* Settings → Tasks: Plugin Tasks card — restore native collapse buttons
+   (hidden globally above) and wire our own collapsed-state class so the
+   search + collapse behaviour mirrors the Plugins page. */
+body.stash-liquid-glass .card > .setting-group.collapsible .setting-group-collapse-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    height: 1.72rem !important;
+    min-width: 0 !important;
+    padding: 0 0.35rem !important;
+    background: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: var(--text-muted) !important;
+    line-height: 1 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transition: color 0.15s;
+}
+body.stash-liquid-glass .card > .setting-group.collapsible .setting-group-collapse-button:hover {
+    color: var(--accent-bright) !important;
+    background: transparent !important;
+}
+body.stash-liquid-glass .card > .setting-group.collapsible .setting-group-collapse-button svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    display: block;
+    transition: transform 0.22s ease;
+}
+/* Native SVG is chevron-up: 0deg = expanded, 180deg = collapsed. */
+body.stash-liquid-glass .card > .setting-group:not(.st-task-plugin-collapsed) .setting-group-collapse-button svg {
+    transform: rotate(0deg);
+}
+body.stash-liquid-glass .card > .setting-group.st-task-plugin-collapsed .setting-group-collapse-button svg {
+    transform: rotate(180deg);
+}
+body.stash-liquid-glass .card > .setting-group.st-task-plugin-collapsed > .collapsible-section {
+    display: none !important;
+}
+body.stash-liquid-glass .card > .setting-group.st-plugin-hidden {
+    display: none !important;
+}
+/* Search bar sits above the first group inside the card. */
+body.stash-liquid-glass .st-task-plugin-search.clearable-input-group {
+    padding: 0.75rem 1rem 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    margin-bottom: 0;
+}
+
 /* The hijacked "Reload plugins" row: tighter vertical padding (search
    bar is the focus, not a label+button row), and let the title-side div
    grow so the search input fills the row. */
