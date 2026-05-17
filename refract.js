@@ -5417,6 +5417,76 @@
     }
     injectPluginSearch(); /* initial pass; re-runs via consolidated watcher */
 
+    // Settings → Tasks page: the Plugin Tasks card lists all plugin-defined
+    // tasks grouped by plugin, each group collapsible via a native chevron
+    // button that refract hides globally. This function restores collapse
+    // via our own st-task-plugin-collapsed class (same pattern as the
+    // Plugins page) and injects a live search input at the top of the card.
+    function setupTaskPluginGroups() {
+        var pluginCard = document.querySelector(".card:has(> .setting-group.collapsible)");
+        if (!pluginCard) return;
+
+        if (!pluginCard.dataset.stTaskSearchDone) {
+            var wrap = document.createElement("div");
+            wrap.className = "clearable-input-group st-plugin-search st-task-plugin-search";
+            wrap.innerHTML =
+                "<input type='text' class='clearable-text-field form-control st-plugin-search-input' " +
+                    "placeholder='Filter tasks…' aria-label='Search plugin tasks' " +
+                    "autocomplete='off' spellcheck='false'>" +
+                "<button type='button' class='clearable-text-field-clear st-plugin-search-clear' " +
+                    "aria-label='Clear search' tabindex='-1' style='display:none'>" +
+                    "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' " +
+                        "stroke-width='2' stroke-linecap='round' stroke-linejoin='round' " +
+                        "aria-hidden='true'>" +
+                        "<path d='M18 6L6 18M6 6l12 12'/></svg>" +
+                "</button>";
+
+            var input = wrap.querySelector("input");
+            var clearBtn = wrap.querySelector(".st-plugin-search-clear");
+
+            function applyTaskFilter() {
+                var q = input.value.trim().toLowerCase();
+                clearBtn.style.display = q ? "" : "none";
+                var groups = pluginCard.querySelectorAll(":scope > .setting-group");
+                for (var gi = 0; gi < groups.length; gi++) {
+                    var g = groups[gi];
+                    var h3 = g.querySelector(":scope > .setting h3");
+                    var name = h3 ? h3.textContent.toLowerCase() : "";
+                    g.classList.toggle("st-plugin-hidden", !!q && name.indexOf(q) === -1);
+                }
+            }
+            input.addEventListener("input", applyTaskFilter);
+            clearBtn.addEventListener("click", function () {
+                input.value = "";
+                applyTaskFilter();
+                input.focus();
+            });
+
+            pluginCard.insertBefore(wrap, pluginCard.firstChild);
+            pluginCard.dataset.stTaskSearchDone = "1";
+        }
+
+        var groups = pluginCard.querySelectorAll(":scope > .setting-group.collapsible");
+        for (var i = 0; i < groups.length; i++) {
+            var group = groups[i];
+            if (group.dataset.stTaskCollapsibleDone === "1") continue;
+
+            var btn = group.querySelector(".setting-group-collapse-button");
+            if (btn) {
+                (function (g) {
+                    g.querySelector(".setting-group-collapse-button").addEventListener("click", function (e) {
+                        e.stopPropagation();
+                        g.classList.toggle("st-task-plugin-collapsed");
+                    });
+                })(group);
+            }
+
+            group.classList.add("st-task-plugin-collapsed");
+            group.dataset.stTaskCollapsibleDone = "1";
+        }
+    }
+    setupTaskPluginGroups(); /* initial pass; re-runs via consolidated watcher */
+
     /* ── Consolidated mutation watcher ──────────────────────────────────
        Single global MutationObserver feeding all body-wide DOM watchers.
        Replaces 7 separate body-subtree observers — each used to fire on
@@ -5448,6 +5518,7 @@
             try { injectPluginToggles(); } catch (e) {}
             try { makePluginSettingsCollapsible(); } catch (e) {}
             try { injectPluginSearch(); } catch (e) {}
+            try { setupTaskPluginGroups(); } catch (e) {}
         }
         function sched() {
             clearTimeout(_t);
