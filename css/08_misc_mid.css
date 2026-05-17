@@ -2704,15 +2704,22 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-circl
     left: 0 !important;
     right: 0 !important;
     z-index: 5 !important;
-    /* Right-align the pill cluster — popup anchors to right edge of its
-       pill so this keeps the popup inside the card. Mirrors the
-       top-right placement of the spec pills for visual balance. */
-    justify-content: flex-end !important;
-    padding: 0.4rem 0.6rem !important;
+    /* Avatar circles on the left, pill cluster (duration / O / tag) on
+       the right — `space-between` pushes them to opposite edges of the
+       row. Tag-popup still anchors right: 0 of its pill, so popups
+       stay inside the card. */
+    justify-content: space-between !important;
+    /* Bottom-align both clusters — without this, the 26px avatars make
+       the row taller and `align-items: center` then floats the shorter
+       pills above the row bottom, opening a 2–3px gap to the title.
+       `flex-end` keeps the pill bottoms flush with the chin top whether
+       avatars are present or not. */
+    align-items: flex-end !important;
+    padding: 0.4rem 0.6rem 0.1rem !important;
     margin: 0 !important;
     min-height: 0 !important;
     border-top: none !important;
-    /* No row backdrop — each pill (performer / o / tag) carries its
+    /* No row backdrop — each pill (duration / O / tag) carries its
        own glass background, so a band here would show as a black line
        behind the hover-scrubber. */
     background: transparent !important;
@@ -2754,10 +2761,11 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill 
     color: #fff !important;
 }
 
-/* In minimal mode hide filesize + resolution; only the duration pill
-   remains, which is repositioned to join the bottom pill row. */
-body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-specs-overlay > .overlay-filesize,
-body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-specs-overlay > .overlay-resolution {
+/* In minimal mode the duration value is mirrored into the bottom pill
+   row via .stash-duration-pill (built in injectPerformerCircles). Hide
+   the entire native .scene-specs-overlay so duration only appears in
+   one place. */
+body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-specs-overlay {
     display: none !important;
 }
 
@@ -2818,66 +2826,10 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card.refract-portrait .scen
     object-fit: contain !important;
 }
 
-/* Thumbnail spec overlay (Stash native: .scene-specs-overlay containing
-   .overlay-filesize / .overlay-resolution / .overlay-duration).
-   Refract minimal mode restyles these as floating glass pills anchored
-   to the bottom-right of the thumbnail. Filesize already hidden via
-   .extra-scene-info rule above.
-   The container is INSIDE .scene-card-link which sits over the preview;
-   absolute positioning here is relative to .scene-card-preview. */
-body.stash-liquid-glass.refract-minimal-cards .scene-card .video-section {
-    position: relative;
-}
-body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-specs-overlay {
-    position: absolute !important;
-    /* Bottom-left of thumbnail, offset upward to share the pill row's
-       vertical band. Pill row sits at the top of .card-section (which
-       overlays the bottom of the card); 2.5rem from card bottom puts
-       duration roughly on the same line. Resolution + filesize are
-       hidden so only the duration pill renders here. */
-    bottom: 2.3rem !important;
-    left: 0.6rem !important;
-    top: auto !important;
-    right: auto !important;
-    display: inline-flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 0.3rem !important;
-    z-index: 5;
-    pointer-events: none;
-}
-body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-specs-overlay > span {
-    display: inline-flex !important;
-    align-items: center !important;
-    padding: 0.18em 0.55em !important;
-    /* Opaque-ish solid bg instead of glass blur — backdrop-filter on
-       every pill x every card was the scroll-killer. Slightly darker
-       to compensate for the lost blur readability lift. */
-    background: rgba(12, 12, 14, 0.78) !important;
-    border: 1px solid var(--glass-border) !important;
-    border-radius: var(--radius-pill) !important;
-    color: var(--text) !important;
-    font-size: 0.7rem !important;
-    font-weight: 600 !important;
-    line-height: 1.1 !important;
-    font-variant-numeric: tabular-nums !important;
-    letter-spacing: 0.01em !important;
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.04) inset !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
-    pointer-events: auto;
-}
-/* Accent the resolution number (1080p / 4K / 2160p…) so video quality
-   pops at a glance. Duration stays neutral. */
-body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-specs-overlay > .overlay-resolution {
-    color: var(--accent-bright) !important;
-    border-color: var(--accent-glow) !important;
-    background: rgba(var(--accent-rgb), 0.16) !important;
-    text-shadow:
-        0 0 6px rgba(var(--accent-rgb), 0.55),
-        0 1px 2px rgba(0, 0, 0, 0.7);
-}
+/* The previous block of .scene-specs-overlay positioning / per-span /
+   resolution-accent rules has been removed — the overlay is now hidden
+   in minimal mode (duration lives in .stash-duration-pill instead) and
+   keeping the rules around just risked overriding the hide. */
 
 /* Studio overlay — let the logo sit directly on the thumbnail without
    a background tile. The user wants the logo "naked" over the image. */
@@ -2896,29 +2848,62 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .studio-overlay {
 body.stash-liquid-glass .stash-performer-pill {
     display: none;
 }
-body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-avatars {
+/* Minimal mode now shows the performer avatar circles (on the left of
+   the row) and HIDES the performer pill — duration takes its slot in
+   the right-side cluster. Circles are sized down to match the row's
+   compact height. */
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill {
     display: none !important;
 }
-body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill {
-    display: inline-flex !important;
-    position: relative;
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-avatars {
+    display: flex !important;
+    flex-shrink: 1;
+    min-width: 0;
+}
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-avatar {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+}
+
+/* Duration pill — mirrors the dark glass styling used by Stash's
+   .scene-specs-overlay span; tabular numerals for stable digit width. */
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-duration-pill {
+    /* Pin duration as the rightmost pill in the cluster regardless of
+       DOM order; flex `order: 99` pushes it past the O-count + tag-count
+       which both use the default order: 0. */
+    order: 99;
+    display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    padding: 0.18em 0.6em;
+    padding: 0.18em 0.55em;
+    /* Lighter than the rest of the pills — translucent dark fill with
+       a blur backdrop reads as glassy rather than solid. backdrop-blur
+       is acceptable here because it's at most one pill per card (not
+       per-element-per-card like the previous palette). */
+    background: rgba(18, 18, 22, 0.4);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+            backdrop-filter: blur(8px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: var(--radius-pill);
-    background: var(--accent-tint);
-    border: 1px solid var(--accent-glow);
-    color: var(--accent-bright);
-    font-size: 0.72rem;
+    color: var(--text);
+    font-size: 0.7rem;
     font-weight: 600;
-    line-height: 1;
-    text-decoration: none !important;
-    cursor: pointer;
-    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.2);
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
-    /* No backdrop-filter: each card × 3 pills = ~90 GPU layers on a
-       30-card grid, which slowed scroll. The accent-tint background is
-       opaque enough to read against any thumbnail. */
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+/* Hide the duration-pill in non-minimal modes — the native
+   .scene-specs-overlay shows duration there instead. The minimal-mode
+   rule above is more specific so the pill stays visible there. */
+body.stash-liquid-glass .stash-duration-pill {
+    display: none;
 }
 body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill:hover {
     background: rgba(var(--accent-rgb), 0.22);
@@ -3038,38 +3023,13 @@ body.stash-liquid-glass .stash-performer-link:hover {
     transform: scale(1.18) translateY(-2px);
     z-index: 20;
 }
-/* Performer-name tooltip — appears centered above the avatar on hover.
-   data-performer-name is set by refract.js; falls back to nothing if
-   the name isn't available. */
-body.stash-liquid-glass .stash-performer-link[data-performer-name]::after {
-    content: attr(data-performer-name);
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%) scale(0.92);
-    transform-origin: bottom center;
-    background: rgba(12, 12, 14, 0.92);
-    color: var(--text);
-    border: 1px solid var(--glass-border);
-    border-radius: 6px;
-    padding: 0.22rem 0.5rem;
-    font-size: 0.7rem;
-    font-weight: 500;
-    line-height: 1.2;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-    transition: opacity 0.15s ease, transform 0.15s ease;
-    z-index: 30;
-}
-body.stash-liquid-glass .stash-performer-link[data-performer-name]:hover::after {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
-}
-/* Let the tooltip escape the card's overflow:hidden when a performer
-   avatar is hovered. Self-clipping children (thumbnail image, etc.)
-   keep their own border-radius so visuals don't break. */
+/* Performer-name tooltip — implemented as a body-portaled element by
+   refract.js (.refract-performer-name-tooltip-portal). The earlier
+   ::after-on-link approach got clipped at the card / grid edge for
+   any avatar near the side of the card; portaling means no ancestor
+   can clip it. data-performer-name on the link is read by the JS on
+   hover. The card's overflow:visible carve-out below is still useful
+   so the avatar's own 1.18× hover scale isn't clipped. */
 body.stash-liquid-glass .scene-card:has(.stash-performer-link:hover),
 body.stash-liquid-glass .grid-card:has(.stash-performer-link:hover) {
     overflow: visible !important;

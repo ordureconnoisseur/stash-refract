@@ -1408,6 +1408,7 @@
                 safeRun(markFilledStars);
                 safeRun(initRefractTagEditor);
                 safeRun(enhanceDuplicateChecker);
+                safeRun(initPerformerNameTooltip);
             } finally {
                 observer.observe(document.body, { childList: true, subtree: true });
             }
@@ -1609,10 +1610,25 @@
 
         row.appendChild(avatarWrap);
 
-        /* Right-side count cluster — holds O count + tag count badges so
-           they share consistent spacing when both are present. */
+        /* Right-side count cluster — holds duration / O count / tag count
+           badges so they share consistent spacing when present. */
         var counts = document.createElement("div");
         counts.className = "stash-card-counts";
+
+        /* Duration pill — mirrors Stash's native .overlay-duration text
+           into the counts cluster. In minimal mode this is the leftmost
+           pill in the right cluster (replacing the performer pill); the
+           original .overlay-duration on the thumbnail is hidden via CSS.
+           In other modes the pill is hidden via CSS and the native
+           overlay-duration stays in its usual spot. */
+        var durEl = card.querySelector(".overlay-duration");
+        var durText = durEl ? (durEl.textContent || "").trim() : "";
+        if (durText) {
+            var dPill = document.createElement("span");
+            dPill.className = "stash-duration-pill";
+            dPill.textContent = durText;
+            counts.appendChild(dPill);
+        }
 
         /* Performer pill — alternative compact representation that lives
            ALONGSIDE the avatar circles. CSS gates which one is visible:
@@ -1710,6 +1726,35 @@
             namesEl.textContent = visibleNames.join(", ") + (leftover > 0 ? " +" + leftover : "");
             namesEl.title = performers.map(function (p) { return p.name; }).filter(Boolean).join(", ");
             section.appendChild(namesEl);
+        }
+
+        /* Floating-hearts effect for "Favourite" scenes — driven by the
+           "Favourite ★" tag injected by stash-advanced-scene-rating. We
+           detect via the tagInfo array (case-insensitive match on
+           "favourite" / "favorite" so it works for either spelling and
+           catches the ★-suffix). Class + 7-heart layer are toggled in
+           sync; only tagged cards pay the animation cost. */
+        var isFavourite = tagInfo && tagInfo.some(function (t) {
+            return t && t.name && /^favou?rite/i.test(t.name);
+        });
+        var existingHearts = card.querySelector(":scope > .refract-heart-particles");
+        if (isFavourite) {
+            card.classList.add("refract-favourite");
+            if (!existingHearts) {
+                var particles = document.createElement("div");
+                particles.className = "refract-heart-particles";
+                particles.setAttribute("aria-hidden", "true");
+                for (var hi = 1; hi <= 7; hi++) {
+                    var heart = document.createElement("span");
+                    heart.className = "refract-heart refract-heart-" + hi;
+                    heart.textContent = "♥"; /* ♥ */
+                    particles.appendChild(heart);
+                }
+                card.appendChild(particles);
+            }
+        } else {
+            card.classList.remove("refract-favourite");
+            if (existingHearts) { existingHearts.remove(); }
         }
     }
 
@@ -3502,6 +3547,78 @@
 
     var refractTagTipEl = null;
     var refractTagTipTimer = null;
+
+    /* ────────────────────────────────────────────────────────────────
+       Performer-name tooltip — portaled to document.body so it can
+       render outside the scene card's bounding box. The earlier
+       ::after-on-link approach was always at risk of being clipped by
+       ancestor overflow / the grid edge — the leftmost avatar's
+       centered tooltip pushed past the card's left edge and got cut
+       off. Portaling sidesteps the whole class of clipping problems
+       since the tooltip's only ancestor is body.
+       ──────────────────────────────────────────────────────────────── */
+    var refractPerfTipEl = null;
+
+    function refractEnsurePerfTip() {
+        if (refractPerfTipEl && document.contains(refractPerfTipEl)) {
+            return refractPerfTipEl;
+        }
+        refractPerfTipEl = document.createElement("div");
+        refractPerfTipEl.className = "refract-performer-name-tooltip-portal";
+        refractPerfTipEl.setAttribute("aria-hidden", "true");
+        document.body.appendChild(refractPerfTipEl);
+        return refractPerfTipEl;
+    }
+
+    function refractShowPerfTip(link) {
+        var name = link.getAttribute("data-performer-name");
+        if (!name) { return; }
+        var tip = refractEnsurePerfTip();
+        tip.textContent = name;
+        var r = link.getBoundingClientRect();
+        /* Show first so we can read offsetWidth/Height with the visible
+           class's styles applied. CSS transition handles the fade. */
+        tip.classList.add("refract-performer-name-tooltip-portal--show");
+        var tipW = tip.offsetWidth;
+        var tipH = tip.offsetHeight;
+        var margin = 8;
+        var left = r.left + r.width / 2 - tipW / 2;
+        left = Math.max(margin, Math.min(left, window.innerWidth - tipW - margin));
+        var top = r.top - tipH - 6;
+        if (top < margin) { top = r.bottom + 6; } /* flip below if no room */
+        tip.style.left = left + "px";
+        tip.style.top = top + "px";
+    }
+
+    function refractHidePerfTip() {
+        if (refractPerfTipEl) {
+            refractPerfTipEl.classList.remove("refract-performer-name-tooltip-portal--show");
+        }
+    }
+
+    function initPerformerNameTooltip() {
+        if (!document.body || document.body._refractPerfTipInit) { return; }
+        document.body._refractPerfTipInit = true;
+        document.body.addEventListener("mouseover", function (e) {
+            var link = e.target.closest && e.target.closest(".stash-performer-link[data-performer-name]");
+            if (!link) { return; }
+            if (e.relatedTarget && link.contains(e.relatedTarget)) { return; }
+            refractShowPerfTip(link);
+        });
+        document.body.addEventListener("mouseout", function (e) {
+            var link = e.target.closest && e.target.closest(".stash-performer-link[data-performer-name]");
+            if (!link) { return; }
+            if (e.relatedTarget && link.contains(e.relatedTarget)) { return; }
+            refractHidePerfTip();
+        });
+        /* Hide on scroll — tooltip is fixed-positioned so it would
+           drift away from its anchor as the page scrolls. */
+        window.addEventListener("scroll", function () {
+            if (refractPerfTipEl && refractPerfTipEl.classList.contains("refract-performer-name-tooltip-portal--show")) {
+                refractHidePerfTip();
+            }
+        }, { passive: true, capture: true });
+    }
 
     function refractEnsureTagTip() {
         if (refractTagTipEl && document.contains(refractTagTipEl)) {

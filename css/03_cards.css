@@ -128,6 +128,95 @@ body.stash-liquid-glass .stash-tilt-glare-inner {
     body.stash-liquid-glass .stash-tilt-glare-inner { display: none; }
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   Floating-hearts effect for favourited scenes
+   The .refract-heart-particles layer is appended to a .scene-card by
+   injectPerformerCircles() in refract.js when the card carries the
+   "Favourite ★" tag from stash-advanced-scene-rating. Seven ♥ glyphs
+   drift upward across the card with staggered delays + horizontal
+   sway, like petals in the wind. Pure CSS animations (transform +
+   opacity only) so they GPU-composite cleanly and pause automatically
+   on off-screen cards via the card's existing content-visibility:auto.
+
+   Disabled in lite mode and for users with prefers-reduced-motion.
+   ─────────────────────────────────────────────────────────────────── */
+body.stash-liquid-glass .refract-heart-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 8; /* above thumbnail image, below .stash-tilt-glare (z:9) */
+    border-radius: inherit;
+}
+body.stash-liquid-glass .refract-heart {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    color: #ff5a85;
+    text-shadow:
+        0 0 4px rgba(255, 90, 133, 0.95),
+        0 0 10px rgba(255, 90, 133, 0.6),
+        0 0 22px rgba(255, 90, 133, 0.3);
+    opacity: 0;
+    transform: translate(0, 24px);
+    will-change: transform, opacity;
+    animation: refractHeartFloat var(--hd, 6s) linear infinite;
+    animation-delay: var(--dl, 0s);
+    font-size: var(--hs, 14px);
+    line-height: 1;
+}
+/* Seven varied trajectories — different start columns, sizes,
+   durations, and delays so the hearts don't rise in lockstep. */
+body.stash-liquid-glass .refract-heart-1 { left: 8%;  --hs: 12px; --hd: 5.4s; --dl: 0s;   }
+body.stash-liquid-glass .refract-heart-2 { left: 22%; --hs: 17px; --hd: 7.2s; --dl: 0.8s; }
+body.stash-liquid-glass .refract-heart-3 { left: 38%; --hs: 11px; --hd: 6s;   --dl: 1.6s; }
+body.stash-liquid-glass .refract-heart-4 { left: 52%; --hs: 19px; --hd: 6.6s; --dl: 2.3s; }
+body.stash-liquid-glass .refract-heart-5 { left: 66%; --hs: 13px; --hd: 5.8s; --dl: 3.1s; }
+body.stash-liquid-glass .refract-heart-6 { left: 80%; --hs: 15px; --hd: 6.4s; --dl: 3.9s; }
+body.stash-liquid-glass .refract-heart-7 { left: 92%; --hs: 12px; --hd: 7s;   --dl: 4.6s; }
+
+/* translateY pixel values, not percentages — CSS `translateY(%)` is a
+   percentage of the element's OWN height, so `-100%` only moved a 13px
+   heart ~13px upward (the original bug, heart never left the bottom).
+   Pixel values cover the full card vertically; the parent layer's
+   overflow:hidden clips the heart cleanly off-top. 320px covers nearly
+   every scene card height in the grid; taller cards will see the heart
+   fade out before reaching the very top, which still looks fine. */
+@keyframes refractHeartFloat {
+    0% {
+        transform: translate(0, 24px) rotate(-6deg) scale(0.55);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.95;
+        transform: translate(6px, -10px) rotate(2deg) scale(1);
+    }
+    50% {
+        opacity: 0.85;
+        transform: translate(-8px, -150px) rotate(8deg) scale(1.05);
+    }
+    82% {
+        opacity: 0.6;
+        transform: translate(10px, -260px) rotate(-4deg) scale(0.95);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(0, -320px) rotate(0deg) scale(0.7);
+    }
+}
+
+/* Lite mode + reduced-motion: kill the animation. The .refract-favourite
+   class stays on the card so other rules (border tint, etc.) can still
+   key off it without the particle cost. */
+body.stash-liquid-glass.refract-lite .refract-heart-particles {
+    display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass .refract-heart-particles {
+        display: none;
+    }
+}
+
 @media (prefers-reduced-motion: no-preference) {
     @keyframes stash-card-in {
         from { opacity: 0; transform: translateY(8px); }
