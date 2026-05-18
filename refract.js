@@ -5338,11 +5338,36 @@
             chevron.addEventListener("click", function (e) {
                 e.stopPropagation();
                 e.preventDefault();
-                this.closest(".setting-group").classList.toggle("st-plugin-collapsed");
+                var grp = this.closest(".setting-group");
+                var sec = grp.querySelector(":scope > .collapsible-section");
+                var collapsing = !grp.classList.contains("st-plugin-collapsed");
+                grp.classList.toggle("st-plugin-collapsed");
+                if (!sec) return;
+                if (collapsing) {
+                    var pinH = sec.getBoundingClientRect().height;
+                    sec.style.maxHeight = pinH + "px";
+                    void sec.offsetHeight;
+                    requestAnimationFrame(function () {
+                        sec.style.maxHeight = "0px";
+                        sec.style.opacity = "0";
+                    });
+                } else {
+                    sec.style.maxHeight = sec.scrollHeight + "px";
+                    sec.style.opacity = "1";
+                }
             });
             rightSide.appendChild(chevron);
 
-            // Default to collapsed.
+            header.addEventListener("click", function (e) {
+                if (!e.target.closest("button, a, input, label, select")) {
+                    e.stopPropagation();
+                }
+            });
+
+            section.style.overflow = "hidden";
+            section.style.maxHeight = "0px";
+            section.style.opacity = "0";
+            section.style.transition = "max-height 0.28s ease, opacity 0.2s ease";
             group.classList.add("st-plugin-collapsed");
             group.dataset.stCollapsibleInjected = "1";
         }
@@ -5541,10 +5566,39 @@
             chevron.addEventListener("click", function (e) {
                 e.stopPropagation();
                 e.preventDefault();
-                this.closest(".setting-group").classList.toggle("st-plugin-collapsed");
+                var grp = this.closest(".setting-group");
+                var sec = grp.querySelector(":scope > .collapsible-section");
+                var collapsing = !grp.classList.contains("st-plugin-collapsed");
+                grp.classList.toggle("st-plugin-collapsed");
+                if (!sec) return;
+                if (collapsing) {
+                    var pinH = sec.getBoundingClientRect().height;
+                    sec.style.maxHeight = pinH + "px";
+                    void sec.offsetHeight;
+                    requestAnimationFrame(function () {
+                        sec.style.maxHeight = "0px";
+                        sec.style.opacity = "0";
+                    });
+                } else {
+                    sec.style.maxHeight = sec.scrollHeight + "px";
+                    sec.style.opacity = "1";
+                }
             });
             rightSide.appendChild(chevron);
 
+            header.addEventListener("click", function (e) {
+                if (!e.target.closest("button, a, input, label, select")) {
+                    e.stopPropagation();
+                }
+            });
+
+            var taskSec = group.querySelector(":scope > .collapsible-section");
+            if (taskSec) {
+                taskSec.style.overflow = "hidden";
+                taskSec.style.maxHeight = "0px";
+                taskSec.style.opacity = "0";
+                taskSec.style.transition = "max-height 0.28s ease, opacity 0.2s ease";
+            }
             group.classList.add("st-plugin-collapsed");
             group.dataset.stTaskChevronDone = "1";
         }
