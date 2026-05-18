@@ -1114,54 +1114,22 @@ body.stash-liquid-glass .setting-section .setting-group.st-plugin-hidden {
     display: none !important;
 }
 
-/* Settings → Tasks: restore collapse buttons only on the plugin tasks card.
-   JS detects the card (btn-secondary btn-sm in collapsible-section) and adds
-   st-task-plugin-card; CSS targets that class. Native task groups (Scan,
-   Generate…) keep their buttons hidden as before. */
-body.stash-liquid-glass .st-task-plugin-card .setting-group-collapse-button {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: auto !important;
-    height: 1.72rem !important;
-    min-width: 0 !important;
-    padding: 0 0.35rem !important;
-    background: transparent !important;
-    background-image: none !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    color: var(--text-muted) !important;
-    line-height: 1 !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    transition: color 0.15s;
-}
-body.stash-liquid-glass .st-task-plugin-card .setting-group-collapse-button:hover {
-    color: var(--accent-bright) !important;
-    background: transparent !important;
-}
-body.stash-liquid-glass .st-task-plugin-card .setting-group-collapse-button svg {
-    width: 1.05rem;
-    height: 1.05rem;
-    display: block;
-    transition: transform 0.22s ease;
-}
-/* Native SVG is chevron-up: reflect Bootstrap .show state via :has(). */
-body.stash-liquid-glass .st-task-plugin-card .setting-group:has(.collapsible-section.show) .setting-group-collapse-button svg {
-    transform: rotate(0deg);
-}
-body.stash-liquid-glass .st-task-plugin-card .setting-group:not(:has(.collapsible-section.show)) .setting-group-collapse-button svg {
-    transform: rotate(180deg);
-}
+/* Settings → Tasks: Plugin Tasks card. JS injects identical st-plugin-chevron
+   buttons and st-plugin-collapsed class as the Plugins page — all chevron CSS
+   above already applies. Only card-specific additions needed here. */
 body.stash-liquid-glass .st-task-plugin-card .setting-group.st-plugin-hidden {
     display: none !important;
 }
-/* Search bar at top of card. */
-body.stash-liquid-glass .st-task-plugin-search.clearable-input-group {
-    padding: 0.75rem 1rem 0.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    margin-bottom: 0;
+/* Search row — mirrors st-plugin-reload-row layout so clearable-input sits inline. */
+body.stash-liquid-glass .setting.st-task-search-row {
+    padding-top: 0.6rem !important;
+    padding-bottom: 0.6rem !important;
+    align-items: center !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+body.stash-liquid-glass .setting.st-task-search-row > .clearable-input-group {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 /* The hijacked "Reload plugins" row: tighter vertical padding (search
