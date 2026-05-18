@@ -5425,16 +5425,23 @@
     // Bootstrap's `show` class — letting Stash's own native handler take over
     // from there (no duplicate click listener needed).
     function setupTaskPluginGroups() {
-        // Find the plugin tasks .card — it contains .setting-group.collapsible
-        // children but is NOT inside a .setting-section (that's the Plugins page).
-        var cards = document.querySelectorAll(".card");
+        // The plugin tasks card lives inside the tasks tab pane. Scope the
+        // search there so we never accidentally match cards on other pages.
+        // The pane ID ends in "-tabpane-tasks" across Stash versions.
+        var tabPane = document.querySelector("[id$='-tabpane-tasks']");
+        if (!tabPane) return;
+
+        // Within the tasks pane, the plugin tasks card is the one that
+        // contains collapsible setting-groups (each plugin gets one group).
+        // Deliberately avoid the .closest(".setting-section") guard used
+        // previously — the tasks page wraps everything in .setting-section.
+        var cards = tabPane.querySelectorAll(".card");
         var pluginCard = null;
         for (var c = 0; c < cards.length; c++) {
-            var card = cards[c];
-            if (card.closest(".setting-section")) continue;
-            if (!card.querySelector(".setting-group.collapsible")) continue;
-            pluginCard = card;
-            break;
+            if (cards[c].querySelector(".setting-group.collapsible")) {
+                pluginCard = cards[c];
+                break;
+            }
         }
         if (!pluginCard) return;
 
