@@ -123,7 +123,7 @@ Refract themes the UIs of these plugins so they sit naturally inside the glass a
 
 **Themed compatibility** (CSS-only re-skin)
 
-- **Binge (StashTV)** — navbar button restyled as an accent-glass pill so it sits naturally alongside the built-in nav icons.
+- **Binge** — navbar button restyled as an accent-glass pill so it sits naturally alongside the built-in nav icons.
 - **flexibleDateInput** — react-datepicker calendar fully restyled: header pills, day cells, month/year dropdown panels, prev/next nav arrows.
 - **stashGlobalSearch** — focus colour swapped to accent so search inputs match the rest of the theme.
 
