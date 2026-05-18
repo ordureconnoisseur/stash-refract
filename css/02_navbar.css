@@ -643,6 +643,15 @@ body.stash-liquid-glass nav.top-nav .stash-nav-fallback-icon {
     display: none !important;
 }
 
+/* ── Navbar drag-to-reorder ──────────────────────────────────────── */
+/* Items animate via JS transforms; only a grab cursor needed here.
+   No drop-target highlight — the live sliding gap shows the landing. */
+body.stash-liquid-glass nav.top-nav .navbar-nav > .st-nav-draggable {
+    cursor: grab;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
 /* ───────────────────────────────────────────────────────────────────
    Library row right-edge fade — applied to .navbar-collapse only
    (NOT .navbar-nav). The collapse fills the flex space between brand

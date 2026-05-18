@@ -1010,6 +1010,54 @@ body.stash-liquid-glass .stash-scribe-restart:hover {
     color: #fff !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   Binge (Stash TV) plugin — navbar button
+   The plugin patches MainNavBar.MenuItems and creates div#BingeNavButton
+   containing only <span>BINGE</span> (no SVG). Refract hides all
+   nav.top-nav spans globally, so we un-hide just this one and re-skin
+   the inner <a> with accent-glass language to match the theme.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Slot after the native library items (order 1-8) but before Desire (90). */
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #BingeNavButton { order: 89; }
+
+/* Un-hide the text label — it's the only content in this button. */
+body.stash-liquid-glass nav.top-nav #BingeNavButton span {
+    display: inline !important;
+}
+
+/* Re-skin the inner <a>: override the plugin's inline styles (#ff3366 bg,
+   yellow border) with Refract's accent-glass pill language. Also fix the
+   font-size (the outer .nav-link inherits font-size:0 from the icons-only
+   rule above, so we must reset it here on the <a>). */
+body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: var(--nav-btn-size) !important;
+    padding: 0 10px !important;
+    min-width: 0 !important;
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--accent-bright) !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    text-decoration: none !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
+    transition: background 0.15s ease, border-color 0.15s ease,
+                color 0.15s ease, box-shadow 0.15s ease !important;
+}
+body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn:hover {
+    background: rgba(var(--accent-rgb), 0.22) !important;
+    border-color: var(--accent-bright) !important;
+    color: #fff !important;
+    box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.35) !important;
+}
+
+
 /* "Ready to generate" hint — keep the green accent (success colour
    convention) but soften the border so it's a hint, not a primary. */
 body.stash-liquid-glass .stash-scribe-secondary.is-ready {

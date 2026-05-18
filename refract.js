@@ -19,6 +19,35 @@
         }
     } catch (e) { /* ignore */ }
 
+    /* ── Early nav-order injection ───────────────────────────────────────
+       Writes saved order as CSS rules into <head> immediately on script
+       execution — before React paints the nav — so items never appear in
+       the wrong order on page load. setupNavbarReorder() later manages
+       the same <style> tag for live drag updates. */
+    (function earlyNavOrder() {
+        try {
+            var raw = localStorage.getItem("refract-nav-order-v1");
+            if (!raw) return;
+            var saved = JSON.parse(raw);
+            if (!Array.isArray(saved) || !saved.length) return;
+            var navSel = "body.stash-liquid-glass nav.top-nav .navbar-nav";
+            var css = "";
+            saved.forEach(function (key, i) {
+                var sel;
+                if (key.slice(0, 2) === "k:") {
+                    sel = navSel + ' > [data-rb-event-key="' + key.slice(2) + '"]';
+                } else if (key.slice(0, 2) === "i:") {
+                    sel = navSel + " > #" + key.slice(2);
+                } else { return; }
+                css += sel + " { order: " + (i + 1) + " !important; }\n";
+            });
+            if (!css) return;
+            var style = document.createElement("style");
+            style.id = "st-nav-order-style";
+            (document.head || document.documentElement).appendChild(style);
+            style.textContent = css;
+        } catch (e) { /* ignore */ }
+    }());
 
     var REFRACT_PRESETS = ["blue", "pink", "red", "yellow", "purple", "green", "teal"];
     var REFRACT_PRESETS_ALL = ["orange", "blue", "pink", "red", "yellow", "purple", "green", "teal"];
@@ -5522,6 +5551,380 @@
     }
     setupTaskPluginGroups(); /* initial pass; re-runs via consolidated watcher */
 
+    /* ── Navbar drag-to-reorder (iOS-style) ─────────────────────────────
+       Pointer-events + FLIP animation so icons slide out of the way live.
+       Saved order persisted to localStorage; re-applied via CSS `order`
+       with !important so React re-renders cannot undo the arrangement.
+
+       Technique: remove dragged item from flex flow (display:none) so
+       remaining items occupy their natural positions, then use
+       translateX transforms + transitions to animate them around a
+       moving gap. FLIP (First-Last-Invert-Play) on both start and drop
+       keeps every transition smooth with no positional jumps. */
+    function setupNavbarReorder() {
+        var NAV_ORDER_KEY = "refract-nav-order-v1";
+        var DRAG_THRESHOLD_SQ = 25; /* 5 px squared */
+        var EASING = "cubic-bezier(.25,.46,.45,.94)";
+
+        var navRow = document.querySelector(
+            "body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav:first-of-type"
+        );
+        if (!navRow) return;
+
+        /* ── helpers ─────────────────────────────────────────────────── */
+        function itemKey(el) {
+            var k = el.getAttribute("data-rb-event-key");
+            if (k) return "k:" + k;
+            if (el.id) return "i:" + el.id;
+            return null;
+        }
+
+        function loadSaved() {
+            try { return JSON.parse(localStorage.getItem(NAV_ORDER_KEY)) || []; }
+            catch (e) { return []; }
+        }
+
+        /* Write order as a CSS rule block rather than inline styles.
+           Inline styles are removed by React on every re-render; a <style>
+           tag in <head> is invisible to React and survives navigation. */
+        var NAV_ORDER_STYLE_ID = "st-nav-order-style";
+        function getOrderSheet() {
+            var el = document.getElementById(NAV_ORDER_STYLE_ID);
+            if (!el) {
+                el = document.createElement("style");
+                el.id = NAV_ORDER_STYLE_ID;
+                document.head.appendChild(el);
+            }
+            return el;
+        }
+
+        function applyOrder() {
+            /* Also strip any legacy inline order styles so they don't win
+               over the !important rules in our style sheet. */
+            Array.from(navRow.children).forEach(function (x) {
+                x.style.removeProperty("order");
+            });
+
+            var saved = loadSaved();
+            var sheet = getOrderSheet();
+            if (!saved.length) { sheet.textContent = ""; return; }
+
+            var navSel = "body.stash-liquid-glass nav.top-nav .navbar-nav";
+            var css = "";
+            saved.forEach(function (key, i) {
+                var sel;
+                if (key.slice(0, 2) === "k:") {
+                    sel = navSel + ' > [data-rb-event-key="' + key.slice(2) + '"]';
+                } else if (key.slice(0, 2) === "i:") {
+                    sel = navSel + " > #" + key.slice(2);
+                } else {
+                    return;
+                }
+                css += sel + " { order: " + (i + 1) + " !important; }\n";
+            });
+            sheet.textContent = css;
+        }
+
+        function getVisualOrder() {
+            return Array.from(navRow.children).sort(function (a, b) {
+                return (parseInt(window.getComputedStyle(a).order) || 0) -
+                       (parseInt(window.getComputedStyle(b).order) || 0);
+            });
+        }
+
+        applyOrder();
+
+        /* ── active drag state ───────────────────────────────────────── */
+        var drag = null;
+
+        function insertIdxFor(cursorX) {
+            var centers = drag.origCenters;
+            for (var i = 0; i < centers.length; i++) {
+                if (cursorX < centers[i]) return i;
+            }
+            return centers.length;
+        }
+
+        function applyShifts(insertIdx) {
+            var shift = drag.shiftAmount;
+            drag.otherItems.forEach(function (x, i) {
+                x.style.transform = i >= insertIdx
+                    ? "translateX(" + shift + "px)"
+                    : "translateX(0)";
+            });
+            drag.curInsert = insertIdx;
+        }
+
+        /* ── drag start ──────────────────────────────────────────────── */
+        function startDrag(el, downX, currentX) {
+            var sorted   = getVisualOrder();
+            var dragRect = el.getBoundingClientRect();
+
+            /* Capture inner-element metrics NOW — before display:none makes
+               getBoundingClientRect() return zeros on all descendants. */
+            var innerSvgs    = Array.from(el.querySelectorAll("svg"));
+            var svgRects     = innerSvgs.map(function (s) { return s.getBoundingClientRect(); });
+            var innerSpans   = Array.from(el.querySelectorAll("span"));
+            var spanDisplays = innerSpans.map(function (s) {
+                return window.getComputedStyle(s).display;
+            });
+
+            /* 1. Capture positions WITH el in flow (beforeRects). */
+            var beforeLeft = {};
+            sorted.forEach(function (x) {
+                var k = itemKey(x) || String(sorted.indexOf(x));
+                beforeLeft[k] = x.getBoundingClientRect().left;
+            });
+
+            /* 2. Remove el from flex flow. */
+            el.style.setProperty("display", "none", "important");
+            void navRow.offsetWidth; /* force reflow */
+
+            /* 3. Capture positions WITHOUT el (afterRects) + measure gap. */
+            var otherItems = sorted.filter(function (x) { return x !== el; });
+            var afterLeft  = {};
+            var shiftAmount = dragRect.width;
+            otherItems.forEach(function (x, i) {
+                var r = x.getBoundingClientRect();
+                afterLeft[itemKey(x) || String(sorted.indexOf(x))] = r.left;
+                /* gap = space between item 0 and item 1 in natural layout */
+                if (i === 1) {
+                    var prev = otherItems[0].getBoundingClientRect();
+                    shiftAmount = dragRect.width + Math.max(0, r.left - prev.right);
+                }
+            });
+
+            /* 4. Compute item centres (stable reference for insertion calc). */
+            var origCenters = otherItems.map(function (x) {
+                var k = itemKey(x) || String(sorted.indexOf(x));
+                var w = x.getBoundingClientRect().width;
+                return (afterLeft[k] || 0) + w / 2;
+            });
+
+            /* 5. FLIP open: apply inverse transforms so items look unmoved,
+                  then animate them to their natural positions (gap closing). */
+            otherItems.forEach(function (x) {
+                var k = itemKey(x) || String(sorted.indexOf(x));
+                var delta = (beforeLeft[k] || 0) - (afterLeft[k] || 0);
+                x.style.transition = "none";
+                x.style.transform  = delta !== 0 ? "translateX(" + delta + "px)" : "";
+            });
+            void navRow.offsetWidth;
+            otherItems.forEach(function (x) {
+                x.style.transition = "transform 0.18s " + EASING;
+                x.style.transform  = "translateX(0)";
+            });
+
+            /* 6. Floating clone — the "lifted" icon following the cursor.
+               Lives in <body>, so nav-scoped CSS doesn't apply; we fix each
+               inner element using metrics captured before display:none.
+               Initial left uses currentX (where cursor is NOW) not dragRect.left
+               so there's no positional jump on the first pointermove. */
+            var clone = el.cloneNode(true);
+            clone.removeAttribute("data-st-nav-drag-done");
+            var initCloneLeft = (currentX !== undefined)
+                ? currentX - (downX - dragRect.left)
+                : dragRect.left;
+            clone.style.cssText =
+                "position:fixed !important; z-index:9999 !important;" +
+                "pointer-events:none !important; margin:0 !important;" +
+                "display:flex !important; align-items:center !important;" +
+                "justify-content:center !important; overflow:hidden !important;" +
+                "left:" + initCloneLeft + "px; top:" + dragRect.top + "px;" +
+                "width:" + dragRect.width + "px; height:" + dragRect.height + "px;" +
+                "opacity:0.92; transition:none !important;" +
+                "transform:scale(1.12) !important;" +
+                "transform-origin:center center !important;" +
+                "border-radius:var(--radius-sm);" +
+                "box-shadow:0 8px 28px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.1);";
+
+            /* Inner <a>: add only the centering/sizing props we need — don't
+               wipe cssText so React-managed inline styles are preserved. */
+            var cloneA = clone.querySelector("a");
+            if (cloneA) {
+                cloneA.style.setProperty("display",          "flex",        "important");
+                cloneA.style.setProperty("align-items",      "center",      "important");
+                cloneA.style.setProperty("justify-content",  "center",      "important");
+                cloneA.style.setProperty("width",            "100%",        "important");
+                cloneA.style.setProperty("height",           "100%",        "important");
+                cloneA.style.setProperty("padding",          "0",           "important");
+                cloneA.style.setProperty("margin",           "0",           "important");
+                cloneA.style.setProperty("box-sizing",       "border-box",  "important");
+                cloneA.style.setProperty("text-decoration",  "none",        "important");
+            }
+            /* Spans: mirror computed display from original (hide labels, keep Binge text). */
+            var cloneSpans = clone.querySelectorAll("span");
+            for (var si = 0; si < cloneSpans.length; si++) {
+                if (spanDisplays[si] === "none") {
+                    cloneSpans[si].style.setProperty("display", "none", "important");
+                }
+            }
+            /* SVGs: pin to pre-captured rendered size so they don't balloon outside nav CSS. */
+            var cloneSvgs = clone.querySelectorAll("svg");
+            for (var vi = 0; vi < cloneSvgs.length; vi++) {
+                if (svgRects[vi] && svgRects[vi].width) {
+                    cloneSvgs[vi].style.width  = svgRects[vi].width  + "px";
+                    cloneSvgs[vi].style.height = svgRects[vi].height + "px";
+                    cloneSvgs[vi].style.flexShrink = "0";
+                }
+            }
+
+            document.body.appendChild(clone);
+
+            /* Compute initial insert index BEFORE assigning drag (insertIdxFor
+               reads drag.origCenters, which doesn't exist yet). */
+            var initInsert = 0;
+            for (var ii = 0; ii < origCenters.length; ii++) {
+                if (downX < origCenters[ii]) { initInsert = ii; break; }
+                initInsert = origCenters.length;
+            }
+
+            drag = {
+                el:          el,
+                clone:       clone,
+                otherItems:  otherItems,
+                origCenters: origCenters,
+                shiftAmount: shiftAmount,
+                offsetX:     downX - dragRect.left,
+                cloneTop:    dragRect.top,
+                curInsert:   initInsert,
+            };
+
+            /* Initial gap position based on where finger went down. */
+            applyShifts(initInsert);
+
+            document.addEventListener("pointermove",   onPointerMove);
+            document.addEventListener("pointerup",     onPointerUp);
+            document.addEventListener("pointercancel", onPointerUp);
+        }
+
+        /* ── during drag ─────────────────────────────────────────────── */
+        function onPointerMove(e) {
+            if (!drag) return;
+            drag.clone.style.left = (e.clientX - drag.offsetX) + "px";
+            var idx = insertIdxFor(e.clientX);
+            if (idx !== drag.curInsert) applyShifts(idx);
+        }
+
+        /* ── drop ────────────────────────────────────────────────────── */
+        function onPointerUp() {
+            if (!drag) return;
+
+            var el         = drag.el;
+            var insertIdx  = drag.curInsert;
+            var otherItems = drag.otherItems;
+
+            /* 1. Capture visual positions while transforms are applied. */
+            var firstLeft = otherItems.map(function (x) {
+                return x.getBoundingClientRect().left;
+            });
+
+            /* 2. Snap transforms off instantly — no transition. */
+            otherItems.forEach(function (x) {
+                x.style.transition = "none";
+                x.style.transform  = "";
+            });
+
+            /* 3. Restore el (invisible for now during FLIP). */
+            el.style.removeProperty("display");
+            el.style.opacity = "0";
+            void navRow.offsetWidth;
+
+            /* 4. Assign final order via CSS stylesheet (React-safe). */
+            var newOrder = otherItems.slice();
+            newOrder.splice(insertIdx, 0, el);
+            var saved = [];
+            newOrder.forEach(function (item) {
+                var k = itemKey(item);
+                if (k) saved.push(k);
+            });
+            localStorage.setItem(NAV_ORDER_KEY, JSON.stringify(saved));
+            applyOrder();
+            void navRow.offsetWidth;
+
+            /* 5. Capture new flex positions (LAST). */
+            var lastLeft = otherItems.map(function (x) {
+                return x.getBoundingClientRect().left;
+            });
+
+            /* 6. FLIP close: invert so items appear at their old positions. */
+            otherItems.forEach(function (x, i) {
+                var delta = firstLeft[i] - lastLeft[i];
+                x.style.transform = delta !== 0 ? "translateX(" + delta + "px)" : "";
+            });
+            void navRow.offsetWidth;
+
+            /* 7. Animate everything to its final position. */
+            otherItems.forEach(function (x) {
+                x.style.transition = "transform 0.22s " + EASING;
+                x.style.transform  = "";
+            });
+            el.style.opacity = "";
+
+            /* 8. Cleanup. */
+            document.body.removeChild(drag.clone);
+            var capturedItems = otherItems;
+            setTimeout(function () {
+                capturedItems.forEach(function (x) { x.style.transition = ""; });
+            }, 240);
+
+            document.removeEventListener("pointermove",   onPointerMove);
+            document.removeEventListener("pointerup",     onPointerUp);
+            document.removeEventListener("pointercancel", onPointerUp);
+            drag = null;
+        }
+
+        /* ── per-item wiring ─────────────────────────────────────────── */
+        function attachDrag(el) {
+            if (el.dataset.stNavDragDone) return;
+            el.dataset.stNavDragDone = "1";
+            el.classList.add("st-nav-draggable");
+
+            /* Native browser drag on <a> / <svg> children captures the pointer
+               and stops pointermove from firing, breaking our threshold detection.
+               Prevent it here so pointer events flow through normally. */
+            el.addEventListener("dragstart", function (e) { e.preventDefault(); });
+
+            el.addEventListener("pointerdown", function (e) {
+                if (e.button !== 0 || drag) return;
+
+                var downX = e.clientX;
+                var downY = e.clientY;
+
+                function onMove(me) {
+                    var dx = me.clientX - downX;
+                    var dy = me.clientY - downY;
+                    if (dx * dx + dy * dy > DRAG_THRESHOLD_SQ) {
+                        cleanup();
+                        me.preventDefault();
+                        startDrag(el, downX, me.clientX);
+                    }
+                }
+                function onUp() { cleanup(); }
+                function cleanup() {
+                    document.removeEventListener("pointermove",   onMove);
+                    document.removeEventListener("pointerup",     onUp);
+                    document.removeEventListener("pointercancel", onUp);
+                }
+                document.addEventListener("pointermove",   onMove);
+                document.addEventListener("pointerup",     onUp);
+                document.addEventListener("pointercancel", onUp);
+            });
+        }
+
+        Array.from(navRow.children).forEach(attachDrag);
+
+        /* One observer per navRow lifetime — catches late-injected plugin items. */
+        if (!navRow.dataset.stNavReorderInit) {
+            navRow.dataset.stNavReorderInit = "1";
+            new MutationObserver(function () {
+                Array.from(navRow.children).forEach(attachDrag);
+                applyOrder();
+            }).observe(navRow, { childList: true });
+        }
+    }
+    setupNavbarReorder(); /* initial pass; re-runs via consolidated watcher */
+
     /* ── Consolidated mutation watcher ──────────────────────────────────
        Single global MutationObserver feeding all body-wide DOM watchers.
        Replaces 7 separate body-subtree observers — each used to fire on
@@ -5554,6 +5957,7 @@
             try { makePluginSettingsCollapsible(); } catch (e) {}
             try { injectPluginSearch(); } catch (e) {}
             try { setupTaskPluginGroups(); } catch (e) {}
+            try { setupNavbarReorder(); } catch (e) {}
         }
         function sched() {
             clearTimeout(_t);
