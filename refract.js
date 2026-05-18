@@ -5418,13 +5418,29 @@
     injectPluginSearch(); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Tasks page: the Plugin Tasks card lists all plugin-defined
-    // tasks grouped by plugin, each group collapsible via a native chevron
-    // button that refract hides globally. This function restores collapse
-    // via our own st-task-plugin-collapsed class (same pattern as the
-    // Plugins page) and injects a live search input at the top of the card.
+    // tasks grouped by plugin. Stash renders native .setting-group-collapse-button
+    // chevrons that refract's global CSS hides. This function marks the card
+    // with st-task-plugin-card (so scoped CSS can un-hide them), injects a
+    // live search input, and defaults each group to collapsed by stripping
+    // Bootstrap's `show` class — letting Stash's own native handler take over
+    // from there (no duplicate click listener needed).
     function setupTaskPluginGroups() {
-        var pluginCard = document.querySelector(".card:has(> .setting-group.collapsible)");
+        // Find the plugin tasks .card — it contains .setting-group.collapsible
+        // children but is NOT inside a .setting-section (that's the Plugins page).
+        var cards = document.querySelectorAll(".card");
+        var pluginCard = null;
+        for (var c = 0; c < cards.length; c++) {
+            var card = cards[c];
+            if (card.closest(".setting-section")) continue;
+            if (!card.querySelector(".setting-group.collapsible")) continue;
+            pluginCard = card;
+            break;
+        }
         if (!pluginCard) return;
+
+        if (!pluginCard.classList.contains("st-task-plugin-card")) {
+            pluginCard.classList.add("st-task-plugin-card");
+        }
 
         if (!pluginCard.dataset.stTaskSearchDone) {
             var wrap = document.createElement("div");
@@ -5447,10 +5463,10 @@
             function applyTaskFilter() {
                 var q = input.value.trim().toLowerCase();
                 clearBtn.style.display = q ? "" : "none";
-                var groups = pluginCard.querySelectorAll(":scope > .setting-group");
+                var groups = pluginCard.querySelectorAll(".setting-group");
                 for (var gi = 0; gi < groups.length; gi++) {
                     var g = groups[gi];
-                    var h3 = g.querySelector(":scope > .setting h3");
+                    var h3 = g.querySelector(".setting h3");
                     var name = h3 ? h3.textContent.toLowerCase() : "";
                     g.classList.toggle("st-plugin-hidden", !!q && name.indexOf(q) === -1);
                 }
@@ -5466,22 +5482,14 @@
             pluginCard.dataset.stTaskSearchDone = "1";
         }
 
-        var groups = pluginCard.querySelectorAll(":scope > .setting-group.collapsible");
+        /* Default each group to collapsed: strip Bootstrap's `show` class.
+           The native button's React/Bootstrap handler then owns toggle from here. */
+        var groups = pluginCard.querySelectorAll(".setting-group.collapsible");
         for (var i = 0; i < groups.length; i++) {
             var group = groups[i];
             if (group.dataset.stTaskCollapsibleDone === "1") continue;
-
-            var btn = group.querySelector(".setting-group-collapse-button");
-            if (btn) {
-                (function (g) {
-                    g.querySelector(".setting-group-collapse-button").addEventListener("click", function (e) {
-                        e.stopPropagation();
-                        g.classList.toggle("st-task-plugin-collapsed");
-                    });
-                })(group);
-            }
-
-            group.classList.add("st-task-plugin-collapsed");
+            var section = group.querySelector(".collapsible-section");
+            if (section) section.classList.remove("show");
             group.dataset.stTaskCollapsibleDone = "1";
         }
     }
