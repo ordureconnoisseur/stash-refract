@@ -2380,14 +2380,25 @@
         if (!isViewMinimiserEnabled()) { return; }
         document.querySelectorAll("[data-stash-filter]").forEach(function (container) {
             if (container.querySelector(".stash-view-wrap")) { return; }
-            /* View-mode buttons are the rightmost btn-group; pick the last one
-               with the most buttons (≥ 3) to avoid grabbing bookmark/filter groups. */
+            /* View-mode buttons: pick the btn-group with the most direct .btn
+               children that isn't a structural wrapper (contains no child btn-group)
+               and isn't a dropdown (no dropdown-toggle child). Threshold ≥ 2 so
+               pages with only two view modes (images, groups, etc.) are handled.
+               Using direct children avoids counting nested groups' buttons, which
+               previously caused the saved-filters btn-group wrapper to be selected
+               on pages where the view-mode group has fewer than 3 buttons. */
             var allGroups = Array.from(container.querySelectorAll(".btn-group"));
             var group = null;
             var maxBtns = 0;
             allGroups.forEach(function (g) {
-                var n = g.querySelectorAll(".btn").length;
-                if (n >= 3 && n >= maxBtns) { group = g; maxBtns = n; }
+                var children = Array.from(g.children);
+                /* Skip wrappers that directly contain other btn-groups */
+                if (children.some(function (c) { return c.classList.contains("btn-group"); })) { return; }
+                var directBtns = children.filter(function (c) { return c.classList.contains("btn"); });
+                /* Skip dropdown groups (saved filters, sort, etc.) */
+                if (directBtns.some(function (b) { return b.classList.contains("dropdown-toggle"); })) { return; }
+                var n = directBtns.length;
+                if (n >= 2 && n >= maxBtns) { group = g; maxBtns = n; }
             });
             if (!group) { return; }
             /* Exclude multiview plugin's picking toggle — it lives in this group

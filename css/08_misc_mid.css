@@ -291,56 +291,93 @@ body.stash-liquid-glass .scene-tabs #scene-edit-details .string-list-input .inpu
     height: 0.9rem !important;
 }
 
-/* Scraper diff form: each row has [reject-X-button][existing input] |
-   [accept-check-button][scraped input]. Style the prepend buttons by
-   the icon they contain — check = green-tinted, xmark = muted/red.
-   Also kill Bootstrap's `.bg-secondary text-white` classes on the
-   wrappers so they pick up the theme colors. */
-body.stash-liquid-glass .scraper-edit form .input-group-prepend,
-body.stash-liquid-glass form .input-group-prepend.bg-secondary {
+/* Scraper diff: [reject-X][existing value] | [accept-✓][scraped value].
+   Scoped to .scraper-edit (covers both inside-form and outside-form rows)
+   and .input-group-prepend.bg-secondary (the bg-secondary wrapper is the
+   reliable marker for these buttons across the whole performer scrape UI). */
+
+/* 1. Kill Bootstrap's bg-secondary grey on the wrapper divs */
+body.stash-liquid-glass .scraper-edit .input-group-prepend,
+body.stash-liquid-glass .input-group-prepend.bg-secondary {
     background: transparent !important;
     border: none !important;
     color: inherit !important;
 }
-body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary {
+/* 2. Base glass look for the buttons themselves */
+body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary,
+body.stash-liquid-glass .input-group-prepend.bg-secondary > .btn.btn-secondary {
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text-muted) !important;
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    border-right: none !important;
     box-shadow: none !important;
     transition: background 0.15s, border-color 0.15s, color 0.15s !important;
 }
-/* Accept (check icon) — green tint */
+/* 3. Flat right side — these buttons are always connected to an input */
+body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary,
+body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: none !important;
+}
+/* 4. Accept (check icon) — green tint */
+body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary:has(svg.fa-check),
+body.stash-liquid-glass .input-group-prepend.bg-secondary > .btn.btn-secondary:has(svg.fa-check),
 body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary:has(svg.fa-check) {
     background: rgba(34, 197, 94, 0.1) !important;
     border-color: rgba(34, 197, 94, 0.32) !important;
     color: #86efac !important;
 }
+body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary:has(svg.fa-check):hover,
+body.stash-liquid-glass .input-group-prepend.bg-secondary > .btn.btn-secondary:has(svg.fa-check):hover,
 body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary:has(svg.fa-check):hover {
     background: rgba(34, 197, 94, 0.18) !important;
     border-color: rgba(34, 197, 94, 0.55) !important;
     color: #bbf7d0 !important;
 }
-/* Reject (xmark icon) — red tint */
+/* 5. Reject/clear (xmark icon) — subtle red tint */
+body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark),
+body.stash-liquid-glass .input-group-prepend.bg-secondary > .btn.btn-secondary:has(svg.fa-xmark),
 body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark) {
     background: rgba(239, 68, 68, 0.08) !important;
     border-color: rgba(239, 68, 68, 0.28) !important;
     color: rgba(252, 165, 165, 0.85) !important;
 }
+body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark):hover,
+body.stash-liquid-glass .input-group-prepend.bg-secondary > .btn.btn-secondary:has(svg.fa-xmark):hover,
 body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark):hover {
     background: rgba(239, 68, 68, 0.18) !important;
     border-color: rgba(239, 68, 68, 0.55) !important;
     color: #fca5a5 !important;
 }
-/* Form-control sibling that follows the prepend button: flat left side */
+/* 6. Flat left side on whatever follows the prepend button */
+body.stash-liquid-glass .scraper-edit .input-group-prepend + .form-control,
+body.stash-liquid-glass .scraper-edit .input-group-prepend + textarea.form-control,
+body.stash-liquid-glass .scraper-edit .input-group-prepend + .image-selection-parent,
+body.stash-liquid-glass .scraper-edit .input-group-prepend + select,
+body.stash-liquid-glass .input-group-prepend.bg-secondary + select,
 body.stash-liquid-glass form .input-group-prepend + .form-control,
 body.stash-liquid-glass form .input-group-prepend + textarea.form-control,
 body.stash-liquid-glass form .input-group-prepend + .image-selection-parent,
-body.stash-liquid-glass form .input-group-prepend + .string-list-input {
+body.stash-liquid-glass form .input-group-prepend + .string-list-input,
+body.stash-liquid-glass .scraper-edit .input-group-prepend + .react-select__control,
+body.stash-liquid-glass form .input-group-prepend + .react-select__control {
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
+}
+/* 7. Glass + appearance reset for select siblings (native OS widget ignores
+   background/border without appearance:none) */
+body.stash-liquid-glass .scraper-edit .input-group-prepend + select,
+body.stash-liquid-glass .input-group-prepend.bg-secondary + select {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-sm) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-left: none !important;
+    padding: 0.375rem 0.75rem !important;
 }
 /* Kill the readonly bg-secondary muddiness on existing-column inputs */
 body.stash-liquid-glass form .form-control.bg-secondary,
