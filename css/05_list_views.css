@@ -1086,8 +1086,21 @@ body.stash-liquid-glass .setting-group.st-plugin-collapsed .st-plugin-chevron sv
 body.stash-liquid-glass .setting-group:not(.st-plugin-collapsed) .st-plugin-chevron svg {
     transform: rotate(90deg);
 }
-body.stash-liquid-glass .setting-group.st-plugin-collapsed > .collapsible-section {
+/* Managed groups: override Bootstrap's .collapse display:none.
+   Animation is handled entirely via JS inline styles. */
+body.stash-liquid-glass .setting-group[data-st-task-chevron-done="1"] > .collapsible-section,
+body.stash-liquid-glass .setting-group[data-st-collapsible-injected="1"] > .collapsible-section {
+    display: block !important;
+}
+/* Unmanaged collapsed groups. Scoped away from managed ones so display:block
+   above always wins for managed groups regardless of .st-plugin-collapsed. */
+body.stash-liquid-glass .setting-group.st-plugin-collapsed:not([data-st-task-chevron-done="1"]):not([data-st-collapsible-injected="1"]) > .collapsible-section {
     display: none !important;
+}
+/* Remove pointer cursor from managed header rows. */
+body.stash-liquid-glass .setting-group[data-st-task-chevron-done="1"] > .setting,
+body.stash-liquid-glass .setting-group[data-st-collapsible-injected="1"] > .setting {
+    cursor: default;
 }
 
 /* Plugin filter input — reuses Stash's .clearable-input-group classes

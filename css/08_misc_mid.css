@@ -1892,7 +1892,8 @@ body.stash-liquid-glass .btn.btn-danger {
    Excludes:
    - .minimal: icon-only buttons (rating stars, navbar icons) stay bare.
    - .page-link / .page-count-dropdown: pagination cluster has its own pill.
-   - .dropdown-toggle: stays integrated with its parent group. */
+   - .dropdown-toggle: gets its own rule below so per-context rules can
+     still win, but the base glass look is applied there too. */
 body.stash-liquid-glass .btn.btn-secondary:where(:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle)) {
     background: var(--glass-bg) !important;
     background-image: none !important;
@@ -1906,6 +1907,37 @@ body.stash-liquid-glass .btn.btn-secondary:where(:not(.minimal):not(.page-link):
     background: var(--glass-bg-strong) !important;
     border-color: var(--glass-border-bright) !important;
     color: #fff !important;
+}
+/* .dropdown-toggle was excluded above so per-context rules can override it.
+   Without a fallback it gets Bootstrap's default grey — wrong in a dark
+   glass theme. Apply the same glass look here at the same low specificity
+   so per-context overrides (filter toolbar, scene toolbar) still win. */
+body.stash-liquid-glass .btn.btn-secondary.dropdown-toggle:where(:not(.minimal):not(.page-link)) {
+    background: var(--glass-bg) !important;
+    background-image: none !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    box-shadow: none !important;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+body.stash-liquid-glass .btn.btn-secondary.dropdown-toggle:where(:not(.minimal):not(.page-link)):hover,
+body.stash-liquid-glass .btn.btn-secondary.dropdown-toggle:where(:not(.minimal):not(.page-link)):focus {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border-bright) !important;
+    color: #fff !important;
+}
+/* Restore Bootstrap's split-button border-radius logic.
+   Refract's border-radius: 12px !important on .btn-primary overrides
+   Bootstrap's .btn-group :first-child/:last-child rules, making each half
+   of a split dropdown look like a separate floating pill. These rules
+   re-apply the flush inner corners only for split-dropdown groups. */
+body.stash-liquid-glass .btn-group:has(.dropdown-toggle-split) > .btn:not(:last-child):not(.dropdown-toggle) {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+body.stash-liquid-glass .btn-group:has(.dropdown-toggle-split) > .btn:not(:first-child) {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
 }
 
 /* Pagination cluster (« ‹ 1 2 3 › » buttons) — must beat the global glass

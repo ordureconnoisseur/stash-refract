@@ -11,6 +11,9 @@ body.stash-liquid-glass .dropdown-menu {
     backdrop-filter: var(--glass-blur);
     padding: 0.4rem;
     color: var(--text);
+    /* Bootstrap defaults to 1000, below Refract's fixed navbar (~1030).
+       1045 keeps menus above the navbar but below modal backdrops (1050). */
+    z-index: 1045 !important;
 }
 body.stash-liquid-glass .dropdown-menu.bg-secondary.text-white,
 body.stash-liquid-glass .dropdown-menu.show.bg-secondary.text-white {
