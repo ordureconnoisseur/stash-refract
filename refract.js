@@ -5417,30 +5417,20 @@
     }
     injectPluginSearch(); /* initial pass; re-runs via consolidated watcher */
 
-    // Settings → Tasks page: the Plugin Tasks card lists all plugin-defined
-    // tasks grouped by plugin. Stash renders native .setting-group-collapse-button
-    // chevrons that refract's global CSS hides. This function marks the card
-    // with st-task-plugin-card (so scoped CSS can un-hide them), injects a
-    // live search input, and defaults each group to collapsed by stripping
-    // Bootstrap's `show` class — letting Stash's own native handler take over
-    // from there (no duplicate click listener needed).
+    // Settings → Tasks page: mirrors makePluginSettingsCollapsible + injectPluginSearch
+    // for the Plugin Tasks card. Identical chevron (st-plugin-chevron) and collapse
+    // class (st-plugin-collapsed) so all existing CSS applies without duplication.
     function setupTaskPluginGroups() {
-        // The plugin tasks card lives inside the tasks tab pane. Scope the
-        // search there so we never accidentally match cards on other pages.
-        // The pane ID ends in "-tabpane-tasks" across Stash versions.
         var tabPane = document.querySelector("[id$='-tabpane-tasks']");
         if (!tabPane) return;
 
-        // Plugin task groups have btn-secondary btn-sm task triggers inside
-        // their collapsible-section. Native task groups (Scan, Generate…)
-        // have custom-switch checkboxes instead. Use that to tell them apart.
+        // Plugin task groups have btn-secondary btn-sm task triggers inside their
+        // collapsible-section; native groups (Scan, Generate…) have checkboxes.
         var cards = tabPane.querySelectorAll(".card");
         var pluginCard = null;
         for (var c = 0; c < cards.length; c++) {
-            var section = cards[c].querySelector(
-                ".setting-group.collapsible .collapsible-section"
-            );
-            if (section && section.querySelector(".btn.btn-secondary.btn-sm")) {
+            var s = cards[c].querySelector(".setting-group.collapsible .collapsible-section");
+            if (s && s.querySelector(".btn.btn-secondary.btn-sm")) {
                 pluginCard = cards[c];
                 break;
             }
@@ -5451,7 +5441,12 @@
             pluginCard.classList.add("st-task-plugin-card");
         }
 
+        // Inject search bar once — wrapped in a .setting row so the
+        // clearable-input-group layout matches the Plugins page search.
         if (!pluginCard.dataset.stTaskSearchDone) {
+            var searchRow = document.createElement("div");
+            searchRow.className = "setting st-task-search-row";
+
             var wrap = document.createElement("div");
             wrap.className = "clearable-input-group st-plugin-search st-task-plugin-search";
             wrap.innerHTML =
@@ -5487,19 +5482,42 @@
                 input.focus();
             });
 
-            pluginCard.insertBefore(wrap, pluginCard.firstChild);
+            searchRow.appendChild(wrap);
+            pluginCard.insertBefore(searchRow, pluginCard.firstChild);
             pluginCard.dataset.stTaskSearchDone = "1";
         }
 
-        /* Default each group to collapsed: strip Bootstrap's `show` class.
-           The native button's React/Bootstrap handler then owns toggle from here. */
+        // Inject identical st-plugin-chevron into each group header and default
+        // to collapsed — exactly as makePluginSettingsCollapsible does it so all
+        // existing chevron CSS (.st-plugin-chevron, .st-plugin-collapsed) applies.
         var groups = pluginCard.querySelectorAll(".setting-group.collapsible");
         for (var i = 0; i < groups.length; i++) {
             var group = groups[i];
-            if (group.dataset.stTaskCollapsibleDone === "1") continue;
-            var section = group.querySelector(".collapsible-section");
-            if (section) section.classList.remove("show");
-            group.dataset.stTaskCollapsibleDone = "1";
+            if (group.dataset.stTaskChevronDone === "1") continue;
+
+            var header = group.querySelector(":scope > .setting");
+            if (!header) { group.dataset.stTaskChevronDone = "1"; continue; }
+            var rightSide = header.lastElementChild;
+            if (!rightSide) { group.dataset.stTaskChevronDone = "1"; continue; }
+
+            var chevron = document.createElement("button");
+            chevron.type = "button";
+            chevron.className = "btn btn-primary btn-sm st-plugin-chevron";
+            chevron.setAttribute("aria-label", "Toggle plugin tasks");
+            chevron.innerHTML =
+                "<svg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg' " +
+                "aria-hidden='true'>" +
+                "<path d='M10 7L15 12L10 17' stroke='currentColor' stroke-width='1.5' " +
+                "stroke-linecap='round' stroke-linejoin='round'/></svg>";
+            chevron.addEventListener("click", function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                this.closest(".setting-group").classList.toggle("st-plugin-collapsed");
+            });
+            rightSide.appendChild(chevron);
+
+            group.classList.add("st-plugin-collapsed");
+            group.dataset.stTaskChevronDone = "1";
         }
     }
     setupTaskPluginGroups(); /* initial pass; re-runs via consolidated watcher */
