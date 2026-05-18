@@ -5431,14 +5431,16 @@
         var tabPane = document.querySelector("[id$='-tabpane-tasks']");
         if (!tabPane) return;
 
-        // Within the tasks pane, the plugin tasks card is the one that
-        // contains collapsible setting-groups (each plugin gets one group).
-        // Deliberately avoid the .closest(".setting-section") guard used
-        // previously — the tasks page wraps everything in .setting-section.
+        // Plugin task groups have btn-secondary btn-sm task triggers inside
+        // their collapsible-section. Native task groups (Scan, Generate…)
+        // have custom-switch checkboxes instead. Use that to tell them apart.
         var cards = tabPane.querySelectorAll(".card");
         var pluginCard = null;
         for (var c = 0; c < cards.length; c++) {
-            if (cards[c].querySelector(".setting-group.collapsible")) {
+            var section = cards[c].querySelector(
+                ".setting-group.collapsible .collapsible-section"
+            );
+            if (section && section.querySelector(".btn.btn-secondary.btn-sm")) {
                 pluginCard = cards[c];
                 break;
             }
