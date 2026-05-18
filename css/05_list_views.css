@@ -1114,12 +1114,11 @@ body.stash-liquid-glass .setting-section .setting-group.st-plugin-hidden {
     display: none !important;
 }
 
-/* Settings → Tasks: Plugin Tasks card. JS marks the card with
-   st-task-plugin-card; CSS targets that class to restore and style the
-   native collapse buttons (hidden globally above), and to support the
-   search filter. Bootstrap's `show` class controls expand/collapse —
-   :has() reflects the current state in the chevron direction. */
-body.stash-liquid-glass .st-task-plugin-card .setting-group-collapse-button {
+/* Settings → Tasks: restore collapse buttons for the entire tasks tab.
+   Targets the tab pane directly — no JS class needed, so buttons are
+   visible even if the card-detection JS hasn't fired yet. The global
+   .setting-group-collapse-button hide above is overridden here. */
+body.stash-liquid-glass [id$="-tabpane-tasks"] .setting-group-collapse-button {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1138,23 +1137,24 @@ body.stash-liquid-glass .st-task-plugin-card .setting-group-collapse-button {
     -webkit-backdrop-filter: none !important;
     transition: color 0.15s;
 }
-body.stash-liquid-glass .st-task-plugin-card .setting-group-collapse-button:hover {
+body.stash-liquid-glass [id$="-tabpane-tasks"] .setting-group-collapse-button:hover {
     color: var(--accent-bright) !important;
     background: transparent !important;
 }
-body.stash-liquid-glass .st-task-plugin-card .setting-group-collapse-button svg {
+body.stash-liquid-glass [id$="-tabpane-tasks"] .setting-group-collapse-button svg {
     width: 1.05rem;
     height: 1.05rem;
     display: block;
     transition: transform 0.22s ease;
 }
-/* Native SVG is chevron-up. Rotate 180° when collapsed (no .show on section). */
-body.stash-liquid-glass .st-task-plugin-card .setting-group:has(.collapsible-section.show) .setting-group-collapse-button svg {
+/* Native SVG is chevron-up: reflect Bootstrap .show state via :has(). */
+body.stash-liquid-glass [id$="-tabpane-tasks"] .setting-group:has(.collapsible-section.show) .setting-group-collapse-button svg {
     transform: rotate(0deg);
 }
-body.stash-liquid-glass .st-task-plugin-card .setting-group:not(:has(.collapsible-section.show)) .setting-group-collapse-button svg {
+body.stash-liquid-glass [id$="-tabpane-tasks"] .setting-group:not(:has(.collapsible-section.show)) .setting-group-collapse-button svg {
     transform: rotate(180deg);
 }
+/* JS adds st-task-plugin-card to the plugin tasks card for search filtering. */
 body.stash-liquid-glass .st-task-plugin-card .setting-group.st-plugin-hidden {
     display: none !important;
 }
