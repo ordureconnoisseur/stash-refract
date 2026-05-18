@@ -17,7 +17,7 @@ Liquid-glass theme for [Stash](https://github.com/stashapp/stash). Frosted glass
 - **Tag editor + duplicate checker overhauls** — alphabetical tag taxonomy with image-and-description hover popovers; comparison-card redesign with highest-res / largest-file callouts
 - **Lite mode** — strips blur, shadows, and animations for older or integrated GPUs
 
-Small niceties: horizontally-scrollable navbar at narrow widths · [stash-multiview](https://github.com/ordureconnoisseur/stash-multiview) accent integration via localStorage handoff · auto-detection of STARS vs DECIMAL rating system.
+Small niceties: horizontally-scrollable navbar at narrow widths · drag-to-reorder navbar icons (order persists across sessions) · [stash-multiview](https://github.com/ordureconnoisseur/stash-multiview) accent integration via localStorage handoff · auto-detection of STARS vs DECIMAL rating system.
 
 ## Install
 
@@ -123,6 +123,7 @@ Refract themes the UIs of these plugins so they sit naturally inside the glass a
 
 **Themed compatibility** (CSS-only re-skin)
 
+- **Binge (StashTV)** — navbar button restyled as an accent-glass pill so it sits naturally alongside the built-in nav icons.
 - **flexibleDateInput** — react-datepicker calendar fully restyled: header pills, day cells, month/year dropdown panels, prev/next nav arrows.
 - **stashGlobalSearch** — focus colour swapped to accent so search inputs match the rest of the theme.
 
