@@ -5213,3 +5213,441 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker[dat
     }
 }
 
+/* ──────────────────────────────────────────────────────────────────
+   Scrape Results Modal
+   Performer / Scene / Studio / Movie / Gallery "Scrape Results"
+   dialog. Anchored on .modal-content:has(> .modal-body >
+   .dialog-container) — the structural fingerprint unique to
+   scrape-result modals. Most accept/reject button glass + flat-corner
+   merging is already handled by the `.scraper-edit` / `form
+   .input-group-prepend` rules earlier in this file; this section adds
+   the modal-specific polish: column header chips, field-row
+   separators, existing-column desaturation, drag/minus chips, image
+   picker, scrollable body.
+   ────────────────────────────────────────────────────────────────── */
+
+/* 1. Column headers — "Existing" / "Scraped" chip strip */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .column-label {
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: var(--text-muted) !important;
+    padding-bottom: 0.45rem !important;
+    margin-bottom: 0.25rem !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+
+/* 2. Field row separation */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .dialog-container > form > [data-field] {
+    padding-top: 0.85rem !important;
+    padding-bottom: 0.85rem !important;
+    margin: 0 !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .dialog-container > form > [data-field]:last-of-type {
+    border-bottom: none !important;
+}
+
+/* 3. Field label on the left (URLs, Performer Image, Name, etc.) */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .dialog-container > form > [data-field] > label.col-form-label {
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: var(--text-muted) !important;
+    padding-top: 0.55rem !important;
+}
+
+/* 4. Existing column desaturation — first .col-lg-6 in each row.
+      Marks "what you have now" as quieter than the scraped candidate. */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field] > .col-lg-9 > .row > .col-lg-6:first-of-type .form-control,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field] > .col-lg-9 > .row > .col-lg-6:first-of-type input.text-input {
+    background: rgba(255, 255, 255, 0.025) !important;
+    color: var(--text-muted) !important;
+    opacity: 0.85;
+}
+
+/* 5. Scraped column inherits glass form-control + accent focus glow
+      from 04_filters.css — no override needed. */
+
+/* 6. Accept (✓) / Reject (✕) buttons inherit their green/red glass
+      from the `form .input-group-prepend > .btn.btn-secondary` rules
+      above. Add a hover halo for emphasis inside the modal. */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .input-group-prepend > .btn.btn-secondary:has(svg.fa-check):hover {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18) !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark):hover {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18) !important;
+}
+
+/* 7. Drag handle + remove (minus) chips inside string-list rows */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button.drag-handle.btn,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button.drag-handle.btn.btn-secondary {
+    background: transparent !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-muted) !important;
+    padding: 0.3rem 0.5rem !important;
+    box-shadow: none !important;
+    transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button.drag-handle:hover {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border-bright) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button.btn.btn-danger,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button.btn.btn-danger.btn-sm {
+    background: rgba(239, 68, 68, 0.06) !important;
+    border: 1px solid rgba(239, 68, 68, 0.22) !important;
+    color: rgba(252, 165, 165, 0.78) !important;
+    padding: 0.3rem 0.5rem !important;
+    box-shadow: none !important;
+    transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button.btn.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.16) !important;
+    border-color: rgba(239, 68, 68, 0.42) !important;
+    color: #fca5a5 !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button .svg-inline--fa {
+    width: 0.85rem !important;
+    height: 0.85rem !important;
+}
+/* Disabled trailing chips on the empty "add new" row — fade out */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button[disabled] {
+    opacity: 0.35 !important;
+    background: transparent !important;
+    border-color: var(--glass-border) !important;
+    color: var(--text-muted) !important;
+}
+
+/* 8. String-list row spacing — keep stacked URL rows from jamming */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .form-group .input-group + .input-group {
+    margin-top: 0.4rem !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .form-group {
+    margin-bottom: 0 !important;
+}
+
+/* 9. Image row — Grid layout. Row sizes to image's actual rendered
+      height (auto); image constrained by both max-height: 380px AND
+      max-width: 100% so it scales within column bounds without
+      overflowing. Rail stretches via grid align-items + inner flex
+      (no percentage heights, which need a definite parent). */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .col-lg-6 > .input-group {
+    display: grid !important;
+    grid-template-columns: auto auto !important;
+    grid-template-rows: auto auto !important;
+    align-items: stretch !important;
+    justify-items: start !important;
+    justify-content: start !important;
+    column-gap: 0 !important;
+    row-gap: 0.5rem !important;
+    width: 100% !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Rail in column 1 — stretched by grid, button stretched by inner flex */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .col-lg-6 > .input-group > .input-group-prepend,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .col-lg-6 > .input-group > .input-group-prepend.bg-secondary {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    align-self: stretch !important;
+    justify-self: start !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .col-lg-6 > .input-group > .input-group-prepend > .btn.btn-secondary {
+    flex: 0 0 auto !important;
+    align-self: stretch !important;
+    width: auto !important;
+    padding: 0.5rem 0.75rem !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-top-left-radius: var(--radius-sm) !important;
+    border-bottom-left-radius: var(--radius-sm) !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: none !important;
+}
+
+/* Existing-side img: max-bound by 380px tall AND 100% column wide,
+   border wraps tightly around the visible image */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .col-lg-6:first-of-type > .input-group > img.performer-image {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+    justify-self: start !important;
+    max-height: 380px !important;
+    max-width: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid var(--glass-border) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-top-right-radius: var(--radius-sm) !important;
+    border-bottom-right-radius: var(--radius-sm) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    opacity: 0.88;
+    display: block !important;
+}
+
+/* Scraped-side: collapse all wrappers with display:contents so the
+   <img> AND .select-buttons become direct grid children of input-group.
+   Then place them explicitly: image in (col 2, row 1) flush with rail,
+   nav strip in (col 2, row 2) below the image as a separate widget. */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .col-lg-6 > .input-group > .image-selection-parent,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection > .performer-image {
+    display: contents !important;
+}
+
+/* Hidden duplicate img */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection > .performer-image > img.d-none {
+    display: none !important;
+}
+
+/* The visible scraped <img> — grid cell 2,1 (flush with rail) */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection > .performer-image > img.performer-image:not(.d-none) {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+    justify-self: start !important;
+    max-height: 380px !important;
+    max-width: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid var(--glass-border) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-top-right-radius: var(--radius-sm) !important;
+    border-bottom-right-radius: var(--radius-sm) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    display: block !important;
+}
+
+/* Nav strip — grid cell 2,2 (below image, not inside the image card).
+   Centered under the image. Only present when multiple scraped images
+   exist; otherwise row 2 collapses to 0. */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection > .select-buttons {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    justify-self: center !important;
+    align-self: start !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    width: auto !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection > .select-buttons .image-index {
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: var(--text-muted) !important;
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 0.2rem 0.7rem !important;
+    margin: 0 !important;
+    min-width: 4.5rem;
+    text-align: center;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection > .select-buttons > .btn.btn-primary {
+    width: 1.9rem !important;
+    height: 1.9rem !important;
+    min-width: 1.9rem !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: var(--radius-sm) !important;
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    box-shadow: none !important;
+    flex: 0 0 auto !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection > .select-buttons > .btn.btn-primary:hover {
+    background: rgba(var(--accent-rgb), 0.22) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.32) !important;
+    color: var(--text) !important;
+    border-color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection > .select-buttons > .btn.btn-primary .svg-inline--fa {
+    width: 0.8rem !important;
+    height: 0.8rem !important;
+}
+
+/* 10. Modal header — accent the pencil icon */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .modal-header > .svg-inline--fa.fa-pencil,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .modal-header > svg.fa-pencil {
+    width: 0.9rem !important;
+    height: 0.9rem !important;
+    color: var(--accent-bright) !important;
+    margin-right: 0.55rem !important;
+    opacity: 0.95;
+}
+
+/* 11. Modal body scroll — keep tall scrape lists inside the viewport */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .modal-body {
+    max-height: 75vh !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(var(--accent-rgb), 0.45) transparent;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .modal-body::-webkit-scrollbar-thumb {
+    background: rgba(var(--accent-rgb), 0.35);
+    border-radius: 999px;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--accent-rgb), 0.6);
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* 12. Footer buttons inherit accent-tint + glow from 04_filters.css
+       L170–226. No override needed. */
+
+/* 13. String-list column as ONE unified container.
+       The full-height ✕ / ✓ pillar is a column-wide action; keep it
+       tall and flush. Inside, the .string-list-input is styled as a
+       single glass block — each URL row is borderless/transparent
+       with a hairline divider, instead of being its own pill. */
+
+/* Tall column-action button (rail): full height, flat-right, accent border */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .col-lg-6 > .input-group {
+    align-items: stretch !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .col-lg-6 > .input-group > .input-group-prepend,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .col-lg-6 > .input-group > .input-group-prepend.bg-secondary {
+    align-self: stretch !important;
+    margin-right: 0 !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .col-lg-6 > .input-group > .input-group-prepend > .btn.btn-secondary {
+    min-height: 100% !important;
+    padding: 0.375rem 0.75rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-top-left-radius: var(--radius-sm) !important;
+    border-bottom-left-radius: var(--radius-sm) !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: none !important;
+}
+
+/* Unified container — one glass block, flat-left where it meets the rail */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .col-lg-6 > .input-group > .string-list-input {
+    flex: 1 !important;
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-top-right-radius: var(--radius-sm) !important;
+    border-bottom-right-radius: var(--radius-sm) !important;
+    overflow: hidden;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group {
+    margin: 0 !important;
+}
+
+/* Each URL row: hairline divider, no individual pill */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group {
+    margin: 0 !important;
+    border-bottom: 1px solid var(--glass-border);
+    border-radius: 0 !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group:last-child {
+    border-bottom: none;
+}
+
+/* The input itself: transparent, borderless, no radius — inherits container surface */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > input.form-control,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > input.text-input.form-control {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0.5rem 0.7rem !important;
+    height: auto !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > input.form-control:focus {
+    background: var(--glass-bg) !important;
+    box-shadow: none !important;
+    color: var(--text) !important;
+}
+
+/* Trailing drag/minus chips: borderless, transparent, separator on the left */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button.btn,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button.btn.btn-secondary,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button.btn.btn-danger,
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button.btn.btn-danger.btn-sm {
+    background: transparent !important;
+    border: none !important;
+    border-left: 1px solid var(--glass-border) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: var(--text-muted) !important;
+    padding: 0 0.6rem !important;
+    margin-left: 0 !important;
+    transition: background 0.15s, color 0.15s !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button:hover {
+    background: var(--glass-bg-strong) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button.btn-danger {
+    color: rgba(252, 165, 165, 0.72) !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.12) !important;
+    color: #fca5a5 !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button[disabled] {
+    opacity: 0.3 !important;
+    border-left-color: var(--glass-border) !important;
+}
+/* Hide drag-to-reorder handles — only the remove (minus) action stays */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button.drag-handle {
+    display: none !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button .svg-inline--fa {
+    width: 0.85rem !important;
+    height: 0.85rem !important;
+}
+
+/* Existing column (left) — desaturate the whole unified container */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .col-lg-6:first-of-type > .input-group > .string-list-input {
+    background: rgba(255, 255, 255, 0.022) !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .col-lg-6:first-of-type > .input-group > .string-list-input input.form-control {
+    color: var(--text-muted) !important;
+    opacity: 0.85;
+}
+
