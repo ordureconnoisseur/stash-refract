@@ -163,9 +163,9 @@
             var lightOn = lightState[0];
             var setLightOn = lightState[1];
 
-            var showNamesState = R.useState(isShowPerformerNamesEnabled());
-            var showNamesOn = showNamesState[0];
-            var setShowNamesOn = showNamesState[1];
+            var cardStyleState = R.useState(getStoredCardStyle());
+            var cardStyle = cardStyleState[0];
+            var setCardStyle = cardStyleState[1];
 
             /* Custom CSS Source state: { loaded, url } where url is
                the value Stash currently has set (empty if not set). */
@@ -211,6 +211,12 @@
                 tagFilledRatings();
             }
 
+            function pickCardStyle(style) {
+                try { localStorage.setItem(MINIMAL_CARDS_STORAGE_KEY, style); } catch (e) { /* ignore */ }
+                applyCardStyleClass(style);
+                setCardStyle(style);
+            }
+
             function toggleLight() {
                 var next = !lightOn;
                 /* Use View Transitions when supported (Chromium 111+,
@@ -240,13 +246,6 @@
                 /* Re-run the sidebar performer carousel setup so clones get
                    added (lite→full) or removed (full→lite) immediately. */
                 try { setupSceneTabsPerformers(); } catch (e) { /* ignore */ }
-            }
-
-            function toggleShowNames() {
-                var next = !showNamesOn;
-                try { localStorage.setItem(SHOW_PERF_NAMES_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
-                applyShowPerformerNamesClass(next);
-                setShowNamesOn(next);
             }
 
             function pick(preset) {
@@ -371,6 +370,27 @@
                         })
                     )
                 ),
+                R.createElement("div", { className: "setting", id: "plugin-refract-card-style" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "Scene card style"),
+                        R.createElement("div", { className: "sub-heading" },
+                            R.createElement("b", null, "Refract"), " (default) — tidier minimal layout; description block hidden so the grid stays consistent across scenes with and without descriptions. ",
+                            R.createElement("b", null, "Classic"), " — Stash's original card layout with description, file path, and details visible.")
+                    ),
+                    R.createElement("div", { className: "refract-setting-control refract-card-style-toggle" },
+                        [
+                            { key: "refract", label: "Refract" },
+                            { key: "classic", label: "Classic" }
+                        ].map(function (item) {
+                            return R.createElement("button", {
+                                key: item.key,
+                                type: "button",
+                                className: "refract-segmented-btn" + (cardStyle === item.key ? " is-active" : ""),
+                                onClick: function () { pickCardStyle(item.key); }
+                            }, item.label);
+                        })
+                    )
+                ),
                 R.createElement("div", { className: "setting", id: "plugin-refract-lite-mode" },
                     R.createElement("div", null,
                         R.createElement("h3", null, "Lite mode"),
@@ -389,28 +409,6 @@
                             R.createElement("label", {
                                 className: "custom-control-label",
                                 htmlFor: "refract-lite-mode-toggle"
-                            })
-                        )
-                    )
-                ),
-                R.createElement("div", { className: "setting", id: "plugin-refract-show-perf-names" },
-                    R.createElement("div", null,
-                        R.createElement("h3", null, "Show performer names"),
-                        R.createElement("div", { className: "sub-heading" },
-                            "Display performer names as a comma-separated line under the avatar circles on scene cards. Useful when you don't want to hover each circle.")
-                    ),
-                    R.createElement("div", { className: "refract-setting-control" },
-                        R.createElement("div", { className: "custom-control custom-switch" },
-                            R.createElement("input", {
-                                type: "checkbox",
-                                className: "custom-control-input",
-                                id: "refract-show-perf-names-toggle",
-                                checked: showNamesOn,
-                                onChange: toggleShowNames
-                            }),
-                            R.createElement("label", {
-                                className: "custom-control-label",
-                                htmlFor: "refract-show-perf-names-toggle"
                             })
                         )
                     )
@@ -481,21 +479,10 @@
     var LOGO_URL_STORAGE_KEY = "refract.customLogoUrl";
     var LITE_MODE_STORAGE_KEY = "refract.liteMode";
     var LIGHT_MODE_STORAGE_KEY = "refract.lightMode";
-    var SHOW_PERF_NAMES_STORAGE_KEY = "refract.showPerformerNames";
+    var MINIMAL_CARDS_STORAGE_KEY = "refract.minimalCards";
     var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";
     var RATING_STYLES = ["intensity", "tiers", "playing-card"];
     var GRAPHQL_URL = "/graphql";
-
-    /* Performer names under scene-card avatar circles. */
-    function isShowPerformerNamesEnabled() {
-        try { return localStorage.getItem(SHOW_PERF_NAMES_STORAGE_KEY) === "1"; }
-        catch (e) { return false; }
-    }
-    function applyShowPerformerNamesClass(on) {
-        if (!document.body) { return; }
-        document.body.classList.toggle("refract-show-perf-names", !!on);
-    }
-    applyShowPerformerNamesClass(isShowPerformerNamesEnabled());
 
     /* Custom CSS Source (Stash interface config) — lets the theme load
        on login / pre-plugin screens. We expose an "Apply / Remove"
@@ -564,6 +551,29 @@
         document.body.classList.toggle("refract-light", !!on);
     }
     applyLightModeClass(isLightModeEnabled());
+
+    /* Scene card style. "refract" (default) = tidier minimal layout —
+       description block hidden so the grid stays consistent across
+       scenes with and without descriptions. "classic" = Stash's
+       original layout with description, file path, and details
+       visible. Body class `refract-minimal-cards` is on the "refract"
+       branch — every selector in 08_misc_mid.css + 15_lite.css that
+       hides/restyles native card details is scoped to that class, so
+       "classic" mode = absence of the class. Legacy boolean values
+       ("1" / "0") mapped transparently for backwards-compat. */
+    function getStoredCardStyle() {
+        try {
+            var v = localStorage.getItem(MINIMAL_CARDS_STORAGE_KEY);
+            if (v === "classic" || v === "0") { return "classic"; }
+            if (v === "refract" || v === "1") { return "refract"; }
+        } catch (e) { /* ignore */ }
+        return "refract";
+    }
+    function applyCardStyleClass(style) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-minimal-cards", style === "refract");
+    }
+    applyCardStyleClass(getStoredCardStyle());
 
     /* Card rating style. "intensity" (default, Minimal) = accent glow
        scales with score — uniform-coloured but progressively brighter
@@ -1515,10 +1525,15 @@
         '<path fill="currentColor" d="M32.5 96l0 149.5c0 17 6.7 33.3 18.7 45.3l192 192c25 25 65.5 25 90.5 0L483.2 333.3c25-25 25-65.5 0-90.5l-192-192C279.2 38.7 263 32 246 32L96.5 32c-35.3 0-64 28.7-64 64zm112 16a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>' +
         '</svg>';
 
-    /* O count icon — stylized rotated O glyph matching Stash native. */
+    /* O count icon — stylized rotated O glyph matching Stash native.
+       Fill attribute lives on the <svg> root (not the inner <path>) to
+       match STAR/CAKE/PLAY structure. Path-level fill would shadow the
+       CSS `fill: --badge-color-bright` override used by playing-card
+       mode and the path would render in the chip's currentColor
+       instead. */
     var O_ICON_SVG =
-        '<svg viewBox="0 0 36 36" aria-hidden="true">' +
-        '<path fill="currentColor" d="M22.855.758L7.875 7.024l12.537 9.733c2.633 2.224 6.377 2.937 9.77 1.518c4.826-2.018 7.096-7.576 5.072-12.413C33.232 1.024 27.68-1.261 22.855.758zm-9.962 17.924L2.05 10.284L.137 23.529a7.993 7.993 0 0 0 2.958 7.803a8.001 8.001 0 0 0 9.798-12.65zm15.339 7.015l-8.156-4.69l-.033 9.223c-.088 2 .904 3.98 2.75 5.041a5.462 5.462 0 0 0 7.479-2.051c1.499-2.644.589-6.013-2.04-7.523z"/>' +
+        '<svg viewBox="0 0 36 36" fill="currentColor" aria-hidden="true">' +
+        '<path d="M22.855.758L7.875 7.024l12.537 9.733c2.633 2.224 6.377 2.937 9.77 1.518c4.826-2.018 7.096-7.576 5.072-12.413C33.232 1.024 27.68-1.261 22.855.758zm-9.962 17.924L2.05 10.284L.137 23.529a7.993 7.993 0 0 0 2.958 7.803a8.001 8.001 0 0 0 9.798-12.65zm15.339 7.015l-8.156-4.69l-.033 9.223c-.088 2 .904 3.98 2.75 5.041a5.462 5.462 0 0 0 7.479-2.051c1.499-2.644.589-6.013-2.04-7.523z"/>' +
         '</svg>';
 
     /* People / group icon — used on the minimal-mode performer pill that
@@ -1687,20 +1702,6 @@
            crop heavily. The image often isn't loaded yet, so check
            complete + naturalWidth, else listen for load once. */
         tagOrientation(card);
-
-        /* Performer name labels — comma-separated, with "+N" overflow.
-           Always emitted; CSS gates visibility on body.refract-show-perf-names. */
-        if (performers && performers.length) {
-            var namesEl = document.createElement("div");
-            namesEl.className = "stash-performer-names";
-            var visibleNames = performers.slice(0, MAX_PERFORMER_CIRCLES)
-                .map(function (p) { return p.name; })
-                .filter(Boolean);
-            var leftover = performers.length - visibleNames.length;
-            namesEl.textContent = visibleNames.join(", ") + (leftover > 0 ? " +" + leftover : "");
-            namesEl.title = performers.map(function (p) { return p.name; }).filter(Boolean).join(", ");
-            section.appendChild(namesEl);
-        }
 
         /* Floating-hearts effect for "Favourite" scenes — driven by the
            "Favourite ★" tag injected by stash-advanced-scene-rating. We
