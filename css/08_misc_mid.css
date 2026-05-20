@@ -5651,3 +5651,525 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     opacity: 0.85;
 }
 
+/* ──────────────────────────────────────────────────────────────────
+   Select Folders modal — folder picker list cleanup
+   Stash native draws a fake tree (L-shaped corner brackets via
+   pseudo-elements) and old PNG folder icons that clash with the glass
+   theme. With a flat list of root paths there's no tree to indicate,
+   so we kill the brackets + icons and render each path as a clean
+   full-width tile with monospace text and accent hover.
+   Unique fingerprint: .dialog-container > ul.folder-list — only the
+   folder picker has that direct child structure.
+   ────────────────────────────────────────────────────────────────── */
+
+/* Kill native tree-bracket + folder-icon pseudo-elements */
+body.stash-liquid-glass .dialog-container > ul.folder-list .folder-list-item::before,
+body.stash-liquid-glass .dialog-container > ul.folder-list .folder-list-item::after,
+body.stash-liquid-glass .dialog-container > ul.folder-list .folder-list-item > button::before,
+body.stash-liquid-glass .dialog-container > ul.folder-list .folder-list-item > button::after,
+body.stash-liquid-glass .dialog-container > ul.folder-list .folder-list-item > button > span::before,
+body.stash-liquid-glass .dialog-container > ul.folder-list .folder-list-item > button > span::after {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+    border: none !important;
+}
+
+/* List container — reset defaults, breathing room below file-path input */
+body.stash-liquid-glass .dialog-container > ul.folder-list {
+    list-style: none !important;
+    padding: 0.5rem 0 0 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.2rem !important;
+}
+
+/* Row wrapper — let the inner button own the visible area */
+body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    list-style: none !important;
+}
+
+/* Path button — flat full-width tile, monospace text, accent on hover */
+body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item > button.btn.btn-link {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    text-align: left !important;
+    padding: 0.5rem 0.75rem !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    border-radius: var(--radius-sm) !important;
+    color: var(--text) !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item > button.btn.btn-link:hover {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+    text-decoration: none !important;
+}
+body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item > button.btn.btn-link:focus,
+body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item > button.btn.btn-link:active {
+    outline: none !important;
+    box-shadow: 0 0 0 2px var(--accent-glow) !important;
+    text-decoration: none !important;
+}
+body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item > button.btn.btn-link > span {
+    font-family: ui-monospace, SFMono-Regular, Menlo, "JetBrains Mono", monospace !important;
+    font-size: 0.88rem !important;
+    letter-spacing: 0 !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   Settings → Tasks — Task Queue card
+   The outer .tasks-panel-queue + inner .job-table.card glass-shell
+   styling lives earlier in this file (L2227+). This section adds the
+   detail polish: section heading, job row layout, stop-button as red
+   icon chip, status hierarchy (description + subtask), and empty state.
+   Progress bar (Bootstrap .progress > .progress-bar) inherits the
+   accent-gradient rule at L1675–1686.
+   ────────────────────────────────────────────────────────────────── */
+
+/* Section heading "Task Queue" */
+body.stash-liquid-glass #tasks-panel .tasks-panel-queue > h1 {
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1em !important;
+    color: var(--text-muted) !important;
+    margin: 0 0 0.55rem 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* Inner card — flush padding so job rows own their gutters */
+body.stash-liquid-glass #tasks-panel .tasks-panel-queue .job-table.card {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+}
+
+/* List reset */
+body.stash-liquid-glass .job-table.card > ul {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Individual job row */
+body.stash-liquid-glass .job-table.card > ul > li.job {
+    padding: 0.7rem 0.85rem !important;
+    margin: 0 !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    transition: background 0.18s ease !important;
+}
+body.stash-liquid-glass .job-table.card > ul > li.job:last-child {
+    border-bottom: none !important;
+}
+body.stash-liquid-glass .job-table.card > ul > li.job:hover {
+    background: rgba(255, 255, 255, 0.025) !important;
+}
+
+/* Row layout: stop button left, status block right */
+body.stash-liquid-glass .job-table.card > ul > li.job > div {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+}
+
+/* Stop button — red-tint icon chip (override btn-primary) */
+body.stash-liquid-glass .job-table.card .job button.btn.btn-primary.stop,
+body.stash-liquid-glass .job-table.card .job button.minimal.stop.btn,
+body.stash-liquid-glass .job-table.card .job button.minimal.stop.btn.btn-primary,
+body.stash-liquid-glass .job-table.card .job button.minimal.stop.btn.btn-sm {
+    flex: 0 0 auto !important;
+    width: 1.85rem !important;
+    height: 1.85rem !important;
+    min-width: 1.85rem !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(239, 68, 68, 0.08) !important;
+    background-color: rgba(239, 68, 68, 0.08) !important;
+    background-image: none !important;
+    border: 1px solid rgba(239, 68, 68, 0.28) !important;
+    border-radius: var(--radius-sm) !important;
+    color: rgba(252, 165, 165, 0.85) !important;
+    box-shadow: none !important;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
+    margin: 0.1rem 0 0 0 !important;
+}
+body.stash-liquid-glass .job-table.card .job button.btn.btn-primary.stop:hover,
+body.stash-liquid-glass .job-table.card .job button.minimal.stop.btn:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: rgba(239, 68, 68, 0.55) !important;
+    color: #fca5a5 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16) !important;
+}
+body.stash-liquid-glass .job-table.card .job button.stop .svg-inline--fa {
+    width: 0.85rem !important;
+    height: 0.85rem !important;
+}
+
+/* Status block — flex column: description, progress, subtask */
+body.stash-liquid-glass .job-table.card .job .job-status {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.4rem !important;
+    min-width: 0 !important;
+}
+
+/* Job description row — spinning gear + task name */
+body.stash-liquid-glass .job-table.card .job .job-description {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass .job-table.card .job .job-description > div {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    color: var(--text) !important;
+    line-height: 1.3 !important;
+}
+body.stash-liquid-glass .job-table.card .job .job-description .svg-inline--fa {
+    width: 0.95rem !important;
+    height: 0.95rem !important;
+    color: var(--accent-bright) !important;
+    opacity: 0.95;
+    flex: 0 0 auto !important;
+}
+
+/* Subtask — secondary description, muted */
+body.stash-liquid-glass .job-table.card .job .job-subtask {
+    font-size: 0.78rem !important;
+    font-weight: 400 !important;
+    color: var(--text-muted) !important;
+    letter-spacing: 0.01em !important;
+    line-height: 1.4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Progress bar inside a job — slim, full-width */
+body.stash-liquid-glass .job-table.card .job .progress {
+    height: 4px !important;
+    margin: 0 !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+}
+body.stash-liquid-glass .job-table.card .job .progress > .progress-bar {
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-bright) 100%) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.4) !important;
+    transition: width 0.35s ease !important;
+}
+
+/* Empty state — centered, muted */
+body.stash-liquid-glass .job-table.card > ul .empty-queue-message {
+    display: block !important;
+    text-align: center !important;
+    padding: 1.5rem 0.85rem !important;
+    color: var(--text-muted) !important;
+    font-size: 0.85rem !important;
+    font-style: italic !important;
+    letter-spacing: 0.01em !important;
+}
+
+/* Smoother fade-in for newly-queued jobs */
+body.stash-liquid-glass .job-table.card .job.fade-in {
+    animation: refract-job-fade-in 0.3s ease-out !important;
+}
+@keyframes refract-job-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   Settings Pages — Comprehensive Restyle (Stage 1: Foundation)
+   Section headings (h1/h2), subsection headings (h3/h4), .setting-group
+   container cards, and internal .setting row separators. Applies across
+   every settings tab via the standard settings scope alias.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── 1a. Section headings (h1/h2) — e.g. "Library", "System", "Interface" ── */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) > h1,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) > h2,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) > div > h1,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) > div > h2,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section > h1,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section > h2 {
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1em !important;
+    color: var(--text-muted) !important;
+    margin: 1.6rem 0 0.7rem 0 !important;
+    padding: 0 0 0.45rem 0 !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+
+/* First heading at the very top of a tab pane — no extra top margin */
+body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] > h1:first-child,
+body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] > h2:first-child,
+body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] > div:first-child > h1:first-child,
+body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] > div:first-child > h2:first-child {
+    margin-top: 0.4rem !important;
+}
+
+/* ── 1b. Subsection headings (h3/h4) — e.g. "Scan", "Auto Tag", "Generate" ── */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > h3,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > h4,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > .collapse-button > h3,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > .collapse-button h3 {
+    font-size: 0.98rem !important;
+    font-weight: 600 !important;
+    color: var(--text) !important;
+    margin: 0 0 0.2rem 0 !important;
+    padding: 0.1rem 0 0.1rem 0.65rem !important;
+    border-left: 2px solid var(--accent-glow) !important;
+    line-height: 1.35 !important;
+    letter-spacing: 0.005em !important;
+}
+
+/* ── 1c. .setting-group containers — transparent (no nested-box look),
+        compact padding so plugin/task list rows don't get spaced out. ── */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0.55rem 1rem !important;
+    margin: 0 0 0.45rem 0 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:hover {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Groups that have a subsection heading (h3/h4) — the "real" content
+   sections like "Scan", "Auto Tag" — get a bit more breathing room. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:has(> h3),
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:has(> h4),
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:has(> .collapse-button > h3) {
+    padding: 0.85rem 1.15rem !important;
+    margin: 0 0 1rem 0 !important;
+}
+
+/* Force rows to align flush-left with their group's padding — Stash's
+   native .setting has a left padding/indent that misaligns it. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > .setting {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* ── 1d. .setting row separators inside groups ── */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > .setting {
+    padding: 0.7rem 0 !important;
+    margin: 0 !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > .setting:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > .setting:first-of-type {
+    padding-top: 0.55rem !important;
+}
+
+/* Section-level description text (the line under each h3 like "Scan for
+   new content and add it to the database.") — muted, smaller, breathing
+   room above the divider strip */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > .description,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > p.description,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > .group-description {
+    font-size: 0.82rem !important;
+    color: var(--text-muted) !important;
+    margin: 0 0 0.6rem 0.65rem !important;
+    line-height: 1.4 !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   Settings Pages — Stage 2: Form rows + accent toggles
+   Soften the noisy underlines on help-trigger labels, override
+   Bootstrap's purple custom-switch / form-switch toggle to use
+   refract's accent, and tidy the row layout so label+description
+   sits left of the control.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── 2a. Soften underlined help-trigger labels in .setting rows ──
+   Many settings labels carry an underline that signals "click for help".
+   The hard solid underline reads as a link/visited-link and is noisy
+   against the dark theme. Replace with a soft dotted accent-tinted
+   underline that still communicates the affordance. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting h6,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting h5,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting label,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting .setting-name {
+    text-decoration: none !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting :is(h6, h5, label, .setting-name) > a[href],
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting :is(h6, h5, label, .setting-name) > .clickable {
+    color: var(--text) !important;
+    text-decoration: underline !important;
+    text-decoration-style: dotted !important;
+    text-decoration-thickness: 1px !important;
+    text-underline-offset: 0.25em !important;
+    text-decoration-color: rgba(var(--accent-rgb), 0.45) !important;
+    cursor: help;
+    transition: text-decoration-color 0.15s, color 0.15s !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting :is(h6, h5, label, .setting-name) > a[href]:hover,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting :is(h6, h5, label, .setting-name) > .clickable:hover {
+    color: var(--accent-bright) !important;
+    text-decoration-color: var(--accent-bright) !important;
+}
+
+/* ── 2b. Custom-switch / form-switch toggles — INTENTIONALLY LEFT
+   UNSTYLED here. Refract has bespoke JS-injected toggle styling in
+   05_list_views.css / refract.js that should not be overridden. ── */
+
+/* ── 2c. Form controls in settings — consistent height + accent focus ──
+   Extends 05_list_views.css L622–633 with refined sizing/focus matching
+   the modal input pattern. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting .form-control,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting .form-select,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting input.text-input,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting select {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: none !important;
+    padding: 0.4rem 0.7rem !important;
+    font-size: 0.85rem !important;
+    height: auto !important;
+    min-height: 2.2rem !important;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting .form-control:focus,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting .form-select:focus,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting input.text-input:focus,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting select:focus {
+    background: rgba(255, 255, 255, 0.07) !important;
+    border-color: var(--accent-glow) !important;
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.14) !important;
+    color: #fff !important;
+}
+
+/* Textarea — taller min-height, same accent-focus treatment */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting textarea.form-control {
+    min-height: 5rem !important;
+    line-height: 1.5 !important;
+    font-family: inherit !important;
+}
+
+/* ── 2d. Sub-heading / description text under a row's label ──
+   Stash often shows a 2-line description below the row's primary label.
+   Make sure it reads as supporting copy (muted, smaller, comfortable). */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting .sub-heading,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting .description {
+    font-size: 0.78rem !important;
+    color: var(--text-muted) !important;
+    margin: 0.15rem 0 0 0 !important;
+    line-height: 1.45 !important;
+    font-weight: 400 !important;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   Settings Pages — Stage 3: Help-tip icons + button refinements + polish
+   The `?` circle next to subsection titles, action button placement
+   inside the heading row, and final vertical-rhythm tweaks.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── 3a. Help-tip "?" icons next to subsection titles ──
+   Stash renders these as small circle buttons inheriting Bootstrap
+   secondary styling. Strip the chrome — render as a subtle muted
+   icon that lifts to accent on hover. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 .help-button,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 button.btn:has(svg.fa-question-circle),
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 button.btn:has(svg.fa-circle-question),
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 .help-icon,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 a.popover-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 1.15rem !important;
+    height: 1.15rem !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 0 0 0.5rem !important;
+    background: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    border-radius: 50% !important;
+    color: var(--text-muted) !important;
+    box-shadow: none !important;
+    vertical-align: middle;
+    opacity: 0.75;
+    transition: color 0.15s, opacity 0.15s, background 0.15s !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 .help-button:hover,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 button.btn:has(svg.fa-question-circle):hover,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 button.btn:has(svg.fa-circle-question):hover,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 .help-icon:hover,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 a.popover-link:hover {
+    color: var(--accent-bright) !important;
+    background: var(--accent-tint) !important;
+    opacity: 1 !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 .help-button .svg-inline--fa,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 button.btn .svg-inline--fa,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 .help-icon .svg-inline--fa {
+    width: 0.78rem !important;
+    height: 0.78rem !important;
+}
+
+/* ── 3b. Action button toolbar inside .setting-group headers ──
+   "Scan" / "Selective scan…" buttons share the row with the h3. Tighten
+   the spacing between buttons; they already inherit refract glass+accent
+   from 05_list_views.css L537–611. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .button-toolbar,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .btn-toolbar {
+    gap: 0.5rem !important;
+    align-items: center !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .btn-toolbar > .btn,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .btn-toolbar > .btn-group {
+    margin-left: 0 !important;
+}
+
+/* ── 3c. Vertical rhythm — calm spacing between .setting-sections ── */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section {
+    margin-bottom: 1.4rem !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* ── 3d. Tab pane outer padding — small breathing room from viewport edge ── */
+body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] {
+    padding: 0.4rem 0.4rem 1.5rem 0.4rem !important;
+}
+
