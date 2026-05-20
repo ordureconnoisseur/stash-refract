@@ -1133,6 +1133,41 @@ body.stash-liquid-glass .setting-section .setting-group.st-plugin-hidden {
 body.stash-liquid-glass .st-task-plugin-card .setting-group.st-plugin-hidden {
     display: none !important;
 }
+
+/* Plugin Tasks rows — tighter padding + hover lift. Dividers from the
+   generic .setting-section .setting border-bottom rule in 08_misc_mid.css
+   L5904 are kept; user preferred the visual separation over a bare list.
+
+   Specificity note: the divider rule uses `:is(#settings-container, …)`
+   which gets ID-level specificity (0,1,3,2). We mirror the same :is()
+   ancestor in every override below so our class+attr additions actually
+   land (final: 0,1,5,2). Without it, plain-class !important loses. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"] {
+    border-radius: var(--radius-sm);
+    transition: background 0.18s ease;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"] > .setting {
+    padding: 0.55rem 0.85rem !important;
+    align-items: center !important;
+    min-height: 0 !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"] > .setting h1,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"] > .setting h2,
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"] > .setting h3 {
+    margin: 0 !important;
+    line-height: 1.3 !important;
+}
+/* Native .setting-group-collapse-button — same specificity story; the
+   global hide at L994 loses to the per-setting cascade. Match :is() here too. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"] .setting-group-collapse-button {
+    display: none !important;
+}
+/* Hover only when collapsed — an expanded row keeping its tint would
+   conflict with the inner task buttons' own hover affordances. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"].st-plugin-collapsed:hover {
+    background: rgba(255, 255, 255, 0.025) !important;
+}
+
 /* Search row — mirrors st-plugin-reload-row layout so clearable-input sits inline. */
 body.stash-liquid-glass .setting.st-task-search-row {
     padding-top: 0.6rem !important;
@@ -1143,6 +1178,24 @@ body.stash-liquid-glass .setting.st-task-search-row {
 body.stash-liquid-glass .setting.st-task-search-row > .clearable-input-group {
     flex: 1 1 auto;
     min-width: 0;
+}
+
+/* Plugins page rows — hover affordance, mirrors the Plugin Tasks polish.
+   Scoped on :has(.st-toggle-injected) since Plugins page rows have a
+   refract-injected toggle, while Plugin Tasks rows do not. Tints the
+   whole .setting-group when collapsed (or for non-collapsible plugins);
+   suppressed when a collapsible row is expanded so the inner settings
+   panel keeps its own hover affordances clean.
+   Specificity matches the L5904 divider rule via the same :is() ancestor. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:has(.st-toggle-injected) {
+    transition: background 0.18s ease;
+    border-radius: var(--radius-sm);
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:has(.st-toggle-injected):hover {
+    background: rgba(255, 255, 255, 0.025) !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group[data-st-collapsible-injected="1"]:not(.st-plugin-collapsed):hover {
+    background: transparent !important;
 }
 
 /* The hijacked "Reload plugins" row: tighter vertical padding (search

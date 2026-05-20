@@ -5616,6 +5616,77 @@
     }
     setupTaskPluginGroups(); /* initial pass; re-runs via consolidated watcher */
 
+    // Settings → Tasks page: native task groups (Scan / Auto Tag / Generate /
+    // Clean / Identify / Migrate). Mirrors setupTaskPluginGroups but anchored
+    // on the absence of `.btn.btn-secondary.btn-sm` inside .collapsible-section
+    // (that pattern marks plugin task triggers; native groups instead have
+    // checkbox toggles). Default to collapsed and inject the same st-plugin-chevron
+    // so existing chevron CSS applies without duplication.
+    function setupNativeTaskGroups() {
+        var tabPane = document.querySelector("[id$='-tabpane-tasks']");
+        if (!tabPane) return;
+
+        var groups = tabPane.querySelectorAll(".setting-group.collapsible");
+        for (var i = 0; i < groups.length; i++) {
+            var group = groups[i];
+
+            if (group.dataset.stTaskChevronDone === "1") continue;
+
+            var section = group.querySelector(":scope > .collapsible-section");
+            if (!section) continue; // no body to collapse
+
+            // Skip plugin task groups — those have .btn.btn-secondary.btn-sm
+            // triggers in their collapsible-section. Native task groups (Scan,
+            // Generate…) have checkbox toggles instead.
+            if (section.querySelector(".btn.btn-secondary.btn-sm")) continue;
+
+            var header = group.querySelector(":scope > .setting");
+            if (!header) { group.dataset.stTaskChevronDone = "1"; continue; }
+            var rightSide = header.lastElementChild;
+            if (!rightSide) { group.dataset.stTaskChevronDone = "1"; continue; }
+
+            var chevron = document.createElement("button");
+            chevron.type = "button";
+            chevron.className = "btn btn-primary btn-sm st-plugin-chevron";
+            chevron.setAttribute("aria-label", "Toggle section");
+            chevron.innerHTML =
+                "<svg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg' " +
+                "aria-hidden='true'>" +
+                "<path d='M10 7L15 12L10 17' stroke='currentColor' stroke-width='1.5' " +
+                "stroke-linecap='round' stroke-linejoin='round'/></svg>";
+            chevron.addEventListener("click", function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                var grp = this.closest(".setting-group");
+                var sec = grp.querySelector(":scope > .collapsible-section");
+                var collapsing = !grp.classList.contains("st-plugin-collapsed");
+                grp.classList.toggle("st-plugin-collapsed");
+                if (!sec) return;
+                if (collapsing) {
+                    var pinH = sec.getBoundingClientRect().height;
+                    sec.style.maxHeight = pinH + "px";
+                    void sec.offsetHeight;
+                    requestAnimationFrame(function () {
+                        sec.style.maxHeight = "0px";
+                        sec.style.opacity = "0";
+                    });
+                } else {
+                    sec.style.maxHeight = sec.scrollHeight + "px";
+                    sec.style.opacity = "1";
+                }
+            });
+            rightSide.appendChild(chevron);
+
+            section.style.overflow = "hidden";
+            section.style.maxHeight = "0px";
+            section.style.opacity = "0";
+            section.style.transition = "max-height 0.28s ease, opacity 0.2s ease";
+            group.classList.add("st-plugin-collapsed");
+            group.dataset.stTaskChevronDone = "1";
+        }
+    }
+    setupNativeTaskGroups(); /* initial pass; re-runs via consolidated watcher */
+
     /* ── Navbar drag-to-reorder (iOS-style) ─────────────────────────────
        Pointer-events + FLIP animation so icons slide out of the way live.
        Saved order persisted to localStorage; re-applied via CSS `order`
@@ -6022,6 +6093,7 @@
             try { makePluginSettingsCollapsible(); } catch (e) {}
             try { injectPluginSearch(); } catch (e) {}
             try { setupTaskPluginGroups(); } catch (e) {}
+            try { setupNativeTaskGroups(); } catch (e) {}
             try { setupNavbarReorder(); } catch (e) {}
         }
         function sched() {

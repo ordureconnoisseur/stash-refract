@@ -5,20 +5,23 @@
    ─────────────────────────────────────────────────────────────────── */
 
 /* Albert Sans Variable — self-hosted from /fonts/. Single variable
-   file covers weights 100–900 (and italic counterpart). Stash serves
-   plugin files at `/plugin/refract/...` (see refract.js L562 for the
-   same pattern). Absolute URL is required — relative `../fonts/` can
-   resolve to the wrong base when the CSS is loaded via Stash's bundler. */
+   file covers weights 100–900 (and italic counterpart). Stash exposes
+   plugin static files under `/plugin/refract/assets/<path>` (the
+   `ui.assets./: .` mapping in refract.yml — the `/assets/` segment is
+   added by Stash, not us). The plain `/plugin/refract/<path>` route
+   only serves the CSS/JS files listed in the manifest — everything else
+   404s, which is why the original v1.10.2 was silently falling back to
+   system-ui until we tested with Moirai One on 2026-05-20. */
 @font-face {
     font-family: "Albert Sans";
-    src: url("/plugin/refract/fonts/AlbertSans-Variable.woff2") format("woff2");
+    src: url("/plugin/refract/assets/fonts/AlbertSans-Variable.woff2") format("woff2");
     font-weight: 100 900;
     font-style: normal;
     font-display: block;
 }
 @font-face {
     font-family: "Albert Sans";
-    src: url("/plugin/refract/fonts/AlbertSans-Variable-Italic.woff2") format("woff2");
+    src: url("/plugin/refract/assets/fonts/AlbertSans-Variable-Italic.woff2") format("woff2");
     font-weight: 100 900;
     font-style: italic;
     font-display: block;
