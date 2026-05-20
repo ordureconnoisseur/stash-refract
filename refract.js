@@ -163,10 +163,6 @@
             var lightOn = lightState[0];
             var setLightOn = lightState[1];
 
-            var cardStyleState = R.useState(getStoredCardStyle());
-            var cardStyle = cardStyleState[0];
-            var setCardStyle = cardStyleState[1];
-
             var showNamesState = R.useState(isShowPerformerNamesEnabled());
             var showNamesOn = showNamesState[0];
             var setShowNamesOn = showNamesState[1];
@@ -246,12 +242,6 @@
                 try { setupSceneTabsPerformers(); } catch (e) { /* ignore */ }
             }
 
-            function pickCardStyle(style) {
-                try { localStorage.setItem(MINIMAL_CARDS_STORAGE_KEY, style); } catch (e) { /* ignore */ }
-                applyCardStyleClass(style);
-                setCardStyle(style);
-            }
-
             function toggleShowNames() {
                 var next = !showNamesOn;
                 try { localStorage.setItem(SHOW_PERF_NAMES_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
@@ -295,22 +285,19 @@
                     onClick: function () { pick(preset); }
                 });
             });
-            /* Light/dark mode toggle — disabled for this release while
-               light-mode CSS is still being refined. Flip the flag to
-               re-enable. All state (lightOn/setLightOn/toggleLight) +
-               body-class bootstrap stays in place so the underlying
-               feature is one-line ship-able when ready. */
-            var SHOW_LIGHT_MODE_TOGGLE = false;
-            if (SHOW_LIGHT_MODE_TOGGLE) {
-                swatches.push(R.createElement("button", {
-                    key: "__light",
-                    type: "button",
-                    className: "refract-accent-swatch refract-light-toggle" + (lightOn ? " is-active" : ""),
-                    title: lightOn ? "Switch to dark mode" : "Switch to light mode",
-                    "aria-label": "Toggle light/dark mode",
-                    onClick: toggleLight
-                }, lightOn ? "☀" : "☾"));
-            }
+            /* Light/dark mode toggle — sun (light on) / moon (light off)
+               glyph sitting alongside the accent swatches. Sun-gradient
+               active state in 11_misc_tail.css makes the current mode
+               obvious at a glance. View Transitions crossfade the flip
+               on supporting browsers; instant on older ones. */
+            swatches.push(R.createElement("button", {
+                key: "__light",
+                type: "button",
+                className: "refract-accent-swatch refract-light-toggle" + (lightOn ? " is-active" : ""),
+                title: lightOn ? "Switch to dark mode" : "Switch to light mode",
+                "aria-label": "Toggle light/dark mode",
+                onClick: toggleLight
+            }, lightOn ? "☀" : "☾"));
 
             return R.createElement("div", { className: "plugin-settings" },
                 R.createElement("div", { className: "setting", id: "plugin-refract-accent" },
@@ -406,27 +393,6 @@
                         )
                     )
                 ),
-                R.createElement("div", { className: "setting", id: "plugin-refract-card-style" },
-                    R.createElement("div", null,
-                        R.createElement("h3", null, "Scene card style"),
-                        R.createElement("div", { className: "sub-heading" },
-                            R.createElement("b", null, "Refract"), " (default) — tidier minimal layout; description block hidden so the grid stays consistent across scenes with and without descriptions. ",
-                            R.createElement("b", null, "Classic"), " — Stash's original card layout with description, file path, and details visible.")
-                    ),
-                    R.createElement("div", { className: "refract-setting-control refract-card-style-toggle" },
-                        [
-                            { key: "refract", label: "Refract" },
-                            { key: "classic", label: "Classic" }
-                        ].map(function (item) {
-                            return R.createElement("button", {
-                                key: item.key,
-                                type: "button",
-                                className: "refract-segmented-btn" + (cardStyle === item.key ? " is-active" : ""),
-                                onClick: function () { pickCardStyle(item.key); }
-                            }, item.label);
-                        })
-                    )
-                ),
                 R.createElement("div", { className: "setting", id: "plugin-refract-show-perf-names" },
                     R.createElement("div", null,
                         R.createElement("h3", null, "Show performer names"),
@@ -515,32 +481,10 @@
     var LOGO_URL_STORAGE_KEY = "refract.customLogoUrl";
     var LITE_MODE_STORAGE_KEY = "refract.liteMode";
     var LIGHT_MODE_STORAGE_KEY = "refract.lightMode";
-    var MINIMAL_CARDS_STORAGE_KEY = "refract.minimalCards";
     var SHOW_PERF_NAMES_STORAGE_KEY = "refract.showPerformerNames";
     var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";
     var RATING_STYLES = ["intensity", "tiers", "playing-card"];
     var GRAPHQL_URL = "/graphql";
-
-    /* Scene card style. "refract" (the new default) = tidier minimal
-       layout — description block hidden so the grid stays consistent.
-       "classic" = Stash's original layout with description and details.
-       Reuses MINIMAL_CARDS_STORAGE_KEY for backwards compat; legacy
-       boolean values ("1" / "0") are mapped transparently. The body
-       class `refract-minimal-cards` stays on the "refract" branch so
-       the existing CSS that depends on it doesn't need renaming. */
-    function getStoredCardStyle() {
-        try {
-            var v = localStorage.getItem(MINIMAL_CARDS_STORAGE_KEY);
-            if (v === "classic" || v === "0") { return "classic"; }
-            if (v === "refract" || v === "1") { return "refract"; }
-        } catch (e) { /* ignore */ }
-        return "refract";
-    }
-    function applyCardStyleClass(style) {
-        if (!document.body) { return; }
-        document.body.classList.toggle("refract-minimal-cards", style === "refract");
-    }
-    applyCardStyleClass(getStoredCardStyle());
 
     /* Performer names under scene-card avatar circles. */
     function isShowPerformerNamesEnabled() {
