@@ -583,26 +583,34 @@ body.stash-liquid-glass.refract-light .count-button.increment-only {
 }
 
 
-/* ═══════ 22.7. Card stat counts — accent-tinted ═══════════════════
-   Scene count + O count on performer cards, and O count on scene
-   cards. Defaults to var(--text-muted) which renders inconsistently
-   (some pull from a Stash-native popover element with its own color,
-   producing a "one is white, one is black" effect). Force accent. */
-body.stash-liquid-glass.refract-light .performer-card .stash-perf-scenes,
-body.stash-liquid-glass.refract-light .performer-card .stash-perf-ocount,
+/* ═══════ 22.7. Card stat counts — accent tinted (non-playing-card) ═
+   Scene count + O count on performer cards (in Minimal/Extravagant
+   modes only), and O count on scene cards. Defaults to var(--text-muted)
+   which renders inconsistently (some inner spans pull from a Stash-
+   native popover element with its own color, producing a "one is
+   white, one is black" effect). Force colors uniformly.
+
+   IMPORTANT: scoped via `:not(.refract-rating-style-playing-card)` so
+   we don't interfere with the playing-card mode universal styling in
+   16_playing_card.css. In playing-card mode the chips use
+   --badge-color via gradient-clip text + bright SVG fill on the inner
+   span/svg elements; the `color: inherit` + `fill: currentColor`
+   below would override those and flatten the gradient. */
+body.stash-liquid-glass.refract-light:not(.refract-rating-style-playing-card) .performer-card .stash-perf-scenes,
+body.stash-liquid-glass.refract-light:not(.refract-rating-style-playing-card) .performer-card .stash-perf-ocount,
 body.stash-liquid-glass.refract-light .scene-card .stash-o-count,
 body.stash-liquid-glass.refract-light .grid-card .stash-o-count {
     color: rgba(var(--accent-rgb), 0.78) !important;
 }
-body.stash-liquid-glass.refract-light .performer-card .stash-perf-scenes *,
-body.stash-liquid-glass.refract-light .performer-card .stash-perf-ocount *,
+body.stash-liquid-glass.refract-light:not(.refract-rating-style-playing-card) .performer-card .stash-perf-scenes *,
+body.stash-liquid-glass.refract-light:not(.refract-rating-style-playing-card) .performer-card .stash-perf-ocount *,
 body.stash-liquid-glass.refract-light .scene-card .stash-o-count *,
 body.stash-liquid-glass.refract-light .grid-card .stash-o-count * {
     color: inherit !important;
     fill: currentColor !important;
 }
-body.stash-liquid-glass.refract-light .performer-card .stash-perf-scenes:hover,
-body.stash-liquid-glass.refract-light .performer-card .stash-perf-ocount:hover,
+body.stash-liquid-glass.refract-light:not(.refract-rating-style-playing-card) .performer-card .stash-perf-scenes:hover,
+body.stash-liquid-glass.refract-light:not(.refract-rating-style-playing-card) .performer-card .stash-perf-ocount:hover,
 body.stash-liquid-glass.refract-light .scene-card .stash-o-count:hover,
 body.stash-liquid-glass.refract-light .grid-card .stash-o-count:hover {
     color: var(--accent-bright) !important;
@@ -657,4 +665,62 @@ body.stash-liquid-glass.refract-light .favorite-button.favorite {
         --glass-bg: rgba(248, 248, 250, 0.97);
         --glass-bg-strong: rgba(240, 240, 244, 0.98);
     }
+}
+
+
+/* ═══════ 26. Custom switch (Bootstrap custom-switch + form-switch) ═
+   Dark-mode switches use a white-on-dark gradient track + heavy drop
+   shadow that goes invisible on white pages. Re-paint with a soft
+   neutral track, dark knob shadow, and tighter accent halo so the
+   switch reads cleanly on white without the bloom that dominates the
+   dark-mode look. */
+
+/* OFF state — neutral grey track, white knob with crisp shadow */
+body.stash-liquid-glass.refract-light .custom-switch .custom-control-label::before {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.10) 100%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.14) !important;
+    box-shadow:
+        inset 0 1px 2px rgba(0, 0, 0, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+body.stash-liquid-glass.refract-light .custom-switch .custom-control-label::after {
+    background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%) !important;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.20),
+        0 1px 1px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(0, 0, 0, 0.06) inset !important;
+}
+
+/* ON state — accent-tinted track, accent knob, much tighter halo */
+body.stash-liquid-glass.refract-light .custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+    background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.16) 0%, rgba(var(--accent-rgb), 0.24) 100%) !important;
+    border-color: rgba(var(--accent-rgb), 0.40) !important;
+    box-shadow:
+        inset 0 1px 2px rgba(var(--accent-rgb), 0.10),
+        0 0 0 3px rgba(var(--accent-rgb), 0.10) !important;
+}
+body.stash-liquid-glass.refract-light .custom-switch .custom-control-input:checked ~ .custom-control-label::after {
+    background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 100%) !important;
+    box-shadow:
+        0 1px 4px rgba(0, 0, 0, 0.22),
+        0 0 0 1px rgba(255, 255, 255, 0.35) inset !important;
+}
+
+/* Same treatment for Bootstrap 5 .form-switch (different markup —
+   single .form-check-input with radial-gradient knob). */
+body.stash-liquid-glass.refract-light .form-switch .form-check-input {
+    background-color: rgba(0, 0, 0, 0.06) !important;
+    border: 1px solid rgba(0, 0, 0, 0.14) !important;
+    background-image: radial-gradient(circle at 0.72rem 50%, #ffffff 0 0.56rem, transparent 0.57rem) !important;
+    box-shadow:
+        inset 0 1px 2px rgba(0, 0, 0, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+body.stash-liquid-glass.refract-light .form-switch .form-check-input:checked {
+    background-color: rgba(var(--accent-rgb), 0.20) !important;
+    border-color: rgba(var(--accent-rgb), 0.40) !important;
+    background-image: radial-gradient(circle at calc(100% - 0.72rem) 50%, var(--accent) 0 0.56rem, transparent 0.57rem) !important;
+    box-shadow:
+        inset 0 1px 2px rgba(var(--accent-rgb), 0.10),
+        0 0 0 3px rgba(var(--accent-rgb), 0.10) !important;
 }

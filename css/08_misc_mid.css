@@ -2672,23 +2672,6 @@ body.stash-liquid-glass .stash-performer-circles {
     min-height: 34px;
 }
 
-/* Performer names line below the circles — hidden by default, shown
-   when body has `.refract-show-perf-names` (toggle in plugin settings).
-   Truncates with ellipsis if the list is longer than card width. */
-body.stash-liquid-glass .stash-performer-names {
-    display: none;
-}
-body.stash-liquid-glass.refract-show-perf-names .scene-card .stash-performer-names {
-    display: block !important;
-    font-size: 0.72rem;
-    color: var(--text-muted);
-    margin-top: 0.3rem;
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 /* Minimal scene cards — minimise the metadata "chin" so more of the
    card is dedicated to the thumbnail.
 
@@ -2697,8 +2680,8 @@ body.stash-liquid-glass.refract-show-perf-names .scene-card .stash-performer-nam
    - tighten card-section padding (less wasted space)
    - shrink the title font + reduce reserved 2-line height
    - tighten the performer-circles row's top padding/margin */
-body.stash-liquid-glass .scene-card .scene-card__details,
-body.stash-liquid-glass .scene-card .scene-card__date {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-card__details,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-card__date {
     display: none !important;
 }
 /* No chin — title floats directly over the bottom of the thumbnail.
@@ -2706,7 +2689,7 @@ body.stash-liquid-glass .scene-card .scene-card__date {
    so card height equals the thumbnail height. Softer bottom gradient
    blends rather than banding; the title's drop-shadow handles
    legibility against bright thumbnails. */
-body.stash-liquid-glass .scene-card .card-section {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section {
     position: absolute !important;
     bottom: 0 !important;
     left: 0 !important;
@@ -2721,11 +2704,11 @@ body.stash-liquid-glass .scene-card .card-section {
     z-index: 4;
     pointer-events: none;
 }
-body.stash-liquid-glass .scene-card .card-section > * {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section > * {
     pointer-events: auto;
 }
-body.stash-liquid-glass .scene-card .card-section-title,
-body.stash-liquid-glass .scene-card .card-section-title .TruncatedText {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section-title,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section-title .TruncatedText {
     /* Guarantee single-line truncation — the title's text actually lives
        inside an inner .TruncatedText div, so both layers need the clamp
        or the inner block wraps to multiple lines. */
@@ -2739,7 +2722,7 @@ body.stash-liquid-glass .scene-card .card-section-title .TruncatedText {
     min-height: 0 !important;
     margin-bottom: 0 !important;
 }
-body.stash-liquid-glass .scene-card .card-section-title {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section-title {
     font-size: 0.92rem !important;
     font-weight: 700 !important;
     line-height: 1.25 !important;
@@ -2767,7 +2750,7 @@ body.stash-liquid-glass .scene-card .card-section-title {
    element's bottom edge at the top of its containing block (which is
    .card-section), so it sits in the thumbnail area. The card's
    overflow: hidden keeps the rounded corners clean. */
-body.stash-liquid-glass .scene-card .stash-performer-circles {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-circles {
     position: absolute !important;
     bottom: 100% !important;
     left: 0 !important;
@@ -2794,14 +2777,14 @@ body.stash-liquid-glass .scene-card .stash-performer-circles {
     background: transparent !important;
     pointer-events: none;
 }
-body.stash-liquid-glass .scene-card .stash-performer-circles > * {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-circles > * {
     pointer-events: auto;
 }
 
 /* O-count in minimal mode — match the accent-glass treatment used by
    .stash-tag-count and .stash-performer-pill so all three pills in the
    row share one visual language. No backdrop-filter (GPU layer cost). */
-body.stash-liquid-glass .scene-card .stash-o-count {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-o-count {
     padding: 0.18em 0.6em !important;
     background: var(--accent-tint) !important;
     border: 1px solid var(--accent-glow) !important;
@@ -2812,7 +2795,7 @@ body.stash-liquid-glass .scene-card .stash-o-count {
     line-height: 1 !important;
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.2) !important;
 }
-body.stash-liquid-glass .scene-card .stash-o-count:hover {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-o-count:hover {
     background: rgba(var(--accent-rgb), 0.22) !important;
     color: var(--accent-bright) !important;
     box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.4) !important;
@@ -2821,12 +2804,12 @@ body.stash-liquid-glass .scene-card .stash-o-count:hover {
 /* Force pill icons AND numbers to white in minimal mode. Background +
    border still carry the accent tint, so the pill reads as a glassy
    accent-tinted chip with crisp white content. */
-body.stash-liquid-glass .scene-card .stash-o-count,
-body.stash-liquid-glass .scene-card .stash-o-count svg,
-body.stash-liquid-glass .scene-card .stash-tag-count,
-body.stash-liquid-glass .scene-card .stash-tag-count .stash-tag-icon,
-body.stash-liquid-glass .scene-card .stash-performer-pill,
-body.stash-liquid-glass .scene-card .stash-performer-pill .stash-performer-icon {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-o-count,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-o-count svg,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-tag-count,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-tag-count .stash-tag-icon,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill .stash-performer-icon {
     color: #fff !important;
 }
 
@@ -2834,20 +2817,16 @@ body.stash-liquid-glass .scene-card .stash-performer-pill .stash-performer-icon 
    row via .stash-duration-pill (built in injectPerformerCircles). Hide
    the entire native .scene-specs-overlay so duration only appears in
    one place. */
-body.stash-liquid-glass .scene-card .scene-specs-overlay {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-specs-overlay {
     display: none !important;
 }
 
 /* Hide the divider + popovers slot below .card-section. Without these
    hidden the chin stays tall because of their height — even when the
    .card-section itself shrinks to just the title. */
-body.stash-liquid-glass .scene-card > hr,
-body.stash-liquid-glass .scene-card > .card-popovers {
+body.stash-liquid-glass.refract-minimal-cards .scene-card > hr,
+body.stash-liquid-glass.refract-minimal-cards .scene-card > .card-popovers {
     display: none !important;
-}
-body.stash-liquid-glass.refract-show-perf-names .scene-card .stash-performer-names {
-    font-size: 0.68rem !important;
-    margin-top: 0.2rem !important;
 }
 
 /* Eliminate the black strip below the 16:9 thumbnail. The card's
@@ -2856,9 +2835,9 @@ body.stash-liquid-glass.refract-show-perf-names .scene-card .stash-performer-nam
    Stretch the preview + image/video to fill the .video-section and
    crop with object-fit: cover so the thumbnail extends to the bottom
    edge of the card. */
-body.stash-liquid-glass .scene-card .video-section,
-body.stash-liquid-glass .scene-card .scene-card-link,
-body.stash-liquid-glass .scene-card .scene-card-preview {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .video-section,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-card-link,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-card-preview {
     height: 100% !important;
     width: 100% !important;
 }
@@ -2870,16 +2849,16 @@ body.stash-liquid-glass .scene-card .scene-card-preview {
    popup-hover caused the card to re-clip and the popup to vanish
    mid-travel. Inner clip = rounded thumbnail + escapable popups, no
    flicker. */
-body.stash-liquid-glass .scene-card {
+body.stash-liquid-glass.refract-minimal-cards .scene-card {
     overflow: visible !important;
 }
-body.stash-liquid-glass .scene-card .video-section {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .video-section {
     border-radius: var(--radius) !important;
     overflow: hidden !important;
 }
-body.stash-liquid-glass .scene-card .scene-card-preview img,
-body.stash-liquid-glass .scene-card .scene-card-preview video,
-body.stash-liquid-glass .scene-card .scene-card-preview .preview-image {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-card-preview img,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-card-preview video,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-card-preview .preview-image {
     height: 100% !important;
     width: 100% !important;
     object-fit: cover !important;
@@ -2889,9 +2868,9 @@ body.stash-liquid-glass .scene-card .scene-card-preview .preview-image {
    contain instead of cover so vertical thumbnails aren't aggressively
    cropped. Letterboxes on the sides; the title overlay still anchors
    to the card's bottom edge. */
-body.stash-liquid-glass .scene-card.refract-portrait .scene-card-preview img,
-body.stash-liquid-glass .scene-card.refract-portrait .scene-card-preview video,
-body.stash-liquid-glass .scene-card.refract-portrait .scene-card-preview .preview-image {
+body.stash-liquid-glass.refract-minimal-cards .scene-card.refract-portrait .scene-card-preview img,
+body.stash-liquid-glass.refract-minimal-cards .scene-card.refract-portrait .scene-card-preview video,
+body.stash-liquid-glass.refract-minimal-cards .scene-card.refract-portrait .scene-card-preview .preview-image {
     object-fit: contain !important;
 }
 
@@ -2902,7 +2881,7 @@ body.stash-liquid-glass .scene-card.refract-portrait .scene-card-preview .previe
 
 /* Studio overlay — let the logo sit directly on the thumbnail without
    a background tile. The user wants the logo "naked" over the image. */
-body.stash-liquid-glass .scene-card .studio-overlay {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .studio-overlay {
     background: transparent !important;
     -webkit-backdrop-filter: none !important;
             backdrop-filter: none !important;
@@ -2921,15 +2900,15 @@ body.stash-liquid-glass .stash-performer-pill {
    the row) and HIDES the performer pill — duration takes its slot in
    the right-side cluster. Circles are sized down to match the row's
    compact height. */
-body.stash-liquid-glass .scene-card .stash-performer-pill {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill {
     display: none !important;
 }
-body.stash-liquid-glass .scene-card .stash-performer-avatars {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-avatars {
     display: flex !important;
     flex-shrink: 1;
     min-width: 0;
 }
-body.stash-liquid-glass .scene-card .stash-performer-avatar {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-avatar {
     width: 26px !important;
     height: 26px !important;
     min-width: 26px !important;
@@ -2938,7 +2917,7 @@ body.stash-liquid-glass .scene-card .stash-performer-avatar {
 
 /* Duration pill — mirrors the dark glass styling used by Stash's
    .scene-specs-overlay span; tabular numerals for stable digit width. */
-body.stash-liquid-glass .scene-card .stash-duration-pill {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-duration-pill {
     /* Pin duration as the rightmost pill in the cluster regardless of
        DOM order; flex `order: 99` pushes it past the O-count + tag-count
        which both use the default order: 0. */
@@ -2974,13 +2953,13 @@ body.stash-liquid-glass .scene-card .stash-duration-pill {
 body.stash-liquid-glass .stash-duration-pill {
     display: none;
 }
-body.stash-liquid-glass .scene-card .stash-performer-pill:hover {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill:hover {
     background: rgba(var(--accent-rgb), 0.22);
     border-color: var(--accent-bright);
     color: var(--accent-bright);
     box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.4);
 }
-body.stash-liquid-glass .scene-card .stash-performer-pill .stash-performer-icon {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill .stash-performer-icon {
     width: 0.95em;
     height: 0.95em;
     display: inline-block;
@@ -2991,7 +2970,7 @@ body.stash-liquid-glass .scene-card .stash-performer-pill .stash-performer-icon 
 /* Performer popup — glass card anchored to the pill, mirroring the tag
    popup pattern (scrollable, fades on hover with margin-bridge so
    mouse can travel pill -> popup -> chip). */
-body.stash-liquid-glass .scene-card .stash-performer-popup {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup {
     position: absolute;
     bottom: 100%;
     right: 0;
@@ -3021,14 +3000,14 @@ body.stash-liquid-glass .scene-card .stash-performer-popup {
     transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
     z-index: 50;
 }
-body.stash-liquid-glass .scene-card .stash-performer-pill:hover .stash-performer-popup,
-body.stash-liquid-glass .scene-card .stash-performer-popup:hover {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill:hover .stash-performer-popup,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup:hover {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
     transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0s;
 }
-body.stash-liquid-glass .scene-card .stash-performer-popup-chip {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup-chip {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -3038,11 +3017,11 @@ body.stash-liquid-glass .scene-card .stash-performer-popup-chip {
     text-decoration: none !important;
     transition: background 0.15s ease, color 0.15s ease;
 }
-body.stash-liquid-glass .scene-card .stash-performer-popup-chip:hover {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup-chip:hover {
     background: var(--accent-tint);
     color: var(--accent-bright);
 }
-body.stash-liquid-glass .scene-card .stash-performer-popup-avatar {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup-avatar {
     width: 26px;
     height: 26px;
     border-radius: 50%;
@@ -3052,7 +3031,7 @@ body.stash-liquid-glass .scene-card .stash-performer-popup-avatar {
     border: 1px solid var(--glass-border);
     background: var(--glass-bg-strong);
 }
-body.stash-liquid-glass .scene-card .stash-performer-popup-name {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup-name {
     font-size: 0.78rem;
     font-weight: 500;
     line-height: 1.2;
@@ -3066,8 +3045,8 @@ body.stash-liquid-glass .scene-card .stash-performer-popup-name {
 /* Let the performer popup escape the card's overflow:hidden when the
    pill is hovered, same carve-out used for .stash-tag-count + the
    performer-name tooltips on avatars. */
-body.stash-liquid-glass .scene-card:has(.stash-performer-pill:hover),
-body.stash-liquid-glass .grid-card:has(.stash-performer-pill:hover) {
+body.stash-liquid-glass.refract-minimal-cards .scene-card:has(.stash-performer-pill:hover),
+body.stash-liquid-glass.refract-minimal-cards .grid-card:has(.stash-performer-pill:hover) {
     overflow: visible !important;
 }
 body.stash-liquid-glass .stash-performer-avatars {
@@ -3309,7 +3288,7 @@ body.stash-liquid-glass .grid-card:has(.stash-performer-popup:hover) {
 }
 /* Minimal mode: card is already overflow: visible, so just lift it
    above grid siblings whenever any popup is open. */
-body.stash-liquid-glass .scene-card:hover {
+body.stash-liquid-glass.refract-minimal-cards .scene-card:hover {
     z-index: 100 !important;
 }
 
@@ -3323,35 +3302,35 @@ body.stash-liquid-glass .scene-card:hover {
    Both elements anchor to bottom: 0 of .scene-card-preview. The hover-
    scrubber sits one z-index higher so its accent marker paints over
    the watched bar when the user is scrubbing. */
-body.stash-liquid-glass .scene-card .progress-bar,
-body.stash-liquid-glass .scene-card .hover-scrubber {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .progress-bar,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .hover-scrubber {
     position: absolute !important;
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
 }
-body.stash-liquid-glass .scene-card .progress-bar {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .progress-bar {
     z-index: 6 !important;
     background: rgba(0, 0, 0, 0.35) !important;
     height: 4px !important;
     border-radius: 0 !important;
 }
-body.stash-liquid-glass .scene-card .progress-bar > .progress-indicator {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .progress-bar > .progress-indicator {
     /* Watched portion — muted white so the active accent scrub marker
        reads as a distinct, brighter layer on top. */
     background: rgba(255, 255, 255, 0.55) !important;
     border-radius: 0 !important;
 }
-body.stash-liquid-glass .scene-card .hover-scrubber {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .hover-scrubber {
     z-index: 7 !important;
 }
-body.stash-liquid-glass .scene-card .hover-scrubber .hover-scrubber-indicator {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .hover-scrubber .hover-scrubber-indicator {
     /* Transparent track — the watched-progress bar underneath provides
        the visible base, and the marker paints in accent on top. */
     background-color: transparent !important;
     height: 4px !important;
 }
-body.stash-liquid-glass .scene-card .hover-scrubber .hover-scrubber-indicator-marker {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .hover-scrubber .hover-scrubber-indicator-marker {
     background-color: rgb(var(--accent-rgb)) !important;
 }
 
@@ -3359,11 +3338,11 @@ body.stash-liquid-glass .scene-card .hover-scrubber .hover-scrubber-indicator-ma
    being hovered, so the scrub action isn't visually competing with the
    title text. The chin fades back in when the mouse leaves the
    scrubber. */
-body.stash-liquid-glass .scene-card .card-section,
-body.stash-liquid-glass .scene-card .card-section-title {
+body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section,
+body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section-title {
     transition: opacity 0.18s ease;
 }
-body.stash-liquid-glass .scene-card:has(.hover-scrubber:hover) .card-section {
+body.stash-liquid-glass.refract-minimal-cards .scene-card:has(.hover-scrubber:hover) .card-section {
     opacity: 0;
 }
 

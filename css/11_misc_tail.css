@@ -967,9 +967,11 @@ body.stash-liquid-glass .setting#plugin-refract-rating-style > .refract-setting-
     margin-left: auto !important;
 }
 
-/* Refract segmented control — used for the rating-style toggle.
-   Glass-pill buttons; the active one fills with accent tint. */
-body.stash-liquid-glass .refract-rating-style-toggle {
+/* Refract segmented control — used for the rating-style toggle AND
+   the scene-card-style toggle. Glass-pill buttons; the active one
+   fills with accent tint. */
+body.stash-liquid-glass .refract-rating-style-toggle,
+body.stash-liquid-glass .refract-card-style-toggle {
     display: inline-flex !important;
     gap: 4px !important;
     background: rgba(255, 255, 255, 0.04);
