@@ -479,6 +479,7 @@
     var LOGO_URL_STORAGE_KEY = "refract.customLogoUrl";
     var LITE_MODE_STORAGE_KEY = "refract.liteMode";
     var LIGHT_MODE_STORAGE_KEY = "refract.lightMode";
+    var LIGHT_TOGGLE_NAVBAR_KEY = "refract.lightToggleNavbar";
     var MINIMAL_CARDS_STORAGE_KEY = "refract.minimalCards";
     var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";
     var RATING_STYLES = ["intensity", "tiers", "playing-card"];
@@ -551,6 +552,22 @@
         document.body.classList.toggle("refract-light", !!on);
     }
     applyLightModeClass(isLightModeEnabled());
+
+    /* Light-mode navbar toggle visibility. Defaults to ON so users can
+       discover light mode without digging into plugin settings. Stash
+       Interface tab gets a switch row (injectInterfaceLightToggleSetting)
+       so it sits alongside other navbar-item visibility toggles. */
+    function isLightToggleNavbarVisible() {
+        try {
+            var v = localStorage.getItem(LIGHT_TOGGLE_NAVBAR_KEY);
+            return v === null || v === "1"; /* default ON when unset */
+        } catch (e) { return true; }
+    }
+    function applyLightToggleNavbarClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-show-light-nav", !!on);
+    }
+    applyLightToggleNavbarClass(isLightToggleNavbarVisible());
 
     /* Scene card style. "refract" (default) = tidier minimal layout —
        description block hidden so the grid stays consistent across
@@ -5632,6 +5649,146 @@
     }
     setupNativeTaskGroups(); /* initial pass; re-runs via consolidated watcher */
 
+    /* Task Queue progress — inline percentage next to the title.
+       Bootstrap renders the percentage as text INSIDE .progress-bar; the
+       bar is 4 px tall in our theme (08_misc_mid.css L5846) so the text
+       overflows vertically as a faded blur. CSS hides the inner text;
+       this function reads the percentage from the .progress-bar's inline
+       style width and appends a small " · 14%" suffix to the job title. */
+    function setupTaskQueuePercent() {
+        var jobs = document.querySelectorAll(".job-table.card li.job");
+        for (var i = 0; i < jobs.length; i++) {
+            var job = jobs[i];
+            var bar = job.querySelector(":scope .progress > .progress-bar");
+            var desc = job.querySelector(":scope .job-description > div");
+            if (!desc) continue;
+
+            var pct = "";
+            if (bar) {
+                var w = bar.getAttribute("style") || "";
+                var m = w.match(/width\s*:\s*([\d.]+)%/i);
+                if (m) {
+                    /* Round so we don't dump "14.2857%" on screen. */
+                    pct = Math.round(parseFloat(m[1])) + "%";
+                }
+            }
+
+            var span = desc.querySelector(":scope > .st-task-pct");
+            if (!pct) {
+                if (span) span.remove();
+                continue;
+            }
+            if (!span) {
+                span = document.createElement("span");
+                span.className = "st-task-pct";
+                desc.appendChild(span);
+            }
+            if (span.textContent !== pct) {
+                span.textContent = pct;
+            }
+        }
+    }
+    setupTaskQueuePercent(); /* initial pass; re-runs via consolidated watcher */
+
+    /* Inject a sun/moon light-mode toggle into the navbar utility cluster
+       (right side, next to the burger / settings cog). Idempotent —
+       skip if already injected. Visibility is gated by CSS via the
+       refract-show-light-nav body class (see applyLightToggleNavbarClass). */
+    function injectNavLightToggle() {
+        var buttons = document.querySelector("nav.top-nav .navbar-buttons");
+        if (!buttons) return;
+        if (buttons.querySelector(":scope > .st-light-toggle-nav")) {
+            /* Already injected — keep the glyph in sync with current state */
+            var existing = buttons.querySelector(":scope > .st-light-toggle-nav");
+            var nowLight = isLightModeEnabled();
+            existing.classList.toggle("is-active", nowLight);
+            existing.setAttribute("aria-label", nowLight ? "Switch to dark mode" : "Switch to light mode");
+            existing.setAttribute("title", nowLight ? "Switch to dark mode" : "Switch to light mode");
+            existing.textContent = nowLight ? "☀" : "☾";
+            return;
+        }
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-primary minimal nav-utility st-light-toggle-nav";
+        var on = isLightModeEnabled();
+        if (on) btn.classList.add("is-active");
+        btn.setAttribute("aria-label", on ? "Switch to dark mode" : "Switch to light mode");
+        btn.setAttribute("title", on ? "Switch to dark mode" : "Switch to light mode");
+        btn.textContent = on ? "☀" : "☾";
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var next = !isLightModeEnabled();
+            function commit() {
+                try { localStorage.setItem(LIGHT_MODE_STORAGE_KEY, next ? "1" : "0"); } catch (err) { /* ignore */ }
+                applyLightModeClass(next);
+                /* Re-sync this button glyph immediately (watcher would
+                   also catch it but feels snappier). */
+                injectNavLightToggle();
+            }
+            if (typeof document.startViewTransition === "function") {
+                document.startViewTransition(commit);
+            } else {
+                commit();
+            }
+        });
+        buttons.appendChild(btn);
+    }
+    injectNavLightToggle();
+
+    /* Inject a "Show light-mode toggle in navbar" switch row into Stash's
+       Interface tab, alongside the other menu-item visibility toggles.
+       The setting persists to LIGHT_TOGGLE_NAVBAR_KEY and re-applies the
+       body class so the navbar button shows/hides immediately. */
+    function injectInterfaceLightToggleSetting() {
+        var pane = document.querySelector("[id$='-tabpane-interface']");
+        if (!pane) return;
+        if (pane.querySelector(".st-light-nav-setting-row")) return;
+
+        /* Look for the Stash "Menu items" section by heading text; if
+           we can't find it, fall back to the first .setting-section in
+           the pane so we still get visible placement. */
+        var target = null;
+        var sections = pane.querySelectorAll(".setting-section");
+        for (var i = 0; i < sections.length; i++) {
+            var h = sections[i].querySelector("h1, h2, h3, h4, h5, h6");
+            if (h && /menu|navigation/i.test(h.textContent || "")) {
+                target = sections[i].querySelector(".setting-group") || sections[i];
+                break;
+            }
+        }
+        if (!target && sections.length) {
+            target = sections[0].querySelector(".setting-group") || sections[0];
+        }
+        if (!target) return;
+
+        var row = document.createElement("div");
+        row.className = "setting st-light-nav-setting-row";
+        row.innerHTML =
+            '<div>' +
+                '<h3>Light-mode toggle</h3>' +
+                '<div class="sub-heading">Show a sun/moon button in the navbar for quick light-mode switching. ' +
+                'Refract plugin must be enabled.</div>' +
+            '</div>' +
+            '<div>' +
+                '<div class="custom-control custom-switch">' +
+                    '<input type="checkbox" class="custom-control-input" id="st-light-nav-toggle">' +
+                    '<label class="custom-control-label" for="st-light-nav-toggle"></label>' +
+                '</div>' +
+            '</div>';
+
+        var input = row.querySelector("#st-light-nav-toggle");
+        input.checked = isLightToggleNavbarVisible();
+        input.addEventListener("change", function () {
+            var on = !!this.checked;
+            try { localStorage.setItem(LIGHT_TOGGLE_NAVBAR_KEY, on ? "1" : "0"); } catch (e) { /* ignore */ }
+            applyLightToggleNavbarClass(on);
+        });
+
+        target.appendChild(row);
+    }
+    injectInterfaceLightToggleSetting();
+
     /* ── Navbar drag-to-reorder (iOS-style) ─────────────────────────────
        Pointer-events + FLIP animation so icons slide out of the way live.
        Saved order persisted to localStorage; re-applied via CSS `order`
@@ -6039,6 +6196,9 @@
             try { injectPluginSearch(); } catch (e) {}
             try { setupTaskPluginGroups(); } catch (e) {}
             try { setupNativeTaskGroups(); } catch (e) {}
+            try { setupTaskQueuePercent(); } catch (e) {}
+            try { injectNavLightToggle(); } catch (e) {}
+            try { injectInterfaceLightToggleSetting(); } catch (e) {}
             try { setupNavbarReorder(); } catch (e) {}
         }
         function sched() {

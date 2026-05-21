@@ -954,6 +954,37 @@ body.stash-liquid-glass .refract-light-toggle.is-active {
         0 0 14px rgba(251, 191, 36, 0.6) !important;
 }
 
+/* Navbar light-mode toggle — same sun/moon glyph as the accent-row
+   swatch button, sized to match the other utility buttons in the
+   navbar cluster. Gated by `body.refract-show-light-nav` so users can
+   hide it via the Interface settings (default: shown). */
+body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav {
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: var(--nav-btn-size) !important;
+    height: var(--nav-btn-size) !important;
+    min-width: var(--nav-btn-size) !important;
+    padding: 0 !important;
+    margin: 0 var(--nav-gap, 0.2rem) !important;
+    border-radius: var(--radius-sm) !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--text) !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s !important;
+}
+body.stash-liquid-glass.refract-show-light-nav nav.top-nav .navbar-buttons > .st-light-toggle-nav {
+    display: inline-flex !important;
+}
+body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav:hover {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+
 /* Right-align Refract's per-setting controls within their .setting
    rows — matches the accent-swatches alignment so each control sits
    next to its heading instead of dropping to a new line. */
