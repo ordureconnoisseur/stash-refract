@@ -5853,6 +5853,26 @@ body.stash-liquid-glass .job-table.card .job .progress > .progress-bar {
     background: linear-gradient(90deg, var(--accent) 0%, var(--accent-bright) 100%) !important;
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.4) !important;
     transition: width 0.35s ease !important;
+    /* Hide Bootstrap's inline percentage label. At our 4px bar height
+       the text overflows vertically as a faded blur. refract.js
+       (setupTaskQueuePercent) reads the width % and appends a `.st-task-pct`
+       sibling next to the job title for readable inline placement. */
+    font-size: 0 !important;
+    line-height: 0 !important;
+    color: transparent !important;
+    overflow: hidden !important;
+}
+
+/* Inline percentage appended next to the job title by setupTaskQueuePercent. */
+body.stash-liquid-glass .job-table.card .job .job-description > div > .st-task-pct {
+    margin-left: 0.4rem !important;
+    padding-left: 0.5rem !important;
+    border-left: 1px solid var(--glass-border) !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    color: var(--text-muted) !important;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
 }
 
 /* Empty state — centered, muted */
