@@ -49,254 +49,691 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Mobile burger menu — touch-only.
-   JS injects `.refract-burger` into the navbar always. CSS gates its
-   visibility on (pointer: coarse) so it only shows on touch devices
-   (phones / tablets), never on desktop browsers — squeezing a desktop
-   window down does NOT trigger the burger.
+   Mobile navigation — touch-only, built ground-up.
 
-   Closed state: library row hidden, burger visible.
-   Open state (body.refract-burger-open): library row repositioned as
-   an absolute dropdown panel below the navbar, items full-width with
-   labels visible.
+   Refract replaces Stash's navbar contents entirely on mobile:
+   - Stash's nav children are hidden (except .navbar-brand which stays
+     as the home link)
+   - We inject a custom .refract-burger button (3-line morphing X icon)
+   - We inject a body-level .refract-mobile-drawer with our own 3-col
+     tile grid (hardcoded Stash routes + our own SVG icons)
+   - A body-level .refract-burger-scrim provides the backdrop
+
+   Gated on (pointer: coarse) so touch-only — desktop window squeeze
+   never fires this.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Default: hidden everywhere. Only reveal under the touch-only media
-   query below. */
-body.stash-liquid-glass nav.top-nav .refract-burger {
+/* Defaults — hidden on non-touch / wide viewports. */
+body.stash-liquid-glass nav.top-nav .refract-burger,
+body.stash-liquid-glass nav.top-nav .refract-mobile-new,
+body.stash-liquid-glass .refract-burger-scrim,
+body.stash-liquid-glass .refract-mobile-drawer {
     display: none;
 }
 
 @media (pointer: coarse) and (max-width: 900px) {
+
+    /* ── Burger button ────────────────────────────────────────────── */
     body.stash-liquid-glass nav.top-nav .refract-burger {
         display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: var(--nav-btn-size) !important;
-        height: var(--nav-btn-size) !important;
-        flex: 0 0 auto !important;
-        background: rgba(255, 255, 255, 0.03) !important;
-        border: 1px solid rgba(255, 255, 255, 0.06) !important;
-        border-radius: var(--radius-sm) !important;
-        color: var(--text) !important;
-        padding: 0 !important;
+        align-items: center;
+        justify-content: center;
+        width: var(--nav-btn-size);
+        height: var(--nav-btn-size);
+        flex: 0 0 auto;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        padding: 0;
         cursor: pointer;
-        transition: background 0.18s ease, border-color 0.18s ease;
-        /* Push to the far right of the navbar — brand is order:1,
-           collapse is 2, buttons is 3; we sit at 99. */
-        order: 99 !important;
-        margin-left: auto !important;
-    }
-    body.stash-liquid-glass nav.top-nav .refract-burger:hover {
-        background: rgba(255, 255, 255, 0.08) !important;
-        border-color: rgba(255, 255, 255, 0.20) !important;
-    }
-    body.stash-liquid-glass nav.top-nav .refract-burger svg {
-        width: 1.1rem !important;
-        height: 1.1rem !important;
-    }
-    /* Burger glow when dropdown is open — match the active-route halo. */
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .refract-burger,
-    body.stash-liquid-glass nav.top-nav .refract-burger[aria-expanded="true"] {
-        color: var(--accent) !important;
-        background: var(--accent-tint) !important;
-        border-color: var(--accent-glow) !important;
-        box-shadow:
-            0 0 18px rgba(var(--accent-rgb), 0.45),
-            0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
-    }
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .refract-burger svg,
-    body.stash-liquid-glass nav.top-nav .refract-burger[aria-expanded="true"] svg {
-        filter:
-            drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.65))
-            drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.45));
-    }
-
-    /* Closed state — hide everything except the brand (home) and the
-       burger. Selectors are qualified with `.collapse` / `.show` to
-       beat the existing force-display rule's specificity in 02_navbar.
-       Direct-child combinator for buttons so the rule doesn't track
-       the cluster after JS moves it into the dropdown. */
-    body.stash-liquid-glass nav.top-nav > .navbar-collapse,
-    body.stash-liquid-glass nav.top-nav > .navbar-collapse.collapse,
-    body.stash-liquid-glass nav.top-nav > .navbar-collapse.show,
-    body.stash-liquid-glass nav.top-nav > .navbar-buttons {
-        display: none !important;
-    }
-
-    /* (See open-state grid rules below — navbar-buttons flattens into
-       the grid via `display: contents`.) */
-
-    /* Force the navbar's clip to allow the dropdown to render below
-       its bounds. backdrop-filter on the navbar creates a containing
-       block that traps position: absolute/fixed children — overriding
-       overflow lets vertical extension show through. */
-    body.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top {
-        overflow: visible !important;
-    }
-
-    /* Open state — single 3-col grid containing library + utility
-       items mixed together, flattened via display:contents on the
-       intermediate .navbar-nav / .navbar-buttons containers. */
-    body.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top > .navbar-collapse,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top > .navbar-collapse.collapse,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top > .navbar-collapse.show {
-        display: grid !important;
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 0.5rem !important;
-        position: fixed !important;
-        top: 64px !important;
-        left: 12px !important;
-        right: 12px !important;
-        background: rgba(18, 18, 22, 0.96) !important;
-        -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
-        backdrop-filter: blur(16px) saturate(140%) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: var(--radius) !important;
-        box-shadow: var(--shadow-xl) !important;
-        padding: 0.7rem !important;
-        z-index: 100 !important;
-        max-height: calc(100vh - 80px) !important;
-        overflow-y: auto !important;
-        overflow-x: visible !important;
-        -webkit-mask-image: none !important;
-        mask-image: none !important;
-    }
-
-    /* Flatten the wrapper containers so their children become direct
-       grid cells of .navbar-collapse. */
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons {
-        display: contents !important;
-    }
-
-    /* Stash renders multiple .navbar-nav siblings inside .navbar-collapse —
-       library (first), an intermediate duplicate utility row (varies),
-       and .navbar-buttons (last, also has .navbar-nav class). Keep the
-       library + .navbar-buttons; hide anything else. */
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse > .navbar-nav:not(:first-child):not(.navbar-buttons) {
-        display: none !important;
-    }
-
-    /* Hide unwanted buttons in the dropdown — both the cell wrapper
-       AND its inner contents. Specificity bumped via duplicate body
-       class chains so this beats my display:flex reset above
-       regardless of source order. */
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *:has(.donate),
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *:has(.logout-button),
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *:has([href*="logout"]),
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *:has([href*="opencollective"]),
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *:has([title="Help"]),
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *[title="Help"],
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *[title="Log out"],
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *.logout-button,
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *.donate,
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *.navbar-toggler,
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *.nav-menu-toggle,
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > *.sidebar-toggle-button,
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > a[href*="logout"],
-    body.stash-liquid-glass.stash-liquid-glass.refract-burger-open nav.top-nav.navbar.fixed-top .navbar-collapse .navbar-buttons > a[href*="opencollective"] {
-        display: none !important;
-    }
-
-    /* Each grid cell = a glassy icon tile with on-theme curve and
-       inner highlight. Active route gets the accent halo. */
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav > *,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > * {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: 100% !important;
-        height: auto !important;
-        max-width: none !important;
-        max-height: none !important;
-        aspect-ratio: 1 / 1 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: var(--glass-bg) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: var(--radius) !important;
-        overflow: hidden !important;
-        flex: initial !important;
-        order: 0 !important;
-        position: relative !important;
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.05),
-            0 4px 12px rgba(0, 0, 0, 0.25) !important;
+        position: relative;
+        order: 99;
+        margin-left: auto;
         transition:
             background 0.18s ease,
             border-color 0.18s ease,
-            transform 0.18s cubic-bezier(0.34, 1.2, 0.64, 1),
-            box-shadow 0.22s ease !important;
+            color 0.18s ease,
+            box-shadow 0.22s ease;
     }
-    /* :active only — tap feedback that ends as soon as the touch
-       releases. Avoids iOS Safari's sticky :hover, which would leave
-       the previous tile glowing accent after navigation. */
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav > *:active,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > *:active {
-        background: var(--accent-tint) !important;
-        border-color: var(--accent-glow) !important;
+    body.stash-liquid-glass nav.top-nav .refract-burger:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.20);
+    }
+    /* Open state — accent halo */
+    body.stash-liquid-glass nav.top-nav .refract-burger.is-open {
+        color: var(--accent);
+        background: var(--accent-tint);
+        border-color: var(--accent-glow);
+        box-shadow:
+            0 0 18px rgba(var(--accent-rgb), 0.45),
+            inset 0 0 0 1px rgba(var(--accent-rgb), 0.18);
+    }
+
+    /* Icon wrapper + three line spans that morph into an X.
+       `display` is !important to beat 02_navbar.css's global
+       `nav.top-nav span { display: none }` rule (which hides Stash's
+       label text spans). */
+    body.stash-liquid-glass nav.top-nav .refract-burger .refract-burger-icon {
+        position: relative;
+        width: 18px;
+        height: 14px;
+        display: block !important;
+    }
+    body.stash-liquid-glass nav.top-nav .refract-burger .refract-burger-line {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 1.6px;
+        background: currentColor;
+        border-radius: 2px;
+        opacity: 0.82;
+        transform-origin: center;
+        display: block !important;
+        transition:
+            top 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.22s cubic-bezier(0.34, 1.2, 0.64, 1) 0.12s,
+            opacity 0.12s ease;
+    }
+    /* When open, full opacity so the X reads as boldly as the accent halo. */
+    body.stash-liquid-glass nav.top-nav .refract-burger.is-open .refract-burger-line {
+        opacity: 1;
+    }
+    body.stash-liquid-glass nav.top-nav .refract-burger .refract-burger-line:nth-child(1) { top: 0; }
+    body.stash-liquid-glass nav.top-nav .refract-burger .refract-burger-line:nth-child(2) { top: 6px; }
+    body.stash-liquid-glass nav.top-nav .refract-burger .refract-burger-line:nth-child(3) { top: 12px; }
+
+    /* X morph — top + bottom lines slide to middle then rotate */
+    body.stash-liquid-glass nav.top-nav .refract-burger.is-open .refract-burger-line:nth-child(1) {
+        top: 6px;
+        transform: rotate(45deg);
+    }
+    body.stash-liquid-glass nav.top-nav .refract-burger.is-open .refract-burger-line:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+        transition-delay: 0s;
+    }
+    body.stash-liquid-glass nav.top-nav .refract-burger.is-open .refract-burger-line:nth-child(3) {
+        top: 6px;
+        transform: rotate(-45deg);
+    }
+
+    /* ── Backdrop scrim ───────────────────────────────────────────── */
+    body.stash-liquid-glass .refract-burger-scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.42);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 99;
+        -webkit-backdrop-filter: blur(0px);
+        backdrop-filter: blur(0px);
+        transition:
+            opacity 0.22s ease,
+            backdrop-filter 0.28s ease,
+            -webkit-backdrop-filter 0.28s ease;
+    }
+    body.stash-liquid-glass.refract-burger-open .refract-burger-scrim {
+        opacity: 1;
+        pointer-events: auto;
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+    }
+
+    /* ── Hide Stash's navbar children entirely on mobile ──────────────
+       Refract builds its own mobile nav from scratch. Keep .navbar-brand
+       (home link), the contextual /new button mirror, and our burger. */
+    body.stash-liquid-glass nav.top-nav > *:not(.navbar-brand):not(.refract-burger):not(.refract-mobile-new) {
+        display: none !important;
+    }
+
+    /* ── Mobile "New" button — mirror of Stash's /new contextual btn ─ */
+    body.stash-liquid-glass nav.top-nav .refract-mobile-new {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: var(--nav-btn-size);
+        height: var(--nav-btn-size);
+        flex: 0 0 auto;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        padding: 0;
+        cursor: pointer;
+        position: relative;
+        order: 98;
+        margin-left: auto;
+        margin-right: 0.4rem;
+        text-decoration: none;
+        transition:
+            background 0.18s ease,
+            border-color 0.18s ease,
+            color 0.18s ease,
+            transform 0.16s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+    body.stash-liquid-glass nav.top-nav .refract-mobile-new + .refract-burger {
+        /* When New button is present it owns margin-left:auto, so reset
+           burger's so they sit flush together on the far right. */
+        margin-left: 0 !important;
+    }
+    body.stash-liquid-glass nav.top-nav .refract-mobile-new:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.20);
+    }
+    body.stash-liquid-glass nav.top-nav .refract-mobile-new:active {
+        background: var(--accent-tint);
+        border-color: var(--accent-glow);
+        color: var(--accent);
+        transform: scale(0.94);
+    }
+    body.stash-liquid-glass nav.top-nav .refract-mobile-new svg {
+        width: 1.1rem;
+        height: 1.1rem;
+    }
+
+    /* ── Mobile drawer (body-level overlay, built ground-up) ───────── */
+    body.stash-liquid-glass .refract-mobile-drawer {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.55rem;
+        position: fixed;
+        top: 64px;
+        left: 12px;
+        right: 12px;
+        background: rgba(20, 20, 24, 0.92);
+        -webkit-backdrop-filter: blur(18px) saturate(140%);
+        backdrop-filter: blur(18px) saturate(140%);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius);
+        box-shadow:
+            var(--shadow-xl),
+            inset 0 0 0 1px rgba(var(--accent-rgb), 0.08);
+        padding: 0.8rem;
+        z-index: 100;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+        /* Closed state — invisible, non-interactive, anchored top-right. */
+        opacity: 0;
+        transform: translateY(-12px) scale(0.96);
+        transform-origin: top right;
+        pointer-events: none;
+        transition:
+            opacity 0.22s ease,
+            transform 0.22s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+    body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+    }
+
+    /* ── Drawer tiles ─────────────────────────────────────────────── */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        aspect-ratio: 1 / 1;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius);
+        color: var(--text);
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        transition:
+            background 0.18s ease,
+            border-color 0.18s ease,
+            color 0.18s ease,
+            transform 0.16s cubic-bezier(0.34, 1.2, 0.64, 1),
+            box-shadow 0.2s ease;
+    }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.7rem;
+        height: 1.7rem;
+    }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-icon svg {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: none !important;
+        max-height: none !important;
+    }
+    /* Plugin SVGs typically use FontAwesome-style viewBoxes (0 0 512 512)
+       with ~12% interior padding. Refract icons fill ~92% of their viewBox.
+       Scale plugin icons up so they read at the same visual size as native. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile[data-plugin-tile="1"] .refract-drawer-tile-icon svg {
+        transform: scale(1.2);
+    }
+    /* :active tap feedback */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile:active {
+        background: var(--accent-tint);
+        border-color: var(--accent-glow);
+        color: var(--accent);
+        transform: scale(0.94);
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.08),
             0 0 18px rgba(var(--accent-rgb), 0.3),
-            0 0 0 1px rgba(var(--accent-rgb), 0.15) inset !important;
-        transform: scale(0.97) !important;
+            inset 0 0 0 1px rgba(var(--accent-rgb), 0.18);
     }
-
-    /* Active route (current page) — strong accent halo so the user
-       knows where they are. */
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .stash-nav-active,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .active {
-        background: var(--accent-tint) !important;
-        border-color: var(--accent-glow) !important;
+    /* Active route halo */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.is-active {
+        background: var(--accent-tint);
+        border-color: var(--accent-glow);
+        color: var(--accent);
         box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.08),
-            0 0 22px rgba(var(--accent-rgb), 0.45),
-            0 0 0 1px rgba(var(--accent-rgb), 0.25) inset !important;
+            inset 0 1px 0 rgba(255, 255, 255, 0.06),
+            0 0 16px rgba(var(--accent-rgb), 0.32),
+            inset 0 0 0 1px rgba(var(--accent-rgb), 0.18);
     }
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .stash-nav-active svg,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .active svg {
-        color: var(--accent) !important;
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.is-active svg {
         filter:
             drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.55))
-            drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.4)) !important;
+            drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.4));
     }
 
-    /* Inner clickable elements (a / button / .btn) — strip their own
-       chrome so all variants render identically inside the tile.
-       Scoped to direct descendants of grid cells so we don't override
-       Stash's existing `display: none` on logout/help/donate links. */
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav > * > a,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav > * > a > .btn,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-nav > * > button,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > * > .btn,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > .btn,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > * > a > .btn,
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse .navbar-buttons > * > a {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: 100% !important;
-        height: 100% !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        color: var(--text) !important;
+    /* Stagger fade-in on open */
+    body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer .refract-drawer-tile {
+        animation: refract-drawer-tile-in 0.32s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+    }
+    body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer .refract-drawer-tile:nth-child(3n+2) {
+        animation-delay: 30ms;
+    }
+    body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer .refract-drawer-tile:nth-child(3n+3) {
+        animation-delay: 60ms;
+    }
+    @keyframes refract-drawer-tile-in {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Mobile scene-detail layout — player + compact details stacked.
+
+   Default narrow-window behavior (07_scene_details.css @media max-width
+   1199.98) locks the row to 100vh and hides the details panel — great
+   on a desktop browser shrunk down (player-only focus mode), but on a
+   real phone the user has no way to access scene details and the video
+   gets massive top/bottom letterboxing inside the tall portrait row.
+
+   This block triggers on touch + portrait-phone widths only, so desktop
+   narrow windows keep the focus-mode layout untouched.
+   ─────────────────────────────────────────────────────────────────── */
+@media (pointer: coarse) and (max-width: 768px) {
+    /* Scene-page container — zero out the global mobile padding-top
+       (5rem from earlier in this file) so the row owns navbar clearance.
+       Without this, container 80 + row top stack and create a huge gap. */
+    body.stash-liquid-glass .main.container-fluid:has(.scene-tabs) {
+        padding-top: 0 !important;
+    }
+    /* Outer row: unlock viewport-height clamp, stack player above details.
+       Top padding = navbar bottom (~56px) + tight visual gap. */
+    body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs) {
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: auto auto !important;
+        gap: 12px !important;
+        padding: 52px 12px 12px !important;
+        overflow: visible !important;
+    }
+
+    /* Player container: stop stretching to fill column height. */
+    body.stash-liquid-glass .scene-player-container,
+    body.stash-liquid-glass .scene-player-container .VideoPlayer {
+        height: auto !important;
+        max-height: none !important;
+    }
+
+    /* Video wrapper: natural 16:9 instead of flex-fill — kills the
+       black letterbox bands inside an over-tall flex column. */
+    body.stash-liquid-glass .video-wrapper,
+    body.stash-liquid-glass div.video-wrapper {
+        flex: 0 0 auto !important;
+        aspect-ratio: 16 / 9 !important;
+        max-height: none !important;
+        height: auto !important;
+    }
+
+    /* Re-show the details panel below the player. Beats the
+       1199.98 `display: none` because 12_mobile.css loads later. */
+    body.stash-liquid-glass .scene-tabs {
+        display: block !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        padding: 0.9rem !important;
+    }
+    /* Inner tab-content was a flex column expecting a fixed-height
+       parent — relax it so content sizes naturally. */
+    body.stash-liquid-glass .scene-tabs .tab-content,
+    body.stash-liquid-glass .scene-tabs .tab-pane.active.show {
+        display: block !important;
+        min-height: 0 !important;
+        flex: initial !important;
+    }
+    /* Performer row inside the panel — kill the 56px chevron gutters
+       (no room for the chevrons on a phone; the row scrolls by touch). */
+    body.stash-liquid-glass .scene-tabs .scene-performers-row {
         padding: 0 !important;
-        margin: 0 !important;
-        text-decoration: none !important;
-        font-size: 0 !important;
-        text-indent: 0 !important;
-        filter: none !important;
     }
-
-    /* Hide labels — icon-only grid. */
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse span {
+    body.stash-liquid-glass .scene-tabs .stash-perf-prev,
+    body.stash-liquid-glass .scene-tabs .stash-perf-next {
         display: none !important;
     }
-    body.stash-liquid-glass.refract-burger-open nav.top-nav .navbar-collapse svg {
-        width: 1.6rem !important;
-        height: 1.6rem !important;
+
+    /* ─── Player control bar: two-row layout ─────────────────────────
+       Desktop layout (prev / play / next | time | progress | volume |
+       rate | source | fullscreen) overflows below ~600px. Split into:
+         Row 1: progress bar (full width)
+         Row 2: prev / play / next | current-time | volume | rate |
+                source | fullscreen
+       Duration + time-divider hidden — current time alone is enough.
+    */
+    body.stash-liquid-glass .video-js .vjs-control-bar {
+        flex-wrap: wrap !important;
+        height: auto !important;
+        min-height: 38px !important;
+        padding: 4px 0.6rem 6px !important;
+        gap: 2px !important;
+        row-gap: 2px !important;
+    }
+    /* Progress = first row, full width. Reorder ahead of order:1 skip-prev. */
+    body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-progress-control {
+        order: 0 !important;
+        flex: 0 0 100% !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 10px !important;
+        margin: 0 !important;
+    }
+    /* Hide duration + divider — current time alone is enough on mobile. */
+    body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-duration,
+    body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-time-divider {
+        display: none !important;
+    }
+    /* Drop the volume's left auto-margin (was pushing it to far right of
+       a single row); use a margin-left:auto on the current-time block
+       instead so the time-then-volume separation lives on row 2. */
+    body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-volume-panel {
+        margin-left: 0 !important;
+    }
+    body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-current-time {
+        margin-right: auto !important;
+        padding: 0 0.35rem !important;
+        font-size: 0.85rem !important;
+        height: 32px !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-current-time .vjs-current-time-display,
+    body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-current-time > * {
+        line-height: 1 !important;
+        padding: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+    }
+    /* Tighten button sizing so all six fit on row 2 of a ~360px viewport. */
+    body.stash-liquid-glass .video-js button.vjs-button {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    body.stash-liquid-glass .video-js .vjs-menu-button {
+        height: 32px !important;
+    }
+    /* Match icon-glyph line-height to mobile button height. Default
+       (36px from 06_scene_player.css L381) is taller than the 32px
+       button and shifts the icon baseline down — out of sync with the
+       time-text baseline. */
+    body.stash-liquid-glass .video-js .vjs-icon-placeholder::before,
+    body.stash-liquid-glass .video-js .vjs-icon-placeholder:before,
+    body.stash-liquid-glass .video-js [class^="vjs-icon-"]::before,
+    body.stash-liquid-glass .video-js [class^="vjs-icon-"]:before,
+    body.stash-liquid-glass .video-js [class*=" vjs-icon-"]::before,
+    body.stash-liquid-glass .video-js [class*=" vjs-icon-"]:before {
+        line-height: 32px !important;
+    }
+    /* Source-selector / playback-rate dropdowns — anchor to RIGHT of
+       their button so they open leftward (toward viewport center)
+       instead of overflowing off the right edge. Cap width to viewport. */
+    body.stash-liquid-glass .video-js .vjs-menu .vjs-menu-content {
+        right: 0 !important;
+        left: auto !important;
+        max-width: calc(100vw - 32px) !important;
+    }
+    /* Volume panel — auto-hide the slider on mobile (tap toggles mute);
+       slider expansion is fiddly on touch and the slider eats horizontal
+       space the buttons need. */
+    body.stash-liquid-glass .video-js .vjs-volume-panel .vjs-volume-control {
+        display: none !important;
+    }
+
+    /* ── List-view filter toolbar slimming ─────────────────────────────
+       The desktop toolbar packs ~15 controls across two rows. On a 390px
+       viewport this looks crammed. Hide controls that have ergonomic
+       mobile replacements or are niche enough to live in settings. */
+
+    /* Zoom slider — has no mobile use (cards size to viewport anyway). */
+    body.stash-liquid-glass .filtered-list-toolbar .zoom-slider-container,
+    body.stash-liquid-glass .filtered-list-toolbar input[type="range"].zoom-slider {
+        display: none !important;
+    }
+
+    /* Play / autoplay button — niche cycling feature, rarely used on phone. */
+    body.stash-liquid-glass .filtered-list-toolbar .play-button {
+        display: none !important;
+    }
+
+    /* Page-size selector (per-page count). Stash wraps the <select>
+       in a .page-size-selector div — hide the wrapper so it doesn't
+       reserve space. */
+    body.stash-liquid-glass .filtered-list-toolbar .page-size-selector {
+        display: none !important;
+    }
+
+    /* View-mode picker — refract replaces Stash's btn-group with a custom
+       .stash-view-wrap dropdown. Hide both forms (the wrap and the fallback
+       btn-group containing the active btn-primary). Also hide the
+       multiview "picking-mode" rescued button — niche and out of place
+       on a minimal mobile toolbar. */
+    body.stash-liquid-glass .filtered-list-toolbar .stash-view-wrap,
+    body.stash-liquid-glass [data-stash-filter] .stash-view-wrap,
+    body.stash-liquid-glass .filtered-list-toolbar .btn-group:has(> .btn-primary),
+    body.stash-liquid-glass [data-stash-filter] .btn-group:has(> .btn-primary),
+    body.stash-liquid-glass .filtered-list-toolbar .mv-picking-toggle-btn {
+        display: none !important;
+    }
+
+    /* Plus (+) button in toolbar — already mirrored next to burger in
+       the navbar via .refract-mobile-new. */
+    body.stash-liquid-glass .filtered-list-toolbar a[href$="/new"] {
+        display: none !important;
+    }
+
+    /* ── Toolbar layout — full-width with gutters, fixed height ─────
+       Refract's default `width: fit-content` sizes the toolbar to its
+       contents, which means hiding everything except the search makes
+       the toolbar collapse to a tiny strip. Force a near-full width with
+       12px side gutters so the pill never goes off-screen. Fixed height
+       prevents collapsed items from pushing the toolbar taller via
+       their own internal flex-wrap. */
+    body.stash-liquid-glass .filtered-list-toolbar {
+        width: calc(100% - 1.5rem) !important;
+        max-width: calc(100% - 1.5rem) !important;
+        height: 3rem !important;
+        min-height: 3rem !important;
+        max-height: 3rem !important;
+        margin: 0.3rem auto !important;
+        padding: 0.45rem 0.6rem !important;
+        /* `overflow: clip` + margin keeps mid-transition items clipped
+           horizontally while letting button glows (box-shadow) extend
+           past the toolbar bounds without being cut off. */
+        overflow: clip !important;
+        overflow-clip-margin: 24px !important;
+        box-sizing: border-box !important;
+        gap: 0.35rem !important;
+        flex-wrap: nowrap !important;
+    }
+    /* Reset the ::before pill's negative inset so the painted background
+       matches toolbar bounds (the desktop -0.6rem extension is what was
+       pushing it past the viewport edge). Also drop the heavy elevation
+       shadow — it gets visible past the overflow-clip-margin and reads
+       as a harsh outer shadow on mobile. Inner highlight only. */
+    body.stash-liquid-glass .filtered-list-toolbar::before {
+        left: 0 !important;
+        right: 0 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+    }
+    /* Wrapper around search input — square 30×30 collapsed (matches the
+       other toolbar icon buttons). Stretches to flex: 1 100% on focus. */
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input,
+    body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group {
+        flex: 0 0 30px !important;
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 0 !important;
+        position: relative !important;
+        transition: flex-basis 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within,
+    body.stash-liquid-glass .filtered-list-toolbar:has(input[placeholder*="Search"]:not(:placeholder-shown)) .search-term-input {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+    }
+    /* Magnifier icon overlay — painted via mask-image so we can color it
+       with currentColor / background-color. mask-image is more reliable
+       than background-image (which was getting wiped by the `background:`
+       shorthand on the input in 09_buttons.css). Fades out on focus. */
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1rem;
+        height: 1rem;
+        background-color: var(--text-muted);
+        -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.3-4.3'/></svg>") center / contain no-repeat;
+        mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.3-4.3'/></svg>") center / contain no-repeat;
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.18s ease;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within::after,
+    body.stash-liquid-glass .filtered-list-toolbar:has(input[placeholder*="Search"]:not(:placeholder-shown)) .search-term-input::after {
+        opacity: 0;
+    }
+    /* The input itself — collapsed = transparent text (icon shows
+       through), open = normal text input */
+    body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"],
+    body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"] {
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: 1 1 0 !important;
+        padding: 0 !important;
+        color: transparent !important;
+        cursor: pointer;
+        transition:
+            padding 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            color 0.12s ease 0.08s !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"]:focus,
+    body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"]:not(:placeholder-shown),
+    body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"]:focus,
+    body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"]:not(:placeholder-shown) {
+        padding: 0 14px !important;
         color: var(--text) !important;
+        background-image: none !important;
+        cursor: text;
+    }
+
+    /* Other toolbar items — animate width AND inner buttons to zero
+       when search opens. Using width-collapse instead of display:none
+       keeps items in flow so transitions stay smooth. max-height clamps
+       the collapsed items to a single row's worth so they can't push
+       the toolbar taller via their own internal wrap behavior. */
+    body.stash-liquid-glass .filtered-list-toolbar > *:not(.search-term-input) {
+        /* Override refract's min-width: 30px on .btn-secondary in BASE
+           state so max-width: 0 can actually shrink items to zero —
+           otherwise CSS resolves used width = min(max-width, max(min-width, ...))
+           which clamps to 30px and we never get a smooth collapse. */
+        min-width: 0 !important;
+        transition:
+            max-width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            max-height 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 0.18s ease,
+            margin 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            padding 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        max-width: 200px;
+        max-height: 30px;
+        overflow: clip;
+        overflow-clip-margin: 16px;
+    }
+    /* Also kill the inner buttons' min-width so the collapse propagates. */
+    body.stash-liquid-glass .filtered-list-toolbar > *:not(.search-term-input) .btn-secondary,
+    body.stash-liquid-glass .filtered-list-toolbar > *:not(.search-term-input) .dropdown-toggle {
+        min-width: 0 !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar:has(.search-term-input:focus-within) > *:not(.search-term-input),
+    body.stash-liquid-glass .filtered-list-toolbar:has(input[placeholder*="Search"]:not(:placeholder-shown)) > *:not(.search-term-input) {
+        max-width: 0 !important;
+        max-height: 0 !important;
+        opacity: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        transform: scale(0.9);
+        pointer-events: none;
+    }
+    /* Also collapse the toolbar's gap when search is open — otherwise
+       the gaps between hidden items still reserve horizontal space. */
+    body.stash-liquid-glass .filtered-list-toolbar:has(.search-term-input:focus-within),
+    body.stash-liquid-glass .filtered-list-toolbar:has(input[placeholder*="Search"]:not(:placeholder-shown)) {
+        gap: 0 !important;
+    }
+
+    /* Hide the "Search..." placeholder text when input isn't focused —
+       the magnifier background icon is the only thing visible in
+       collapsed state. */
+    body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"]:not(:focus)::placeholder {
+        color: transparent !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"]:focus::placeholder {
+        color: var(--text-muted) !important;
+    }
+
+    /* ── 2-column card grid on mobile list pages ─────────────────────
+       Use CSS Grid on the card row — more deterministic than flex for
+       forcing a fixed column count, and not affected by inherited
+       width/zoom rules on cards. */
+    body.stash-liquid-glass .row.justify-content-center {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.6rem !important;
+        margin: 0.9rem 0 0 !important;
+        padding: 0 0.6rem !important;
+    }
+    /* Cards fill their grid cell — defeat Stash's .zoom-1 width rules */
+    body.stash-liquid-glass .row.justify-content-center > .grid-card,
+    body.stash-liquid-glass .row.justify-content-center > .card,
+    body.stash-liquid-glass .row.justify-content-center > .performer-card,
+    body.stash-liquid-glass .row.justify-content-center > .scene-card,
+    body.stash-liquid-glass .row.justify-content-center > [class*="col-"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        flex: initial !important;
+        margin: 0 !important;
     }
 }
