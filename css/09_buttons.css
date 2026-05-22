@@ -163,6 +163,24 @@ body.stash-liquid-glass .wrap-tags {
     display: none !important;
 }
 
+/* Edit-filter modal: re-show the applied-criteria pills inside the dialog
+   so the user can still see / remove current filters while editing. Flex-
+   order lifts them above the long criterion list (right under the Search
+   Term row) without DOM mutation, so React doesn't fight us. */
+body.stash-liquid-glass .modal .wrap-tags.filter-tags,
+body.stash-liquid-glass .modal-dialog .wrap-tags.filter-tags {
+    display: flex !important;
+    flex-wrap: wrap;
+    margin: 0.4rem 0 0.8rem !important;
+}
+body.stash-liquid-glass .modal-dialog .dialog-content:has(> .criterion-list) {
+    display: flex !important;
+    flex-direction: column !important;
+}
+body.stash-liquid-glass .modal-dialog .dialog-content > .search-term-row { order: 0 !important; }
+body.stash-liquid-glass .modal-dialog .dialog-content > div:has(> .wrap-tags.filter-tags) { order: 1 !important; }
+body.stash-liquid-glass .modal-dialog .dialog-content > .criterion-list { order: 2 !important; }
+
 /* ── Filter button: orange glow when active (JS sets data-filter-active) */
 body.stash-liquid-glass [data-stash-filter] button[data-filter-active] {
     color: var(--accent) !important;
