@@ -975,7 +975,11 @@
     /* Custom mobile burger button — injected into the navbar via JS. CSS
        (12_mobile.css) gates visibility on (pointer: coarse) so it only
        shows on touch devices. Toggles `refract-burger-open` on <body>;
-       CSS re-styles `.navbar-collapse` as a dropdown panel in that state. */
+       CSS re-styles `.navbar-collapse` as a dropdown panel in that state.
+
+       Inner DOM: three .refract-burger-line spans (stacked horizontals)
+       that CSS morphs into an X via rotate/translate when .is-open. */
+    var BURGER_CLOSE_MS = 180;
     function injectMobileBurger() {
         var nav = document.querySelector("nav.top-nav");
         if (!nav) { return false; }
@@ -987,20 +991,20 @@
         burger.setAttribute("aria-label", "Toggle navigation menu");
         burger.setAttribute("aria-expanded", "false");
         burger.innerHTML =
-            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-            'stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
-            '<path d="M4 6h16M4 12h16M4 18h16"/></svg>';
+            '<span class="refract-burger-icon" aria-hidden="true">' +
+                '<span class="refract-burger-line"></span>' +
+                '<span class="refract-burger-line"></span>' +
+                '<span class="refract-burger-line"></span>' +
+            '</span>';
 
         burger.addEventListener("click", function (e) {
             e.stopPropagation();
-            var willOpen = !document.body.classList.contains("refract-burger-open");
-            if (willOpen) {
-                refractRelocateButtonsIntoDropdown();
+            var isOpen = document.body.classList.contains("refract-burger-open");
+            if (isOpen) {
+                refractCloseBurger();
             } else {
-                refractRestoreButtonsFromDropdown();
+                refractOpenBurger();
             }
-            document.body.classList.toggle("refract-burger-open", willOpen);
-            burger.setAttribute("aria-expanded", willOpen ? "true" : "false");
         });
 
         // Insert at the end so it sits on the far right of the navbar.
@@ -1008,28 +1012,298 @@
         return true;
     }
 
-    /* On open: move .navbar-buttons (sibling of .navbar-collapse in
-       Stash's mobile DOM) inside the collapse panel so the utility
-       cluster renders as the bottom row of the dropdown grid. Restore
-       on close so desktop layout is preserved. */
-    function refractRelocateButtonsIntoDropdown() {
-        var nav = document.querySelector("nav.top-nav");
-        if (!nav) { return; }
-        var collapse = nav.querySelector(".navbar-collapse");
-        var buttons = nav.querySelector(".navbar-buttons");
-        if (!collapse || !buttons) { return; }
-        if (buttons.parentNode === collapse) { return; }
-        buttons.setAttribute("data-refract-relocated", "1");
-        collapse.appendChild(buttons);
+    /* Mirror Stash's native "/new" button (contextual + button used to
+       add new scenes/performers/etc.) as a refract-styled .refract-mobile-new
+       anchor positioned just left of the burger. Tracks the native button's
+       current href and updates as the route changes. Removes itself on
+       routes where Stash itself wouldn't show a new button.
+
+       We can't read the native button's visibility (we hide its parent
+       wholesale on mobile), so the route-whitelist below mirrors the
+       set Stash renders the new button on. */
+    var NEW_BUTTON_ROUTES = [
+        "/scenes", "/performers", "/studios", "/tags",
+        "/galleries", "/images", "/groups", "/movies"
+    ];
+    function refractRouteAllowsNew() {
+        var path = window.location.pathname;
+        for (var i = 0; i < NEW_BUTTON_ROUTES.length; i++) {
+            var prefix = NEW_BUTTON_ROUTES[i];
+            if (path === prefix || path.indexOf(prefix + "/") === 0) {
+                return true;
+            }
+        }
+        return false;
     }
-    function refractRestoreButtonsFromDropdown() {
+
+    function injectMobileNewButton() {
         var nav = document.querySelector("nav.top-nav");
-        if (!nav) { return; }
-        var buttons = nav.querySelector('[data-refract-relocated="1"]');
-        if (!buttons) { return; }
-        buttons.removeAttribute("data-refract-relocated");
-        if (buttons.parentNode !== nav) {
-            nav.appendChild(buttons);
+        if (!nav) { return false; }
+
+        var nativeLink = nav.querySelector('a[href$="/new"]');
+        var existing = nav.querySelector(".refract-mobile-new");
+
+        if (!nativeLink || !refractRouteAllowsNew()) {
+            if (existing) { existing.remove(); }
+            return false;
+        }
+
+        var href = nativeLink.getAttribute("href");
+        var label = nativeLink.getAttribute("aria-label")
+            || nativeLink.getAttribute("title")
+            || "New";
+
+        if (existing) {
+            if (existing.getAttribute("href") !== href) {
+                existing.setAttribute("href", href);
+                existing.setAttribute("aria-label", label);
+                existing.setAttribute("title", label);
+            }
+            return true;
+        }
+
+        var btn = document.createElement("a");
+        btn.className = "refract-mobile-new";
+        btn.setAttribute("href", href);
+        btn.setAttribute("aria-label", label);
+        btn.setAttribute("title", label);
+        btn.innerHTML = PLUS_SVG;
+
+        // SPA-navigate via pushState rather than full reload.
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            var target = btn.getAttribute("href");
+            if (target && window.location.pathname !== target) {
+                window.history.pushState(null, "", target);
+                window.dispatchEvent(new PopStateEvent("popstate"));
+            }
+        });
+
+        // Insert before the burger so it sits just to its left.
+        var burger = nav.querySelector(".refract-burger");
+        if (burger) {
+            nav.insertBefore(btn, burger);
+        } else {
+            nav.appendChild(btn);
+        }
+        return true;
+    }
+
+    /* Body-level backdrop scrim — fades in/out with the drawer.
+       Click closes. Injected once, idempotent. */
+    function injectBurgerScrim() {
+        if (document.querySelector(".refract-burger-scrim")) { return true; }
+        var scrim = document.createElement("div");
+        scrim.className = "refract-burger-scrim";
+        scrim.setAttribute("aria-hidden", "true");
+        scrim.addEventListener("click", function () { refractCloseBurger(); });
+        document.body.appendChild(scrim);
+        return true;
+    }
+
+    /* Open / close — toggles body class which animates the drawer. */
+    function refractOpenBurger() {
+        document.body.classList.add("refract-burger-open");
+        var b = document.querySelector(".refract-burger");
+        if (b) {
+            b.classList.add("is-open");
+            b.setAttribute("aria-expanded", "true");
+        }
+        refractMarkActiveDrawerTile();
+    }
+    function refractCloseBurger() {
+        if (!document.body.classList.contains("refract-burger-open")) { return; }
+        var b = document.querySelector(".refract-burger");
+        if (b) {
+            b.classList.remove("is-open");
+            b.setAttribute("aria-expanded", "false");
+        }
+        document.body.classList.remove("refract-burger-open");
+    }
+
+    /* Mobile drawer — body-level overlay built from a hardcoded item
+       list. Independent of Stash's navbar DOM (which we hide entirely
+       on mobile). Each tile is an <a> whose click triggers SPA nav via
+       pushState + popstate (Stash's React Router responds to popstate). */
+    var MOBILE_NAV_ITEMS = [
+        { href: "/scenes",         label: "Scenes",     icon: "scenes" },
+        { href: "/images",         label: "Images",     icon: "images" },
+        { href: "/groups",         label: "Movies",     icon: "movies",   aliases: ["/movies"] },
+        { href: "/galleries",      label: "Galleries",  icon: "galleries" },
+        { href: "/scenes/markers", label: "Markers",    icon: "markers",  aliases: ["/markers"] },
+        { href: "/performers",     label: "Performers", icon: "performers" },
+        { href: "/studios",        label: "Studios",    icon: "studios" },
+        { href: "/tags",           label: "Tags",       icon: "tags" },
+        { href: "/stats",          label: "Stats",      icon: "stats" },
+        { href: "/settings",       label: "Settings",   icon: "settings" }
+    ];
+
+    var MOBILE_NAV_ICONS = {
+        scenes:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z" fill="currentColor" stroke="none"/></svg>',
+        images:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.6" fill="currentColor" stroke="none"/><path d="M21 16l-5-5-9 9"/></svg>',
+        movies:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="9" r="5"/><circle cx="15.5" cy="9" r="5"/><circle cx="12" cy="15.5" r="5"/></svg>',
+        galleries:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="14" height="14" rx="2"/><rect x="7" y="3" width="14" height="14" rx="2" opacity="0.55"/></svg>',
+        markers:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 5 5 5 9c0 5.5 7 13 7 13s7-7.5 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="currentColor" stroke="none"/></svg>',
+        performers: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+        studios:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>',
+        tags:       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L3 13V3h10l7.6 7.6a2 2 0 010 2.8z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></svg>',
+        stats:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+        settings:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>'
+    };
+
+    function injectMobileDrawer() {
+        if (document.querySelector(".refract-mobile-drawer")) { return true; }
+        var drawer = document.createElement("nav");
+        drawer.className = "refract-mobile-drawer";
+        drawer.setAttribute("aria-label", "Mobile navigation");
+
+        var html = "";
+        for (var i = 0; i < MOBILE_NAV_ITEMS.length; i++) {
+            var item = MOBILE_NAV_ITEMS[i];
+            var icon = MOBILE_NAV_ICONS[item.icon] || "";
+            html +=
+                '<a class="refract-drawer-tile" href="' + item.href + '" data-href="' + item.href + '" aria-label="' + item.label + '">' +
+                    '<span class="refract-drawer-tile-icon">' + icon + '</span>' +
+                '</a>';
+        }
+        drawer.innerHTML = html;
+
+        drawer.addEventListener("click", function (e) {
+            var t = e.target;
+            if (!t || !t.closest) { return; }
+            var tile = t.closest(".refract-drawer-tile");
+            if (!tile) { return; }
+            e.preventDefault();
+            var href = tile.getAttribute("data-href");
+            refractCloseBurger();
+            if (href && window.location.pathname !== href) {
+                window.history.pushState(null, "", href);
+                window.dispatchEvent(new PopStateEvent("popstate"));
+            }
+        });
+
+        document.body.appendChild(drawer);
+        refractMarkActiveDrawerTile();
+        return true;
+    }
+
+    /* Replace Stash's native navbar SVG icons with our refract-styled
+       versions (the same set used in the mobile drawer). Idempotent
+       via data-refract-icon marker. Re-applied on each watcher tick
+       and on stash:location since React may re-render the nav. */
+    function refractApplyNavIcons() {
+        var nav = document.querySelector("nav.top-nav");
+        if (!nav) { return false; }
+        for (var i = 0; i < MOBILE_NAV_ITEMS.length; i++) {
+            var item = MOBILE_NAV_ITEMS[i];
+            var iconSvgStr = MOBILE_NAV_ICONS[item.icon];
+            if (!iconSvgStr) { continue; }
+            var hrefs = [item.href].concat(item.aliases || []);
+            for (var h = 0; h < hrefs.length; h++) {
+                var links = nav.querySelectorAll('[href="' + hrefs[h] + '"]');
+                for (var j = 0; j < links.length; j++) {
+                    var link = links[j];
+                    if (link.getAttribute("data-refract-icon") === item.icon) { continue; }
+                    var oldSvg = link.querySelector("svg");
+                    if (!oldSvg) { continue; }
+                    var wrapper = document.createElement("span");
+                    wrapper.innerHTML = iconSvgStr;
+                    var newSvg = wrapper.firstElementChild;
+                    if (!newSvg) { continue; }
+                    // Preserve Stash's classes so sizing / active CSS still applies.
+                    var oldClass = oldSvg.getAttribute("class");
+                    if (oldClass) { newSvg.setAttribute("class", oldClass); }
+                    oldSvg.replaceWith(newSvg);
+                    link.setAttribute("data-refract-icon", item.icon);
+                }
+            }
+        }
+        return true;
+    }
+
+    /* Append plugin-injected nav items to the mobile drawer. Scans the
+       navbar for any link not already represented (by href) in our
+       hardcoded MOBILE_NAV_ITEMS, then builds a tile in our style
+       using the plugin's own SVG. Idempotent (skips tiles that exist),
+       runs every watcher tick so plugins that mount late get caught.
+       Skips /new contextual buttons — those get mirrored next to the
+       burger via injectMobileNewButton instead. */
+    var NATIVE_NAV_SKIP = {
+        "/": true,        // home — brand orb already covers it
+        "/setup": true,
+        "/migrate": true
+    };
+    function refractAppendPluginDrawerTiles() {
+        var drawer = document.querySelector(".refract-mobile-drawer");
+        var nav = document.querySelector("nav.top-nav");
+        if (!drawer || !nav) { return false; }
+
+        // Build the set of hrefs we already render natively.
+        var known = {};
+        for (var i = 0; i < MOBILE_NAV_ITEMS.length; i++) {
+            var item = MOBILE_NAV_ITEMS[i];
+            known[item.href] = true;
+            if (item.aliases) {
+                for (var k = 0; k < item.aliases.length; k++) {
+                    known[item.aliases[k]] = true;
+                }
+            }
+        }
+
+        var links = nav.querySelectorAll("a[href]");
+        for (var j = 0; j < links.length; j++) {
+            var link = links[j];
+            var href = link.getAttribute("href");
+            if (!href) { continue; }
+            if (known[href]) { continue; }
+            if (NATIVE_NAV_SKIP[href]) { continue; }
+            // /new contextual button — mirrored separately next to burger.
+            if (/\/new$/.test(href)) { continue; }
+            // External / system links we never want in the drawer.
+            if (href.indexOf("logout") !== -1) { continue; }
+            if (href.indexOf("opencollective") !== -1) { continue; }
+            if (href.indexOf("github.com") !== -1) { continue; }
+            if (/^https?:/i.test(href)) { continue; }
+            // Already rendered.
+            if (drawer.querySelector('.refract-drawer-tile[data-href="' + href + '"]')) { continue; }
+
+            var srcSvg = link.querySelector("svg");
+            if (!srcSvg) { continue; }
+            var label = link.getAttribute("aria-label")
+                || link.getAttribute("title")
+                || (link.textContent || "").trim()
+                || href;
+
+            var tile = document.createElement("a");
+            tile.className = "refract-drawer-tile";
+            tile.setAttribute("href", href);
+            tile.setAttribute("data-href", href);
+            tile.setAttribute("aria-label", label);
+            tile.setAttribute("data-plugin-tile", "1");
+
+            var iconSpan = document.createElement("span");
+            iconSpan.className = "refract-drawer-tile-icon";
+            // Clone the plugin's SVG so we don't steal it from the original
+            // (the original may still render in desktop mode under wider widths).
+            iconSpan.appendChild(srcSvg.cloneNode(true));
+            tile.appendChild(iconSpan);
+
+            drawer.appendChild(tile);
+        }
+
+        return true;
+    }
+
+    function refractMarkActiveDrawerTile() {
+        var drawer = document.querySelector(".refract-mobile-drawer");
+        if (!drawer) { return; }
+        var tiles = drawer.querySelectorAll(".refract-drawer-tile");
+        var path = window.location.pathname;
+        for (var i = 0; i < tiles.length; i++) {
+            var href = tiles[i].getAttribute("data-href");
+            // Prefix-match so /scenes/12345 still lights up "Scenes".
+            var active = href && (path === href || path.indexOf(href + "/") === 0);
+            tiles[i].classList.toggle("is-active", !!active);
         }
     }
 
@@ -1037,29 +1311,31 @@
         if (window.__refractBurgerHandlersBound) { return; }
         window.__refractBurgerHandlersBound = true;
 
-        function closeBurger() {
-            refractRestoreButtonsFromDropdown();
-            document.body.classList.remove("refract-burger-open");
-            var b = document.querySelector(".refract-burger");
-            if (b) { b.setAttribute("aria-expanded", "false"); }
-        }
-
         document.addEventListener("click", function (e) {
             if (!document.body.classList.contains("refract-burger-open")) { return; }
             var t = e.target;
             if (!t || !t.closest) { return; }
             if (t.closest(".refract-burger")) { return; }
-            if (t.closest("nav.top-nav .navbar-collapse")) {
-                if (t.closest("a, button")) { closeBurger(); }
-                return;
-            }
-            closeBurger();
+            // Scrim + drawer-tile clicks are handled by their own listeners.
+            if (t.closest(".refract-burger-scrim")) { return; }
+            if (t.closest(".refract-mobile-drawer")) { return; }
+            refractCloseBurger();
         });
 
-        if (typeof PluginApi !== "undefined" && PluginApi && PluginApi.Event && PluginApi.Event.addEventListener) {
-            PluginApi.Event.addEventListener("stash:location", closeBurger);
+        document.addEventListener("keydown", function (e) {
+            if (e.key !== "Escape") { return; }
+            if (!document.body.classList.contains("refract-burger-open")) { return; }
+            refractCloseBurger();
+        });
+
+        function onLocationChange() {
+            refractCloseBurger();
+            refractMarkActiveDrawerTile();
         }
-        window.addEventListener("popstate", closeBurger);
+        if (typeof PluginApi !== "undefined" && PluginApi && PluginApi.Event && PluginApi.Event.addEventListener) {
+            PluginApi.Event.addEventListener("stash:location", onLocationChange);
+        }
+        window.addEventListener("popstate", onLocationChange);
     }
 
     /* Inject a "Support Stash" link at the bottom of the settings sidebar
@@ -1391,6 +1667,11 @@
                 safeRun(normalizeLibraryAddButton);
                 safeRun(relocateAddSourceButton);
                 safeRun(injectMobileBurger);
+                safeRun(injectMobileNewButton);
+                safeRun(injectBurgerScrim);
+                safeRun(injectMobileDrawer);
+                safeRun(refractApplyNavIcons);
+                safeRun(refractAppendPluginDrawerTiles);
                 safeRun(normalizeSettingsSidebarNavItems);
                 safeRun(injectSupportStashLink);
                 safeRun(markActiveUtilityButtons);
@@ -2653,6 +2934,11 @@
                 normalizeLibraryAddButton();
                 relocateAddSourceButton();
                 injectMobileBurger();
+                injectMobileNewButton();
+                injectBurgerScrim();
+                injectMobileDrawer();
+                refractApplyNavIcons();
+                refractAppendPluginDrawerTiles();
                 normalizeSettingsSidebarNavItems();
                 injectSupportStashLink();
                 markActiveUtilityButtons();
@@ -2680,7 +2966,12 @@
         injectNewButtonIcon();
         normalizeLibraryAddButton();
         relocateAddSourceButton();
-                injectMobileBurger();
+        injectMobileBurger();
+        injectMobileNewButton();
+        injectBurgerScrim();
+        injectMobileDrawer();
+        refractApplyNavIcons();
+        refractAppendPluginDrawerTiles();
         normalizeSettingsSidebarNavItems();
                 injectSupportStashLink();
         markActiveUtilityButtons();
