@@ -48,15 +48,14 @@ body.stash-liquid-glass .slick-slider .card,
 body.stash-liquid-glass .slick-slider .grid-card {
     content-visibility: visible;
     contain-intrinsic-size: none;
-    /* clip-path force-clips the diagonal tier ribbon to the card's
-       rounded rectangle in the slick-track context, where plain
-       overflow:hidden doesn't reliably clip transformed descendants.
-       Side effect: box-shadows that extend past the card (tier glow,
-       hover halo) are also clipped, and the rating-banner pill loses
-       its escape via overflow:visible. The user prefers the cleaner
-       look without the outset effects in the carousel. */
-    contain: layout paint style;
-    clip-path: inset(0 round var(--radius));
+    /* Containment downgraded from `layout paint style` to `layout` only.
+       Paint containment promotes each card to its own composited raster
+       layer, and with a rounded clip-path on top that meant Chromium on
+       Windows D3D11 had to manage hundreds of layer masks per home-page
+       navigation (matching HLSL shader recompile spam). Layout-only
+       containment keeps the slick translate-resize bug at bay without
+       the per-card layer explosion. */
+    contain: layout;
 }
 body.stash-liquid-glass .card:hover,
 body.stash-liquid-glass .grid-card:hover {
