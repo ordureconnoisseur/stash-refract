@@ -306,7 +306,14 @@ body.stash-liquid-glass .rating-banner {
     margin: 0 !important;
     /* Squircle-like corners on a square */
     border-radius: clamp(0.85rem, 28%, 1.2rem) !important;
-    background: var(--glass-bg) !important;
+    /* Solid-ish dark fill instead of var(--glass-bg) + backdrop blur.
+       Every visible scene/performer card renders a rating banner, so
+       on a home page with multiple recommendation rows × ~20 cards each
+       that was 80+ live blur surfaces — biggest single shader cost on
+       the home page in Chromium/D3D11. Solid background reads almost
+       identically on top of card thumbnails (which are themselves dark
+       enough that the blur was barely visible) and costs zero GPU. */
+    background: rgba(20, 20, 24, 0.78) !important;
     border: 1px solid rgba(var(--accent-rgb), 0.35) !important;
     color: var(--accent-bright) !important;
     font-size: 1.28rem;
@@ -316,8 +323,6 @@ body.stash-liquid-glass .rating-banner {
     line-height: 1;
     white-space: nowrap;
     -webkit-font-smoothing: antialiased;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
     pointer-events: none;
     box-shadow:
         0 0 0 1px rgba(var(--accent-rgb), 0.18) inset,
