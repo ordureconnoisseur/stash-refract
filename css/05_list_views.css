@@ -2186,6 +2186,340 @@ body.stash-liquid-glass .PerformerTagger-performer-search-item > span {
     min-width: 0;       /* allow span to shrink below text intrinsic width */
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   Tag Tagger (StashDB cross-reference page)
+   Parallels PerformerTagger: grid of cards, each a thumbnail above a
+   name + status pill + UUID-link / search-input pill. Differences:
+   .TagTagger-tag is the card frame, .TagTagger-details is an extra
+   wrapper holding the image + .TagTagger-details-text (the text block),
+   and the image lives in .tag-card instead of .performer-card. Tags
+   are usually icon/swatch-shaped so the thumbnail is 1:1 not 3:4.
+   ─────────────────────────────────────────────────────────────────── */
+
+body.stash-liquid-glass .card:has(> .TagTagger) {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    contain: none !important;
+}
+
+body.stash-liquid-glass .TagTagger {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    align-items: start;
+    gap: 0.85rem;
+    margin-top: 0.75rem;
+}
+
+body.stash-liquid-glass .TagTagger-tag {
+    display: flex;
+    flex-direction: column;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    overflow: hidden;
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+body.stash-liquid-glass .TagTagger-tag:hover {
+    border-color: rgba(var(--accent-rgb), 0.28);
+    box-shadow:
+        var(--shadow-lg),
+        0 0 24px rgba(var(--accent-rgb), 0.18);
+    transform: translateY(-1px);
+}
+
+/* .TagTagger-details is the outer wrapper (image + text-block siblings),
+   distinct from PerformerTagger where -details IS the text block. */
+body.stash-liquid-glass .TagTagger-details {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: none !important;
+    box-sizing: border-box;
+}
+
+/* Tag image — 1:1 frame, image absolutely positioned, cover crop */
+body.stash-liquid-glass .TagTagger-tag .tag-card {
+    all: unset !important;
+    display: block !important;
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: var(--glass-bg-strong) !important;
+}
+body.stash-liquid-glass .TagTagger-tag .tag-card > img {
+    all: unset !important;
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    transition: filter 0.18s, transform 0.3s;
+}
+body.stash-liquid-glass .TagTagger-tag:hover .tag-card > img {
+    filter: saturate(1.15);
+}
+
+/* Details text block — sits below the image, accent-tinted top border */
+body.stash-liquid-glass .TagTagger-details-text {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0.7rem 0.8rem 0.85rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+    border-top: 1px solid rgba(var(--accent-rgb), 0.18);
+    background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.04) 0%, transparent 100%);
+}
+body.stash-liquid-glass .TagTagger-details-text > .TagTagger-header {
+    margin-bottom: 0.5rem;
+}
+body.stash-liquid-glass .TagTagger-header {
+    text-decoration: none !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .TagTagger-header h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+    transition: color 0.18s;
+}
+body.stash-liquid-glass .TagTagger-header:hover h2 {
+    color: var(--accent-bright);
+}
+
+/* "Tag already tagged" → green ✓ TAGGED pill */
+body.stash-liquid-glass .TagTagger-details-text > .text-left:not(.sub-content) {
+    margin: 0 0 0.5rem 0;
+    padding: 0;
+    display: flex;
+    line-height: 0;
+}
+body.stash-liquid-glass .TagTagger-details-text .text-left > h5.text-bold {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    color: #4ade80;
+    border-radius: var(--radius-pill);
+    padding: 0.12rem 0.48rem;
+    font-size: 0;
+    font-weight: 600;
+    line-height: 1;
+    margin: 0;
+    width: max-content;
+    letter-spacing: 0.04em;
+}
+body.stash-liquid-glass .TagTagger-details-text .text-left > h5.text-bold::before {
+    content: "✓ TAGGED";
+    font-size: 0.68rem;
+    text-transform: uppercase;
+}
+
+/* Untagged → amber ⚠ NEEDS MATCH pill, synthesized on the search input-group */
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link)::before {
+    content: "⚠ NEEDS MATCH";
+    display: inline-flex;
+    align-items: center;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #fbbf24;
+    border-radius: var(--radius-pill);
+    padding: 0.12rem 0.48rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    width: max-content;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+body.stash-liquid-glass .TagTagger-details-text .sub-content {
+    margin: 0;
+}
+body.stash-liquid-glass .TagTagger-details-text .sub-content:empty {
+    display: none;
+}
+
+/* StashDB UUID pill (tagged state) */
+body.stash-liquid-glass .TagTagger-box-link {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: stretch;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: rgba(var(--accent-rgb), 0.06);
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    padding: 0;
+    box-sizing: border-box;
+}
+body.stash-liquid-glass .TagTagger-box-link .input-group-text {
+    min-width: 0;
+    min-height: 1.85rem;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 0.95rem !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+body.stash-liquid-glass .TagTagger-box-link .input-group-text a {
+    font-size: 0 !important;
+    display: inline-block;
+    color: transparent !important;
+    text-decoration: none !important;
+    transition: opacity 0.18s;
+}
+body.stash-liquid-glass .TagTagger-box-link .input-group-text a::before {
+    content: "↗ View on StashDB";
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent-bright);
+    letter-spacing: 0.02em;
+}
+body.stash-liquid-glass .TagTagger-box-link .input-group-text a:hover::before {
+    color: var(--accent-light);
+}
+body.stash-liquid-glass .TagTagger-box-link .input-group-append {
+    display: flex !important;
+    align-items: stretch !important;
+}
+body.stash-liquid-glass .TagTagger-box-link > .input-group-append > .btn-primary,
+body.stash-liquid-glass .TagTagger-box-link .btn-primary.btn {
+    all: unset !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: stretch !important;
+    background: transparent !important;
+    color: var(--accent-bright) !important;
+    padding: 0 0.95rem !important;
+    font-size: 0.7rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    border-left: 1px solid rgba(var(--accent-rgb), 0.18) !important;
+    transition: background 0.18s, color 0.18s;
+}
+body.stash-liquid-glass .TagTagger-box-link > .input-group-append > .btn-primary:hover,
+body.stash-liquid-glass .TagTagger-box-link .btn-primary.btn:hover {
+    background: rgba(var(--accent-rgb), 0.14) !important;
+    color: var(--accent-light) !important;
+}
+
+/* Untagged search input pill — two-row grid: badge → input+button row */
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 0;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    box-sizing: border-box;
+}
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link)::before {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin-bottom: 0.5rem;
+}
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link)::after {
+    content: "";
+    grid-column: 1 / -1;
+    grid-row: 2;
+    background: rgba(var(--accent-rgb), 0.06);
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    border-radius: var(--radius-pill);
+    pointer-events: none;
+    z-index: 0;
+}
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link) > .text-input {
+    grid-column: 1;
+    grid-row: 2;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: var(--text) !important;
+    padding: 0 0.95rem !important;
+    font-size: 0.78rem !important;
+    line-height: 1 !important;
+    min-height: 1.85rem;
+    z-index: 1;
+    outline: none !important;
+    box-shadow: none !important;
+    min-width: 0;
+}
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link) > .text-input::placeholder {
+    color: var(--text-muted);
+}
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link) > .text-input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link):focus-within::after {
+    border-color: rgba(var(--accent-rgb), 0.55);
+    background: rgba(var(--accent-rgb), 0.10);
+}
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link) > .input-group-append {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex !important;
+    align-items: stretch !important;
+    z-index: 1;
+}
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link) .btn-primary,
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link) .btn-primary.btn {
+    all: unset !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: stretch !important;
+    background: transparent !important;
+    color: var(--accent-bright) !important;
+    padding: 0 0.95rem !important;
+    font-size: 0.7rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    border-left: 1px solid rgba(var(--accent-rgb), 0.18) !important;
+    transition: background 0.18s, color 0.18s;
+}
+body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link) .btn-primary:hover {
+    background: rgba(var(--accent-rgb), 0.14) !important;
+    color: var(--accent-light) !important;
+}
+
 /* ── Performer Edit Tags Tab — native taxonomy editor ─────────────────
    Refract-injected "Edit Tags" tab on the performer page. Hierarchical
    taxonomy editor with groups → subgroups → tag buttons. The native

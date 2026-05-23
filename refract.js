@@ -1283,9 +1283,18 @@
 
             var iconSpan = document.createElement("span");
             iconSpan.className = "refract-drawer-tile-icon";
-            // Clone the plugin's SVG so we don't steal it from the original
-            // (the original may still render in desktop mode under wider widths).
-            iconSpan.appendChild(srcSvg.cloneNode(true));
+            // Clone + strip inline sizing/classes from the plugin's SVG so
+            // our CSS owns sizing cleanly. iOS Safari honors width="1em"
+            // and FA's .svg-inline--fa more aggressively than desktop, so
+            // without stripping these the icon renders at the wrong size
+            // and gets pushed off-center within the tile.
+            var cloned = srcSvg.cloneNode(true);
+            cloned.removeAttribute("class");
+            cloned.removeAttribute("width");
+            cloned.removeAttribute("height");
+            cloned.removeAttribute("style");
+            cloned.removeAttribute("preserveAspectRatio");
+            iconSpan.appendChild(cloned);
             tile.appendChild(iconSpan);
 
             drawer.appendChild(tile);
@@ -2572,6 +2581,167 @@
         }
     }
 
+    /* ── Details Tags Overhaul plugin: collapse panel by default ──────
+       The kmv details-tags-overhaul plugin renders its panel with
+       `.is-open` already on the section root, so the tag groups are
+       visible by default. Refract paired CSS hides everything below
+       the panel header when `.is-open` is absent — here we strip it
+       once on first render so the panel starts collapsed. A marker on
+       the section keeps us from re-stripping after the user opens it
+       manually (the plugin's own JS owns toggle behavior). */
+    function collapseDetailsTagsOverhaul() {
+        document.querySelectorAll("#kmv-details-tags-overhaul.details-tags-overhaul.is-open").forEach(function (el) {
+            if (el.dataset.stRefractCollapsedOnce) { return; }
+            el.classList.remove("is-open");
+            el.dataset.stRefractCollapsedOnce = "1";
+        });
+    }
+
+    /* ── Hold-to-decrement on every O-count button ─────────────────────
+       Stash's O counter increments on click. Add a long-press behavior:
+       holding for 500ms fires the matching {scene,image}DecrementO mutation
+       and suppresses the following click (which would otherwise increment).
+       The count text is updated in place from the mutation response.
+
+       Targets two wrapper variants Stash uses:
+         .count-button (scene detail toolbar + scene-card popovers)
+           — two buttons inside: .count-icon[title="O Count"] + .count-value
+         .o-counter (image detail toolbar + Lightbox-footer + image-card popovers)
+           — single button title="O Count" with count as last inner span
+
+       Entity ID is resolved from context:
+         • scene/image detail toolbar → URL match
+         • Lightbox → current image src
+         • scene/image card popovers → href on the card link
+         • performer cards → SKIPPED (no performerDecrementO mutation;
+           the O count there is an aggregate display) */
+    function setupOCounterLongPress(root) {
+        var r = root || document;
+        r.querySelectorAll(".count-button, .o-counter").forEach(function (wrapper) {
+            if (wrapper.dataset.refractOLongPress === "1") { return; }
+            /* Sanity: only attach to wrappers that actually contain an O button. */
+            if (!wrapper.querySelector('button[title="O Count"]')) { return; }
+            var ctx = detectOEntityContext(wrapper);
+            if (!ctx) { return; }
+            wrapper.dataset.refractOLongPress = "1";
+
+            var HOLD_MS = 500;
+            var timer = null;
+            var longPressed = false;
+
+            function setCount(n) {
+                /* .count-button: count text lives in .count-value > span */
+                var cv = wrapper.querySelector(".count-value span");
+                if (cv) { cv.textContent = String(n); return; }
+                /* .o-counter: count is the last <span> child of the O Count button */
+                var titleBtn = wrapper.querySelector('button[title="O Count"]');
+                if (titleBtn) {
+                    var spans = titleBtn.querySelectorAll(":scope > span");
+                    var span = spans[spans.length - 1];
+                    if (span) { span.textContent = String(n); }
+                }
+            }
+
+            function decrement() {
+                var mutation = ctx.type === "scene"
+                    ? "mutation Dec($id: ID!) { sceneDecrementO(id: $id) }"
+                    : "mutation Dec($id: ID!) { imageDecrementO(id: $id) }";
+                var field = ctx.type === "scene" ? "sceneDecrementO" : "imageDecrementO";
+                gqlWithVars(mutation, { id: ctx.id }).then(function (resp) {
+                    if (resp && resp.data && typeof resp.data[field] === "number") {
+                        setCount(resp.data[field]);
+                    }
+                }).catch(function () { /* ignore */ });
+            }
+
+            function cancelTimer() {
+                if (timer !== null) { clearTimeout(timer); timer = null; }
+            }
+
+            wrapper.addEventListener("pointerdown", function (e) {
+                if (e.button !== 0) { return; }
+                /* Only react to pointerdowns on an actual button — clicking
+                   the wrapper border/padding shouldn't fire. */
+                if (!e.target.closest("button")) { return; }
+                longPressed = false;
+                cancelTimer();
+                timer = setTimeout(function () {
+                    timer = null;
+                    longPressed = true;
+                    decrement();
+                    /* Tiny flash so the user sees the long-press registered. */
+                    wrapper.classList.add("refract-o-decremented");
+                    setTimeout(function () {
+                        wrapper.classList.remove("refract-o-decremented");
+                    }, 280);
+                }, HOLD_MS);
+            });
+            wrapper.addEventListener("pointerup", cancelTimer);
+            wrapper.addEventListener("pointerleave", cancelTimer);
+            wrapper.addEventListener("pointercancel", cancelTimer);
+
+            /* Capture-phase click suppression — fires before Stash's own
+               click handler. Reset the flag after suppressing so the next
+               normal click still increments. */
+            wrapper.addEventListener("click", function (e) {
+                if (longPressed) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    longPressed = false;
+                }
+            }, true);
+        });
+    }
+
+    function detectOEntityContext(el) {
+        var path = location.pathname;
+
+        /* 1. Detail-page toolbars: entity ID comes from the URL. */
+        if (el.closest(".scene-toolbar")) {
+            var sm = path.match(/\/scenes\/(\d+)/);
+            if (sm) { return { type: "scene", id: sm[1] }; }
+        }
+        if (el.closest(".image-toolbar")) {
+            var im = path.match(/\/images\/(\d+)/);
+            if (im) { return { type: "image", id: im[1] }; }
+        }
+
+        /* 2. Lightbox — pull the ID out of the currently-visible image src. */
+        var lb = el.closest(".Lightbox") || (el.closest(".Lightbox-footer") && document.querySelector(".Lightbox"));
+        if (lb) {
+            var imgEl = lb.querySelector('img[src*="/image/"]');
+            if (imgEl) {
+                var lm = (imgEl.getAttribute("src") || "").match(/\/image\/(\d+)/);
+                if (lm) { return { type: "image", id: lm[1] }; }
+            }
+        }
+
+        /* 3. Card popovers — find the card type and pull the ID from its link.
+              Skip performer cards entirely: the O count there is an aggregate
+              across all the performer's scenes, not a single entity. */
+        var performerCard = el.closest(".performer-card");
+        var sceneCard = el.closest(".scene-card, .gallery-card");
+        var imageCard = el.closest(".image-card");
+        if (performerCard && !sceneCard && !imageCard) { return null; }
+        if (sceneCard) {
+            var sl = sceneCard.querySelector('a[href*="/scenes/"]');
+            if (sl) {
+                var slm = (sl.getAttribute("href") || "").match(/\/scenes\/(\d+)/);
+                if (slm) { return { type: "scene", id: slm[1] }; }
+            }
+        }
+        if (imageCard) {
+            var il = imageCard.querySelector('a[href*="/images/"]');
+            if (il) {
+                var ilm = (il.getAttribute("href") || "").match(/\/images\/(\d+)/);
+                if (ilm) { return { type: "image", id: ilm[1] }; }
+            }
+        }
+
+        return null;
+    }
+
     /* ── Filter toolbar: mark container + hide zoom slider ─────────── */
 
     function initFilterBar() {
@@ -2580,10 +2750,13 @@
         if (!search) { return; }
         search.setAttribute("data-fb-done", "1");
 
-        /* Don't tag modal dialogs (internal UI), and don't tag the sidebar
-           filter panel — it contains a search input + lots of filter-
-           section buttons and gets misidentified as the toolbar otherwise. */
-        if (search.closest && search.closest('.modal, .modal-dialog, .modal-content, .sidebar')) { return; }
+        /* Don't tag modal dialogs (internal UI), the sidebar filter panel
+           (search input + lots of filter-section buttons → false positive),
+           or forms (third-party plugins like edit-tags-overhaul inject a
+           "Search tags…" input inside the scene edit form; the form column
+           has plenty of buttons, so it'd otherwise get tagged as a toolbar
+           and inherit all the filter-bar styling). */
+        if (search.closest && search.closest('.modal, .modal-dialog, .modal-content, .sidebar, form, .edit-tags-overhaul')) { return; }
 
         /* Walk up until we find a div containing ≥ 4 buttons — that is the
            filter toolbar wrapper, whatever Stash names the class. */
@@ -5265,6 +5438,13 @@
                 el.style.removeProperty(p);
             });
         });
+        /* Strip data-stash-filter off form columns — older builds (or any
+           run where a third-party plugin's "Search…" input snuck into the
+           scene edit form) would tag the column as a filter toolbar and
+           inherit the wrong styling. Forms aren't toolbars. */
+        document.querySelectorAll("form [data-stash-filter], form[data-stash-filter]").forEach(function (el) {
+            el.removeAttribute("data-stash-filter");
+        });
     }
 
     /* Operation-menu modal — when the 3-dots #operation-menu button is
@@ -6491,6 +6671,8 @@
             try { injectNavLightToggle(); } catch (e) {}
             try { injectInterfaceLightToggleSetting(); } catch (e) {}
             try { setupNavbarReorder(); } catch (e) {}
+            try { collapseDetailsTagsOverhaul(); } catch (e) {}
+            try { setupOCounterLongPress(); } catch (e) {}
         }
         function sched() {
             clearTimeout(_t);

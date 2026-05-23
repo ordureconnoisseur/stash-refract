@@ -122,7 +122,7 @@ body.stash-liquid-glass .mv-add-btn.mv-queued {
    SVG itself gets a drop-shadow which is rendered by the SVG layer
    and isn't clipped by the toolbar overflow. */
 body.stash-liquid-glass .mv-scene-page-btn.active,
-body.stash-liquid-glass .scene-tabs .scene-toolbar .mv-scene-page-btn.active {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn.active {
     background: var(--accent-tint) !important;
     border: 1px solid var(--accent-bright) !important;
     border-color: var(--accent-bright) !important;
@@ -131,7 +131,7 @@ body.stash-liquid-glass .scene-tabs .scene-toolbar .mv-scene-page-btn.active {
         0 0 0 1px rgba(var(--accent-rgb), 0.3) inset,
         0 0 12px rgba(var(--accent-rgb), 0.35) inset !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-toolbar .mv-scene-page-btn.active svg {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn.active svg {
     filter:
         drop-shadow(0 0 6px rgba(var(--accent-rgb), 0.75))
         drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.5)) !important;
@@ -1078,7 +1078,7 @@ body.stash-liquid-glass .stash-scribe-secondary.is-ready {
    label) for our heading. The section now wraps in its own row/col
    for React-safety, so we target the heading inside .col-12 inside
    .stash-scribe-review-section. */
-body.stash-liquid-glass .scene-tabs .stash-scribe-review-section .stash-scribe-review-heading {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-section .stash-scribe-review-heading {
     margin: 0.6rem 0 0.35rem 0 !important;
     font-size: 0.7rem !important;
     font-weight: 600 !important;
@@ -1089,7 +1089,7 @@ body.stash-liquid-glass .scene-tabs .stash-scribe-review-section .stash-scribe-r
 
 /* Scene page — re-apply 07_scene_details.css:783 (description prose)
    for our p.pre. */
-body.stash-liquid-glass .scene-tabs .stash-scribe-review-section p.pre {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-section p.pre {
     color: var(--text) !important;
     font-size: 0.85rem !important;
     line-height: 1.5 !important;
@@ -1110,7 +1110,7 @@ body.stash-liquid-glass .stash-scribe-review-edit-row {
 
 /* Scene-page heading row — h6 spans full width, so flex the title
    + Edit button onto a single line with Edit pushed right. */
-body.stash-liquid-glass .scene-tabs .stash-scribe-review-heading {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-heading {
     display: flex !important;
     align-items: center !important;
     gap: 0.5rem !important;
@@ -1153,4 +1153,730 @@ body.stash-liquid-glass .stash-scribe-msg-assistant .stash-scribe-msg-body.stash
     border: 1px dashed rgba(74, 222, 128, 0.5) !important;
     color: rgba(187, 247, 208, 0.95) !important;
     font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Edit Tags Overhaul (kmv plugin) — grouped/searchable tag picker
+   ═══════════════════════════════════════════════════════════════════
+
+   Third-party plugin that injects a `<section id="kmv-edit-tags-overhaul">`
+   into the scene edit form (replaces the multi-select tag picker). It
+   uses its own BEM classes (`.edit-tags-overhaul__*`) and its own JS
+   to toggle group expand/collapse via an `is-open` class. We only
+   re-skin its visible elements — never override `display` for
+   collapsible bodies, since the plugin's JS owns that state. */
+
+body.stash-liquid-glass #kmv-edit-tags-overhaul.edit-tags-overhaul {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    padding: 0.9rem 1rem 1rem;
+    margin: 0.5rem 0 1rem;
+    color: var(--text);
+    font-family: var(--theme-font-stack);
+}
+
+/* Panel header (title + Copy/Paste buttons) */
+body.stash-liquid-glass .edit-tags-overhaul__panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+    flex-wrap: wrap;
+}
+body.stash-liquid-glass .edit-tags-overhaul__panel-header-info {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    min-width: 0;
+}
+body.stash-liquid-glass .edit-tags-overhaul__panel-title {
+    font-size: 0.78rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted) !important;
+    margin: 0 !important;
+    font-weight: 600;
+    font-family: var(--theme-font-stack) !important;
+}
+body.stash-liquid-glass .edit-tags-overhaul__panel-summary {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    opacity: 0.75;
+}
+body.stash-liquid-glass .edit-tags-overhaul__panel-actions {
+    display: inline-flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+body.stash-liquid-glass .edit-tags-overhaul__panel-btn {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    border-radius: var(--radius-pill);
+    padding: 0.22rem 0.7rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+body.stash-liquid-glass .edit-tags-overhaul__panel-btn:hover:not([disabled]) {
+    background: var(--accent-tint);
+    border-color: var(--accent-glow);
+    color: var(--accent-bright);
+}
+body.stash-liquid-glass .edit-tags-overhaul__panel-btn[disabled] {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* Search box */
+body.stash-liquid-glass .edit-tags-overhaul__search {
+    position: relative;
+    margin-bottom: 0.9rem;
+}
+body.stash-liquid-glass .edit-tags-overhaul__search-input {
+    width: 100%;
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    border-radius: var(--radius-pill);
+    padding: 0.42rem 0.95rem;
+    font-size: 0.82rem;
+    line-height: 1.2;
+    outline: none;
+    box-shadow: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+body.stash-liquid-glass .edit-tags-overhaul__search-input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+body.stash-liquid-glass .edit-tags-overhaul__search-input:focus {
+    border-color: rgba(var(--accent-rgb), 0.55);
+    box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.25), 0 0 14px rgba(var(--accent-rgb), 0.18);
+}
+body.stash-liquid-glass .edit-tags-overhaul__search-empty {
+    color: var(--text-muted);
+    font-size: 0.74rem;
+    margin-top: 0.5rem;
+    opacity: 0.75;
+}
+
+/* Groups list — vertical stack of glass cards */
+body.stash-liquid-glass .edit-tags-overhaul__groups {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+body.stash-liquid-glass .edit-tags-overhaul__group {
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: border-color 0.18s, box-shadow 0.18s;
+}
+body.stash-liquid-glass .edit-tags-overhaul__group:hover {
+    border-color: rgba(var(--accent-rgb), 0.22);
+}
+body.stash-liquid-glass .edit-tags-overhaul__group.is-open {
+    border-color: rgba(var(--accent-rgb), 0.32);
+    box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.10);
+}
+
+/* Group / subgroup header rows (click-to-toggle via plugin JS). Left-
+   aligned: chevron → title → meta, packed flush left, with the +/pin
+   button pushed to the right via `margin-left: auto`. */
+body.stash-liquid-glass .edit-tags-overhaul__header,
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.55rem;
+    padding: 0.4rem 0.75rem;
+    text-align: left;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+}
+body.stash-liquid-glass .edit-tags-overhaul__header-main,
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-header-main {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.5rem;
+    min-width: 0;
+    flex: 0 1 auto;
+    text-align: left;
+}
+body.stash-liquid-glass .edit-tags-overhaul__header-actions {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* Collapse chevron — matches refract's native `.collapse-icon`:
+   FontAwesome chevron-right SVG, small (0.55rem), low opacity, rotates
+   90° when the section opens. Implemented as a mask so colour flows
+   through `background-color` (currentColor doesn't work on backgrounds). */
+body.stash-liquid-glass .edit-tags-overhaul__header-main::before,
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-header-main::before {
+    content: "";
+    display: inline-block;
+    width: 0.55rem;
+    height: 0.55rem;
+    background-color: var(--text);
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'><path d='M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'><path d='M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    opacity: 0.35;
+    flex-shrink: 0;
+    transform: rotate(0deg);
+    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
+}
+body.stash-liquid-glass .edit-tags-overhaul__header:hover .edit-tags-overhaul__header-main::before,
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-header:hover .edit-tags-overhaul__subgroup-header-main::before {
+    opacity: 0.65;
+}
+body.stash-liquid-glass .edit-tags-overhaul__group.is-open > .edit-tags-overhaul__header .edit-tags-overhaul__header-main::before,
+body.stash-liquid-glass .edit-tags-overhaul__subgroup.is-open > .edit-tags-overhaul__subgroup-header .edit-tags-overhaul__subgroup-header-main::before {
+    transform: rotate(90deg);
+    opacity: 0.75;
+    background-color: var(--accent-bright);
+}
+body.stash-liquid-glass .edit-tags-overhaul__header:hover,
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-header:hover {
+    background: rgba(var(--accent-rgb), 0.06);
+}
+body.stash-liquid-glass .edit-tags-overhaul__header-main,
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-header-main {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+body.stash-liquid-glass .edit-tags-overhaul__title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    line-height: 1.2;
+    text-align: left;
+}
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-title {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    line-height: 1.2;
+    text-align: left;
+}
+body.stash-liquid-glass .edit-tags-overhaul__meta,
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-meta {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+body.stash-liquid-glass .edit-tags-overhaul__selected-count:not(:empty),
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-selected-count:not(:empty) {
+    color: var(--accent-bright);
+    font-weight: 700;
+}
+body.stash-liquid-glass .edit-tags-overhaul__selected-count:not(:empty)::after,
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-selected-count:not(:empty)::after {
+    content: "/";
+    margin: 0 0.15rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+}
+body.stash-liquid-glass .edit-tags-overhaul__total-count,
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-total-count {
+    opacity: 0.7;
+}
+
+/* Header actions: parent-tag pin / unpin toggle ("+") */
+body.stash-liquid-glass .edit-tags-overhaul__header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn:hover {
+    background: var(--accent-tint);
+    border-color: var(--accent-glow);
+    color: var(--accent-bright);
+}
+body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn[aria-pressed="true"] {
+    background: rgba(var(--accent-rgb), 0.22);
+    border-color: var(--accent);
+    color: var(--accent-bright);
+}
+
+/* Collapsible bodies — hidden by default, shown when the parent group /
+   subgroup has `.is-open` (toggled by plugin JS). Without this, the
+   plugin renders everything expanded since its own CSS only flips a
+   class, not `display`.
+
+   Layout: row+wrap with align-items: flex-start so tag pills size to
+   their content and stay left-aligned. Subgroups inside take a full
+   row via flex-basis so they don't try to fit alongside loose tags. */
+body.stash-liquid-glass .edit-tags-overhaul__body {
+    display: none;
+    padding: 0.5rem 0.7rem 0.7rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    border-top: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.18);
+}
+body.stash-liquid-glass .edit-tags-overhaul__group.is-open > .edit-tags-overhaul__body {
+    display: flex;
+}
+/* Subgroups stretch to a full row inside the body */
+body.stash-liquid-glass .edit-tags-overhaul__body > .edit-tags-overhaul__subgroup {
+    flex: 1 1 100%;
+    min-width: 0;
+}
+
+body.stash-liquid-glass .edit-tags-overhaul__subgroup {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+body.stash-liquid-glass .edit-tags-overhaul__subgroup.is-open {
+    border-color: rgba(var(--accent-rgb), 0.28);
+}
+body.stash-liquid-glass .edit-tags-overhaul__subgroup-body {
+    display: none;
+    padding: 0.45rem 0.6rem 0.6rem;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    border-top: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.12);
+}
+body.stash-liquid-glass .edit-tags-overhaul__subgroup.is-open > .edit-tags-overhaul__subgroup-body {
+    display: flex;
+}
+
+/* Tag button — refract pill, accent glow when pressed. Explicit
+   left-align + flex-start so the label sits flush-left even if a
+   parent flex stretches the pill. */
+body.stash-liquid-glass .edit-tags-overhaul__tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    flex: 0 0 auto;
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    border-radius: var(--radius-pill);
+    padding: 0.24rem 0.7rem;
+    font-size: 0.74rem;
+    font-weight: 500;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.12s, box-shadow 0.12s;
+    white-space: nowrap;
+    box-shadow: none;
+}
+body.stash-liquid-glass .edit-tags-overhaul__tag:hover {
+    background: var(--accent-tint);
+    border-color: var(--accent-glow);
+    color: var(--accent-light);
+    transform: translateY(-1px);
+}
+body.stash-liquid-glass .edit-tags-overhaul__tag[aria-pressed="true"] {
+    background: rgba(var(--accent-rgb), 0.22);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    box-shadow:
+        0 0 12px rgba(var(--accent-rgb), 0.35),
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset;
+}
+body.stash-liquid-glass .edit-tags-overhaul__tag[aria-pressed="true"]:hover {
+    background: rgba(var(--accent-rgb), 0.3);
+    color: #fff;
+}
+body.stash-liquid-glass .edit-tags-overhaul__tag-label {
+    pointer-events: none;
+}
+
+/* ── Tag hover preview popups (ETO + CustomTagsManager): tighten ─────
+   Both plugins render an identical-shape hover-preview popup keyed on
+   tag pills. Native CSS in each sets width to min(34rem, …) (up to
+   544px) and uses object-fit: contain on the image, which letterboxes
+   wide tag images with significant empty space on each side. Cap the
+   popup width and switch image fit to cover so the preview reads as a
+   tight card.
+
+   Multi-image previews still work — the inner grid uses auto-fit with
+   minmax(8rem, 1fr) (ETO) or minmax(6.9rem, 1fr) (CTM), so 1-3 images
+   flow naturally within the narrower width. */
+body.stash-liquid-glass #edit-tags-overhaul-hover-preview.edit-tags-overhaul-hover-preview,
+body.stash-liquid-glass #custom-tags-manager-hover-preview.tag-manager-hover-preview {
+    width: min(22rem, calc(100vw - 2rem)) !important;
+}
+body.stash-liquid-glass #edit-tags-overhaul-hover-preview .edit-tags-overhaul-hover-preview__image-frame,
+body.stash-liquid-glass #custom-tags-manager-hover-preview .tag-manager-hover-preview__image-frame {
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+body.stash-liquid-glass #edit-tags-overhaul-hover-preview .edit-tags-overhaul-hover-preview__image-frame img,
+body.stash-liquid-glass #custom-tags-manager-hover-preview .tag-manager-hover-preview__image-frame img {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 13rem !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Details Tags Overhaul (kmv plugin) — grouped read-only tag display
+   ═══════════════════════════════════════════════════════════════════
+
+   Sister plugin to edit-tags-overhaul, but read-only — appears on the
+   scene detail page to show applied tags grouped by parent. Each tag
+   is an `<a>` with an image + label, not a button. The plugin toggles
+   `.is-open` on the section root (panel), each `__group`, and each
+   `__subgroup`, with explicit `__panel-toggle` / `__toggle` /
+   `__subgroup-toggle` buttons (▾ chevrons) plus a clickable header
+   row. We re-skin everything and default-collapse the whole panel via
+   refract.js (collapseDetailsTagsOverhaul) on first render. */
+
+body.stash-liquid-glass #kmv-details-tags-overhaul.details-tags-overhaul {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    padding: 0.6rem 0.9rem;
+    margin: 0.5rem 0 1rem;
+    color: var(--text);
+    font-family: var(--theme-font-stack);
+}
+
+/* Panel header (title + summary + ▾ toggle) — full row is clickable */
+body.stash-liquid-glass .details-tags-overhaul__panel-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+body.stash-liquid-glass .details-tags-overhaul__panel-title {
+    font-size: 0.78rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted) !important;
+    margin: 0 !important;
+    font-weight: 600;
+    font-family: var(--theme-font-stack) !important;
+}
+body.stash-liquid-glass .details-tags-overhaul__panel-summary {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    opacity: 0.75;
+    flex: 1 1 auto;
+}
+/* Panel toggle — hide the plugin's `▾` text and overlay the refract
+   chevron SVG via mask. Rotates 90° when panel is open. */
+body.stash-liquid-glass .details-tags-overhaul__panel-toggle {
+    background: transparent;
+    border: none;
+    color: transparent;
+    font-size: 0;
+    width: 0.9rem;
+    height: 0.9rem;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+}
+body.stash-liquid-glass .details-tags-overhaul__panel-toggle::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--text);
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'><path d='M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'><path d='M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    opacity: 0.5;
+    transform: rotate(0deg);
+    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
+}
+body.stash-liquid-glass .details-tags-overhaul__panel-header:hover .details-tags-overhaul__panel-toggle::before {
+    opacity: 0.8;
+}
+body.stash-liquid-glass .details-tags-overhaul.is-open .details-tags-overhaul__panel-toggle::before {
+    transform: rotate(90deg);
+    opacity: 1;
+    background-color: var(--accent-bright);
+}
+
+/* Panel body — show only when .is-open on the section root */
+body.stash-liquid-glass .details-tags-overhaul__groups {
+    display: none;
+}
+body.stash-liquid-glass .details-tags-overhaul.is-open > .details-tags-overhaul__groups {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin-top: 0.75rem;
+}
+
+/* Group card */
+body.stash-liquid-glass .details-tags-overhaul__group {
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.18s, box-shadow 0.18s;
+}
+body.stash-liquid-glass .details-tags-overhaul__group:hover {
+    border-color: rgba(var(--accent-rgb), 0.22);
+}
+body.stash-liquid-glass .details-tags-overhaul__group.is-open {
+    border-color: rgba(var(--accent-rgb), 0.32);
+    box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.10);
+}
+
+/* Group / subgroup header rows */
+body.stash-liquid-glass .details-tags-overhaul__header,
+body.stash-liquid-glass .details-tags-overhaul__subgroup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.8rem;
+    user-select: none;
+    transition: background 0.15s;
+}
+body.stash-liquid-glass .details-tags-overhaul__header:hover,
+body.stash-liquid-glass .details-tags-overhaul__subgroup-header:hover {
+    background: rgba(var(--accent-rgb), 0.06);
+}
+body.stash-liquid-glass .details-tags-overhaul__header-main,
+body.stash-liquid-glass .details-tags-overhaul__subgroup-header-main {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+body.stash-liquid-glass .details-tags-overhaul__title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+}
+body.stash-liquid-glass .details-tags-overhaul__subgroup-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.2;
+}
+body.stash-liquid-glass .details-tags-overhaul__meta,
+body.stash-liquid-glass .details-tags-overhaul__subgroup-meta {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+body.stash-liquid-glass .details-tags-overhaul__total-count,
+body.stash-liquid-glass .details-tags-overhaul__subgroup-total-count {
+    opacity: 0.75;
+}
+
+/* Group / subgroup toggle chevrons — same SVG mask treatment.
+   The plugin renders these as `<button>▾</button>`; we hide the text
+   and overlay the refract chevron-right via mask. Rotates 90° on open. */
+body.stash-liquid-glass .details-tags-overhaul__toggle,
+body.stash-liquid-glass .details-tags-overhaul__subgroup-toggle {
+    background: transparent;
+    border: none;
+    color: transparent;
+    font-size: 0;
+    width: 0.7rem;
+    height: 0.7rem;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+}
+body.stash-liquid-glass .details-tags-overhaul__toggle::before,
+body.stash-liquid-glass .details-tags-overhaul__subgroup-toggle::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--text);
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'><path d='M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'><path d='M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    opacity: 0.35;
+    transform: rotate(0deg);
+    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
+}
+body.stash-liquid-glass .details-tags-overhaul__header:hover .details-tags-overhaul__toggle::before,
+body.stash-liquid-glass .details-tags-overhaul__subgroup-header:hover .details-tags-overhaul__subgroup-toggle::before {
+    opacity: 0.65;
+}
+body.stash-liquid-glass .details-tags-overhaul__group.is-open > .details-tags-overhaul__header .details-tags-overhaul__toggle::before,
+body.stash-liquid-glass .details-tags-overhaul__subgroup.is-open > .details-tags-overhaul__subgroup-header .details-tags-overhaul__subgroup-toggle::before {
+    transform: rotate(90deg);
+    opacity: 0.75;
+    background-color: var(--accent-bright);
+}
+
+/* Collapsible bodies */
+body.stash-liquid-glass .details-tags-overhaul__body {
+    display: none;
+    padding: 0.5rem 0.7rem 0.7rem;
+    flex-direction: column;
+    gap: 0.55rem;
+    border-top: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.18);
+}
+body.stash-liquid-glass .details-tags-overhaul__group.is-open > .details-tags-overhaul__body {
+    display: flex;
+}
+body.stash-liquid-glass .details-tags-overhaul__group.is-open > .details-tags-overhaul__body:has(> .details-tags-overhaul__tag) {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+body.stash-liquid-glass .details-tags-overhaul__subgroup {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+body.stash-liquid-glass .details-tags-overhaul__subgroup.is-open {
+    border-color: rgba(var(--accent-rgb), 0.28);
+}
+body.stash-liquid-glass .details-tags-overhaul__subgroup-body {
+    display: none;
+    padding: 0.45rem 0.6rem 0.6rem;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    border-top: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.12);
+}
+body.stash-liquid-glass .details-tags-overhaul__subgroup.is-open > .details-tags-overhaul__subgroup-body {
+    display: flex;
+}
+
+/* Tag link — card with thumbnail above label. The plugin sets
+   `--dto-image-size` (default 100px from its inline style on the section),
+   so we use that so user-configured sizes flow through. */
+body.stash-liquid-glass .details-tags-overhaul__tag {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--text) !important;
+    border-radius: var(--radius);
+    padding: 0.4rem 0.4rem 0.5rem;
+    width: calc(var(--dto-image-size, 100px) + 0.8rem);
+    font-size: 0.72rem;
+    line-height: 1.25;
+    text-decoration: none !important;
+    text-align: center;
+    transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.12s, box-shadow 0.12s;
+}
+body.stash-liquid-glass .details-tags-overhaul__tag:hover {
+    background: var(--accent-tint);
+    border-color: var(--accent-glow);
+    color: var(--accent-light) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(var(--accent-rgb), 0.18);
+}
+body.stash-liquid-glass .details-tags-overhaul__tag-image {
+    display: block;
+    width: var(--dto-image-size, 100px) !important;
+    height: var(--dto-image-size, 100px) !important;
+    object-fit: cover;
+    object-position: center;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    background: var(--glass-bg-strong);
+    flex-shrink: 0;
+    margin: 0 auto;
+}
+body.stash-liquid-glass .details-tags-overhaul__tag:hover > .details-tags-overhaul__tag-image {
+    border-color: var(--accent);
+}
+body.stash-liquid-glass .details-tags-overhaul__tag-label {
+    font-weight: 600;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Image-only variant (no label) — bigger square */
+body.stash-liquid-glass .details-tags-overhaul__tag--image-only {
+    width: calc(var(--dto-image-only-size, 120px) + 0.8rem);
+    padding: 0.4rem;
+}
+body.stash-liquid-glass .details-tags-overhaul__tag--image-only > .details-tags-overhaul__tag-image {
+    width: var(--dto-image-only-size, 120px) !important;
+    height: var(--dto-image-only-size, 120px) !important;
+}
+
+/* Tag rows wrap so cards flow naturally */
+body.stash-liquid-glass .details-tags-overhaul__body,
+body.stash-liquid-glass .details-tags-overhaul__subgroup-body {
+    align-items: flex-start;
 }

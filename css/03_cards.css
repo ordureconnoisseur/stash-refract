@@ -1436,7 +1436,7 @@ body.stash-liquid-glass .rating-number > span {
 
 /* Sidebar / scene-toolbar variant — slimmer 26px height to match the
    inline pill scale used by .adv-rating-btn + count-button in that row. */
-body.stash-liquid-glass .scene-tabs .scene-toolbar .rating-number {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-number {
     height: 26px !important;
     padding: 0 0.55rem !important;
     font-size: 0.72rem !important;
