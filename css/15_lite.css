@@ -97,11 +97,15 @@ body.stash-liquid-glass.refract-lite .rating-banner.refract-tier-high {
     text-shadow: none !important;
 }
 
-/* ── 6b. Top navbar: fully solid background. Universal kill in §1
-       already removes backdrop-filter, but the base bg is a translucent
-       `var(--glass-bg)` (~0.4 alpha) so without blur it reads as a
-       faint film over scrolling content. Pin to fully opaque dark. */
-body.stash-liquid-glass.refract-lite nav.top-nav.navbar {
+/* ── 6b. Floating glass platforms (navbar, filter toolbar pill,
+       pagination capsule, detail header). All use var(--glass-bg)
+       (~0.06 alpha) + backdrop-blur in base mode; without blur the
+       low alpha reads as transparent film over scrolling content.
+       Pin to fully opaque dark. */
+body.stash-liquid-glass.refract-lite nav.top-nav.navbar,
+body.stash-liquid-glass.refract-lite .filtered-list-toolbar::before,
+body.stash-liquid-glass.refract-lite .pagination,
+body.stash-liquid-glass.refract-lite .detail-header {
     background: rgb(35, 35, 35) !important;
 }
 
