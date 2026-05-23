@@ -102,7 +102,7 @@ body.stash-liquid-glass.refract-lite .rating-banner.refract-tier-high {
        `var(--glass-bg)` (~0.4 alpha) so without blur it reads as a
        faint film over scrolling content. Pin to fully opaque dark. */
 body.stash-liquid-glass.refract-lite nav.top-nav.navbar {
-    background: rgb(18, 18, 22) !important;
+    background: rgb(35, 35, 35) !important;
 }
 
 /* ── 7. Navbar buttons: kill hover lift + accent halo + glare ─── */
