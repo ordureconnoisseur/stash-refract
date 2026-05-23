@@ -2756,7 +2756,7 @@
            "Search tags…" input inside the scene edit form; the form column
            has plenty of buttons, so it'd otherwise get tagged as a toolbar
            and inherit all the filter-bar styling). */
-        if (search.closest && search.closest('.modal, .modal-dialog, .modal-content, .sidebar, form, .edit-tags-overhaul')) { return; }
+        if (search.closest && search.closest('.modal, .modal-dialog, .modal-content, .sidebar, form, .edit-tags-overhaul, #tag-manager-host, .tag-manager')) { return; }
 
         /* Walk up until we find a div containing ≥ 4 buttons — that is the
            filter toolbar wrapper, whatever Stash names the class. */
@@ -5443,6 +5443,12 @@
            scene edit form) would tag the column as a filter toolbar and
            inherit the wrong styling. Forms aren't toolbars. */
         document.querySelectorAll("form [data-stash-filter], form[data-stash-filter]").forEach(function (el) {
+            el.removeAttribute("data-stash-filter");
+        });
+        /* Same problem with CustomTagsManager — its sidebar holds a search
+           input + many buttons, which made older builds tag the whole
+           layout as a filter toolbar. The plugin owns its own styling. */
+        document.querySelectorAll("#tag-manager-host [data-stash-filter], .tag-manager [data-stash-filter]").forEach(function (el) {
             el.removeAttribute("data-stash-filter");
         });
     }
