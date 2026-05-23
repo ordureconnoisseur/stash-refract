@@ -97,6 +97,14 @@ body.stash-liquid-glass.refract-lite .rating-banner.refract-tier-high {
     text-shadow: none !important;
 }
 
+/* ── 6b. Top navbar: fully solid background. Universal kill in §1
+       already removes backdrop-filter, but the base bg is a translucent
+       `var(--glass-bg)` (~0.4 alpha) so without blur it reads as a
+       faint film over scrolling content. Pin to fully opaque dark. */
+body.stash-liquid-glass.refract-lite nav.top-nav.navbar {
+    background: rgb(18, 18, 22) !important;
+}
+
 /* ── 7. Navbar buttons: kill hover lift + accent halo + glare ─── */
 body.stash-liquid-glass.refract-lite nav.top-nav a.btn:hover,
 body.stash-liquid-glass.refract-lite nav.top-nav button.btn:hover {
