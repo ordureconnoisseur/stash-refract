@@ -237,7 +237,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .refract-mobile-drawer {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 0.55rem;
+        /* Fixed px values for gap + padding — iOS "Larger Text"
+           accessibility scaling inflates rem-based values, causing the
+           tile spacing to look wildly different on real phones vs
+           desktop RDM. px decouples from root font-size drift. */
+        gap: 9px;
+        padding: 13px;
         position: fixed;
         top: 64px;
         left: 12px;
@@ -250,7 +255,6 @@ body.stash-liquid-glass .refract-mobile-drawer {
         box-shadow:
             var(--shadow-xl),
             inset 0 0 0 1px rgba(var(--accent-rgb), 0.08);
-        padding: 0.8rem;
         z-index: 100;
         max-height: calc(100vh - 80px);
         overflow-y: auto;
@@ -294,8 +298,9 @@ body.stash-liquid-glass .refract-mobile-drawer {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 1.7rem;
-        height: 1.7rem;
+        /* px-pinned so icon size doesn't drift with iOS font scaling. */
+        width: 28px;
+        height: 28px;
     }
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-icon svg {
         width: 100% !important;
