@@ -1538,6 +1538,84 @@ body.stash-liquid-glass .edit-tags-overhaul__tag-label {
     pointer-events: none;
 }
 
+/* ── CustomTagsManager: keep rows inside the sidebar ──────────────────
+   Confirmed via DevTools: the row-actions (drag handle) gets rendered
+   past the sidebar's right edge when a row's tag name is long, and the
+   .tag-manager__group's `overflow: hidden` then clips it.
+
+   Root cause: .tag-manager__tree-item-name is `white-space: nowrap;
+   overflow: visible`, so the FLEX intrinsic size of the name column
+   equals the full text width. The flex algorithm shrinks row-left to
+   fit, but because the inner span has overflow:visible, its rendered
+   content overflows visually past its allocated box — and on some
+   viewport widths the row's own grid track is narrower than the
+   row's computed width, pushing row-actions out.
+
+   Fix: force the name to actually clip+ellipsis (not just shrink the
+   box), and pin every container in the chain to its parent's width so
+   nothing escapes the grid track. */
+body.stash-liquid-glass #tag-manager-host .tag-manager__tree-item-name {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    display: block !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+body.stash-liquid-glass #tag-manager-host .tag-manager__group-main,
+body.stash-liquid-glass #tag-manager-host .tag-manager__subgroup-main,
+body.stash-liquid-glass #tag-manager-host .tag-manager__tree-item-main {
+    overflow: hidden !important;
+    min-width: 0 !important;
+}
+body.stash-liquid-glass #tag-manager-host .tag-manager__row-left {
+    overflow: hidden !important;
+    min-width: 0 !important;
+}
+/* Pin every container to its parent's box so the rows don't bust out
+   of the sidebar grid track at narrow viewports. */
+body.stash-liquid-glass #tag-manager-host .tag-manager__tree-wrap,
+body.stash-liquid-glass #tag-manager-host .tag-manager__tree-panel-scroll,
+body.stash-liquid-glass #tag-manager-host .tag-manager__root-section,
+body.stash-liquid-glass #tag-manager-host .tag-manager__root-body,
+body.stash-liquid-glass #tag-manager-host .tag-manager__group,
+body.stash-liquid-glass #tag-manager-host .tag-manager__group-body,
+body.stash-liquid-glass #tag-manager-host .tag-manager__subgroup,
+body.stash-liquid-glass #tag-manager-host .tag-manager__subgroup-children {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+/* The scroll container is `overflow: auto` (both axes), which lets the
+   rows be intrinsically wider than the sidebar (nowrap text expands
+   their natural width, pushing the drag-handle past the visible right
+   edge). Force vertical-only scroll so the horizontal axis stays
+   pinned to the container width. */
+body.stash-liquid-glass #tag-manager-host .tag-manager__tree-panel-scroll {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+/* Pin the row itself to 100% of its parent's box. Without this the
+   flex layout uses the row's intrinsic min-content (which includes
+   the full nowrap text + drag handle), making the row wider than the
+   sidebar — pushing the drag handle past the right edge. */
+body.stash-liquid-glass #tag-manager-host .tag-manager__group-header,
+body.stash-liquid-glass #tag-manager-host .tag-manager__subgroup-header,
+body.stash-liquid-glass #tag-manager-host .tag-manager__tree-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+/* Subgroup-header carries a 0.3rem horizontal margin (`margin: 0.3rem
+   0.3rem 0` from the plugin) for its inset appearance. width:100% plus
+   those margins makes the row stick 0.3rem past the parent on each
+   side, where the group's `overflow: hidden` clips the drag handle.
+   Subtract the margins from the width so the row stays inside. */
+body.stash-liquid-glass #tag-manager-host .tag-manager__subgroup-header {
+    width: calc(100% - 0.6rem) !important;
+}
+
 /* ── Tag hover preview popups (ETO + CustomTagsManager): tighten ─────
    Both plugins render an identical-shape hover-preview popup keyed on
    tag pills. Native CSS in each sets width to min(34rem, …) (up to
