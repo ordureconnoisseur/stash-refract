@@ -154,6 +154,23 @@ body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-to
     box-shadow: none !important;
 }
 
+/* ── 10b. Home-page Slick carousels: drop per-card clip-path + paint
+       containment. The base rule in 03_cards.css wraps every carousel
+       card in `contain: layout paint style` + `clip-path: inset(0 round
+       var(--radius))` so the diagonal tier-ribbon glow stays inside the
+       rounded corners. In lite the tier glow + all box-shadows are
+       already gone, so the clip-path isn't doing useful work — but each
+       card still gets its own composited raster layer with a custom
+       mask. On Windows Chromium (D3D11) that's hundreds of layers
+       across multiple recommendation rows, which is why lite helped
+       grid views but not the home page. Strip the mask + downgrade
+       containment to layout-only so cards share fewer layers. */
+body.stash-liquid-glass.refract-lite .slick-slider .card,
+body.stash-liquid-glass.refract-lite .slick-slider .grid-card {
+    clip-path: none !important;
+    contain: layout !important;
+}
+
 /* ── 11. Minimal-cards performer pill + popup solid-dark fallback.
        The lite-mode universal rules (sections 1-2 above) already strip
        backdrop-filter, transitions, and shadows. Add a concrete dark
