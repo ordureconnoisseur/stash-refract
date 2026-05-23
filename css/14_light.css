@@ -295,7 +295,7 @@ body.stash-liquid-glass.refract-light .card,
 body.stash-liquid-glass.refract-light .grid-card,
 body.stash-liquid-glass.refract-light .detail-header,
 body.stash-liquid-glass.refract-light .detail-header .detail-group,
-body.stash-liquid-glass.refract-light .scene-tabs .tab-content,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .tab-content,
 body.stash-liquid-glass.refract-light .filter-item {
     border-color: var(--glass-border) !important;
 }
@@ -305,7 +305,7 @@ body.stash-liquid-glass.refract-light .filter-item {
 body.stash-liquid-glass.refract-light .navbar a,
 body.stash-liquid-glass.refract-light .navbar button:not(.btn-primary):not([class*="accent"]),
 body.stash-liquid-glass.refract-light .dropdown-menu .dropdown-item,
-body.stash-liquid-glass.refract-light .scene-tabs .nav-link:not(.active),
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .nav-link:not(.active),
 body.stash-liquid-glass.refract-light .filter-container,
 body.stash-liquid-glass.refract-light .filter-container * {
     color: var(--text) !important;
@@ -385,7 +385,7 @@ body.stash-liquid-glass.refract-light .card,
 body.stash-liquid-glass.refract-light .grid-card,
 body.stash-liquid-glass.refract-light .modal-content,
 body.stash-liquid-glass.refract-light .alert,
-body.stash-liquid-glass.refract-light .scene-tabs .tab-content {
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .tab-content {
     border-color: rgba(var(--accent-rgb), 0.18) !important;
 }
 
@@ -504,23 +504,23 @@ body.stash-liquid-glass.refract-light .text-muted {
 
 
 /* ═══════ 21. Scene detail header + toolbar ════════════════════════
-   `.scene-header` hardcodes `color: #fff !important` — invisible on
+   `:is(.scene-header, .image-header)` hardcodes `color: #fff !important` — invisible on
    white. Toolbar buttons use rgba(255,255,255, low) backgrounds that
    vanish on light bg, leaving the dark icons looking like floating
    black silhouettes. Restore proper light-mode visibility. */
-body.stash-liquid-glass.refract-light h3.scene-header,
-body.stash-liquid-glass.refract-light h2.scene-header,
-body.stash-liquid-glass.refract-light .scene-header {
+body.stash-liquid-glass.refract-light h3:is(.scene-header, .image-header),
+body.stash-liquid-glass.refract-light h2:is(.scene-header, .image-header),
+body.stash-liquid-glass.refract-light :is(.scene-header, .image-header) {
     color: var(--text) !important;
 }
-body.stash-liquid-glass.refract-light .scene-header .TruncatedText,
-body.stash-liquid-glass.refract-light .scene-header > div {
+body.stash-liquid-glass.refract-light :is(.scene-header, .image-header) .TruncatedText,
+body.stash-liquid-glass.refract-light :is(.scene-header, .image-header) > div {
     color: var(--text) !important;
 }
 
 /* Toolbar button frames — flip invisible white-tint bg to dark-tint */
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .adv-rating-btn,
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button {
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) {
     background: rgba(0, 0, 0, 0.04) !important;
     border-color: var(--glass-border) !important;
 }
@@ -528,10 +528,10 @@ body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button {
    default grey was leaking through and rendering as a dark circular
    blob behind each icon. The original L539 rule sets background:
    transparent in dark mode; we re-assert with extra force in light. */
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button,
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button.btn,
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button.btn.btn-secondary,
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button.btn-secondary.minimal {
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) button,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) button.btn,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) button.btn.btn-secondary,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) button.btn-secondary.minimal {
     background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
@@ -539,7 +539,7 @@ body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button b
     box-shadow: none !important;
     color: rgba(var(--accent-rgb), 0.7) !important;
 }
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button:hover {
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) button:hover {
     background: var(--accent-tint) !important;
     background-color: var(--accent-tint) !important;
     color: var(--accent-bright) !important;
@@ -548,15 +548,15 @@ body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button b
 /* Toolbar icons that aren't rating-stars (eye/O-count icon, organized
    box, ellipsis menu, mv-scene-btn) — were inheriting dark text and
    reading as black silhouettes. Tint accent like navbar icons. */
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .count-button button,
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .organized-button,
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar #operation-menu,
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .mv-scene-page-btn {
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) button,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) #operation-menu,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn {
     color: rgba(var(--accent-rgb), 0.7) !important;
 }
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .organized-button:hover,
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar #operation-menu:hover,
-body.stash-liquid-glass.refract-light .scene-tabs .scene-toolbar .mv-scene-page-btn:hover {
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button:hover,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) #operation-menu:hover,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn:hover {
     color: var(--accent-bright) !important;
 }
 

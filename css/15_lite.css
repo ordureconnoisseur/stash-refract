@@ -70,7 +70,7 @@ body.stash-liquid-glass.refract-lite .performer-card:hover {
 }
 
 /* ── 5. Glass panels: solid dark backgrounds (blur gone) ──────── */
-body.stash-liquid-glass.refract-lite .scene-tabs,
+body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs),
 body.stash-liquid-glass.refract-lite .gallery-tabs,
 body.stash-liquid-glass.refract-lite .Lightbox-footer,
 body.stash-liquid-glass.refract-lite .Lightbox-navbutton.btn.btn-link,
@@ -148,9 +148,9 @@ body.stash-liquid-glass.refract-lite .gs-chip.gs-focused {
 }
 
 /* ── 10. Scene-toolbar pill button glow on hover ──────────────── */
-body.stash-liquid-glass.refract-lite .scene-tabs .scene-toolbar .organized-button:hover,
-body.stash-liquid-glass.refract-lite .scene-tabs .scene-toolbar .dropdown-toggle:hover,
-body.stash-liquid-glass.refract-lite .scene-tabs .scene-toolbar .mv-scene-page-btn:hover {
+body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button:hover,
+body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle:hover,
+body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn:hover {
     box-shadow: none !important;
 }
 

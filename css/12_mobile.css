@@ -302,12 +302,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         height: 100% !important;
         max-width: none !important;
         max-height: none !important;
-    }
-    /* Plugin SVGs typically use FontAwesome-style viewBoxes (0 0 512 512)
-       with ~12% interior padding. Refract icons fill ~92% of their viewBox.
-       Scale plugin icons up so they read at the same visual size as native. */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile[data-plugin-tile="1"] .refract-drawer-tile-icon svg {
-        transform: scale(1.2);
+        display: block;
     }
     /* :active tap feedback */
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile:active {
@@ -368,12 +363,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
     /* Scene-page container — zero out the global mobile padding-top
        (5rem from earlier in this file) so the row owns navbar clearance.
        Without this, container 80 + row top stack and create a huge gap. */
-    body.stash-liquid-glass .main.container-fluid:has(.scene-tabs) {
+    body.stash-liquid-glass .main.container-fluid:has(:is(.scene-tabs, .image-tabs)) {
         padding-top: 0 !important;
     }
     /* Outer row: unlock viewport-height clamp, stack player above details.
        Top padding = navbar bottom (~56px) + tight visual gap. */
-    body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs) {
+    body.stash-liquid-glass .main.container-fluid > .row:has(> :is(.scene-tabs, .image-tabs)) {
         height: auto !important;
         max-height: none !important;
         min-height: 0 !important;
@@ -403,7 +398,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
 
     /* Re-show the details panel below the player. Beats the
        1199.98 `display: none` because 12_mobile.css loads later. */
-    body.stash-liquid-glass .scene-tabs {
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
         display: block !important;
         height: auto !important;
         max-height: none !important;
@@ -413,19 +408,19 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
     /* Inner tab-content was a flex column expecting a fixed-height
        parent — relax it so content sizes naturally. */
-    body.stash-liquid-glass .scene-tabs .tab-content,
-    body.stash-liquid-glass .scene-tabs .tab-pane.active.show {
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content,
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane.active.show {
         display: block !important;
         min-height: 0 !important;
         flex: initial !important;
     }
     /* Performer row inside the panel — kill the 56px chevron gutters
        (no room for the chevrons on a phone; the row scrolls by touch). */
-    body.stash-liquid-glass .scene-tabs .scene-performers-row {
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row {
         padding: 0 !important;
     }
-    body.stash-liquid-glass .scene-tabs .stash-perf-prev,
-    body.stash-liquid-glass .scene-tabs .stash-perf-next {
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-perf-prev,
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-perf-next {
         display: none !important;
     }
 

@@ -177,7 +177,7 @@ body.stash-liquid-glass .main.container-fluid > .row {
 /* Scene page: only top padding so the row's own 20px padding is the only
    outer spacing on the sides + bottom. The 1.5rem here adds gap below
    the floating navbar; sides/bottom symmetry preserved. */
-body.stash-liquid-glass .main.container-fluid:has(> .row > .scene-tabs) {
+body.stash-liquid-glass .main.container-fluid:has(> .row > :is(.scene-tabs, .image-tabs)) {
     padding: 1.5rem 0 0 0 !important;
 }
 

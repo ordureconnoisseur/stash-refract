@@ -9,7 +9,7 @@
    disturbed); background-clip:padding-box paints the glass inside the
    transparent border. NO overflow:hidden — would clip the lifted
    performer-row at the bottom of the tab-pane. */
-body.stash-liquid-glass .scene-tabs {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
@@ -26,7 +26,7 @@ body.stash-liquid-glass .scene-tabs {
    Replaces Bootstrap's flex .row + negative margins. Three columns:
    details panel | divider | player. Locked to viewport height; gap +
    padding give consistent spacing between tiles and from screen edges. */
-body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs) {
+body.stash-liquid-glass .main.container-fluid > .row:has(> :is(.scene-tabs, .image-tabs)) {
     display: grid !important;
     grid-template-columns: minmax(0, clamp(385px, 22.5vw, 405px)) minmax(0, 1fr) !important;
     grid-template-rows: 1fr !important;
@@ -50,7 +50,7 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs) {
 /* Always hide the chevron toggle divider — the auto-collapse below
    handles narrow widths automatically, so the manual toggle is dead UI. */
 body.stash-liquid-glass .scene-divider,
-body.stash-liquid-glass .scene-tabs.collapsed {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs).collapsed {
     display: none !important;
 }
 
@@ -60,10 +60,10 @@ body.stash-liquid-glass .scene-tabs.collapsed {
    change — keeping these aligned avoids a janky in-between state
    where the panel takes 340px but the player gets squeezed to 0. */
 @media (max-width: 1199.98px) {
-    body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs) {
+    body.stash-liquid-glass .main.container-fluid > .row:has(> :is(.scene-tabs, .image-tabs)) {
         grid-template-columns: minmax(0, 1fr) !important;
     }
-    body.stash-liquid-glass .scene-tabs {
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
         display: none !important;
     }
 }
@@ -73,7 +73,7 @@ body.stash-liquid-glass .scene-tabs.collapsed {
    auto` (intrinsic content height), which OVERRIDES `max-height: 100%`
    and forces the item taller than the grid track. Setting it to 0
    makes the item honour the track height and clip via overflow. */
-body.stash-liquid-glass .scene-tabs {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
     height: 100% !important;
     max-height: 100% !important;
     min-height: 0 !important;
@@ -91,17 +91,17 @@ body.stash-liquid-glass .scene-tabs {
        doesn't reflow / get clipped when the scrollbar appears or hides. */
     scrollbar-gutter: stable !important;
 }
-body.stash-liquid-glass .scene-tabs::-webkit-scrollbar {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs)::-webkit-scrollbar {
     width: 6px !important;
 }
-body.stash-liquid-glass .scene-tabs::-webkit-scrollbar-track {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs)::-webkit-scrollbar-track {
     background: transparent !important;
 }
-body.stash-liquid-glass .scene-tabs::-webkit-scrollbar-thumb {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs)::-webkit-scrollbar-thumb {
     background: var(--glass-border) !important;
     border-radius: 3px !important;
 }
-body.stash-liquid-glass .scene-tabs .tab-content,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content,
 body.stash-liquid-glass .gallery-container .tab-content {
     background: transparent !important;
     border: none !important;
@@ -117,7 +117,7 @@ body.stash-liquid-glass .gallery-container .tab-content {
     flex: 1 1 auto !important;
     min-height: 0 !important;
 }
-body.stash-liquid-glass .scene-tabs .tab-pane.active.show {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane.active.show {
     display: flex !important;
     flex-direction: column !important;
     gap: 0.75rem !important;
@@ -134,7 +134,7 @@ body.stash-liquid-glass .scene-tabs .tab-pane.active.show {
    When content above is short, the auto-margin consumes the gap so the cards
    sit flush at the panel bottom. When content overflows, the row stays at its
    natural position (no negative margin). */
-body.stash-liquid-glass .scene-tabs .row:has(> .col-12.scene-performers-row) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row:has(> .col-12.scene-performers-row) {
     margin-top: auto !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
@@ -171,8 +171,8 @@ body.stash-liquid-glass .gallery-divider {
    div and injects .stash-perf-prev / .stash-perf-next chevrons that scrollBy()
    the inner row by one card width. Wrapper has 56px gutters on each side so
    chevrons sit in their own space, not on top of the cards.
-   Inside .scene-tabs the same class is added to .col-12 in-place; the sidebar
-   block below (with .scene-tabs qualifier) overrides padding/margin there. */
+   Inside :is(.scene-tabs, .image-tabs) the same class is added to .col-12 in-place; the sidebar
+   block below (with :is(.scene-tabs, .image-tabs) qualifier) overrides padding/margin there. */
 body.stash-liquid-glass .scene-performers-row {
     position: relative !important;
     overflow: visible !important;
@@ -253,7 +253,7 @@ body.stash-liquid-glass .stash-perf-next:hover {
    refract.js) that replaces Bootstrap's native dropdown. The overlay
    fills the details panel with a dimmed scrim and a centered glass card
    containing the operation items as buttons. Bypasses Popper entirely. */
-body.stash-liquid-glass .scene-tabs,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs),
 body.stash-liquid-glass .gallery-tabs {
     position: relative !important;
 }
@@ -380,7 +380,7 @@ body.stash-liquid-glass .gallery-tabs {
 }
 
 /* ── Title row — studio label stacked above the scene title ──────── */
-body.stash-liquid-glass .scene-header-container {
+body.stash-liquid-glass :is(.scene-header-container, .image-header-container) {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -394,17 +394,17 @@ body.stash-liquid-glass .scene-header-container {
 /* Hide the studio LOGO IMAGE only. The studio NAME is injected as a
    <span class="st-studio-name"> child of the <a> by refract.js (the
    name lives only in the image's alt attribute on this Stash version). */
-body.stash-liquid-glass .scene-tabs .scene-header-container img,
-body.stash-liquid-glass .scene-tabs .scene-header-container .studio-logo img,
-body.stash-liquid-glass .scene-tabs .scene-studio-overlay img,
-body.stash-liquid-glass .scene-tabs .scene-studio img,
-body.stash-liquid-glass .scene-tabs .studio-logo img {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-header-container, .image-header-container) img,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-header-container, .image-header-container) .studio-logo img,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-studio-overlay img,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-studio img,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .studio-logo img {
     display: none !important;
 }
 /* Studio name label injected by JS — small accent-bright link sitting
    above the scene title, matching the muted-label aesthetic used for
    inline studio text elsewhere. */
-body.stash-liquid-glass .scene-header-container h1.studio-logo {
+body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1.studio-logo {
     margin: 0 0 0.15rem 0 !important;
     padding: 0 !important;
     font-size: 0.85rem !important;
@@ -413,7 +413,7 @@ body.stash-liquid-glass .scene-header-container h1.studio-logo {
     background: transparent !important;
     border: none !important;
 }
-body.stash-liquid-glass .scene-header-container h1.studio-logo > a {
+body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1.studio-logo > a {
     color: var(--accent-bright) !important;
     text-decoration: none !important;
     text-transform: uppercase;
@@ -422,7 +422,7 @@ body.stash-liquid-glass .scene-header-container h1.studio-logo > a {
     font-weight: 700;
     transition: color 0.15s ease;
 }
-body.stash-liquid-glass .scene-header-container h1.studio-logo > a:hover {
+body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1.studio-logo > a:hover {
     color: var(--accent-light) !important;
 }
 body.stash-liquid-glass .st-studio-name {
@@ -430,8 +430,8 @@ body.stash-liquid-glass .st-studio-name {
 }
 /* If a studio link/text accompanies the title, render it inline before
    the title as a small muted label. */
-body.stash-liquid-glass .scene-tabs .scene-studio,
-body.stash-liquid-glass .scene-tabs .scene-studio-name {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-studio,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-studio-name {
     flex: 0 0 auto !important;
     font-size: 0.85rem !important;
     color: var(--text-muted) !important;
@@ -441,9 +441,9 @@ body.stash-liquid-glass .scene-tabs .scene-studio-name {
     background: transparent !important;
     border: none !important;
 }
-body.stash-liquid-glass h3.scene-header,
-body.stash-liquid-glass h2.scene-header,
-body.stash-liquid-glass .scene-header {
+body.stash-liquid-glass h3:is(.scene-header, .image-header),
+body.stash-liquid-glass h2:is(.scene-header, .image-header),
+body.stash-liquid-glass :is(.scene-header, .image-header) {
     flex: 1 1 auto !important;
     min-width: 0 !important;
     background: transparent !important;
@@ -460,23 +460,23 @@ body.stash-liquid-glass .scene-header {
     line-height: 1.3 !important;
     letter-spacing: -0.01em !important;
 }
-body.stash-liquid-glass .scene-header .TruncatedText,
-body.stash-liquid-glass .scene-header > div {
+body.stash-liquid-glass :is(.scene-header, .image-header) .TruncatedText,
+body.stash-liquid-glass :is(.scene-header, .image-header) > div {
     color: inherit !important;
     font-family: inherit !important;
     font-size: inherit !important;
     font-weight: inherit !important;
     line-height: inherit !important;
 }
-body.stash-liquid-glass .scene-header h5,
-body.stash-liquid-glass .scene-header .text-muted {
+body.stash-liquid-glass :is(.scene-header, .image-header) h5,
+body.stash-liquid-glass :is(.scene-header, .image-header) .text-muted {
     font-size: 0.82rem !important;
     color: var(--text-muted) !important;
     font-weight: 400 !important;
 }
 
 /* Subheader row (date | fps | resolution) sits below the title */
-body.stash-liquid-glass .scene-tabs .scene-subheader {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) {
     display: flex !important;
     flex-wrap: wrap !important;
     align-items: center !important;
@@ -485,16 +485,16 @@ body.stash-liquid-glass .scene-tabs .scene-subheader {
     font-size: 0.78rem !important;
     color: var(--text-muted) !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-subheader .date {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .date {
     color: var(--text) !important;
     font-weight: 500 !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-subheader .divider {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .divider {
     opacity: 0.4 !important;
 }
 
 /* ── Toolbar — strict single row of small glass-pill buttons ──────── */
-body.stash-liquid-glass .scene-tabs .scene-toolbar {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
     display: flex !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
@@ -504,10 +504,10 @@ body.stash-liquid-glass .scene-tabs .scene-toolbar {
     -ms-overflow-style: none !important;
     scrollbar-width: none !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-toolbar::-webkit-scrollbar {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar)::-webkit-scrollbar {
     display: none !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-toolbar-group {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) {
     display: flex !important;
     align-items: center !important;
     gap: 0.3rem !important;
@@ -516,12 +516,12 @@ body.stash-liquid-glass .scene-tabs .scene-toolbar-group {
 /* Star rating styling lives in the global block in 08_misc_mid.css.
    Scene-tabs only needs to size the button frame to align with adjacent
    pill controls; the icon styling is inherited. */
-body.stash-liquid-glass .scene-tabs .rating-stars button {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars button {
     width: 18px !important;
     height: 18px !important;
     min-width: 18px !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-toolbar .adv-rating-btn {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
     height: 26px !important;
     padding: 0 0.55rem !important;
     background: rgba(255, 255, 255, 0.05) !important;
@@ -534,7 +534,7 @@ body.stash-liquid-glass .scene-tabs .scene-toolbar .adv-rating-btn {
     align-items: center !important;
     gap: 0.2rem !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-toolbar .count-button {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) {
     height: 26px !important;
     border-radius: var(--radius-pill) !important;
     overflow: hidden !important;
@@ -543,7 +543,7 @@ body.stash-liquid-glass .scene-tabs .scene-toolbar .count-button {
     display: inline-flex !important;
     align-items: center !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-toolbar .count-button button {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) button {
     height: 26px !important;
     padding: 0 0.5rem !important;
     background: transparent !important;
@@ -555,23 +555,48 @@ body.stash-liquid-glass .scene-tabs .scene-toolbar .count-button button {
     align-items: center !important;
     gap: 0.25rem !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-toolbar .count-button button:hover {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) button:hover {
     color: #fff !important;
     background: rgba(255, 255, 255, 0.07) !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-toolbar .count-button svg {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) svg {
     width: 11px !important;
     height: 11px !important;
+}
+
+/* Stash renders .o-counter as a btn-group with a split-button dropdown
+   caret next to the count, but the menu is empty on image pages — kill
+   both the split-button and the Bootstrap dropdown-toggle::after caret
+   so the pill stays clean. Scoped to image-toolbar; scene-page .o-counter
+   (if it ever uses this markup) keeps its dropdown. */
+body.stash-liquid-glass .image-toolbar .o-counter .dropdown-toggle-split,
+body.stash-liquid-glass .image-toolbar .o-counter > .dropdown,
+body.stash-liquid-glass .image-toolbar .o-counter .dropdown-toggle::after {
+    display: none !important;
+}
+
+/* Long-press feedback: refract.js adds .refract-o-decremented on the
+   wrapper (.count-button or .o-counter) for ~280ms when a hold fires the
+   decrement mutation. Tint red briefly so the user sees the action
+   registered. Regular click increments and gets no flash. Covers all
+   surfaces — detail toolbars, lightbox, scene/image card popovers. */
+body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented,
+body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented > button,
+body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented .count-icon,
+body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented .count-value {
+    background: rgba(244, 60, 60, 0.18) !important;
+    color: #fca5a5 !important;
+    transition: background 0.15s, color 0.15s !important;
 }
 /* `.mv-scene-page-btn` (multiview plugin) shares this size/shape rule
    with Stash core toolbar buttons; reference intentionally retained
    so the multiview button matches the rest. Plugin-specific styling
    (active state, glow) lives in 13_plugins.css. Same applies to the
    :hover and svg rules below. */
-body.stash-liquid-glass .scene-tabs .scene-toolbar .organized-button,
-body.stash-liquid-glass .scene-tabs .scene-toolbar .dropdown-toggle,
-body.stash-liquid-glass .scene-tabs .scene-toolbar .mv-scene-page-btn,
-body.stash-liquid-glass .scene-tabs .scene-toolbar > span > span > button {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > span > span > button {
     width: 26px !important;
     height: 26px !important;
     min-width: 26px !important;
@@ -585,22 +610,22 @@ body.stash-liquid-glass .scene-tabs .scene-toolbar > span > span > button {
     justify-content: center !important;
     box-shadow: none !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-toolbar .organized-button:hover,
-body.stash-liquid-glass .scene-tabs .scene-toolbar .dropdown-toggle:hover,
-body.stash-liquid-glass .scene-tabs .scene-toolbar .mv-scene-page-btn:hover {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button:hover,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle:hover,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn:hover {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     color: #fff !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-toolbar .organized-button svg,
-body.stash-liquid-glass .scene-tabs .scene-toolbar .dropdown-toggle svg,
-body.stash-liquid-glass .scene-tabs .scene-toolbar .mv-scene-page-btn svg {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button svg,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle svg,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn svg {
     width: 11px !important;
     height: 11px !important;
 }
 
 /* ── Tabs nav — compact pill row, single line ─────────────────────── */
-body.stash-liquid-glass .scene-tabs .nav-tabs,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs,
 body.stash-liquid-glass .gallery-tabs .nav-tabs,
 body.stash-liquid-glass .nav-tabs {
     border-bottom-color: var(--glass-border) !important;
@@ -613,17 +638,17 @@ body.stash-liquid-glass .nav-tabs {
    matters). Bare .nav-tabs (performer/studio detail page count tabs) keep
    overflow visible so the active-tab box-shadow glow can extend past the
    strip's vertical bounds. */
-body.stash-liquid-glass .scene-tabs .nav-tabs,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs,
 body.stash-liquid-glass .gallery-tabs .nav-tabs {
     overflow-x: auto !important;
     -ms-overflow-style: none !important;
     scrollbar-width: none !important;
 }
-body.stash-liquid-glass .scene-tabs .nav-tabs::-webkit-scrollbar,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs::-webkit-scrollbar,
 body.stash-liquid-glass .gallery-tabs .nav-tabs::-webkit-scrollbar {
     display: none !important;
 }
-body.stash-liquid-glass .scene-tabs .nav-tabs .nav-link,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link,
 body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-link,
 body.stash-liquid-glass .nav-tabs .nav-link {
     color: var(--text-muted) !important;
@@ -645,23 +670,23 @@ body.stash-liquid-glass .nav-tabs .nav-link {
    width is no longer pinned to the sum of tab widths; any extra space
    is absorbed by the tabs instead of leaving a trailing gap.
 
-   IMPORTANT: scoped to the SIDEBAR tab strips (.scene-tabs / .gallery-
+   IMPORTANT: scoped to the SIDEBAR tab strips (:is(.scene-tabs, .image-tabs) / .gallery-
    tabs) only. The previous version also matched bare `.nav-tabs
    .nav-item`, which stretched main-page tab strips (performer detail,
    gallery image-list, etc.) into unnaturally wide buttons. */
-body.stash-liquid-glass .scene-tabs .nav-tabs .nav-item,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-item,
 body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-item {
     flex: 1 1 auto !important;
     min-width: 0 !important;
 }
-body.stash-liquid-glass .scene-tabs .nav-tabs .nav-link:hover,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:hover,
 body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-link:hover,
 body.stash-liquid-glass .nav-tabs .nav-link:hover {
     color: #fff !important;
     background: rgba(255, 255, 255, 0.07) !important;
     border-color: var(--glass-border) !important;
 }
-body.stash-liquid-glass .scene-tabs .nav-tabs .nav-link.active,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active,
 body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-link.active,
 body.stash-liquid-glass .nav-tabs .nav-link.active {
     color: var(--accent-bright) !important;
@@ -687,11 +712,11 @@ body.stash-liquid-glass .performer-tabs .nav-tabs .nav-link .badge {
 }
 
 
-body.stash-liquid-glass .scene-tabs .card .card-body,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .card .card-body,
 body.stash-liquid-glass .gallery-tabs .card .card-body {
     padding: 1rem !important;
 }
-body.stash-liquid-glass .scene-tabs .card .card-header,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .card .card-header,
 body.stash-liquid-glass .gallery-tabs .card .card-header {
     background: transparent !important;
     border-bottom: 1px solid var(--glass-border) !important;
@@ -717,12 +742,12 @@ body.stash-liquid-glass .markers-panel .marker-card:hover {
 
 body.stash-liquid-glass .scene-file-info table,
 body.stash-liquid-glass .scene-history table,
-body.stash-liquid-glass .scene-tabs .table {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table {
     background: transparent !important;
     color: var(--text) !important;
     font-size: 0.82rem !important;
 }
-body.stash-liquid-glass .scene-tabs .table thead th {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table thead th {
     background: rgba(255, 255, 255, 0.04) !important;
     color: var(--text-muted) !important;
     border-bottom: 1px solid var(--glass-border) !important;
@@ -731,15 +756,15 @@ body.stash-liquid-glass .scene-tabs .table thead th {
     text-transform: uppercase !important;
     letter-spacing: 0.04em !important;
 }
-body.stash-liquid-glass .scene-tabs .table tbody tr {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table tbody tr {
     border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
     transition: background 0.15s !important;
 }
-body.stash-liquid-glass .scene-tabs .table tbody tr:hover {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table tbody tr:hover {
     background: rgba(255, 255, 255, 0.04) !important;
 }
-body.stash-liquid-glass .scene-tabs .table td,
-body.stash-liquid-glass .scene-tabs .table th {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table td,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table th {
     border-color: rgba(255, 255, 255, 0.04) !important;
     padding: 0.55rem 0.75rem !important;
 }
@@ -748,15 +773,15 @@ body.stash-liquid-glass .scene-tabs .table th {
 
 /* Metadata strip (Created At / Updated At / Studio Code) — hidden per
    user preference. The full row is wrapped, so hide the row too. */
-body.stash-liquid-glass .scene-tabs .col-12.scene-details,
-body.stash-liquid-glass .scene-tabs .row:has(> .col-12.scene-details) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12.scene-details,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row:has(> .col-12.scene-details) {
     display: none !important;
 }
 
 /* Description+Tags column — flat content, no nested chrome.
    Keep Bootstrap's column padding so the .row's -15px negative margin
    is properly compensated; only zero out chrome (bg/border/filter). */
-body.stash-liquid-glass .scene-tabs .row > .col-12:has(> p.pre) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row > .col-12:has(> p.pre) {
     background: transparent !important;
     border: none !important;
     border-radius: 0 !important;
@@ -765,7 +790,7 @@ body.stash-liquid-glass .scene-tabs .row > .col-12:has(> p.pre) {
 }
 
 /* Section labels (h6 "Details:", "Tags") */
-body.stash-liquid-glass .scene-tabs .col-12 > h6 {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
     margin: 0.6rem 0 0.35rem 0 !important;
     font-size: 0.7rem !important;
     font-weight: 600 !important;
@@ -773,7 +798,7 @@ body.stash-liquid-glass .scene-tabs .col-12 > h6 {
     letter-spacing: 0.08em !important;
     color: var(--text-muted) !important;
 }
-body.stash-liquid-glass .scene-tabs .col-12 > h6:first-child {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6:first-child {
     margin-top: 0 !important;
 }
 
@@ -781,13 +806,13 @@ body.stash-liquid-glass .scene-tabs .col-12 > h6:first-child {
    - Before JS lift: it sits before .scene-performers (caught by :has(+))
    - After JS lift: .scene-performers is gone; the h6 becomes the last
      child of .col-12 (caught by :last-child). */
-body.stash-liquid-glass .scene-tabs .col-12 > h6:has(+ .scene-performers),
-body.stash-liquid-glass .scene-tabs .col-12 > h6:last-child {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6:has(+ .scene-performers),
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6:last-child {
     display: none !important;
 }
 
 /* Description text */
-body.stash-liquid-glass .scene-tabs .col-12 > p.pre {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > p.pre {
     color: var(--text) !important;
     font-size: 0.85rem !important;
     line-height: 1.5 !important;
@@ -827,7 +852,7 @@ body.stash-liquid-glass .tag-item.tag-link.badge:hover a {
    "Tags" h6 in the scene-tabs panel. Tags wrap row-by-row left-to-right
    like the original layout; container is capped to ~5 rows of pills
    with internal vertical scroll for any overflow. */
-body.stash-liquid-glass .scene-tabs .st-tag-list {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list {
     display: flex !important;
     flex-flow: row wrap !important;
     align-content: flex-start !important;
@@ -843,21 +868,21 @@ body.stash-liquid-glass .scene-tabs .st-tag-list {
 /* Subtle bottom fade — only when the strip actually overflows its
    max-height (toggled by syncTagListFade in refract.js). Short tag
    lists stay sharply rendered with no half-faded last row. */
-body.stash-liquid-glass .scene-tabs .st-tag-list.refract-overflow {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list.refract-overflow {
     -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent 100%) !important;
             mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent 100%) !important;
 }
-body.stash-liquid-glass .scene-tabs .st-tag-list::-webkit-scrollbar {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list::-webkit-scrollbar {
     width: 6px !important;
 }
-body.stash-liquid-glass .scene-tabs .st-tag-list::-webkit-scrollbar-track {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list::-webkit-scrollbar-track {
     background: transparent !important;
 }
-body.stash-liquid-glass .scene-tabs .st-tag-list::-webkit-scrollbar-thumb {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list::-webkit-scrollbar-thumb {
     background: var(--glass-border) !important;
     border-radius: 3px !important;
 }
-body.stash-liquid-glass .scene-tabs .st-tag-list .tag-item {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item {
     margin: 0 !important;
     flex-shrink: 0 !important;
 }
@@ -879,7 +904,7 @@ body.stash-liquid-glass .scene-tabs .st-tag-list .tag-item {
    the visual content right and makes the right column extend past the
    row's content area. Zero the gutter vars here AND on the inner row so
    the chain is fully neutralised. */
-body.stash-liquid-glass .scene-tabs .scene-performers-row {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row {
     display: block !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -900,7 +925,7 @@ body.stash-liquid-glass .scene-tabs .scene-performers-row {
    sidebar grid (count=2/3/4) inherits overflow-x:auto and clips the
    right card behind a hidden scrollbar gutter. The count="many" rule
    re-applies them where actually needed. */
-body.stash-liquid-glass .scene-tabs .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers {
     margin: 0 !important;
     padding: 4px 2px 8px !important;
     background: transparent !important;
@@ -922,19 +947,19 @@ body.stash-liquid-glass .scene-tabs .scene-performers {
    up `.row > *` rules — width:100%, padding-left/right from --bs-gutter-x.
    With gutter zeroed above, padding goes to 0 — but force the reset
    explicitly on the cards too in case any later rule re-introduces it. */
-body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card {
     padding-left: 0 !important;
     padding-right: 0 !important;
     margin: 0 !important;
 }
 
 /* count = 1 → hero card, centered, current 280px size */
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="1"] .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="1"] .scene-performers {
     display: flex !important;
     flex-wrap: nowrap !important;
     justify-content: center !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="1"] .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="1"] .scene-performers > .performer-card {
     flex: 0 0 280px !important;
     width: 280px !important;
     min-width: 280px !important;
@@ -942,46 +967,46 @@ body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="1"] .
 }
 
 /* count = 2 → equal side-by-side grid */
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="2"] .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="2"] .scene-performers {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="2"] .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="2"] .scene-performers > .performer-card {
     width: 100% !important;
     min-width: 0 !important;
     max-width: none !important;
 }
 
 /* count = 3 → row of 2 + 1 centered in row 2 */
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="3"] .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="3"] .scene-performers {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
     grid-auto-rows: auto !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="3"] .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="3"] .scene-performers > .performer-card {
     width: 100% !important;
     min-width: 0 !important;
     max-width: none !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="3"] .scene-performers > .performer-card:nth-child(3) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="3"] .scene-performers > .performer-card:nth-child(3) {
     grid-column: 1 / -1 !important;
     max-width: calc(50% - 5px) !important;
     justify-self: center !important;
 }
 
 /* count = 4 → 2×2 grid */
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="4"] .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="4"] .scene-performers {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="4"] .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="4"] .scene-performers > .performer-card {
     width: 100% !important;
     min-width: 0 !important;
     max-width: none !important;
 }
 
 /* count = many (5+) → single-card carousel with snap */
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"] .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers {
     display: flex !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
@@ -991,20 +1016,20 @@ body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"
     scrollbar-width: thin !important;
     scrollbar-color: var(--glass-border) transparent !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"] .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers > .performer-card {
     flex: 0 0 280px !important;
     width: 280px !important;
     min-width: 280px !important;
     max-width: 280px !important;
     scroll-snap-align: center !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar {
     height: 6px !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar-track {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar-track {
     background: transparent !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar-thumb {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar-thumb {
     background: var(--glass-border) !important;
     border-radius: 3px !important;
 }
@@ -1012,7 +1037,7 @@ body.stash-liquid-glass .scene-tabs .scene-performers-row[data-perf-count="many"
 /* Pagination dots — only present when count="many" (JS only appends them
    in that case). Active dot is an accent-coloured pill; inactive dots are
    subtle glass-border circles that brighten on hover. */
-body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .stash-perf-dots {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -1020,7 +1045,7 @@ body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots {
     margin: 0.5rem 0 0.25rem 0 !important;
     padding: 0 !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots .dot {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .stash-perf-dots .dot {
     appearance: none !important;
     -webkit-appearance: none !important;
     background: var(--glass-border) !important;
@@ -1033,17 +1058,17 @@ body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots .dot 
     transition: background 0.18s ease, width 0.22s ease, opacity 0.15s ease !important;
     opacity: 0.65 !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots .dot:hover,
-body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots .dot:focus-visible {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .stash-perf-dots .dot:hover,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .stash-perf-dots .dot:focus-visible {
     opacity: 1 !important;
     outline: none !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers-row .stash-perf-dots .dot.active {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .stash-perf-dots .dot.active {
     background: var(--accent-bright) !important;
     width: 18px !important;
     opacity: 1 !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card .thumbnail-section {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .thumbnail-section {
     aspect-ratio: 2 / 3 !important;
     width: 100% !important;
     overflow: hidden !important;
@@ -1054,14 +1079,14 @@ body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card .thumbna
    leaving the image at its natural top-left position. Target ONLY that
    anchor (the one containing the image) — there's a second <a> in the
    thumbnail-section for the country flag that we must not stretch. */
-body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card .thumbnail-section > a:has(> .performer-card-image) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .thumbnail-section > a:has(> .performer-card-image) {
     display: block !important;
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card .performer-card-image {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .performer-card-image {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
@@ -1075,7 +1100,7 @@ body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card .perform
    scene-tabs strip. The default sizes (3.5rem rating, fa-2x heart) are
    tuned for full-size performer cards and look oversized here. Border-
    radius matches the card's image rounding (~10px) for visual harmony. */
-body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card .rating-banner {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .rating-banner {
     width: 2.15rem !important;
     height: 2.15rem !important;
     min-width: 2.15rem !important;
@@ -1087,12 +1112,12 @@ body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card .rating-
     top: 0.6rem !important;
     left: 0.6rem !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card .favorite-button {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .favorite-button {
     padding: 0.2rem !important;
     top: 0.45rem !important;
     right: 0.45rem !important;
 }
-body.stash-liquid-glass .scene-tabs .scene-performers > .performer-card .favorite-button svg {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .favorite-button svg {
     width: 1.35rem !important;
     height: 1.35rem !important;
     font-size: 1.35rem !important;
@@ -1287,5 +1312,39 @@ body.stash-liquid-glass .scene-wall-item-text-container {
 /* The .scene-divider chevron toggle is hidden globally in the layout
    block above (lines ~46–50). The auto-collapse media query handles
    narrow widths automatically, so the manual toggle is dead UI. */
+
+/* ── Image-detail page: glass shell around the still ─────────────────
+   The image page mirrors the scene page grid (sidebar + media on right),
+   but its right column holds .image-container with a raw <img> instead of
+   the video player. Give it the same glass shell as .video-wrapper so the
+   still floats nicely inside the row. Scoped to the row that has .image-tabs
+   to avoid touching .image-container in other contexts (e.g. galleries). */
+body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image-container {
+    background: #000 !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    overflow: hidden !important;
+    height: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.35),
+        0 0 60px -10px rgba(var(--accent-rgb), 0.28),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+}
+body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image-container > img.image-image {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    margin: 0 !important;
+}
 
 /* ── Wall / masonry view ────────────────────────────────────────────── */

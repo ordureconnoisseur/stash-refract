@@ -118,28 +118,28 @@ body.stash-liquid-glass .wall-item .wall-item-check:checked {
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.55) !important;
 }
 
-body.stash-liquid-glass .scene-tabs .btn-group .btn.active,
-body.stash-liquid-glass .scene-tabs .btn-group .btn.btn-primary {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .btn-group .btn.active,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .btn-group .btn.btn-primary {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
     color: var(--accent-bright) !important;
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Edit tab (#scene-edit-details inside .scene-tabs)
+   Edit tab (:is(#scene-edit-details, #image-edit-details) inside :is(.scene-tabs, .image-tabs))
    The 320px sidebar is too narrow for Bootstrap's col-sm-3/col-sm-9
    label/input split. Stack labels above inputs, tighten spacing, and
    restyle the react-select multi-value pills so they match the tag
    pill aesthetic used elsewhere in the panel.
    ─────────────────────────────────────────────────────────────────── */
 
-body.stash-liquid-glass .scene-tabs #scene-edit-details {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) {
     padding: 0 !important;
 }
 
 /* The form-container row has px-3 / pt-3 utilities and Stash's native
    dark form background (~rgb(32,43,51)) — neutralise both. */
-body.stash-liquid-glass .scene-tabs #scene-edit-details .form-container {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .form-container {
     padding: 0 !important;
     margin: 0 !important;
     background: transparent !important;
@@ -148,13 +148,13 @@ body.stash-liquid-glass .scene-tabs #scene-edit-details .form-container {
 
 /* Stack label + input vertically. Bootstrap's col-sm-3 / col-sm-9
    becomes a single full-width column inside the narrow sidebar. */
-body.stash-liquid-glass .scene-tabs #scene-edit-details .form-group.row {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .form-group.row {
     display: flex !important;
     flex-direction: column !important;
     margin: 0 0 0.85rem 0 !important;
     gap: 0.3rem !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .form-group.row > label {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .form-group.row > label {
     flex: 0 0 auto !important;
     max-width: 100% !important;
     width: 100% !important;
@@ -166,10 +166,10 @@ body.stash-liquid-glass .scene-tabs #scene-edit-details .form-group.row > label 
     color: var(--text-muted) !important;
     text-align: left !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .form-group.row > div[class*="col-"],
-body.stash-liquid-glass .scene-tabs #scene-edit-details .form-group.row > .col-sm-9,
-body.stash-liquid-glass .scene-tabs #scene-edit-details .form-group.row > .col-lg-12,
-body.stash-liquid-glass .scene-tabs #scene-edit-details .form-group.row > .col-xl-12 {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .form-group.row > div[class*="col-"],
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .form-group.row > .col-sm-9,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .form-group.row > .col-lg-12,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .form-group.row > .col-xl-12 {
     flex: 1 1 auto !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -181,68 +181,68 @@ body.stash-liquid-glass .scene-tabs #scene-edit-details .form-group.row > .col-x
    does, and forcing it !important on this high-specificity selector
    prevents downstream pill-merging selectors (string-list-input,
    date-input-group) from flattening the right corners. */
-body.stash-liquid-glass .scene-tabs #scene-edit-details .form-control,
-body.stash-liquid-glass .scene-tabs #scene-edit-details textarea.form-control,
-body.stash-liquid-glass .scene-tabs #scene-edit-details input.text-input {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .form-control,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) textarea.form-control,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) input.text-input {
     font-size: 0.82rem !important;
     padding: 0.4rem 0.6rem !important;
     background: rgba(255, 255, 255, 0.04) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details textarea.form-control {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) textarea.form-control {
     min-height: 6rem !important;
     line-height: 1.4 !important;
 }
 
 /* Edit-buttons row (Save / Delete + Scrape with…) */
-body.stash-liquid-glass .scene-tabs #scene-edit-details .edit-buttons-container {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .edit-buttons-container {
     margin: 0 0 1rem 0 !important;
     padding: 0 !important;
     flex-wrap: wrap !important;
     gap: 0.4rem !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .edit-buttons {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .edit-buttons {
     margin: 0 !important;
     padding: 0 !important;
     display: flex !important;
     gap: 0.4rem !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .edit-buttons .edit-button,
-body.stash-liquid-glass .scene-tabs #scene-edit-details .scraper-group .btn:not(.reload-button) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .edit-buttons .edit-button,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .scraper-group .btn:not(.reload-button) {
     font-size: 0.78rem !important;
     padding: 0.35rem 0.7rem !important;
     border-radius: var(--radius-sm) !important;
 }
 /* The magnifying-glass dropdown is a btn-secondary — Bootstrap default
    gives it ~rgb(57,75,89), a desaturated blue. Convert to glass. */
-body.stash-liquid-glass .scene-tabs #scene-edit-details .scraper-group .btn.btn-secondary {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .scraper-group .btn.btn-secondary {
     background: rgba(255, 255, 255, 0.04) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .scraper-group .btn.btn-secondary:hover {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .scraper-group .btn.btn-secondary:hover {
     background: rgba(255, 255, 255, 0.08) !important;
     border-color: var(--accent-glow) !important;
     color: var(--text) !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .scraper-group {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .scraper-group {
     gap: 0.3rem !important;
 }
 
 /* React-select control inside the Edit form */
-body.stash-liquid-glass .scene-tabs #scene-edit-details .react-select__control {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .react-select__control {
     background: rgba(255, 255, 255, 0.04) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     min-height: 32px !important;
     font-size: 0.82rem !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .react-select__control--is-focused {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .react-select__control--is-focused {
     border-color: var(--accent-glow) !important;
     box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.10) !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .react-select__placeholder {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .react-select__placeholder {
     color: var(--text-muted) !important;
     font-size: 0.82rem !important;
 }
@@ -274,19 +274,38 @@ body.stash-liquid-glass .react-select__multi-value__remove:hover {
     background: rgba(244, 60, 60, 0.18) !important;
     color: #fca5a5 !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .react-select__indicator {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .react-select__indicator {
     padding: 0 0.35rem !important;
 }
 
+/* React Select injects two sibling spans with class `css-XXX-a11yText`
+   immediately before `.react-select__control` — these are aria-live regions
+   for screen readers and should be visually hidden. Some browser/cascade
+   combinations let them render as small dots/ovals below each select. Force
+   the standard sr-only pattern so they stay off-screen no matter what. */
+body.stash-liquid-glass [class*="css-"][class$="-a11yText"],
+body.stash-liquid-glass .react-select [aria-live] {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    pointer-events: none !important;
+}
+
 /* URL string-list input rows */
-body.stash-liquid-glass .scene-tabs #scene-edit-details .string-list-input .form-group {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .string-list-input .form-group {
     margin: 0 0 0.4rem 0 !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .string-list-input .input-group .btn {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .string-list-input .input-group .btn {
     padding: 0.35rem 0.55rem !important;
     font-size: 0.78rem !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .string-list-input .input-group .btn svg {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .string-list-input .input-group .btn svg {
     width: 0.9rem !important;
     height: 0.9rem !important;
 }
@@ -392,7 +411,7 @@ body.stash-liquid-glass form textarea.form-control.bg-secondary {
    and its trailing buttons (scrape, minus) into a single pill: input
    gets right-flat corners, last button gets right-rounded; everything
    in between stays flat-cornered. We need an ID in the selector to
-   beat the `.scene-tabs #scene-edit-details .form-control` rule above
+   beat the `:is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .form-control` rule above
    that sets `border-radius: 12px !important` on the same input. */
 html body.stash-liquid-glass .string-list-input .input-group > input.form-control,
 html body.stash-liquid-glass .string-list-input .input-group > input.text-input.form-control,
@@ -514,10 +533,10 @@ body.stash-liquid-glass .string-list-input .input-group > .input-group-append > 
 }
 
 /* Date picker row */
-body.stash-liquid-glass .scene-tabs #scene-edit-details .date-input-group .btn {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .date-input-group .btn {
     padding: 0.35rem 0.55rem !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .date-input-group .btn svg {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .date-input-group .btn svg {
     width: 0.9rem !important;
     height: 0.9rem !important;
 }
@@ -697,7 +716,7 @@ body.stash-liquid-glass form input[type="number"].text-input::-webkit-inner-spin
 }
 
 /* Cover image preview — compact and rounded */
-body.stash-liquid-glass .scene-tabs #scene-edit-details .scene-cover {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .scene-cover {
     width: 100% !important;
     max-height: 160px !important;
     object-fit: cover !important;
@@ -708,42 +727,51 @@ body.stash-liquid-glass .scene-tabs #scene-edit-details .scene-cover {
 }
 
 /* Stash IDs list — compact spacing */
-body.stash-liquid-glass .scene-tabs #scene-edit-details ul.pl-0 {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) ul.pl-0 {
     padding: 0 !important;
     margin: 0 0 0.5rem 0 !important;
     list-style: none !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details ul.pl-0 li {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) ul.pl-0 li {
     display: flex !important;
     align-items: center !important;
     gap: 0.35rem !important;
     margin: 0 0 0.3rem 0 !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details ul.pl-0 li .btn {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) ul.pl-0 li .btn {
     padding: 0.25rem 0.45rem !important;
     flex: 0 0 auto !important;
 }
 
 /* Custom Fields collapse panel — tighter */
-body.stash-liquid-glass .scene-tabs #scene-edit-details .custom-fields-input {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .custom-fields-input {
     margin-top: 0.5rem !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .custom-fields-input .collapse-button {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .custom-fields-input .collapse-button {
     padding: 0.3rem 0 !important;
     font-size: 0.78rem !important;
     color: var(--text-muted) !important;
 }
-body.stash-liquid-glass .scene-tabs #scene-edit-details .custom-fields-input-header label {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .custom-fields-input-header label {
     font-size: 0.65rem !important;
     text-transform: uppercase !important;
     letter-spacing: 0.08em !important;
     color: var(--text-muted) !important;
 }
 
-/* Group-row (no-groups state) — make the placeholder dropdown line up */
-body.stash-liquid-glass .scene-tabs #scene-edit-details .group-table .group-table-header,
-body.stash-liquid-glass .scene-tabs #scene-edit-details .group-table .group-row {
+/* Group-row (no-groups state) — make the placeholder dropdown line up
+   with the Performers / Tags selects above and below. Stash wraps the
+   Groups select in an extra .group-table > .group-row > .col-12 chain
+   that carries Bootstrap's 15px column gutters, which would otherwise
+   inset the dropdown vs its siblings. Zero margins + zero col padding
+   so the Groups field has the same effective width as the others. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .group-table .group-table-header,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .group-table .group-row {
     margin: 0 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .group-table .group-row > [class*="col-"] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 /* Detail header name-icons row — flex layout with breathing room */
