@@ -1,0 +1,46 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Scroll-perf — strip GPU-expensive backdrop-filter while the user
+   is actively scrolling. Each blur surface re-rasterizes on every
+   frame the viewport moves over it; on Chromium D3D11 that's the
+   biggest remaining frame-time cost on a busy home page after the
+   v1.13.0 perf pass.
+
+   JS in refract.js adds `body.refract-scrolling` on first scroll
+   event of a burst, debounces 150ms after the last event to remove
+   it. While scrolling, blur is off → cheap; when stopped, blur
+   returns → one cost-spike on stop instead of per-frame cost
+   throughout the scroll.
+
+   Mirrors lite mode's universal kill + solid-bg fallbacks, gated on
+   a different body class. If both classes are active (user is on
+   lite AND scrolling), the rules are functionally identical, no
+   conflict.
+   ═══════════════════════════════════════════════════════════════════ */
+
+body.stash-liquid-glass.refract-scrolling *,
+body.stash-liquid-glass.refract-scrolling *::before,
+body.stash-liquid-glass.refract-scrolling *::after {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+/* Floating glass platforms — solid bg fallback while blur is off,
+   matches lite mode's section 4. */
+body.stash-liquid-glass.refract-scrolling nav.top-nav.navbar,
+body.stash-liquid-glass.refract-scrolling .filtered-list-toolbar::before,
+body.stash-liquid-glass.refract-scrolling .pagination,
+body.stash-liquid-glass.refract-scrolling .detail-header {
+    background: rgb(35, 35, 35) !important;
+}
+
+/* Modal / popover / dropdown / tab surfaces — solid bg fallback,
+   matches lite mode's section 3. */
+body.stash-liquid-glass.refract-scrolling :is(.scene-tabs, .image-tabs),
+body.stash-liquid-glass.refract-scrolling .gallery-tabs,
+body.stash-liquid-glass.refract-scrolling .Lightbox-footer,
+body.stash-liquid-glass.refract-scrolling .Lightbox-navbutton.btn.btn-link,
+body.stash-liquid-glass.refract-scrolling .modal-content,
+body.stash-liquid-glass.refract-scrolling .popover,
+body.stash-liquid-glass.refract-scrolling .dropdown-menu {
+    background: rgba(18, 18, 22, 0.96) !important;
+}

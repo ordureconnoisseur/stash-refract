@@ -23,6 +23,7 @@ ui:
     - css/13_plugins.css
     - css/14_light.css
     - css/16_playing_card.css
+    - css/17_scroll_perf.css
     - css/15_lite.css
 settings:
   accent:
