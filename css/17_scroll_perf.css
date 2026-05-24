@@ -11,18 +11,19 @@
    returns → one cost-spike on stop instead of per-frame cost
    throughout the scroll.
 
-   No solid-bg fallbacks for navbar / toolbar / pagination etc.
-   while scrolling — the brief solid-gray pop was more visually
-   jarring than the elements' natural --glass-bg showing through
-   transparent for 150ms. Lite mode keeps its solid fallbacks
-   because it's persistent, not transient.
+   The always-visible chrome (navbar, filter toolbar pill, pagination,
+   detail header, modals/popovers/dropdowns/tabs) gets its blur
+   RESTORED during scroll — these are single fixed surfaces with
+   constant per-frame cost, and stripping them flashes a visible
+   transparency change every time the user scrolls. The real perf
+   win is in the card-inner pills/overlays/etc. which multiply across
+   the viewport; those keep their blur stripped.
 
-   2026-05-24 — extending to a full skeleton (strip filter +
-   text-shadow + simplify box-shadow + pause animations) backfired:
-   the universal style recalc on every class toggle was more
-   expensive than the per-frame raster savings, AND the restore-
-   flicker became dramatic with so many properties popping back at
-   once. Kept narrow.
+   2026-05-24 — tried extending to a full skeleton (strip filter +
+   text-shadow + simplify box-shadow + pause animations). Backfired:
+   universal style recalc on every class toggle was more expensive
+   than the per-frame raster savings, AND restore-flicker became
+   dramatic with so many properties popping back at once. Kept narrow.
    ═══════════════════════════════════════════════════════════════════ */
 
 body.stash-liquid-glass.refract-scrolling *,
@@ -30,4 +31,22 @@ body.stash-liquid-glass.refract-scrolling *::before,
 body.stash-liquid-glass.refract-scrolling *::after {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+}
+
+/* Restore blur on chrome — selectors more specific than `*` so the
+   restore wins the cascade tiebreak even with matched !important.
+   Visual continuity: these elements look identical scrolling vs not. */
+body.stash-liquid-glass.refract-scrolling nav.top-nav.navbar,
+body.stash-liquid-glass.refract-scrolling .filtered-list-toolbar::before,
+body.stash-liquid-glass.refract-scrolling .pagination,
+body.stash-liquid-glass.refract-scrolling .detail-header,
+body.stash-liquid-glass.refract-scrolling :is(.scene-tabs, .image-tabs),
+body.stash-liquid-glass.refract-scrolling .gallery-tabs,
+body.stash-liquid-glass.refract-scrolling .Lightbox-footer,
+body.stash-liquid-glass.refract-scrolling .Lightbox-navbutton.btn.btn-link,
+body.stash-liquid-glass.refract-scrolling .modal-content,
+body.stash-liquid-glass.refract-scrolling .popover,
+body.stash-liquid-glass.refract-scrolling .dropdown-menu {
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    backdrop-filter: var(--glass-blur) !important;
 }
