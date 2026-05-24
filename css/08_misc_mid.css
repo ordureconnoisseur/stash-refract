@@ -3727,6 +3727,32 @@ body.stash-liquid-glass .slick-arrow.slick-disabled {
     pointer-events: none !important;
 }
 
+/* ── Recommendation rows: off-screen render skip ─────────────────
+   Each row contains heading + slick carousel of ~20 cards. On a home
+   page with 4-5 rows that's 80-100 backdrop-filtered card surfaces in
+   the DOM, all painted on every frame even when below the fold —
+   biggest remaining compositor cost on Chromium / D3D11 after the
+   shader-consolidation pass.
+
+   `content-visibility: auto` lets Chromium skip layout + paint for
+   rows outside the viewport (with a small render-ahead buffer). The
+   `contain-intrinsic-size: auto 400px` reserves placeholder space so
+   scroll position doesn't jump, and the `auto` keyword lets the
+   browser remember the actual size after first paint.
+
+   Safe to apply at the row level: slick lives INSIDE .recommendation-row,
+   so when the section is skipped the whole carousel subtree is hidden
+   atomically — slick never sees its track at width 0 (which was the
+   bug from applying content-visibility directly to .slick-slider .card
+   in lite mode). Edit mode disables this so drag-reorder stays live. */
+body.stash-liquid-glass .recommendation-row {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 400px;
+}
+body.stash-liquid-glass .recommendations-container-edit .recommendation-row {
+    content-visibility: visible;
+}
+
 /* ── Recommendation row head ─────────────────────────────────────── */
 body.stash-liquid-glass .recommendation-row-head {
     display: flex !important;
