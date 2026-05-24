@@ -1229,7 +1229,7 @@ body.stash-liquid-glass .pagination-container {
 body.stash-liquid-glass .pagination-index-container {
     background: transparent !important;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
