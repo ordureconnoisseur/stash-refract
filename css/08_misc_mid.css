@@ -1664,32 +1664,39 @@ body.stash-liquid-glass .movie-card .favorite-button.favorite svg {
 /* Direct-target favourite-button positioning. Stash's current DOM no
    longer wraps .favorite-button in an <a> (the rules above target the
    old wrapped layout and don't match the current DOM at all). Pin to
-   top-right of the CARD (not the inset thumbnail image area) with
-   hover-reveal: hidden by default unless the card is hovered or
-   already favourited. Positioned relative to .thumbnail-section
-   (which is the absolute-positioning ancestor); since thumbnail-
-   section starts at the card top-left with no margin/border, top:
-   0.5rem; right: 0.5rem lands at the card's top-right corner. */
-body.stash-liquid-glass .studio-card .favorite-button,
-body.stash-liquid-glass .group-card .favorite-button,
-body.stash-liquid-glass .movie-card .favorite-button {
+   top-right of the CARD itself, not the inset thumbnail image area.
+   Hover-reveal: hidden by default unless the card is hovered or
+   already favourited.
+
+   Higher-specificity chain (button.favorite-button.btn) so this wins
+   any Stash defaults that may set top/right inline or via more
+   specific selectors. Top/right of 0 anchors to the card's outer
+   corner (thumbnail-section starts at card 0,0 with no margin/border);
+   the inset comes from a small `inset: 0.5rem` instead. */
+body.stash-liquid-glass .studio-card button.favorite-button.btn,
+body.stash-liquid-glass .group-card button.favorite-button.btn,
+body.stash-liquid-glass .movie-card button.favorite-button.btn {
     position: absolute !important;
     top: 0.5rem !important;
     right: 0.5rem !important;
+    left: auto !important;
+    bottom: auto !important;
     z-index: 4 !important;
     opacity: 0 !important;
     transition: opacity 0.18s ease !important;
-    padding: 0.25rem !important;
+    padding: 0.2rem !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    width: auto !important;
+    height: auto !important;
 }
-body.stash-liquid-glass .studio-card:hover .favorite-button,
-body.stash-liquid-glass .studio-card .favorite-button.favorite,
-body.stash-liquid-glass .group-card:hover .favorite-button,
-body.stash-liquid-glass .group-card .favorite-button.favorite,
-body.stash-liquid-glass .movie-card:hover .favorite-button,
-body.stash-liquid-glass .movie-card .favorite-button.favorite {
+body.stash-liquid-glass .studio-card:hover button.favorite-button.btn,
+body.stash-liquid-glass .studio-card button.favorite-button.btn.favorite,
+body.stash-liquid-glass .group-card:hover button.favorite-button.btn,
+body.stash-liquid-glass .group-card button.favorite-button.btn.favorite,
+body.stash-liquid-glass .movie-card:hover button.favorite-button.btn,
+body.stash-liquid-glass .movie-card button.favorite-button.btn.favorite {
     opacity: 1 !important;
 }
 
@@ -1726,6 +1733,24 @@ body.stash-liquid-glass .performer-card .card-popovers > .count-button.increment
 body.stash-liquid-glass .scene-card .card-popovers > .count-button.increment-only .count-icon,
 body.stash-liquid-glass .scene-card .card-popovers > .count-button.increment-only .count-value {
     color: var(--accent-bright) !important;
+    /* Match sibling .btn.minimal.btn-primary — same font-size, weight,
+       padding as scene-count / performer-count buttons in the row. */
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    padding: 0.375rem 0.75rem !important;
+}
+/* Icon size: scene-count uses Font Awesome's fa-icon at 1em (rendered
+   at ~1rem). The O count's inline SVG renders at width="1em" attr by
+   default but the parent button's 0.8rem font-size made it
+   proportionally smaller. With font-size now 1rem (above), 1em = 1rem
+   matches the FA icon. Explicit override locks both axes. */
+body.stash-liquid-glass .studio-card .card-popovers > .count-button.increment-only .count-icon svg,
+body.stash-liquid-glass .group-card .card-popovers > .count-button.increment-only .count-icon svg,
+body.stash-liquid-glass .movie-card .card-popovers > .count-button.increment-only .count-icon svg,
+body.stash-liquid-glass .performer-card .card-popovers > .count-button.increment-only .count-icon svg,
+body.stash-liquid-glass .scene-card .card-popovers > .count-button.increment-only .count-icon svg {
+    width: 1em !important;
+    height: 1em !important;
 }
 
 /* ───────────────────────────────────────────────────────────────────
