@@ -20,8 +20,8 @@
 
 #mv-topbar {
     background: rgba(20, 20, 24, 0.78) !important;
-    backdrop-filter: blur(24px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+    backdrop-filter: var(--glass-blur-xl-sat) !important;
+    -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
     border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
 
@@ -79,14 +79,14 @@ body:has(#mv-menu-panel) #mv-roulette-btn:hover {
 
 #mv-settings-modal {
     background: rgba(8, 8, 10, 0.45) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
+    backdrop-filter: var(--glass-blur-lg) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg) !important;
 }
 
 .mv-settings-card {
     background: rgba(28, 28, 32, 0.62) !important;
-    backdrop-filter: blur(32px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(32px) saturate(140%) !important;
+    backdrop-filter: var(--glass-blur-2xl-sat) !important;
+    -webkit-backdrop-filter: var(--glass-blur-2xl-sat) !important;
     border-color: rgba(255, 255, 255, 0.14) !important;
     border-radius: 14px !important;
     box-shadow:
@@ -148,8 +148,8 @@ body:has(#mv-menu-panel) #mv-roulette-btn:hover {
         inset 0 1px 0 rgba(255, 255, 255, 0.22),
         inset 0 -1px 0 rgba(0, 0, 0, 0.28),
         0 4px 12px rgba(0, 0, 0, 0.28) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: var(--glass-blur-sm) !important;
+    backdrop-filter: var(--glass-blur-sm) !important;
     transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease !important;
 }
 .mv-toggle::after {
@@ -209,8 +209,8 @@ body:has(#mv-menu-panel) #mv-roulette-btn:hover {
 
 #mv-menu-panel {
     background: rgba(28, 28, 32, 0.62) !important;
-    backdrop-filter: blur(32px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(32px) saturate(140%) !important;
+    backdrop-filter: var(--glass-blur-2xl-sat) !important;
+    -webkit-backdrop-filter: var(--glass-blur-2xl-sat) !important;
     border-color: rgba(255, 255, 255, 0.14) !important;
     border-radius: 14px !important;
     box-shadow:

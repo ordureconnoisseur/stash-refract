@@ -421,8 +421,8 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash
         0 0 64px rgba(var(--badge-color), 0.28),
         0 6px 16px rgba(0, 0, 0, 0.6) !important;
     text-decoration: none !important;
-    backdrop-filter: blur(4px) !important;
-    -webkit-backdrop-filter: blur(4px) !important;
+    backdrop-filter: var(--glass-blur-xs) !important;
+    -webkit-backdrop-filter: var(--glass-blur-xs) !important;
     transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
 }
 /* Badge number — gradient text fill matching the name banner. JS
@@ -549,8 +549,8 @@ body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .
         0 0 12px rgba(var(--tier-color), 0.85),
         0 0 28px rgba(var(--tier-color), 0.4),
         0 4px 10px rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: var(--glass-blur-xs);
+    -webkit-backdrop-filter: var(--glass-blur-xs);
     pointer-events: none;
 }
 

@@ -38,7 +38,24 @@ body.stash-liquid-glass {
     --glass-bg-strong: rgba(255, 255, 255, 0.10);
     --glass-border: rgba(255, 255, 255, 0.12);
     --glass-border-bright: rgba(255, 255, 255, 0.22);
-    --glass-blur: blur(24px);
+    --glass-blur: blur(24px);             /* legacy alias — equals --glass-blur-xl */
+
+    /* Backdrop blur tiers. Each unique backdrop-filter expression compiles
+       to its own HLSL shader on Windows Chromium / D3D11; consolidating
+       to a fixed token set caps the shader count (was 22, now 11) and
+       stops the HLSLCompiler recompile churn on home-page navigation. */
+    --glass-blur-xs:      blur(6px);
+    --glass-blur-sm:      blur(10px);
+    --glass-blur-md:      blur(14px);
+    --glass-blur-lg:      blur(20px);
+    --glass-blur-xl:      blur(24px);
+    --glass-blur-2xl:     blur(32px);
+    --glass-blur-sm-sat:  blur(10px) saturate(140%);
+    --glass-blur-md-sat:  blur(14px) saturate(140%);
+    --glass-blur-lg-sat:  blur(20px) saturate(140%);
+    --glass-blur-xl-sat:  blur(24px) saturate(140%);
+    --glass-blur-2xl-sat: blur(32px) saturate(140%);
+
     --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
 
     /* Depth shadows — graduated single-layer drop shadows. Tokenized

@@ -318,8 +318,8 @@ body.stash-liquid-glass nav.top-nav .navbar-toggler {
             0 6px 18px rgba(0, 0, 0, 0.35),
             0 0 22px rgba(var(--accent-rgb), 0.18),
             inset 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
-        -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-        backdrop-filter: blur(14px) saturate(140%) !important;
+        -webkit-backdrop-filter: var(--glass-blur-md-sat) !important;
+        backdrop-filter: var(--glass-blur-md-sat) !important;
     }
     &:hover::before {
         opacity: 1 !important;
