@@ -395,7 +395,7 @@
                     R.createElement("div", null,
                         R.createElement("h3", null, "Lite mode"),
                         R.createElement("div", { className: "sub-heading" },
-                            "Strip backdrop-blur, glow shadows, animations, hover effects, and the performer carousel loop trick. Lighter on GPU; recommended on older or integrated graphics.")
+                            "Strip backdrop-blur (the heaviest GPU cost on Windows Chromium). Animations, shadows, and hover effects stay. Recommended if the home page feels janky on Chrome / Edge / Brave.")
                     ),
                     R.createElement("div", { className: "refract-setting-control" },
                         R.createElement("div", { className: "custom-control custom-switch" },
@@ -521,11 +521,11 @@
         });
     }
 
-    /* Lite mode — strips backdrop-blur, multi-layer glow shadows,
-       animations / transitions / hover effects, and the performer
-       carousel infinite-loop clones. CSS rules in css/14_lite.css are
-       gated on `body.refract-lite`. JS gates (card tilt, carousel
-       clone setup) read this class at runtime. */
+    /* Lite mode — strips ONLY backdrop-blur (the heaviest GPU cost on
+       Windows Chromium / D3D11). Animations, shadows, glow halos,
+       hover effects, card tilt, and the performer carousel loop
+       clones all stay on. CSS rules in css/15_lite.css handle the
+       blur kill + solid-background fallbacks; no JS gates needed. */
     function isLiteModeEnabled() {
         try {
             return localStorage.getItem(LITE_MODE_STORAGE_KEY) === "1";
@@ -1718,8 +1718,6 @@
 
     function cardTiltBind(card) {
         if (card._stashTilt) { return; }
-        /* Lite mode: skip the 3D-tilt + glare entirely. */
-        if (document.body.classList.contains("refract-lite")) { return; }
         card._stashTilt = true;
 
         /* Skip the glare overlay on image-cards — it paints above Stash's
@@ -4822,15 +4820,9 @@
            and last card to the start lets the user scroll past either
            edge and silently land on the equivalent real card. */
 
-        /* Lite mode: skip the clones entirely (and tear any stale ones
-           down). Native scroll-snap takes over with no silent jumps. */
-        var liteOn = document.body.classList.contains("refract-lite");
-
         /* (Re)build loop clones if count changed or clones missing. */
         var existingClones = row.querySelectorAll(":scope > .performer-card.refract-clone").length;
-        if (liteOn) {
-            if (existingClones > 0) { teardownClones(row, state); }
-        } else if (existingClones !== 2 || state.lastRealCount !== count) {
+        if (existingClones !== 2 || state.lastRealCount !== count) {
             teardownClones(row, state);
             var firstClone = realCards[0].cloneNode(true);
             var lastClone = realCards[count - 1].cloneNode(true);
