@@ -11,16 +11,18 @@
    returns → one cost-spike on stop instead of per-frame cost
    throughout the scroll.
 
-   2026-05-24 — tried extending to a full skeleton (strip filter +
-   text-shadow + simplify box-shadow + pause animations). Backfired:
-   the universal style recalc on every class toggle was more expensive
-   than the per-frame raster savings, AND the restore-flicker became
-   dramatic with so many properties popping back at once. Kept narrow.
+   No solid-bg fallbacks for navbar / toolbar / pagination etc.
+   while scrolling — the brief solid-gray pop was more visually
+   jarring than the elements' natural --glass-bg showing through
+   transparent for 150ms. Lite mode keeps its solid fallbacks
+   because it's persistent, not transient.
 
-   Mirrors lite mode's universal kill + solid-bg fallbacks, gated on
-   a different body class. If both classes are active (user is on
-   lite AND scrolling), the rules are functionally identical, no
-   conflict.
+   2026-05-24 — extending to a full skeleton (strip filter +
+   text-shadow + simplify box-shadow + pause animations) backfired:
+   the universal style recalc on every class toggle was more
+   expensive than the per-frame raster savings, AND the restore-
+   flicker became dramatic with so many properties popping back at
+   once. Kept narrow.
    ═══════════════════════════════════════════════════════════════════ */
 
 body.stash-liquid-glass.refract-scrolling *,
@@ -28,25 +30,4 @@ body.stash-liquid-glass.refract-scrolling *::before,
 body.stash-liquid-glass.refract-scrolling *::after {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-}
-
-/* Floating glass platforms — solid bg fallback while blur is off,
-   matches lite mode's section 4. */
-body.stash-liquid-glass.refract-scrolling nav.top-nav.navbar,
-body.stash-liquid-glass.refract-scrolling .filtered-list-toolbar::before,
-body.stash-liquid-glass.refract-scrolling .pagination,
-body.stash-liquid-glass.refract-scrolling .detail-header {
-    background: rgb(35, 35, 35) !important;
-}
-
-/* Modal / popover / dropdown / tab surfaces — solid bg fallback,
-   matches lite mode's section 3. */
-body.stash-liquid-glass.refract-scrolling :is(.scene-tabs, .image-tabs),
-body.stash-liquid-glass.refract-scrolling .gallery-tabs,
-body.stash-liquid-glass.refract-scrolling .Lightbox-footer,
-body.stash-liquid-glass.refract-scrolling .Lightbox-navbutton.btn.btn-link,
-body.stash-liquid-glass.refract-scrolling .modal-content,
-body.stash-liquid-glass.refract-scrolling .popover,
-body.stash-liquid-glass.refract-scrolling .dropdown-menu {
-    background: rgba(18, 18, 22, 0.96) !important;
 }
