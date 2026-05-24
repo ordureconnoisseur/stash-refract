@@ -1474,6 +1474,16 @@
         var links = document.querySelectorAll(
             "nav.top-nav .navbar-buttons a.nav-utility[href], nav.top-nav .navbar-nav a[href]:not([href^='javascript'])"
         );
+        /* Pre-pass: collect all left-nav hrefs so we can disambiguate
+           prefix matches. /scenes shouldn't light up when on
+           /scenes/markers because Markers is its own nav item with a
+           longer prefix. */
+        var leftNavHrefs = [];
+        links.forEach(function (link) {
+            if (link.classList.contains("nav-utility")) { return; }
+            var p = refractPathFromHref(link.getAttribute("href") || "");
+            if (p && p !== "/") { leftNavHrefs.push(p); }
+        });
         links.forEach(function (link) {
             var rawHref = link.getAttribute("href") || "";
             if (!rawHref) { link.classList.remove("stash-nav-active"); return; }
@@ -1489,9 +1499,25 @@
             /* Left-side route links use prefix match (e.g. /scenes active on /scenes/123).
                Utility links (.nav-utility) use exact match. */
             var isLeftNav = !link.classList.contains("nav-utility");
-            var isActive = isLeftNav
-                ? (currentPath === hrefPath || currentPath.indexOf(hrefPath + "/") === 0)
-                : (currentPath === hrefPath);
+            var isActive;
+            if (isLeftNav) {
+                if (currentPath === hrefPath) {
+                    isActive = true;
+                } else if (currentPath.indexOf(hrefPath + "/") === 0) {
+                    /* Prefix match — but only if no longer-prefix nav item
+                       also matches. Prevents /scenes lighting up on
+                       /scenes/markers (Markers owns the longer prefix). */
+                    isActive = !leftNavHrefs.some(function (other) {
+                        return other !== hrefPath
+                            && other.length > hrefPath.length
+                            && (currentPath === other || currentPath.indexOf(other + "/") === 0);
+                    });
+                } else {
+                    isActive = false;
+                }
+            } else {
+                isActive = (currentPath === hrefPath);
+            }
             if (isActive) { link.classList.add("stash-nav-active"); }
             else { link.classList.remove("stash-nav-active"); }
         });
@@ -2056,7 +2082,7 @@
         tagOrientation(card);
 
         /* Floating-hearts effect for "Favourite" scenes — driven by the
-           "Favourite ★" tag injected by stash-advanced-scene-rating. We
+           "Favourite ★" tag injected by the Advanced Rating plugin. We
            detect via the tagInfo array (case-insensitive match on
            "favourite" / "favorite" so it works for either spelling and
            catches the ★-suffix). Class + 7-heart layer are toggled in

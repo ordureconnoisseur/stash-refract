@@ -131,7 +131,7 @@ body.stash-liquid-glass .stash-tilt-glare-inner {
    Floating-hearts effect for favourited scenes
    The .refract-heart-particles layer is appended to a .scene-card by
    injectPerformerCircles() in refract.js when the card carries the
-   "Favourite ★" tag from stash-advanced-scene-rating. Seven ♥ glyphs
+   "Favourite ★" tag from the Advanced Rating plugin. Seven ♥ glyphs
    drift upward across the card with staggered delays + horizontal
    sway, like petals in the wind. Pure CSS animations (transform +
    opacity only) so they GPU-composite cleanly and pause automatically
@@ -368,6 +368,8 @@ body.stash-liquid-glass .grid-card.performer-card .rating-banner,
 body.stash-liquid-glass .card.performer-card .rating-banner,
 body.stash-liquid-glass .scene-card > .rating-banner,
 body.stash-liquid-glass .grid-card.scene-card > .rating-banner,
+body.stash-liquid-glass .studio-card .rating-banner,
+body.stash-liquid-glass .grid-card.studio-card .rating-banner,
 body.stash-liquid-glass #performer-page .image-container .rating-banner {
     position: absolute !important;
     top: 0.45rem !important;
@@ -376,6 +378,19 @@ body.stash-liquid-glass #performer-page .image-container .rating-banner {
     bottom: auto !important;
     z-index: 6;
     transform: none !important;
+}
+
+/* Studio cards: compact 2.7rem badge like scene cards (the default
+   3.5rem is too big for the smaller studio thumbnail aspect). */
+body.stash-liquid-glass .studio-card .rating-banner,
+body.stash-liquid-glass .grid-card.studio-card .rating-banner {
+    width: 2.7rem !important;
+    height: 2.7rem !important;
+    min-width: 2.7rem !important;
+    min-height: 2.7rem !important;
+    max-width: 2.7rem !important;
+    max-height: 2.7rem !important;
+    font-size: 1rem !important;
 }
 
 /* ── Select-circle access ─────────────────────────────────────────
