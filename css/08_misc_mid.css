@@ -1676,20 +1676,26 @@ body.stash-liquid-glass .movie-card .favorite-button.favorite svg {
 body.stash-liquid-glass .studio-card button.favorite-button.btn,
 body.stash-liquid-glass .group-card button.favorite-button.btn,
 body.stash-liquid-glass .movie-card button.favorite-button.btn {
+    /* Mirror the rating banner at top-left (top: 0.45rem; left: 0.45rem)
+       on the opposite corner. No background — just the icon, matching
+       the rating banner's positioning offsets exactly for symmetry. */
     position: absolute !important;
-    top: 0.5rem !important;
-    right: 0.5rem !important;
+    top: 0.45rem !important;
+    right: 0.45rem !important;
     left: auto !important;
     bottom: auto !important;
-    z-index: 4 !important;
+    z-index: 6 !important;
     opacity: 0 !important;
     transition: opacity 0.18s ease !important;
-    padding: 0.2rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     width: auto !important;
     height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
 }
 body.stash-liquid-glass .studio-card:hover button.favorite-button.btn,
 body.stash-liquid-glass .studio-card button.favorite-button.btn.favorite,
