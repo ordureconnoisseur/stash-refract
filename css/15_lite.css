@@ -1,16 +1,21 @@
 /* ═══════════════════════════════════════════════════════════════════
-   Lite mode — strips ONLY backdrop-filter (the GPU cost driver on
-   Windows Chromium / D3D11), plus solid-background fallbacks for the
-   surfaces where backdrop-filter was providing the visible glass.
+   Lite mode — strips the GPU-heavy bits without the nuclear nuke the
+   original lite mode evolved into. What's killed:
+     • backdrop-filter everywhere (the main D3D11 cost driver)
+     • hover glow halos on cards, navbar buttons, scene toolbar
+     • active-route navbar icon glow
+     • focused chip / list-item glow
+     • 3D card tilt + glare overlay (also gated in refract.js)
 
-   Animations, transitions, shadows, glow halos, hover effects, card
-   tilt, performer-carousel loop clones — all stay on. The original
-   lite mode evolved into a nuclear strip that lost the refract
-   identity; re-scoped 2026-05-24 to just the live-blur kill.
+   What stays:
+     • animations, transitions, base shadows
+     • performer carousel infinite-loop clones
+     • cheap state indicators (border-color, color shifts) on hover
 
-   Activated by `body.refract-lite` (toggle in plugin settings).
-   Rules below ALL scope to `body.stash-liquid-glass.refract-lite ...`
-   so they layer on top of every other refract sheet.
+   Re-scoped 2026-05-24. Activated by `body.refract-lite` (toggle in
+   plugin settings). Rules below ALL scope to
+   `body.stash-liquid-glass.refract-lite ...` so they layer on top of
+   every other refract sheet.
 
    Loaded LAST in refract.yml (after 13_plugins.css).
    ═══════════════════════════════════════════════════════════════════ */
@@ -23,7 +28,13 @@ body.stash-liquid-glass.refract-lite *::after {
     backdrop-filter: none !important;
 }
 
-/* ── 2. Glass panels: solid dark backgrounds where backdrop-filter
+/* ── 2. Hide card tilt-glare overlay (JS gate also skips binding) ─ */
+body.stash-liquid-glass.refract-lite .stash-tilt-glare,
+body.stash-liquid-glass.refract-lite .stash-tilt-glare-inner {
+    display: none !important;
+}
+
+/* ── 3. Glass panels: solid dark backgrounds where backdrop-filter
        was the visible. Modals, popovers, dropdowns, lightbox chrome,
        scene/gallery/image tab containers. */
 body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs),
@@ -36,7 +47,7 @@ body.stash-liquid-glass.refract-lite .dropdown-menu {
     background: rgba(18, 18, 22, 0.96) !important;
 }
 
-/* ── 3. Floating glass platforms (navbar, filter toolbar pill,
+/* ── 4. Floating glass platforms (navbar, filter toolbar pill,
        pagination capsule, detail header). All use var(--glass-bg)
        (~0.06 alpha) + backdrop-blur in base mode; without blur the
        low alpha reads as transparent film over scrolling content.
@@ -48,10 +59,72 @@ body.stash-liquid-glass.refract-lite .detail-header {
     background: rgb(35, 35, 35) !important;
 }
 
-/* ── 4. Minimal-cards pills + overlays solid-dark fallback. The
+/* ── 5. Cards: no hover lift, dark drop-shadow instead of accent
+       glow halo. Keeps a sense of depth on hover without the GPU
+       cost of the multi-layer accent glow. */
+body.stash-liquid-glass.refract-lite .card:hover,
+body.stash-liquid-glass.refract-lite .grid-card:hover,
+body.stash-liquid-glass.refract-lite .scene-card:hover,
+body.stash-liquid-glass.refract-lite .performer-card:hover {
+    transform: none !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+    border-color: var(--glass-border) !important;
+}
+
+/* ── 6. Navbar buttons: kill hover lift + accent halo + glare ─── */
+body.stash-liquid-glass.refract-lite nav.top-nav a.btn:hover,
+body.stash-liquid-glass.refract-lite nav.top-nav button.btn:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass.refract-lite nav.top-nav a.btn::before,
+body.stash-liquid-glass.refract-lite nav.top-nav button.btn::before,
+body.stash-liquid-glass.refract-lite nav.top-nav .gs-trigger.btn::before,
+body.stash-liquid-glass.refract-lite nav.top-nav button.gs-trigger::before {
+    display: none !important;
+}
+
+/* ── 7. ACTIVE-route navbar icons. The base rule that paints the
+       accent halo on active icons uses a high-specificity :is()
+       selector chain — equal-class +1 specificity (with .refract-lite
+       on body) is needed to win the cascade. Keep the accent COLOUR
+       on text/border so the active state is still visible — just
+       kill the glow + filter. */
+body.stash-liquid-glass.refract-lite nav.top-nav :is(a.nav-link, a.nav-utility):is(.stash-nav-active, .active) > :is(button, .btn),
+body.stash-liquid-glass.refract-lite nav.top-nav :is(a.nav-link, a.nav-utility):is(.stash-nav-active, .active).btn,
+body.stash-liquid-glass.refract-lite nav.top-nav .navbar-nav a.btn.stash-nav-active,
+body.stash-liquid-glass.refract-lite nav.top-nav .navbar-buttons a[href$="/new"] > :is(button, .btn) {
+    box-shadow: none !important;
+}
+body.stash-liquid-glass.refract-lite nav.top-nav :is(a.nav-link, a.nav-utility):is(.stash-nav-active, .active) svg,
+body.stash-liquid-glass.refract-lite nav.top-nav .navbar-nav a.btn.stash-nav-active svg,
+body.stash-liquid-glass.refract-lite nav.top-nav .navbar-buttons a[href$="/new"] svg {
+    filter: none !important;
+}
+body.stash-liquid-glass.refract-lite nav.top-nav .navbar-buttons a[href$="/new"] > button:hover,
+body.stash-liquid-glass.refract-lite nav.top-nav .navbar-buttons a[href$="/new"] > .btn:hover {
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* ── 8. Drop accent glow on focused list items / focused chips ── */
+body.stash-liquid-glass.refract-lite .gs-card.gs-focused,
+body.stash-liquid-glass.refract-lite .gs-chip.gs-focused {
+    box-shadow: none !important;
+}
+
+/* ── 9. Scene-toolbar pill button glow on hover ──────────────── */
+body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button:hover,
+body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle:hover,
+body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn:hover {
+    box-shadow: none !important;
+}
+
+/* ── 10. Minimal-cards pills + overlays solid-dark fallback. The
        performer pill, scene specs overlay, and studio overlay all
        use backdrop-filter in base mode; without it they read as
-       ghost text on the thumbnail. */
+       ghost text on the thumbnail. Hover keeps a cheap colour shift
+       for feedback (no glow halo). */
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .stash-performer-pill {
     background: rgba(20, 20, 24, 0.92) !important;
 }

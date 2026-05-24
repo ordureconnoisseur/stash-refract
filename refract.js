@@ -395,7 +395,7 @@
                     R.createElement("div", null,
                         R.createElement("h3", null, "Lite mode"),
                         R.createElement("div", { className: "sub-heading" },
-                            "Strip backdrop-blur (the heaviest GPU cost on Windows Chromium). Animations, shadows, and hover effects stay. Recommended if the home page feels janky on Chrome / Edge / Brave.")
+                            "Strip backdrop-blur + hover glow halos + card tilt (the GPU-heavy bits). Animations, shadows, and the performer carousel stay. Recommended if the home page feels janky on Chrome / Edge / Brave.")
                     ),
                     R.createElement("div", { className: "refract-setting-control" },
                         R.createElement("div", { className: "custom-control custom-switch" },
@@ -521,11 +521,13 @@
         });
     }
 
-    /* Lite mode — strips ONLY backdrop-blur (the heaviest GPU cost on
-       Windows Chromium / D3D11). Animations, shadows, glow halos,
-       hover effects, card tilt, and the performer carousel loop
-       clones all stay on. CSS rules in css/15_lite.css handle the
-       blur kill + solid-background fallbacks; no JS gates needed. */
+    /* Lite mode — strips backdrop-blur (the heaviest GPU cost on
+       Windows Chromium / D3D11), hover glow halos, and the 3D card
+       tilt-glare. Animations, base shadows, transitions, and the
+       performer carousel loop clones all stay on. CSS rules in
+       css/15_lite.css handle the blur kill + solid backgrounds +
+       hover-effect strips; the cardTiltBind JS gate skips the tilt
+       binding entirely. */
     function isLiteModeEnabled() {
         try {
             return localStorage.getItem(LITE_MODE_STORAGE_KEY) === "1";
@@ -1718,6 +1720,8 @@
 
     function cardTiltBind(card) {
         if (card._stashTilt) { return; }
+        /* Lite mode: skip the 3D-tilt + glare entirely. */
+        if (document.body.classList.contains("refract-lite")) { return; }
         card._stashTilt = true;
 
         /* Skip the glare overlay on image-cards — it paints above Stash's
