@@ -1693,65 +1693,39 @@ body.stash-liquid-glass .movie-card .favorite-button.favorite {
     opacity: 1 !important;
 }
 
-/* ── Unified card-popovers pill styling for studio / group / movie ─
-   The native .card-popovers row contains three different DOM shapes:
-     • .scene-count   — <a><button class="minimal btn btn-primary">icon+text</button></a>
-     • .performer-count — same shape
-     • .count-button.increment-only — <div role=group><button.count-icon><button.count-value></div>
-   The count-button already gets a glass pill from 10_pills_badges.css;
-   the .btn-primary children of <a> did NOT, so they looked like raw
-   orange Bootstrap buttons next to the pill. Apply the same glass-pill
-   language to all three so the row reads as a consistent set. */
-body.stash-liquid-glass .studio-card .card-popovers > a > .btn,
-body.stash-liquid-glass .group-card .card-popovers > a > .btn,
-body.stash-liquid-glass .movie-card .card-popovers > a > .btn {
-    background: var(--glass-bg-strong) !important;
-    border: 1px solid var(--glass-border) !important;
-    -webkit-backdrop-filter: var(--glass-blur-md) !important;
-    backdrop-filter: var(--glass-blur-md) !important;
-    border-radius: var(--radius-pill) !important;
-    padding: 0.35rem 0.7rem !important;
-    color: var(--text) !important;
-    font-size: 0.8rem !important;
-    font-weight: 600 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 0.35rem !important;
-    box-shadow:
-        0 2px 10px rgba(0, 0, 0, 0.25),
-        0 0 12px 2px rgba(255, 255, 255, 0.07) !important;
-    transition: box-shadow 0.2s ease, border-color 0.15s !important;
-}
-body.stash-liquid-glass .studio-card .card-popovers > a > .btn:hover,
-body.stash-liquid-glass .group-card .card-popovers > a > .btn:hover,
-body.stash-liquid-glass .movie-card .card-popovers > a > .btn:hover {
-    border-color: rgba(255, 255, 255, 0.18) !important;
-    box-shadow:
-        0 2px 10px rgba(0, 0, 0, 0.3),
-        0 0 20px 5px rgba(255, 255, 255, 0.13) !important;
-}
-body.stash-liquid-glass .studio-card .card-popovers > a > .btn svg,
-body.stash-liquid-glass .group-card .card-popovers > a > .btn svg,
-body.stash-liquid-glass .movie-card .card-popovers > a > .btn svg {
-    width: 0.9em !important;
-    height: 0.9em !important;
-    color: var(--text-muted) !important;
-}
-/* Reset the btn-group's segmented border-radius — each child is its
-   own pill, not a connected group. */
-body.stash-liquid-glass .studio-card .card-popovers.btn-group,
-body.stash-liquid-glass .group-card .card-popovers.btn-group,
-body.stash-liquid-glass .movie-card .card-popovers.btn-group {
-    display: inline-flex !important;
-    gap: 0.4rem !important;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: auto;
+/* ── Card-popovers O-count alignment ──────────────────────────────
+   .scene-count and .performer-count in the popovers row render as
+   .btn.minimal.btn-primary (transparent background + accent-bright
+   colour, defined in 09_buttons.css). .count-button.increment-only
+   (O count) by default gets the glass-pill treatment from
+   10_pills_badges.css — which is right in the scene toolbar but
+   wrong here, where it sits next to two transparent siblings.
+
+   In the card-popovers context, strip the glass pill so the O count
+   reads as transparent + accent like its siblings. */
+body.stash-liquid-glass .studio-card .card-popovers > .count-button.increment-only,
+body.stash-liquid-glass .group-card .card-popovers > .count-button.increment-only,
+body.stash-liquid-glass .movie-card .card-popovers > .count-button.increment-only,
+body.stash-liquid-glass .performer-card .card-popovers > .count-button.increment-only,
+body.stash-liquid-glass .scene-card .card-popovers > .count-button.increment-only {
     background: transparent !important;
     border: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     box-shadow: none !important;
-    padding: 0 0.5rem 0.5rem !important;
-    align-self: center;
+    overflow: visible !important;
+}
+body.stash-liquid-glass .studio-card .card-popovers > .count-button.increment-only .count-icon,
+body.stash-liquid-glass .studio-card .card-popovers > .count-button.increment-only .count-value,
+body.stash-liquid-glass .group-card .card-popovers > .count-button.increment-only .count-icon,
+body.stash-liquid-glass .group-card .card-popovers > .count-button.increment-only .count-value,
+body.stash-liquid-glass .movie-card .card-popovers > .count-button.increment-only .count-icon,
+body.stash-liquid-glass .movie-card .card-popovers > .count-button.increment-only .count-value,
+body.stash-liquid-glass .performer-card .card-popovers > .count-button.increment-only .count-icon,
+body.stash-liquid-glass .performer-card .card-popovers > .count-button.increment-only .count-value,
+body.stash-liquid-glass .scene-card .card-popovers > .count-button.increment-only .count-icon,
+body.stash-liquid-glass .scene-card .card-popovers > .count-button.increment-only .count-value {
+    color: var(--accent-bright) !important;
 }
 
 /* ───────────────────────────────────────────────────────────────────
