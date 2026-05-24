@@ -378,6 +378,25 @@ body.stash-liquid-glass #performer-page .image-container .rating-banner {
     transform: none !important;
 }
 
+/* ── Select-circle access ─────────────────────────────────────────
+   The rating banner sits at the same top-left position as the
+   .card-check select circle (top: 0.45rem; left: 0.45rem on the
+   banner, top: 0.5rem; left: 0.5rem on the checkbox). The checkbox
+   has z-index 10 so it's technically above the banner, but its
+   semi-transparent fill + small 1.25rem size made it visually
+   compete with the banner's accent glow underneath. Fade the banner
+   on checkbox hover/check so the select circle stands out clearly.
+   Scoped to direct-child rating-banner on scene cards (per the
+   single-source-of-truth rule above); performer cards use the
+   native nested banner. */
+body.stash-liquid-glass .scene-card:has(.card-check:hover) > .rating-banner,
+body.stash-liquid-glass .scene-card:has(.card-check:checked) > .rating-banner,
+body.stash-liquid-glass .performer-card:has(.card-check:hover) .rating-banner,
+body.stash-liquid-glass .performer-card:has(.card-check:checked) .rating-banner {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
 /* Tiers (coloured) mode used to repaint the rating-banner with red /
    amber / green traffic-light tints based on refract-tier-low/-mid/-high.
    That treatment is now replaced by the card-frame tier system below
