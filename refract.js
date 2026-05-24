@@ -1815,8 +1815,23 @@
 
     function initCardTilts() {
         if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
+        /* Lazy-bind via IntersectionObserver: tilt listeners + glare overlay
+           are created only when a card crosses within ~200px of the viewport,
+           then we unobserve. On a home page with ~80 cards across multiple
+           recommendation rows that drops the synchronous boot-phase bind
+           cost from ~80 cards to ~20 (cards never reached are never bound).
+           The _stashTilt idempotence guard inside cardTiltBind keeps the
+           SPA-rebind path safe. */
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) {
+                    cardTiltBind(e.target);
+                    io.unobserve(e.target);
+                }
+            });
+        }, { rootMargin: "200px" });
         document.querySelectorAll(".grid-card, .scene-card, .performer-card, .wall-item").forEach(function (card) {
-            cardTiltBind(card);
+            if (!card._stashTilt) { io.observe(card); }
         });
     }
 
