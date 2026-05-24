@@ -61,21 +61,24 @@ body.stash-liquid-glass.refract-lite .detail-header {
 
 /* ── 5. Cards: no hover lift, dark drop-shadow instead of accent
        glow halo. Keeps a sense of depth on hover without the GPU
-       cost of the multi-layer accent glow. */
+       cost of the multi-layer accent glow. Base mode's accent
+       border-color flows through (cheap, no compositor cost). */
 body.stash-liquid-glass.refract-lite .card:hover,
 body.stash-liquid-glass.refract-lite .grid-card:hover,
 body.stash-liquid-glass.refract-lite .scene-card:hover,
 body.stash-liquid-glass.refract-lite .performer-card:hover {
     transform: none !important;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
-    border-color: var(--glass-border) !important;
 }
 
-/* ── 6. Navbar buttons: kill hover lift + accent halo + glare ─── */
+/* ── 6. Navbar buttons: kill hover lift + accent halo + glare, but
+       paint a cheap accent tint instead. Background-color shift is
+       paint-only — no compositor cost. */
 body.stash-liquid-glass.refract-lite nav.top-nav a.btn:hover,
 body.stash-liquid-glass.refract-lite nav.top-nav button.btn:hover {
     transform: none !important;
     box-shadow: none !important;
+    background: rgba(var(--accent-rgb), 0.12) !important;
 }
 body.stash-liquid-glass.refract-lite nav.top-nav a.btn::before,
 body.stash-liquid-glass.refract-lite nav.top-nav button.btn::before,
