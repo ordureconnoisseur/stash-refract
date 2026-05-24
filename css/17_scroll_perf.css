@@ -1,31 +1,66 @@
 /* ═══════════════════════════════════════════════════════════════════
-   Scroll-perf — strip GPU-expensive backdrop-filter while the user
-   is actively scrolling. Each blur surface re-rasterizes on every
-   frame the viewport moves over it; on Chromium D3D11 that's the
-   biggest remaining frame-time cost on a busy home page after the
-   v1.13.0 perf pass.
+   Scroll-perf — full skeleton render during active scroll.
 
-   JS in refract.js adds `body.refract-scrolling` on first scroll
-   event of a burst, debounces 150ms after the last event to remove
-   it. While scrolling, blur is off → cheap; when stopped, blur
-   returns → one cost-spike on stop instead of per-frame cost
-   throughout the scroll.
+   Each backdrop-filter / drop-shadow / animated multi-layer shadow
+   re-rasterizes per frame as the viewport moves over it. During
+   scroll, nuke ALL the GPU-expensive flourishes (blur, drop-shadow,
+   glow halos, animations, text-shadow stacks, tilt-glare overlays)
+   and replace card / rating-banner shadows with cheap single dark
+   drops. Restored on scroll-stop (150ms debounce, refract.js).
 
-   Mirrors lite mode's universal kill + solid-bg fallbacks, gated on
-   a different body class. If both classes are active (user is on
-   lite AND scrolling), the rules are functionally identical, no
-   conflict.
+   The bet: one cost-spike on scroll-stop is dramatically cheaper
+   than per-frame compositing of the full effect stack on every
+   visible card across the entire scroll burst.
+
+   Mirrors the lite mode philosophy, gated on `.refract-scrolling`
+   instead of `.refract-lite`. Active only for the brief moments
+   where it matters most.
    ═══════════════════════════════════════════════════════════════════ */
 
+/* ── 1. Universal kill — backdrop-filter, filter (drop-shadow chains),
+       text-shadow stacks, and CSS animation playback. Transitions are
+       NOT affected by animation-play-state, so they keep working. */
 body.stash-liquid-glass.refract-scrolling *,
 body.stash-liquid-glass.refract-scrolling *::before,
 body.stash-liquid-glass.refract-scrolling *::after {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+    filter: none !important;
+    text-shadow: none !important;
+    animation-play-state: paused !important;
 }
 
-/* Floating glass platforms — solid bg fallback while blur is off,
-   matches lite mode's section 4. */
+/* ── 2. Cards: kill the multi-layer accent halo on hover + the breathing
+       tier shadows. Replace with cheap solid drop for structural depth.
+       Hover transform (scale lift) also gone — composited layer churn
+       as scroll passes hovered cards isn't worth it. */
+body.stash-liquid-glass.refract-scrolling .card,
+body.stash-liquid-glass.refract-scrolling .grid-card,
+body.stash-liquid-glass.refract-scrolling .scene-card,
+body.stash-liquid-glass.refract-scrolling .performer-card,
+body.stash-liquid-glass.refract-scrolling .card:hover,
+body.stash-liquid-glass.refract-scrolling .grid-card:hover,
+body.stash-liquid-glass.refract-scrolling .scene-card:hover,
+body.stash-liquid-glass.refract-scrolling .performer-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    transform: none !important;
+}
+
+/* ── 3. Rating banner — strip the 4-layer accent glow, keep a simple
+       dark shadow so the badge still has presence. */
+body.stash-liquid-glass.refract-scrolling .rating-banner {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* ── 4. Hide tilt-glare overlays — pure mouse-driven flourish,
+       irrelevant during scroll. Also belt-and-suspenders since the
+       filter/animation kills above already neutralise their visuals. */
+body.stash-liquid-glass.refract-scrolling .stash-tilt-glare,
+body.stash-liquid-glass.refract-scrolling .stash-tilt-glare-inner {
+    display: none !important;
+}
+
+/* ── 5. Floating glass platforms — solid bg fallback while blur is off. */
 body.stash-liquid-glass.refract-scrolling nav.top-nav.navbar,
 body.stash-liquid-glass.refract-scrolling .filtered-list-toolbar::before,
 body.stash-liquid-glass.refract-scrolling .pagination,
@@ -33,8 +68,7 @@ body.stash-liquid-glass.refract-scrolling .detail-header {
     background: rgb(35, 35, 35) !important;
 }
 
-/* Modal / popover / dropdown / tab surfaces — solid bg fallback,
-   matches lite mode's section 3. */
+/* ── 6. Modal / popover / dropdown / tab surfaces — solid bg fallback. */
 body.stash-liquid-glass.refract-scrolling :is(.scene-tabs, .image-tabs),
 body.stash-liquid-glass.refract-scrolling .gallery-tabs,
 body.stash-liquid-glass.refract-scrolling .Lightbox-footer,
