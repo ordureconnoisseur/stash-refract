@@ -119,7 +119,7 @@ Refract themes the UIs of these plugins so they sit naturally inside the glass a
 **Deep integration** (themed UI + custom touches)
 
 - [**stash-multiview**](https://github.com/ordureconnoisseur/stash-multiview) — multi-scene player. The accent picked in Refract flows through to the multiview player page via a localStorage handoff. Multiview's navbar button, picking toggle, queue badge, scene-card add buttons, and floating launcher are all themed.
-- [**stash-advanced-scene-rating**](https://github.com/ordureconnoisseur/stash-advanced-scene-rating) and [**stash-advanced-performer-rating**](https://github.com/ordureconnoisseur/stash-advanced-performer-rating) — the ★+ rating trigger, favourite-heart toggle, and the criterion-rating modal are all re-skinned in accent glass.
+- [**stash-advanced-rating**](https://github.com/ordureconnoisseur/stash-advanced-rating) — the ★+ rating trigger, favourite-heart toggle, and the criterion-rating modal are all re-skinned in accent glass (both scene and performer rating).
 
 **Themed compatibility** (CSS-only re-skin)
 

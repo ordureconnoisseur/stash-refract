@@ -618,7 +618,7 @@ body.stash-liquid-glass.refract-light .grid-card .stash-o-count:hover {
 
 
 /* ═══════ 23. Advanced ratings badge (external plugin) ════════════
-   `.adv-rating-btn-badge` is styled by the Advanced Scene Ratings
+   `.adv-rating-btn-badge` is styled by the Advanced Rating
    plugin, not by Refract — its dark pill bypasses our tokens and
    looks like a black blob on white. Force light styling. Same for
    any other badge the plugin paints. */

@@ -590,9 +590,9 @@ body.stash-liquid-glass .gs-see-all:hover {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   stash-advanced-scene-rating
+   stash-advanced-rating
    Sister plugin that injects two buttons next to the scene toolbar
-   rating control:
+   rating control (and the analogous controls on the performer toolbar):
      • `.adv-rating-btn` — the ★+ trigger that opens the per-criterion
        rating modal. Ships with a yellow palette by default; we re-skin
        it in accent-glass to match Refract's toolbar language.
