@@ -1673,15 +1673,24 @@ body.stash-liquid-glass .movie-card .favorite-button.favorite svg {
    specific selectors. Top/right of 0 anchors to the card's outer
    corner (thumbnail-section starts at card 0,0 with no margin/border);
    the inset comes from a small `inset: 0.5rem` instead. */
+/* Defeat .thumbnail-section's position: relative so the favorite-button
+   positions relative to .studio-card directly — same containing block
+   as the rating banner uses. Otherwise the heart inherits thumbnail-
+   section's coord system which is the same coords numerically but
+   doesn't actually escape past its bounds for the visual placement we
+   want. */
+body.stash-liquid-glass .studio-card .thumbnail-section,
+body.stash-liquid-glass .group-card .thumbnail-section,
+body.stash-liquid-glass .movie-card .thumbnail-section {
+    position: static !important;
+}
 body.stash-liquid-glass .studio-card button.favorite-button.btn,
 body.stash-liquid-glass .group-card button.favorite-button.btn,
 body.stash-liquid-glass .movie-card button.favorite-button.btn {
-    /* Mirror the rating banner at top-left (top: 0.45rem; left: 0.45rem)
-       on the opposite corner. Same offset → same distance from the
-       card's corner → falls in the same rounded-corner dark frame
-       area where the grey image container's border-radius carves it
-       away. No background — just the icon, matching the rating
-       banner's minimal chrome. */
+    /* Mirror the rating banner exactly — same approach: position
+       absolute, same offsets (just right instead of left), positions
+       relative to .studio-card (same containing block as the rating
+       banner now that .thumbnail-section is position: static). */
     position: absolute !important;
     top: 0.45rem !important;
     right: 0.45rem !important;
