@@ -1649,8 +1649,8 @@ body.stash-liquid-glass .movie-card .favorite-button.favorite {
 body.stash-liquid-glass .studio-card .favorite-button svg,
 body.stash-liquid-glass .group-card .favorite-button svg,
 body.stash-liquid-glass .movie-card .favorite-button svg {
-    width: 1.4rem !important;
-    height: 1.4rem !important;
+    width: 2rem !important;
+    height: 2rem !important;
     filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.7)) !important;
 }
 body.stash-liquid-glass .studio-card .favorite-button.favorite svg,
@@ -1692,8 +1692,8 @@ body.stash-liquid-glass .movie-card button.favorite-button.btn {
        relative to .studio-card (same containing block as the rating
        banner now that .thumbnail-section is position: static). */
     position: absolute !important;
-    top: 0.45rem !important;
-    right: 0.45rem !important;
+    top: 0.85rem !important;
+    right: 0.85rem !important;
     left: auto !important;
     bottom: auto !important;
     z-index: 6 !important;
