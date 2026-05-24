@@ -539,6 +539,34 @@
     }
     applyLiteModeClass(isLiteModeEnabled());
 
+    /* Scroll-perf — toggle body.refract-scrolling on scroll bursts so
+       css/17_scroll_perf.css can strip backdrop-filter while the user
+       is actively scrolling. Each blur surface re-rasterizes per frame
+       during scroll (biggest remaining cost on Chromium D3D11); blur
+       returns once they stop. Capture listener catches scroll events
+       from inner scrollable containers too, not just window scroll. */
+    (function initScrollPerf() {
+        var scrollTimer = null;
+        var isScrolling = false;
+        function onScroll() {
+            if (!isScrolling) {
+                isScrolling = true;
+                if (document.body) {
+                    document.body.classList.add("refract-scrolling");
+                }
+            }
+            if (scrollTimer) { clearTimeout(scrollTimer); }
+            scrollTimer = setTimeout(function () {
+                isScrolling = false;
+                scrollTimer = null;
+                if (document.body) {
+                    document.body.classList.remove("refract-scrolling");
+                }
+            }, 150);
+        }
+        window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    })();
+
     /* Light mode — orthogonal to accents. Toggles a white/paper base
        via the `refract-light` body class; CSS rules in css/14_light.css
        override tokens + hardcoded shadows. Pairs with any accent.
