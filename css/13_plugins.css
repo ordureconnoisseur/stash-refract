@@ -96,7 +96,7 @@ body.stash-liquid-glass.mv-picking-mode .mv-add-btn {
     background: rgba(0, 0, 0, 0.55) !important;
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
     border-radius: var(--radius-sm) !important;
-    backdrop-filter: blur(8px) !important;
+    backdrop-filter: var(--glass-blur-sm) !important;
     color: #fff !important;
 }
 body.stash-liquid-glass.mv-picking-mode .mv-add-btn svg {
@@ -296,8 +296,8 @@ body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plu
    without being clipped. */
 body.stash-liquid-glass .react-datepicker {
     background: rgba(18, 18, 22, 0.88) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
-    backdrop-filter: blur(20px) saturate(140%) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg-sat) !important;
+    backdrop-filter: var(--glass-blur-lg-sat) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     box-shadow:
@@ -478,8 +478,8 @@ body.stash-liquid-glass .react-datepicker__navigation:hover .react-datepicker__n
 body.stash-liquid-glass .react-datepicker__month-dropdown,
 body.stash-liquid-glass .react-datepicker__year-dropdown {
     background: rgba(14, 14, 18, 0.98) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
-    backdrop-filter: blur(20px) saturate(140%) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg-sat) !important;
+    backdrop-filter: var(--glass-blur-lg-sat) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: var(--shadow-xl) !important;
@@ -750,8 +750,8 @@ body.stash-liquid-glass .adv-favourite-card-btn {
     background: rgba(0, 0, 0, 0.55) !important;
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
     border-radius: var(--radius-sm) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-            backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: var(--glass-blur-sm) !important;
+            backdrop-filter: var(--glass-blur-sm) !important;
     color: rgba(255, 255, 255, 0.88) !important;
     box-shadow: none !important;
     width: 28px !important;
@@ -925,8 +925,8 @@ body.stash-liquid-glass .stash-scribe-trigger-btn svg {
    Glass-blur backdrop + the standard accent halo around the modal
    card (same recipe used for the .gs-modal stashGlobalSearch panel). */
 body.stash-liquid-glass .stash-scribe-modal-overlay {
-    backdrop-filter: blur(8px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+    backdrop-filter: var(--glass-blur-sm-sat) !important;
+    -webkit-backdrop-filter: var(--glass-blur-sm-sat) !important;
 }
 body.stash-liquid-glass .stash-scribe-modal {
     /* Match the ASR/APR modal opacity recipe (.adv-rating-modal-content
@@ -935,8 +935,8 @@ body.stash-liquid-glass .stash-scribe-modal {
     background: rgba(28, 28, 28, 0.97) !important;
     border: 1px solid rgba(255, 255, 255, 0.10) !important;
     border-radius: var(--radius) !important;
-    -webkit-backdrop-filter: blur(32px) !important;
-    backdrop-filter: blur(32px) !important;
+    -webkit-backdrop-filter: var(--glass-blur-2xl) !important;
+    backdrop-filter: var(--glass-blur-2xl) !important;
     color: var(--text) !important;
     box-shadow:
         0 32px 80px rgba(0, 0, 0, 0.7),

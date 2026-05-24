@@ -615,8 +615,8 @@ body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] :is(.filter-containe
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
 }
 
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) :is(.form-control, .form-select, .custom-select) {
@@ -802,8 +802,8 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     color: var(--text) !important;
     box-shadow: none !important;
     border-radius: var(--radius-sm) !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
     transition:
         background 0.35s ease,
         border-top-color 0.35s ease,
@@ -878,8 +878,8 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     border-radius: 0 0 var(--radius-sm) var(--radius-sm) !important;
     margin-top: 0 !important;
     overflow: hidden;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
     transition: border-color 0.35s ease;
 }
 /* React-Bootstrap uses the same `.collapsing` class for open AND close, so CSS
@@ -1363,8 +1363,8 @@ body.stash-liquid-glass .tagger-container-header {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: var(--glass-blur-md);
+    backdrop-filter: var(--glass-blur-md);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     padding: 0.45rem 0.6rem;
 }
@@ -2111,8 +2111,8 @@ body.stash-liquid-glass .PerformerTagger-performer-search .refract-search-close 
     align-items: center;
     justify-content: center;
     background: rgba(var(--accent-rgb), 0.14);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
     border: 1px solid rgba(var(--accent-rgb), 0.35);
     border-radius: var(--radius-pill);
     color: var(--accent-bright);
@@ -2954,8 +2954,8 @@ body.stash-liquid-glass .refract-tag-tooltip-portal {
         0 1px 2px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.16),
         inset 0 -1px 0 rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: var(--glass-blur-xl-sat);
+    -webkit-backdrop-filter: var(--glass-blur-xl-sat);
     padding: 0.55rem;
     display: flex;
     flex-direction: column;

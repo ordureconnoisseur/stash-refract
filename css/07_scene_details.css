@@ -13,8 +13,8 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.35),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
@@ -265,8 +265,8 @@ body.stash-liquid-glass .st-op-menu-overlay {
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: var(--glass-blur-md-sat);
+    -webkit-backdrop-filter: var(--glass-blur-md-sat);
     animation: st-op-menu-fade-in 0.15s ease-out;
 }
 @keyframes st-op-menu-fade-in {
@@ -283,8 +283,8 @@ body.stash-liquid-glass .st-op-menu-card {
         0 24px 60px rgba(0, 0, 0, 0.7),
         0 0 0 1px rgba(var(--accent-rgb), 0.14),
         0 0 40px 6px rgba(var(--accent-rgb), 0.18);
-    backdrop-filter: blur(28px) saturate(160%);
-    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    backdrop-filter: var(--glass-blur-2xl-sat);
+    -webkit-backdrop-filter: var(--glass-blur-2xl-sat);
     padding: 0.4rem;
     display: flex;
     flex-direction: column;
@@ -360,8 +360,8 @@ body.stash-liquid-glass .gallery-tabs {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.35),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),

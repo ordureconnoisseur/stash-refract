@@ -541,8 +541,8 @@ body.stash-liquid-glass [data-popper-placement] {
     background-color: rgba(20, 20, 24, 0.97) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 12px !important;
-    -webkit-backdrop-filter: blur(24px);
-    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     color: var(--text) !important;
     box-shadow: var(--shadow-xl) !important;
 }
@@ -703,8 +703,8 @@ body.stash-liquid-glass .filtered-list-toolbar::before {
     box-shadow:
         var(--glass-shadow),
         inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
-    -webkit-backdrop-filter: blur(28px) saturate(170%) !important;
-    backdrop-filter: blur(28px) saturate(170%) !important;
+    -webkit-backdrop-filter: var(--glass-blur-2xl-sat) !important;
+    backdrop-filter: var(--glass-blur-2xl-sat) !important;
     z-index: -1 !important;
     pointer-events: none !important;
 }
@@ -1261,8 +1261,8 @@ body.stash-liquid-glass .pagination-index-container .filter-container.text-muted
     color: var(--text-muted) !important;
     padding: 0.2rem 0.7rem !important;
     line-height: 1.25 !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
 }
 
 /* ───────────────────────────────────────────────────────────────────
@@ -1325,8 +1325,8 @@ body.stash-liquid-glass .table-responsive:has(> table.table:has(thead th.select-
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     overflow: hidden;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
     box-shadow: var(--shadow-md);
 }
 body.stash-liquid-glass .table-responsive:has(> table.table:has(thead th.select-col)) > table.table.table-striped.table-bordered {
@@ -1344,8 +1344,8 @@ body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.se
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     overflow: hidden;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
     box-shadow: var(--shadow-md);
 }
 body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) thead tr:first-child th {

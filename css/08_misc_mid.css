@@ -1031,8 +1031,8 @@ body.stash-liquid-glass .detail-header .detail-group {
     border-radius: var(--radius-sm) !important;
     padding: 0.65rem 0.85rem;
     margin-top: 0.6rem !important;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: var(--glass-blur-md);
+    backdrop-filter: var(--glass-blur-md);
 }
 
 body.stash-liquid-glass .detail-header .detail-item:not(:first-child) {
@@ -1077,8 +1077,8 @@ body.stash-liquid-glass .detail-header .tag-head button.btn.btn-primary:not(.edi
     color: var(--text) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: none !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
 }
 
 body.stash-liquid-glass .detail-header .tag-head button.btn.btn-primary:not(.edit):not(.favorite-button):hover {
@@ -1111,8 +1111,8 @@ body.stash-liquid-glass .details-edit .btn.btn-secondary {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: var(--glass-blur-md);
+    backdrop-filter: var(--glass-blur-md);
 }
 body.stash-liquid-glass .details-edit .btn.btn-secondary:hover:not(:disabled) {
     background: var(--glass-bg-strong) !important;
@@ -2197,8 +2197,8 @@ body.stash-liquid-glass .btn.btn-danger {
     border: 1px solid rgba(239, 68, 68, 0.32) !important;
     color: #f87171 !important;
     box-shadow: none !important;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: var(--glass-blur-md);
+    backdrop-filter: var(--glass-blur-md);
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 body.stash-liquid-glass .btn.btn-danger:hover,
@@ -2216,8 +2216,8 @@ body.stash-liquid-glass .btn.btn-success {
     border: 1px solid rgba(34, 197, 94, 0.34) !important;
     color: #4ade80 !important;
     box-shadow: none !important;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: var(--glass-blur-md);
+    backdrop-filter: var(--glass-blur-md);
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 body.stash-liquid-glass .btn.btn-success:hover,
@@ -2245,8 +2245,8 @@ body.stash-liquid-glass .sidebar-toggle-button-container .sidebar-toggle-button 
     background: rgba(16, 16, 19, 0.7) !important;
     border-color: var(--glass-border) !important;
     color: var(--text) !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
 }
 body.stash-liquid-glass .sidebar-section {
     border-bottom: 1px solid var(--glass-border) !important;
@@ -2277,8 +2277,8 @@ body.stash-liquid-glass #tasks-panel .tasks-panel-queue {
     margin: 0 0 0.75rem 0 !important;
     padding: 0.55rem 0.7rem !important;
     box-sizing: border-box !important;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
     line-height: 1.35;
     letter-spacing: 0.005em;
@@ -2958,8 +2958,8 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-duration-pill {
        is acceptable here because it's at most one pill per card (not
        per-element-per-card like the previous palette). */
     background: rgba(18, 18, 22, 0.4);
-    -webkit-backdrop-filter: blur(8px) saturate(140%);
-            backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: var(--glass-blur-sm-sat);
+            backdrop-filter: var(--glass-blur-sm-sat);
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: var(--radius-pill);
     color: var(--text);
@@ -3017,8 +3017,8 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup
     border: 1px solid var(--glass-border);
     border-radius: 10px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-            backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: var(--glass-blur-lg-sat);
+            backdrop-filter: var(--glass-blur-lg-sat);
     scrollbar-width: thin;
     scrollbar-color: var(--glass-border) transparent;
     opacity: 0;
@@ -3420,8 +3420,8 @@ body.stash-liquid-glass .stash-performer-popup::before {
     padding-top: max(var(--pad), env(safe-area-inset-top));
     box-sizing: border-box;
     background: linear-gradient(180deg, rgba(8, 8, 8, 0.92) 0%, #0a0a0a 100%);
-    -webkit-backdrop-filter: blur(14px);
-    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: var(--glass-blur-md);
+    backdrop-filter: var(--glass-blur-md);
     overflow: auto;
     color: var(--text, #fff);
 }
@@ -3450,8 +3450,8 @@ body.stash-liquid-glass .stash-performer-popup::before {
     font-size: 0.9rem;
     height: 2.4rem;
     cursor: pointer;
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: var(--glass-blur-lg);
+    backdrop-filter: var(--glass-blur-lg);
     transition: background 0.18s, border-color 0.18s;
 }
 #stash-category-browser .stash-cat-close {
@@ -3496,8 +3496,8 @@ body.stash-liquid-glass .stash-performer-popup::before {
     overflow: hidden;
     border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
     background: var(--glass-bg, rgba(255, 255, 255, 0.06));
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: var(--glass-blur-lg);
+    backdrop-filter: var(--glass-blur-lg);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     cursor: pointer;
     text-align: left;
@@ -3794,8 +3794,8 @@ body.stash-liquid-glass .recommendations-container-edit > div > [draggable="true
         border-color 0.18s ease,
         transform 0.18s ease,
         box-shadow 0.18s ease;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
 }
 /* 6-dot drag handle drawn from a single dot + 5 box-shadow clones */
 body.stash-liquid-glass .recommendations-container-edit > div > [draggable="true"]::before {
@@ -4915,8 +4915,8 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__spr
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: var(--glass-blur-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.18s;
@@ -4948,8 +4948,8 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__chi
     border: 1px solid rgba(var(--accent-rgb), 0.6);
     border-radius: var(--radius-pill);
     padding: 0.22rem 0.55rem;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: var(--glass-blur-xs);
+    -webkit-backdrop-filter: var(--glass-blur-xs);
 }
 
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__meta {

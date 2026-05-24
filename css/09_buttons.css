@@ -110,8 +110,8 @@ body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .btn.btn-secondar
     height: 30px !important;
     padding: 0 0.7rem !important;
     border-radius: var(--radius-sm) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: var(--glass-blur-md) !important;
+    backdrop-filter: var(--glass-blur-md) !important;
 }
 body.stash-liquid-glass [data-stash-filter] .sort-by-select .btn.btn-secondary:hover,
 body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .btn.btn-secondary:hover {
@@ -569,8 +569,8 @@ body.stash-liquid-glass .adv-rating-modal-overlay {
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.52);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
 }
 
 /* Modal glass card */
@@ -584,8 +584,8 @@ body.stash-liquid-glass .adv-rating-modal-content {
         0 0 0 1px rgba(var(--accent-rgb), 0.18),
         0 0 48px 8px rgba(var(--accent-rgb), 0.18),
         0 0 100px 24px rgba(var(--accent-rgb), 0.08) !important;
-    -webkit-backdrop-filter: blur(32px);
-    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: var(--glass-blur-2xl);
+    backdrop-filter: var(--glass-blur-2xl);
     min-width: 400px;
     max-width: 520px;
     width: 100%;
