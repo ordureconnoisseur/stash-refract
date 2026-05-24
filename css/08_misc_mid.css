@@ -1661,6 +1661,99 @@ body.stash-liquid-glass .movie-card .favorite-button.favorite svg {
         drop-shadow(0 1px 4px rgba(0, 0, 0, 0.6)) !important;
 }
 
+/* Direct-target favourite-button positioning. Stash's current DOM no
+   longer wraps .favorite-button in an <a> (the rules above target the
+   old wrapped layout and don't match the current DOM at all). Pin to
+   top-right of the CARD (not the inset thumbnail image area) with
+   hover-reveal: hidden by default unless the card is hovered or
+   already favourited. Positioned relative to .thumbnail-section
+   (which is the absolute-positioning ancestor); since thumbnail-
+   section starts at the card top-left with no margin/border, top:
+   0.5rem; right: 0.5rem lands at the card's top-right corner. */
+body.stash-liquid-glass .studio-card .favorite-button,
+body.stash-liquid-glass .group-card .favorite-button,
+body.stash-liquid-glass .movie-card .favorite-button {
+    position: absolute !important;
+    top: 0.5rem !important;
+    right: 0.5rem !important;
+    z-index: 4 !important;
+    opacity: 0 !important;
+    transition: opacity 0.18s ease !important;
+    padding: 0.25rem !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass .studio-card:hover .favorite-button,
+body.stash-liquid-glass .studio-card .favorite-button.favorite,
+body.stash-liquid-glass .group-card:hover .favorite-button,
+body.stash-liquid-glass .group-card .favorite-button.favorite,
+body.stash-liquid-glass .movie-card:hover .favorite-button,
+body.stash-liquid-glass .movie-card .favorite-button.favorite {
+    opacity: 1 !important;
+}
+
+/* ── Unified card-popovers pill styling for studio / group / movie ─
+   The native .card-popovers row contains three different DOM shapes:
+     • .scene-count   — <a><button class="minimal btn btn-primary">icon+text</button></a>
+     • .performer-count — same shape
+     • .count-button.increment-only — <div role=group><button.count-icon><button.count-value></div>
+   The count-button already gets a glass pill from 10_pills_badges.css;
+   the .btn-primary children of <a> did NOT, so they looked like raw
+   orange Bootstrap buttons next to the pill. Apply the same glass-pill
+   language to all three so the row reads as a consistent set. */
+body.stash-liquid-glass .studio-card .card-popovers > a > .btn,
+body.stash-liquid-glass .group-card .card-popovers > a > .btn,
+body.stash-liquid-glass .movie-card .card-popovers > a > .btn {
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    -webkit-backdrop-filter: var(--glass-blur-md) !important;
+    backdrop-filter: var(--glass-blur-md) !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 0.35rem 0.7rem !important;
+    color: var(--text) !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.25),
+        0 0 12px 2px rgba(255, 255, 255, 0.07) !important;
+    transition: box-shadow 0.2s ease, border-color 0.15s !important;
+}
+body.stash-liquid-glass .studio-card .card-popovers > a > .btn:hover,
+body.stash-liquid-glass .group-card .card-popovers > a > .btn:hover,
+body.stash-liquid-glass .movie-card .card-popovers > a > .btn:hover {
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    box-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.3),
+        0 0 20px 5px rgba(255, 255, 255, 0.13) !important;
+}
+body.stash-liquid-glass .studio-card .card-popovers > a > .btn svg,
+body.stash-liquid-glass .group-card .card-popovers > a > .btn svg,
+body.stash-liquid-glass .movie-card .card-popovers > a > .btn svg {
+    width: 0.9em !important;
+    height: 0.9em !important;
+    color: var(--text-muted) !important;
+}
+/* Reset the btn-group's segmented border-radius — each child is its
+   own pill, not a connected group. */
+body.stash-liquid-glass .studio-card .card-popovers.btn-group,
+body.stash-liquid-glass .group-card .card-popovers.btn-group,
+body.stash-liquid-glass .movie-card .card-popovers.btn-group {
+    display: inline-flex !important;
+    gap: 0.4rem !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: auto;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 0.5rem 0.5rem !important;
+    align-self: center;
+}
+
 /* ───────────────────────────────────────────────────────────────────
    Expand/collapse detail header toggle
    ─────────────────────────────────────────────────────────────────── */

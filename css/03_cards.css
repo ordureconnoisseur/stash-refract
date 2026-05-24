@@ -380,18 +380,9 @@ body.stash-liquid-glass #performer-page .image-container .rating-banner {
     transform: none !important;
 }
 
-/* Studio cards: compact 2.7rem badge like scene cards (the default
-   3.5rem is too big for the smaller studio thumbnail aspect). */
-body.stash-liquid-glass .studio-card .rating-banner,
-body.stash-liquid-glass .grid-card.studio-card .rating-banner {
-    width: 2.7rem !important;
-    height: 2.7rem !important;
-    min-width: 2.7rem !important;
-    min-height: 2.7rem !important;
-    max-width: 2.7rem !important;
-    max-height: 2.7rem !important;
-    font-size: 1rem !important;
-}
+/* Studio cards keep the default 3.5rem badge — matches performer
+   cards (similar small-thumbnail layout) rather than the compact
+   2.7rem scene-card size which looked weak at this scale. */
 
 /* ── Select-circle access ─────────────────────────────────────────
    The rating banner sits at the same top-left position as the
