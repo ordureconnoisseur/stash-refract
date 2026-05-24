@@ -1677,8 +1677,11 @@ body.stash-liquid-glass .studio-card button.favorite-button.btn,
 body.stash-liquid-glass .group-card button.favorite-button.btn,
 body.stash-liquid-glass .movie-card button.favorite-button.btn {
     /* Mirror the rating banner at top-left (top: 0.45rem; left: 0.45rem)
-       on the opposite corner. No background — just the icon, matching
-       the rating banner's positioning offsets exactly for symmetry. */
+       on the opposite corner. Same offset → same distance from the
+       card's corner → falls in the same rounded-corner dark frame
+       area where the grey image container's border-radius carves it
+       away. No background — just the icon, matching the rating
+       banner's minimal chrome. */
     position: absolute !important;
     top: 0.45rem !important;
     right: 0.45rem !important;
