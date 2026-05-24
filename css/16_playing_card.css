@@ -83,6 +83,18 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refra
     pointer-events: none;
 }
 
+/* ── Top-left select-circle access ───────────────────────────────────
+   The name banner spans the top-left 75% of the card and visually
+   covers the .card-check select circle. The banner has pointer-events:
+   none so the checkbox is still clickable underneath, but it's hard
+   to see what you're aiming at. When the user hovers near the
+   checkbox, fade the banner so the circle is fully visible. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card:has(.card-check:hover) .refract-pc-name-banner,
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card:has(.card-check:checked) .refract-pc-name-banner {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
 /* Gender "type" slot — sits to the left of the name like a Pokemon
    card type symbol. Bigger than the base rule + a multi-layer neon
    glow chain that mirrors the name text's drop-shadow structure
