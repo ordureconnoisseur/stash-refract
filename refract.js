@@ -687,22 +687,39 @@
         return h;
     }
 
+    /* GraphQL transport uses XMLHttpRequest, not fetch.
+       Some third-party plugins (e.g. stashUserscriptLibrary, used by
+       OStats) monkey-patch window.fetch to inject their own per-response
+       hooks. Those hooks assume a specific data shape (e.g. data.data.findScene)
+       and throw synchronously inside their patched .then when refract's
+       responses don't match — which rejects refract's promise chain and
+       silently breaks scene-card badge injection (initSceneCards's catch
+       swallows the error). XHR isn't typically intercepted, so this
+       sidesteps the whole class of conflict. */
+    function gqlXhr(body) {
+        return new Promise(function (resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", GRAPHQL_URL, true);
+            xhr.withCredentials = true;
+            var headers = gqlHeaders();
+            Object.keys(headers).forEach(function (k) {
+                xhr.setRequestHeader(k, headers[k]);
+            });
+            xhr.onload = function () {
+                try { resolve(JSON.parse(xhr.responseText)); }
+                catch (e) { reject(e); }
+            };
+            xhr.onerror = function () { reject(new Error("network error")); };
+            xhr.send(body);
+        });
+    }
+
     function gql(query) {
-        return fetch(GRAPHQL_URL, {
-            method: "POST",
-            headers: gqlHeaders(),
-            credentials: "include",
-            body: JSON.stringify({ query: query }),
-        }).then(function (r) { return r.json(); });
+        return gqlXhr(JSON.stringify({ query: query }));
     }
 
     function gqlWithVars(query, variables) {
-        return fetch(GRAPHQL_URL, {
-            method: "POST",
-            headers: gqlHeaders(),
-            credentials: "include",
-            body: JSON.stringify({ query: query, variables: variables }),
-        }).then(function (r) { return r.json(); });
+        return gqlXhr(JSON.stringify({ query: query, variables: variables }));
     }
 
     /* Detect Stash's rating-system type (STARS vs DECIMAL). We can't read
@@ -2177,22 +2194,54 @@
 
         if (!ids.length) { return; }
 
-        var q = 'query { findScenes(scene_ids: [' + ids.join(',') + ']) {' +
-                '  scenes { id o_counter rating100 performers { id name } tags { id name } }' +
-                '} }';
+        /* Use aliased findScene (singular) calls instead of findScenes
+           (plural) with scene_ids. Stash's findScenes(scene_ids:) errors
+           the entire batch if ANY id in the list doesn't exist — and on
+           a home page with stale/deleted recommendations that's common
+           enough to silently break every card in the page. findScene(id:)
+           returns null for missing ids, so other aliases in the same
+           query still resolve and the rest of the cards get badges. */
+        var fields = 'id o_counter rating100 performers { id name } tags { id name }';
+        var aliases = ids.map(function (id) {
+            return 's' + id + ': findScene(id: ' + id + ') { ' + fields + ' }';
+        }).join(' ');
+        var q = 'query { ' + aliases + ' }';
         gql(q)
             .then(function (res) {
-                var scenes = res.data && res.data.findScenes && res.data.findScenes.scenes || [];
-                scenes.forEach(function (scene) {
-                    var card = cardMap[String(scene.id)] || cardMap[parseInt(scene.id, 10)];
-                    if (!card) { return; }
+                var data = res.data || {};
+                Object.keys(data).forEach(function (key) {
+                    var scene = data[key];
+                    if (!scene) { return; }
                     var tags = scene.tags || [];
                     var tagInfo = tags.map(function (t) { return { id: t.id, name: t.name }; })
                                       .filter(function (t) { return t.id && t.name; });
                     var oCount = parseInt(scene.o_counter, 10) || 0;
                     var rating = parseInt(scene.rating100, 10) || 0;
-                    injectPerformerCircles(card, scene.performers || [], tags.length, scene.id, oCount, tagInfo);
-                    injectSceneRating(card, rating);
+                    /* Re-query the live DOM by scene-id href instead of
+                       trusting cardMap. On the home page, React + slick
+                       reshuffle/clone scene-card nodes between when we
+                       fire the query and when it resolves — cardMap
+                       refs point to detached originals while the visible
+                       cards (including slick clones) are new nodes that
+                       cardMap doesn't know about. Querying by href
+                       finds whatever's in the DOM right now, so all
+                       visible copies of a scene-card get badges. The
+                       idempotence checks inside injectPerformerCircles
+                       /injectSceneRating make double-calls safe. */
+                    var sceneId = String(scene.id);
+                    var liveCards = document.querySelectorAll(
+                        '.scene-card a[href^="/scenes/' + sceneId + '?"], ' +
+                        '.scene-card a[href="/scenes/' + sceneId + '"], ' +
+                        '.scene-card a[href^="/scenes/' + sceneId + '/"]'
+                    );
+                    var seen = [];
+                    liveCards.forEach(function (a) {
+                        var card = a.closest(".scene-card");
+                        if (!card || seen.indexOf(card) !== -1) { return; }
+                        seen.push(card);
+                        injectPerformerCircles(card, scene.performers || [], tags.length, scene.id, oCount, tagInfo);
+                        injectSceneRating(card, rating);
+                    });
                 });
                 /* Re-tag freshly-injected banners so tier classes + the
                    --refract-rating var land for intensity/tiers modes. */

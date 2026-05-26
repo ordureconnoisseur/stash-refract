@@ -421,7 +421,14 @@ body.stash-liquid-glass .pagination[data-pager-role="hide"] {
     display: none !important;
 }
 
-/* Float the bottom pager row — fixed to viewport bottom center */
+/* Float the bottom pager row — fixed to viewport bottom center.
+   `flex-direction: column` only applies when the float row is a WRAPPER
+   (e.g. .pagination-footer on /scenes — wraps the pill plus other items
+   stacked vertically). When the float row IS the .pagination/.btn-group
+   itself (e.g. on /performers, /studios, /tags, /groups, where rowOf()
+   returned the pagination directly), column-direction stacks the
+   individual page buttons vertically instead of horizontally — that's
+   what produced the "pagination vertical on non-scene pages" report. */
 body.stash-liquid-glass [data-pager-row="float"] {
     position: fixed !important;
     bottom: 1.5rem !important;
@@ -430,10 +437,16 @@ body.stash-liquid-glass [data-pager-row="float"] {
     z-index: 400 !important;
     margin: 0 !important;
     display: flex !important;
-    flex-direction: column !important;
     align-items: center !important;
     gap: 6px !important;
     pointer-events: auto !important;
+}
+body.stash-liquid-glass [data-pager-row="float"]:not(.pagination):not(.btn-group) {
+    flex-direction: column !important;
+}
+body.stash-liquid-glass [data-pager-row="float"].pagination,
+body.stash-liquid-glass [data-pager-row="float"].btn-group {
+    flex-direction: row !important;
 }
 
 /* Glass pill around the floated pagination — covers both the wrapper-row
