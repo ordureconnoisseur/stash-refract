@@ -3813,6 +3813,12 @@ body.stash-liquid-glass .stash-carousel-fill {
 body.stash-liquid-glass .slick-slider {
     position: relative;
 }
+/* Two-layer chevron: the button itself is a subtle dark glass circle
+   (gives the icon something to sit on when it overlaps card imagery),
+   and a ::before pseudo-element holds the actual chevron drawn via
+   mask + accent-bright background. The old single-element design
+   masked the button itself, so there was no visible circle — only the
+   thin chevron line floating against whatever was behind. */
 body.stash-liquid-glass .slick-arrow,
 body.stash-liquid-glass .slick-prev,
 body.stash-liquid-glass .slick-next {
@@ -3820,50 +3826,71 @@ body.stash-liquid-glass .slick-next {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
+    /* Chevrons sit INSIDE the slider's content area (left/right: 4px)
+       rather than in the page gutter. The .recommendation-row's
+       `content-visibility: auto` adds `contain: paint` which creates
+       a stacking context — chevrons positioned in the gutter would
+       compete with the gutter's z-index from OUTSIDE that context and
+       lose regardless of how high their z-index is. Inside-the-slider
+       positioning sidesteps that entirely.
+
+       Solid semi-transparent background instead of backdrop-filter:
+       blur on these tiny surfaces caused visible flicker on every
+       repaint as the carousel scrolled or the card behind the chevron
+       changed. A solid dark fill reads almost identical at this size
+       without the GPU cost. */
     z-index: 10;
-    /* chevron colour comes from background-color through a mask of the SVG
-       — keeps the arrow on the configurable accent var, not a hardcoded hex */
-    background: var(--accent-bright) !important;
-    border: none !important;
+    background: rgba(20, 20, 24, 0.72) !important;
+    border: 1px solid var(--glass-border) !important;
     border-radius: 50%;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
     -webkit-backdrop-filter: none !important;
-    -webkit-mask-repeat: no-repeat !important;
-            mask-repeat: no-repeat !important;
-    -webkit-mask-position: center !important;
-            mask-position: center !important;
-    -webkit-mask-size: 16px 16px !important;
-            mask-size: 16px 16px !important;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
+            backdrop-filter: none !important;
     cursor: pointer;
-    opacity: 0.85;
-    transition: opacity 0.18s, transform 0.18s, filter 0.18s;
+    opacity: 1;
+    transition: opacity 0.18s, transform 0.18s, filter 0.18s, background 0.18s, border-color 0.18s;
     padding: 0 !important;
     color: transparent !important;
     font-size: 0 !important;
+    overflow: visible;
 }
 body.stash-liquid-glass .slick-arrow::before,
 body.stash-liquid-glass .slick-prev::before,
 body.stash-liquid-glass .slick-next::before {
-    display: none !important;
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    background: var(--accent-bright) !important;
+    -webkit-mask-repeat: no-repeat !important;
+            mask-repeat: no-repeat !important;
+    -webkit-mask-position: center !important;
+            mask-position: center !important;
+    -webkit-mask-size: 14px 14px !important;
+            mask-size: 14px 14px !important;
+    pointer-events: none;
 }
 body.stash-liquid-glass .slick-prev {
-    left: -32px !important;
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M15 6L9 12L15 18' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
-            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M15 6L9 12L15 18' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    left: 4px !important;
+}
+body.stash-liquid-glass .slick-prev::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M15 6L9 12L15 18' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M15 6L9 12L15 18' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
 }
 body.stash-liquid-glass .slick-next {
-    right: -32px !important;
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M9 6L15 12L9 18' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
-            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M9 6L15 12L9 18' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    right: 4px !important;
+}
+body.stash-liquid-glass .slick-next::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M9 6L15 12L9 18' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M9 6L15 12L9 18' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
 }
 body.stash-liquid-glass .slick-arrow:hover {
-    opacity: 1;
-    transform: translateY(-50%) scale(1.15);
-    filter: drop-shadow(0 2px 6px rgba(var(--accent-rgb), 0.65));
+    background: rgba(var(--accent-rgb), 0.18) !important;
+    border-color: rgba(var(--accent-rgb), 0.55) !important;
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.35) !important;
 }
 body.stash-liquid-glass .slick-arrow.slick-disabled {
     opacity: 0.25 !important;
