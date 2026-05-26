@@ -1192,7 +1192,7 @@
         galleries:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="14" height="14" rx="2"/><rect x="7" y="3" width="14" height="14" rx="2" opacity="0.55"/></svg>',
         markers:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 5 5 5 9c0 5.5 7 13 7 13s7-7.5 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="currentColor" stroke="none"/></svg>',
         performers: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
-        studios:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg>',
+        studios:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="13" cy="6" r="3"/><rect x="2.5" y="9.5" width="15" height="9" rx="1.5"/><path d="M17.5 12.5L21.5 11L21.5 17L17.5 15.5Z"/></svg>',
         tags:       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L3 13V3h10l7.6 7.6a2 2 0 010 2.8z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></svg>',
         stats:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
         settings:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>'
@@ -3205,6 +3205,33 @@
         });
     }
 
+    /* ── Active-task poll: spin the navbar cog while tasks run ──────
+       Polls jobQueue every 4s, toggles `refract-tasks-running` on
+       <body> when any job is in a non-terminal state. CSS in
+       02_navbar.css picks up that class and rotates the settings
+       cog SVG. Pauses while the tab is hidden to avoid background
+       traffic, refreshes immediately on tab-visible so the spinner
+       state isn't stale by up to one interval. */
+    function refractActiveTaskPoll() {
+        function check() {
+            if (document.hidden) { return; }
+            gql('query { jobQueue { id status } }')
+                .then(function (res) {
+                    var jobs = (res && res.data && res.data.jobQueue) || [];
+                    var active = jobs.some(function (j) {
+                        return j && (j.status === "READY" || j.status === "RUNNING" || j.status === "STOPPING");
+                    });
+                    document.body.classList.toggle("refract-tasks-running", active);
+                })
+                .catch(function () { /* Stash restarting or offline — leave class as-is */ });
+        }
+        check();
+        setInterval(check, 4000);
+        document.addEventListener("visibilitychange", function () {
+            if (!document.hidden) { check(); }
+        });
+    }
+
     /* ── boot ────────────────────────────────────────────────────── */
 
     function boot() {
@@ -3284,6 +3311,7 @@
         initRefractTagEditor();
         enhanceDuplicateChecker();
         refractFetchRatingSystem();
+        refractActiveTaskPoll();
         watchForReinjection();
         syncRoute();
     }

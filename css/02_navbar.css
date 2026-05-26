@@ -666,3 +666,20 @@ body.stash-liquid-glass nav.top-nav .navbar-nav > .st-nav-draggable {
     }
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   Active-task spinner — slowly rotate the settings cog whenever a
+   background job is running. JS in refract.js (refractActiveTaskPoll)
+   polls jobQueue every 4s and toggles `refract-tasks-running` on
+   <body>. 3s linear rotation matches the unhurried pace of native
+   Stash; transform-origin: center keeps the rotation visually
+   centred even when the SVG's viewBox isn't 0,0-square.
+   ─────────────────────────────────────────────────────────────────── */
+@keyframes refract-cog-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+body.stash-liquid-glass.refract-tasks-running nav.top-nav a[href="/settings"] svg {
+    animation: refract-cog-spin 3s linear infinite;
+    transform-origin: center;
+}
+
