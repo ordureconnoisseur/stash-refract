@@ -1196,10 +1196,44 @@ body.stash-liquid-glass .tag-card .thumbnail-section {
     padding: 0.5rem 0.5rem 0;
     overflow: visible;
 }
+/* Lock .tag-card to a fixed visual size regardless of the container.
+   Two problems being solved:
+   - On the home page, Stash's react-slick gives the tag recommendation
+     row slides of full-row width (~1280px on desktop). Without a card
+     max-width the card filled the slide, rendering one giant tile per
+     page.
+   - On any layout, .tag-card-header used `aspect-ratio: 4/3 + width: 100%`,
+     which means image height tracked container width — a wide container
+     produced a tall image, and the cards in the same row inherited the
+     tallest one's height. Fixed height + object-fit:cover gives every
+     image the same height regardless of natural dimensions or column
+     width, so cards stay uniform. */
+body.stash-liquid-glass .tag-card {
+    max-width: 220px;
+}
+body.stash-liquid-glass .slick-slider .tag-card {
+    /* In slick contexts, .tag-card behaves as `display: inline-block` so
+       its width follows the image's intrinsic ratio at the fixed 165px
+       header height — landscape images give wider cards, portrait images
+       narrower. Force an explicit width so every card lines up uniformly
+       and the image fills the header at 220×165 (with object-fit:cover
+       cropping any aspect-ratio mismatch).
+
+       Stash's tag recommendation row uses react-slick's variableWidth
+       mode — each slide takes its content's width with NO inter-slide
+       padding from slick. So horizontal margin lives on the card itself
+       to give adjacent cards breathing room (image-card / studio-card
+       rows get this for free from Stash's natural card-margin which we
+       don't override). */
+    width: 220px !important;
+    margin: 0 5px !important;
+}
 body.stash-liquid-glass .tag-card .tag-card-header {
     display: block;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    /* 124px on a 204px-wide header (220 card minus 16px thumbnail-section
+       padding) gives ~5:3 landscape — clearly rectangular, not square. */
+    height: 124px;
     overflow: hidden;
     border-radius: var(--radius-sm);
 }
