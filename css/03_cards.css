@@ -56,6 +56,41 @@ body.stash-liquid-glass .slick-slider .grid-card {
        containment keeps the slick translate-resize bug at bay without
        the per-card layer explosion. */
     contain: layout;
+    /* Re-assert overflow:hidden — the base .card rule sets it for the
+       rounded-corner clip + the playing-card tier-ribbon "cut sash"
+       effect (16_playing_card.css relies on overflow:hidden clipping
+       the ribbon's negative right:-3rem). The slick override doesn't
+       touch overflow normally, but the playing-card ribbon was still
+       extending past the rounded corner on slick scene-cards — likely
+       because something in slick's inline-style transform was nudging
+       the stacking context. Explicit !important guarantees the clip. */
+    overflow: hidden !important;
+}
+
+/* Tier-ribbon clip: only the small subset of slick cards that actually
+   have a playing-card tier ribbon (refract-card-tier-*) get clip-path,
+   so the perf cost (the HLSL shader recompile spam that commit 847600c
+   fixed by removing clip-path from ALL slick cards) is bounded to a
+   handful of rated cards instead of every card in the carousel.
+
+   Why this is needed at all: the ribbon uses `transform: rotate(45deg)`
+   which creates a stacking context. Chromium has a long-standing bug
+   where stacking contexts inside an `overflow: hidden` parent that
+   itself sits inside a transformed ancestor (slick-track's
+   `translate3d(...)`) can spill past the parent's clip. clip-path
+   enforces the clip at the compositor level. */
+body.stash-liquid-glass.refract-rating-style-playing-card .slick-slider :is(.scene-card, .performer-card)[class*="refract-card-tier-"] {
+    clip-path: inset(0 round var(--radius));
+    /* Tier-coloured border instead of the outer glow halo (which the
+       clip-path would clip away anyway). 1.5px is enough to read as a
+       deliberate accent at home-page card size without bleeding into
+       neighbouring cards. Border respects the clip, no GPU layer cost
+       — the perf reason the outer halo box-shadow was originally
+       removed from slick cards. */
+    border-color: rgba(var(--tier-color), 0.75) !important;
+    box-shadow:
+        inset 0 0 0 1px rgba(var(--tier-color-bright, var(--tier-color)), 0.35),
+        var(--shadow-md) !important;
 }
 body.stash-liquid-glass .card:hover,
 body.stash-liquid-glass .grid-card:hover {
