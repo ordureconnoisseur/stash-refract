@@ -606,8 +606,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         position: relative !important;
         transition: flex-basis 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
-    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within,
-    body.stash-liquid-glass .filtered-list-toolbar:has(input[placeholder*="Search"]:not(:placeholder-shown)) .search-term-input {
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within {
         flex: 1 1 100% !important;
         width: 100% !important;
     }
@@ -630,30 +629,41 @@ body.stash-liquid-glass .refract-mobile-drawer {
         opacity: 1;
         transition: opacity 0.18s ease;
     }
-    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within::after,
-    body.stash-liquid-glass .filtered-list-toolbar:has(input[placeholder*="Search"]:not(:placeholder-shown)) .search-term-input::after {
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within::after {
         opacity: 0;
+    }
+    /* Hide the × clear button while the search bar is collapsed (no
+       focus) — otherwise it overlaps the magnifier icon when there's
+       still a term applied. */
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:not(:focus-within) .clearable-text-field-clear {
+        display: none !important;
     }
     /* The input itself — collapsed = transparent text (icon shows
        through), open = normal text input */
-    body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"],
-    body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"] {
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input input,
+    body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group input,
+    body.stash-liquid-glass [data-stash-filter] .search-term-input input,
+    body.stash-liquid-glass [data-stash-filter] .clearable-input-group input {
         width: 100% !important;
         min-width: 0 !important;
         flex: 1 1 0 !important;
         padding: 0 !important;
         color: transparent !important;
+        -webkit-text-fill-color: transparent !important;
+        caret-color: transparent !important;
         cursor: pointer;
         transition:
             padding 0.22s cubic-bezier(0.4, 0, 0.2, 1),
             color 0.12s ease 0.08s !important;
     }
-    body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"]:focus,
-    body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"]:not(:placeholder-shown),
-    body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"]:focus,
-    body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"]:not(:placeholder-shown) {
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within input,
+    body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group:focus-within input,
+    body.stash-liquid-glass [data-stash-filter] .search-term-input:focus-within input,
+    body.stash-liquid-glass [data-stash-filter] .clearable-input-group:focus-within input {
         padding: 0 14px !important;
         color: var(--text) !important;
+        -webkit-text-fill-color: var(--text) !important;
+        caret-color: var(--text) !important;
         background-image: none !important;
         cursor: text;
     }
@@ -686,8 +696,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .filtered-list-toolbar > *:not(.search-term-input) .dropdown-toggle {
         min-width: 0 !important;
     }
-    body.stash-liquid-glass .filtered-list-toolbar:has(.search-term-input:focus-within) > *:not(.search-term-input),
-    body.stash-liquid-glass .filtered-list-toolbar:has(input[placeholder*="Search"]:not(:placeholder-shown)) > *:not(.search-term-input) {
+    body.stash-liquid-glass .filtered-list-toolbar:has(.search-term-input:focus-within) > *:not(.search-term-input) {
         max-width: 0 !important;
         max-height: 0 !important;
         opacity: 0;
@@ -698,8 +707,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
     /* Also collapse the toolbar's gap when search is open — otherwise
        the gaps between hidden items still reserve horizontal space. */
-    body.stash-liquid-glass .filtered-list-toolbar:has(.search-term-input:focus-within),
-    body.stash-liquid-glass .filtered-list-toolbar:has(input[placeholder*="Search"]:not(:placeholder-shown)) {
+    body.stash-liquid-glass .filtered-list-toolbar:has(.search-term-input:focus-within) {
         gap: 0 !important;
     }
 
@@ -711,6 +719,111 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
     body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"]:focus::placeholder {
         color: var(--text-muted) !important;
+    }
+
+    /* When a dropdown inside the toolbar opens (sort-by, etc.), lift the
+       `overflow: clip` / `max-height` on every ancestor between the menu
+       and the toolbar, plus the toolbar itself, so the menu can render
+       below. Without this the menu is clipped by the toolbar's 24px
+       clip-margin + the wrapper item's 30px max-height + any
+       intermediate Bootstrap wrappers (.input-group-prepend, .btn-group). */
+    body.stash-liquid-glass .filtered-list-toolbar:has(.dropdown-menu.show),
+    body.stash-liquid-glass .filtered-list-toolbar:has([aria-expanded="true"]) {
+        overflow: visible !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar:has(.dropdown-menu.show) *,
+    body.stash-liquid-glass .filtered-list-toolbar:has([aria-expanded="true"]) * {
+        overflow: visible !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar > *:has(.dropdown-menu.show),
+    body.stash-liquid-glass .filtered-list-toolbar > *:has([aria-expanded="true"]) {
+        max-height: none !important;
+        max-width: none !important;
+    }
+    /* On mobile, render Bootstrap dropdowns inside the toolbar as
+       centered modal panels. `position: fixed` + explicit top/left
+       override Popper's `inset: 0 auto auto 0`; `transform` overrides
+       Popper's translate3d. Paired with the body-level
+       `.refract-toolbar-dropdown-scrim` injected by refract.js. */
+    body.stash-liquid-glass .filtered-list-toolbar .dropdown-menu.show {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: translate(-50%, -50%) !important;
+        width: calc(100vw - 3rem) !important;
+        max-width: 340px !important;
+        min-width: 0 !important;
+        max-height: 70vh !important;
+        overflow-y: auto !important;
+        /* Prevent scroll chain to body — without this, scrolling past
+           the menu's end propagates to the page on iOS, which then
+           recomputes the scrim's backdrop-filter every frame and the
+           blur visibly flickers/clears. */
+        overscroll-behavior: contain !important;
+        -webkit-overflow-scrolling: touch !important;
+        z-index: 1050 !important;
+        padding: 0.5rem !important;
+        border-radius: var(--radius) !important;
+        /* Opaque modal — the scrim already provides the blurred page
+           backdrop, so the menu itself should be solid (otherwise the
+           menu's own backdrop-filter blurs the scrim through its
+           translucent fill and the contents read as hazy). */
+        background: rgb(22, 22, 27) !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    /* Make rows inside the modal touch-friendly */
+    body.stash-liquid-glass .filtered-list-toolbar .dropdown-menu.show .dropdown-item {
+        padding: 0.75rem 0.9rem !important;
+        font-size: 1rem !important;
+    }
+
+    /* Backdrop scrim — fades in / out, blurs the page behind. Same
+       pattern as .refract-burger-scrim. */
+    body.stash-liquid-glass .refract-toolbar-dropdown-scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 1040;
+        -webkit-backdrop-filter: blur(0px);
+        backdrop-filter: blur(0px);
+        /* Promote to its own GPU layer — iOS Safari otherwise drops
+           backdrop-filter rendering when a scrolling element (the modal)
+           sits over the scrim. translateZ + will-change + isolation
+           together pin the scrim onto a compositor layer that survives
+           scroll repaints. */
+        transform: translateZ(0);
+        will-change: backdrop-filter, transform;
+        isolation: isolate;
+        transition:
+            opacity 0.22s ease,
+            backdrop-filter 0.28s ease,
+            -webkit-backdrop-filter 0.28s ease;
+    }
+    body.stash-liquid-glass.refract-toolbar-dropdown-open .refract-toolbar-dropdown-scrim {
+        opacity: 1;
+        pointer-events: auto;
+        -webkit-backdrop-filter: var(--glass-blur-xs);
+        backdrop-filter: var(--glass-blur-xs);
+    }
+    /* Lift the toolbar's stacking context above the scrim while the
+       modal is open. Without this, the menu's `z-index: 1050` is local
+       to the toolbar's `z-index: 90` stacking context, so at root the
+       menu effectively renders below the scrim (1040) — and the scrim's
+       backdrop-filter blurs over the menu. */
+    body.stash-liquid-glass.refract-toolbar-dropdown-open .filtered-list-toolbar {
+        z-index: 1060 !important;
+    }
+    /* Lock the page behind the modal — stops the scrim's backdrop-filter
+       from flickering as scroll events propagate to the body. */
+    body.stash-liquid-glass.refract-toolbar-dropdown-open {
+        overflow: hidden !important;
+        overscroll-behavior: none !important;
     }
 
     /* ── 2-column card grid on mobile list pages ─────────────────────

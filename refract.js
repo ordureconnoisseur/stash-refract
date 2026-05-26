@@ -1148,6 +1148,44 @@
         return true;
     }
 
+    /* Mobile: when a Bootstrap dropdown inside the toolbar opens (sort,
+       page-size, etc.), show a body-level scrim and re-style the menu as
+       a centered modal panel via the `refract-toolbar-dropdown-open`
+       body class. Tapping the scrim closes the dropdown by clicking its
+       toggle (which lets Bootstrap run its full close routine). */
+    function injectToolbarDropdownScrim() {
+        if (!document.querySelector(".refract-toolbar-dropdown-scrim")) {
+            var scrim = document.createElement("div");
+            scrim.className = "refract-toolbar-dropdown-scrim";
+            scrim.setAttribute("aria-hidden", "true");
+            scrim.addEventListener("click", function () {
+                var toggle = document.querySelector(
+                    ".filtered-list-toolbar [aria-expanded='true']"
+                );
+                if (toggle) { toggle.click(); }
+            });
+            document.body.appendChild(scrim);
+        }
+        if (!document.body.__refractToolbarDropdownObserver) {
+            var observer = new MutationObserver(function () {
+                var anyOpen = !!document.querySelector(
+                    ".filtered-list-toolbar .dropdown-menu.show"
+                );
+                document.body.classList.toggle(
+                    "refract-toolbar-dropdown-open", anyOpen
+                );
+            });
+            observer.observe(document.body, {
+                subtree: true,
+                childList: true,
+                attributes: true,
+                attributeFilter: ["class", "aria-expanded"]
+            });
+            document.body.__refractToolbarDropdownObserver = observer;
+        }
+        return true;
+    }
+
     /* Open / close — toggles body class which animates the drawer. */
     function refractOpenBurger() {
         document.body.classList.add("refract-burger-open");
@@ -1751,6 +1789,7 @@
                 safeRun(injectMobileBurger);
                 safeRun(injectMobileNewButton);
                 safeRun(injectBurgerScrim);
+                safeRun(injectToolbarDropdownScrim);
                 safeRun(injectMobileDrawer);
                 safeRun(refractApplyNavIcons);
                 safeRun(refractAppendPluginDrawerTiles);
@@ -3256,6 +3295,7 @@
                 injectMobileBurger();
                 injectMobileNewButton();
                 injectBurgerScrim();
+                injectToolbarDropdownScrim();
                 injectMobileDrawer();
                 refractApplyNavIcons();
                 refractAppendPluginDrawerTiles();
@@ -3289,6 +3329,7 @@
         injectMobileBurger();
         injectMobileNewButton();
         injectBurgerScrim();
+        injectToolbarDropdownScrim();
         injectMobileDrawer();
         refractApplyNavIcons();
         refractAppendPluginDrawerTiles();
