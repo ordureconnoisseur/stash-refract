@@ -5954,11 +5954,17 @@ body.stash-liquid-glass #tasks-panel .tasks-panel-queue > h1 {
     border: none !important;
 }
 
-/* Inner card — flush padding so job rows own their gutters */
+/* Inner card — flush padding so job rows own their gutters. Force
+   `height: auto` because something (Stash native CSS or React inline
+   style for the collapse-animation state) was pinning the card to
+   ~140px (one job's height), clipping every job past the first via
+   overflow:hidden. The queue should always grow to fit all jobs. */
 body.stash-liquid-glass #tasks-panel .tasks-panel-queue .job-table.card {
     padding: 0 !important;
     margin: 0 !important;
     overflow: hidden !important;
+    height: auto !important;
+    max-height: none !important;
 }
 
 /* List reset */
@@ -5968,12 +5974,33 @@ body.stash-liquid-glass .job-table.card > ul {
     padding: 0 !important;
 }
 
-/* Individual job row */
+/* Individual job row — every job gets the SAME fixed height so the
+   queue card grows with job COUNT, not with the running job's
+   per-tick subtask churn (Generate / Scan jobs can list 10+ subtask
+   file paths, which was making the card height bounce around as
+   subtasks scrolled in and out of the recent list).
+
+   A small chevron (.refract-job-chevron) at the bottom-right toggles
+   the .refract-job-expanded class to let users see the full subtask
+   list per row on demand. Injected + click-handled by refract.js
+   (setupTaskJobChevrons), state stored in a closure Set keyed by
+   job index so it survives React re-renders. */
 body.stash-liquid-glass .job-table.card > ul > li.job {
     padding: 0.7rem 0.85rem !important;
     margin: 0 !important;
     border-bottom: 1px solid var(--glass-border) !important;
-    transition: background 0.18s ease !important;
+    transition: background 0.18s ease, height 0.22s ease, max-height 0.22s ease !important;
+    position: relative;
+    height: 64px !important;
+    max-height: 64px !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+}
+body.stash-liquid-glass .job-table.card > ul > li.job.refract-job-expanded {
+    height: auto !important;
+    min-height: 64px !important;
+    max-height: 600px !important;
+    overflow: auto !important;
 }
 body.stash-liquid-glass .job-table.card > ul > li.job:last-child {
     border-bottom: none !important;
@@ -5981,6 +6008,49 @@ body.stash-liquid-glass .job-table.card > ul > li.job:last-child {
 body.stash-liquid-glass .job-table.card > ul > li.job:hover {
     background: rgba(255, 255, 255, 0.025) !important;
 }
+
+/* Chevron toggle — vertically centred on the row's right edge, only
+   shown on jobs with subtasks to expand. Same accent-tinted chip
+   styling as the X stop button on the row's left edge (mirrored
+   visually), and the same chevron SVG + rotate-on-expand convention
+   as st-plugin-chevron elsewhere: points RIGHT when collapsed,
+   rotates 90° to point DOWN when expanded. */
+body.stash-liquid-glass .refract-job-chevron {
+    position: absolute !important;
+    right: 0.5rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 1.85rem !important;
+    height: 1.85rem !important;
+    min-width: 1.85rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(var(--accent-rgb), 0.08) !important;
+    border: 1px solid rgba(var(--accent-rgb), 0.28) !important;
+    border-radius: var(--radius-sm) !important;
+    color: var(--accent-bright) !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+    z-index: 5 !important;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+body.stash-liquid-glass .refract-job-chevron:hover {
+    background: rgba(var(--accent-rgb), 0.2) !important;
+    border-color: rgba(var(--accent-rgb), 0.55) !important;
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.16) !important;
+}
+body.stash-liquid-glass .refract-job-chevron svg {
+    width: 0.9rem !important;
+    height: 0.9rem !important;
+    transition: transform 0.22s ease !important;
+}
+body.stash-liquid-glass .job.refract-job-expanded .refract-job-chevron svg {
+    transform: rotate(90deg) !important;
+}
+
 
 /* Row layout: stop button left, status block right */
 body.stash-liquid-glass .job-table.card > ul > li.job > div {
