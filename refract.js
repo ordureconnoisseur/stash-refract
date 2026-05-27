@@ -1224,16 +1224,16 @@
     ];
 
     var MOBILE_NAV_ICONS = {
-        scenes:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z" fill="currentColor" stroke="none"/></svg>',
-        images:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.6" fill="currentColor" stroke="none"/><path d="M21 16l-5-5-9 9"/></svg>',
-        movies:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="9" r="5"/><circle cx="15.5" cy="9" r="5"/><circle cx="12" cy="15.5" r="5"/></svg>',
-        galleries:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="14" height="14" rx="2"/><rect x="7" y="3" width="14" height="14" rx="2" opacity="0.55"/></svg>',
-        markers:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 5 5 5 9c0 5.5 7 13 7 13s7-7.5 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="currentColor" stroke="none"/></svg>',
-        performers: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
-        studios:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="13" cy="6" r="3"/><rect x="2.5" y="9.5" width="15" height="9" rx="1.5"/><path d="M17.5 12.5L21.5 11L21.5 17L17.5 15.5Z"/></svg>',
-        tags:       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L3 13V3h10l7.6 7.6a2 2 0 010 2.8z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></svg>',
-        stats:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
-        settings:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>'
+        scenes:     '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z" fill="currentColor" stroke="none"/></svg>',
+        images:     '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.6" fill="currentColor" stroke="none"/><path d="M21 16l-5-5-9 9"/></svg>',
+        movies:     '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="9" r="5"/><circle cx="15.5" cy="9" r="5"/><circle cx="12" cy="15.5" r="5"/></svg>',
+        galleries:  '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="14" height="14" rx="2"/><rect x="7" y="3" width="14" height="14" rx="2" opacity="0.55"/></svg>',
+        markers:    '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8 2 5 5 5 9c0 5.5 7 13 7 13s7-7.5 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="currentColor" stroke="none"/></svg>',
+        performers: '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+        studios:    '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="13" cy="6" r="3"/><rect x="2.5" y="9.5" width="15" height="9" rx="1.5"/><path d="M17.5 12.5L21.5 11L21.5 17L17.5 15.5Z"/></svg>',
+        tags:       '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L3 13V3h10l7.6 7.6a2 2 0 010 2.8z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none"/></svg>',
+        stats:      '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+        settings:   '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>'
     };
 
     function injectMobileDrawer() {
@@ -4833,9 +4833,9 @@
        video. Click handlers proxy to the corresponding (hidden) VideoJS
        buttons so we don't depend on the player API surface. */
     var SVG_BACK_10 =
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg>';
+        '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg>';
     var SVG_FWD_10 =
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 4 21 9 16 9"/></svg>';
+        '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 4 21 9 16 9"/></svg>';
     var SVG_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg>';
     var SVG_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6V5zm8 0h4v14h-4V5z"/></svg>';
 
@@ -6350,6 +6350,82 @@
     }
     setupTaskQueuePercent(); /* initial pass; re-runs via consolidated watcher */
 
+    /* Task Queue per-row expand: each job row is fixed at 110px so
+       the card grows with job count not subtask churn. A chevron in
+       the bottom-right of rows that have subtasks toggles a
+       `refract-job-expanded` class to reveal the full subtask list.
+
+       Expanded state lives in a closure Set keyed by job INDEX (jobs
+       don't expose a stable id we can latch onto). Index-based
+       tracking means if a job completes and shifts, the next job at
+       that index inherits the expanded state — acceptable trade-off
+       for not having job ids exposed by Stash. */
+    /* Use the same chevron path as st-plugin-chevron (refract.js:5969)
+       for visual consistency. CSS rotates it 90° to point down in the
+       collapsed state, 270° when expanded. */
+    var REFRACT_JOB_CHEVRON_SVG =
+        "<svg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg' aria-hidden='true'>" +
+        "<path d='M10 7L15 12L10 17' stroke='currentColor' stroke-width='1.5' " +
+        "stroke-linecap='round' stroke-linejoin='round'/></svg>";
+    var refractExpandedJobIndices = new Set();
+    function setupTaskJobChevrons() {
+        var card = document.querySelector("#tasks-panel .tasks-panel-queue .job-table.card");
+        if (!card) { return; }
+        /* Clean up any stale top-of-card toggle from the earlier
+           collapse experiment, in case its CSS leaks. */
+        var staleToggle = card.querySelector(":scope > .refract-task-queue-toggle");
+        if (staleToggle) { staleToggle.remove(); }
+
+        var jobs = card.querySelectorAll(":scope > ul > li.job");
+        jobs.forEach(function (job, idx) {
+            var hasSubtasks = !!job.querySelector(".job-subtask");
+            var existingChevron = job.querySelector(":scope > .refract-job-chevron");
+
+            if (refractExpandedJobIndices.has(idx)) {
+                job.classList.add("refract-job-expanded");
+            } else {
+                job.classList.remove("refract-job-expanded");
+            }
+
+            if (!hasSubtasks) {
+                if (existingChevron) { existingChevron.remove(); }
+                return;
+            }
+
+            if (!existingChevron) {
+                var btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "refract-job-chevron";
+                btn.setAttribute("data-refract-job-idx", String(idx));
+                btn.setAttribute("aria-label", "Toggle subtask list");
+                btn.innerHTML = REFRACT_JOB_CHEVRON_SVG;
+                job.appendChild(btn);
+            } else {
+                existingChevron.setAttribute("data-refract-job-idx", String(idx));
+            }
+        });
+    }
+
+    if (!window.__refractJobChevronClickBound) {
+        window.__refractJobChevronClickBound = true;
+        document.addEventListener("click", function (e) {
+            var t = e.target;
+            if (!t || !t.closest) { return; }
+            var btn = t.closest(".refract-job-chevron");
+            if (!btn) { return; }
+            var idx = parseInt(btn.getAttribute("data-refract-job-idx"), 10);
+            if (isNaN(idx)) { return; }
+            if (refractExpandedJobIndices.has(idx)) {
+                refractExpandedJobIndices.delete(idx);
+            } else {
+                refractExpandedJobIndices.add(idx);
+            }
+            setupTaskJobChevrons();
+        }, true);
+    }
+
+    setupTaskJobChevrons();
+
     /* Inject a sun/moon light-mode toggle into the navbar utility cluster
        (right side, next to the burger / settings cog). Idempotent —
        skip if already injected. Visibility is gated by CSS via the
@@ -6857,6 +6933,7 @@
             try { setupTaskPluginGroups(); } catch (e) {}
             try { setupNativeTaskGroups(); } catch (e) {}
             try { setupTaskQueuePercent(); } catch (e) {}
+            try { setupTaskJobChevrons(); } catch (e) {}
             try { injectNavLightToggle(); } catch (e) {}
             try { injectInterfaceLightToggleSetting(); } catch (e) {}
             try { setupNavbarReorder(); } catch (e) {}
