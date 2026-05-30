@@ -195,10 +195,51 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
     line-height: 1.4 !important;
 }
 
-/* Edit-buttons row (Save / Delete + Scrape with…) */
+/* Edit-buttons row (Save / Delete + Scrape with…).
+   Stash makes this bar `position: sticky; top: 0` with an OPAQUE
+   `background-color: $body-bg` so scrolled fields can't bleed through.
+   Refract's `.form-container { background: transparent }` treatment
+   strips that fill, so the sticky bar reads as see-through and the
+   fields below (Director, Galleries, …) overlap the buttons on scroll.
+
+   Fix: fade the fields out under the bar. The bar is toned with the
+   PANEL's own glass recipe (`--glass-bg-strong` + a saturated blur,
+   matching `.scene-tabs` in 07_scene_details.css) so it reads as part
+   of the panel rather than a foreign band — earlier attempts looked like
+   a band because they matched the BODY tone, not the lighter glass panel
+   the toolbar actually sits on. The backdrop-filter frosts any field
+   scrolling behind the buttons so it blurs away instead of overlapping
+   legibly, and the background gradient fades to transparent over the
+   extra bottom padding so a field dissolves into the frost as it rises
+   into the bar rather than popping under a hard edge. `--glass-bg-strong`
+   is overridden in 14_light.css, so this tracks light/dark automatically.
+   Selector sits later than the `.form-container` rule at equal
+   specificity, so its background wins. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .edit-buttons-container {
+    /* Keep Stash's `position: sticky; top: 0` (do NOT override position) —
+       the Save/Scrape bar stays pinned while the form scrolls. To occlude
+       fields scrolling up behind it WITHOUT reading as a band, replicate
+       the panel's exact composited tone with an OPAQUE fill:
+         panel surface = page-behind + one `--glass-bg-strong` overlay.
+       So: an opaque `var(--bg-1)` base (the page color behind the panel)
+       with the SAME `--glass-bg-strong` overlay layered on top. Opaque =>
+       fields are fully hidden (no overlap); identical formula => the bar
+       is the same grey as the panel (no band). Earlier attempts banded
+       because they used the BODY tone alone (too dark) or a translucent
+       glass layer ON TOP of the panel glass (too light / double-glass).
+       Both `--bg-1` and `--glass-bg-strong` flip in 14_light.css, so this
+       tracks the panel in light mode too. No backdrop-filter: an opaque
+       fill makes it pointless and a second blur is what lightened the bar
+       before. Selector sits later than `.form-container` at equal
+       specificity, so its background wins the cascade. */
+    z-index: 11 !important;
+    background:
+        linear-gradient(var(--glass-bg-strong), var(--glass-bg-strong)),
+        var(--bg-1) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     margin: 0 0 1rem 0 !important;
-    padding: 0 !important;
+    padding: 0.5rem 0 !important;
     flex-wrap: wrap !important;
     gap: 0.4rem !important;
 }
@@ -596,9 +637,15 @@ body.stash-liquid-glass form .date-input-group:not(:has(.invalid-feedback)):not(
     display: none;
 }
 
+/* Native "Attempt to fix" anchor: hidden in place (refract.js leaves it
+   React-managed and injects its own proxy pill instead of moving it).
+   !important here beats any inline style React sets on the node. */
+body.stash-liquid-glass .refract-date-fix-native {
+    display: none !important;
+}
 /* Fix pill — small accent-on-danger button to the right of the error
-   message. Refract.js moves the original "Attempt to fix?" anchor
-   into the group and relabels it "Fix" with this class. */
+   message. Refract.js injects this as a proxy that forwards the click to
+   the hidden native "Attempt to fix?" anchor. */
 body.stash-liquid-glass .date-input-group > .refract-date-fix-btn,
 body.stash-liquid-glass form .date-input-group > .refract-date-fix-btn {
     flex: 0 0 auto !important;
