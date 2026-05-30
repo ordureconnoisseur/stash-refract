@@ -1871,11 +1871,23 @@
     /* ── SPA route detection ─────────────────────────────────────── */
 
     function initHistory() {
-        var p = history.pushState, r = history.replaceState;
         function fire() { nextTick(syncRoute); }
-        history.pushState = function () { var x = p.apply(history, arguments); fire(); return x; };
-        history.replaceState = function () { var x = r.apply(history, arguments); fire(); return x; };
-        window.addEventListener("popstate", fire);
+        /* Prefer Stash's own location event (stash:location, fired from
+           App.tsx on every React Router navigation) over monkeypatching
+           history.pushState/replaceState. The patch approach is fragile:
+           it collides with any other plugin that wraps the same methods.
+           Only fall back to wrapping history on older Stash builds that
+           predate the event. */
+        if (typeof PluginApi !== "undefined" && PluginApi && PluginApi.Event && PluginApi.Event.addEventListener) {
+            PluginApi.Event.addEventListener("stash:location", fire);
+        } else {
+            var p = history.pushState, r = history.replaceState;
+            history.pushState = function () { var x = p.apply(history, arguments); fire(); return x; };
+            history.replaceState = function () { var x = r.apply(history, arguments); fire(); return x; };
+            window.addEventListener("popstate", fire);
+        }
+        /* hashchange isn't covered by stash:location; keep it for any
+           hash-routed setup. */
         window.addEventListener("hashchange", fire);
     }
 
