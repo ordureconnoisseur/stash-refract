@@ -1266,6 +1266,106 @@ body.stash-liquid-glass .pagination-index-container .filter-container.text-muted
 }
 
 /* ───────────────────────────────────────────────────────────────────
+   Scenes list: relocate the totals summary to the TOP-RIGHT of the grid.
+   Stash centers a `.pagination-index-container` above the grid showing
+   "1-40 of N" + "(duration - total size)". refract.js reformats its text
+   to a single line ("N scenes · duration · size", dropping the per-page
+   range); this block lifts the whole container out of flow and pins it to
+   the top-right, on the toolbar row above the cards. Scoped to the scenes
+   LIST route via `body.stash-route-scenes` (set by setRouteClass) rather
+   than the `.scenes-stats` node, because refract.js consumes that node
+   when it reformats; only the /scenes LIST gets this class, not
+   /scenes/<id>. The desktop caption treatment is
+   gated to >=768px; on mobile it stays in refract's default centered pill
+   (the top-right corner is too cramped on narrow screens). The inner span
+   is de-chromed into a subtle muted caption (no chip) by the rule below. */
+
+/* Hide the native TOP pager (page-number buttons) GLOBALLY and UNSCOPED
+   from the JS route class, so it's gone from the very first paint. This is
+   what kills the "huge gutter for a split second" reload flash: everything
+   else here is gated on body.stash-route-scenes (added by refract.js only
+   after boot), so before the JS runs the top pager renders full-size and
+   balloons the row. .pagination-index-container is ONLY ever the top
+   pager's location (the bottom pager lives in .pagination-footer), and
+   refract always hides the top pager regardless, so hiding it globally is
+   safe and not viewport-gated. */
+body.stash-liquid-glass .pagination-index-container > .pagination {
+    display: none !important;
+}
+@media (min-width: 768px) {
+    body.stash-liquid-glass.stash-route-scenes .sidebar-pane-content > .pagination-index-container {
+        /* refract.js's floating-pager logic tags THIS container
+           data-pager-row="hide" (rowOf() resolves the top pager's wrapper
+           to .pagination-index-container, which also holds the stats), so
+           09_buttons.css hides it with display:none. That's why the totals
+           were invisible — and why they "randomly" reappeared: on a
+           single-page result Stash renders the top pager as an empty <div>
+           (not .pagination), so nothing gets tagged and the row stays
+           visible. This selector out-specifies the hide rule (0,4,1 vs
+           0,2,1), so re-assert display to bring the stats back on every
+           scenes list. The inner .pagination page buttons keep their own
+           data-pager-role="hide" (a separate rule we don't touch), so only
+           the stats summary shows, not duplicate page controls. */
+        /* In normal flow, right above the grid and right-aligned, with a
+           minimal gap to the first scene row. display:flex !important also
+           defeats the floating-pager hide (data-pager-row -> display:none
+           from 09_buttons.css) that otherwise swallows this container. */
+        display: flex !important;
+        justify-content: flex-end !important;
+        width: 100% !important;
+        /* Pulled up tight under the toolbar with a minimal gap to the first
+           scene row. --refract-stats-inset lines the caption's right edge
+           up with the rightmost card; tune in one place if it drifts.
+           Inset via padding-right, NOT margin-right: the container is
+           width:100% with border-box, so a right margin pushes it PAST 100%
+           and overflows (which is why bumping the margin value moved
+           nothing, and likely caused the load-time horizontal-overflow
+           flash). padding-right shrinks the flex content area instead, so
+           justify-content:flex-end lands the text inset from the edge with
+           no overflow. */
+        --refract-stats-inset: 0.85rem;
+        margin: -0.55rem 0 0.05rem 0 !important;
+        padding: 0 var(--refract-stats-inset) 0 0 !important;
+        /* It's a passive label — never intercept clicks on the toolbar
+           controls or cards it floats over. */
+        pointer-events: none;
+    }
+    /* Subtle caption, not a pill. Strip the glass-chip chrome inherited
+       from the .paginationIndex rule above (background/border/radius/blur/
+       padding) and render the totals as a small, tracked, muted caption so
+       it reads as quiet reference text rather than a UI control. Selector
+       carries .text-muted.center-text so it reliably out-specifies that
+       chip rule. Color is --text-muted + opacity (not a hardcoded faint
+       white) so it stays legible in both dark and light themes. */
+    body.stash-liquid-glass.stash-route-scenes .sidebar-pane-content > .pagination-index-container .filter-container.text-muted.paginationIndex.center-text {
+        /* Slick accent: a gradient underline that fades from transparent up
+           to full accent at the right corner, painted as a 1.5px background
+           image. The left padding extends the underline ~3rem PAST the text
+           on the left, giving a long fade-in tail rather than a line that
+           stops at the first glyph. Resolves --accent-rgb, so it recolors
+           with the active preset. */
+        background: linear-gradient(90deg, transparent 0%, rgba(var(--accent-rgb), 0.12) 22%, rgba(var(--accent-rgb), 0.9) 100%) no-repeat right bottom / 100% 1.5px !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        padding: 0 0 0.22rem 3rem !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        font-size: 0.68rem !important;
+        font-weight: 500 !important;
+        letter-spacing: 0.06em !important;
+        color: var(--text-muted) !important;
+        opacity: 0.85;
+        font-variant-numeric: tabular-nums !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 100% !important;
+        text-align: right !important;
+        line-height: 1.3 !important;
+    }
+}
+
+/* ───────────────────────────────────────────────────────────────────
    Headings + links
    ─────────────────────────────────────────────────────────────────── */
 

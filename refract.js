@@ -6090,6 +6090,61 @@
         });
     }
 
+    /* Scenes list "stats" pill. Stash renders, in the top
+       `.pagination-index-container`, a `span.paginationIndex` reading
+       "1-40 of 1234" with a `<br>` and a `.scenes-stats` span holding
+       "(duration - total size)". Refract repositions this span to the
+       top-right of the grid (CSS) and here reformats the text to a single
+       line: "<total> scenes · <duration> · <size>" — dropping the
+       per-page "1-40 of" range and flattening the two lines into one.
+
+       We only touch the count node: we read Stash's own "X of N" text to
+       recover N (the only coupling — that format is hardcoded, not
+       localized, in PaginationIndex), and we MOVE the existing
+       `.scenes-duration` / `.scenes-size` nodes (which Stash keeps
+       localized + live) into our reformatted line rather than re-deriving
+       them, so the size/duration formatting always matches Stash. Marked
+       idempotent + re-derived from a cached signature so React re-renders
+       (new totals after filtering) refresh it. */
+    function reformatSceneStats() {
+        document.querySelectorAll(".pagination-index-container span.paginationIndex").forEach(function (idx) {
+            var statsSpan = idx.querySelector(".scenes-stats");
+            if (!statsSpan) { return; } /* scenes view only — gallery/perf lists have no .scenes-stats */
+            var dur = statsSpan.querySelector(".scenes-duration");
+            var size = statsSpan.querySelector(".scenes-size");
+            /* Recover the total count from the leading "first-last of N"
+               text. The count text is the first text node of the span,
+               before the <br>. */
+            var head = "";
+            for (var i = 0; i < idx.childNodes.length; i++) {
+                var n = idx.childNodes[i];
+                if (n.nodeType === 1 && n.tagName === "BR") { break; }
+                if (n.nodeType === 3) { head += n.nodeValue; }
+            }
+            var m = head.match(/([\d.,\s]+)\s*$/); /* trailing number after "of" */
+            var total = head.indexOf(" of ") !== -1
+                ? head.split(" of ").pop().trim()
+                : (m ? m[1].trim() : "");
+            var durTxt = dur ? dur.textContent.trim() : "";
+            var sizeTxt = size ? size.textContent.trim() : "";
+            /* Signature guards against rebuilding every mutation, but still
+               refreshes when the totals change (filter/page-size). */
+            var sig = total + "|" + durTxt + "|" + sizeTxt;
+            if (idx.dataset.stStatsSig === sig) { return; }
+            idx.dataset.stStatsSig = sig;
+
+            /* Build "<N> scenes · <dur> · <size>" from the parts that
+               exist. Empty when totals unknown — leave Stash's text. */
+            if (!total) { return; }
+            while (idx.firstChild) { idx.removeChild(idx.firstChild); }
+            var parts = [total + (total === "1" ? " scene" : " scenes")];
+            if (durTxt) { parts.push(durTxt); }
+            if (sizeTxt) { parts.push(sizeTxt); }
+            idx.appendChild(document.createTextNode(parts.join(" · ")));
+            idx.classList.add("refract-scene-stats");
+        });
+    }
+
     function injectStudioName() {
         var anchors = document.querySelectorAll(".scene-header-container h1.studio-logo > a");
         for (var i = 0; i < anchors.length; i++) {
@@ -7168,6 +7223,7 @@
             try { tagViewAllLinks(); } catch (e) {}
             try { cleanupOrphanGsTriggers(); } catch (e) {}
             try { relocateDateFixLinks(); } catch (e) {}
+            try { reformatSceneStats(); } catch (e) {}
             try { injectStudioName(); } catch (e) {}
             try { fixSceneTaggerDetails(); } catch (e) {}
             try { relocateTaggerBatchButtons(); } catch (e) {}
