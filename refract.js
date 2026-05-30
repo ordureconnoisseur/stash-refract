@@ -6029,11 +6029,32 @@
         });
     }
 
-    /* Relocate the Stash "Attempt to fix?" link that sits as a SIBLING
-       of an invalid `.date-input-group`. Move it INSIDE the group so
-       it can render as a small "Fix" pill on the right of the error
-       message row (CSS handles the visual). Idempotent via class. */
+    /* Surface the Stash "Attempt to fix?" link (which sits as a SIBLING
+       after an invalid `.date-input-group`) as a compact "Fix" pill on
+       the error row.
+
+       We must NOT move the native anchor into the group. Moving a
+       React-managed node desyncs React's tree: once the date is fixed,
+       React unmounts the original wrapper but the moved anchor is left
+       orphaned in the group with its onClick handler detached, so a
+       second click triggers the anchor's default navigation (Stash
+       homepage) and loses unsaved form data. Instead we leave the native
+       anchor in place (CSS-hidden via .refract-date-fix-native), inject
+       our OWN non-navigating <button> proxy that forwards the click to
+       the live native anchor, and remove that proxy as soon as the field
+       is valid. Idempotent via class. */
     function relocateDateFixLinks() {
+        /* 1. Remove stale proxy buttons whose field is no longer invalid.
+           This is what prevents the data-loss second click: the pill is
+           gone the instant the date validates. */
+        document.querySelectorAll(".date-input-group > .refract-date-fix-btn").forEach(function (btn) {
+            var grp = btn.closest(".date-input-group");
+            if (!grp || !grp.querySelector("input.is-invalid")) {
+                btn.remove();
+            }
+        });
+        /* 2. Add a proxy Fix pill for invalid fields exposing a native
+           fix anchor. */
         document.querySelectorAll(".date-input-group:has(input.is-invalid)").forEach(function (group) {
             if (group.querySelector(":scope > .refract-date-fix-btn")) { return; }
             var sibling = group.nextElementSibling;
@@ -6044,14 +6065,28 @@
             if (!link) { return; }
             var text = (link.textContent || "").trim().toLowerCase();
             if (text.indexOf("attempt") !== 0 && text.indexOf("fix") === -1) { return; }
-            link.classList.add("refract-date-fix-btn");
-            link.textContent = "Fix";
-            link.setAttribute("title", "Attempt to fix the date format");
-            /* Hide the now-empty wrapper div if it had only this anchor. */
-            if (sibling !== link) {
-                sibling.style.display = "none";
-            }
-            group.appendChild(link);
+            /* Hide the native anchor in place (do not move it) so React
+               keeps managing its lifecycle; the CSS !important rule beats
+               any inline style React may set on the node. */
+            (sibling !== link ? sibling : link).classList.add("refract-date-fix-native");
+            var btn = document.createElement("button");
+            btn.type = "button"; /* never submit/save the form */
+            btn.className = "refract-date-fix-btn";
+            btn.textContent = "Fix";
+            btn.setAttribute("title", "Attempt to fix the date format");
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                /* Re-resolve the native anchor at click time (React may
+                   have re-rendered it). Clicking the live, still-mounted
+                   anchor runs Stash's handler in React's context, so the
+                   fix applies and no orphan is ever created. */
+                var sib = group.nextElementSibling;
+                var native = sib && sib.matches && sib.matches("a")
+                    ? sib
+                    : (sib && sib.querySelector ? sib.querySelector("a") : null);
+                if (native) { native.click(); }
+            });
+            group.appendChild(btn);
         });
     }
 
