@@ -33,6 +33,11 @@
             var navSel = "body.stash-liquid-glass nav.top-nav .navbar-nav";
             var css = "";
             saved.forEach(function (key, i) {
+                /* A legacy/corrupted non-string entry (e.g. a bare number
+                   from an older format) would throw on .slice and, caught by
+                   the outer try, silently drop the ENTIRE saved nav order.
+                   Skip non-strings instead. */
+                if (typeof key !== "string") { return; }
                 var sel;
                 if (key.slice(0, 2) === "k:") {
                     sel = navSel + ' > [data-rb-event-key="' + key.slice(2) + '"]';
@@ -93,13 +98,23 @@
        but they CAN read this handoff on load: replay the vars onto
        their own :root, and inject our overlay <link> alongside. */
     function broadcastAccentToPlugins() {
-        setTimeout(function () {
+        var attempts = 0;
+        function attempt() {
             try {
                 var cs = getComputedStyle(document.body);
                 var a = cs.getPropertyValue("--accent").trim();
                 var b = cs.getPropertyValue("--accent-bright").trim();
                 var t = cs.getPropertyValue("--accent-tint").trim();
                 var r = cs.getPropertyValue("--accent-rgb").trim();
+                /* On a cold load the bundled CSS may not have applied yet,
+                   so the accent vars read empty. Retry a few frames before
+                   giving up — otherwise the multiview handoff keeps a stale
+                   accent with no recovery. */
+                if (!a && attempts < 10) {
+                    attempts++;
+                    requestAnimationFrame(attempt);
+                    return;
+                }
                 if (a) { localStorage.setItem("mv.theme.accent", a); }
                 if (b) { localStorage.setItem("mv.theme.accentBright", b); }
                 if (t) { localStorage.setItem("mv.theme.accentTint", t); }
@@ -126,7 +141,12 @@
                     localStorage.setItem("mv.theme.styleUrl", refractStyleUrl);
                 }
             } catch (e) { /* ignore */ }
-        }, 0);
+        }
+        if (typeof requestAnimationFrame === "function") {
+            requestAnimationFrame(attempt);
+        } else {
+            setTimeout(attempt, 0);
+        }
     }
 
     function applyAccentPreset() { applyAccentClass(getStoredAccent()); }
@@ -706,8 +726,30 @@
                 xhr.setRequestHeader(k, headers[k]);
             });
             xhr.onload = function () {
-                try { resolve(JSON.parse(xhr.responseText)); }
-                catch (e) { reject(e); }
+                var res;
+                try { res = JSON.parse(xhr.responseText); }
+                catch (e) { reject(e); return; }
+                /* onload fires for HTTP 4xx/5xx too (only transport
+                   failures hit onerror). Without this guard an auth error
+                   (401/403/422) with a parseable JSON body resolves with
+                   res.data === undefined, which callers can't distinguish
+                   from a legitimately empty result — so enrichment silently
+                   no-ops with no retry signal. */
+                if (xhr.status < 200 || xhr.status >= 300) {
+                    var httpMsg = (res && res.errors && res.errors.length &&
+                        res.errors[0].message) || ("HTTP " + xhr.status);
+                    reject(new Error(httpMsg));
+                    return;
+                }
+                /* GraphQL total failure: errors present AND no data at all.
+                   Partial success (some aliased findScene calls resolved,
+                   others errored — see initSceneCards) still carries `data`,
+                   so we resolve and let the caller use what it got. */
+                if (res && res.errors && res.errors.length && res.data == null) {
+                    reject(new Error(res.errors[0].message || "GraphQL error"));
+                    return;
+                }
+                resolve(res);
             };
             xhr.onerror = function () { reject(new Error("network error")); };
             xhr.send(body);
@@ -752,7 +794,14 @@
             .then(function (res) {
                 var ui = res && res.data && res.data.configuration
                     && res.data.configuration.ui;
-                var t = (ui && ui.ratingSystemOptions && ui.ratingSystemOptions.type) || "";
+                /* No usable config blob in a *successful* response — don't
+                   clobber the cached value with "". (An errored/auth-failed
+                   response now rejects in gqlXhr and lands in .catch below,
+                   so it never reaches here and the cache is preserved.)
+                   When ui IS present, an empty type legitimately means
+                   decimal mode, so writing "" is correct. */
+                if (!ui) { return; }
+                var t = (ui.ratingSystemOptions && ui.ratingSystemOptions.type) || "";
                 try { localStorage.setItem(RATING_SYSTEM_STORAGE_KEY, t); } catch (e) { /* ignore */ }
                 applyRatingSystemClass(t);
             }).catch(function () { /* ignore — keep cached value */ });
@@ -1247,7 +1296,9 @@
             var item = MOBILE_NAV_ITEMS[i];
             var icon = MOBILE_NAV_ICONS[item.icon] || "";
             html +=
-                '<a class="refract-drawer-tile" href="' + item.href + '" data-href="' + item.href + '" aria-label="' + item.label + '">' +
+                '<a class="refract-drawer-tile" href="' + item.href + '" data-href="' + item.href + '"' +
+                    ((item.aliases && item.aliases.length) ? ' data-aliases="' + item.aliases.join(" ") + '"' : '') +
+                    ' aria-label="' + item.label + '">' +
                     '<span class="refract-drawer-tile-icon">' + icon + '</span>' +
                 '</a>';
         }
@@ -1276,6 +1327,39 @@
        versions (the same set used in the mobile drawer). Idempotent
        via data-refract-icon marker. Re-applied on each watcher tick
        and on stash:location since React may re-render the nav. */
+    /* Escape a value for use inside a DOUBLE-QUOTED attribute selector,
+       e.g. [href="<value>"]. Only " and \ are special there. (CSS.escape is
+       for unquoted identifiers and would over-escape.) Without this, a
+       runtime href/key containing a quote throws a SyntaxError that aborts
+       the whole querySelector pass. */
+    function refractAttrEscape(s) {
+        return String(s == null ? "" : s).replace(/(["\\])/g, "\\$1");
+    }
+
+    /* Shared max-height/opacity collapse animation for the plugin- and
+       task-group chevrons (previously triplicated verbatim). On expand,
+       release the fixed max-height once the transition finishes so a
+       section whose content grows later (e.g. async-loaded settings) isn't
+       clipped by the frozen pixel height (audit B19). */
+    function refractAnimateCollapse(body, willExpand) {
+        if (!body) { return; }
+        if (willExpand) {
+            body.style.maxHeight = body.scrollHeight + "px";
+            body.style.opacity = "1";
+            var onEnd = function (e) {
+                if (e.target !== body || e.propertyName !== "max-height") { return; }
+                body.style.maxHeight = "none";
+                body.removeEventListener("transitionend", onEnd);
+            };
+            body.addEventListener("transitionend", onEnd);
+        } else {
+            body.style.maxHeight = body.scrollHeight + "px";
+            void body.offsetHeight;
+            body.style.maxHeight = "0px";
+            body.style.opacity = "0";
+        }
+    }
+
     function refractApplyNavIcons() {
         var nav = document.querySelector("nav.top-nav");
         if (!nav) { return false; }
@@ -1285,7 +1369,7 @@
             if (!iconSvgStr) { continue; }
             var hrefs = [item.href].concat(item.aliases || []);
             for (var h = 0; h < hrefs.length; h++) {
-                var links = nav.querySelectorAll('[href="' + hrefs[h] + '"]');
+                var links = nav.querySelectorAll('[href="' + refractAttrEscape(hrefs[h]) + '"]');
                 for (var j = 0; j < links.length; j++) {
                     var link = links[j];
                     if (link.getAttribute("data-refract-icon") === item.icon) { continue; }
@@ -1325,6 +1409,8 @@
 
         // Build the set of hrefs we already render natively.
         var known = {};
+        // Track plugin hrefs seen this pass, to reconcile orphaned tiles below.
+        var present = {};
         for (var i = 0; i < MOBILE_NAV_ITEMS.length; i++) {
             var item = MOBILE_NAV_ITEMS[i];
             known[item.href] = true;
@@ -1349,8 +1435,8 @@
             if (href.indexOf("opencollective") !== -1) { continue; }
             if (href.indexOf("github.com") !== -1) { continue; }
             if (/^https?:/i.test(href)) { continue; }
-            // Already rendered.
-            if (drawer.querySelector('.refract-drawer-tile[data-href="' + href + '"]')) { continue; }
+            // Already rendered — still mark present so reconcile keeps it.
+            if (drawer.querySelector('.refract-drawer-tile[data-href="' + refractAttrEscape(href) + '"]')) { present[href] = true; continue; }
 
             var srcSvg = link.querySelector("svg");
             if (!srcSvg) { continue; }
@@ -1383,6 +1469,18 @@
             tile.appendChild(iconSpan);
 
             drawer.appendChild(tile);
+            present[href] = true;
+        }
+
+        /* Reconcile: drop plugin tiles whose source nav link is gone
+           (plugin disabled/unmounted). Otherwise a stale tile lingers and
+           click-navigates to a now-dead route. */
+        var ptiles = drawer.querySelectorAll(".refract-drawer-tile[data-plugin-tile]");
+        for (var p = 0; p < ptiles.length; p++) {
+            var ph = ptiles[p].getAttribute("data-href");
+            if (!present[ph] && ptiles[p].parentNode) {
+                ptiles[p].parentNode.removeChild(ptiles[p]);
+            }
         }
 
         return true;
@@ -1392,13 +1490,27 @@
         var drawer = document.querySelector(".refract-mobile-drawer");
         if (!drawer) { return; }
         var tiles = drawer.querySelectorAll(".refract-drawer-tile");
-        var path = window.location.pathname;
+        /* Hash-aware path (bare pathname is always "/" under hash routing);
+           honour each tile's data-aliases; and light up the LONGEST matching
+           prefix so /scenes/markers lights Markers, not Scenes — mirrors
+           markActiveUtilityButtons(). */
+        var path = refractPathFromLocation();
+        var best = null, bestLen = -1;
         for (var i = 0; i < tiles.length; i++) {
-            var href = tiles[i].getAttribute("data-href");
-            // Prefix-match so /scenes/12345 still lights up "Scenes".
-            var active = href && (path === href || path.indexOf(href + "/") === 0);
-            tiles[i].classList.toggle("is-active", !!active);
+            tiles[i].classList.remove("is-active");
+            var cands = [tiles[i].getAttribute("data-href") || ""];
+            var aliasAttr = tiles[i].getAttribute("data-aliases");
+            if (aliasAttr) { cands = cands.concat(aliasAttr.split(/\s+/)); }
+            for (var c = 0; c < cands.length; c++) {
+                var href = cands[c];
+                if (!href) { continue; }
+                if ((path === href || path.indexOf(href + "/") === 0) && href.length > bestLen) {
+                    best = tiles[i];
+                    bestLen = href.length;
+                }
+            }
         }
+        if (best) { best.classList.add("is-active"); }
     }
 
     function refractBindBurgerGlobalHandlers() {
@@ -2286,7 +2398,26 @@
                    --refract-rating var land for intensity/tiers modes. */
                 try { tagFilledRatings(); } catch (e) { /* ignore */ }
             })
-            .catch(function () { /* ignore */ });
+            .catch(function () {
+                /* Query failed (expired ApiKey, network blip, Stash
+                   restart). Un-mark the cards we claimed so the next
+                   MutationObserver pass retries them — otherwise
+                   :not([data-stash-sc]) excludes them forever and they show
+                   no badges until a full reload. Re-query live by href since
+                   React may have swapped the nodes while in flight; a
+                   detached original still carrying the marker is harmless
+                   (the live selector never sees it). */
+                ids.forEach(function (id) {
+                    document.querySelectorAll(
+                        '.scene-card[data-stash-sc] a[href^="/scenes/' + id + '?"], ' +
+                        '.scene-card[data-stash-sc] a[href="/scenes/' + id + '"], ' +
+                        '.scene-card[data-stash-sc] a[href^="/scenes/' + id + '/"]'
+                    ).forEach(function (a) {
+                        var c = a.closest(".scene-card");
+                        if (c) { c.removeAttribute("data-stash-sc"); }
+                    });
+                });
+            });
     }
 
     /* Inject a .rating-banner inside a scene card (mirrors the badge
@@ -3189,6 +3320,16 @@
             }
 
             function updateBar() {
+                /* Self-clean: if slick remounted and this slider was
+                   detached by React, stop observing the dead subtree so
+                   the observer + its closures can be collected (the
+                   data-stash-slick marker means the fresh slider gets its
+                   own observer; this one would otherwise fire forever
+                   against detached nodes). */
+                if (!slider.isConnected) {
+                    if (slideObserver) { slideObserver.disconnect(); }
+                    return;
+                }
                 var total = countRealSlides();
                 if (total <= 1) { fill.style.width = "100%"; return; }
                 var pct = (currentIndex() / (total - 1)) * 100;
@@ -3535,10 +3676,13 @@
     var refractDupStrategy = null;
 
     function refractParseBytes(text) {
-        var m = (text || "").match(/([\d.]+)\s*([KMGT])i?B/i);
+        /* Unit prefix is optional so a plain-bytes value like "512 B" parses
+           as 512 rather than 0 — a 0 would corrupt group totals, the
+           "largest" winner pick, and the reclaim estimate. */
+        var m = (text || "").match(/([\d.]+)\s*([KMGT]?)i?B/i);
         if (!m) { return 0; }
         var u = m[2].toUpperCase();
-        var mult = { K: 1024, M: 1048576, G: 1073741824, T: 1099511627776 }[u] || 1;
+        var mult = { "": 1, K: 1024, M: 1048576, G: 1073741824, T: 1099511627776 }[u] || 1;
         return parseFloat(m[1]) * mult;
     }
 
@@ -3562,6 +3706,27 @@
         var titleLink = cells[2].querySelector("a");
         var pathEl = cells[2].querySelector(".scene-path");
         var actionButtons = cells[9].querySelectorAll(".edit-button");
+        /* Identify Delete vs Merge by their label (title / aria-label /
+           text), NOT by column position. A positional [0]=delete/[1]=merge
+           mapping silently fires the WRONG action — merging scenes the user
+           meant to delete — if Stash ever reorders the action column or adds
+           another .edit-button. Fall back to positional only when no label
+           disambiguates (preserves behavior on unlabelled buttons). */
+        function dupBtnLabel(b) {
+            return ((b.getAttribute("aria-label") || "") + " " +
+                    (b.getAttribute("title") || "") + " " +
+                    (b.textContent || "")).toLowerCase();
+        }
+        var dupDeleteBtn = null, dupMergeBtn = null;
+        for (var ab = 0; ab < actionButtons.length; ab++) {
+            var lbl = dupBtnLabel(actionButtons[ab]);
+            if (!dupDeleteBtn && lbl.indexOf("delete") !== -1) { dupDeleteBtn = actionButtons[ab]; }
+            else if (!dupMergeBtn && lbl.indexOf("merge") !== -1) { dupMergeBtn = actionButtons[ab]; }
+        }
+        if (!dupDeleteBtn && !dupMergeBtn) {
+            dupDeleteBtn = actionButtons[0] || null;
+            dupMergeBtn = actionButtons[1] || null;
+        }
         var filesizeText = (cells[5].textContent || "").trim();
         var resolutionText = (cells[6].textContent || "").trim();
         var spriteImg = cells[1].querySelector("img");
@@ -3579,8 +3744,8 @@
             resolutionPixels: refractParseResolution(resolutionText),
             bitrate: (cells[7].textContent || "").trim(),
             codec: (cells[8].textContent || "").trim(),
-            deleteBtn: actionButtons[0] || null,
-            mergeBtn: actionButtons[1] || null
+            deleteBtn: dupDeleteBtn,
+            mergeBtn: dupMergeBtn
         };
     }
 
@@ -4887,10 +5052,16 @@
             }
             syncPlayIcon();
             if (playBtn) {
-                new MutationObserver(syncPlayIcon).observe(playBtn, {
+                /* Store the observer on the node and disconnect any prior
+                   one before re-observing, so re-processing a play button
+                   (or a node React reused) never stacks observers. */
+                if (playBtn.__refractPlayObs) { playBtn.__refractPlayObs.disconnect(); }
+                var playObs = new MutationObserver(syncPlayIcon);
+                playObs.observe(playBtn, {
                     attributes: true,
                     attributeFilter: ["class"]
                 });
+                playBtn.__refractPlayObs = playObs;
             }
         });
     }
@@ -4923,7 +5094,16 @@
                 var amount = card ? (card.offsetWidth + gap) : Math.max(row.clientWidth * 0.7, 200);
                 row.scrollBy({ left: dir * amount, behavior: "smooth" });
             }
+            var chevronRo = null;
             function syncChevronVisibility() {
+                /* Self-clean: once React swaps out this row, stop observing
+                   the detached node so the ResizeObserver + scroll listener
+                   closures can be collected (the fresh wrap gets its own via
+                   the :not([data-stash-perf-arrows]) selector). */
+                if (!row.isConnected) {
+                    if (chevronRo) { chevronRo.disconnect(); }
+                    return;
+                }
                 var noScroll = row.scrollWidth <= row.clientWidth + 1;
                 var atStart = row.scrollLeft <= 1;
                 var atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 1;
@@ -4936,9 +5116,9 @@
             wrap.appendChild(next);
             row.addEventListener("scroll", syncChevronVisibility, { passive: true });
             if (typeof ResizeObserver === "function") {
-                var ro = new ResizeObserver(syncChevronVisibility);
-                ro.observe(row);
-                if (wrap.parentElement) { ro.observe(wrap.parentElement); }
+                chevronRo = new ResizeObserver(syncChevronVisibility);
+                chevronRo.observe(row);
+                if (wrap.parentElement) { chevronRo.observe(wrap.parentElement); }
             } else {
                 window.addEventListener("resize", syncChevronVisibility, { passive: true });
             }
@@ -5184,8 +5364,16 @@
 
     function installScopedRowObserver(wrap, row) {
         var state = wrap.__refractPerf || {};
-        if (state.scopedMo) return;
+        /* Re-observe when React has swapped the .scene-performers row for a
+           new node: the old observer would otherwise keep watching a
+           detached row and never fire for performer add/remove, leaving
+           dots/clones stale until a full route change rebuilds the wrap. */
+        if (state.scopedMo) {
+            if (state.observedRow === row) { return; }
+            state.scopedMo.disconnect();
+        }
         var debounce = null;
+        state.observedRow = row;
         state.scopedMo = new MutationObserver(function () {
             clearTimeout(debounce);
             debounce = setTimeout(function () { applyAdaptiveLayout(wrap); }, 80);
@@ -5789,6 +5977,15 @@
             footerCenter.appendChild(mirror);
         }
         function sync() {
+            /* Self-clean: when React swaps the lightbox indicator for a
+               fresh node, this observer is left watching the detached old
+               one (the new node gets its own observer via the guard below).
+               Disconnect once the target leaves the document so it can be
+               collected instead of firing against a dead node forever. */
+            if (!indicator.isConnected) {
+                if (indicator.__refractCountObs) { indicator.__refractCountObs.disconnect(); }
+                return;
+            }
             var b = indicator.querySelector("b");
             mirror.textContent = b ? (b.textContent || "").trim() : "";
         }
@@ -5850,13 +6047,21 @@
         var anchors = document.querySelectorAll(".scene-header-container h1.studio-logo > a");
         for (var i = 0; i < anchors.length; i++) {
             var a = anchors[i];
-            if (a.dataset.stStudioInjected === "1") continue;
             var img = a.querySelector("img");
             if (!img) continue;
             var name = img.getAttribute("alt") || "";
             // Strip a trailing " logo" suffix if present (Stash's convention).
             name = name.replace(/\s+logo$/i, "").trim();
             if (!name) continue;
+            /* Refresh on change rather than skip-once: when the studio is
+               reassigned, React updates the <img alt> in place on the same
+               anchor, so a skip-if-injected guard would leave the old studio
+               name showing forever. */
+            var existing = a.querySelector(":scope > .st-studio-name");
+            if (existing) {
+                if (existing.textContent !== name) { existing.textContent = name; }
+                continue;
+            }
             var span = document.createElement("span");
             span.className = "st-studio-name";
             span.textContent = name;
@@ -5892,10 +6097,11 @@
             }
 
             // The Enable/Disable btn is the btn-sm one. Skip rows w/o it.
-            var nativeBtn = rightSide.querySelector("button.btn.btn-primary.btn-sm");
+            /* Exclude our own injected chevron IN the selector — matching it
+               then `continue`-ing skipped the whole row, so the plugin got
+               no toggle at all when the chevron sorted first. */
+            var nativeBtn = rightSide.querySelector("button.btn.btn-primary.btn-sm:not(.st-plugin-chevron)");
             if (!nativeBtn) continue;
-            // Skip our own injected chevron.
-            if (nativeBtn.classList.contains("st-plugin-chevron")) continue;
 
             // Already done? Just sync state.
             var existing = rightSide.querySelector(".st-toggle-injected");
@@ -5920,14 +6126,21 @@
             var inp = wrap.querySelector("input");
             inp.checked = !header.classList.contains("disabled");
             inp.addEventListener("click", function (e) {
+                // Don't bubble to the row in case parents listen.
+                e.stopPropagation();
                 // Forward to the native button so Stash's React handler runs.
                 // Use a synthetic click event the React listener will accept.
                 var btn = this.closest(".setting").querySelector(
                     "button.btn.btn-primary.btn-sm:not(.st-plugin-chevron)"
                 );
-                if (btn) btn.click();
-                // Don't bubble to the row in case parents listen.
-                e.stopPropagation();
+                if (btn && btn.isConnected) {
+                    btn.click();
+                } else {
+                    /* No live native button to forward to (mid re-render):
+                       undo the optimistic checkbox flip so the visible switch
+                       can't desync from the plugin's real state. */
+                    this.checked = !this.checked;
+                }
             });
 
             // Place toggle as the LEFT-most action item in the right column.
@@ -5976,18 +6189,7 @@
                 var collapsing = !grp.classList.contains("st-plugin-collapsed");
                 grp.classList.toggle("st-plugin-collapsed");
                 if (!sec) return;
-                if (collapsing) {
-                    var pinH = sec.getBoundingClientRect().height;
-                    sec.style.maxHeight = pinH + "px";
-                    void sec.offsetHeight;
-                    requestAnimationFrame(function () {
-                        sec.style.maxHeight = "0px";
-                        sec.style.opacity = "0";
-                    });
-                } else {
-                    sec.style.maxHeight = sec.scrollHeight + "px";
-                    sec.style.opacity = "1";
-                }
+                refractAnimateCollapse(sec, !collapsing);
             });
             rightSide.appendChild(chevron);
 
@@ -6204,18 +6406,7 @@
                 var collapsing = !grp.classList.contains("st-plugin-collapsed");
                 grp.classList.toggle("st-plugin-collapsed");
                 if (!sec) return;
-                if (collapsing) {
-                    var pinH = sec.getBoundingClientRect().height;
-                    sec.style.maxHeight = pinH + "px";
-                    void sec.offsetHeight;
-                    requestAnimationFrame(function () {
-                        sec.style.maxHeight = "0px";
-                        sec.style.opacity = "0";
-                    });
-                } else {
-                    sec.style.maxHeight = sec.scrollHeight + "px";
-                    sec.style.opacity = "1";
-                }
+                refractAnimateCollapse(sec, !collapsing);
             });
             rightSide.appendChild(chevron);
 
@@ -6284,18 +6475,7 @@
                 var collapsing = !grp.classList.contains("st-plugin-collapsed");
                 grp.classList.toggle("st-plugin-collapsed");
                 if (!sec) return;
-                if (collapsing) {
-                    var pinH = sec.getBoundingClientRect().height;
-                    sec.style.maxHeight = pinH + "px";
-                    void sec.offsetHeight;
-                    requestAnimationFrame(function () {
-                        sec.style.maxHeight = "0px";
-                        sec.style.opacity = "0";
-                    });
-                } else {
-                    sec.style.maxHeight = sec.scrollHeight + "px";
-                    sec.style.opacity = "1";
-                }
+                refractAnimateCollapse(sec, !collapsing);
             });
             rightSide.appendChild(chevron);
 
@@ -6355,11 +6535,13 @@
        the bottom-right of rows that have subtasks toggles a
        `refract-job-expanded` class to reveal the full subtask list.
 
-       Expanded state lives in a closure Set keyed by job INDEX (jobs
-       don't expose a stable id we can latch onto). Index-based
-       tracking means if a job completes and shifts, the next job at
-       that index inherits the expanded state — acceptable trade-off
-       for not having job ids exposed by Stash. */
+       Expanded state lives in a closure Set keyed by the job's
+       DESCRIPTION TEXT (Stash exposes no stable job id). Index keys
+       were wrong: when a job completes and drops out, every later job
+       shifts down one index, so the next job at that index would
+       inherit the expanded state. Description text is stable across
+       that shift. (Two jobs with identical descriptions share state —
+       a rare, harmless edge vs. the index-bleed it replaces.) */
     /* Use the same chevron path as st-plugin-chevron (refract.js:5969)
        for visual consistency. CSS rotates it 90° to point down in the
        collapsed state, 270° when expanded. */
@@ -6367,7 +6549,12 @@
         "<svg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg' aria-hidden='true'>" +
         "<path d='M10 7L15 12L10 17' stroke='currentColor' stroke-width='1.5' " +
         "stroke-linecap='round' stroke-linejoin='round'/></svg>";
-    var refractExpandedJobIndices = new Set();
+    var refractExpandedJobKeys = new Set();
+    function refractJobKey(job) {
+        var d = job.querySelector(".job-description");
+        var t = d ? (d.textContent || "").replace(/\s+/g, " ").trim() : "";
+        return t || null;
+    }
     function setupTaskJobChevrons() {
         var card = document.querySelector("#tasks-panel .tasks-panel-queue .job-table.card");
         if (!card) { return; }
@@ -6377,11 +6564,12 @@
         if (staleToggle) { staleToggle.remove(); }
 
         var jobs = card.querySelectorAll(":scope > ul > li.job");
-        jobs.forEach(function (job, idx) {
+        jobs.forEach(function (job) {
             var hasSubtasks = !!job.querySelector(".job-subtask");
             var existingChevron = job.querySelector(":scope > .refract-job-chevron");
+            var key = refractJobKey(job);
 
-            if (refractExpandedJobIndices.has(idx)) {
+            if (key && refractExpandedJobKeys.has(key)) {
                 job.classList.add("refract-job-expanded");
             } else {
                 job.classList.remove("refract-job-expanded");
@@ -6396,12 +6584,12 @@
                 var btn = document.createElement("button");
                 btn.type = "button";
                 btn.className = "refract-job-chevron";
-                btn.setAttribute("data-refract-job-idx", String(idx));
+                if (key) { btn.setAttribute("data-refract-job-key", key); }
                 btn.setAttribute("aria-label", "Toggle subtask list");
                 btn.innerHTML = REFRACT_JOB_CHEVRON_SVG;
                 job.appendChild(btn);
-            } else {
-                existingChevron.setAttribute("data-refract-job-idx", String(idx));
+            } else if (key) {
+                existingChevron.setAttribute("data-refract-job-key", key);
             }
         });
     }
@@ -6413,12 +6601,12 @@
             if (!t || !t.closest) { return; }
             var btn = t.closest(".refract-job-chevron");
             if (!btn) { return; }
-            var idx = parseInt(btn.getAttribute("data-refract-job-idx"), 10);
-            if (isNaN(idx)) { return; }
-            if (refractExpandedJobIndices.has(idx)) {
-                refractExpandedJobIndices.delete(idx);
+            var key = btn.getAttribute("data-refract-job-key");
+            if (!key) { return; }
+            if (refractExpandedJobKeys.has(key)) {
+                refractExpandedJobKeys.delete(key);
             } else {
-                refractExpandedJobIndices.add(idx);
+                refractExpandedJobKeys.add(key);
             }
             setupTaskJobChevrons();
         }, true);
@@ -6586,6 +6774,10 @@
             var navSel = "body.stash-liquid-glass nav.top-nav .navbar-nav";
             var css = "";
             saved.forEach(function (key, i) {
+                /* Skip non-string entries — a legacy/corrupted numeric entry
+                   would throw on .slice and, caught by the outer try, drop
+                   the entire saved nav order. */
+                if (typeof key !== "string") { return; }
                 var sel;
                 if (key.slice(0, 2) === "k:") {
                     sel = navSel + ' > [data-rb-event-key="' + key.slice(2) + '"]';
@@ -6601,8 +6793,8 @@
 
         function getVisualOrder() {
             return Array.from(navRow.children).sort(function (a, b) {
-                return (parseInt(window.getComputedStyle(a).order) || 0) -
-                       (parseInt(window.getComputedStyle(b).order) || 0);
+                return (parseInt(window.getComputedStyle(a).order, 10) || 0) -
+                       (parseInt(window.getComputedStyle(b).order, 10) || 0);
             });
         }
 
@@ -6835,8 +7027,15 @@
             });
             el.style.opacity = "";
 
-            /* 8. Cleanup. */
-            document.body.removeChild(drag.clone);
+            /* 8. Cleanup. Guard the removeChild: if the floating clone was
+               already detached (a pointercancel/pointerup race, or React
+               reconciled <body>), an unguarded removeChild throws and skips
+               the listener teardown + `drag = null` below — permanently
+               jamming drag-reorder (the next pointerdown is rejected by
+               `|| drag`). */
+            if (drag.clone && drag.clone.parentNode) {
+                drag.clone.parentNode.removeChild(drag.clone);
+            }
             var capturedItems = otherItems;
             setTimeout(function () {
                 capturedItems.forEach(function (x) { x.style.transition = ""; });
