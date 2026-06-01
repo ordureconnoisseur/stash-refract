@@ -1265,6 +1265,26 @@ body.stash-liquid-glass .pagination-index-container .filter-container.text-muted
     backdrop-filter: var(--glass-blur-sm);
 }
 
+/* refract.js reformats the scenes-list totals NON-destructively: it leaves
+   Stash's live "1-40 of N" text + .scenes-stats node in place (so React keeps
+   the count correct after filtering) and appends its own .refract-stats-overlay
+   child with the single-line "N scenes · dur · size" form. These rules collapse
+   the native content so only the overlay shows. The bare "1-40 of N" text node
+   can't be hidden directly, so font-size:0 collapses it; the overlay restores a
+   real size. */
+body.stash-liquid-glass span.paginationIndex.refract-scene-stats {
+    font-size: 0 !important;
+}
+body.stash-liquid-glass span.paginationIndex.refract-scene-stats > br,
+body.stash-liquid-glass span.paginationIndex.refract-scene-stats > .scenes-stats {
+    display: none !important;
+}
+body.stash-liquid-glass span.paginationIndex.refract-scene-stats > .refract-stats-overlay {
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
 /* ───────────────────────────────────────────────────────────────────
    Scenes list: relocate the totals summary to the TOP-RIGHT of the grid.
    Stash centers a `.pagination-index-container` above the grid showing
@@ -1350,7 +1370,11 @@ body.stash-liquid-glass .pagination-index-container > .pagination {
         padding: 0 0 0.22rem 3rem !important;
         -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
-        font-size: 0.68rem !important;
+        /* font-size:0 collapses Stash's native "1-40 of N" text node; the
+           overlay child below restores the caption size. The remaining text
+           props (weight/spacing/colour/opacity/tabular-nums) cascade down to
+           the overlay via inheritance, so they only need declaring once here. */
+        font-size: 0 !important;
         font-weight: 500 !important;
         letter-spacing: 0.06em !important;
         color: var(--text-muted) !important;
@@ -1362,6 +1386,9 @@ body.stash-liquid-glass .pagination-index-container > .pagination {
         max-width: 100% !important;
         text-align: right !important;
         line-height: 1.3 !important;
+    }
+    body.stash-liquid-glass.stash-route-scenes .sidebar-pane-content > .pagination-index-container span.paginationIndex.refract-scene-stats > .refract-stats-overlay {
+        font-size: 0.68rem;
     }
 }
 

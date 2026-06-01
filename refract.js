@@ -6094,18 +6094,23 @@
        `.pagination-index-container`, a `span.paginationIndex` reading
        "1-40 of 1234" with a `<br>` and a `.scenes-stats` span holding
        "(duration - total size)". Refract repositions this span to the
-       top-right of the grid (CSS) and here reformats the text to a single
-       line: "<total> scenes · <duration> · <size>" — dropping the
-       per-page "1-40 of" range and flattening the two lines into one.
+       top-right of the grid (CSS) and reformats the text to a single line:
+       "<total> scenes · <duration> · <size>" — dropping the per-page
+       "1-40 of" range and flattening the two lines into one.
 
-       We only touch the count node: we read Stash's own "X of N" text to
-       recover N (the only coupling — that format is hardcoded, not
-       localized, in PaginationIndex), and we MOVE the existing
-       `.scenes-duration` / `.scenes-size` nodes (which Stash keeps
-       localized + live) into our reformatted line rather than re-deriving
-       them, so the size/duration formatting always matches Stash. Marked
-       idempotent + re-derived from a cached signature so React re-renders
-       (new totals after filtering) refresh it. */
+       IMPORTANT: PaginationIndex is a React function component that
+       re-renders `{indexText}<br/>{metadataByline}` IN PLACE whenever the
+       filtered total changes. So we must NOT destroy its children — doing
+       that desyncs React's fiber (it keeps updating now-detached text nodes
+       while our replacement stays frozen at the first value, which is why
+       the count used to be stuck at the unfiltered library total). Instead
+       we leave Stash's nodes intact (CSS collapses the native text via the
+       `refract-scene-stats` class) and maintain our OWN `.refract-stats-
+       overlay` child holding the reformatted line. We re-read Stash's live,
+       localized count/duration/size each pass and refresh the overlay from a
+       signature, so a filter re-render flows straight through. We only read
+       Stash's "X of N" text to recover N (the one coupling — that format is
+       hardcoded, not localized, in PaginationIndex). */
     function reformatSceneStats() {
         document.querySelectorAll(".pagination-index-container span.paginationIndex").forEach(function (idx) {
             var statsSpan = idx.querySelector(".scenes-stats");
@@ -6114,7 +6119,8 @@
             var size = statsSpan.querySelector(".scenes-size");
             /* Recover the total count from the leading "first-last of N"
                text. The count text is the first text node of the span,
-               before the <br>. */
+               before the <br> — our overlay is appended AFTER the <br>, so
+               this loop never sees it. */
             var head = "";
             for (var i = 0; i < idx.childNodes.length; i++) {
                 var n = idx.childNodes[i];
@@ -6127,21 +6133,26 @@
                 : (m ? m[1].trim() : "");
             var durTxt = dur ? dur.textContent.trim() : "";
             var sizeTxt = size ? size.textContent.trim() : "";
-            /* Signature guards against rebuilding every mutation, but still
-               refreshes when the totals change (filter/page-size). */
-            var sig = total + "|" + durTxt + "|" + sizeTxt;
-            if (idx.dataset.stStatsSig === sig) { return; }
-            idx.dataset.stStatsSig = sig;
+            if (!total) { return; } /* totals unknown — leave Stash's text */
 
-            /* Build "<N> scenes · <dur> · <size>" from the parts that
-               exist. Empty when totals unknown — leave Stash's text. */
-            if (!total) { return; }
-            while (idx.firstChild) { idx.removeChild(idx.firstChild); }
+            /* Build "<N> scenes · <dur> · <size>" from the parts present. */
             var parts = [total + (total === "1" ? " scene" : " scenes")];
             if (durTxt) { parts.push(durTxt); }
             if (sizeTxt) { parts.push(sizeTxt); }
-            idx.appendChild(document.createTextNode(parts.join(" · ")));
+            var text = parts.join(" · ");
+
             idx.classList.add("refract-scene-stats");
+            var overlay = idx.querySelector(":scope > .refract-stats-overlay");
+            /* Signature skips redundant writes but always re-creates the
+               overlay if React reconciled it away on a re-render. */
+            if (overlay && idx.dataset.stStatsSig === text) { return; }
+            if (!overlay) {
+                overlay = document.createElement("span");
+                overlay.className = "refract-stats-overlay";
+                idx.appendChild(overlay);
+            }
+            overlay.textContent = text;
+            idx.dataset.stStatsSig = text;
         });
     }
 
