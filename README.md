@@ -148,4 +148,4 @@ Refract themes the UIs of these plugins so they sit naturally inside the glass a
 
 ## AI Disclosure
 
-Refract began as hand-written code. Ongoing auditing, debugging, and refactoring rely heavily on AI tools, and the project's written content (this README, plugin descriptions, and release notes) is largely AI-generated.
+Refract's development relies heavily on AI tools for auditing, debugging, and refactoring, and the project's written content (this README, plugin descriptions, and release notes) is largely AI-generated.
