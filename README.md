@@ -145,3 +145,7 @@ Refract themes the UIs of these plugins so they sit naturally inside the glass a
 ## License
 
 [AGPL-3.0](./LICENSE)
+
+## AI Disclosure
+
+Refract began as hand-written code. Ongoing auditing, debugging, and refactoring rely heavily on AI tools, and the project's written content (this README, plugin descriptions, and release notes) is largely AI-generated.
