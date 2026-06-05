@@ -3046,3 +3046,36 @@ body.stash-liquid-glass .refract-performer-name-tooltip-portal.refract-performer
     transform: scale(1);
 }
 
+/* Card mode (Suggestion Box → "Performer card on hover"): render a mini
+   performer card — image above the name — instead of the plain text
+   label. Same class, so positioning/show transition are reused. */
+body.stash-liquid-glass .refract-performer-name-tooltip-portal--card {
+    display: flex;
+    flex-direction: column;
+    width: 140px;
+    padding: 0;
+    white-space: normal;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--glass-bg-strong);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+}
+body.stash-liquid-glass .refract-perf-tip-img {
+    width: 140px;
+    height: 184px;
+    object-fit: cover;
+    object-position: center 18%;
+    display: block;
+    background: var(--glass-bg-strong);
+}
+body.stash-liquid-glass .refract-perf-tip-name {
+    display: block;
+    padding: 0.4rem 0.55rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    white-space: normal;
+}
+

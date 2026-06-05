@@ -47,11 +47,105 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> :is(.scene-tabs, .ima
     width: 100% !important;
     box-sizing: border-box !important;
 }
-/* Always hide the chevron toggle divider — the auto-collapse below
-   handles narrow widths automatically, so the manual toggle is dead UI. */
-body.stash-liquid-glass .scene-divider,
+/* Hide a collapsed detail panel. The .scene-divider chevron (restyled
+   further down) toggles Stash's own `collapsed` state onto .scene-tabs,
+   which this rule then hides; the grid rules below reclaim its space. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs).collapsed {
     display: none !important;
+}
+
+/* ── Manual details-panel toggle ─────────────────────────────────────
+   Stash renders a .scene-divider between the details panel and the player
+   with a chevron <Button> that collapses the panel (adds .collapsed to
+   .scene-tabs and .expanded to the player). Refract used to hide it as
+   dead UI; instead FLOAT its chevron over the existing seam. The divider
+   is taken out of grid flow (position:absolute) so the 2-column layout and
+   its single gap are unchanged — no extra column, no doubled gap. */
+body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-divider) {
+    position: relative !important;
+}
+/* Collapsed: .scene-tabs is hidden (rule above). Keep a thin left gutter
+   so the chevron stays in a gap (never overlapping the player); the player
+   is the only flowed child now, so force it into the 2nd column or it would
+   land in the gutter. */
+body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs.collapsed) {
+    grid-template-columns: 2rem minmax(0, 1fr) !important;
+    column-gap: 0 !important;
+    padding-left: 0 !important;
+}
+body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs.collapsed) > .scene-player-container {
+    grid-column: 2 !important;
+}
+/* Wide screens only (Stash's own `d-xl-block`; narrow uses the
+   single-column auto-collapse). Park the chevron on the seam: 20px row
+   padding + the details column width + half the 20px gap. */
+@media (min-width: 1200px) {
+    /* Full-height strip centred on the seam so the whole panel-height
+       column is the click target; the chevron is centred within it. */
+    body.stash-liquid-glass .scene-divider {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        position: absolute !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: calc(20px + clamp(385px, 22.5vw, 405px) + 10px) !important;
+        transform: translateX(-50%) !important;
+        z-index: 6 !important;
+        width: 1.5rem !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        min-width: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    /* Collapsed: centre the strip in the thin left gutter (no left
+       padding now, so the gutter starts at x=0). */
+    body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs.collapsed) .scene-divider {
+        left: 1rem !important;
+    }
+}
+/* Bare chevron — no pill, no border. The button fills the full-height
+   strip so the entire seam (panel height) is clickable; a faint hover
+   tint hints at the target without reintroducing a pill. */
+body.stash-liquid-glass .scene-divider .btn {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--text-muted) !important;
+    cursor: pointer !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    transition: color 0.15s ease, background 0.15s ease !important;
+}
+body.stash-liquid-glass .scene-divider .btn:hover,
+body.stash-liquid-glass .scene-divider .btn:focus,
+body.stash-liquid-glass .scene-divider .btn:focus-visible,
+body.stash-liquid-glass .scene-divider .btn:active {
+    color: var(--accent-bright) !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+body.stash-liquid-glass .scene-divider .btn svg {
+    width: 0.85rem !important;
+    height: 0.85rem !important;
+    /* taller than wide — a stretched chevron, width unchanged */
+    transform: scaleY(2) !important;
 }
 
 /* Narrow viewports: drop the details panel entirely, leaving the
@@ -127,17 +221,37 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane.active.show {
     flex: 1 1 auto !important;
     min-height: 0 !important;
 }
-/* Anchor the performer row to the bottom of the tab pane.
-   The .col-12 that contains .scene-performers gets class scene-performers-row
-   in-place (no node move). Its Bootstrap .row wrapper gets margin-top:auto so
-   the whole row is pushed to the bottom of the .tab-pane flex column.
-   When content above is short, the auto-margin consumes the gap so the cards
-   sit flush at the panel bottom. When content overflows, the row stays at its
-   natural position (no negative margin). */
+/* Anchor ONLY the performer carousel to the bottom of the tab pane, with
+   the description + tags kept flush under the header.
+
+   Stash's SceneDetailPanel renders the description, tags AND performers
+   into a SINGLE .col-12 (it gets the scene-performers-row class in-place,
+   no node move). So putting margin-top:auto on that .col-12's .row wrapper
+   pushed the *entire* block — description included — to the panel bottom,
+   leaving a big gap under the header whenever the description was short
+   (long descriptions filled the panel and hid the bug). Instead:
+     1. let the content row + its col fill the pane height (top-aligned),
+     2. make the col a flex column,
+     3. give the "Performers" heading (the h6 immediately before
+        .scene-performers) margin-top:auto so the heading + cards + dots
+        drop to the bottom while description/tags stay at the top.
+   When content overflows the pane the auto-margin collapses to 0 and the
+   carousel sits at its natural position, exactly as before. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row:has(> .col-12.scene-performers-row) {
-    margin-top: auto !important;
+    margin-top: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    align-content: stretch !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12.scene-performers-row {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12.scene-performers-row > h6:has(+ .scene-performers) {
+    margin-top: auto !important;
 }
 
 /* ───────────────────────────────────────────────────────────────────
@@ -427,6 +541,24 @@ body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1
 }
 body.stash-liquid-glass .st-studio-name {
     display: inline;
+}
+
+/* "Studio banner" opt-in (Settings → Refract → The Suggestion Box adds the
+   `refract-studio-banner` body class): show Stash's studio logo image above
+   the scene title instead of the muted studio-name label. Higher specificity
+   than the unconditional logo-hide rule above (extra .refract-studio-banner
+   class) so it wins. Explicit height (not max-height) so small source logos
+   scale UP to a consistent banner size; max-width reins in very wide ones. */
+body.stash-liquid-glass.refract-studio-banner :is(.scene-tabs, .image-tabs) :is(.scene-header-container, .image-header-container) .studio-logo img {
+    display: inline-block !important;
+    width: auto !important;
+    height: 2.75rem !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+    vertical-align: middle !important;
+}
+body.stash-liquid-glass.refract-studio-banner :is(.scene-header-container, .image-header-container) .st-studio-name {
+    display: none !important;
 }
 /* If a studio link/text accompanies the title, render it inline before
    the title as a small muted label. */

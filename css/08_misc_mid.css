@@ -4613,11 +4613,15 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker #scene-duplicate-check
     box-shadow: none !important;
     padding: 1rem 0.5rem 4rem !important;
     max-width: 100% !important;
-    /* Strip the .card containment — `contain: layout` creates a
-       containing block for position:fixed descendants, which would
-       trap our floating pager inside this card instead of the
-       viewport. Cards/list-views elsewhere keep their containment. */
+    /* Strip the .card containment — `contain: layout` AND the
+       `content-visibility: auto` (which implies contain: size layout style
+       paint) both create a containing block for position:fixed descendants,
+       trapping the floating pager inside this card so it sticks to the
+       card's content bottom instead of the viewport. Neutralise BOTH so the
+       pager escapes to the viewport like every other list page. Cards/
+       list-views elsewhere keep their containment. */
     contain: none !important;
+    content-visibility: visible !important;
 }
 /* Anchor for the absolutely-positioned phash warning */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker {
@@ -4671,6 +4675,10 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
     gap: 0.5rem 0.85rem;
     flex: 0 0 auto;
 }
+/* Push the injected "Per Page" selector to the far right of the filter bar. */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .refract-dup-pagesize-group {
+    margin-left: auto !important;
+}
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .form-group .row {
     margin: 0 !important;
     flex-wrap: nowrap;
@@ -4715,7 +4723,9 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form select.input-control,
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form select.form-control {
-    background: var(--glass-bg-strong) !important;
+    /* background-COLOR (not the `background` shorthand) so the chevron
+       background-image below isn't reset to none by the !important shorthand. */
+    background-color: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
@@ -4726,14 +4736,12 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
     margin: 0 !important;
     appearance: none;
     -webkit-appearance: none;
-    background-image:
-        linear-gradient(135deg, transparent 50%, rgba(var(--accent-rgb), 0.7) 50%),
-        linear-gradient(45deg, rgba(var(--accent-rgb), 0.7) 50%, transparent 50%);
-    background-position:
-        calc(100% - 1rem) 50%,
-        calc(100% - 0.6rem) 50%;
-    background-size: 0.4rem 0.4rem;
-    background-repeat: no-repeat;
+    /* The theme's standard select chevron (stroke SVG), matching the
+       tagger-header selects — not a custom gradient triangle. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+    background-position: right 0.7rem center !important;
+    background-size: 0.85rem !important;
+    background-repeat: no-repeat !important;
     transition: border-color 0.15s, background-color 0.15s;
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form select:hover {
@@ -4748,9 +4756,29 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
     border: 1px solid rgba(var(--accent-rgb), 0.4) !important;
     color: var(--accent-bright) !important;
     border-radius: var(--radius-pill) !important;
-    padding: 0.45rem 1rem !important;
+    padding: 0.45rem 1.9rem 0.45rem 1rem !important;
     font-size: 0.82rem !important;
     font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    position: relative;
+}
+/* Replace Bootstrap's tiny triangle caret with the theme's stroke chevron
+   (currentColor mask, so it inherits the accent text colour) — makes it
+   read as a dropdown, not a plain button. */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown .dropdown-toggle::after {
+    content: "" !important;
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    width: 0.7rem;
+    height: 0.7rem;
+    margin: 0 !important;
+    border: none !important;
+    transform: translateY(-50%);
+    background-color: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown .dropdown-toggle:hover {
     background: rgba(var(--accent-rgb), 0.2) !important;
@@ -4813,6 +4841,9 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker[data-refract-dup-enhanced="1"] {
     padding-bottom: 5.5rem;
 }
+/* Both native pager rows are hidden: the duplicates count + page-size select
+   are surfaced inside the refract summary bar (left side), the page nav lives
+   in the floating pill. */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="top"] {
     display: none !important;
 }
@@ -4821,7 +4852,8 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="t
    views. Here we want a single horizontal pill. Higher specificity + !important. */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] {
     position: fixed !important;
-    bottom: 1.25rem !important;
+    /* Match the generic floating pager's offset (09_buttons.css: bottom 1.5rem). */
+    bottom: 1.5rem !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     z-index: 401 !important;
@@ -4923,6 +4955,15 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="b
     margin-right: 0 !important;
 }
 
+/* The floating pill is JUST the page navigation (plus bulk Edit/Delete when
+   items are checked) — the duplicates count and page-size select live in
+   the top row instead, so hide them in the floated bottom row. */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > h6,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > select,
+body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .form-control {
+    display: none !important;
+}
+
 /* ── Missing-phash warning — float to top-right, vertically centered
    with the h4's text via fixed-height matching the title's line. ── */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > p.lead {
@@ -4981,6 +5022,18 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary__
     color: var(--text-muted);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary__stat b {
+    color: var(--text);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-right: 0.25rem;
+}
+/* Total-duplicates count (moved in from the old standalone pager row). */
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary__count {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary__count b {
     color: var(--text);
     font-size: 1.05rem;
     font-weight: 700;

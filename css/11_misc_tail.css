@@ -990,6 +990,8 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav:hover
    next to its heading instead of dropping to a new line. */
 body.stash-liquid-glass .setting#plugin-refract-view-minimiser > .refract-setting-control,
 body.stash-liquid-glass .setting#plugin-refract-custom-logo > .refract-setting-control,
+body.stash-liquid-glass .setting#plugin-refract-studio-banner > .refract-setting-control,
+body.stash-liquid-glass .setting#plugin-refract-perf-card-hover > .refract-setting-control,
 body.stash-liquid-glass .setting#plugin-refract-rating-style > .refract-setting-control {
     display: flex !important;
     justify-content: flex-end !important;
@@ -1048,6 +1050,80 @@ body.stash-liquid-glass .refract-logo-input:focus {
     outline: none !important;
     border-color: var(--accent-glow) !important;
     box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.18) !important;
+}
+
+/* ── "The Suggestion Box" — collapsible drawer of opt-in extras in the
+   Refract plugin-settings panel (native <details>). Styled as a bordered
+   card with a clickable summary header + a chevron that rotates on open. */
+body.stash-liquid-glass .refract-suggestion-box {
+    margin-top: 0.75rem;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.02);
+    overflow: hidden;
+}
+body.stash-liquid-glass .refract-suggestion-summary {
+    position: relative;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    /* extra right padding leaves room for the chevron on the right edge */
+    padding: 0.85rem 2.2rem 0.85rem 1rem;
+    transition: background 0.15s ease;
+}
+body.stash-liquid-glass .refract-suggestion-summary::-webkit-details-marker,
+body.stash-liquid-glass .refract-suggestion-summary::marker {
+    display: none;
+    content: "";
+}
+body.stash-liquid-glass .refract-suggestion-summary:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+body.stash-liquid-glass .refract-suggestion-summary h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+}
+/* Disclosure chevron on the RIGHT edge — the same FontAwesome chevron-right
+   SVG (via mask) used by refract's other collapsible settings, rotating 90°
+   and tinting accent when the drawer opens. */
+body.stash-liquid-glass .refract-suggestion-summary::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    width: 0.6rem;
+    height: 0.6rem;
+    background-color: var(--text);
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'><path d='M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512'><path d='M311.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L243.2 256 73.9 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z'/></svg>");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    opacity: 0.35;
+    transform: translateY(-50%) rotate(0deg);
+    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
+}
+body.stash-liquid-glass .refract-suggestion-summary:hover::after {
+    opacity: 0.65;
+}
+body.stash-liquid-glass .refract-suggestion-box[open] .refract-suggestion-summary::after {
+    transform: translateY(-50%) rotate(90deg);
+    opacity: 0.75;
+    background-color: var(--accent-bright);
+}
+body.stash-liquid-glass .refract-suggestion-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 0.75rem 1rem 0.85rem;
+    border-top: 1px solid var(--glass-border);
 }
 
 /* Refract plugin-settings toggle — used for the view-mode minimiser

@@ -1958,3 +1958,13 @@ body.stash-liquid-glass .details-tags-overhaul__body,
 body.stash-liquid-glass .details-tags-overhaul__subgroup-body {
     align-items: flex-start;
 }
+
+/* ── Settings → Plugins: alphabetical sort + disabled-to-bottom ───────
+   refract.js (sortPluginList) flags the bare <div> that wraps the plugin
+   .setting-group rows with this class and assigns each row a CSS `order`
+   (enabled A→Z, then disabled A→Z). Flex column is what makes `order`
+   take effect; nothing is moved in the DOM. */
+body.stash-liquid-glass .refract-plugin-list {
+    display: flex !important;
+    flex-direction: column !important;
+}

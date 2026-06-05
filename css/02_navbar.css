@@ -123,7 +123,8 @@ body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > [data-rb-ev
 body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href="/stats"]       { order: 1; }
 body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href*="/logout"],
 body.stash-liquid-glass nav.top-nav .navbar-buttons > .logout-button         { order: 50; }
-body.stash-liquid-glass nav.top-nav .navbar-buttons > :has([title="Help"])   { order: 60; }
+body.stash-liquid-glass nav.top-nav .navbar-buttons > :has([title="Help"]),
+body.stash-liquid-glass nav.top-nav .navbar-buttons > button.nav-utility[title="Help"] { order: 60; }
 body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(.donate),
 body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href*="opencollective"] { order: 70; }
 /* url-switcher order: 80 — see 13_plugins.css */
@@ -264,6 +265,7 @@ body.stash-liquid-glass nav.top-nav .navbar-nav .nav-item > .nav-link {
    breaking anchors like <a class="nav-utility btn"> for Settings.
    CSS nesting collapses base + ::before + :hover + :hover::before + :active
    into one selector list (Safari 17.2+, Chrome 120+). */
+body.stash-liquid-glass.refract-show-help nav.top-nav .navbar-buttons > button.nav-utility[title="Help"],
 body.stash-liquid-glass nav.top-nav a.btn:where(:not(.brand-link):not(.navbar-brand button):not(.logout-button):not([href*="/logout"]):not([title="Help"]):not([aria-label="Help"]):not([href="/help"]):not([href*="/manual"]):not([href*="opencollective"]):not(.sidebar-toggle-button)),
 body.stash-liquid-glass nav.top-nav button.btn:where(:not(.brand-link):not(.navbar-brand button):not(.nav-utility):not(.logout-button):not([href*="/logout"]):not([title="Help"]):not([aria-label="Help"]):not([href="/help"]):not([href*="/manual"]):not([href*="opencollective"]):not(.sidebar-toggle-button)),
 body.stash-liquid-glass nav.top-nav .navbar-toggler {
@@ -636,6 +638,39 @@ body.stash-liquid-glass nav.top-nav .sidebar-toggle-button,
 body.stash-liquid-glass nav.top-nav a:has(svg[data-icon="circle-question"]),
 body.stash-liquid-glass nav.top-nav a:has(svg.fa-circle-question) {
     display: none !important;
+}
+
+/* Help button opt-in (body.refract-show-help, toggled from Interface > Menu
+   Items). Stash renders the utility buttons TWICE — once in the collapsed
+   menu and once in the persistent .navbar-buttons cluster — so we re-show
+   ONLY the .navbar-buttons instance to avoid a duplicate. The actual show +
+   styling is handled by adding this same instance to the icon-button restyle
+   rule above (so it gets identical sizing + hover box as Stats/Settings).
+
+   Rest state: force transparent. The restyle rule's faint base border reads
+   heavier on this bare <button> than on the anchor-wrapped utilities, so we
+   strip it until :hover, where the restyle paints the box like every other
+   nav button. */
+body.stash-liquid-glass.refract-show-help nav.top-nav .navbar-buttons > button.nav-utility[title="Help"]:not(:hover) {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Icon: swap Stash's solid FontAwesome question-circle for a stroke-style
+   glyph that matches the theme's line icons. Native SVG hidden; the glyph is
+   painted as a currentColor mask on ::after so it inherits the button's text
+   colour (and the hover brighten). CSS-only — React can't clobber it. */
+body.stash-liquid-glass.refract-show-help nav.top-nav .navbar-buttons > button.nav-utility[title="Help"] svg {
+    display: none !important;
+}
+body.stash-liquid-glass.refract-show-help nav.top-nav .navbar-buttons > button.nav-utility[title="Help"]::after {
+    content: "" !important;
+    width: var(--nav-icon-size) !important;
+    height: var(--nav-icon-size) !important;
+    background-color: currentColor !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12 18.01L12.01 17.9989' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12 18.01L12.01 17.9989' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 
 /* Scrub orphan label/fallback nodes left over from the previous theme JS. */

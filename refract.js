@@ -187,6 +187,14 @@
             var cardStyle = cardStyleState[0];
             var setCardStyle = cardStyleState[1];
 
+            var studioBannerState = R.useState(isStudioBannerVisible());
+            var studioBannerOn = studioBannerState[0];
+            var setStudioBannerOn = studioBannerState[1];
+
+            var perfCardHoverState = R.useState(isPerformerCardHover());
+            var perfCardHoverOn = perfCardHoverState[0];
+            var setPerfCardHoverOn = perfCardHoverState[1];
+
             /* Custom CSS Source state: { loaded, url } where url is
                the value Stash currently has set (empty if not set). */
             var cssSrc = R.useState({ loaded: false, url: "" });
@@ -235,6 +243,20 @@
                 try { localStorage.setItem(MINIMAL_CARDS_STORAGE_KEY, style); } catch (e) { /* ignore */ }
                 applyCardStyleClass(style);
                 setCardStyle(style);
+            }
+
+            function toggleStudioBanner() {
+                var next = !studioBannerOn;
+                try { localStorage.setItem(STUDIO_BANNER_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                applyStudioBannerClass(next);
+                setStudioBannerOn(next);
+            }
+
+            function togglePerfCardHover() {
+                var next = !perfCardHoverOn;
+                try { localStorage.setItem(PERFORMER_CARD_HOVER_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                applyPerformerCardHoverClass(next);
+                setPerfCardHoverOn(next);
             }
 
             function toggleLight() {
@@ -327,46 +349,6 @@
                     ),
                     R.createElement("div", { className: "refract-accent-swatches" }, swatches)
                 ),
-                R.createElement("div", { className: "setting", id: "plugin-refract-view-minimiser" },
-                    R.createElement("div", null,
-                        R.createElement("h3", null, "View-mode minimiser"),
-                        R.createElement("div", { className: "sub-heading" },
-                            "Collapse the row of view-mode buttons into a single icon + expand chevron. Disable to use Stash's original button group.")
-                    ),
-                    R.createElement("div", { className: "refract-setting-control" },
-                        R.createElement("div", { className: "custom-control custom-switch" },
-                            R.createElement("input", {
-                                type: "checkbox",
-                                className: "custom-control-input",
-                                id: "refract-view-minimiser-toggle",
-                                checked: minimiserOn,
-                                onChange: toggleMinimiser
-                            }),
-                            R.createElement("label", {
-                                className: "custom-control-label",
-                                htmlFor: "refract-view-minimiser-toggle"
-                            })
-                        )
-                    )
-                ),
-                R.createElement("div", { className: "setting", id: "plugin-refract-custom-logo" },
-                    R.createElement("div", null,
-                        R.createElement("h3", null, "Custom logo"),
-                        R.createElement("div", { className: "sub-heading" },
-                            "Image URL displayed in the navbar home button. Leave empty for the default Refract orb. Hosted URLs and ",
-                            R.createElement("code", null, "data:image/..."),
-                            " URIs are both supported.")
-                    ),
-                    R.createElement("div", { className: "refract-setting-control" },
-                        R.createElement("input", {
-                            type: "text",
-                            className: "form-control refract-logo-input",
-                            placeholder: "https://example.com/logo.png",
-                            value: logoUrl,
-                            onChange: function (e) { updateLogoUrl(e.target.value); }
-                        })
-                    )
-                ),
                 R.createElement("div", { className: "setting", id: "plugin-refract-rating-style" },
                     R.createElement("div", null,
                         R.createElement("h3", null, "Card rating style"),
@@ -390,27 +372,6 @@
                         })
                     )
                 ),
-                R.createElement("div", { className: "setting", id: "plugin-refract-card-style" },
-                    R.createElement("div", null,
-                        R.createElement("h3", null, "Scene card style"),
-                        R.createElement("div", { className: "sub-heading" },
-                            R.createElement("b", null, "Refract"), " (default) — tidier minimal layout; description block hidden so the grid stays consistent across scenes with and without descriptions. ",
-                            R.createElement("b", null, "Classic"), " — Stash's original card layout with description, file path, and details visible.")
-                    ),
-                    R.createElement("div", { className: "refract-setting-control refract-card-style-toggle" },
-                        [
-                            { key: "refract", label: "Refract" },
-                            { key: "classic", label: "Classic" }
-                        ].map(function (item) {
-                            return R.createElement("button", {
-                                key: item.key,
-                                type: "button",
-                                className: "refract-segmented-btn" + (cardStyle === item.key ? " is-active" : ""),
-                                onClick: function () { pickCardStyle(item.key); }
-                            }, item.label);
-                        })
-                    )
-                ),
                 R.createElement("div", { className: "setting", id: "plugin-refract-lite-mode" },
                     R.createElement("div", null,
                         R.createElement("h3", null, "Lite mode"),
@@ -430,6 +391,124 @@
                                 className: "custom-control-label",
                                 htmlFor: "refract-lite-mode-toggle"
                             })
+                        )
+                    )
+                ),
+                /* ── The Suggestion Box ─────────────────────────────────────
+                   A collapsed-by-default drawer of opt-in features that run
+                   against the theme's defaults but get requested often.
+                   Native <details> so it stays hidden until clicked open. */
+                R.createElement("details", { className: "refract-suggestion-box" },
+                    R.createElement("summary", { className: "refract-suggestion-summary" },
+                        R.createElement("h3", null, "The Suggestion Box"),
+                        R.createElement("div", { className: "sub-heading" },
+                            "Things I'd never pick myself. But you asked, so here they are. Enable at your own aesthetic risk.")
+                    ),
+                    R.createElement("div", { className: "refract-suggestion-body" },
+                        R.createElement("div", { className: "setting", id: "plugin-refract-studio-banner" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Studio banner"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Show the studio's logo image above the scene title instead of the small muted studio name.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-studio-banner-toggle",
+                                        checked: studioBannerOn,
+                                        onChange: toggleStudioBanner
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-studio-banner-toggle"
+                                    })
+                                )
+                            )
+                        ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-perf-card-hover" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Performer card on hover"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Hovering a performer circle on a scene card shows a card-style popover (image + name) instead of just the name.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-perf-card-hover-toggle",
+                                        checked: perfCardHoverOn,
+                                        onChange: togglePerfCardHover
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-perf-card-hover-toggle"
+                                    })
+                                )
+                            )
+                        ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-view-minimiser" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "View-mode minimiser"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Collapse the row of view-mode buttons into a single icon + expand chevron. Disable to use Stash's original button group.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-view-minimiser-toggle",
+                                        checked: minimiserOn,
+                                        onChange: toggleMinimiser
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-view-minimiser-toggle"
+                                    })
+                                )
+                            )
+                        ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-custom-logo" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Custom logo"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Image URL displayed in the navbar home button. Leave empty for the default Refract orb. Hosted URLs and ",
+                                    R.createElement("code", null, "data:image/..."),
+                                    " URIs are both supported.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("input", {
+                                    type: "text",
+                                    className: "form-control refract-logo-input",
+                                    placeholder: "https://example.com/logo.png",
+                                    value: logoUrl,
+                                    onChange: function (e) { updateLogoUrl(e.target.value); }
+                                })
+                            )
+                        ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-card-style" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "Scene card style"),
+                        R.createElement("div", { className: "sub-heading" },
+                            R.createElement("b", null, "Refract"), " (default) — tidier minimal layout; description block hidden so the grid stays consistent across scenes with and without descriptions. ",
+                            R.createElement("b", null, "Classic"), " — Stash's original card layout with description, file path, and details visible.")
+                    ),
+                    R.createElement("div", { className: "refract-setting-control refract-card-style-toggle" },
+                        [
+                            { key: "refract", label: "Refract" },
+                            { key: "classic", label: "Classic" }
+                        ].map(function (item) {
+                            return R.createElement("button", {
+                                key: item.key,
+                                type: "button",
+                                className: "refract-segmented-btn" + (cardStyle === item.key ? " is-active" : ""),
+                                onClick: function () { pickCardStyle(item.key); }
+                            }, item.label);
+                        })
+                    )
                         )
                     )
                 ),
@@ -500,6 +579,9 @@
     var LITE_MODE_STORAGE_KEY = "refract.liteMode";
     var LIGHT_MODE_STORAGE_KEY = "refract.lightMode";
     var LIGHT_TOGGLE_NAVBAR_KEY = "refract.lightToggleNavbar";
+    var HELP_BUTTON_STORAGE_KEY = "refract.showHelpButton";
+    var STUDIO_BANNER_STORAGE_KEY = "refract.studioBanner";
+    var PERFORMER_CARD_HOVER_KEY = "refract.performerCardHover";
     var MINIMAL_CARDS_STORAGE_KEY = "refract.minimalCards";
     var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";
     var RATING_STYLES = ["intensity", "tiers", "playing-card"];
@@ -618,6 +700,54 @@
         document.body.classList.toggle("refract-show-light-nav", !!on);
     }
     applyLightToggleNavbarClass(isLightToggleNavbarVisible());
+
+    /* Help button visibility. Refract hides Stash's navbar Help (?) button
+       by default; this opt-in toggle re-shows it via the `refract-show-help`
+       body class (css/02_navbar.css gates the hide + restyles it to match
+       the other navbar icon buttons). Defaults OFF (unset = hidden). */
+    function isHelpButtonVisible() {
+        try {
+            return localStorage.getItem(HELP_BUTTON_STORAGE_KEY) === "1";
+        } catch (e) { return false; }
+    }
+    function applyHelpButtonClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-show-help", !!on);
+    }
+    applyHelpButtonClass(isHelpButtonVisible());
+
+    /* Studio banner visibility. Refract shows the studio NAME as a small
+       muted label above the scene title by default (the logo image is
+       hidden). This opt-in toggle (in "The Suggestion Box" settings drawer)
+       swaps the muted text for Stash's original studio logo image via the
+       `refract-studio-banner` body class (css/07_scene_details.css gates the
+       swap). Defaults OFF. */
+    function isStudioBannerVisible() {
+        try {
+            return localStorage.getItem(STUDIO_BANNER_STORAGE_KEY) === "1";
+        } catch (e) { return false; }
+    }
+    function applyStudioBannerClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-studio-banner", !!on);
+    }
+    applyStudioBannerClass(isStudioBannerVisible());
+
+    /* Performer-card-on-hover. By default hovering a performer circle on a
+       scene card shows a small name-only tooltip; this opt-in toggle swaps
+       it for a card-style popover (image + name) via the
+       `refract-performer-card-hover` body class, read live by the tooltip
+       portal logic. Defaults OFF. */
+    function isPerformerCardHover() {
+        try {
+            return localStorage.getItem(PERFORMER_CARD_HOVER_KEY) === "1";
+        } catch (e) { return false; }
+    }
+    function applyPerformerCardHoverClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-performer-card-hover", !!on);
+    }
+    applyPerformerCardHoverClass(isPerformerCardHover());
 
     /* Scene card style. "refract" (default) = tidier minimal layout —
        description block hidden so the grid stays consistent across
@@ -2843,6 +2973,14 @@
             return pager.parentElement;
         }
 
+        /* Scene Duplicate Checker has its own dedicated pager treatment
+           (data-refract-pager rows tagged by enhanceDuplicateChecker +
+           styling in 08_misc_mid.css) — skip it here so the two systems
+           don't fight over the same elements. */
+        if (document.querySelector("#scene-duplicate-checker")) {
+            return;
+        }
+
         /* Hide every pager except the last (Stash shows one at top, one at bottom) */
         pagers.slice(0, -1).forEach(function (p) {
             p.setAttribute("data-pager-role", "hide");
@@ -4175,8 +4313,8 @@
         /* Trim Stash's verbose "N sets of duplicates found." h6 down to
            "N duplicates". React may re-render and reset this; the next
            mutation cycle calls back here and fixes it. */
-        var pagerH6 = document.querySelector('[data-refract-pager="bottom"] > h6');
-        if (pagerH6) {
+        var pagerH6s = dc.querySelectorAll('[data-refract-pager] > h6');
+        pagerH6s.forEach(function (pagerH6) {
             var numMatch = (pagerH6.textContent || "").match(/[\d,]+/);
             if (numMatch) {
                 var want = '<b>' + numMatch[0] + '</b> duplicates';
@@ -4184,6 +4322,58 @@
                     pagerH6.innerHTML = want;
                 }
             }
+        });
+
+        /* Page-size selector → injected into the filter form (alongside
+           Search Accuracy etc.) rather than the stats bar. The native
+           <select> is React-controlled, so inject a proxy styled like the
+           form's other selects (which gives it the themed dropdown chevron)
+           and forward changes to the live select via the native value setter
+           + a dispatched change event React listens for. Idempotent. */
+        var dupForm = dc.querySelector(":scope > form");
+        var dupNativeSel = dc.querySelector('[data-refract-pager] select');
+        if (dupForm && dupNativeSel && dupNativeSel.options && dupNativeSel.options.length) {
+            var psProxy = dupForm.querySelector(".refract-dup-pagesize");
+            if (!psProxy) {
+                var psGroup = document.createElement("div");
+                psGroup.className = "form-group refract-dup-pagesize-group";
+                var psRow = document.createElement("div");
+                psRow.className = "row no-gutters";
+                var psLabel = document.createElement("label");
+                psLabel.className = "form-label";
+                psLabel.textContent = "Per Page";
+                var psCol = document.createElement("div");
+                psCol.className = "col-auto";
+                psProxy = document.createElement("select");
+                psProxy.className = "input-control form-control refract-dup-pagesize";
+                psProxy.title = "Scenes per page";
+                psProxy.addEventListener("change", function () {
+                    var live = dc.querySelector('[data-refract-pager] select');
+                    if (!live) { return; }
+                    var setter = Object.getOwnPropertyDescriptor(
+                        window.HTMLSelectElement.prototype, "value"
+                    ).set;
+                    setter.call(live, this.value);
+                    live.dispatchEvent(new Event("change", { bubbles: true }));
+                });
+                psCol.appendChild(psProxy);
+                psRow.appendChild(psLabel);
+                psRow.appendChild(psCol);
+                psGroup.appendChild(psRow);
+                dupForm.appendChild(psGroup);
+            }
+            /* (Re)sync options + current value from the live native select. */
+            if (psProxy.options.length !== dupNativeSel.options.length) {
+                psProxy.innerHTML = "";
+                for (var psi = 0; psi < dupNativeSel.options.length; psi++) {
+                    var psO = dupNativeSel.options[psi];
+                    var psOp = document.createElement("option");
+                    psOp.value = psO.value;
+                    psOp.textContent = psO.textContent;
+                    psProxy.appendChild(psOp);
+                }
+            }
+            if (psProxy.value !== dupNativeSel.value) { psProxy.value = dupNativeSel.value; }
         }
 
         /* Signature: row count + first row's title href. Cheap fingerprint
@@ -4235,10 +4425,20 @@
             });
             var summary = document.createElement("div");
             summary.className = "refract-dup-summary";
+            /* Total-duplicates count: read from the (already trimmed) React
+               pager h6 — it's the page-independent total, which refract's
+               per-page group math can't reproduce. */
+            var topH6 = dc.querySelector('[data-refract-pager] > h6');
+            var countMatch = topH6 ? (topH6.textContent || "").match(/[\d,]+/) : null;
+            var countHTML = countMatch
+                ? '<span class="refract-dup-summary__count"><b>' + escapeHtml(countMatch[0]) + '</b> duplicates</span>'
+                : '';
             summary.innerHTML =
+                countHTML +
                 '<span class="refract-dup-summary__stat"><b>' + groups.length + '</b> sets</span>' +
                 '<span class="refract-dup-summary__stat"><b>' + escapeHtml(refractFormatBytes(totalBytes)) + '</b> across duplicates</span>' +
                 '<span class="refract-dup-summary__reclaim">Reclaim up to <b>' + escapeHtml(refractFormatBytes(reclaimable)) + '</b> by deleting suggested</span>';
+
             panels.appendChild(summary);
 
             groups.forEach(function (g, gi) {
@@ -4439,7 +4639,29 @@
         var name = link.getAttribute("data-performer-name");
         if (!name) { return; }
         var tip = refractEnsurePerfTip();
-        tip.textContent = name;
+        /* Card mode (Suggestion Box opt-in): show the performer image +
+           name instead of a plain text label. */
+        var cardMode = document.body.classList.contains("refract-performer-card-hover");
+        tip.textContent = "";
+        if (cardMode) {
+            var m = (link.getAttribute("href") || "").match(/\/performers\/(\d+)/);
+            if (m) {
+                var im = document.createElement("img");
+                im.className = "refract-perf-tip-img";
+                im.src = "/performer/" + m[1] + "/image";
+                im.alt = "";
+                im.loading = "lazy";
+                tip.appendChild(im);
+            }
+            var nm = document.createElement("span");
+            nm.className = "refract-perf-tip-name";
+            nm.textContent = name;
+            tip.appendChild(nm);
+            tip.classList.add("refract-performer-name-tooltip-portal--card");
+        } else {
+            tip.textContent = name;
+            tip.classList.remove("refract-performer-name-tooltip-portal--card");
+        }
         var r = link.getBoundingClientRect();
         /* Show first so we can read offsetWidth/Height with the visible
            class's styles applied. CSS transition handles the fade. */
@@ -6262,6 +6484,69 @@
     }
     injectPluginToggles(); /* initial pass; re-runs via consolidated watcher */
 
+    // Settings → Plugins page: sort the installed-plugin list alphabetically
+    // and float disabled plugins to the bottom (under the enabled ones).
+    // Stash renders the plugins as one .setting-group per plugin inside a
+    // bare <div>; we flag that <div> as a flex column (refract-plugin-list,
+    // styled in css/13_plugins.css) and assign each row a CSS `order`. Nothing
+    // is moved in the DOM — relocating a React-managed node desyncs its fiber
+    // (NotFoundError on the next reconcile), so order-only is the safe play.
+    // Re-runs via the consolidated watcher, so it re-sorts after a plugin is
+    // toggled (which re-renders the list and resets our inline order).
+    function sortPluginList() {
+        /* Identify plugin rows the same way injectPluginToggles does: a
+           .setting-group whose header carries the native enable/disable
+           btn-sm (the injected chevron is excluded). Collect their parent
+           containers (normally a single <div>). */
+        var groups = document.querySelectorAll(".setting-section .setting-group");
+        var containers = [];
+        for (var i = 0; i < groups.length; i++) {
+            var header = groups[i].querySelector(":scope > .setting");
+            if (!header) continue;
+            if (!header.querySelector("button.btn.btn-primary.btn-sm:not(.st-plugin-chevron)")) continue;
+            var parent = groups[i].parentElement;
+            if (parent && containers.indexOf(parent) === -1) { containers.push(parent); }
+        }
+
+        for (var c = 0; c < containers.length; c++) {
+            var container = containers[c];
+            container.classList.add("refract-plugin-list");
+
+            var rows = [];
+            var kids = container.children;
+            for (var k = 0; k < kids.length; k++) {
+                var g = kids[k];
+                if (!g.classList || !g.classList.contains("setting-group")) continue;
+                var h = g.querySelector(":scope > .setting");
+                if (!h) continue;
+                var h3 = h.querySelector(":scope > div:first-child > h3");
+                /* Name lives in the heading's leading text node ("Name (1.2.3)");
+                   reading the text node (not textContent) skips the project-link
+                   anchor injectPluginToggles appends into the same h3. */
+                var nameSrc = (h3 && h3.firstChild && h3.firstChild.nodeType === 3)
+                    ? h3.firstChild.nodeValue
+                    : (h3 ? h3.textContent : "");
+                var name = (nameSrc || "").replace(/\s*\([^)]*\)\s*$/, "").trim().toLowerCase();
+                rows.push({ el: g, name: name, disabled: h.classList.contains("disabled") });
+            }
+            if (!rows.length) continue;
+
+            /* Enabled first (A→Z), then disabled (A→Z). */
+            rows.sort(function (a, b) {
+                if (a.disabled !== b.disabled) { return a.disabled ? 1 : -1; }
+                if (a.name < b.name) { return -1; }
+                if (a.name > b.name) { return 1; }
+                return 0;
+            });
+
+            for (var r = 0; r < rows.length; r++) {
+                var ord = String(r);
+                if (rows[r].el.style.order !== ord) { rows[r].el.style.order = ord; }
+            }
+        }
+    }
+    sortPluginList(); /* initial pass; re-runs via consolidated watcher */
+
     // Settings → Plugins page: each plugin renders its inline settings,
     // hooks, etc. always-expanded, which makes the list very long. Inject
     // a chevron toggle on every plugin's header row and default the
@@ -6826,6 +7111,59 @@
     }
     injectInterfaceLightToggleSetting();
 
+    /* Inject a "Help button" switch row into Stash's Interface tab Menu
+       Items section, alongside the other menu-item visibility toggles.
+       Refract hides Stash's navbar Help (?) button by default; this row
+       lets the user bring it back. Persists to HELP_BUTTON_STORAGE_KEY
+       and re-applies the body class so the button shows/hides live. */
+    function injectInterfaceHelpToggleSetting() {
+        var pane = document.querySelector("[id$='-tabpane-interface']");
+        if (!pane) return;
+        if (pane.querySelector(".st-help-btn-setting-row")) return;
+
+        /* Find the Stash "Menu items" section by heading text; fall back
+           to the first .setting-section so we still get visible placement. */
+        var target = null;
+        var sections = pane.querySelectorAll(".setting-section");
+        for (var i = 0; i < sections.length; i++) {
+            var h = sections[i].querySelector("h1, h2, h3, h4, h5, h6");
+            if (h && /menu|navigation/i.test(h.textContent || "")) {
+                target = sections[i].querySelector(".setting-group") || sections[i];
+                break;
+            }
+        }
+        if (!target && sections.length) {
+            target = sections[0].querySelector(".setting-group") || sections[0];
+        }
+        if (!target) return;
+
+        var row = document.createElement("div");
+        row.className = "setting st-help-btn-setting-row";
+        row.innerHTML =
+            '<div>' +
+                '<h3>Help button</h3>' +
+                '<div class="sub-heading">Show Stash\'s Help (?) button in the navbar. ' +
+                'Refract hides it by default; enable to bring it back.</div>' +
+            '</div>' +
+            '<div>' +
+                '<div class="custom-control custom-switch">' +
+                    '<input type="checkbox" class="custom-control-input" id="st-help-btn-toggle">' +
+                    '<label class="custom-control-label" for="st-help-btn-toggle"></label>' +
+                '</div>' +
+            '</div>';
+
+        var input = row.querySelector("#st-help-btn-toggle");
+        input.checked = isHelpButtonVisible();
+        input.addEventListener("change", function () {
+            var on = !!this.checked;
+            try { localStorage.setItem(HELP_BUTTON_STORAGE_KEY, on ? "1" : "0"); } catch (e) { /* ignore */ }
+            applyHelpButtonClass(on);
+        });
+
+        target.appendChild(row);
+    }
+    injectInterfaceHelpToggleSetting();
+
     /* ── Navbar drag-to-reorder (iOS-style) ─────────────────────────────
        Pointer-events + FLIP animation so icons slide out of the way live.
        Saved order persisted to localStorage; re-applied via CSS `order`
@@ -7241,6 +7579,7 @@
             try { injectTaggerSearchClose(); } catch (e) {}
             try { applyScenePlayerFixes(); } catch (e) {}
             try { injectPluginToggles(); } catch (e) {}
+            try { sortPluginList(); } catch (e) {}
             try { makePluginSettingsCollapsible(); } catch (e) {}
             try { injectPluginSearch(); } catch (e) {}
             try { setupTaskPluginGroups(); } catch (e) {}
@@ -7249,6 +7588,7 @@
             try { setupTaskJobChevrons(); } catch (e) {}
             try { injectNavLightToggle(); } catch (e) {}
             try { injectInterfaceLightToggleSetting(); } catch (e) {}
+            try { injectInterfaceHelpToggleSetting(); } catch (e) {}
             try { setupNavbarReorder(); } catch (e) {}
             try { collapseDetailsTagsOverhaul(); } catch (e) {}
             try { setupOCounterLongPress(); } catch (e) {}

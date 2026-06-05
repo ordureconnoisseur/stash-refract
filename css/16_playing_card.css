@@ -779,3 +779,55 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refrac
    gated on body.refract-rating-style-tiers so they're already off here
    by virtue of the body class being different — no extra suppression
    needed. */
+
+/* ── Scene tagger: strip rating chrome from result thumbnails ─────────
+   Each tagger match renders a 150px .scene-card beside its title (see
+   the .search-item layout cap in 05_list_views.css). At that size the
+   rating banner, the "PERFECT" tier sash, the rotating tier border and
+   the breathe/float/sheen effects read as noise that fights the frame
+   the user is trying to identify. Suppress them here — this sheet loads
+   after 03_cards.css and 05_list_views.css, so equal-specificity rules
+   win by load order — without touching the normal grid/slick cards.
+
+   The banner hide is ungated (it shows in every rating style); the tier
+   decorations only exist under tiers/playing-card, so those rules carry
+   the matching :is() qualifier for specificity parity with their source
+   rules. */
+body.stash-liquid-glass .search-item .scene-card .rating-banner {
+    display: none !important;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .search-item .scene-card .refract-pc-tier-label {
+    display: none !important;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .search-item .scene-card[class*="refract-card-tier-"]::before,
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .search-item .scene-card[class*="refract-card-tier-"]::after {
+    content: none !important;
+    display: none !important;
+}
+body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .search-item .scene-card[class*="refract-card-tier-"] {
+    animation: none !important;
+    transform: none !important;
+    border-color: var(--glass-border) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* Corner clip: the tagger card is image-only (the title sits beside it,
+   not in a chin), but the base thumbnail wrapper rounds only its TOP
+   corners (03_cards.css assumes a footer below) and the image can render
+   a hair wider than the 150px cap. With the wrapping tier border gone
+   that left the right/bottom corners reading square. Round all four on
+   both the card and its image wrapper and keep the image within bounds. */
+body.stash-liquid-glass .search-item .scene-card {
+    overflow: hidden !important;
+    border-radius: var(--radius) !important;
+}
+body.stash-liquid-glass .search-item .scene-card :is(.video-section, .scene-card-preview, .preview-image) {
+    border-radius: var(--radius) !important;
+    overflow: hidden !important;
+}
+body.stash-liquid-glass .search-item .scene-card img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+}

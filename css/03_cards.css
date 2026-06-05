@@ -675,6 +675,18 @@ body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-pl
     isolation: isolate;
 }
 
+/* Same fix, but for EVERY card grid row regardless of rating style. In the
+   default "intensity" mode there are no refract-card-tier-* classes, so the
+   rule above never matched and a hovered/lifted card (its transform creates
+   a stacking context) could paint — and intercept clicks — over the floating
+   pager. Isolating the row keeps all card stacking scoped inside it so the
+   pager (z-index 400, outside the row) always stays on top and clickable. */
+body.stash-liquid-glass .row:has(> .grid-card),
+body.stash-liquid-glass .row:has(> .scene-card),
+body.stash-liquid-glass .row:has(> .performer-card) {
+    isolation: isolate;
+}
+
 /* ── Animation primitives ───────────────────────────────────────────── */
 @property --refract-rotate {
     syntax: "<angle>";
