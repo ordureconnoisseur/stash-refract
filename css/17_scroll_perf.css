@@ -50,3 +50,21 @@ body.stash-liquid-glass.refract-scrolling .dropdown-menu {
     -webkit-backdrop-filter: var(--glass-blur) !important;
     backdrop-filter: var(--glass-blur) !important;
 }
+
+/* ── Slick carousel mid-slide blur strip (Gecko/WebKit only) ──────────
+   Home-page slick rows move via a transform: translate3d() transition on
+   .slick-track, NOT native scroll — so initScrollPerf above never fires for
+   them. Firefox/WebKit re-raster every blurred card pill each frame as the
+   track translates (the blur samples a backdrop that shifts under it), which
+   janks the slide. refract.js tags the slider .refract-slick-animating for the
+   ~500ms transition window (Chromium excluded in JS — it composites this
+   smoothly, so the class never appears there). The strip is scoped to a SINGLE
+   carousel subtree and toggled once per slide (not per frame), so unlike the
+   document-wide refract-scrolling rule it costs no full-tree recalc. Blur
+   restores on settle, masked by the slide motion. */
+body.stash-liquid-glass .slick-slider.refract-slick-animating *,
+body.stash-liquid-glass .slick-slider.refract-slick-animating *::before,
+body.stash-liquid-glass .slick-slider.refract-slick-animating *::after {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}

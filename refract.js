@@ -647,6 +647,12 @@
        during scroll (biggest remaining cost on Chromium D3D11); blur
        returns once they stop. Capture listener catches scroll events
        from inner scrollable containers too, not just window scroll. */
+    /* Engine flag — true for Blink/Chromium (Chrome/Edge/Opera/Brave), false
+       for Gecko (Firefox) and WebKit (Safari). backdrop-filter raster behaves
+       very differently across these, so a couple of perf mitigations branch on
+       it. Detect by the "Chrome/" UA token (absent in Firefox and Safari). */
+    var IS_CHROMIUM = /Chrome\//.test(navigator.userAgent || "");
+
     (function initScrollPerf() {
         /* Chromium-only. The backdrop-filter raster cost this mitigates is a
            Blink issue (worst on Windows D3D11). On Firefox there's no raster
@@ -655,7 +661,7 @@
            pop-in flash on every scroll burst. So off-Chromium we never attach
            the listener: the class is never added and 17_scroll_perf.css stays
            inert. (Firefox regression reported on v1.13.13.) */
-        if (!/Chrome\//.test(navigator.userAgent || "")) { return; }
+        if (!IS_CHROMIUM) { return; }
         var scrollTimer = null;
         var isScrolling = false;
         function onScroll() {
@@ -3490,8 +3496,32 @@
 
             updateBar();
 
+            /* Off-Chromium only: drop in-card glass blur while the row is mid-
+               slide. Slick moves via a transform: translate3d() transition on
+               .slick-track (NOT native scroll, so initScrollPerf never fires
+               here). On Gecko/WebKit, re-rastering the blurred card pills every
+               frame as the track translates janks the slide. We tag the slider
+               .refract-slick-animating for the transition window; the scoped
+               `*` strip in 17_scroll_perf.css kills blur within just this one
+               carousel subtree (toggled once per slide, not per frame, so no
+               document-wide recalc), and it restores on settle, masked by the
+               slide motion. Chromium composites this smoothly already, so the
+               class is never added there. */
+            var animTimer = null;
+            function markAnimating() {
+                if (IS_CHROMIUM) { return; }
+                slider.classList.add("refract-slick-animating");
+                clearTimeout(animTimer);
+                animTimer = setTimeout(function () {
+                    slider.classList.remove("refract-slick-animating");
+                }, 560); /* slick default speed 500ms + settle margin */
+            }
+
             /* Watch for slick moving by observing class changes on slides */
-            var slideObserver = new MutationObserver(updateBar);
+            var slideObserver = new MutationObserver(function () {
+                updateBar();
+                markAnimating();
+            });
             var track = slider.querySelector(".slick-track");
             if (track) {
                 slideObserver.observe(track, { attributes: true, subtree: true, attributeFilter: ["class"] });
