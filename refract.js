@@ -641,47 +641,21 @@
     }
     applyLiteModeClass(isLiteModeEnabled());
 
-    /* Scroll-perf — toggle body.refract-scrolling on scroll bursts so
-       css/17_scroll_perf.css can strip backdrop-filter while the user
-       is actively scrolling. Each blur surface re-rasterizes per frame
-       during scroll (biggest remaining cost on Chromium D3D11); blur
-       returns once they stop. Capture listener catches scroll events
-       from inner scrollable containers too, not just window scroll. */
     /* Engine flag — true for Blink/Chromium (Chrome/Edge/Opera/Brave), false
        for Gecko (Firefox) and WebKit (Safari). backdrop-filter raster behaves
        very differently across these, so a couple of perf mitigations branch on
        it. Detect by the "Chrome/" UA token (absent in Firefox and Safari). */
     var IS_CHROMIUM = /Chrome\//.test(navigator.userAgent || "");
 
-    (function initScrollPerf() {
-        /* Chromium-only. The backdrop-filter raster cost this mitigates is a
-           Blink issue (worst on Windows D3D11). On Firefox there's no raster
-           win, and toggling body.refract-scrolling forces a universal style
-           recalc (the `*` rule in 17_scroll_perf.css) that produces a visible
-           pop-in flash on every scroll burst. So off-Chromium we never attach
-           the listener: the class is never added and 17_scroll_perf.css stays
-           inert. (Firefox regression reported on v1.13.13.) */
-        if (!IS_CHROMIUM) { return; }
-        var scrollTimer = null;
-        var isScrolling = false;
-        function onScroll() {
-            if (!isScrolling) {
-                isScrolling = true;
-                if (document.body) {
-                    document.body.classList.add("refract-scrolling");
-                }
-            }
-            if (scrollTimer) { clearTimeout(scrollTimer); }
-            scrollTimer = setTimeout(function () {
-                isScrolling = false;
-                scrollTimer = null;
-                if (document.body) {
-                    document.body.classList.remove("refract-scrolling");
-                }
-            }, 150);
-        }
-        window.addEventListener("scroll", onScroll, { passive: true, capture: true });
-    })();
+    /* scroll-perf REMOVED in v1.13.17. It toggled body.refract-scrolling on
+       scroll bursts so 17_scroll_perf.css could strip backdrop-filter during
+       scroll. On Chromium D3D11, flipping backdrop-filter on every element
+       mass-rebuilt hundreds of GPU compositing layers, FREEZING the home page
+       for seconds on scroll. It was already gated off for Gecko/WebKit (only
+       caused a pop-in flash there, no raster win) and its Chromium benefit was
+       marginal at best — net-negative. Static blur scrolls acceptably; the
+       toggle cost far more than it saved. (The body.refract-scrolling CSS rules
+       were removed from 17_scroll_perf.css in the same change.) */
 
     /* Light mode — orthogonal to accents. Toggles a white/paper base
        via the `refract-light` body class; CSS rules in css/14_light.css
@@ -3506,15 +3480,14 @@
 
             /* Off-Chromium only: drop in-card glass blur while the row is mid-
                slide. Slick moves via a transform: translate3d() transition on
-               .slick-track (NOT native scroll, so initScrollPerf never fires
-               here). On Gecko/WebKit, re-rastering the blurred card pills every
-               frame as the track translates janks the slide. We tag the slider
-               .refract-slick-animating for the transition window; the scoped
-               `*` strip in 17_scroll_perf.css kills blur within just this one
-               carousel subtree (toggled once per slide, not per frame, so no
-               document-wide recalc), and it restores on settle, masked by the
-               slide motion. Chromium composites this smoothly already, so the
-               class is never added there. */
+               .slick-track (not native scroll). On Gecko/WebKit, re-rastering
+               the blurred card pills every frame as the track translates janks
+               the slide. We tag the slider .refract-slick-animating for the
+               transition window; the scoped `*` strip in 17_scroll_perf.css
+               kills blur within just this one carousel subtree (toggled once
+               per slide, not per frame), and it restores on settle, masked by
+               the slide motion. Chromium composites this smoothly already, so
+               the class is never added there. */
             var animTimer = null;
             function markAnimating() {
                 if (IS_CHROMIUM) { return; }
