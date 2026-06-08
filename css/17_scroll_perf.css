@@ -12,19 +12,25 @@
    remains, and it's the narrow, single-subtree case that actually helps.
    ═══════════════════════════════════════════════════════════════════ */
 
-/* ── Slick carousel mid-slide blur strip (Gecko/WebKit only) ──────────
-   Home-page slick rows move via a transform: translate3d() transition on
-   .slick-track, not native scroll. Firefox/WebKit re-raster every blurred card
-   pill each frame as the track translates (the blur samples a backdrop that
-   shifts under it), which janks the slide. refract.js tags the slider
-   .refract-slick-animating for the ~500ms transition window (Chromium excluded
-   in JS — it composites this smoothly, so the class never appears there). The
-   strip is scoped to a SINGLE carousel subtree and toggled once per slide (not
-   per frame), so it costs no full-tree recalc. Blur restores on settle, masked
-   by the slide motion. */
+/* ── Slick carousel mid-slide simplification (Gecko/WebKit only) ──────
+   Home slick rows move via a transform: translate3d() transition on
+   .slick-track (not native scroll). As the track translates, Firefox/WebKit
+   must re-raster every moving card each frame, and the heavy parts are the
+   `filter: drop-shadow` chains, `box-shadow`s, and backdrop-filter — most of
+   all in playing-card mode (glowing tier ribbon, neon name/gender glyphs,
+   per-card shadows). refract.js tags the slider .refract-slick-animating for
+   the ~500ms transition window (Chromium excluded in JS — it gets its own
+   handling). We strip those raster-heavy properties across the carousel
+   subtree so cards render flat + cheap WHILE sliding, then restore on settle,
+   masked by the motion. One class toggle per slide on a single carousel
+   subtree, so no full-tree recalc (unlike the removed document-wide
+   scroll-perf). Transforms — the slide itself and the ribbon's rotate — are
+   left alone; they composite cheaply. */
 body.stash-liquid-glass .slick-slider.refract-slick-animating *,
 body.stash-liquid-glass .slick-slider.refract-slick-animating *::before,
 body.stash-liquid-glass .slick-slider.refract-slick-animating *::after {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+    filter: none !important;
+    box-shadow: none !important;
 }
