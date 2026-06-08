@@ -648,6 +648,14 @@
        returns once they stop. Capture listener catches scroll events
        from inner scrollable containers too, not just window scroll. */
     (function initScrollPerf() {
+        /* Chromium-only. The backdrop-filter raster cost this mitigates is a
+           Blink issue (worst on Windows D3D11). On Firefox there's no raster
+           win, and toggling body.refract-scrolling forces a universal style
+           recalc (the `*` rule in 17_scroll_perf.css) that produces a visible
+           pop-in flash on every scroll burst. So off-Chromium we never attach
+           the listener: the class is never added and 17_scroll_perf.css stays
+           inert. (Firefox regression reported on v1.13.13.) */
+        if (!/Chrome\//.test(navigator.userAgent || "")) { return; }
         var scrollTimer = null;
         var isScrolling = false;
         function onScroll() {
@@ -2179,23 +2187,17 @@
 
     function initCardTilts() {
         if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
-        /* Lazy-bind via IntersectionObserver: tilt listeners + glare overlay
-           are created only when a card crosses within ~200px of the viewport,
-           then we unobserve. On a home page with ~80 cards across multiple
-           recommendation rows that drops the synchronous boot-phase bind
-           cost from ~80 cards to ~20 (cards never reached are never bound).
-           The _stashTilt idempotence guard inside cardTiltBind keeps the
-           SPA-rebind path safe. */
-        var io = new IntersectionObserver(function (entries) {
-            entries.forEach(function (e) {
-                if (e.isIntersecting) {
-                    cardTiltBind(e.target);
-                    io.unobserve(e.target);
-                }
-            });
-        }, { rootMargin: "200px" });
+        /* Bind tilt listeners + glare overlay up front at boot / SPA-rebind.
+           v1.13.13 lazy-bound these via IntersectionObserver (bind only when a
+           card neared the viewport) to shave boot cost ~80→~20 cards, but that
+           appended the .stash-tilt-glare overlay div mid-scroll as cards came
+           into view — a DOM mutation during scroll that flashed a visible
+           pop-in (worst on Firefox during fast scroll). Binding all present
+           cards directly costs only a few listeners + one tiny div each, and
+           the _stashTilt idempotence guard in cardTiltBind keeps repeat
+           (SPA-rebind) calls cheap. */
         document.querySelectorAll(".grid-card, .scene-card, .performer-card, .wall-item").forEach(function (card) {
-            if (!card._stashTilt) { io.observe(card); }
+            cardTiltBind(card);
         });
     }
 
