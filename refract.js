@@ -2100,6 +2100,14 @@
         if (card._stashTilt) { return; }
         /* Lite mode: skip the 3D-tilt + glare entirely. */
         if (document.body.classList.contains("refract-lite")) { return; }
+        /* Home-page slick carousel cards: skip the tilt entirely. The per-
+           mousemove perspective/scale transform forced backdrop-filter +
+           glow-shadow re-raster every frame against a blur-dense home page,
+           dropping hover to ~2fps on Chrome. CSS in 03_cards.css also
+           flattens their :hover (no scale/glow). The effect stays on the
+           real list/grid views. Not marked _stashTilt — the closest() check
+           is cheap and keeps SPA re-binds correct. */
+        if (card.closest && card.closest(".slick-slider")) { return; }
         card._stashTilt = true;
 
         /* Skip the glare overlay on image-cards — it paints above Stash's

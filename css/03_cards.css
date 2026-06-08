@@ -110,6 +110,22 @@ body.stash-liquid-glass .grid-card:hover {
     transform: scale3d(1.04, 1.04, 1.04);
 }
 
+/* Home-page slick carousel cards: flat hover (no lift, no glow). The JS 3D
+   tilt is skipped for .slick-slider cards (refract.js), and here we drop the
+   CSS scale lift + accent-glow shadow that — combined with the per-mousemove
+   tilt transform — forced per-frame backdrop-filter + big-shadow re-raster on
+   hover, dropping Chrome to ~2fps on a blur-dense home page. The lift was only
+   ever a safety net for the JS tilt (now gone here), and the glow halo was
+   already removed from slick cards in tier mode for the same perf reason.
+   Tier-ribbon cards keep their higher-specificity tier shadow; the cheap
+   border-colour highlight stays for hover feedback. Full effect remains on the
+   real list/grid views. */
+body.stash-liquid-glass .slick-slider .card:hover,
+body.stash-liquid-glass .slick-slider .grid-card:hover {
+    transform: none !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
 /* Card images — fill their container; only round when explicitly inset by a
    card-type-specific rule (tag cards, etc.). Edge-to-edge images rely on the
    card's overflow:hidden + border-radius for corner clipping; an extra
