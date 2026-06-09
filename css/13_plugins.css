@@ -667,19 +667,28 @@ body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge {
     background: transparent !important;
     color: var(--accent-bright) !important;
     border: 0 !important;
-    border-left: 1px solid rgba(var(--accent-rgb), 0.6) !important;
     border-radius: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
-    justify-content: center !important;
+    gap: 8px !important;          /* divider -> number (matches star -> divider) */
     line-height: 1 !important;
     min-height: 0 !important;
-    height: 16px !important;
-    padding: 0 0 0 8px !important;
+    height: auto !important;
+    padding: 0 !important;
     margin: 0 !important;
     font-size: 0.82rem !important;
     font-weight: 700 !important;
     font-variant-numeric: tabular-nums;
+}
+/* The divider as its own centred element (not a border-left), so the gap
+   before and after it is symmetric — the container gap (star -> divider)
+   equals the badge gap (divider -> number). */
+body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge::before {
+    content: "" !important;
+    flex: 0 0 auto !important;
+    width: 1px !important;
+    height: 14px !important;
+    background: rgba(var(--accent-rgb), 0.6) !important;
 }
 /* No state-based fill — the count is always the inline accent number. */
 body.stash-liquid-glass .adv-rating-btn--partial .adv-rating-btn-badge {
@@ -689,7 +698,9 @@ body.stash-liquid-glass .adv-rating-btn--partial .adv-rating-btn-badge {
 body.stash-liquid-glass .adv-rating-btn:hover .adv-rating-btn-badge {
     background: transparent !important;
     color: #fff !important;
-    border-left-color: rgba(255, 255, 255, 0.5) !important;
+}
+body.stash-liquid-glass .adv-rating-btn:hover .adv-rating-btn-badge::before {
+    background: rgba(255, 255, 255, 0.6) !important;
 }
 
 /* ── Favourite heart toggle ─────────────────────────────────────── */
