@@ -675,6 +675,11 @@ body.stash-liquid-glass .filtered-list-toolbar {
 body.stash-liquid-glass .filtered-list-toolbar {
     margin-left: auto !important;
     margin-right: auto !important;
+    /* Nudge the toolbar down from the floating navbar so it sits centred in
+       the band above the grid (the relocated scenes stats line below it had
+       left it riding too high). Paired with the stats block's tighter
+       negative margin-top further down, which pulls the grid back up. */
+    margin-top: 0.2rem !important;
     display: flex !important;
     width: -webkit-fit-content !important;
     width: -moz-fit-content !important;
@@ -1344,7 +1349,7 @@ body.stash-liquid-glass .pagination-index-container > .pagination {
            justify-content:flex-end lands the text inset from the edge with
            no overflow. */
         --refract-stats-inset: 0.85rem;
-        margin: -0.55rem 0 0.05rem 0 !important;
+        margin: -0.85rem 0 0.05rem 0 !important;
         padding: 0 var(--refract-stats-inset) 0 0 !important;
         /* It's a passive label — never intercept clicks on the toolbar
            controls or cards it floats over. */

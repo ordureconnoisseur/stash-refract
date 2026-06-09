@@ -796,3 +796,77 @@ body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb:hover {
     background: rgba(var(--accent-rgb), 0.4);
 }
 
+/* ── Scene inline ratings panel ─────────────────────────────────────
+   On scene pages the ★+ trigger toggles an inline panel in the details
+   sidebar (instead of the overlay) so the video keeps playing while you
+   rate. It reuses the same .rating-row / .rating-stars-modal / .rating-
+   star / .rating-clear / .rating-tooltip / .adv-rating-* classes as the
+   modal, which are already themed above — here we only style the new
+   panel container + header and tighten horizontal padding to fit the
+   narrow sidebar column. */
+body.stash-liquid-glass .adv-rating-inline-panel {
+    background: var(--glass-bg-strong) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    padding: 0 !important;
+    overflow: hidden;
+    color: var(--text) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg-sat);
+    backdrop-filter: var(--glass-blur-lg-sat);
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(var(--accent-rgb), 0.12),
+        0 0 28px 4px rgba(var(--accent-rgb), 0.10) !important;
+}
+/* Header — uppercase muted label (like the modal's .adv-rating-header h3)
+   with the "N criteria · M rated" summary aligned right. */
+body.stash-liquid-glass .adv-rating-inline-head {
+    display: flex !important;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.7rem 1rem 0.6rem !important;
+    margin-bottom: 0 !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+body.stash-liquid-glass .adv-rating-inline-title {
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: var(--text-muted) !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-subhead {
+    font-size: 0.72rem !important;
+    color: var(--text-muted) !important;
+    opacity: 0.85;
+}
+/* Tighten the shared row / list / breakdown horizontal padding for the
+   sidebar (the overlay uses a roomier 1.25rem); drop the list scroll cap
+   since the sidebar already scrolls. */
+body.stash-liquid-glass .adv-rating-inline-panel .ratings-list {
+    padding: 0.25rem 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-row {
+    padding: 0.5rem 1rem !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-star {
+    font-size: 1.25rem;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown {
+    padding: 0.6rem 1rem 0.7rem !important;
+    margin-top: 0 !important;
+    border-top: 1px solid var(--glass-border) !important;
+}
+/* Trigger pressed state while the panel is open — accent ring instead of
+   the plugin's default yellow inset. */
+body.stash-liquid-glass .adv-rating-btn--active {
+    background: rgba(var(--accent-rgb), 0.22) !important;
+    border-color: var(--accent-bright) !important;
+    color: #fff !important;
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.35),
+                inset 0 0 0 1px rgba(var(--accent-rgb), 0.5) !important;
+}
+
