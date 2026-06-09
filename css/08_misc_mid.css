@@ -447,6 +447,25 @@ body.stash-liquid-glass form textarea.form-control.bg-secondary {
     border: 1px solid var(--glass-border) !important;
 }
 
+/* ── Scrape dialog tidy-up ───────────────────────────────────────────
+   (a) Skinnier label column (col-lg-3 25% -> 17%) so the Existing/Scraped
+       data columns get more width for the actual values.
+   (b) Cap the multi-select value-container height + scroll so a long
+       existing-tags list (20+ chips) doesn't blow the modal out
+       vertically and crowd the controls. */
+body.stash-liquid-glass .scraper-edit .row[data-field] > .col-form-label.col-lg-3 {
+    flex: 0 0 17% !important;
+    max-width: 17% !important;
+}
+body.stash-liquid-glass .scraper-edit .row[data-field] > .col-lg-9 {
+    flex: 0 0 83% !important;
+    max-width: 83% !important;
+}
+body.stash-liquid-glass .scraper-edit .react-select__value-container--is-multi {
+    max-height: 132px;
+    overflow-y: auto;
+}
+
 /* Generic .string-list-input rows in edit forms (Aliases, URLs on the
    performer / scene / studio / tag edit forms). Merge the text input
    and its trailing buttons (scrape, minus) into a single pill: input
@@ -3520,9 +3539,6 @@ body.stash-liquid-glass .stash-tag-popup {
     right: 0;
     min-width: 160px;
     max-width: 280px;
-    /* Cap to fit within typical thumbnail bounds (cards have overflow:
-       hidden — only the carve-out below frees the popup, but capping
-       size prevents over-extending past the viewport on tall lists). */
     max-height: min(220px, 50vh);
     overflow-y: auto;
     overflow-x: hidden;
@@ -3585,6 +3601,58 @@ body.stash-liquid-glass .stash-tag-popup-chip:hover {
     background: var(--accent-tint);
     border-color: var(--accent-glow);
     color: var(--accent-bright);
+}
+
+/* ── Tag-count popup: body portal (escapes card overflow) ──────────────
+   The inline `.stash-tag-popup` (built into the card) is clipped by the
+   card's overflow:hidden no matter how short we cap it. So refract.js
+   (initTagCountPopover) clones its chips into this body-level element on
+   hover, positioned via getBoundingClientRect — exactly like the
+   performer-name tooltip. Hide the inline one; it's now just a data source. */
+body.stash-liquid-glass .stash-tag-count .stash-tag-popup {
+    display: none !important;
+}
+body.stash-liquid-glass .refract-tag-popup-portal {
+    position: fixed;
+    z-index: 9999;
+    min-width: 160px;
+    max-width: 280px;
+    /* Body-level, so it's free to be tall — capped to viewport, never the
+       card. Flip-below logic in JS keeps it on-screen. */
+    max-height: min(360px, 62vh);
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 4px;
+    padding: 0.5rem 0.55rem;
+    background: rgba(12, 12, 14, 0.96);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    scrollbar-width: thin;
+    scrollbar-color: var(--glass-border) transparent;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px) scale(0.98);
+    transform-origin: bottom right;
+    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0s linear 0.14s;
+    pointer-events: none;
+}
+body.stash-liquid-glass .refract-tag-popup-portal::-webkit-scrollbar {
+    width: 4px;
+}
+body.stash-liquid-glass .refract-tag-popup-portal::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 2px;
+}
+body.stash-liquid-glass .refract-tag-popup-portal--show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0s linear 0s;
+    pointer-events: auto;
 }
 /* Let the popups escape the card's overflow:hidden when hovered,
    mirroring the existing carve-out for performer-link tooltips. Also
@@ -5898,6 +5966,63 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [d
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection > .select-buttons > .btn.btn-primary .svg-inline--fa {
     width: 0.8rem !important;
     height: 0.8rem !important;
+}
+
+/* ── Scene cover scrape image. UNLIKE the performer modal above (which uses
+   the .image-selection grid), the scene scrape modal puts a single landscape
+   <img class="scene-cover"> directly inside a Bootstrap .input-group next to
+   the accept/reject button. The native layout leaves the image full-bleed
+   with no rounded corners against the rounded button. Fix: make the whole
+   input-group ONE rounded pill (overflow clips the image's right corners),
+   button = left rail, image fills the rest at its natural aspect. */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .col-lg-6 > .input-group:has(> img.scene-cover) {
+    display: flex !important;
+    flex-flow: row nowrap !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+}
+/* Button rail: flush left, square inner corners (the container rounds the
+   outside), full image height via align-self stretch. */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .col-lg-6 > .input-group:has(> img.scene-cover) > .input-group-prepend {
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: stretch !important;
+}
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .col-lg-6 > .input-group:has(> img.scene-cover) > .input-group-prepend > .btn.btn-secondary {
+    align-self: stretch !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.5rem 0.75rem !important;
+    margin: 0 !important;
+    border: none !important;
+    border-right: 1px solid var(--glass-border) !important;
+    border-radius: 0 !important;
+}
+/* The cover image: fill the rest, natural aspect, square corners (container
+   clips them into the pill). Caps height so a big cover doesn't blow up the
+   modal; shrinks to fit beside the rail (min-width:0). */
+body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .col-lg-6 > .input-group > img.scene-cover {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    max-height: 280px !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    display: block !important;
 }
 
 /* 10. Modal header — accent the pencil icon */

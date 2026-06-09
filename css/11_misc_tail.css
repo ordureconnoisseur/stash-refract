@@ -945,6 +945,11 @@ body.stash-liquid-glass .refract-light-toggle {
     align-items: center !important;
     justify-content: center !important;
 }
+body.stash-liquid-glass .refract-light-toggle svg {
+    width: 1rem !important;
+    height: 1rem !important;
+    display: block !important;
+}
 body.stash-liquid-glass .refract-light-toggle.is-active {
     background: linear-gradient(135deg, #fef3c7, #fbbf24) !important;
     border-color: #f59e0b !important;
@@ -978,6 +983,11 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav {
 }
 body.stash-liquid-glass.refract-show-light-nav nav.top-nav .navbar-buttons > .st-light-toggle-nav {
     display: inline-flex !important;
+}
+body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav svg {
+    width: 1.15rem !important;
+    height: 1.15rem !important;
+    display: block !important;
 }
 body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav:hover {
     background: var(--accent-tint) !important;

@@ -119,8 +119,14 @@ body.stash-liquid-glass.refract-lite .gs-chip.gs-focused {
 /* ── 9. Scene-toolbar pill button glow on hover ──────────────── */
 body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button:hover,
 body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle:hover,
-body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn:hover {
+body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn:hover,
+body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized,
+body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized:hover {
     box-shadow: none !important;
+}
+/* Keep the cheap accent fill/colour on the active organized state (no glow). */
+body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized svg {
+    filter: none !important;
 }
 
 /* ── 10. Minimal-cards pills + overlays solid-dark fallback. The

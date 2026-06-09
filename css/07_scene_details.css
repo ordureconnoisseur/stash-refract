@@ -749,6 +749,22 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     border-color: var(--accent-glow) !important;
     color: #fff !important;
 }
+/* Active (organized) state — accent fill + glow so the toggle reads as ON.
+   Stash adds `.organized` to the button when the scene is organized. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-bright) !important;
+    color: var(--accent-bright) !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.35) !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized:hover {
+    background: rgba(var(--accent-rgb), 0.24) !important;
+    color: #fff !important;
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.45) !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized svg {
+    filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.55)) !important;
+}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button svg,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle svg,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn svg {
