@@ -136,8 +136,24 @@ body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .stash-pe
     border-color: var(--accent-glow) !important;
     color: var(--accent-bright) !important;
 }
-body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .stash-performer-popup {
-    background: rgba(14, 14, 18, 0.98) !important;
+/* Performer popup: lite mode strips its backdrop blur (rule 1), so the
+   translucent glass background reads as see-through over the card/page.
+   Pin it fully opaque. Broadened past the minimal-cards/scene-card scope of
+   the base rule so it stays solid wherever the popup appears. */
+body.stash-liquid-glass.refract-lite .stash-performer-popup {
+    background: rgb(16, 16, 20) !important;
+}
+
+/* Performer hover tooltip — the "performer card on hover" portal (Suggestion
+   Box opt-in, body.refract-performer-card-hover). Its `--card` style overrides
+   the opaque base bg with var(--glass-bg-strong) + backdrop blur; lite strips
+   the blur, leaving only the low-alpha glass = see-through. Pin both the text
+   and card variants solid. The image fill inside also defaults to the glass
+   token before it loads, so solidify that too. */
+body.stash-liquid-glass.refract-lite .refract-performer-name-tooltip-portal,
+body.stash-liquid-glass.refract-lite .refract-performer-name-tooltip-portal--card,
+body.stash-liquid-glass.refract-lite .refract-perf-tip-img {
+    background: rgb(16, 16, 20) !important;
 }
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .scene-specs-overlay > span {
     background: rgba(20, 20, 24, 0.92) !important;

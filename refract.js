@@ -234,6 +234,7 @@
 
             function pickRatingStyle(style) {
                 try { localStorage.setItem(RATING_STYLE_STORAGE_KEY, style); } catch (e) { /* ignore */ }
+                scheduleServerSync();
                 applyRatingStyleClass(style);
                 setRatingStyle(style);
                 tagFilledRatings();
@@ -241,6 +242,7 @@
 
             function pickCardStyle(style) {
                 try { localStorage.setItem(MINIMAL_CARDS_STORAGE_KEY, style); } catch (e) { /* ignore */ }
+                scheduleServerSync();
                 applyCardStyleClass(style);
                 setCardStyle(style);
             }
@@ -248,6 +250,7 @@
             function toggleStudioBanner() {
                 var next = !studioBannerOn;
                 try { localStorage.setItem(STUDIO_BANNER_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
                 applyStudioBannerClass(next);
                 setStudioBannerOn(next);
             }
@@ -255,6 +258,7 @@
             function togglePerfCardHover() {
                 var next = !perfCardHoverOn;
                 try { localStorage.setItem(PERFORMER_CARD_HOVER_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
                 applyPerformerCardHoverClass(next);
                 setPerfCardHoverOn(next);
             }
@@ -270,6 +274,7 @@
                    browsers. */
                 function commit() {
                     try { localStorage.setItem(LIGHT_MODE_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                    scheduleServerSync();
                     applyLightModeClass(next);
                     setLightOn(next);
                 }
@@ -283,6 +288,7 @@
             function toggleLite() {
                 var next = !liteOn;
                 try { localStorage.setItem(LITE_MODE_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
                 applyLiteModeClass(next);
                 setLiteOn(next);
                 /* Re-run the sidebar performer carousel setup so clones get
@@ -292,6 +298,7 @@
 
             function pick(preset) {
                 try { localStorage.setItem(ACCENT_STORAGE_KEY, preset); } catch (e) { /* ignore */ }
+                scheduleServerSync();
                 applyAccentClass(preset);
                 setLocalAccent(preset);
             }
@@ -299,6 +306,7 @@
             function toggleMinimiser() {
                 var next = !minimiserOn;
                 try { localStorage.setItem(VIEW_MINIMISER_STORAGE_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
                 setMinimiserOn(next);
                 if (next) { initViewModeDropdown(); }
                 else { teardownViewModeDropdown(); }
@@ -310,6 +318,7 @@
                     if (trimmed) { localStorage.setItem(LOGO_URL_STORAGE_KEY, trimmed); }
                     else { localStorage.removeItem(LOGO_URL_STORAGE_KEY); }
                 } catch (e) { /* ignore */ }
+                scheduleServerSync();
                 setLogoUrl(value);
                 refineBrandHomeOrb();
             }
@@ -585,6 +594,17 @@
     var MINIMAL_CARDS_STORAGE_KEY = "refract.minimalCards";
     var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";
     var RATING_STYLES = ["intensity", "tiers", "playing-card"];
+
+    /* Settings mirrored to Stash's server-side UI config (see the
+       settings-sync block below). RATING_SYSTEM is deliberately excluded:
+       it's auto-detected from Stash, not a user preference. */
+    var REFRACT_SYNC_KEYS = [
+        ACCENT_STORAGE_KEY, VIEW_MINIMISER_STORAGE_KEY, LOGO_URL_STORAGE_KEY,
+        LITE_MODE_STORAGE_KEY, LIGHT_MODE_STORAGE_KEY, LIGHT_TOGGLE_NAVBAR_KEY,
+        HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
+        MINIMAL_CARDS_STORAGE_KEY, RATING_STYLE_STORAGE_KEY
+    ];
+
     var GRAPHQL_URL = "/graphql";
 
     /* Custom CSS Source (Stash interface config) — lets the theme load
@@ -881,6 +901,83 @@
     function gqlWithVars(query, variables) {
         return gqlXhr(JSON.stringify({ query: query, variables: variables }));
     }
+
+    /* ── Server-side settings sync ──────────────────────────────────────
+       refract settings live in localStorage for an instant, flash-free
+       boot, but localStorage is per-origin and per-browser — so settings
+       "reset" when Stash is reached via a different URL/session/relaunch.
+       Mirror them into Stash's server-side UI config
+       (configuration.ui.refract) so they persist per-server everywhere.
+       Contract: localStorage is the instant cache; the server copy is the
+       source of truth on boot. On change we write both. */
+    function snapshotRefractSettings() {
+        var out = {};
+        REFRACT_SYNC_KEYS.forEach(function (k) {
+            try {
+                var v = localStorage.getItem(k);
+                if (v !== null) { out[k] = v; }
+            } catch (e) { /* ignore */ }
+        });
+        return out;
+    }
+
+    var refractSyncTimer = null;
+    function scheduleServerSync() {
+        if (refractSyncTimer) { clearTimeout(refractSyncTimer); }
+        refractSyncTimer = setTimeout(function () {
+            refractSyncTimer = null;
+            gqlWithVars(
+                'mutation($v: Any){ configureUISetting(key: "refract", value: $v) }',
+                { v: snapshotRefractSettings() }
+            ).catch(function () { /* offline / no perms — localStorage still holds it */ });
+        }, 400);
+    }
+
+    /* Re-apply every synced setting from (now-updated) localStorage. Called
+       after the server copy is pulled in on boot. Mirrors the boot apply
+       sequence; rating-system is auto-detected separately so it's skipped. */
+    function reapplyRefractSettings() {
+        try {
+            applyAccentClass(getStoredAccent());
+            applyLiteModeClass(isLiteModeEnabled());
+            applyLightModeClass(isLightModeEnabled());
+            applyLightToggleNavbarClass(isLightToggleNavbarVisible());
+            applyHelpButtonClass(isHelpButtonVisible());
+            applyStudioBannerClass(isStudioBannerVisible());
+            applyPerformerCardHoverClass(isPerformerCardHover());
+            applyCardStyleClass(getStoredCardStyle());
+            applyRatingStyleClass(getStoredRatingStyle());
+        } catch (e) { /* ignore */ }
+    }
+
+    /* Boot reconcile: pull the server copy. If present, it wins — write it
+       into localStorage and re-apply. If absent (first run after upgrade),
+       migrate the current localStorage settings up to the server. */
+    function initSettingsSync() {
+        gql("query { configuration { ui } }").then(function (res) {
+            var ui = res && res.data && res.data.configuration && res.data.configuration.ui;
+            var server = ui && ui.refract;
+            if (server && typeof server === "object" && Object.keys(server).length) {
+                var changed = false;
+                REFRACT_SYNC_KEYS.forEach(function (k) {
+                    if (!Object.prototype.hasOwnProperty.call(server, k)) { return; }
+                    var sv = server[k];
+                    if (sv === null || sv === undefined) { return; }
+                    sv = String(sv);
+                    var cur = null;
+                    try { cur = localStorage.getItem(k); } catch (e) { /* ignore */ }
+                    if (cur !== sv) {
+                        try { localStorage.setItem(k, sv); changed = true; } catch (e) { /* ignore */ }
+                    }
+                });
+                if (changed) { reapplyRefractSettings(); }
+            } else if (Object.keys(snapshotRefractSettings()).length) {
+                /* No server copy yet — migrate current localStorage up. */
+                scheduleServerSync();
+            }
+        }).catch(function () { /* no server / no auth — stay on localStorage */ });
+    }
+    initSettingsSync();
 
     /* Detect Stash's rating-system type (STARS vs DECIMAL). We can't read
        this from the rating-banner alone because Stash only writes the
@@ -1508,6 +1605,59 @@
         return true;
     }
 
+    /* Swap Stash's FontAwesome icons in the card-popover count buttons
+       (performer / scene / tag / gallery / studio) for refract's own
+       navbar SVGs, so card footers match the nav. The FA <Icon> renders
+       <svg data-icon="user|tag|play-circle|...">; we keep that element
+       (don't replaceWith — that detaches React's fiber) and rewrite its
+       viewBox + inner paths + stroke styling in place. Re-keying data-icon
+       to "<name>-refract" makes the next watcher pass skip it; a React
+       re-render restores the FA glyph + original data-icon, which the
+       watcher re-catches. */
+    /* Keyed by the popover button's stable class (.performer-count etc.),
+       NOT FA's data-icon — FA7 renamed those (only "user" still matched,
+       which is why just the performer icon swapped first time round). */
+    var CARD_POPOVER_BTN_ICON = {
+        "performer-count": "performers",
+        "scene-count": "scenes",
+        "tag-count": "tags",
+        "gallery-count": "galleries",
+        "studio-count": "studios",
+        "image-count": "images",
+        "group-count": "movies",
+        "marker-count": "markers"
+    };
+    function refractifyCardPopoverIcons() {
+        Object.keys(CARD_POPOVER_BTN_ICON).forEach(function (cls) {
+            var key = CARD_POPOVER_BTN_ICON[cls];
+            var iconStr = MOBILE_NAV_ICONS[key];
+            if (!iconStr) { return; }
+            var svgs = document.querySelectorAll(
+                ".card-popovers ." + cls + " svg:not([data-refract-pop])"
+            );
+            for (var i = 0; i < svgs.length; i++) {
+                var svg = svgs[i];
+                var tmp = document.createElement("div");
+                tmp.innerHTML = iconStr;
+                var ref = tmp.querySelector("svg");
+                if (!ref) { continue; }
+                svg.setAttribute("viewBox", ref.getAttribute("viewBox") || "0 0 24 24");
+                svg.innerHTML = ref.innerHTML;
+                /* Inline styles beat FA's .svg-inline--fa CSS, which would
+                   otherwise fill our stroke-only glyphs into solid blobs.
+                   Inner elements keep their own fill/stroke attrs. */
+                svg.style.fill = "none";
+                svg.style.stroke = "currentColor";
+                svg.style.strokeWidth = "2";
+                svg.style.strokeLinecap = "round";
+                svg.style.strokeLinejoin = "round";
+                svg.style.width = "1em";
+                svg.style.height = "1em";
+                svg.setAttribute("data-refract-pop", key);
+            }
+        });
+    }
+
     /* Append plugin-injected nav items to the mobile drawer. Scans the
        navbar for any link not already represented (by href) in our
        hardcoded MOBILE_NAV_ITEMS, then builds a tile in our style
@@ -2034,6 +2184,7 @@
                 safeRun(injectToolbarDropdownScrim);
                 safeRun(injectMobileDrawer);
                 safeRun(refractApplyNavIcons);
+                safeRun(refractifyCardPopoverIcons);
                 safeRun(refractAppendPluginDrawerTiles);
                 safeRun(normalizeSettingsSidebarNavItems);
                 safeRun(injectSupportStashLink);
@@ -7056,6 +7207,7 @@
             var next = !isLightModeEnabled();
             function commit() {
                 try { localStorage.setItem(LIGHT_MODE_STORAGE_KEY, next ? "1" : "0"); } catch (err) { /* ignore */ }
+                scheduleServerSync();
                 applyLightModeClass(next);
                 /* Re-sync this button glyph immediately (watcher would
                    also catch it but feels snappier). */
@@ -7117,6 +7269,7 @@
         input.addEventListener("change", function () {
             var on = !!this.checked;
             try { localStorage.setItem(LIGHT_TOGGLE_NAVBAR_KEY, on ? "1" : "0"); } catch (e) { /* ignore */ }
+            scheduleServerSync();
             applyLightToggleNavbarClass(on);
         });
 
@@ -7170,6 +7323,7 @@
         input.addEventListener("change", function () {
             var on = !!this.checked;
             try { localStorage.setItem(HELP_BUTTON_STORAGE_KEY, on ? "1" : "0"); } catch (e) { /* ignore */ }
+            scheduleServerSync();
             applyHelpButtonClass(on);
         });
 

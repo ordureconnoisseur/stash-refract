@@ -3261,6 +3261,104 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup
     min-width: 0;
 }
 
+/* ── Native performer hover-popover (galleries, images, anywhere refract
+   does NOT inject its own scene-card performer popup) ───────────────────
+   Stash renders each popover performer as a flat image link
+   (.performer-tag > .image-thumbnail) plus a separate name badge
+   (.tag-item.badge), defaulting to a sprawled inline layout. For now: drop
+   the images entirely and show a clean vertical list of name text. (Avatars
+   here are a TODO pending a decision on gallery cards — see CLAUDE.md.) */
+body.stash-liquid-glass .hover-popover-content:has(.performer-tag-container) {
+    width: max-content;
+    max-width: 280px;
+    padding: 0.4rem 0.6rem;
+}
+body.stash-liquid-glass .hover-popover-content .performer-tag-container {
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    margin: 0;
+}
+/* Hide the avatar image link — text names only for now. */
+body.stash-liquid-glass .hover-popover-content .performer-tag {
+    display: none !important;
+}
+body.stash-liquid-glass .hover-popover-content .tag-item.badge {
+    display: block !important;
+    margin: 0;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+body.stash-liquid-glass .hover-popover-content .tag-item.badge a {
+    color: var(--text) !important;
+    text-decoration: none !important;
+    white-space: nowrap;
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+body.stash-liquid-glass .hover-popover-content .tag-item.badge a:hover {
+    color: var(--accent-bright) !important;
+}
+
+/* When "performer card on hover" is enabled, render the performer popover
+   as a PANEL of portrait cards matching the scene-card hover card. Stash
+   renders one .performer-tag-container per performer (image link
+   .performer-tag > .image-thumbnail, then a name link .tag-item), so each
+   container IS one card: image on top, name below. Single performer = one
+   card; multiple = the cards wrap into a grid inside the popover panel.
+   Higher specificity (extra body class) overrides the text-only rules. */
+body.stash-liquid-glass.refract-performer-card-hover .hover-popover-content:has(.performer-tag-container) {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem !important;
+    max-width: 460px; /* ~3 cards before wrapping */
+}
+/* Each performer = one portrait card. */
+body.stash-liquid-glass.refract-performer-card-hover .hover-popover-content .performer-tag-container {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    width: 132px;
+    margin: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--glass-bg-strong);
+}
+body.stash-liquid-glass.refract-performer-card-hover .hover-popover-content .performer-tag {
+    display: block !important;
+    width: 132px;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+}
+body.stash-liquid-glass.refract-performer-card-hover .hover-popover-content .performer-tag .image-thumbnail {
+    display: block;
+    width: 132px;
+    height: 174px;
+    object-fit: cover;
+    object-position: center 18%;
+}
+body.stash-liquid-glass.refract-performer-card-hover .hover-popover-content .tag-item.badge {
+    display: block !important;
+    width: 132px;
+    margin: 0;
+    padding: 0.35rem 0.4rem !important;
+    text-align: center;
+    background: transparent !important;
+    border: none !important;
+}
+body.stash-liquid-glass.refract-performer-card-hover .hover-popover-content .tag-item.badge a {
+    color: var(--text) !important;
+    text-decoration: none !important;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: normal;
+}
+
 /* Let the performer popup escape the card's overflow:hidden when the
    pill is hovered, same carve-out used for .stash-tag-count + the
    performer-name tooltips on avatars. */
