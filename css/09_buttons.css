@@ -817,7 +817,12 @@ body.stash-liquid-glass .adv-rating-inline-panel {
     color: var(--text) !important;
     -webkit-backdrop-filter: var(--glass-blur-lg-sat);
     backdrop-filter: var(--glass-blur-lg-sat);
+    /* Soft dark drop for lift + a short-radius accent halo behind the panel
+       for depth. The accent glow (not a fill) gives presence without the
+       bright-band problem the white surface had. */
     box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.35),
+        0 0 12px rgba(var(--accent-rgb), 0.22),
         inset 0 0 0 1px rgba(var(--accent-rgb), 0.10),
         inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
