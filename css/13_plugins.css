@@ -607,9 +607,9 @@ body.stash-liquid-glass .adv-rating-btn {
     background: var(--accent-tint) !important;
     border: 1px solid var(--accent-glow) !important;
     color: var(--accent-bright) !important;
-    border-radius: var(--radius-sm) !important;
+    border-radius: var(--radius-pill) !important;
     height: 26px !important;
-    padding: 0 8px !important;
+    padding: 0 10px !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
     /* Force explicit flex centering — the ★ glyph in most fonts sits
        below the visual line center because the star's bottom points
@@ -619,7 +619,7 @@ body.stash-liquid-glass .adv-rating-btn {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 2px;
+    gap: 6px;
     line-height: 1 !important;
     font-size: 0.9rem !important;
     transition: background 0.18s ease, border-color 0.18s ease,
@@ -636,15 +636,11 @@ body.stash-liquid-glass .adv-rating-btn > span[style*="color"] {
     line-height: 1;
     transform: translateY(-1px);
 }
-/* `+` glyph is baseline-aligned in most fonts and renders ~2px below
-   the line's geometric centre. Bump it up to match the star. Also
-   slight bold for weight parity with the ★. */
-/* Plus-icon sizing + flex centering live in the plugin's own CSS so
-   it works without Refract. Refract only needs to ensure the inherited
-   button colour reaches the SVG stroke (currentColor handles that for
-   free) and re-centre vertically alongside the nudged ★. */
+/* Drop the redundant `+` glyph. The button is just ★ (+ the unrated count
+   when pending); the ★ alone reads as "rating" and the title/tooltip
+   conveys the action. The + only added visual clutter. */
 body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-plus {
-    transform: translateY(-1px);
+    display: none !important;
 }
 body.stash-liquid-glass .adv-rating-btn:hover {
     background: rgba(var(--accent-rgb), 0.22) !important;
@@ -662,27 +658,36 @@ body.stash-liquid-glass .adv-rating-btn > span[style*="color"] {
 body.stash-liquid-glass .adv-rating-btn:hover > span[style*="color"] {
     color: #fff !important;
 }
-/* Unrated-count badge (when criteria are still pending) — restyle from
-   the plugin's grey/yellow pill to a glass dark pill with accent text. */
+/* Unrated-count: instead of a detached chunky pill, render it inline after
+   the ★ behind a hairline divider — "★ | 4" — so the button reads as one
+   cohesive unit, matching the toolbar's other icon+number controls. */
 body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge {
-    background: rgba(0, 0, 0, 0.45) !important;
+    background: transparent !important;
     color: var(--accent-bright) !important;
-    border: 1px solid rgba(var(--accent-rgb), 0.4) !important;
+    border: 0 !important;
+    border-left: 1px solid var(--accent-glow) !important;
+    border-radius: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     line-height: 1 !important;
-    min-height: 18px;
-    padding: 0 6px !important;
-    margin-left: 4px;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 1px 0 0 7px !important;
+    margin: 0 !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    font-variant-numeric: tabular-nums;
 }
+/* No state-based fill — the count is always the inline accent number. */
 body.stash-liquid-glass .adv-rating-btn--partial .adv-rating-btn-badge {
-    background: rgba(var(--accent-rgb), 0.25) !important;
-    color: #fff !important;
+    background: transparent !important;
+    color: var(--accent-bright) !important;
 }
 body.stash-liquid-glass .adv-rating-btn:hover .adv-rating-btn-badge {
-    background: #000 !important;
-    color: var(--accent-bright) !important;
+    background: transparent !important;
+    color: #fff !important;
+    border-left-color: rgba(255, 255, 255, 0.5) !important;
 }
 
 /* ── Favourite heart toggle ─────────────────────────────────────── */
@@ -1967,4 +1972,355 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup-body {
 body.stash-liquid-glass .refract-plugin-list {
     display: flex !important;
     flex-direction: column !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Tag Sidebar (tag-sidebar plugin) — docked tag-tree filter panel
+   BEM `tag-sidebar__*`. Root `.tag-sidebar__panel` is position:absolute
+   top:0 left:0 (360px, full height), so it slid UNDER refract's floating
+   navbar (fixed, top:12px, height ~nav-btn-size + padding). Push the panel
+   down to clear the nav and re-skin the whole thing in glass.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Panel shell — clear the navbar (~its top:12px + height + padding + gap,
+   which the existing scene-page calc treats as nav-btn-size + 1.6rem) and
+   shrink the height to match so the bottom doesn't overflow the viewport. */
+body.stash-liquid-glass .tag-sidebar__panel {
+    top: calc(var(--nav-btn-size) + 2.6rem) !important;
+    /* Float it off the left edge. margin-left (not left) so we don't fight
+       the plugin's open/close which animates `left`/transform — margin just
+       shifts the resting position; the closed state still tucks off-screen. */
+    margin-left: 12px !important;
+    height: calc(100vh - var(--nav-btn-size) - 2.6rem - 12px) !important;
+    max-height: calc(100vh - var(--nav-btn-size) - 2.6rem - 12px) !important;
+    background: rgba(16, 16, 20, 0.92) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg-sat) !important;
+            backdrop-filter: var(--glass-blur-lg-sat) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow-lg) !important;
+    color: var(--text) !important;
+    font-family: var(--theme-font-stack) !important;
+}
+
+/* Inner = scroll host (panel itself is overflow:hidden). The plugin makes
+   this a flex container, and its content was measured at 472px wide inside a
+   359px panel — the children weren't stretching to the panel width on the
+   flex cross-axis. Force a proper vertical column with stretched, full-width,
+   shrinkable children so nothing can exceed the sidebar. */
+body.stash-liquid-glass .tag-sidebar__inner {
+    padding: 0.85rem 0.9rem 1rem !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--glass-border) transparent !important;
+    /* Reserve a gutter for the scrollbar so it never overlaps the count
+       numbers on the right edge of each row. */
+    scrollbar-gutter: stable !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    flex-wrap: nowrap !important;
+}
+/* Every descendant container stretches to full width and may shrink — kills
+   the content-sized overflow at whatever nested flex level it occurs (the
+   inner [data-stash-filter] wrapper, sections, tree, branches, children). */
+body.stash-liquid-glass .tag-sidebar__inner > *,
+body.stash-liquid-glass .tag-sidebar__panel [data-stash-filter],
+body.stash-liquid-glass .tag-sidebar__panel [data-stash-filter] > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    align-self: stretch !important;
+    box-sizing: border-box !important;
+}
+body.stash-liquid-glass .tag-sidebar__inner::-webkit-scrollbar { width: 6px; }
+body.stash-liquid-glass .tag-sidebar__inner::-webkit-scrollbar-thumb {
+    background: var(--glass-border); border-radius: 3px;
+}
+
+/* Header (title + Clear) */
+body.stash-liquid-glass .tag-sidebar__header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.7rem !important;
+}
+body.stash-liquid-glass .tag-sidebar__eyebrow {
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    color: var(--text) !important;
+    letter-spacing: 0.01em !important;
+}
+body.stash-liquid-glass .tag-sidebar__clear {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-pill) !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    padding: 0.2rem 0.7rem !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s !important;
+}
+body.stash-liquid-glass .tag-sidebar__clear:not(:disabled):hover {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .tag-sidebar__clear:disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+}
+
+/* Match ANY/ALL segmented control */
+body.stash-liquid-glass .tag-sidebar__segmented {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.7rem !important;
+}
+body.stash-liquid-glass .tag-sidebar__segmented-label {
+    font-size: 0.7rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: var(--text-muted) !important;
+    font-weight: 600 !important;
+}
+body.stash-liquid-glass .tag-sidebar__segmented-buttons {
+    display: inline-flex !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    padding: 2px !important;
+    gap: 2px !important;
+}
+body.stash-liquid-glass .tag-sidebar__segmented-button {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-pill) !important;
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    padding: 0.2rem 0.7rem !important;
+    transition: background 0.15s, color 0.15s !important;
+}
+body.stash-liquid-glass .tag-sidebar__segmented-button.is-active {
+    background: var(--accent) !important;
+    color: #fff !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.4) !important;
+}
+
+/* Search field — glass pill */
+body.stash-liquid-glass .tag-sidebar__search-input {
+    width: 100% !important;
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--text) !important;
+    font-size: 0.82rem !important;
+    padding: 0.4rem 0.85rem !important;
+    margin-bottom: 0.8rem !important;
+    transition: border-color 0.15s, box-shadow 0.15s !important;
+}
+body.stash-liquid-glass .tag-sidebar__search-input:focus {
+    outline: none !important;
+    border-color: var(--accent-glow) !important;
+    box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.25),
+                0 0 12px rgba(var(--accent-rgb), 0.22) !important;
+}
+body.stash-liquid-glass .tag-sidebar__search-input::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Section labels (Selected Tags / Tag Tree) + empty state */
+body.stash-liquid-glass .tag-sidebar__section {
+    margin-top: 0.9rem !important;
+}
+body.stash-liquid-glass .tag-sidebar__section-label {
+    font-size: 0.68rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    font-weight: 700 !important;
+    color: var(--text-muted) !important;
+    margin: 0 0 0.5rem !important;
+}
+body.stash-liquid-glass .tag-sidebar__empty {
+    font-size: 0.8rem !important;
+    color: var(--text-muted) !important;
+    padding: 0.1rem 0 0.5rem !important;
+}
+
+/* Keep every tree container pinned to the panel width. Without this, the
+   longest (deeply-indented) child row sets the tree's min-content width, so
+   when a parent is expanded EVERY row stretches past the 360px panel and the
+   count pills get pushed off the right edge / names over-truncate. Pin the
+   chain to 100% + min-width:0 so rows stay inside the sidebar and the label
+   ellipsis does the truncating (mirrors the CustomTagsManager fix above). */
+body.stash-liquid-glass .tag-sidebar__inner,
+body.stash-liquid-glass .tag-sidebar__section,
+body.stash-liquid-glass .tag-sidebar__section--tree,
+body.stash-liquid-glass .tag-sidebar__tree,
+body.stash-liquid-glass .tag-sidebar__branch,
+body.stash-liquid-glass .tag-sidebar__children {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+/* Clip stray horizontal overflow only at the tree root (the inner scroll
+   host already does its own overflow-x:hidden). Not on every nested level —
+   overflow-x:hidden + overflow-y:visible would force nested y-scrollers. */
+body.stash-liquid-glass .tag-sidebar__tree {
+    overflow-x: hidden !important;
+}
+
+/* Tree rows. NOTE: indentation is the plugin's own `padding-left`, computed
+   from the row's `--tag-sidebar-depth` custom property — so DON'T set the
+   `padding` shorthand (it would wipe padding-left and flatten the tree) and
+   DON'T force `width:100%` (it fights any margin indent). width:auto fills
+   the parent content box; max-width:100% + min-width:0 keep it inside the
+   sidebar and let the label ellipsis do the truncating. */
+body.stash-liquid-glass .tag-sidebar__row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.1rem !important;
+    padding-top: 0.13rem !important;
+    padding-bottom: 0.13rem !important;
+    padding-right: 0.35rem !important;
+    border-radius: var(--radius-sm) !important;
+    transition: background 0.12s ease !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+body.stash-liquid-glass .tag-sidebar__row:hover {
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* Action buttons — small square; expand ▸ neutral, include + accent,
+   exclude − red. Active states fill solid. */
+body.stash-liquid-glass .tag-sidebar__action {
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--text-muted) !important;
+    border-radius: var(--radius-sm) !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    min-width: 1.25rem !important;
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.78rem !important;
+    line-height: 1 !important;
+    transition: background 0.13s, border-color 0.13s, color 0.13s !important;
+}
+body.stash-liquid-glass .tag-sidebar__action--expand:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass .tag-sidebar__action--include:hover {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+body.stash-liquid-glass .tag-sidebar__action--include.is-active {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: #fff !important;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.45) !important;
+}
+body.stash-liquid-glass .tag-sidebar__action--exclude:hover {
+    background: rgba(239, 68, 68, 0.16) !important;
+    border-color: rgba(239, 68, 68, 0.45) !important;
+    color: #f87171 !important;
+}
+body.stash-liquid-glass .tag-sidebar__action--exclude.is-active {
+    background: rgba(239, 68, 68, 0.85) !important;
+    border-color: rgba(239, 68, 68, 0.9) !important;
+    color: #fff !important;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.45) !important;
+}
+
+/* Tag-name button */
+body.stash-liquid-glass .tag-sidebar__label {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text) !important;
+    font-size: 0.82rem !important;
+    font-weight: 500 !important;
+    text-align: left !important;
+    padding: 0.18rem 0.25rem !important;
+    margin-left: 0.15rem !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+    transition: color 0.13s !important;
+}
+body.stash-liquid-glass .tag-sidebar__label:hover {
+    color: var(--accent-bright) !important;
+}
+
+/* Count pill — soft accent, right-aligned, tabular */
+body.stash-liquid-glass .tag-sidebar__count {
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    color: var(--accent-light) !important;
+    font-variant-numeric: tabular-nums !important;
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+    padding-left: 0.4rem !important;
+}
+
+/* Toggle tab — rotate the "TAGS" label to vertical text so the tab is a thin
+   strip on the screen edge instead of a wide horizontal box. Glass styling to
+   match the panel + navbar. Position is left to the plugin (don't fight its
+   open/close), we only change the content orientation + skin. */
+body.stash-liquid-glass .tag-sidebar__toggle {
+    writing-mode: vertical-rl !important;
+    text-orientation: mixed !important;
+    width: auto !important;
+    min-width: 0 !important;
+    /* Slim vertical strip */
+    padding: 0.7rem 0.28rem !important;
+    font-size: 0.66rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.14em !important;
+    text-transform: uppercase !important;
+    line-height: 1 !important;
+    background: rgba(16, 16, 20, 0.92) !important;
+    border: 1px solid var(--glass-border) !important;
+    /* Attach flush to the panel's flat right edge — no left border, round
+       only the right corners, drop the shadow on the right side. */
+    border-left: none !important;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
+    color: var(--text-muted) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+            backdrop-filter: var(--glass-blur) !important;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.35) !important;
+    /* The plugin slides the toggle via `transition: left 180ms ease`. Our
+       override MUST keep `left` (and the same 180ms) or the toggle teleports
+       while the panel slides. */
+    transition: left 180ms ease, background 0.15s ease,
+                border-color 0.15s ease, color 0.15s ease !important;
+}
+body.stash-liquid-glass .tag-sidebar__toggle:hover {
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    color: var(--accent-bright) !important;
+}
+/* Open: the plugin slides the toggle to left:var(--tag-sidebar-panel-width)
+   (the un-floated panel edge). We floated the panel +12px, so target +12px
+   more. Driving it through `left` lets the plugin's native 180ms left-slide
+   animate it in sync with the panel — no separate margin to desync. Closed
+   state (left:0, screen edge) is untouched. */
+body.stash-liquid-glass .tag-sidebar--open .tag-sidebar__toggle {
+    left: calc(var(--tag-sidebar-panel-width, 360px) + 12px) !important;
+    margin-left: 0 !important;
 }
