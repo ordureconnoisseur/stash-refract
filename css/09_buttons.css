@@ -805,7 +805,11 @@ body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb:hover {
    panel container + header and tighten horizontal padding to fit the
    narrow sidebar column. */
 body.stash-liquid-glass .adv-rating-inline-panel {
-    background: var(--glass-bg-strong) !important;
+    /* A darker, recessed well rather than a bright glass card: --glass-bg-
+       strong is a translucent WHITE overlay, which stacks on the already-
+       glass .scene-tabs and reads as a jarring bright band. A dark tint +
+       faint accent inset ring sits as a calm inset panel instead. */
+    background: rgba(0, 0, 0, 0.22) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     padding: 0 !important;
@@ -814,9 +818,8 @@ body.stash-liquid-glass .adv-rating-inline-panel {
     -webkit-backdrop-filter: var(--glass-blur-lg-sat);
     backdrop-filter: var(--glass-blur-lg-sat);
     box-shadow:
-        0 8px 24px rgba(0, 0, 0, 0.35),
-        0 0 0 1px rgba(var(--accent-rgb), 0.12),
-        0 0 28px 4px rgba(var(--accent-rgb), 0.10) !important;
+        inset 0 0 0 1px rgba(var(--accent-rgb), 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 /* Header — uppercase muted label (like the modal's .adv-rating-header h3)
    with the "N criteria · M rated" summary aligned right. */
@@ -834,7 +837,16 @@ body.stash-liquid-glass .adv-rating-inline-title {
     font-weight: 700 !important;
     letter-spacing: 0.1em !important;
     text-transform: uppercase !important;
-    color: var(--text-muted) !important;
+    /* Accent the section title so the panel doesn't read flat. */
+    color: var(--accent-bright) !important;
+}
+/* Accent the Score breakdown heading + caret to match the panel title. */
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown-heading {
+    color: var(--accent-bright) !important;
+    opacity: 1 !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown-caret {
+    color: var(--accent-bright) !important;
 }
 body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-subhead {
     font-size: 0.72rem !important;
