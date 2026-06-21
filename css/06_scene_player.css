@@ -472,8 +472,47 @@ body.stash-liquid-glass .video-js .vjs-vtt-thumbnail-display {
     border-radius: 8px !important;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55) !important;
 }
+/* Marker dots on the scrubber (.vjs-marker). The player colours a dot from its
+   primary tag's colour via an INLINE background-color (markers.ts) when that tag
+   has one; otherwise Stash's default is a dim rgba(33,33,33,.8) that vanishes on
+   the dark seek bar. Give the no-colour fallback the theme accent + a soft glow
+   so markers are always visible, and add a rounded cap + glow to every dot.
+   No !important on background so a tag's inline colour still wins. */
+body.stash-liquid-glass .video-js .vjs-marker {
+    background-color: var(--accent);
+    width: 5px;
+    border-radius: 3px;
+    box-shadow:
+        0 0 4px rgba(var(--accent-rgb), 0.55),
+        0 0 1px rgba(0, 0, 0, 0.6);
+}
+body.stash-liquid-glass .video-js .vjs-marker:hover {
+    box-shadow:
+        0 0 8px rgba(var(--accent-rgb), 0.85),
+        0 0 2px rgba(0, 0, 0, 0.7);
+}
+/* Marker name tooltip on the scrubber. Stash's player shows this on hover
+   over a .vjs-marker dot (ScenePlayer/markers.ts), toggling its inline
+   visibility + position. We used to hide it outright because the unstyled
+   native version clashed with the glass time-tooltip; instead, give it the
+   same glass treatment and let the player keep control of show/hide and
+   placement (so we only theme it, never set visibility/top/right here). */
 body.stash-liquid-glass .video-js .vjs-marker-tooltip {
-    display: none !important;
+    position: absolute !important;
+    background: rgba(12, 12, 14, 0.85) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 6px !important;
+    color: var(--text) !important;
+    font-family: inherit !important;
+    font-size: 0.64rem !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    padding: 0.22rem 0.42rem !important;
+    white-space: nowrap !important;
+    pointer-events: none !important;
+    z-index: 2 !important;
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
 }
 
 /* ── Volume (vertical popup, glass) ───────────────────────────────── */

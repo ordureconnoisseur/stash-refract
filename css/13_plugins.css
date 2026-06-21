@@ -284,6 +284,125 @@ body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #desire-nav
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plugin_hon)                   { order: 91; }
 
 /* ═══════════════════════════════════════════════════════════════════
+   Ascension (Sakoto's HotorNot fork) — performer-card battle-rank badge
+   Ascension swaps a performer card's native .rating-banner for its
+   `.hon-battle-rank-badge.hon-battle-rank-badge-compact`. Left to the
+   plugin it lands wherever the banner sat and overlaps Refract's
+   `.stash-perf-stats` pills. refract.js (integrateAscensionBadges)
+   instead appends it inside the `.stash-perf-country` caption in
+   playing-card mode and tags it `.refract-ascension-badge`, so these
+   rules render it as subtle inline text pinned to the RIGHT edge of the
+   card, on the nationality's line (flame glyph + tier-coloured number),
+   not a chip. In other rating styles (no visible country) it falls back
+   into the chin above the stat pills. Inert on installs without
+   Ascension.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* The rank read-out is no longer a pinned capsule. refract.js appends it
+   inside the `.stash-perf-country` caption (playing-card mode), which
+   becomes a space-between row, so the read-out sits at the RIGHT edge of
+   the card on the nationality's line. In other modes (no visible country)
+   it falls back into the chin above the stat pills via the direct-child
+   rule below. Either way it renders as subtle text, not a chip. */
+
+/* Subtle inline rank text: flame glyph + number, no capsule chrome. The
+   dark text-shadow keeps it legible over the card image, matching the
+   country caption it sits beside. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge,
+body.stash-liquid-glass .performer-card .hon-battle-rank-badge.hon-battle-rank-badge-compact {
+    display: inline-flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    gap: 0.34rem !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    box-sizing: border-box !important;
+    vertical-align: middle !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
+    box-shadow: none !important;
+    pointer-events: auto !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    color: rgba(255, 255, 255, 0.92) !important;
+    /* Grounding shadow for the gradient (background-clip:text) number
+       lives HERE on the container, not on the text element, where a
+       filter would break the clip. Applies to the composited flame +
+       number, keeping both legible over bright card images. */
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.62)) !important;
+    transition: none !important;
+}
+
+/* Fallback case (performer with no country caption, or a non-playing-
+   card rating mode): refract.js drops the badge straight into the chin
+   (a stretch flex-column). Left-align it so it reads where the country
+   caption would, top-aligned above the stat pills. Direct-child selector
+   so it only targets the fallback, never the country-nested case. */
+body.stash-liquid-glass .performer-card .card-section > .refract-ascension-badge {
+    align-self: flex-start !important;
+}
+
+/* Ascension's flame glyph (prepended in refract.js) leads the read-out
+   in place of the old "ASCENSION" wordmark. The path carries a warm
+   amber-to-red gradient fill (defined inside the SVG), so we do NOT set
+   `fill` here (a CSS fill would override the gradient). The layered
+   drop-shadows give it a glowy ember halo, with a dark grounding shadow
+   so it stays legible over any card image. Sized a touch above the
+   number's cap height so the flame reads clearly. */
+body.stash-liquid-glass .performer-card .refract-ascension-icon {
+    width: 1.15em !important;
+    height: 1.15em !important;
+    flex: 0 0 auto !important;
+    overflow: visible !important;
+    filter:
+        drop-shadow(0 0 1.5px rgba(255, 180, 70, 0.95))
+        drop-shadow(0 0 5px rgba(255, 90, 20, 0.6))
+        drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55)) !important;
+}
+
+/* Hide the plugin's tier emoji: the flame glyph already marks the line
+   as Ascension, and the number carries its own warm gradient. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-emoji {
+    display: none !important;
+}
+
+/* The rank number wears the SAME amber-to-red gradient as the flame, via
+   background-clip:text. `-webkit-text-fill-color: transparent !important`
+   overrides the plugin's inline tier colour so the gradient shows.
+   CRITICAL: no `filter` or `text-shadow` on THIS element. In Chromium a
+   filter on a background-clip:text element breaks the clip, and the only
+   thing that then paints is the dark shadow, rendering the number black.
+   The grounding shadow lives on the badge container instead. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-text {
+    font-weight: 800 !important;
+    font-size: 0.92rem !important;
+    letter-spacing: 0.01em !important;
+    background: linear-gradient(180deg, #ffd24a 0%, #ff7a18 48%, #e11d2a 100%) !important;
+    -webkit-background-clip: text !important;
+            background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    text-shadow: none !important;
+    filter: none !important;
+}
+
+/* Declutter for the grid: the full W/L/D record, win-rate and streak
+   belong on the performer page, not a dense card. Hiding the entire
+   `.hon-match-stats` cluster keeps every read-out uniform ("flame #N")
+   regardless of how many stats a performer has. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-match-stats {
+    display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    flexibleDateInput plugin — react-datepicker theming
    ═══════════════════════════════════════════════════════════════════ */
 

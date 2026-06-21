@@ -1680,6 +1680,9 @@
         var known = {};
         // Track plugin hrefs seen this pass, to reconcile orphaned tiles below.
         var present = {};
+        // Track which KNOWN (hardcoded) routes are actually present in the
+        // live navbar, so we can hide tiles for menu items the user disabled.
+        var knownPresent = {};
         for (var i = 0; i < MOBILE_NAV_ITEMS.length; i++) {
             var item = MOBILE_NAV_ITEMS[i];
             known[item.href] = true;
@@ -1695,7 +1698,7 @@
             var link = links[j];
             var href = link.getAttribute("href");
             if (!href) { continue; }
-            if (known[href]) { continue; }
+            if (known[href]) { knownPresent[href] = true; continue; }
             if (NATIVE_NAV_SKIP[href]) { continue; }
             // /new contextual button — mirrored separately next to burger.
             if (/\/new$/.test(href)) { continue; }
@@ -1749,6 +1752,38 @@
             var ph = ptiles[p].getAttribute("data-href");
             if (!present[ph] && ptiles[p].parentNode) {
                 ptiles[p].parentNode.removeChild(ptiles[p]);
+            }
+        }
+
+        /* Hide hardcoded tiles for menu items the user disabled in Stash's
+           Interface settings. Stash filters disabled items out of the
+           navbar DOM entirely (MainNavbar menuItems), so a known route
+           absent from the live navbar means it's disabled. We toggle a
+           hide class rather than removing the tile, so re-enabling the
+           item restores it. Only runs once the navbar has actually
+           rendered (>= 1 known route present), so we never blank the
+           drawer mid-load; Settings/Stats are always rendered, so this
+           readiness signal is reliable. */
+        var navReady = false;
+        for (var kp in knownPresent) {
+            if (knownPresent.hasOwnProperty(kp)) { navReady = true; break; }
+        }
+        if (navReady) {
+            var htiles = drawer.querySelectorAll(".refract-drawer-tile:not([data-plugin-tile])");
+            for (var h = 0; h < htiles.length; h++) {
+                var htile = htiles[h];
+                var hcands = [htile.getAttribute("data-href") || ""];
+                var halias = htile.getAttribute("data-aliases");
+                if (halias) { hcands = hcands.concat(halias.split(/\s+/)); }
+                var enabled = false;
+                for (var hc = 0; hc < hcands.length; hc++) {
+                    if (hcands[hc] && knownPresent[hcands[hc]]) { enabled = true; break; }
+                }
+                if (enabled) {
+                    htile.classList.remove("refract-drawer-tile-off");
+                } else {
+                    htile.classList.add("refract-drawer-tile-off");
+                }
             }
         }
 
@@ -2195,6 +2230,7 @@
                 safeRun(initSceneCards);
                 safeRun(initPerformerCards);
                 safeRun(syncPerformerCardHearts);
+                safeRun(integrateAscensionBadges);
                 safeRun(initSlickCarousels);
                 safeRun(initFilterBar);
                 safeRun(initFilterButtonBadge);
@@ -2778,10 +2814,74 @@
         ' c0-17.7-14.3-32-32-32H32zm0 256c-17.7 0-32 14.3-32 32s14.3 32 32 32H352c17.7 0 32-14.3' +
         ' 32-32s-14.3-32-32-32H32z"/></svg>';
 
+    /* Ascension's own navbar wordmark glyph (the `plugin_hon__flame`
+       flame). Injected as the lead glyph of the relocated rank read-out
+       so it self-documents as "Ascension" without the literal word.
+       Mirrors the plugin's `viewBox="0 0 512 512"` flame path verbatim,
+       but fills it with a warm amber-to-red vertical gradient (paired
+       with a glow in 13_plugins.css) so it reads as an actual flame, not
+       a flat tier-coloured mark. The gradient def rides inside the SVG;
+       its id is shared across every injected flame (all identical, so a
+       `url(#)` reference resolving to the first is fine). */
+    var ASCENSION_FLAME_SVG =
+        '<svg class="refract-ascension-icon" viewBox="0 0 512 512" aria-hidden="true">' +
+        '<defs><linearGradient id="refract-flame-grad" x1="0.5" y1="0" x2="0.5" y2="1">' +
+        '<stop offset="0" stop-color="#ffd24a"/>' +
+        '<stop offset="0.5" stop-color="#ff7a18"/>' +
+        '<stop offset="1" stop-color="#e11d2a"/>' +
+        '</linearGradient></defs>' +
+        '<path fill="url(#refract-flame-grad)" d="M160.53 20.906c-22.075.207-39.973 9.138-54.218 23.782C89.507 61.962 78.3 87.6 ' +
+        '74.876 115.624c-6.847 56.05 16.55 119.953 82.094 146.625l-7.032 17.313c-64.128-26.096-93.275' +
+        '-84.757-94.782-141-17.36 10.866-27.608 27.05-32.343 46.437-5.728 23.448-2.727 51.54 7.906 ' +
+        '77.844 21.264 52.61 71.37 96.856 138.436 87.594l2.563 18.53c-48.795 6.74-90.183-11.576-119.907' +
+        '-41.03-8.152 16.216-7.504 32.264-.657 48.312 8.472 19.854 27.498 39.252 52.875 53.594 47.085 ' +
+        '26.61 114.8 35.554 173.19 5.094-5.43-20.99-2.652-45.074 11.342-69.313 22.71-39.332 60.78-49.83 ' +
+        '88.375-38.688 13.798 5.572 25.08 16.555 29.875 31.157 4.796 14.6 2.836 32.303-7.375 50.312-11.8 ' +
+        '20.81-34.144 27.877-51.25 22.22-8.552-2.83-16.22-9.437-18.875-18.876-2.653-9.44-.142-20.366 ' +
+        '7.063-31.313l15.594 10.282c-5.238 7.955-5.5 13.08-4.69 15.967.813 2.888 2.84 4.895 6.75 6.188 ' +
+        '7.822 2.587 21.483-.152 29.158-13.688 8.188-14.44 8.82-26.183 5.843-35.25-2.976-9.066-9.846' +
+        '-15.954-19.092-19.687-18.493-7.467-46.14-2.273-65.188 30.72-14.024 24.29-14.373 45.376-6.72 ' +
+        '63.436l2.814 4.375c-.197.13-.397.25-.594.376.256.497.513 1.008.78 1.5 1.945 3.565 4.218 7.007 ' +
+        '6.814 10.28.1.13.21.25.312.377.395.49.81.984 1.22 1.468 11.508 13.657 28.358 24.378 47.312 ' +
+        '30.283 24.26 7.557 51.596 7.146 74.843-3.75 23.248-10.897 42.935-31.972 52.69-68.375 3.323' +
+        '-12.406 5.08-23.776 5.5-34.313.01-.418.023-.832.03-1.25.087-5.1-.088-10.246-.563-15.406-.037' +
+        '-.407-.084-.814-.125-1.22-.032-.27-.06-.544-.093-.813-3.295-25.79-15.823-46.16-34.345-64.437' +
+        '-29.635-29.24-75.698-51.638-122.75-74.125-47.052-22.487-95.112-45.1-128.875-77.656-31.683' +
+        '-30.553-49.926-71.185-40.313-124.814-.72-.01-1.444-.006-2.156 0z"/></svg>';
+
     function stripYearsOld() {
         document.querySelectorAll(".performer-card .performer-card__age").forEach(function (el) {
             el.textContent = el.textContent.replace(/\s*years?\s+old/gi, "").trim();
         });
+    }
+
+    /* Apply the Bronze→Perfect card-frame tier class (drives the playing-
+       card name-banner glow + tiers-mode card frame) directly from a
+       0–10 rating. tagFilledRatings normally does this, but it reads the
+       native `.rating-banner` from the debounced runAll pass — and on
+       performer cards Ascension deletes that banner (ratingBanner.replace
+       With) on a 300ms timer, which beats the debounce on navigation and
+       leaves the card untiered. initPerformerCards already parses the
+       rating off the banner the instant the card is processed (the
+       race-winning immediate observer), so applying the tier here makes
+       it survive regardless of whether the banner lives long enough for
+       tagFilledRatings to see it. Thresholds mirror tagFilledRatings. */
+    function applyCardTier(card, v) {
+        if (!card) { return; }
+        ["bronze", "silver", "gold", "diamond", "legendary", "perfect"].forEach(function (t) {
+            card.classList.remove("refract-card-tier-" + t);
+        });
+        var heavyMode = document.body.classList.contains("refract-rating-style-tiers")
+            || document.body.classList.contains("refract-rating-style-playing-card");
+        if (heavyMode && v >= 5) {
+            var tier = v >= 10  ? "perfect"
+                     : v >= 9.5 ? "legendary"
+                     : v >= 8.5 ? "diamond"
+                     : v >= 7.5 ? "gold"
+                     : v >= 6.5 ? "silver"
+                     :            "bronze";
+            card.classList.add("refract-card-tier-" + tier);
+        }
     }
 
     function initPerformerCards() {
@@ -2827,6 +2927,9 @@
                     }
                 }
                 if (ratingNum && ratingNum > 0) {
+                    /* Tier the card now, from the banner we just read —
+                       before Ascension can delete it (see applyCardTier). */
+                    applyCardTier(card, ratingNum);
                     /* If the user has Stash's rating system set to stars,
                        show the rating chip on a 0–5 scale to match their
                        configured UI; otherwise stay on the 0–10 decimal
@@ -2998,7 +3101,14 @@
                     } catch (e) { /* fall back to the raw code */ }
                     var countryWrap = document.createElement("span");
                     countryWrap.className = "stash-perf-country";
-                    countryWrap.textContent = countryName;
+                    /* Name lives in an inner span so the Ascension rank
+                       read-out can sit on the SAME line, pushed to the
+                       right edge, while the name still ellipsis-truncates
+                       if it's long (see integrateAscensionBadges). */
+                    var countryNameSpan = document.createElement("span");
+                    countryNameSpan.className = "stash-perf-country-name";
+                    countryNameSpan.textContent = countryName;
+                    countryWrap.appendChild(countryNameSpan);
                     section.insertBefore(countryWrap, row);
                 }
             }
@@ -3084,6 +3194,107 @@
             } else {
                 card.classList.remove("refract-favourite");
                 if (existing) { existing.remove(); }
+            }
+        });
+    }
+
+    /* ── Ascension (Sakoto's HotorNot fork) compatibility ─────────────
+       Ascension swaps a performer card's native .rating-banner for its
+       own `.hon-battle-rank-badge.hon-battle-rank-badge-compact`. The
+       badge inherits none of the banner's layout, so it lands wherever
+       the banner sat in the DOM and overlaps Refract's injected
+       `.stash-perf-stats` pill row (the user-reported clash). Relocate
+       it to ride the SAME LINE as the chin's `.stash-perf-country`
+       caption, pinned to the RIGHT edge of the card (append it inside
+       that span, which CSS turns into a space-between row), so it reads
+       as a quiet trailing rank read-out opposite the nationality rather
+       than a chip that fights the stat pills. We also prepend Ascension's
+       own navbar flame glyph as the badge's lead icon (replacing the
+       literal "ASCENSION" wordmark CSS used before) and colour it to
+       match the rank number, so the read-out is "<country> ... [flame] N".
+       13_plugins.css strips the plugin's capsule chrome and renders it as
+       subtle inline text. Tag it `.refract-ascension-badge` for that CSS,
+       and flag the body so other rules can detect Ascension.
+
+       The country caption only renders in playing-card mode (CSS-hidden
+       elsewhere), so we only nest into it there. Falls back to the chin
+       just above the stat pills when there's no visible country caption
+       (performer without a country, or a non-playing-card mode).
+       Idempotent: only moves a badge that isn't already parked, and only
+       injects the flame once, so Ascension's debounced re-injection and
+       React re-renders don't cause churn. Runs from watchForReinjection
+       (which disconnects before mutating), so our move doesn't re-fire
+       the observer. Inert on installs without Ascension; the selector
+       matches no DOM. */
+    function integrateAscensionBadges() {
+        var badges = document.querySelectorAll(".performer-card .hon-battle-rank-badge");
+        if (badges.length) {
+            document.body.classList.add("refract-has-ascension");
+        }
+        /* Only playing-card mode shows the `.stash-perf-country` caption;
+           in other rating styles it's CSS-hidden, so nesting the rank
+           into it would hide it too, so fall back to the chin there. */
+        var pcMode = document.body.classList.contains("refract-rating-style-playing-card");
+        badges.forEach(function (badge) {
+            badge.classList.add("refract-ascension-badge");
+            /* Ascension renders "undefinedW/L/D" when a performer has no
+               recorded record yet, so sanitise so the line reads cleanly.
+               Re-runs each cycle, so it self-heals if Ascension rebuilds
+               the badge. */
+            badge.querySelectorAll(".hon-wins, .hon-losses, .hon-draws").forEach(function (s) {
+                if (/undefined/i.test(s.textContent)) {
+                    s.textContent = s.textContent.replace(/undefined/gi, "0");
+                }
+            });
+            /* Drop both the literal "Rank " word and the "#" so the
+               read-out is a bare number after the flame glyph. Only write
+               when it actually changes, to avoid needless mutations. */
+            var rankText = badge.querySelector(".hon-rank-text");
+            if (rankText) {
+                var stripped = rankText.textContent
+                    .replace(/^\s*rank\s*/i, "")
+                    .replace(/^\s*#\s*/, "");
+                if (stripped !== rankText.textContent) {
+                    rankText.textContent = stripped;
+                }
+            }
+            /* Lead the read-out with Ascension's own navbar flame glyph
+               (once per badge instance). Sits before the plugin's tier
+               emoji, which CSS hides, so the line reads "[flame] N". The
+               glyph carries its own warm gradient fill, so no per-card
+               colour wiring is needed. */
+            if (!badge.querySelector(".refract-ascension-icon")) {
+                badge.insertAdjacentHTML("afterbegin", ASCENSION_FLAME_SVG);
+            }
+            var card = badge.closest(".performer-card");
+            if (!card) { return; }
+            var section = card.querySelector(".card-section");
+            /* Playing-card mode: ride the country caption's line, pushed to
+               the RIGHT edge of the card. The marker class turns the caption
+               into a space-between flex row (name left, rank right), and we
+               append the badge as its last child. */
+            var country = (pcMode && section)
+                ? section.querySelector(":scope > .stash-perf-country")
+                : null;
+            if (country) {
+                country.classList.add("refract-country-with-rank");
+                if (badge.parentElement === country && country.lastElementChild === badge) {
+                    return;
+                }
+                country.appendChild(badge);
+                return;
+            }
+            /* Fallback (no country caption / non-playing-card): sit in the
+               chin, just above the stat pills. */
+            if (!section) { return; }
+            var anchor = section.querySelector(":scope > .stash-perf-stats");
+            if (anchor) {
+                if (badge.parentElement === section && badge.nextElementSibling === anchor) {
+                    return;
+                }
+                section.insertBefore(badge, anchor);
+            } else if (!(badge.parentElement === section && badge === section.lastElementChild)) {
+                section.appendChild(badge);
             }
         });
     }
@@ -7308,6 +7519,12 @@
             /* Already injected — keep the glyph in sync with current state */
             var existing = buttons.querySelector(":scope > .st-light-toggle-nav");
             var nowLight = isLightModeEnabled();
+            /* Only mutate when the state actually changed. The global
+               mutation watcher calls this every pass; re-parsing the SVG
+               subtree each time can drop a click whose mousedown/mouseup
+               straddles the innerHTML swap. */
+            var wasLight = existing.classList.contains("is-active");
+            if (wasLight === nowLight && existing.querySelector("svg")) return;
             existing.classList.toggle("is-active", nowLight);
             existing.setAttribute("aria-label", nowLight ? "Switch to dark mode" : "Switch to light mode");
             existing.setAttribute("title", nowLight ? "Switch to dark mode" : "Switch to light mode");

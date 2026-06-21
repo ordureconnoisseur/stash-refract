@@ -294,6 +294,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
             transform 0.16s cubic-bezier(0.34, 1.2, 0.64, 1),
             box-shadow 0.2s ease;
     }
+    /* Hardcoded tile for a menu item the user disabled in Stash's
+       Interface settings. refract.js adds this class when the route is
+       absent from the live navbar (Stash omits disabled items from the
+       navbar DOM). Hidden, not removed, so re-enabling restores it. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.refract-drawer-tile-off {
+        display: none !important;
+    }
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-icon {
         display: flex;
         align-items: center;

@@ -949,6 +949,7 @@ body.stash-liquid-glass .refract-light-toggle svg {
     width: 1rem !important;
     height: 1rem !important;
     display: block !important;
+    pointer-events: none !important;
 }
 body.stash-liquid-glass .refract-light-toggle.is-active {
     background: linear-gradient(135deg, #fef3c7, #fbbf24) !important;
@@ -988,6 +989,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav svg {
     width: 1.15rem !important;
     height: 1.15rem !important;
     display: block !important;
+    pointer-events: none !important;
 }
 body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav:hover {
     background: var(--accent-tint) !important;

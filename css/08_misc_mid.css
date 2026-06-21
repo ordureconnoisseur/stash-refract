@@ -6319,11 +6319,17 @@ body.stash-liquid-glass .job-table.card > ul > li.job {
     overflow: hidden !important;
     box-sizing: border-box;
 }
+/* Expanded — a FIXED-height scroll panel, not content-sized. With
+   `height: auto` the row tracked its subtask list, which churns every
+   tick during a scan (files scroll in/out, line count wobbles), so the
+   row and the whole queue card bounced up and down. Pinning the height
+   and scrolling the list inside keeps the card perfectly stable: the
+   churn happens within a static box, like a small log viewer. Tune the
+   240px if short subtask lists leave too much empty space. */
 body.stash-liquid-glass .job-table.card > ul > li.job.refract-job-expanded {
-    height: auto !important;
-    min-height: 64px !important;
-    max-height: 600px !important;
-    overflow: auto !important;
+    height: 240px !important;
+    max-height: 240px !important;
+    overflow-y: auto !important;
 }
 body.stash-liquid-glass .job-table.card > ul > li.job:last-child {
     border-bottom: none !important;

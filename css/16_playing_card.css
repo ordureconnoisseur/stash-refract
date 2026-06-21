@@ -512,6 +512,31 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash
     white-space: nowrap !important;
 }
 
+/* With an Ascension rank read-out appended (refract.js adds the marker
+   class), the caption becomes a full-width row: nationality on the left,
+   rank pinned to the RIGHT edge of the card. `overflow: visible` (the
+   base rule sets it hidden for name ellipsis) so the rank's glow and
+   drop-shadow aren't sharply clipped by this tight line box; the name's
+   own truncation moves to the inner span below. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-country.refract-country-with-rank {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.4rem !important;
+    width: 100% !important;
+    align-self: stretch !important;
+    overflow: visible !important;
+}
+/* The name takes the slack and ellipsis-truncates so the rank is never
+   pushed off the right edge by a long country name. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-country.refract-country-with-rank .stash-perf-country-name {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
 /* Strip order: rating first (left), O count last. Country flag no
    longer lives in the strip (inline in the name banner instead). */
 body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .stash-perf-rating  { order: 1; }

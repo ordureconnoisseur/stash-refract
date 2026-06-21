@@ -1457,6 +1457,295 @@ body.stash-liquid-glass .scene-wall-item-text-container {
     color: var(--text) !important;
 }
 
+/* ── Scene Markers panel (tag-grouped "primary" cards) ───────────────
+   Native markup (SceneMarkersPanel/PrimaryTags): .scene-markers-panel >
+   Create-Marker .btn + .container > .primary-tag.row > N .primary-card
+   (Bootstrap Card, one per primary tag; classes col-12 col-sm-6 col-xl-6)
+   > h3(tag name) + .primary-card-body > per-marker <div>{ <hr>, .row(title
+   link + .ml-auto Edit link), .d-flex timestamp, .card-section.centered tag
+   badges }. Refract never touched this, so it was raw cluttered Bootstrap:
+   no panel surface, no gutters between cards, <hr> noise, negative-margin
+   rows. Give the cards glass + real spacing; the wall preview below is
+   already themed via .wall-item (08_misc_mid). */
+
+/* Create-Marker button: a clear primary action with a leading +. */
+body.stash-liquid-glass .scene-markers-panel > .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+    font-weight: 600;
+}
+body.stash-liquid-glass .scene-markers-panel > .btn::before {
+    content: "+";
+    font-size: 1.1em;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Neutralise the Bootstrap .container so the grid uses full panel width. */
+body.stash-liquid-glass .scene-markers-panel > .container {
+    max-width: 100%;
+    padding: 0;
+}
+
+/* Card grid: drop the row's negative margins, add a real gutter. */
+/* Responsive card grid: each tag card needs ~260px to hold a chapter row,
+   so cards stay 1-up in a narrow panel and only split to 2+ when there is
+   real width (auto-fill, not the old forced 50%). */
+body.stash-liquid-glass .scene-markers-panel .primary-tag.row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    align-items: start;
+    margin: 0;
+    gap: 1rem;
+}
+
+/* "Categories" section label (the .primary-tag wrapper only renders when the
+   scene actually has markers, so the label never shows on an empty panel). */
+body.stash-liquid-glass .scene-markers-panel .primary-tag::before {
+    content: "Categories";
+    grid-column: 1 / -1;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* Each tag card = a glass surface. The grid sizes it, so neutralise the
+   Bootstrap col's flex/max-width (max-width:50% would otherwise cap it). */
+body.stash-liquid-glass .scene-markers-panel .primary-card {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0.85rem 1rem 0.95rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+    backdrop-filter: var(--glass-blur-sm);
+}
+
+/* Tag-name header: divider under it, not a floating h3. */
+body.stash-liquid-glass .scene-markers-panel .primary-card > h3 {
+    margin: 0 0 0.55rem;
+    padding-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+body.stash-liquid-glass .scene-markers-panel .primary-card-body {
+    padding: 0;
+}
+
+/* Each marker becomes a CHAPTER ROW (Stash's vertical stack is abandoned):
+   a leading monospace timecode chip in its own column, the title + Edit on
+   the main line, sub-tags beneath the title. CSS grid REORDERS the native
+   sibling divs (.row = title/Edit, .d-flex = timecode, .card-section = tags)
+   into this layout via named areas, no DOM changes:
+       [ time ]  Title ............... Edit
+       [ time ]  #tag #tag                                                  */
+body.stash-liquid-glass .scene-markers-panel .primary-card-body hr {
+    display: none;
+}
+body.stash-liquid-glass .scene-markers-panel .primary-card-body > div {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+        "time main"
+        ".    tags";
+    column-gap: 0.7rem;
+    row-gap: 0.2rem;
+    align-items: center;
+    margin: 0 -0.4rem;
+    padding: 0.4rem 0.4rem;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+}
+body.stash-liquid-glass .scene-markers-panel .primary-card-body > div:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Leading timecode chip: the .d-flex wrapper occupies the "time" column. */
+body.stash-liquid-glass .scene-markers-panel .primary-card-body .d-flex {
+    grid-area: time;
+}
+body.stash-liquid-glass .scene-markers-panel .primary-card-body .d-flex > div:first-child {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    color: var(--accent-light);
+    background: rgba(var(--accent-rgb), 0.14);
+    border: 1px solid rgba(var(--accent-rgb), 0.3);
+    border-radius: 6px;
+    padding: 0.13rem 0.42rem;
+}
+
+/* Title + Edit share the "main" line. */
+body.stash-liquid-glass .scene-markers-panel .primary-card-body .row {
+    grid-area: main;
+    margin: 0;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+}
+/* Marker title (first link) = primary content: readable, not blue. */
+body.stash-liquid-glass .scene-markers-panel .primary-card-body .row > .btn-link:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0;
+    text-align: left;
+    line-height: 1.3;
+    font-weight: 600;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+    color: var(--text) !important;
+}
+/* Edit: a small muted action that fades in only on row hover / focus. */
+body.stash-liquid-glass .scene-markers-panel .primary-card-body .row > .btn-link.ml-auto {
+    flex: 0 0 auto;
+    padding: 0;
+    font-size: 0.74rem;
+    line-height: 1.3;
+    color: var(--text-muted) !important;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+body.stash-liquid-glass .scene-markers-panel .primary-card-body > div:hover .btn-link.ml-auto,
+body.stash-liquid-glass .scene-markers-panel .primary-card-body > div:focus-within .btn-link.ml-auto {
+    opacity: 1;
+}
+body.stash-liquid-glass .scene-markers-panel .primary-card-body .row > .btn-link:hover {
+    color: var(--accent-bright) !important;
+}
+
+/* Sub-tags sit beneath the title in the "tags" area. */
+body.stash-liquid-glass .scene-markers-panel .card-section.centered {
+    grid-area: tags;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 0;
+}
+
+/* ── Previews gallery (the marker wall) ──────────────────────────────
+   MarkerWallPanel renders the SAME markers as the cards above, as preview
+   tiles: .scene-markers-panel > .row > .wall(.row) > N .wall-item >
+   .wall-item-container > .wall-item-anchor >
+   [.wall-item-media | .wall-item-missing] + .wall-item-text(>div + .wall-tag).
+   Native forces them full-width single-column (a tall black stack) with a
+   white centred caption bar. Reframe as a tight responsive gallery of filmic
+   chapter tiles with dark captions; tiles whose preview has not been
+   generated get a film-frame placeholder instead of a black void. Scoped to
+   .scene-markers-panel so the zoomy global wall (markers page, tag pages) is
+   untouched. */
+
+/* Drop the wrapper row's negative margins; space it from the index. */
+body.stash-liquid-glass .scene-markers-panel > .row {
+    margin: 1.6rem 0 0;
+}
+
+/* Wall -> responsive grid (overrides the native flex + justify-center). */
+body.stash-liquid-glass .scene-markers-panel .wall {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 0.85rem;
+    margin: 0;
+    max-width: 100%;
+}
+
+/* "Previews" section label, only when tiles actually exist. */
+body.stash-liquid-glass .scene-markers-panel .wall:has(.wall-item)::before {
+    content: "Previews";
+    grid-column: 1 / -1;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* Each tile: uniform 16:9, override the native full-width / min-height stack. */
+body.stash-liquid-glass .scene-markers-panel .wall .wall-item {
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    margin: 0 !important;
+}
+body.stash-liquid-glass .scene-markers-panel .wall .wall-item-media {
+    object-fit: cover !important;
+}
+
+/* Pending-preview placeholder: a muted film frame with a play glyph,
+   not a black box with tiny text. */
+body.stash-liquid-glass .scene-markers-panel .wall-item-missing {
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.62rem !important;
+    letter-spacing: 0.05em;
+    text-transform: lowercase;
+    color: var(--text-muted) !important;
+    background:
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.022) 0 9px, transparent 9px 18px),
+        linear-gradient(180deg, #16161b 0%, #0d0d10 100%) !important;
+}
+body.stash-liquid-glass .scene-markers-panel .wall-item-missing::before {
+    content: "";
+    width: 1.6rem;
+    height: 1.6rem;
+    opacity: 0.5;
+    background: var(--text-muted);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E") no-repeat center / contain;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+
+/* Caption: dark gradient rising from the bottom, left-aligned white text
+   (replacing the native white centred bar). */
+body.stash-liquid-glass .scene-markers-panel .wall-item-text {
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.9) 0%,
+        rgba(0, 0, 0, 0.5) 45%,
+        transparent 100%
+    ) !important;
+    color: #fff !important;
+    text-align: left !important;
+    padding: 1.5rem 0.55rem 0.45rem !important;
+    line-height: 1.25 !important;
+}
+body.stash-liquid-glass .scene-markers-panel .wall-item-text > div {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* Sub-tag chips inside the caption. */
+body.stash-liquid-glass .scene-markers-panel .wall-item-text .wall-tag {
+    display: inline-block;
+    margin: 0.3rem 0.25rem 0 0;
+    padding: 0.05rem 0.4rem;
+    font-size: 0.58rem;
+    font-weight: 600;
+    border-radius: var(--radius-pill);
+    background: rgba(var(--accent-rgb), 0.22);
+    color: var(--accent-light) !important;
+}
+
 /* The .scene-divider chevron toggle is hidden globally in the layout
    block above (lines ~46–50). The auto-collapse media query handles
    narrow widths automatically, so the manual toggle is dead UI. */
