@@ -986,8 +986,8 @@ body.stash-liquid-glass.refract-show-light-nav nav.top-nav .navbar-buttons > .st
     display: inline-flex !important;
 }
 body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav svg {
-    width: 1.15rem !important;
-    height: 1.15rem !important;
+    width: 1.45rem !important;
+    height: 1.45rem !important;
     display: block !important;
     pointer-events: none !important;
 }

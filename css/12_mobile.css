@@ -59,11 +59,13 @@
      tile grid (hardcoded Stash routes + our own SVG icons)
    - A body-level .refract-burger-scrim provides the backdrop
 
-   Gated on (pointer: coarse) so touch-only — desktop window squeeze
-   never fires this.
+   Width-driven (not touch-gated): any narrow viewport gets this layout,
+   so iPad Split View and desktop snap/split windows get the compact UI
+   too — not just touch devices. The burger/drawer DOM is injected
+   unconditionally by refract.js, so width alone is enough to show it.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Defaults — hidden on non-touch / wide viewports. */
+/* Defaults — hidden on wide viewports. */
 body.stash-liquid-glass nav.top-nav .refract-burger,
 body.stash-liquid-glass nav.top-nav .refract-mobile-new,
 body.stash-liquid-glass .refract-burger-scrim,
@@ -71,7 +73,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     display: none;
 }
 
-@media (pointer: coarse) and (max-width: 900px) {
+@media (max-width: 900px) {
 
     /* ── Burger button ────────────────────────────────────────────── */
     body.stash-liquid-glass nav.top-nav .refract-burger {
@@ -368,10 +370,11 @@ body.stash-liquid-glass .refract-mobile-drawer {
    real phone the user has no way to access scene details and the video
    gets massive top/bottom letterboxing inside the tall portrait row.
 
-   This block triggers on touch + portrait-phone widths only, so desktop
-   narrow windows keep the focus-mode layout untouched.
+   This block triggers on portrait-phone widths (any device), so narrow
+   windows get the stacked player + accessible details instead of the
+   100vh focus-mode lock.
    ─────────────────────────────────────────────────────────────────── */
-@media (pointer: coarse) and (max-width: 768px) {
+@media (max-width: 768px) {
     /* Scene-page container — zero out the global mobile padding-top
        (5rem from earlier in this file) so the row owns navbar clearance.
        Without this, container 80 + row top stack and create a huge gap. */
@@ -540,11 +543,21 @@ body.stash-liquid-glass .refract-mobile-drawer {
         display: none !important;
     }
 
-    /* Page-size selector (per-page count). Stash wraps the <select>
-       in a .page-size-selector div — hide the wrapper so it doesn't
-       reserve space. */
-    body.stash-liquid-glass .filtered-list-toolbar .page-size-selector {
+    /* Page-size selector (per-page count) stays visible in the mobile
+       toolbar — users need to change how many scenes load per page (it
+       was previously hidden, which locked narrow/split views at the
+       default 40). Shrunk to a tiny number-only tile (no chevron) so it
+       barely costs any toolbar space. Base look from 09_buttons.css. */
+    body.stash-liquid-glass .filtered-list-toolbar .page-size-selector::after {
         display: none !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .page-size-selector select {
+        width: 2.5rem !important;
+        min-width: 2.5rem !important;
+        max-width: 2.5rem !important;
+        height: 2.2rem !important;
+        padding: 0 0.35rem !important;
+        font-size: 0.78rem !important;
     }
 
     /* View-mode picker — refract replaces Stash's btn-group with a custom

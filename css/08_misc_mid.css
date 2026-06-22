@@ -3058,6 +3058,13 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill 
 body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-specs-overlay {
     display: none !important;
 }
+/* EXCEPT on the tagger (.search-item .scene-card): those cards are plain
+   thumbnail links that injectPerformerCircles never processes, so they get
+   no .stash-duration-pill to mirror specs into. Hiding the native overlay
+   there would drop resolution/size/duration entirely — keep it visible. */
+body.stash-liquid-glass.refract-minimal-cards .search-item .scene-card .scene-specs-overlay {
+    display: block !important;
+}
 
 /* Hide the divider + popovers slot below .card-section. Without these
    hidden the chin stays tall because of their height — even when the
@@ -5850,7 +5857,10 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [d
 }
 
 /* Existing-side img: max-bound by 380px tall AND 100% column wide,
-   border wraps tightly around the visible image */
+   border wraps tightly around the visible image. NOTE: no opacity dim —
+   dimming the image reads as a brightness/quality difference (it isn't;
+   the pixels match the scraped side). Which side is which is already clear
+   from the red-X / green-check rail, labels, and position. */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .col-lg-6:first-of-type > .input-group > img.performer-image {
     grid-column: 2 !important;
     grid-row: 1 !important;
@@ -5869,7 +5879,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [d
     border-bottom-right-radius: var(--radius-sm) !important;
     background: transparent !important;
     box-shadow: none !important;
-    opacity: 0.88;
+    opacity: 1 !important;
     display: block !important;
 }
 
