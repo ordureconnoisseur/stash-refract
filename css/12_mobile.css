@@ -526,7 +526,15 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .video-js .vjs-volume-panel .vjs-volume-control {
         display: none !important;
     }
+}
 
+/* Toolbar slimming is promoted to the ≤900px (tablet / split-view) tier so
+   iPad Split View and snapped desktop windows get the clean, non-wrapping
+   mobile toolbar instead of the half-converted desktop one (which wrapped
+   the reshuffle + multiview filter-add button onto a second row that
+   spilled below the pill onto the cards). Scene-page stacking, the
+   2-column grid and the video control-bar split stay phone-only (≤768px). */
+@media (max-width: 900px) {
     /* ── List-view filter toolbar slimming ─────────────────────────────
        The desktop toolbar packs ~15 controls across two rows. On a 390px
        viewport this looks crammed. Hide controls that have ergonomic
@@ -541,6 +549,52 @@ body.stash-liquid-glass .refract-mobile-drawer {
     /* Play / autoplay button — niche cycling feature, rarely used on phone. */
     body.stash-liquid-glass .filtered-list-toolbar .play-button {
         display: none !important;
+    }
+
+    /* The random-sort reshuffle button is dead weight on mobile (you rarely
+       re-roll a random order on a phone) and the space is better spent on
+       the multiview filter-slot add button. Hide it unconditionally. DOM:
+       .sort-by-select > [.input-group-prepend (sort-by toggle)] [.dropdown-menu]
+       [direction caret <button>] [reshuffle <button> — only when sort=random].
+       The toggle is wrapped in .input-group-prepend, so the two bare buttons
+       (direction, reshuffle) are the only adjacent button siblings; `button +
+       button` therefore uniquely targets the reshuffle and never the caret
+       (which is preceded by a non-button), and matches nothing when the
+       reshuffle is absent (non-random sort). */
+    body.stash-liquid-glass .filtered-list-toolbar .sort-by-select > button + button {
+        display: none !important;
+    }
+
+    /* Keep the injected filter-slot add button a clean square. The search-
+       collapse rules zero out toolbar items' min-width, which lets the flex
+       layout compress this button (its content is just a single "+"/count
+       glyph, narrower than the funnel's icon) into a vertical oval. Pin it
+       to a fixed square matching the page-size pill's height. */
+    body.stash-liquid-glass.mv-picking-mode .filtered-list-toolbar #mv-filter-add-btn,
+    body.stash-liquid-glass.mv-picking-mode .filtered-list-toolbar .mv-filter-add-btn {
+        flex: 0 0 auto !important;
+        width: 2.2rem !important;
+        min-width: 2.2rem !important;
+        max-width: 2.2rem !important;
+        height: 2.2rem !important;
+        padding: 0 !important;
+    }
+
+    /* THE multiview-breaks-the-toolbar fix. The nested button groups (filter,
+       sort, view) ship with flex-wrap: wrap, and the search-collapse rules
+       zero their min-width so the search field can expand. Together that lets
+       the flex layout shrink a group below its content and wrap its buttons
+       onto a SECOND internal row, which spills out the bottom of the fixed-
+       height pill onto the scene cards the moment the toolbar gets tight
+       (e.g. when picking mode injects the filter-add button). Pin every
+       nested group to one non-shrinking line so the toolbar stays a single
+       clean row (it clips horizontally if it ever truly overflows, never
+       wraps downward). The search field keeps its own expand/collapse. */
+    body.stash-liquid-glass .filtered-list-toolbar .btn-group,
+    body.stash-liquid-glass .filtered-list-toolbar .sort-by-select,
+    body.stash-liquid-glass .filtered-list-toolbar .list-operations {
+        flex-wrap: nowrap !important;
+        flex-shrink: 0 !important;
     }
 
     /* Page-size selector (per-page count) stays visible in the mobile
@@ -560,16 +614,20 @@ body.stash-liquid-glass .refract-mobile-drawer {
         font-size: 0.78rem !important;
     }
 
-    /* View-mode picker — refract replaces Stash's btn-group with a custom
-       .stash-view-wrap dropdown. Hide both forms (the wrap and the fallback
-       btn-group containing the active btn-primary). Also hide the
-       multiview "picking-mode" rescued button — niche and out of place
-       on a minimal mobile toolbar. */
+    /* View-mode picker: refract replaces Stash's native grid/list/wall
+       btn-group with a custom .stash-view-wrap dropdown. Hide both the
+       wrap (mobile uses the burger/zoom instead) and the native view-mode
+       group. The ACTIVE view button carries .btn-primary, so
+       `:has(> .btn-primary)` uniquely targets that one group and never the
+       filter / saved-filter group (whose buttons are all .btn-secondary).
+       multiview's filter-slot add button (#mv-filter-add-btn) is appended
+       into the FILTER group, not this one, so it is unaffected and stays
+       visible. The picking-mode toggle is rescued as a standalone sibling
+       and stays visible too. */
     body.stash-liquid-glass .filtered-list-toolbar .stash-view-wrap,
     body.stash-liquid-glass [data-stash-filter] .stash-view-wrap,
     body.stash-liquid-glass .filtered-list-toolbar .btn-group:has(> .btn-primary),
-    body.stash-liquid-glass [data-stash-filter] .btn-group:has(> .btn-primary),
-    body.stash-liquid-glass .filtered-list-toolbar .mv-picking-toggle-btn {
+    body.stash-liquid-glass [data-stash-filter] .btn-group:has(> .btn-primary) {
         display: none !important;
     }
 
@@ -594,6 +652,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
         max-height: 3rem !important;
         margin: 0.3rem auto !important;
         padding: 0.45rem 0.6rem !important;
+        /* Centre the whole button cluster. The toolbar is forced to full
+           width (below), and Stash's native justify-content: space-between
+           would otherwise pin search to the far left + the last button to
+           the far right with big gaps between. Centre packs them as one
+           group with the gap below. */
+        justify-content: center !important;
         /* `overflow: clip` + margin keeps mid-transition items clipped
            horizontally while letting button glows (box-shadow) extend
            past the toolbar bounds without being cut off. */
@@ -845,7 +909,9 @@ body.stash-liquid-glass .refract-mobile-drawer {
         overflow: hidden !important;
         overscroll-behavior: none !important;
     }
+}
 
+@media (max-width: 768px) {
     /* ── 2-column card grid on mobile list pages ─────────────────────
        Use CSS Grid on the card row — more deterministic than flex for
        forcing a fixed column count, and not affected by inherited
