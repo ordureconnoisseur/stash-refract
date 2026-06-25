@@ -172,3 +172,98 @@ body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .scene-sp
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .studio-overlay {
     background: rgba(20, 20, 24, 0.92) !important;
 }
+
+/* ── Playing-card mode: flatten per-card neon for weak GPUs ──────────
+   Playing-card mode stacks a neon scaffold on EVERY card on the page:
+   `filter: drop-shadow` glow chains on the name / gender icon / tier-
+   ribbon text (the legendary + perfect names run 5-6 drop-shadow layers
+   each), multi-layer box-shadow halos on the tier ribbon, and a constant
+   shimmer animation on perfect-tier ribbons + names. Across a large
+   library that is a lot of continuous filter + shadow raster for an
+   integrated GPU. Lite mode keeps the layout and tier COLOURS (carried by
+   the ribbon/name gradients, not the glow) but drops the GPU-heavy parts:
+   filters off, the ribbon halo flattened to one cheap shadow, the shimmer
+   stopped. Scoped to the FRONT scaffold (.refract-pc-*) only — the card
+   back's blurred photo backdrop and one-at-a-time dossier stay intact. */
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-name-text,
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-name-banner .gender-icon,
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-tier-label,
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-tier-label::after {
+    filter: none !important;
+    animation: none !important;
+}
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-tier-label {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ── Tier / playing-card cards: stop the continuous motion ──────────
+   In BOTH tiers and playing-card modes, every rated card runs nonstop
+   infinite animations: a 7-layer box-shadow "breathe", a float/scale
+   bob, a sheen sweep (::before), and sparkle / rotating-conic-border
+   overlays (::after). On a full grid that is dozens of cards repainting
+   every single frame, forever — the biggest ongoing cost on weak
+   hardware, and lite mode was leaving all of it running. Freeze them
+   (static paints once and caches), reset the float transform so cards
+   sit still, and replace the animated 7-layer glow with a cheap 3-layer
+   static ring so scroll raster stays light while the tier COLOUR
+   identity is kept. The rotating ::after ring freezes into a static
+   coloured frame (legendary/perfect keep their multi-hue border). */
+body.stash-liquid-glass.refract-lite:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) :is(.performer-card, .scene-card)[class*="refract-card-tier-"],
+body.stash-liquid-glass.refract-lite:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) :is(.performer-card, .scene-card)[class*="refract-card-tier-"]::before,
+body.stash-liquid-glass.refract-lite:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) :is(.performer-card, .scene-card)[class*="refract-card-tier-"]::after {
+    animation: none !important;
+}
+body.stash-liquid-glass.refract-lite:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) :is(.performer-card, .scene-card)[class*="refract-card-tier-"] {
+    translate: none !important;
+    scale: none !important;
+    rotate: none !important;
+    /* A thicker static ring (white hairline + 3px tier-colour band) stands
+       in for the border that the now-removed glow used to imply, so cards
+       still read as framed. Spread-only rings are nearly free; one small
+       10px glow + a depth shadow keep a hint of dimension. */
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.65),
+        0 0 0 3px rgba(var(--tier-color-bright, var(--tier-color)), 0.85),
+        0 0 10px rgba(var(--tier-color), 0.4),
+        0 4px 14px rgba(0, 0, 0, 0.45) !important;
+}
+/* The sheen sweep (::before) rests off-canvas at opacity 0 when frozen,
+   so it just adds a dead compositing layer — drop it entirely. */
+body.stash-liquid-glass.refract-lite:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) :is(.performer-card, .scene-card)[class*="refract-card-tier-"]::before {
+    display: none !important;
+}
+/* Card-back foil/holo shimmer (only ever on the single flipped card, but
+   no reason to animate it in lite either). */
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .refract-cb,
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .refract-cb::after,
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .refract-cb-score-num {
+    animation: none !important;
+}
+
+/* ── EXPERIMENTAL: skip rendering offscreen cards in list grids ──────
+   content-visibility:auto lets the browser skip layout, paint AND image
+   decode for any card scrolled out of view, doing that work only as the
+   card nears the viewport. It's the one lever that cuts the structural
+   style-recalc / layout cost and the image-decode cost together (the
+   practical version of "render images cheaper" - offscreen images never
+   decode). Scoped to the vertical LIST grids only (cards that are direct
+   children of .row.justify-content-center), so the home-page slick
+   carousels - where a per-card version misbehaved before - are left
+   alone. contain-intrinsic-size uses the `auto` keyword so each card
+   remembers its real size after rendering once; the ~320px fallback only
+   applies to never-yet-seen cards far below, minimising scroll drift.
+   NOTE: content-visibility implies paint containment, which clips a
+   card's outside decorations - the legendary/perfect rotating-border
+   ::after (inset:-4.5px) will rely on the static box-shadow ring above
+   instead of its conic ring here. Lite mode only; trivially revertible. */
+body.stash-liquid-glass.refract-lite .row.justify-content-center > .performer-card,
+body.stash-liquid-glass.refract-lite .row.justify-content-center > .scene-card,
+body.stash-liquid-glass.refract-lite .row.justify-content-center > .gallery-card,
+body.stash-liquid-glass.refract-lite .row.justify-content-center > .image-card,
+body.stash-liquid-glass.refract-lite .row.justify-content-center > .studio-card,
+body.stash-liquid-glass.refract-lite .row.justify-content-center > .tag-card,
+body.stash-liquid-glass.refract-lite .row.justify-content-center > .group-card,
+body.stash-liquid-glass.refract-lite .row.justify-content-center > .movie-card {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 320px;
+}
