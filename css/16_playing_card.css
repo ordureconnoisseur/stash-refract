@@ -856,3 +856,610 @@ body.stash-liquid-glass .search-item .scene-card img {
     max-width: 100% !important;
     height: auto !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   PERFORMER CARD FLIP (prototype) — a trading-card back showing the
+   advanced-rating category bars over a mirrored, frosted photo backdrop.
+   Built by injectPerformerCardFlip in refract.js; opt-in per card via the
+   corner flip button; lazy. Playing-card mode + performer cards only.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Corner flip affordance — hidden until card hover (or while flipped). */
+/* Flip TAB tucked into the right edge at mid-height, on BOTH faces. The
+   top-right corner is taken by the tier ribbon + favourite heart and the
+   bottom by the stats strip, so the side edge is the only clear zone. It
+   slides out of the edge on hover - same control, same place, front and back. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-card-flip-btn {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    z-index: 9;
+    width: 27px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px 0 0 11px;
+    background: rgba(10, 10, 12, 0.62);
+    border: 1px solid var(--glass-border);
+    border-right: none;
+    backdrop-filter: blur(8px);
+    color: var(--text);
+    cursor: pointer;
+    opacity: 0;
+    transform: translate(100%, -50%);
+    transition: opacity 0.18s ease, transform 0.2s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card:hover .refract-card-flip-btn {
+    opacity: 1;
+    transform: translate(0, -50%);
+}
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-card-flip-btn:hover {
+    background: rgba(var(--accent-rgb), 0.9);
+    border-color: var(--accent);
+    color: #fff;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-card-flip-btn svg {
+    width: 15px;
+    height: 15px;
+}
+
+/* Back face — a static full-cover overlay. It is hidden until the card's
+   two-phase rotation reaches its invisible edge (handled in JS); the WHOLE
+   card does the turning, so the back never needs its own 3D transform. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refract-card-back {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    border-radius: inherit;
+    overflow: hidden;
+    display: none;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-show-back .refract-card-back {
+    display: block;
+}
+/* While the back is shown, hide the front content (image + scaffold) so it
+   doesn't sit under the translucent back. The back overlay and the flip
+   button stay visible. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-show-back > *:not(.refract-card-back):not(.refract-card-flip-btn) {
+    visibility: hidden;
+}
+
+/* Mirrored, heavily blurred frosted photo backdrop. */
+body.stash-liquid-glass .refract-back-photo {
+    position: absolute;
+    inset: -22px;
+    background-size: cover;
+    background-position: center;
+    transform: scaleX(-1);
+    filter: blur(20px) saturate(1.25) brightness(0.58);
+}
+body.stash-liquid-glass .refract-back-frost {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, rgba(20, 16, 12, 0.26) 0%, rgba(8, 8, 10, 0.58) 100%);
+    backdrop-filter: blur(2px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CARD-BACK - collectible dossier, fixed (NON-SCROLLING), STATS-first.
+   Compact header (small portrait + name + tier chip), then a headline
+   SCORE band with the top scene demoted to a small thumbnail beside it,
+   then the category "Assets" as the large flex body (one readable row
+   each: name, pip meter, value), then a collector footer of library
+   stats. Tier-tinted via --seal / --seal-rgb; the blurred mirrored photo
+   shows through the gaps. Built by refractBuildPerformerBack in refract.js.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Tier identity. Beyond the colour, each tier scales how lavish the back
+   looks via three knobs: --tier-frame (foil-ring strength), --tier-glow
+   (accent glow) and --tier-holo (holographic surface sheen). Bronze is matte
+   and humble; it ramps up to perfect being bright, glowing and animated. */
+body.stash-liquid-glass .refract-cb {
+    --seal: var(--accent);
+    --seal-rgb: var(--accent-rgb);
+    --tier-frame: 0.32;
+    --tier-glow: 0.28;
+    --tier-holo: 0;
+}
+body.stash-liquid-glass .refract-cb-tier-bronze    { --seal: #cd7f32; --seal-rgb: 205, 127, 50;  --tier-frame: 0.20; --tier-glow: 0.10; --tier-holo: 0; }
+body.stash-liquid-glass .refract-cb-tier-silver    { --seal: #d8dbe2; --seal-rgb: 216, 219, 226; --tier-frame: 0.32; --tier-glow: 0.18; --tier-holo: 0; }
+body.stash-liquid-glass .refract-cb-tier-gold      { --seal: #f5c542; --seal-rgb: 245, 197, 66;  --tier-frame: 0.46; --tier-glow: 0.32; --tier-holo: 0.22; }
+body.stash-liquid-glass .refract-cb-tier-diamond   { --seal: #b9f2ff; --seal-rgb: 185, 242, 255; --tier-frame: 0.58; --tier-glow: 0.46; --tier-holo: 0.45; }
+body.stash-liquid-glass .refract-cb-tier-legendary { --seal: #d08bff; --seal-rgb: 208, 139, 255; --tier-frame: 0.64; --tier-glow: 0.52; --tier-holo: 0.58; }
+/* Perfect is accent-INDEPENDENT (matching the front frame): a platinum-white
+   core, with the rainbow numeral + holo carrying the colour. This keeps it
+   distinct from Legendary even when the user's accent is itself purple. */
+body.stash-liquid-glass .refract-cb-tier-perfect   { --seal: #ffffff; --seal-rgb: 255, 255, 255; --tier-frame: 0.80; --tier-glow: 0.62; --tier-holo: 0.95; }
+
+/* Framed body: fills the card, foil double-border, never scrolls. The foil
+   ring and an inner accent glow scale with the tier. */
+body.stash-liquid-glass .refract-cb {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 11px;
+    border-radius: inherit;
+    color: var(--text);
+    overflow: hidden;
+    box-shadow:
+        inset 0 0 0 1px rgba(var(--seal-rgb), var(--tier-frame)),
+        inset 0 0 0 4px rgba(0, 0, 0, 0.34),
+        inset 0 0 28px rgba(0, 0, 0, 0.55),
+        inset 0 0 22px rgba(var(--seal-rgb), calc(var(--tier-glow) * 0.5));
+}
+/* Holographic surface sheen: invisible on bronze/silver, building to a full
+   animated sweep on perfect. Sits above the content as a light foil glaze. */
+body.stash-liquid-glass .refract-cb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(115deg,
+        transparent 24%,
+        rgba(255, 255, 255, 0.13) 42%,
+        rgba(var(--seal-rgb), 0.28) 50%,
+        rgba(255, 255, 255, 0.10) 58%,
+        transparent 76%);
+    background-size: 300% 300%;
+    mix-blend-mode: screen;
+    opacity: var(--tier-holo);
+    animation: refract-holo 7s ease-in-out infinite;
+}
+@keyframes refract-holo {
+    0% { background-position: 14% 0%; }
+    50% { background-position: 86% 100%; }
+    100% { background-position: 14% 0%; }
+}
+
+/* Title bar: performer name pinned top-left, tier chip pinned top-right
+   (fills what used to be a bare corner). */
+body.stash-liquid-glass .refract-cb-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+/* Title group: gender glyph + name kept together at the left so the tier chip
+   stays pinned to the right edge of the header. */
+body.stash-liquid-glass .refract-cb-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex: 0 1 auto;
+}
+/* Hero row: the portrait and the score banner sit side by side. The portrait
+   stretches to the score's height. */
+body.stash-liquid-glass .refract-cb-hero {
+    display: flex;
+    align-items: stretch;
+    gap: 9px;
+    flex: 0 0 auto;
+}
+body.stash-liquid-glass .refract-cb-portrait {
+    width: 60px;
+    flex: 0 0 auto;
+    border-radius: 9px;
+    background-size: cover;
+    background-position: center top;
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(var(--seal-rgb), 0.4);
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+/* Same display font as the front of the card (Concert One). !important beats
+   the universal `*:not(code){font-family:...}` rule in 01_tokens. Bigger, with
+   the front's neon-tube glow chain, tier-tinted via --seal. No overflow:hidden
+   (it would clip the glow into a rectangle) - long names clip at the card edge,
+   exactly like the front. */
+body.stash-liquid-glass .refract-cb-name {
+    flex: 0 1 auto;
+    min-width: 0;
+    font-family: "Concert One", "Segoe UI", system-ui, -apple-system, sans-serif !important;
+    font-size: 1.34rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.05;
+    white-space: nowrap;
+    color: #fff;
+    -webkit-text-fill-color: #fff;
+    /* Glow via text-shadow, NOT filter: a filter makes the name its own
+       stacking context, which Chromium mis-composites under the tier holo
+       overlay's mix-blend-mode and the name vanishes entirely on the holo
+       tiers (gold/diamond/legendary/perfect). text-shadow gives the same neon
+       glow without creating that stacking context. */
+    text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.92),
+        0 0 3px rgba(255, 255, 255, 0.55),
+        0 0 8px rgba(var(--seal-rgb), 0.7),
+        0 0 16px rgba(var(--seal-rgb), 0.4);
+}
+/* Gender "type" glyph before the name (cloned from the card's native icon).
+   Sized up to sit next to the headline name. NO filter override: the base
+   03_cards gender rules add a drop-shadow, but a filter makes the glyph its
+   own stacking context, which Chromium mis-composites under the holo ::after
+   overlay (mix-blend-mode: screen) and vanishes it on the holo tiers - the
+   same trap the name hit. Keep the per-gender colour, drop the filter. The
+   .gender-icon.refract-cb-gender double-class beats the base rule's specificity
+   so these !importants actually win. */
+body.stash-liquid-glass .performer-card .gender-icon.refract-cb-gender {
+    width: 1.18rem !important;
+    height: 1.18rem !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    filter: none !important;
+}
+body.stash-liquid-glass .refract-cb-tierchip {
+    flex: 0 0 auto;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 4px 11px;
+    border-radius: 999px;
+    color: var(--seal);
+    border: 1px solid rgba(var(--seal-rgb), calc(var(--tier-frame) + 0.15));
+    background: rgba(var(--seal-rgb), calc(var(--tier-glow) * 0.4));
+    box-shadow: 0 0 8px rgba(var(--seal-rgb), calc(var(--tier-glow) * 0.6));
+    white-space: nowrap;
+}
+
+/* Ornate score emblem: a full-width rating banner (foil frame over a tier
+   sunburst ground, a metallic gradient numeral with a slow sheen, an engraved
+   label flanked by hairlines, the favourite as a corner gem). */
+body.stash-liquid-glass .refract-cb-score {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 7px 12px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(var(--seal-rgb), calc(var(--tier-frame) + 0.12));
+    background:
+        radial-gradient(circle at 50% 42%, rgba(var(--seal-rgb), 0.22), rgba(0, 0, 0, 0.18) 72%),
+        repeating-conic-gradient(from 0deg at 50% 42%, rgba(var(--seal-rgb), 0.07) 0deg 5deg, transparent 5deg 11deg);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+        inset 0 0 16px rgba(0, 0, 0, 0.55),
+        0 0 18px rgba(var(--seal-rgb), var(--tier-glow)),
+        0 4px 12px rgba(0, 0, 0, 0.5);
+}
+body.stash-liquid-glass .refract-cb-score-empty { min-height: 60px; }
+body.stash-liquid-glass .refract-cb-score-num {
+    position: relative;
+    z-index: 1;
+    font-size: 2.7rem;
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(135deg, #ffffff 0%, var(--seal) 40%, #ffffff 56%, var(--seal) 100%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter:
+        drop-shadow(0 0 10px rgba(var(--seal-rgb), 0.55))
+        drop-shadow(0 2px 3px rgba(0, 0, 0, 0.55));
+    animation: refract-foil-sheen 5s ease-in-out infinite;
+}
+@keyframes refract-foil-sheen {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+/* The moving sheen is itself a tier signal: matte (static) on the low tiers. */
+body.stash-liquid-glass .refract-cb-tier-bronze .refract-cb-score-num,
+body.stash-liquid-glass .refract-cb-tier-silver .refract-cb-score-num {
+    animation: none;
+}
+
+/* LEGENDARY signature: a cool tri-tone (pink -> purple -> blue -> white)
+   gradient on the numeral and holo, echoing the front frame's triadic palette.
+   More than a single hue, but a step cooler/narrower than Perfect's full
+   rainbow so the two stay distinct. */
+body.stash-liquid-glass .refract-cb-tier-legendary .refract-cb-score-num {
+    background: linear-gradient(115deg, #f472b6, #c084fc, #60a5fa, #ffffff, #f472b6);
+    background-size: 240% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter:
+        drop-shadow(0 0 10px rgba(192, 132, 252, 0.6))
+        drop-shadow(0 2px 3px rgba(0, 0, 0, 0.55));
+    animation: refract-foil-sheen 4.5s linear infinite;
+}
+body.stash-liquid-glass .refract-cb-tier-legendary::after {
+    background: linear-gradient(115deg,
+        transparent 20%,
+        rgba(244, 114, 182, 0.18) 35%,
+        rgba(192, 132, 252, 0.22) 47%,
+        rgba(96, 165, 250, 0.18) 59%,
+        rgba(255, 255, 255, 0.13) 67%,
+        transparent 84%);
+    background-size: 300% 300%;
+}
+
+/* PERFECT signature: the top tier is unmistakably PRISMATIC where every other
+   tier is a single hue - a rainbow foil numeral and a rainbow holographic
+   sheen. This is what sets it apart from Legendary at a glance. */
+body.stash-liquid-glass .refract-cb-tier-perfect .refract-cb-score-num {
+    background: linear-gradient(115deg, #ff6b6b, #ffd24d, #4ade80, #4dc3ff, #c87bff, #ff6b6b);
+    background-size: 260% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter:
+        drop-shadow(0 0 11px rgba(255, 255, 255, 0.45))
+        drop-shadow(0 2px 3px rgba(0, 0, 0, 0.55));
+    animation: refract-foil-sheen 4s linear infinite;
+}
+body.stash-liquid-glass .refract-cb-tier-perfect::after {
+    background: linear-gradient(115deg,
+        transparent 16%,
+        rgba(255, 107, 107, 0.20) 32%,
+        rgba(255, 210, 77, 0.20) 41%,
+        rgba(74, 222, 128, 0.20) 50%,
+        rgba(77, 195, 255, 0.20) 59%,
+        rgba(200, 123, 255, 0.20) 68%,
+        transparent 84%);
+    background-size: 300% 300%;
+}
+body.stash-liquid-glass .refract-cb-score-lbl {
+    position: relative;
+    z-index: 1;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.48rem;
+    font-weight: 800;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--seal);
+    text-shadow: 0 0 8px rgba(var(--seal-rgb), 0.4);
+}
+body.stash-liquid-glass .refract-cb-score-lbl::before,
+body.stash-liquid-glass .refract-cb-score-lbl::after {
+    content: "";
+    width: 16px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(var(--seal-rgb), 0.75));
+}
+body.stash-liquid-glass .refract-cb-score-lbl::after {
+    background: linear-gradient(90deg, rgba(var(--seal-rgb), 0.75), transparent);
+}
+body.stash-liquid-glass .refract-cb-fav {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    z-index: 2;
+    font-size: 0.82rem;
+    color: #ff5d7a;
+    text-shadow: 0 0 8px rgba(255, 93, 122, 0.9);
+}
+
+/* Media strip: up to three thumbnails (top scene, then library photos, then
+   more scene stills). Lazy - only fetched when the card is flipped. */
+body.stash-liquid-glass .refract-cb-media {
+    display: flex;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+body.stash-liquid-glass .refract-cb-media-item {
+    position: relative;
+    display: block;
+    flex: 1 1 0;
+    min-width: 0;
+    height: 56px;
+    border-radius: 7px;
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px solid rgba(var(--seal-rgb), calc(var(--tier-frame) + 0.10));
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 12px rgba(var(--seal-rgb), var(--tier-glow));
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+/* Clickable: lift + glow on hover to signal it opens the scene/image. */
+body.stash-liquid-glass a.refract-cb-media-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--seal);
+    box-shadow:
+        0 7px 18px rgba(0, 0, 0, 0.6),
+        0 0 18px rgba(var(--seal-rgb), calc(var(--tier-glow) + 0.25));
+}
+body.stash-liquid-glass .refract-cb-media-img {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-color: rgba(255, 255, 255, 0.04);
+}
+body.stash-liquid-glass .refract-cb-media-item::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 58%);
+    pointer-events: none;
+}
+body.stash-liquid-glass .refract-cb-media-tag {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 1;
+    font-size: 0.36rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.62);
+    color: var(--seal);
+    border: 1px solid rgba(var(--seal-rgb), 0.5);
+}
+body.stash-liquid-glass .refract-cb-media-rate {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    z-index: 1;
+    font-size: 0.44rem;
+    font-weight: 800;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.62);
+    color: #fff;
+    border: 1px solid rgba(var(--seal-rgb), 0.5);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Assets: the large flex body. One readable row per category. */
+body.stash-liquid-glass .refract-cb-assets {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.26);
+    padding: 7px 10px 8px;
+    overflow: hidden;
+}
+body.stash-liquid-glass .refract-cb-loading {
+    font-size: 0.66rem;
+    color: var(--text-muted);
+    padding: 6px 2px;
+}
+body.stash-liquid-glass .refract-cb-assets-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 auto;
+    font-size: 0.54rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--seal);
+    margin-bottom: 5px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+body.stash-liquid-glass .refract-cb-assets-n {
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+}
+/* Centered when it fits; scrolls (this list only) when it overflows. The
+   `safe` keyword keeps the first row reachable instead of clipping it. */
+body.stash-liquid-glass .refract-cb-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    gap: 9px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 3px;
+}
+body.stash-liquid-glass .refract-cb-grid::-webkit-scrollbar { width: 4px; }
+body.stash-liquid-glass .refract-cb-grid::-webkit-scrollbar-track { background: transparent; }
+body.stash-liquid-glass .refract-cb-grid::-webkit-scrollbar-thumb {
+    background: rgba(var(--seal-rgb), 0.5);
+    border-radius: 4px;
+}
+body.stash-liquid-glass .refract-cb-stat {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+body.stash-liquid-glass .refract-cb-stat-name {
+    flex: 0 0 42%;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.88);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* Segmented heat meter: count = value, colour = level - so a strong
+   category (full, green) is obvious beside a weak one (short, red). */
+body.stash-liquid-glass .refract-cb-bar {
+    display: flex;
+    gap: 3px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+body.stash-liquid-glass .refract-cb-seg {
+    flex: 1 1 0;
+    height: 9px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+body.stash-liquid-glass .refract-s1 .refract-cb-seg.on { background: #e5484d; box-shadow: 0 0 6px rgba(229, 72, 77, 0.6); }
+body.stash-liquid-glass .refract-s2 .refract-cb-seg.on { background: #f0883e; box-shadow: 0 0 6px rgba(240, 136, 62, 0.6); }
+body.stash-liquid-glass .refract-s3 .refract-cb-seg.on { background: #f5c542; box-shadow: 0 0 6px rgba(245, 197, 66, 0.6); }
+body.stash-liquid-glass .refract-s4 .refract-cb-seg.on { background: #9bd64a; box-shadow: 0 0 6px rgba(155, 214, 74, 0.55); }
+body.stash-liquid-glass .refract-s5 .refract-cb-seg.on { background: #4ade80; box-shadow: 0 0 7px rgba(74, 222, 128, 0.6); }
+body.stash-liquid-glass .refract-cb-stat-val {
+    flex: 0 0 auto;
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: var(--seal);
+    font-variant-numeric: tabular-nums;
+    min-width: 0.7em;
+    text-align: right;
+}
+body.stash-liquid-glass .refract-s0 .refract-cb-stat-val { color: var(--text-muted); }
+body.stash-liquid-glass .refract-s1 .refract-cb-stat-val { color: #e5484d; }
+body.stash-liquid-glass .refract-s2 .refract-cb-stat-val { color: #f0883e; }
+body.stash-liquid-glass .refract-s3 .refract-cb-stat-val { color: #f5c542; }
+body.stash-liquid-glass .refract-s4 .refract-cb-stat-val { color: #9bd64a; }
+body.stash-liquid-glass .refract-s5 .refract-cb-stat-val { color: #4ade80; }
+body.stash-liquid-glass .refract-cb-empty {
+    margin: auto;
+    font-size: 0.66rem;
+    font-style: italic;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* Collector footer: library counts + vitals, wrapping onto a second line. */
+body.stash-liquid-glass .refract-cb-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 5px 14px;
+    flex: 0 0 auto;
+    padding-top: 7px;
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+}
+body.stash-liquid-glass .refract-cb-foot:empty { display: none; }
+body.stash-liquid-glass .refract-cb-foot-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    font-size: 0.54rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.5);
+}
+body.stash-liquid-glass .refract-cb-foot-item b {
+    color: var(--seal);
+    font-size: 0.78rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}

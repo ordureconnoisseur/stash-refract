@@ -1476,11 +1476,33 @@ body.stash-liquid-glass .scene-markers-panel > .btn {
     margin-bottom: 1.25rem;
     font-weight: 600;
 }
-body.stash-liquid-glass .scene-markers-panel > .btn::before {
+/* The native Create Marker button gets a "+" glyph; the refract-injected
+   "See All" shortcut carries its own list icon, so exclude it here. */
+body.stash-liquid-glass .scene-markers-panel > .btn:not(.refract-marker-see-all)::before {
     content: "+";
     font-size: 1.1em;
     font-weight: 700;
     line-height: 1;
+}
+
+/* "See All" markers shortcut (refract-injected). Anchored top-right of the
+   panel, opposite the native Create Marker button, with the same glass .btn
+   look. Deep-links to the full Markers list pre-filtered to this scene so
+   bulk marker editing is one click away. */
+body.stash-liquid-glass .scene-markers-panel {
+    position: relative;
+}
+body.stash-liquid-glass .scene-markers-panel > .btn.refract-marker-see-all {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-bottom: 0;
+    text-decoration: none;
+}
+body.stash-liquid-glass .scene-markers-panel > .btn.refract-marker-see-all svg {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
 }
 
 /* Neutralise the Bootstrap .container so the grid uses full panel width. */

@@ -687,9 +687,14 @@ body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-pl
    sharing the cards' stacking context and losing to high-tier cards.
    `isolation: isolate` makes the row its own stacking context root, so
    card z-indices can't leak past it. */
-body.stash-liquid-glass:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) .row:has(> [class*="refract-card-tier-"]) {
-    isolation: isolate;
-}
+/* NOTE: a redundant tiers/playing-card-only row-isolation rule lived here:
+   `.row:has(> [class*="refract-card-tier-"])`. It matched the SAME grid rows
+   as the all-mode `.row:has(> .scene-card / .performer-card)` rule just below
+   (the tier classes are added onto the .scene-card/.performer-card elements),
+   so deleting it changes nothing visually, but it removes a mode-gated
+   substring `:has()` that Chrome re-evaluated on every style recalc across the
+   heavy tiers/playing-card grids. The z-index rationale above still applies
+   via the rule below. */
 
 /* Same fix, but for EVERY card grid row regardless of rating style. In the
    default "intensity" mode there are no refract-card-tier-* classes, so the
