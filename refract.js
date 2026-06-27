@@ -3714,8 +3714,9 @@
        particles layer holding TWO sub-layers; CSS shows whichever fits
        the current mode (so toggling lite at runtime switches instantly
        with no rebuild):
-         • .refract-heart-float-layer — five ♥ glyphs that drift upward
-           (full mode). Transform + opacity animation only.
+         • .refract-heart-float-layer — an animated vignette ring of live
+           hearts that twinkle (staggered opacity + scale pulse), full
+           mode. Transform + opacity animation only.
          • .refract-heart-halo-layer — a static photographic-vignette ring
            of hearts (lite mode + reduced motion): one of five baked SVGs
            (crowding the corners, thinning inward, centre clear) applied as
@@ -3728,14 +3729,53 @@
         particles.className = "refract-heart-particles";
         particles.setAttribute("aria-hidden", "true");
 
-        /* ── Floating layer (full mode) — five staggered drifting ♥. ── */
+        /* ── Full-mode layer — an ANIMATED vignette ring. Same edge-
+           crowding distribution as the lite halo, but built as live spans
+           so each heart can twinkle (a staggered opacity + scale pulse)
+           for a shimmering halo. Full mode only; lite swaps to the static
+           baked SVG below. transform + opacity only, so the animation is
+           GPU-composited. */
         var floatLayer = document.createElement("div");
         floatLayer.className = "refract-heart-float-layer";
-        for (var hi = 1; hi <= 5; hi++) {
+
+        var COUNT = 28;     /* hearts in the ring */
+        var BAND  = 0.30;   /* how far inward (0..0.5) the ring reaches */
+        var GLYPHS = ["♥", "♥", "♥", "♥", "♡"];
+        var PALETTE = ["255, 74, 130", "255, 102, 150", "255, 130, 170"];
+        var placed = 0, guard = 0, maxGuard = COUNT * 50;
+        while (placed < COUNT && guard < maxGuard) {
+            guard++;
+            var x = Math.random();
+            var y = Math.random();
+            var edge = Math.min(x, 1 - x, y, 1 - y);    /* 0 at rim .. 0.5 centre */
+            var t = edge / BAND;
+            if (t >= 1) { continue; }                    /* central void */
+            if (Math.random() > Math.pow(1 - t, 1.7)) { continue; } /* vignette falloff */
+            var depth = 1 - t;                           /* 1 at rim .. 0 inward */
+
+            var color = PALETTE[(Math.random() * PALETTE.length) | 0];
+            var size  = (9 + depth * 16).toFixed(1);     /* 9 .. 25px */
+            var op    = (0.4 + depth * 0.55).toFixed(2); /* 0.40 .. 0.95 peak */
+            var rot   = ((Math.random() * 46) - 23).toFixed(1);
+            var glow  = (3 + depth * 9).toFixed(1);
+            var dur   = (2.4 + Math.random() * 2.8).toFixed(2); /* 2.4 .. 5.2s */
+            var dl    = (Math.random() * 3.5).toFixed(2);       /* 0 .. 3.5s stagger */
+
             var fh = document.createElement("span");
-            fh.className = "refract-heart-float refract-heart-" + hi;
-            fh.textContent = "♥";
+            fh.className = "refract-heart-twinkle";
+            fh.textContent = GLYPHS[(Math.random() * GLYPHS.length) | 0];
+            fh.style.cssText =
+                "left:" + (x * 100).toFixed(2) + "%;" +
+                "top:" + (y * 100).toFixed(2) + "%;" +
+                "font-size:" + size + "px;" +
+                "color:rgba(" + color + ",1);" +
+                "text-shadow:0 0 " + glow + "px rgba(" + color + ",0.5);" +
+                "--op:" + op + ";" +
+                "--rot:" + rot + "deg;" +
+                "--dur:" + dur + "s;" +
+                "--dl:" + dl + "s;";
             floatLayer.appendChild(fh);
+            placed++;
         }
         particles.appendChild(floatLayer);
 

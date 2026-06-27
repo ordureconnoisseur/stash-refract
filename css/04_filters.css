@@ -664,7 +664,13 @@ body.stash-liquid-glass .filtered-list-toolbar {
     min-height: 2.9rem !important;
     align-items: center;
     position: sticky !important;
-    top: 5rem !important;
+    /* Track the navbar height so the stuck gap stays constant. The fixed
+       navbar sits at top 12px and its bottom edge works out to
+       `--nav-btn-size + 1.4rem`; adding 1.2rem keeps a steady ~1.2rem gap.
+       At the smallest breakpoint (--nav-btn-size 2.4rem) this resolves to
+       the old 5rem, so nothing changes there; it only grows the offset on
+       the larger breakpoints where the taller navbar was eating the gap. */
+    top: calc(var(--nav-btn-size) + 2.6rem) !important;
     z-index: 90 !important;
     max-width: 100% !important;
     /* margin: 0 auto on inline element doesn't centre — wrap parent

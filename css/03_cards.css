@@ -249,35 +249,30 @@ body.stash-liquid-glass .refract-heart-halo-layer {
     border-radius: inherit;
 }
 
-/* Floating layer (full mode) */
-body.stash-liquid-glass .refract-heart-float {
+/* Full-mode layer — animated vignette ring. Each heart twinkles (a
+   staggered opacity + scale pulse) so the whole ring shimmers. Position /
+   size / colour / glow / --op (peak opacity) / --rot / --dur / --dl are
+   set inline per heart by refractBuildHearts(). Animates transform +
+   opacity only, so it GPU-composites and never touches layout/paint. */
+body.stash-liquid-glass .refract-heart-twinkle {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    color: #ff5a85;
-    opacity: 0;
-    /* translate3d forces GPU compositing for the animation without
-       needing will-change (which thrashes on too many elements). */
-    transform: translate3d(0, 24px, 0);
-    animation: refractHeartFloat var(--hd, 6s) linear infinite;
-    animation-delay: var(--dl, 0s);
-    font-size: var(--hs, 14px);
     line-height: 1;
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(1);
+    animation: refractHeartTwinkle var(--dur, 3.5s) ease-in-out var(--dl, 0s) infinite;
 }
-/* Five varied trajectories spread evenly across the card width. */
-body.stash-liquid-glass .refract-heart-1 { left: 10%; --hs: 13px; --hd: 5.6s; --dl: 0s;   }
-body.stash-liquid-glass .refract-heart-2 { left: 32%; --hs: 17px; --hd: 7.0s; --dl: 1.0s; }
-body.stash-liquid-glass .refract-heart-3 { left: 52%; --hs: 12px; --hd: 6.0s; --dl: 2.0s; }
-body.stash-liquid-glass .refract-heart-4 { left: 72%; --hs: 18px; --hd: 6.6s; --dl: 3.0s; }
-body.stash-liquid-glass .refract-heart-5 { left: 90%; --hs: 13px; --hd: 5.8s; --dl: 4.0s; }
-/* translateY pixel values (not %) so a small heart still travels the full
-   card height; the layer's overflow:hidden clips it cleanly off-top. */
-@keyframes refractHeartFloat {
-    0%   { transform: translate3d(0, 24px, 0) rotate(-6deg) scale(0.55); opacity: 0; }
-    8%   { opacity: 0.95; transform: translate3d(4px, -20px, 0) rotate(2deg) scale(1); }
-    50%  { opacity: 0.9;  transform: translate3d(-8px, -240px, 0) rotate(8deg) scale(1.05); }
-    90%  { opacity: 0.75; transform: translate3d(10px, -460px, 0) rotate(-4deg) scale(0.95); }
-    100% { opacity: 0;    transform: translate3d(0, -500px, 0) rotate(0deg) scale(0.7); }
+/* Pulse between ~half and full of the heart's depth-based peak opacity,
+   with a gentle scale breath. The `calc(var(--op) * ...)` keeps each
+   heart's edge-depth brightness while it twinkles. */
+@keyframes refractHeartTwinkle {
+    0%, 100% {
+        opacity: calc(var(--op, 0.7) * 0.45);
+        transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(0.82);
+    }
+    50% {
+        opacity: var(--op, 0.7);
+        transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(1.12);
+    }
 }
 
 /* Halo layer (lite mode) — the heart ring is a baked SVG background-image
