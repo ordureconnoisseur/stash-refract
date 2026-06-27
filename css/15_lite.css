@@ -43,6 +43,7 @@ body.stash-liquid-glass.refract-lite .Lightbox-footer,
 body.stash-liquid-glass.refract-lite .Lightbox-navbutton.btn.btn-link,
 body.stash-liquid-glass.refract-lite .modal-content,
 body.stash-liquid-glass.refract-lite .popover,
+body.stash-liquid-glass.refract-lite #select_page_popover,
 body.stash-liquid-glass.refract-lite .dropdown-menu {
     background: rgba(18, 18, 22, 0.96) !important;
 }
@@ -169,8 +170,12 @@ body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .scene-sp
     border-color: var(--accent-glow) !important;
     color: var(--accent-bright) !important;
 }
+/* The studio logo is a contained image (or text with a native text-shadow),
+   not small overlay text, so it doesn't need the solid legibility plate the
+   spec/resolution chips get — that plate rendered as a sharp dark box around
+   the logo. Keep it transparent, matching regular (non-lite) minimal mode. */
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .studio-overlay {
-    background: rgba(20, 20, 24, 0.92) !important;
+    background: transparent !important;
 }
 
 /* ── Playing-card mode: flatten per-card neon for weak GPUs ──────────

@@ -199,6 +199,10 @@
             var cardBackExplicitOn = cardBackExplicitState[0];
             var setCardBackExplicitOn = cardBackExplicitState[1];
 
+            var pluginSortState = R.useState(isPluginSortDisabledBottom());
+            var pluginSortDisabledBottomOn = pluginSortState[0];
+            var setPluginSortDisabledBottomOn = pluginSortState[1];
+
             /* Custom CSS Source state: { loaded, url } where url is
                the value Stash currently has set (empty if not set). */
             var cssSrc = R.useState({ loaded: false, url: "" });
@@ -257,6 +261,16 @@
                 scheduleServerSync();
                 applyStudioBannerClass(next);
                 setStudioBannerOn(next);
+            }
+
+            function togglePluginSortDisabledBottom() {
+                var next = !pluginSortDisabledBottomOn;
+                try { localStorage.setItem(PLUGIN_SORT_DISABLED_BOTTOM_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                setPluginSortDisabledBottomOn(next);
+                /* Re-sort immediately so the change is visible if the user is
+                   sitting on the Plugins page (FLIP-animated by sortPluginList). */
+                try { sortPluginList(); } catch (e) { /* ignore */ }
             }
 
             function togglePerfCardHover() {
@@ -456,6 +470,28 @@
                                 )
                             )
                         ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-plugin-sort" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Group by enabled state"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "On the Settings → Plugins page, sort enabled plugins A→Z first, then disabled ones A→Z below. Off (default) is one flat A→Z list, matching Stash's native order. Reorders glide rather than snap.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-plugin-sort-toggle",
+                                        checked: pluginSortDisabledBottomOn,
+                                        onChange: togglePluginSortDisabledBottom
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-plugin-sort-toggle"
+                                    })
+                                )
+                            )
+                        ),
                         (REFRACT_CARDBACK_EXPLICIT_ENABLED ? R.createElement("div", { className: "setting", id: "plugin-refract-cardback-explicit" },
                             R.createElement("div", null,
                                 R.createElement("h3", null, "Explicit card-back labels"),
@@ -636,6 +672,9 @@
     var MINIMAL_CARDS_STORAGE_KEY = "refract.minimalCards";
     var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";
     var CARD_BACK_EXPLICIT_KEY = "refract.cardBackExplicit";
+    /* Settings → Plugins list: float disabled plugins to the bottom (the
+       pre-v1.15 behaviour) instead of one flat A→Z run. Opt-in; default off. */
+    var PLUGIN_SORT_DISABLED_BOTTOM_KEY = "refract.pluginSortDisabledBottom";
     /* Explicit card-back labels are built but held back from public release:
        the toggle is hidden and isCardBackExplicit() is forced off while this is
        false. Flip to true to ship the feature (no other change needed). */
@@ -649,8 +688,15 @@
         ACCENT_STORAGE_KEY, VIEW_MINIMISER_STORAGE_KEY, LOGO_URL_STORAGE_KEY,
         LITE_MODE_STORAGE_KEY, LIGHT_MODE_STORAGE_KEY, LIGHT_TOGGLE_NAVBAR_KEY,
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
-        MINIMAL_CARDS_STORAGE_KEY, RATING_STYLE_STORAGE_KEY, CARD_BACK_EXPLICIT_KEY
+        MINIMAL_CARDS_STORAGE_KEY, RATING_STYLE_STORAGE_KEY, CARD_BACK_EXPLICIT_KEY,
+        PLUGIN_SORT_DISABLED_BOTTOM_KEY
     ];
+
+    function isPluginSortDisabledBottom() {
+        try {
+            return localStorage.getItem(PLUGIN_SORT_DISABLED_BOTTOM_KEY) === "1";
+        } catch (e) { return false; }
+    }
 
     var GRAPHQL_URL = "/graphql";
 
@@ -3822,6 +3868,28 @@
         last.setAttribute("data-pager-role", "float");
         rowOf(last).setAttribute("data-pager-row", "float");
     }
+
+    /* ── Page-jump popover: dismiss on scroll ──────────────────────────
+       The "jump to page" popover (#select_page_popover) is Popper-positioned
+       and portaled to <body>, while the floating pager it springs from is
+       position:fixed. On scroll the fixed bar is composited smoothly, but
+       Popper recomputes the popover's document coords a frame late, so the
+       pill visibly stutters as it chases the bar. It's a transient type-a-page
+       input, so the clean fix is to just close it on scroll (clicking the
+       trigger toggles it shut) — nothing left to stutter. Bound once. */
+    var refractPageJumpDismissBound = false;
+    function bindPageJumpScrollDismiss() {
+        if (refractPageJumpDismissBound) { return; }
+        refractPageJumpDismissBound = true;
+        window.addEventListener("scroll", function () {
+            /* The overlay only exists in the DOM while open, so this is a
+               cheap no-op the rest of the time. */
+            if (!document.getElementById("select_page_popover")) { return; }
+            var trigger = document.querySelector("button.page-count");
+            if (trigger) { trigger.click(); }
+        }, { passive: true, capture: true });
+    }
+    bindPageJumpScrollDismiss();
 
     /* ── Table list view: strip overflowable so hover-popup never fires ── */
 
@@ -7075,7 +7143,7 @@
             if (!btn) { return; }
             /* Don't intercept — let Bootstrap open the dropdown first so the
                .dropdown-menu element actually renders. Then capture it. */
-            var panel = document.querySelector(".scene-tabs, .gallery-tabs");
+            var panel = document.querySelector(".scene-tabs, .image-tabs, .gallery-tabs");
             if (!panel) { return; }
             /* If overlay is already open, dismiss and stop. */
             if (panel.querySelector(".st-op-menu-overlay")) {
@@ -7272,6 +7340,20 @@
         });
     }
 
+    /* The bulk-edit dialogs ("Edit N Images / Scenes / …") render their Date
+       field with the wrapper class `.bulk-update-date-input` instead of the
+       inline-form `.date-input-group`, but the markup inside is identical
+       (a .form-control + an .input-group-append holding the nested
+       react-datepicker calendar button). All of Refract's date-field merge
+       styling is keyed to `.date-input-group`, so the bulk field missed it and
+       the calendar rendered as a detached pill. Stamp the same class on so it
+       reuses that handling verbatim. Idempotent. */
+    function tagBulkDateInputGroups() {
+        document.querySelectorAll(".bulk-update-date-input:not(.date-input-group)").forEach(function (el) {
+            el.classList.add("date-input-group");
+        });
+    }
+
     /* Scenes list "stats" pill. Stash renders, in the top
        `.pagination-index-container`, a `span.paginationIndex` reading
        "1-40 of 1234" with a `<br>` and a `.scenes-stats` span holding
@@ -7455,7 +7537,14 @@
     // (NotFoundError on the next reconcile), so order-only is the safe play.
     // Re-runs via the consolidated watcher, so it re-sorts after a plugin is
     // toggled (which re-renders the list and resets our inline order).
+    /* FLIP position cache, keyed by plugin name → { top, left } from the last
+       sort pass. Keyed by NAME (not node) so it survives React replacing the
+       row nodes when a plugin is toggled. offsetTop/offsetLeft are used (not
+       getBoundingClientRect): they're layout positions, so they're immune to
+       both scrolling and any transform left over from an in-flight animation. */
+    var refractPluginPosCache = {};
     function sortPluginList() {
+        var disabledBottom = isPluginSortDisabledBottom();
         /* Identify plugin rows the same way injectPluginToggles does: a
            .setting-group whose header carries the native enable/disable
            btn-sm (the injected chevron is excluded). Collect their parent
@@ -7469,6 +7558,9 @@
             var parent = groups[i].parentElement;
             if (parent && containers.indexOf(parent) === -1) { containers.push(parent); }
         }
+
+        var animate = !document.body.classList.contains("refract-lite") &&
+            !(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
         for (var c = 0; c < containers.length; c++) {
             var container = containers[c];
@@ -7489,22 +7581,88 @@
                     ? h3.firstChild.nodeValue
                     : (h3 ? h3.textContent : "");
                 var name = (nameSrc || "").replace(/\s*\([^)]*\)\s*$/, "").trim().toLowerCase();
-                rows.push({ el: g, name: name });
+                /* Disabled rows carry `.disabled` on the header (same signal
+                   injectPluginToggles reads to set the toggle checkbox). */
+                rows.push({ el: g, name: name, disabled: h.classList.contains("disabled") });
             }
             if (!rows.length) continue;
 
-            /* Purely alphabetical (A→Z); enabled/disabled state no longer
-               affects order, matching the upstream native plugin list. */
             rows.sort(function (a, b) {
+                /* When the opt-in is on, enabled rows come first, disabled
+                   rows sink below; A→Z within each group. Off = one flat
+                   A→Z run, matching the upstream native plugin list. */
+                if (disabledBottom && a.disabled !== b.disabled) {
+                    return a.disabled ? 1 : -1;
+                }
                 if (a.name < b.name) { return -1; }
                 if (a.name > b.name) { return 1; }
                 return 0;
             });
 
-            for (var r = 0; r < rows.length; r++) {
-                var ord = String(r);
-                if (rows[r].el.style.order !== ord) { rows[r].el.style.order = ord; }
+            /* FIRST — each row's prior layout position (from the cache; empty
+               on the very first pass, so first render never animates). */
+            var firsts = {};
+            var fr;
+            for (fr = 0; fr < rows.length; fr++) {
+                if (Object.prototype.hasOwnProperty.call(refractPluginPosCache, rows[fr].name)) {
+                    firsts[rows[fr].name] = refractPluginPosCache[rows[fr].name];
+                }
             }
+
+            /* Apply the new order (CSS `order` only — never move the nodes). */
+            var changed = false;
+            var r;
+            for (r = 0; r < rows.length; r++) {
+                var ord = String(r);
+                if (rows[r].el.style.order !== ord) { rows[r].el.style.order = ord; changed = true; }
+            }
+
+            /* LAST — read each row's new layout position (one reflow) and
+               refresh the cache for next time. Skip hidden rows (offsetParent
+               null, e.g. filtered out by search) so they don't poison the FLIP. */
+            var lasts = {};
+            var lr;
+            for (lr = 0; lr < rows.length; lr++) {
+                var el = rows[lr].el;
+                if (!el.offsetParent) { continue; }
+                var pos = { top: el.offsetTop, left: el.offsetLeft };
+                lasts[rows[lr].name] = pos;
+                refractPluginPosCache[rows[lr].name] = pos;
+            }
+
+            if (!animate || !changed) { continue; }
+
+            /* PLAY — invert each moved row back to where it visually was, then
+               transition the transform away so the reorder glides into place. */
+            var moved = [];
+            var p;
+            for (p = 0; p < rows.length; p++) {
+                var nm = rows[p].name;
+                if (!firsts[nm] || !lasts[nm]) { continue; }
+                var dx = firsts[nm].left - lasts[nm].left;
+                var dy = firsts[nm].top - lasts[nm].top;
+                if (!dx && !dy) { continue; }
+                var elp = rows[p].el;
+                elp.style.transition = "none";
+                elp.style.transform = "translate(" + dx + "px, " + dy + "px)";
+                moved.push(elp);
+            }
+            if (!moved.length) { continue; }
+            /* Force a reflow so the inverted transforms commit before we play. */
+            void container.offsetHeight;
+            var m;
+            for (m = 0; m < moved.length; m++) {
+                moved[m].style.transition = "transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)";
+                moved[m].style.transform = "";
+            }
+            (function (els) {
+                setTimeout(function () {
+                    for (var z = 0; z < els.length; z++) {
+                        els[z].style.transition = "";
+                        els[z].style.transform = "";
+                    }
+                }, 460);
+            })(moved);
         }
     }
     sortPluginList(); /* initial pass; re-runs via consolidated watcher */
@@ -8565,6 +8723,7 @@
             try { setupOCounterLongPress(); } catch (e) {}
             try { injectMarkerSeeAllButton(); } catch (e) {}
             try { injectPerformerCardFlip(); } catch (e) {}
+            try { tagBulkDateInputGroups(); } catch (e) {}
         }
         function sched() {
             clearTimeout(_t);

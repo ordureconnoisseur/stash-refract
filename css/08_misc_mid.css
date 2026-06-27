@@ -315,6 +315,53 @@ body.stash-liquid-glass .react-select__multi-value__remove:hover {
     background: rgba(244, 60, 60, 0.18) !important;
     color: #fca5a5 !important;
 }
+/* Performer disambiguation — Stash renders the parenthetical "(Disambiguation)"
+   with a dark muted colour that's near-invisible on Refract's dark pills /
+   options. Pin it to a readable muted tone wherever it appears in a select. */
+body.stash-liquid-glass .react-select__multi-value .performer-disambiguation,
+body.stash-liquid-glass .react-select__single-value .performer-disambiguation,
+body.stash-liquid-glass .react-select__option .performer-disambiguation,
+body.stash-liquid-glass .react-select__option .performer-select-disambiguation {
+    color: var(--text-muted) !important;
+    opacity: 0.9;
+}
+
+/* ── Bulk-edit mode selector (Overwrite / Add / Remove) ───────────────
+   The MultiSet mode buttons (.button-group-above, in every "Edit N <items>"
+   dialog) are all .btn-primary inside .modal-body, where a broad settings/
+   dialog rule (05_list_views) already gives every .btn-primary the modal
+   "Apply" look (accent-tint glass) — so all three looked identical and you
+   couldn't tell which was selected. The ACTIVE one keeping that Apply look is
+   exactly right; we only need to make the INACTIVE ones read as "off". So mirror
+   the footer's Cancel button (btn-secondary glass) on :not(.active). That
+   05 rule out-specifies via an :is(#id ...) argument, so we mirror the same
+   :is() ID weight here to win (the .modal-body arg is what actually matches).
+   A small gap keeps them distinct, like the footer Cancel/Apply pair. */
+body.stash-liquid-glass :is(#configuration-tabs #settings-container, .modal-body) .button-group-above {
+    display: inline-flex !important;
+    gap: 5px !important;
+    margin-bottom: 0.55rem !important;
+}
+body.stash-liquid-glass :is(#configuration-tabs #settings-container, .modal-body) .button-group-above .btn.btn-primary:not(.active) {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+}
+body.stash-liquid-glass :is(#configuration-tabs #settings-container, .modal-body) .button-group-above .btn.btn-primary:not(.active):hover {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border-bright) !important;
+    color: #fff !important;
+}
+
+/* The bulk-edit Date field (.bulk-update-date-input) has the SAME internal
+   structure as the inline .date-input-group (input + .input-group-append with a
+   nested react-datepicker button), but a different wrapper class, so it missed
+   all the merge handling below. refract.js stamps `date-input-group` onto it
+   (tagBulkDateInputGroups) so it reuses that proven treatment verbatim — no
+   duplicate CSS. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .react-select__indicator {
     padding: 0 0.35rem !important;
 }
@@ -699,6 +746,12 @@ body.stash-liquid-glass form .date-input-group > input.date-input {
     border-right: none !important;
     flex: 1 1 auto !important;
     min-width: 0 !important;
+    /* The bulk-edit dialog gives form-controls a top margin; here it pushed
+       the input down so the group grew taller than the input and the calendar
+       button (align-self: stretch) stretched past it. Zero it so the input
+       fills the row and the button stays flush. */
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
 }
 body.stash-liquid-glass .date-input-group > .input-group-append {
     display: inline-flex !important;
@@ -2028,6 +2081,28 @@ body.stash-liquid-glass .react-select__option--is-selected {
     color: var(--accent-bright) !important;
 }
 
+/* ── Native <select> dropdown options — readable in every modal ───────
+   The open option list of a NATIVE <select> (e.g. the home-page Customize
+   "Add" dialog's Type / Premade Filter pickers) is painted by the browser,
+   outside the React tree, so it never inherits the theme's glass surfaces.
+   Refract styles the closed select box, and form-control text is light, but
+   the OPTION rows had no background set — on Windows Chromium that renders
+   light-text-on-default-white, so the list looks blank and only the
+   OS-highlighted row is legible (this is why macOS, which draws its own
+   native menu and ignores the colour, was never affected). Give every
+   option/optgroup an opaque themed surface + text so the whole list reads
+   in both dark and light mode. Tokens (not hard-coded greys) so light mode
+   flips correctly; the narrower per-widget rules (page-size selector,
+   tagger header) keep their own look via higher specificity. */
+body.stash-liquid-glass select option,
+body.stash-liquid-glass select optgroup {
+    background-color: var(--bg-1) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass select optgroup {
+    font-weight: 600 !important;
+}
+
 /* Universal custom checkbox — round glass dot, orange fill + white SVG
    check on :checked, accent glow. Matches the table-list select column
    and the Lightbox popover idiom. Excludes switches (which inherit a
@@ -2269,12 +2344,16 @@ body.stash-liquid-glass [data-pager-row="float"] .pagination .dropdown:has(> but
    number-input spinner arrows are hidden, the input + button join into
    one clean pill, and the popover arrow-pip is removed. */
 body.stash-liquid-glass #select_page_popover {
-    background: var(--glass-bg-strong) !important;
+    /* Match the floating pagination capsule exactly (same glass fill + blur)
+       — it's the control this popover springs from and it reads cleanly. Light
+       mode gets an opaque fill via the 14_light popover list; lite mode (no
+       backdrop-filter) gets a solid fill via 15_lite. */
+    background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     box-shadow: var(--shadow-lg) !important;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    backdrop-filter: var(--glass-blur) !important;
     padding: 4px !important;
     color: var(--text) !important;
     max-width: max-content !important;
@@ -2331,6 +2410,17 @@ body.stash-liquid-glass #select_page_popover input.form-control:focus {
     border-color: var(--accent-glow) !important;
     box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.15) !important;
     outline: none !important;
+}
+/* The number auto-selects on focus; the browser-default selection turns it
+   black-on-pale (unreadable over the glass). Keep it white on a clear,
+   luminous accent wash instead. */
+body.stash-liquid-glass #select_page_popover input.form-control::selection {
+    background: rgba(var(--accent-rgb), 0.6) !important;
+    color: #fff !important;
+}
+body.stash-liquid-glass #select_page_popover input.form-control::-moz-selection {
+    background: rgba(var(--accent-rgb), 0.6) !important;
+    color: #fff !important;
 }
 body.stash-liquid-glass #select_page_popover .btn.btn-primary {
     background: var(--accent-tint) !important;

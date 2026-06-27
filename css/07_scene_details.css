@@ -591,6 +591,12 @@ body.stash-liquid-glass :is(.scene-header, .image-header) {
     color: #fff !important;
     line-height: 1.3 !important;
     letter-spacing: -0.01em !important;
+    /* Long unbroken titles (image filenames like
+       "2025-12-21_f_yug_harvest_2002708..." have no spaces) can't wrap, so
+       they run past the panel edge despite TruncatedText's 2-line clamp.
+       Allow a mid-"word" break so they wrap and the clamp + ellipsis apply. */
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
 }
 body.stash-liquid-glass :is(.scene-header, .image-header) .TruncatedText,
 body.stash-liquid-glass :is(.scene-header, .image-header) > div {
@@ -599,6 +605,8 @@ body.stash-liquid-glass :is(.scene-header, .image-header) > div {
     font-size: inherit !important;
     font-weight: inherit !important;
     line-height: inherit !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
 }
 body.stash-liquid-glass :is(.scene-header, .image-header) h5,
 body.stash-liquid-glass :is(.scene-header, .image-header) .text-muted {

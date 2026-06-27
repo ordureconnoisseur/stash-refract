@@ -152,6 +152,43 @@ body.stash-liquid-glass .scene-marker-card .thumbnail-section {
     overflow: hidden;
 }
 
+/* ── Default performer placeholder recolour ──────────────────────────────
+   When a performer has no image Stash serves a flat white silhouette
+   (<svg><path fill="#fff"></svg>), the img src carrying `default=true`. The
+   glaring white collided with the white card name (worst in lite mode). We
+   recolour it IN PLACE with an SVG filter embedded as a data-URI: feFlood
+   paints the accent, feComposite `in` clips it to the silhouette's alpha, so
+   the shape becomes a translucent accent — no JS, no overlay, no hiding the
+   img, so it can never blank a card (if the filter is ever ignored the plain
+   silhouette just shows). A data-URI can't read --accent, so there's one rule
+   per swatch; the base rule is the default orange. */
+body.stash-liquid-glass img.performer-card-image[src*="default=true"],
+body.stash-liquid-glass img[src*="default=true"].performer-card-image,
+body.stash-liquid-glass .performer-card img[src*="default=true"] {
+    filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%23f97316' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
+}
+body.stash-liquid-glass.refract-blue .performer-card img[src*="default=true"] {
+    filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%233b82f6' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
+}
+body.stash-liquid-glass.refract-pink .performer-card img[src*="default=true"] {
+    filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%23ec4899' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
+}
+body.stash-liquid-glass.refract-red .performer-card img[src*="default=true"] {
+    filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%23ef4444' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
+}
+body.stash-liquid-glass.refract-yellow .performer-card img[src*="default=true"] {
+    filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%23eab308' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
+}
+body.stash-liquid-glass.refract-purple .performer-card img[src*="default=true"] {
+    filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%23a855f7' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
+}
+body.stash-liquid-glass.refract-green .performer-card img[src*="default=true"] {
+    filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%2322c55e' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
+}
+body.stash-liquid-glass.refract-teal .performer-card img[src*="default=true"] {
+    filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%2314b8a6' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
+}
+
 /* Tilt glare overlay — injected by refract.js */
 body.stash-liquid-glass .stash-tilt-glare {
     position: absolute;
