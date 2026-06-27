@@ -200,6 +200,38 @@ body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.perf
 body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-tier-label {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
 }
+/* The name's neon glow (filter) is stripped above, leaving light text that
+   can vanish on bright / white photos. Restore legibility with a SOFT
+   text-shadow (lite doesn't strip text-shadow). Diffuse, not a hard
+   outline — a quiet drop + a faint halo, so it reads as depth rather than
+   a sticker stroke. Lite-only; full mode keeps its glow untouched. */
+/* Perfect tier is excluded: its name is a `background-clip: text` rainbow
+   gradient, and a forced text-shadow on transparent-fill clipped text is a
+   known Blink combo that breaks the clip (rainbow paints as a box). Perfect
+   keeps its own rainbow rendering. */
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card):not(.refract-card-tier-perfect) .refract-pc-name-text {
+    text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.8),
+        0 0 6px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* ── Playing-card stat pills: strip the neon for lite mode ──────────
+   Each stat pill (.stash-perf-stats > *) stacks a 5-layer tube-light
+   box-shadow (14/32/64px blurs) plus drop-shadow filter chains on its
+   number and icon. Four pills on every card across a full grid is a lot
+   of expensive blur raster + per-pill compositing layers. Lite keeps the
+   layout, border, and tier-coloured fill/text (all paint-only, no
+   compositor cost) but flattens the glow to one cheap depth shadow,
+   kills the icon/number filters, and drops the hover lift + halo. */
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > *,
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > *:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+    transform: none !important;
+}
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > span,
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > svg {
+    filter: none !important;
+}
 
 /* ── Tier / playing-card cards: stop the continuous motion ──────────
    In BOTH tiers and playing-card modes, every rated card runs nonstop

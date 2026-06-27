@@ -3093,12 +3093,12 @@
            complete + naturalWidth, else listen for load once. */
         tagOrientation(card);
 
-        /* Floating-hearts effect for "Favourite" scenes — driven by the
+        /* Heart-halo effect for "Favourite" scenes — driven by the
            "Favourite ★" tag injected by the Advanced Rating plugin. We
            detect via the tagInfo array (case-insensitive match on
            "favourite" / "favorite" so it works for either spelling and
-           catches the ★-suffix). Class + 7-heart layer are toggled in
-           sync; only tagged cards pay the animation cost. */
+           catches the ★-suffix). Class + static heart-halo layer are
+           toggled in sync; only tagged cards build the layer. */
         var isFavourite = tagInfo && tagInfo.some(function (t) {
             return t && t.name && /^favou?rite/i.test(t.name);
         });
@@ -3106,16 +3106,7 @@
         if (isFavourite) {
             card.classList.add("refract-favourite");
             if (!existingHearts) {
-                var particles = document.createElement("div");
-                particles.className = "refract-heart-particles";
-                particles.setAttribute("aria-hidden", "true");
-                for (var hi = 1; hi <= 5; hi++) {
-                    var heart = document.createElement("span");
-                    heart.className = "refract-heart refract-heart-" + hi;
-                    heart.textContent = "♥"; /* ♥ */
-                    particles.appendChild(heart);
-                }
-                card.appendChild(particles);
+                card.appendChild(refractBuildHearts());
             }
         } else {
             card.classList.remove("refract-favourite");
@@ -3416,10 +3407,20 @@
             var row = document.createElement("div");
             row.className = "stash-perf-stats";
 
-            /* Rating badge — gated to playing-card mode via CSS. We always
-               inject the badge if the card has a rated banner; the number
+            /* Build all four stat pills (Rating, Age, O Count, Scenes) in
+               a fixed order on EVERY card so the strip keeps the same
+               shape regardless of which stats the performer has filled in.
+               A pill with no value shows a "-" placeholder and gets the
+               `stash-perf-empty` class (CSS dims it). If NONE of the four
+               has a real value we skip the strip entirely (see anyStat) so
+               an unrated/blank performer doesn't get a row of empty pills. */
+            var anyStat = false;
+
+            /* Rating badge — gated to playing-card mode via CSS. The number
                comes from the same parse path as tagFilledRatings (className
-               > textContent). Only injected when v > 0. */
+               > textContent). Real value only when v > 0; otherwise "-". */
+            var ratingValue = null;
+            var ratingTitle = "Rating";
             if (ratingEl) {
                 var ratingNum = null;
                 var mCls = ratingEl.className.match(/\brating-100-(\d+)\b/);
@@ -3454,82 +3455,97 @@
                     if (starsMode) {
                         displayRating = Math.round((ratingNum / 2) * 100) / 100;
                     }
-                    var rEl = document.createElement("span");
-                    rEl.className = "stash-perf-rating";
-                    rEl.title = "Rating " + displayRating + (starsMode ? " / 5" : " / 10");
-                    rEl.innerHTML = STAR_SVG +
-                        '<span class="stash-perf-label">Rating</span>' +
-                        "<span>" + escapeHtml(String(displayRating)) + "</span>";
-                    row.appendChild(rEl);
+                    ratingValue = String(displayRating);
+                    ratingTitle = "Rating " + displayRating + (starsMode ? " / 5" : " / 10");
                 }
             }
+            var rEl = document.createElement("span");
+            rEl.className = "stash-perf-rating" + (ratingValue == null ? " stash-perf-empty" : "");
+            rEl.title = ratingTitle;
+            rEl.innerHTML = STAR_SVG +
+                '<span class="stash-perf-label">Rating</span>' +
+                "<span>" + (ratingValue == null ? "-" : escapeHtml(ratingValue)) + "</span>";
+            row.appendChild(rEl);
+            if (ratingValue != null) { anyStat = true; }
 
             /* Age — adds a cake icon + "Age" label so the bare number
                (e.g. "27") isn't ambiguous in the playing-card stats
                strip. The icon and label are CSS-hidden in Minimal /
                Extravagant modes so those modes keep the compact
                icon-less "27" rendering they had before. */
+            var ageValue = null;
+            var ageAtProduction = false;
             if (ageEl) {
                 var ageText = ageEl.textContent.replace(/\s*years?\s+old/gi, "").trim();
                 /* Stash appends " at production" when the scene has a
                    date and the performer's age is being shown relative
                    to that date. Move the qualifier into the chip label
                    so the value stays a clean bare number. */
-                var ageAtProduction = /\s*at\s+production\s*$/i.test(ageText);
+                ageAtProduction = /\s*at\s+production\s*$/i.test(ageText);
                 if (ageAtProduction) {
                     ageText = ageText.replace(/\s*at\s+production\s*$/i, "").trim();
                 }
-                if (ageText) {
-                    var ageSpan = document.createElement("span");
-                    ageSpan.className = "stash-perf-age";
-                    if (ageAtProduction) {
-                        ageSpan.title = "Age at production";
-                    }
-                    ageSpan.innerHTML = CAKE_SVG +
-                        '<span class="stash-perf-label">Age' +
-                            (ageAtProduction ? '<span class="stash-perf-label-mark">*</span>' : '') +
-                        '</span>' +
-                        "<span>" + escapeHtml(ageText) + "</span>";
-                    row.appendChild(ageSpan);
-                }
+                if (ageText) { ageValue = ageText; }
                 ageEl.style.display = "none";
             }
+            var ageSpan = document.createElement("span");
+            ageSpan.className = "stash-perf-age" + (ageValue == null ? " stash-perf-empty" : "");
+            if (ageValue != null && ageAtProduction) {
+                ageSpan.title = "Age at production";
+            }
+            ageSpan.innerHTML = CAKE_SVG +
+                '<span class="stash-perf-label">Age' +
+                    ((ageValue != null && ageAtProduction) ? '<span class="stash-perf-label-mark">*</span>' : '') +
+                '</span>' +
+                "<span>" + (ageValue == null ? "-" : escapeHtml(ageValue)) + "</span>";
+            row.appendChild(ageSpan);
+            if (ageValue != null) { anyStat = true; }
 
             /* O count — Stash renders it as a two-button group:
                  .count-button > [button title="O Count"] + [button.count-value > span]
                Find the title="O Count" button, walk to its parent group,
-               read the .count-value span. Only inject when non-zero. */
+               read the .count-value span. Real value only when non-zero. */
+            var oValue = null;
             var oTitleBtn = popovers ? popovers.querySelector('button[title="O Count"]') : null;
             if (oTitleBtn) {
                 var oGroup = oTitleBtn.closest(".count-button");
                 var oValueSpan = oGroup ? oGroup.querySelector(".count-value span") : null;
                 var oText = oValueSpan ? oValueSpan.textContent.trim() : "";
-                if (oText && oText !== "0") {
-                    var oEl = document.createElement("span");
-                    oEl.className = "stash-perf-ocount";
-                    oEl.title = oText + " O";
-                    oEl.innerHTML = O_ICON_SVG +
-                        '<span class="stash-perf-label">O Count</span>' +
-                        "<span>" + escapeHtml(oText) + "</span>";
-                    row.appendChild(oEl);
-                }
+                if (oText && oText !== "0") { oValue = oText; }
             }
+            var oEl = document.createElement("span");
+            oEl.className = "stash-perf-ocount" + (oValue == null ? " stash-perf-empty" : "");
+            if (oValue != null) { oEl.title = oValue + " O"; }
+            oEl.innerHTML = O_ICON_SVG +
+                '<span class="stash-perf-label">O Count</span>' +
+                "<span>" + (oValue == null ? "-" : escapeHtml(oValue)) + "</span>";
+            row.appendChild(oEl);
+            if (oValue != null) { anyStat = true; }
 
             /* Scene count — wrap the number in an inner <span> for the
                same reason as age (lets playing-card mode target an inner
-               element for gradient text-clip without clipping the chip). */
+               element for gradient text-clip without clipping the chip).
+               Real value only when non-zero; the pill is a live link only
+               when it has scenes to point at. */
+            var sceneValue = null;
+            var sceneHref = null;
             if (sceneLink) {
                 var countEl = sceneLink.querySelector("span");
                 var countText = countEl ? countEl.textContent.trim() : "";
-                var scenesA = document.createElement("a");
-                scenesA.className = "stash-perf-scenes";
-                scenesA.href = sceneLink.getAttribute("href") || "#";
-                scenesA.addEventListener("click", stopProp);
-                scenesA.innerHTML = PLAY_SVG +
-                    '<span class="stash-perf-label">Scenes</span>' +
-                    "<span>" + escapeHtml(countText) + "</span>";
-                row.appendChild(scenesA);
+                if (countText && countText !== "0") { sceneValue = countText; }
+                sceneHref = sceneLink.getAttribute("href");
             }
+            var scenesA = document.createElement("a");
+            scenesA.className = "stash-perf-scenes" + (sceneValue == null ? " stash-perf-empty" : "");
+            if (sceneValue != null) {
+                if (sceneHref) { scenesA.href = sceneHref; }
+                scenesA.addEventListener("click", stopProp);
+            }
+            scenesA.innerHTML = PLAY_SVG +
+                '<span class="stash-perf-label">Scenes</span>' +
+                "<span>" + (sceneValue == null ? "-" : escapeHtml(sceneValue)) + "</span>";
+            row.appendChild(scenesA);
+            if (sceneValue != null) { anyStat = true; }
 
             /* Country flag — kept around; clone is injected INSIDE the
                name banner (alongside the gender icon) in playing-card
@@ -3547,7 +3563,12 @@
             tierLabel.className = "refract-pc-tier-label";
             card.appendChild(tierLabel);
 
-            section.appendChild(row);
+            /* Only show the stat strip if at least one of the four pills
+               has a real value — a performer with no rating/age/scenes/O
+               gets no row of all-"-" placeholders. */
+            if (anyStat) {
+                section.appendChild(row);
+            }
 
             /* Combined shrink-to-fit for the stat strip + name banner.
                Both passes need to re-run on card resize (window zoom,
@@ -3566,12 +3587,25 @@
                     refitPending = false;
                     if (!document.body.classList.contains("refract-rating-style-playing-card")) { return; }
                     /* Stat strip — high scene counts (3 digits) push
-                       chips off the right edge. Step --pc-badge-scale
-                       down through the ladder until the row fits. */
-                    var scales = [1, 0.92, 0.84, 0.76, 0.68, 0.6];
-                    for (var i = 0; i < scales.length; i++) {
-                        row.style.setProperty("--pc-badge-scale", scales[i]);
-                        if (row.scrollWidth <= row.clientWidth + 1) { break; }
+                       chips off the right edge, so shrink to fit. Use a
+                       CONTINUOUS ratio rather than a coarse ladder: the
+                       old [1, 0.92, 0.84, ...] steps could overshoot and
+                       leave the row only ~85% full, and because the strip
+                       is `justify-content: space-between` that surplus got
+                       spread into a big random gap between the chips. We
+                       measure the natural content width at full scale and
+                       multiply the scale toward an exact fit; the 2px
+                       borders don't scale so a few corrective passes
+                       converge geometrically on the right value. */
+                    row.style.setProperty("--pc-badge-scale", 1);
+                    var pcAvail = row.clientWidth;
+                    if (pcAvail > 0 && row.scrollWidth > pcAvail + 1) {
+                        var pcFit = 1;
+                        for (var pi = 0; pi < 4 && row.scrollWidth > pcAvail + 1; pi++) {
+                            pcFit = Math.max(0.6, pcFit * (pcAvail - 1) / row.scrollWidth);
+                            row.style.setProperty("--pc-badge-scale", pcFit);
+                            if (pcFit <= 0.6) { break; }
+                        }
                     }
                     /* Name banner — Concert One is moderately wide;
                        step font-size down through the ladder until the
@@ -3676,12 +3710,57 @@
         });
     }
 
-    /* Floating-hearts effect for favourited PERFORMER cards — only in
-       playing-card rating-style mode. Mirrors the scene-card hearts
-       feature, but the source of "is this favourited?" is the native
-       Stash `.favorite-button.favorite` class rather than a tag lookup,
-       so we re-sync on every mutation cycle (Stash applies / removes
-       the class reactively when the user toggles the heart). */
+    /* Heart effect for favourited cards. Builds ONE .refract-heart-
+       particles layer holding TWO sub-layers; CSS shows whichever fits
+       the current mode (so toggling lite at runtime switches instantly
+       with no rebuild):
+         • .refract-heart-float-layer — five ♥ glyphs that drift upward
+           (full mode). Transform + opacity animation only.
+         • .refract-heart-halo-layer — a static photographic-vignette ring
+           of hearts (lite mode + reduced motion): one of five baked SVGs
+           (crowding the corners, thinning inward, centre clear) applied as
+           a background-image. One node + one cached blit per card. Zero
+           per-frame cost.
+       Shared by the scene-card (tag-driven) and performer-card (native-
+       favourite) injectors. */
+    function refractBuildHearts() {
+        var particles = document.createElement("div");
+        particles.className = "refract-heart-particles";
+        particles.setAttribute("aria-hidden", "true");
+
+        /* ── Floating layer (full mode) — five staggered drifting ♥. ── */
+        var floatLayer = document.createElement("div");
+        floatLayer.className = "refract-heart-float-layer";
+        for (var hi = 1; hi <= 5; hi++) {
+            var fh = document.createElement("span");
+            fh.className = "refract-heart-float refract-heart-" + hi;
+            fh.textContent = "♥";
+            floatLayer.appendChild(fh);
+        }
+        particles.appendChild(floatLayer);
+
+        /* ── Halo layer (lite mode / reduced motion) — static vignette. ──
+           The ring of hearts is a baked SVG (img/heart-halo-N.svg) applied
+           as a background-image in CSS, NOT ~36 live spans. One node per
+           card instead of 36 keeps style-recalc cheap on big favourite
+           grids, and the whole ring paints as a single cached blit. Pick
+           one of five pre-rendered variants at random so the cards don't
+           all share the exact same pattern (the variants are generated
+           from this same vignette distribution; see img/heart-halo-*.svg).
+           The rose rim-glow is baked into each SVG too, so no extra CSS. */
+        var halo = document.createElement("div");
+        var variant = 1 + ((Math.random() * 5) | 0);
+        halo.className = "refract-heart-halo-layer refract-heart-halo-v" + variant;
+        particles.appendChild(halo);
+
+        return particles;
+    }
+
+    /* Heart-halo sync for favourited PERFORMER cards — only in playing-
+       card rating-style mode. The source of "is this favourited?" is the
+       native Stash `.favorite-button.favorite` class rather than a tag
+       lookup, so we re-sync on every mutation cycle (Stash toggles the
+       class reactively when the user clicks the heart). */
     function syncPerformerCardHearts() {
         var inPlayingCard = document.body.classList.contains("refract-rating-style-playing-card");
         document.querySelectorAll(".performer-card").forEach(function (card) {
@@ -3690,16 +3769,7 @@
             if (inPlayingCard && isFav) {
                 card.classList.add("refract-favourite");
                 if (!existing) {
-                    var particles = document.createElement("div");
-                    particles.className = "refract-heart-particles";
-                    particles.setAttribute("aria-hidden", "true");
-                    for (var hi = 1; hi <= 5; hi++) {
-                        var heart = document.createElement("span");
-                        heart.className = "refract-heart refract-heart-" + hi;
-                        heart.textContent = "♥";
-                        particles.appendChild(heart);
-                    }
-                    card.appendChild(particles);
+                    card.appendChild(refractBuildHearts());
                 }
             } else {
                 card.classList.remove("refract-favourite");
@@ -6403,10 +6473,20 @@
            count changes, single delegated keydown listener for arrow keys.
        Fully idempotent — guards via class presence and wrap.__refractPerf state. */
     function setupSceneTabsPerformers() {
+        /* Galleries render performers in `.gallery-performers` instead of
+           scenes' `.scene-performers` (identical card layout + structure,
+           just a different container class). Tag the gallery row with
+           `scene-performers` so every shared selector below (and all the
+           adaptive-layout CSS) treats scenes, images and galleries the same.
+           Re-added each cycle if React strips it on re-render. */
+        document.querySelectorAll(".gallery-tabs .tab-pane .col-12 > .gallery-performers:not(.scene-performers)").forEach(function (el) {
+            el.classList.add("scene-performers");
+        });
+
         /* Step 1 — mark the col-12 that contains .scene-performers as our wrapper.
            classList.add is a non-childList mutation so it does not retrigger the
            MutationObserver (which watches childList only). */
-        document.querySelectorAll(".scene-tabs .tab-pane .col-12 > .scene-performers").forEach(function (el) {
+        document.querySelectorAll(":is(.scene-tabs, .image-tabs, .gallery-tabs) .tab-pane .col-12 > .scene-performers").forEach(function (el) {
             var col = el.parentElement;
             if (!col || !col.classList.contains("col-12")) return;
             if (!col.classList.contains("scene-performers-row")) {
@@ -6415,7 +6495,7 @@
         });
 
         /* Step 2-6 — apply adaptive layout per wrapper. */
-        document.querySelectorAll(".scene-tabs .col-12.scene-performers-row").forEach(function (wrap) {
+        document.querySelectorAll(":is(.scene-tabs, .image-tabs, .gallery-tabs) .col-12.scene-performers-row").forEach(function (wrap) {
             applyAdaptiveLayout(wrap);
         });
     }
@@ -6474,7 +6554,53 @@
         /* Refresh real-cards reference after clone insertion. */
         realCards = row.querySelectorAll(":scope > .performer-card:not(.refract-clone)");
 
-        /* Rebuild dots only if count changed. */
+        /* Nav row: a centred [prev][dots][next] strip. The chevron buttons
+           reuse the main-column carousel's .stash-perf-prev/.stash-perf-next
+           styling (glyph + accent); CSS flips them from the absolute overlay
+           to inline items flanking the dots. The nav container is built once
+           and kept across re-runs; the dots are rebuilt inside it (between
+           the chevrons) when the performer count changes. Both chevrons and
+           dots step with wrap-around, reading the LIVE row + active dot at
+           click time so a React row-swap can't strand a stale closure. */
+        if (!state.nav || !state.nav.isConnected) {
+            if (state.nav && state.nav.parentNode) { state.nav.parentNode.removeChild(state.nav); }
+            var makeNav = function (dir) {
+                return function (e) {
+                    e.preventDefault();
+                    var liveRow = wrap.querySelector(".scene-performers");
+                    var st = wrap.__refractPerf || {};
+                    var dotsEl2 = st.dots;
+                    if (!liveRow || !dotsEl2 || !dotsEl2.children.length) { return; }
+                    var n = dotsEl2.children.length;
+                    var curDot = dotsEl2.querySelector(".active");
+                    var curIdx = curDot ? Array.prototype.indexOf.call(dotsEl2.children, curDot) : 0;
+                    var nextIdx = dir > 0 ? (curIdx + 1) % n : (curIdx - 1 + n) % n;
+                    var rc = liveRow.querySelectorAll(":scope > .performer-card:not(.refract-clone)")[nextIdx];
+                    if (rc) { rc.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }); }
+                };
+            };
+            var navEl = document.createElement("div");
+            navEl.className = "stash-perf-nav";
+            var pBtn = document.createElement("button");
+            pBtn.type = "button";
+            pBtn.className = "stash-perf-prev";
+            pBtn.setAttribute("aria-label", "Previous performer");
+            pBtn.addEventListener("click", makeNav(-1));
+            var nBtn = document.createElement("button");
+            nBtn.type = "button";
+            nBtn.className = "stash-perf-next";
+            nBtn.setAttribute("aria-label", "Next performer");
+            nBtn.addEventListener("click", makeNav(1));
+            navEl.appendChild(pBtn);
+            navEl.appendChild(nBtn);
+            wrap.appendChild(navEl);
+            state.nav = navEl;
+            state.prevBtn = pBtn;
+            state.nextBtn = nBtn;
+        }
+
+        /* Rebuild dots only if count changed; insert them between the
+           chevrons inside the nav row. */
         var existingDotCount = state.dots ? state.dots.children.length : 0;
         if (existingDotCount !== count) {
             if (state.dots && state.dots.parentNode) state.dots.parentNode.removeChild(state.dots);
@@ -6493,7 +6619,7 @@
                 })(i);
                 dotsEl.appendChild(dot);
             }
-            wrap.appendChild(dotsEl);
+            state.nav.insertBefore(dotsEl, state.nextBtn);
             state.dots = dotsEl;
         }
 
@@ -6579,7 +6705,7 @@
         state.onKey = function (e) {
             if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
             if (!wrap.isConnected) return;
-            var panel = wrap.closest(".scene-tabs");
+            var panel = wrap.closest(".scene-tabs, .image-tabs, .gallery-tabs");
             if (!panel) return;
             var active = document.activeElement;
             var inPanel = active && panel.contains(active);
@@ -6619,8 +6745,12 @@
     function teardownCarouselExtras(wrap, state) {
         if (state.io) { state.io.disconnect(); state.io = null; }
         if (state.onKey) { document.removeEventListener("keydown", state.onKey); state.onKey = null; }
-        if (state.dots && state.dots.parentNode) state.dots.parentNode.removeChild(state.dots);
+        /* Removing the nav container takes the chevrons + dots with it. */
+        if (state.nav && state.nav.parentNode) state.nav.parentNode.removeChild(state.nav);
+        state.nav = null;
         state.dots = null;
+        state.prevBtn = null;
+        state.nextBtn = null;
         wrap.__refractPerf = state;
     }
 

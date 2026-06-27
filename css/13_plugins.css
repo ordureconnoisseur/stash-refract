@@ -343,11 +343,12 @@ body.stash-liquid-glass .performer-card .hon-battle-rank-badge.hon-battle-rank-b
 
 /* Fallback case (performer with no country caption, or a non-playing-
    card rating mode): refract.js drops the badge straight into the chin
-   (a stretch flex-column). Left-align it so it reads where the country
-   caption would, top-aligned above the stat pills. Direct-child selector
-   so it only targets the fallback, never the country-nested case. */
+   (a stretch flex-column). Right-align it so the rank stays pinned to the
+   card's right edge — the same side it sits on when a country caption IS
+   present (pushed right in a space-between row). Direct-child selector so
+   it only targets the fallback, never the country-nested case. */
 body.stash-liquid-glass .performer-card .card-section > .refract-ascension-badge {
-    align-self: flex-start !important;
+    align-self: flex-end !important;
 }
 
 /* Ascension's flame glyph (prepended in refract.js) leads the read-out
@@ -371,6 +372,14 @@ body.stash-liquid-glass .performer-card .refract-ascension-icon {
 /* Hide the plugin's tier emoji: the flame glyph already marks the line
    as Ascension, and the number carries its own warm gradient. */
 body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-emoji {
+    display: none !important;
+}
+
+/* Hide the "of <total>" suffix (.hon-rank-total): the read-out is a bare
+   rank number ("[flame] N"), not "N of 492". On narrow grid cards it got
+   clipped, but wider contexts (e.g. the gallery details panel) revealed
+   it trailing the badge. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-total {
     display: none !important;
 }
 

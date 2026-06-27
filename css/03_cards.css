@@ -216,98 +216,102 @@ body.stash-liquid-glass .stash-tilt-glare-inner {
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Floating-hearts effect for favourited scenes
-   The .refract-heart-particles layer is appended to a .scene-card by
-   injectPerformerCircles() in refract.js when the card carries the
-   "Favourite ★" tag from the Advanced Rating plugin. Seven ♥ glyphs
-   drift upward across the card with staggered delays + horizontal
-   sway, like petals in the wind. Pure CSS animations (transform +
-   opacity only) so they GPU-composite cleanly and pause automatically
-   on off-screen cards via the card's existing content-visibility:auto.
-
-   Disabled in lite mode and for users with prefers-reduced-motion.
+   Heart effect for favourited cards (floating in full mode, static
+   vignette halo in lite mode / under reduced motion)
+   refractBuildHearts() (refract.js) appends a .refract-heart-particles
+   layer with two sub-layers (.refract-heart-float-layer +
+   .refract-heart-halo-layer); the rules below show whichever fits the
+   mode. The halo is a ring of ♥ glyphs to a favourited card — a photographic-
+   vignette ring: dense in the corners, thinning inward, the middle left
+   clear. Each glyph's position / size / opacity / colour / glow / tilt
+   are written inline by the generator; the rules here are only the
+   shared frame. Static paint (no animation) — it pauses nothing and
+   costs nothing per frame, so it stays on in lite mode and is harmless
+   under reduced motion. The layer is `contain: layout paint` so it can
+   never dirty the rest of the card.
    ─────────────────────────────────────────────────────────────────── */
 body.stash-liquid-glass .refract-heart-particles {
     position: absolute;
     inset: 0;
     pointer-events: none;
     overflow: hidden;
-    z-index: 8; /* above thumbnail image, below .stash-tilt-glare (z:9) */
+    /* Over the thumbnail; lowered to a backdrop on lite performer
+       playing-cards (16_playing_card.css). */
+    z-index: 8;
     border-radius: inherit;
-    /* Isolate the layer so heart movement doesn't dirty the rest of
-       the card's paint. Major win in playing-card mode where the card
-       already has tier breathing / sheen / sparkle / float animations
-       running — without containment, every heart frame re-paints the
-       full card. */
     contain: layout paint;
 }
-body.stash-liquid-glass .refract-heart {
+body.stash-liquid-glass .refract-heart-float-layer,
+body.stash-liquid-glass .refract-heart-halo-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+}
+
+/* Floating layer (full mode) */
+body.stash-liquid-glass .refract-heart-float {
     position: absolute;
     bottom: 0;
     left: 0;
     color: #ff5a85;
     opacity: 0;
     /* translate3d forces GPU compositing for the animation without
-       needing will-change (which thrashes on too many elements).
-       text-shadow dropped — animated text shadows force a per-frame
-       raster pass; the bright pink glyph reads fine on its own. */
+       needing will-change (which thrashes on too many elements). */
     transform: translate3d(0, 24px, 0);
     animation: refractHeartFloat var(--hd, 6s) linear infinite;
     animation-delay: var(--dl, 0s);
     font-size: var(--hs, 14px);
     line-height: 1;
 }
-/* Five varied trajectories — reduced from seven for perf. Spread
-   evenly across the card width so coverage stays balanced. */
+/* Five varied trajectories spread evenly across the card width. */
 body.stash-liquid-glass .refract-heart-1 { left: 10%; --hs: 13px; --hd: 5.6s; --dl: 0s;   }
 body.stash-liquid-glass .refract-heart-2 { left: 32%; --hs: 17px; --hd: 7.0s; --dl: 1.0s; }
 body.stash-liquid-glass .refract-heart-3 { left: 52%; --hs: 12px; --hd: 6.0s; --dl: 2.0s; }
 body.stash-liquid-glass .refract-heart-4 { left: 72%; --hs: 18px; --hd: 6.6s; --dl: 3.0s; }
 body.stash-liquid-glass .refract-heart-5 { left: 90%; --hs: 13px; --hd: 5.8s; --dl: 4.0s; }
-/* refract-heart-6 / -7 are no longer injected; their CSS deleted. */
-
-/* translateY pixel values, not percentages — CSS `translateY(%)` is a
-   percentage of the element's OWN height, so `-100%` only moved a 13px
-   heart ~13px upward (the original bug, heart never left the bottom).
-   Pixel values cover the full card vertically; the parent layer's
-   overflow:hidden clips the heart cleanly off-top. 500px now covers
-   even the taller portrait performer cards in playing-card mode
-   (~400-450px tall) — opacity stays high through ~90% of the arc so
-   the upper third of the card actually sees hearts, then fade-out
-   completes by 100%. On shorter scene cards the heart simply clips
-   off-top before fully fading, which still reads as a natural exit. */
+/* translateY pixel values (not %) so a small heart still travels the full
+   card height; the layer's overflow:hidden clips it cleanly off-top. */
 @keyframes refractHeartFloat {
-    0% {
-        transform: translate3d(0, 24px, 0) rotate(-6deg) scale(0.55);
-        opacity: 0;
-    }
-    8% {
-        opacity: 0.95;
-        transform: translate3d(4px, -20px, 0) rotate(2deg) scale(1);
-    }
-    50% {
-        opacity: 0.9;
-        transform: translate3d(-8px, -240px, 0) rotate(8deg) scale(1.05);
-    }
-    90% {
-        opacity: 0.75;
-        transform: translate3d(10px, -460px, 0) rotate(-4deg) scale(0.95);
-    }
-    100% {
-        opacity: 0;
-        transform: translate3d(0, -500px, 0) rotate(0deg) scale(0.7);
-    }
+    0%   { transform: translate3d(0, 24px, 0) rotate(-6deg) scale(0.55); opacity: 0; }
+    8%   { opacity: 0.95; transform: translate3d(4px, -20px, 0) rotate(2deg) scale(1); }
+    50%  { opacity: 0.9;  transform: translate3d(-8px, -240px, 0) rotate(8deg) scale(1.05); }
+    90%  { opacity: 0.75; transform: translate3d(10px, -460px, 0) rotate(-4deg) scale(0.95); }
+    100% { opacity: 0;    transform: translate3d(0, -500px, 0) rotate(0deg) scale(0.7); }
 }
 
-/* Lite mode + reduced-motion: kill the animation. The .refract-favourite
-   class stays on the card so other rules (border tint, etc.) can still
-   key off it without the particle cost. */
-body.stash-liquid-glass.refract-lite .refract-heart-particles {
+/* Halo layer (lite mode) — the heart ring is a baked SVG background-image
+   (refractBuildHearts picks one of five variant classes at random), NOT
+   live heart elements: one node + one cached blit per card. The rose rim
+   glow is baked into each SVG, so there's no extra background here. The
+   SVG stretches edge-to-edge (`100% 100%`) so the ring always hugs the
+   card edges regardless of card aspect. */
+body.stash-liquid-glass .refract-heart-halo-layer {
+    /* Hidden by default; revealed in lite / reduced motion below. */
+    display: none;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+}
+body.stash-liquid-glass .refract-heart-halo-v1 { background-image: url("/plugin/refract/assets/img/heart-halo-1.svg"); }
+body.stash-liquid-glass .refract-heart-halo-v2 { background-image: url("/plugin/refract/assets/img/heart-halo-2.svg"); }
+body.stash-liquid-glass .refract-heart-halo-v3 { background-image: url("/plugin/refract/assets/img/heart-halo-3.svg"); }
+body.stash-liquid-glass .refract-heart-halo-v4 { background-image: url("/plugin/refract/assets/img/heart-halo-4.svg"); }
+body.stash-liquid-glass .refract-heart-halo-v5 { background-image: url("/plugin/refract/assets/img/heart-halo-5.svg"); }
+
+/* Mode switch: lite (and reduced motion) show the static halo, no float. */
+body.stash-liquid-glass.refract-lite .refract-heart-float-layer {
     display: none;
 }
+body.stash-liquid-glass.refract-lite .refract-heart-halo-layer {
+    display: block;
+}
 @media (prefers-reduced-motion: reduce) {
-    body.stash-liquid-glass .refract-heart-particles {
+    body.stash-liquid-glass .refract-heart-float-layer {
         display: none;
+    }
+    body.stash-liquid-glass .refract-heart-halo-layer {
+        display: block;
     }
 }
 

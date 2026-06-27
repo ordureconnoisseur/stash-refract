@@ -237,7 +237,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane.active.show {
         drop to the bottom while description/tags stay at the top.
    When content overflows the pane the auto-margin collapses to 0 and the
    carousel sits at its natural position, exactly as before. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row:has(> .col-12.scene-performers-row) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .row:has(> .col-12.scene-performers-row) {
     margin-top: 0 !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
@@ -245,12 +245,12 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row:has(> .col-12.scene-p
     min-height: 0 !important;
     align-content: stretch !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12.scene-performers-row {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .col-12.scene-performers-row {
     display: flex !important;
     flex-direction: column !important;
     min-height: 0 !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12.scene-performers-row > h6:has(+ .scene-performers) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .col-12.scene-performers-row > h6:has(+ .scene-performers) {
     margin-top: auto !important;
 }
 
@@ -1060,7 +1060,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item {
    the visual content right and makes the right column extend past the
    row's content area. Zero the gutter vars here AND on the inner row so
    the chain is fully neutralised. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row {
     display: block !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -1081,7 +1081,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row {
    sidebar grid (count=2/3/4) inherits overflow-x:auto and clips the
    right card behind a hidden scrollbar gutter. The count="many" rule
    re-applies them where actually needed. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers {
     margin: 0 !important;
     padding: 4px 2px 8px !important;
     background: transparent !important;
@@ -1103,19 +1103,19 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers {
    up `.row > *` rules — width:100%, padding-left/right from --bs-gutter-x.
    With gutter zeroed above, padding goes to 0 — but force the reset
    explicitly on the cards too in case any later rule re-introduces it. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card {
     padding-left: 0 !important;
     padding-right: 0 !important;
     margin: 0 !important;
 }
 
 /* count = 1 → hero card, centered, current 280px size */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="1"] .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="1"] .scene-performers {
     display: flex !important;
     flex-wrap: nowrap !important;
     justify-content: center !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="1"] .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="1"] .scene-performers > .performer-card {
     flex: 0 0 280px !important;
     width: 280px !important;
     min-width: 280px !important;
@@ -1123,46 +1123,46 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data
 }
 
 /* count = 2 → equal side-by-side grid */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="2"] .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="2"] .scene-performers {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="2"] .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="2"] .scene-performers > .performer-card {
     width: 100% !important;
     min-width: 0 !important;
     max-width: none !important;
 }
 
 /* count = 3 → row of 2 + 1 centered in row 2 */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="3"] .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="3"] .scene-performers {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
     grid-auto-rows: auto !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="3"] .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="3"] .scene-performers > .performer-card {
     width: 100% !important;
     min-width: 0 !important;
     max-width: none !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="3"] .scene-performers > .performer-card:nth-child(3) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="3"] .scene-performers > .performer-card:nth-child(3) {
     grid-column: 1 / -1 !important;
     max-width: calc(50% - 5px) !important;
     justify-self: center !important;
 }
 
 /* count = 4 → 2×2 grid */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="4"] .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="4"] .scene-performers {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="4"] .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="4"] .scene-performers > .performer-card {
     width: 100% !important;
     min-width: 0 !important;
     max-width: none !important;
 }
 
 /* count = many (5+) → single-card carousel with snap */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers {
     display: flex !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
@@ -1172,28 +1172,61 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data
     scrollbar-width: thin !important;
     scrollbar-color: var(--glass-border) transparent !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers > .performer-card {
     flex: 0 0 280px !important;
     width: 280px !important;
     min-width: 280px !important;
     max-width: 280px !important;
     scroll-snap-align: center !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar {
     height: 6px !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar-track {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar-track {
     background: transparent !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar-thumb {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row[data-perf-count="many"] .scene-performers::-webkit-scrollbar-thumb {
     background: var(--glass-border) !important;
     border-radius: 3px !important;
+}
+
+/* Sidebar carousel nav row (setupSceneTabsPerformers, "many" bucket):
+   a centred [‹][dots][›] strip. The chevrons reuse the main-column
+   .stash-perf-prev/.stash-perf-next glyph + accent styling, but here we
+   flip them from the absolute overlay to plain inline flex items that
+   flank the dots — more visible and self-positioning. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    margin: 0.5rem 0 0.25rem 0 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-nav .stash-perf-dots {
+    margin: 0 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-nav .stash-perf-prev,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-nav .stash-perf-next {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    flex: 0 0 auto !important;
+    width: 26px !important;
+    height: 26px !important;
+    -webkit-mask-size: 14px 14px !important;
+            mask-size: 14px 14px !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-nav .stash-perf-prev:hover,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-nav .stash-perf-next:hover {
+    transform: scale(1.15) !important;
 }
 
 /* Pagination dots — only present when count="many" (JS only appends them
    in that case). Active dot is an accent-coloured pill; inactive dots are
    subtle glass-border circles that brighten on hover. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .stash-perf-dots {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-dots {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -1201,7 +1234,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .sta
     margin: 0.5rem 0 0.25rem 0 !important;
     padding: 0 !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .stash-perf-dots .dot {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-dots .dot {
     appearance: none !important;
     -webkit-appearance: none !important;
     background: var(--glass-border) !important;
@@ -1214,17 +1247,17 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .sta
     transition: background 0.18s ease, width 0.22s ease, opacity 0.15s ease !important;
     opacity: 0.65 !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .stash-perf-dots .dot:hover,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .stash-perf-dots .dot:focus-visible {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-dots .dot:hover,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-dots .dot:focus-visible {
     opacity: 1 !important;
     outline: none !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row .stash-perf-dots .dot.active {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-dots .dot.active {
     background: var(--accent-bright) !important;
     width: 18px !important;
     opacity: 1 !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .thumbnail-section {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .thumbnail-section {
     aspect-ratio: 2 / 3 !important;
     width: 100% !important;
     overflow: hidden !important;
@@ -1235,14 +1268,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .perfo
    leaving the image at its natural top-left position. Target ONLY that
    anchor (the one containing the image) — there's a second <a> in the
    thumbnail-section for the country flag that we must not stretch. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .thumbnail-section > a:has(> .performer-card-image) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .thumbnail-section > a:has(> .performer-card-image) {
     display: block !important;
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .performer-card-image {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .performer-card-image {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
@@ -1256,7 +1289,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .perfo
    scene-tabs strip. The default sizes (3.5rem rating, fa-2x heart) are
    tuned for full-size performer cards and look oversized here. Border-
    radius matches the card's image rounding (~10px) for visual harmony. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .rating-banner {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .rating-banner {
     width: 2.15rem !important;
     height: 2.15rem !important;
     min-width: 2.15rem !important;
@@ -1268,15 +1301,58 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .perfo
     top: 0.6rem !important;
     left: 0.6rem !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .favorite-button {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .favorite-button {
     padding: 0.2rem !important;
     top: 0.45rem !important;
     right: 0.45rem !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers > .performer-card .favorite-button svg {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .favorite-button svg {
     width: 1.35rem !important;
     height: 1.35rem !important;
     font-size: 1.35rem !important;
+}
+/* Playing-card mode: the favourite heart, gender icon and name banner are
+   sized in fixed rem calibrated for the larger grid cards, so on the
+   narrower sidebar cards they stay oversized while only the name auto-scales
+   (the JS refit). Make each sidebar card a query container and size that
+   chrome in cqw (percent of card width) so it scales gracefully with the
+   card. cqw values are calibrated to the grid look at ~280px wide; grid
+   cards keep their fixed rem. (Favourited-hidden-until-hover and the heart
+   position carry over from the playing-card rules.) */
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card {
+    container-type: inline-size !important;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .favorite-button {
+    top: 4.3cqw !important;
+    right: 6.3cqw !important;
+    width: 20.5cqw !important;
+    height: 20.5cqw !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .favorite-button svg {
+    width: 100% !important;
+    height: 100% !important;
+    font-size: inherit !important;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .refract-pc-name-banner {
+    padding: 2.8cqw 4cqw !important;
+    gap: 2cqw !important;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .refract-pc-name-banner .gender-icon {
+    width: 7.7cqw !important;
+    height: 7.7cqw !important;
+}
+/* Tier ribbon (diagonal sash) — fixed rem geometry (top 1.4 / right -3 /
+   width 11 / 0.72rem text) likewise scaled to cqw so the sash + its text
+   shrink with the card. Calibrated to match the grid at ~280px. */
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card[class*="refract-card-tier-"] .refract-pc-tier-label {
+    top: 8cqw !important;
+    right: -17cqw !important;
+    width: 63cqw !important;
+    padding: 1.7cqw 0 !important;
+}
+body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card[class*="refract-card-tier-"] .refract-pc-tier-label::after {
+    font-size: 4.1cqw !important;
 }
 
 /* ── File-info / details-list (definition lists) ───────────────────── */

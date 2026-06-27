@@ -431,7 +431,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
     /* Performer row inside the panel — kill the 56px chevron gutters
        (no room for the chevrons on a phone; the row scrolls by touch). */
-    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row {
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row {
         padding: 0 !important;
     }
     body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-perf-prev,
