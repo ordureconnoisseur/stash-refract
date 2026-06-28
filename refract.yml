@@ -1,6 +1,6 @@
 name: Refract Theme
 description: Liquid-glass theme for Stash — frosted glass panels, floating navbar, dark base, configurable accent.
-version: 1.17.1
+version: 1.17.2
 url: https://github.com/ordureconnoisseur/stash-refract
 ui:
   assets:

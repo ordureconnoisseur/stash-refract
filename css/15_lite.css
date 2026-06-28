@@ -205,11 +205,9 @@ body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.perf
    text-shadow (lite doesn't strip text-shadow). Diffuse, not a hard
    outline — a quiet drop + a faint halo, so it reads as depth rather than
    a sticker stroke. Lite-only; full mode keeps its glow untouched. */
-/* Perfect tier is excluded: its name is a `background-clip: text` rainbow
-   gradient, and a forced text-shadow on transparent-fill clipped text is a
-   known Blink combo that breaks the clip (rainbow paints as a box). Perfect
-   keeps its own rainbow rendering. */
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card):not(.refract-card-tier-perfect) .refract-pc-name-text {
+/* Applies to every tier now: Legendary + Perfect names are solid white
+   too, so there's no background-clip text for the shadow to break. */
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-name-text {
     text-shadow:
         0 1px 2px rgba(0, 0, 0, 0.8),
         0 0 6px rgba(0, 0, 0, 0.45) !important;
@@ -227,10 +225,32 @@ body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performe
 body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > *:hover {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
     transform: none !important;
+    /* White border to match the flat-white text + icon below. */
+    border-color: rgba(255, 255, 255, 0.9) !important;
 }
 body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > span,
 body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > svg {
     filter: none !important;
+}
+/* Readability: in lite, drop the tier-colour gradient/fill on the pill
+   label, value AND icon and paint them flat white, which reads clearly
+   over the translucent fill (the gold-on-gold fix). The border (above) is
+   whitened to match. No blur/shadow, just a colour swap. */
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > span {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+            background-clip: initial !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+    /* One small static shadow so the white text holds up over bright
+       photos. Single layer (not a stacked chain) and no blur surface, so
+       it's cheap, like the rating banner's own text-shadow. */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > svg {
+    fill: #fff !important;
+    /* Matching single drop-shadow on the white icon. */
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7)) !important;
 }
 
 /* ── Tier / playing-card cards: stop the continuous motion ──────────

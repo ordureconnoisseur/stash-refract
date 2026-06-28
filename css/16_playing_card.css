@@ -221,15 +221,10 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refra
        This keeps every letter equally readable regardless of which
        tier's color is in play. Perfect tier overrides with a pastel
        rainbow gradient below since rainbow is its signature. */
-    /* Tint the fill toward the tier colour but keep it light so it still
-       stands out and stays readable: 40% of the SATURATED tier colour
-       (--badge-color, not the near-white --badge-color-bright) + 60%
-       white. The plain #fff fallback keeps the name white where
-       color-mix is unsupported. */
-    color: #fff;
-    color: color-mix(in srgb, rgb(var(--badge-color)) 40%, #fff 60%);
-    -webkit-text-fill-color: #fff;
-    -webkit-text-fill-color: color-mix(in srgb, rgb(var(--badge-color)) 40%, #fff 60%);
+    /* Solid white name (the tier identity lives in the glow / ribbon, not
+       the fill). */
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
     background: none;
     /* Neon glow stack — 4 layers (down from 8, perf-trimmed). Each
        drop-shadow() is a full GPU blur pass; on a gallery page with
@@ -753,6 +748,7 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refrac
    uniformly readable; the drop-shadow chain carries the tier color
    identity from inner cladding to far halo. */
 body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-card-tier-legendary .refract-pc-name-text {
+    /* Styled exactly like the base tiers: solid white + base 4-layer glow. */
     color: #ffffff;
     -webkit-text-fill-color: #ffffff;
     background: none;
@@ -764,9 +760,8 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refrac
     filter:
         drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
         drop-shadow(0 0 2px rgba(255, 255, 255, 1))
-        drop-shadow(0 0 6px rgba(var(--tier-color), 1))
-        drop-shadow(0 0 12px rgba(var(--tier-color-2), 0.7))
-        drop-shadow(0 0 24px rgba(var(--tier-color-3, var(--tier-color-2)), 0.45));
+        drop-shadow(0 0 6px rgba(var(--badge-color-bright), 1))
+        drop-shadow(0 0 14px rgba(var(--badge-color), 0.6));
 }
 
 /* Perfect — pastel rainbow text gradient + slow hue-cycle. The
@@ -775,21 +770,12 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refrac
    saturated hot-pink starting stop hurting the first letters).
    Multi-layer rainbow glow chain radiates outward. */
 body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-card-tier-perfect .refract-pc-name-text {
-    background: linear-gradient(
-        90deg,
-        #ffd6e4,  /* pale pink */
-        #fff6cf,  /* pale yellow */
-        #d2f5dc,  /* pale green */
-        #cfe1fd,  /* pale blue */
-        #e1d5fd,  /* pale lavender */
-        #ffd6e4); /* pale pink */
-    -webkit-background-clip: text;
-            background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    background-size: 200% 100%;
-    animation: refractPcPerfectText 6s linear infinite;
-    text-shadow: none;
+    /* Styled exactly like the base tiers: solid white + base 4-layer glow,
+       no gradient text-clip and no hue-cycle animation. */
+    color: #ffffff;
+    -webkit-text-fill-color: #ffffff;
+    background: none;
+    animation: none;
     /* 6 layers — Perfect needs the rainbow halo radiating outward
        around the glyphs (yellow → blue → purple) for its full
        multi-color identity. The earlier 4-layer perf trim cut the
@@ -799,11 +785,11 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refrac
     filter:
         drop-shadow(0 1px 2px rgba(0, 0, 0, 0.95))
         drop-shadow(0 0 2px rgba(255, 255, 255, 1))
-        drop-shadow(0 0 6px rgba(255, 255, 255, 0.85))
-        drop-shadow(0 0 14px rgba(253, 230, 138, 0.65))
-        drop-shadow(0 0 28px rgba(147, 197, 253, 0.5))
-        drop-shadow(0 0 50px rgba(196, 181, 253, 0.32));
+        drop-shadow(0 0 6px rgba(var(--badge-color-bright), 1))
+        drop-shadow(0 0 14px rgba(var(--badge-color), 0.6));
 }
+
+/* Hue-cycle for the Perfect tier ribbon label (the name no longer uses it). */
 @keyframes refractPcPerfectText {
     from { background-position: 0% 50%; }
     to   { background-position: 200% 50%; }

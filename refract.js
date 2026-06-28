@@ -3601,10 +3601,14 @@
                     var pcAvail = row.clientWidth;
                     if (pcAvail > 0 && row.scrollWidth > pcAvail + 1) {
                         var pcFit = 1;
-                        for (var pi = 0; pi < 4 && row.scrollWidth > pcAvail + 1; pi++) {
-                            pcFit = Math.max(0.6, pcFit * (pcAvail - 1) / row.scrollWidth);
+                        /* Floor 0.45 (was 0.6): on a narrow card or with a wide
+                           fallback font (Concert One not loaded), four pill
+                           labels could still overflow at 0.6 and the last chip
+                           clipped. 6 passes converge even in that extreme case. */
+                        for (var pi = 0; pi < 6 && row.scrollWidth > pcAvail + 1; pi++) {
+                            pcFit = Math.max(0.45, pcFit * (pcAvail - 1) / row.scrollWidth);
                             row.style.setProperty("--pc-badge-scale", pcFit);
-                            if (pcFit <= 0.6) { break; }
+                            if (pcFit <= 0.45) { break; }
                         }
                     }
                     /* Name banner — Concert One is moderately wide;
