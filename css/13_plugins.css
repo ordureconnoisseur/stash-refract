@@ -282,6 +282,70 @@ body.stash-liquid-glass nav.top-nav button#url-switcher-btn.mode-tunnel svg {
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #desire-nav-container                 { order: 90; }
 /* Generic plugin nav element (#plugin_hon) — slotted just after Desire. */
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plugin_hon)                   { order: 91; }
+/* StashGifs launcher — same DOM shape as binge/desire/forage (an icon
+   nav-link that opens its own app). Slot it into the launcher cluster at
+   the end of the library row; with no explicit order it defaults to 0 and
+   jumps in front of Scenes. */
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #StashGifsButton                      { order: 93; }
+/* SFWSwitch + DiceR live in the right-hand .navbar-buttons cluster. Both
+   default to order 0 (ahead of Stats); slot them just after Stats(1) and
+   ahead of url-switcher(80)/Settings(90). :has() picks each out by its
+   inner button since both use a generic .mr-2 wrapper. */
+body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(#plugin_sfw)                                    { order: 10 !important; }
+body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(.random-btn)                                   { order: 11 !important; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   DiceR — random-entity navbar button icon
+   The plugin injects:
+     <div class="mr-2"><a href="javascript:void(0)">
+       <button class="btn btn-primary random-btn">[die]Roll</button></a></div>
+   The master nav rule sizes button.btn to an icon square, and the navbar's
+   font-size:0 zeroes the emoji+label — so out of the box it renders as a
+   BLANK square. Draw a proper dice glyph via a masked SVG (so it inherits
+   the nav's currentColor like every other icon) and keep the text off.
+   NOTE: the master button rule (02_navbar.css) already owns this button's
+   ::before for its hover sheen and pins it opacity:0, so the icon MUST live
+   on ::after or it inherits that opacity:0 and stays invisible. */
+body.stash-liquid-glass nav.top-nav .navbar-buttons .random-btn {
+    font-size: 0 !important;   /* belt-and-braces on the emoji + "Roll" label */
+    /* Strip Bootstrap .btn-primary chrome at rest so it reads as a bare icon
+       like the other nav launchers; the master rule still supplies the glass
+       tile on hover (same approach as the url-switcher button above). */
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass nav.top-nav .navbar-buttons .random-btn::after {
+    content: "" !important;
+    display: block !important;
+    opacity: 1 !important;
+    width: var(--nav-icon-size) !important;
+    height: var(--nav-icon-size) !important;
+    background-color: currentColor !important;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M5,4A1,1,0,1,0,6,5,1,1,0,0,0,5,4Zm6,6a1,1,0,1,0,1,1A1,1,0,0,0,11,10ZM8,7A1,1,0,1,0,9,8,1,1,0,0,0,8,7Zm4.36-6H3.64A2.64,2.64,0,0,0,1,3.64v8.72A2.64,2.64,0,0,0,3.64,15h8.72A2.64,2.64,0,0,0,15,12.36V3.64A2.64,2.64,0,0,0,12.36,1ZM13.6,12.36a1.25,1.25,0,0,1-1.24,1.24H3.64A1.25,1.25,0,0,1,2.4,12.36V3.64A1.25,1.25,0,0,1,3.64,2.4h8.72A1.25,1.25,0,0,1,13.6,3.64Z'/></svg>") center / contain no-repeat !important;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M5,4A1,1,0,1,0,6,5,1,1,0,0,0,5,4Zm6,6a1,1,0,1,0,1,1A1,1,0,0,0,11,10ZM8,7A1,1,0,1,0,9,8,1,1,0,0,0,8,7Zm4.36-6H3.64A2.64,2.64,0,0,0,1,3.64v8.72A2.64,2.64,0,0,0,3.64,15h8.72A2.64,2.64,0,0,0,15,12.36V3.64A2.64,2.64,0,0,0,12.36,1ZM13.6,12.36a1.25,1.25,0,0,1-1.24,1.24H3.64A1.25,1.25,0,0,1,2.4,12.36V3.64A1.25,1.25,0,0,1,3.64,2.4h8.72A1.25,1.25,0,0,1,13.6,3.64Z'/></svg>") center / contain no-repeat !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SFWSwitch — navbar toggle icon
+   The plugin injects <button id="plugin_sfw" class="btn btn-primary">
+   holding an odd FontAwesome "screen" glyph. Hide it and draw the same
+   clean eye-off used by the mobile drawer tile, via a ::after mask (the
+   master button rule owns ::before for its hover sheen). currentColor keeps
+   it consistent with every other nav icon. */
+body.stash-liquid-glass nav.top-nav #plugin_sfw > svg {
+    display: none !important;
+}
+body.stash-liquid-glass nav.top-nav #plugin_sfw::after {
+    content: "" !important;
+    display: block !important;
+    opacity: 1 !important;
+    width: var(--nav-icon-size) !important;
+    height: var(--nav-icon-size) !important;
+    background-color: currentColor !important;
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24'/><path d='M1 1l22 22'/></svg>") center / contain no-repeat !important;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24'/><path d='M1 1l22 22'/></svg>") center / contain no-repeat !important;
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    Ascension (Sakoto's HotorNot fork) — performer-card battle-rank badge

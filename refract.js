@@ -1617,6 +1617,29 @@
             if (!t || !t.closest) { return; }
             var tile = t.closest(".refract-drawer-tile");
             if (!tile) { return; }
+            /* Action tiles (DiceR roll, SFWSwitch toggle) mirror a plugin's
+               navbar CONTROL, not a route. Forward the click to the live
+               source button (re-queried each time; it persists in the navbar)
+               and close the drawer. */
+            var actionSel = tile.getAttribute("data-action-selector");
+            if (actionSel) {
+                e.preventDefault();
+                refractCloseBurger();
+                var liveBtn = document.querySelector(actionSel);
+                if (liveBtn) { liveBtn.click(); }
+                return;
+            }
+            /* target="_blank" tiles (plugin launcher buttons like binge/
+               desire/forage/Stash TV, which open a standalone app in a new
+               tab rather than an in-app route) get the native anchor click
+               behaviour — no preventDefault, no fake SPA nav. Faking a
+               pushState+popstate to a static plugin-asset path that no
+               React Router route matches would just rewrite the URL bar
+               and do nothing, silently breaking the tile. */
+            if (tile.getAttribute("target") === "_blank") {
+                refractCloseBurger();
+                return;
+            }
             e.preventDefault();
             var href = tile.getAttribute("data-href");
             refractCloseBurger();
@@ -1751,6 +1774,32 @@
         });
     }
 
+    /* Normalize an arbitrary (plugin-authored) icon's color to currentColor
+       so it always reads against refract's dark glass tiles. Plugins inject
+       icons in all sorts of ways — some inherit color via a CSS class (fine,
+       survives as currentColor already), but others bake a literal color
+       into a fill/stroke attribute or inline style (e.g. a legacy FA4-style
+       glyph, or an icon lib that hardcodes "#212529"). That literal color
+       clones verbatim and, if dark, is invisible on our dark background —
+       reads to the user as "the icon is missing" when the tile/link are
+       actually fine. Root gets fill/stroke forced to currentColor so any
+       child with NO explicit color inherits it normally; a child WITH an
+       explicit non-"none" color gets overridden too (still normalized) but
+       "none" is left alone so multi-part icons keep their intentional gaps. */
+    function refractNormalizeIconColor(svg) {
+        svg.setAttribute("fill", "currentColor");
+        svg.setAttribute("stroke", "currentColor");
+        var all = svg.querySelectorAll("*");
+        for (var i = 0; i < all.length; i++) {
+            var el = all[i];
+            el.removeAttribute("style");
+            var fill = el.getAttribute("fill");
+            if (fill && fill.toLowerCase() !== "none") { el.setAttribute("fill", "currentColor"); }
+            var stroke = el.getAttribute("stroke");
+            if (stroke && stroke.toLowerCase() !== "none") { el.setAttribute("stroke", "currentColor"); }
+        }
+    }
+
     /* Append plugin-injected nav items to the mobile drawer. Scans the
        navbar for any link not already represented (by href) in our
        hardcoded MOBILE_NAV_ITEMS, then builds a tile in our style
@@ -1798,7 +1847,21 @@
             if (href.indexOf("logout") !== -1) { continue; }
             if (href.indexOf("opencollective") !== -1) { continue; }
             if (href.indexOf("github.com") !== -1) { continue; }
-            if (/^https?:/i.test(href)) { continue; }
+            /* Absolute http(s) URLs: skip genuinely external hosts, but KEEP
+               same-origin ones. Some plugins hardcode the full origin for a
+               standalone app they open in a new tab (e.g. stashgifs, whose
+               button carries target="_blank" + a real svg); those are ours to
+               mirror, and the drawer's target="_blank" branch launches them
+               correctly. */
+            if (/^https?:/i.test(href) && href.indexOf(window.location.origin) !== 0) { continue; }
+            /* Not a real route — a "javascript:"/"#" href means the link is
+               actually a click-handler-driven action (e.g. a plugin's modal
+               trigger styled as a nav pill, like Ascension's ranking button)
+               rather than a page to navigate to. Faking SPA navigation to it
+               would silently do nothing (or throw), and there's no original
+               click handler to forward to since we only clone the icon, not
+               the source node. Skip rather than half-support it. */
+            if (/^(javascript:|#)/i.test(href.replace(/^\s+/, ""))) { continue; }
             // Already rendered — still mark present so reconcile keeps it.
             if (drawer.querySelector('.refract-drawer-tile[data-href="' + refractAttrEscape(href) + '"]')) { present[href] = true; continue; }
 
@@ -1815,6 +1878,16 @@
             tile.setAttribute("data-href", href);
             tile.setAttribute("aria-label", label);
             tile.setAttribute("data-plugin-tile", "1");
+            // Carry target/rel so standalone-app launcher buttons (binge,
+            // desire, forage, Stash TV — real routes that open in a new
+            // tab rather than an in-app page) keep that behaviour when
+            // mirrored here; see the drawer's click handler above.
+            var linkTarget = link.getAttribute("target");
+            if (linkTarget) {
+                tile.setAttribute("target", linkTarget);
+                var linkRel = link.getAttribute("rel");
+                tile.setAttribute("rel", linkRel || "noopener noreferrer");
+            }
 
             var iconSpan = document.createElement("span");
             iconSpan.className = "refract-drawer-tile-icon";
@@ -1829,6 +1902,7 @@
             cloned.removeAttribute("height");
             cloned.removeAttribute("style");
             cloned.removeAttribute("preserveAspectRatio");
+            refractNormalizeIconColor(cloned);
             iconSpan.appendChild(cloned);
             tile.appendChild(iconSpan);
 
@@ -1861,7 +1935,12 @@
             if (knownPresent.hasOwnProperty(kp)) { navReady = true; break; }
         }
         if (navReady) {
-            var htiles = drawer.querySelectorAll(".refract-drawer-tile:not([data-plugin-tile])");
+            /* Exclude action tiles (data-action-tile): they mirror plugin
+               controls, not routes, so they have no data-href to match a live
+               navbar route — without this exclusion the "disabled route" pass
+               would stamp them refract-drawer-tile-off on every tick and hide
+               them. */
+            var htiles = drawer.querySelectorAll(".refract-drawer-tile:not([data-plugin-tile]):not([data-action-tile])");
             for (var h = 0; h < htiles.length; h++) {
                 var htile = htiles[h];
                 var hcands = [htile.getAttribute("data-href") || ""];
@@ -1879,6 +1958,86 @@
             }
         }
 
+        refractAppendPluginActionTiles();
+        return true;
+    }
+
+    /* Mirror plugin navbar ACTION buttons (click-handlers, not routes) into
+       the drawer. The route-mirror above can't reach these: DiceR's roll
+       button has href="javascript:void(0)" and no <svg> (its icon is a CSS
+       mask), and SFWSwitch's toggle is a <button> whose wrapping <a> has no
+       href — so neither is a real route with a clonable icon on an a[href].
+       For each registered control we find the live source button, build a
+       tile with a matching icon (cloned from the source's own svg when it
+       has one, else the spec's inline markup), and forward the tile's click
+       to the live button (Refract's "leave the native node, proxy the
+       click" pattern). Idempotent; reconciles tiles whose plugin unmounted. */
+    var PLUGIN_ACTION_TILES = [
+        {
+            key: "dicer",
+            label: "Random",
+            selector: ".random-btn",
+            icon: '<svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"><path d="M5,4A1,1,0,1,0,6,5,1,1,0,0,0,5,4Zm6,6a1,1,0,1,0,1,1A1,1,0,0,0,11,10ZM8,7A1,1,0,1,0,9,8,1,1,0,0,0,8,7Zm4.36-6H3.64A2.64,2.64,0,0,0,1,3.64v8.72A2.64,2.64,0,0,0,3.64,15h8.72A2.64,2.64,0,0,0,15,12.36V3.64A2.64,2.64,0,0,0,12.36,1ZM13.6,12.36a1.25,1.25,0,0,1-1.24,1.24H3.64A1.25,1.25,0,0,1,2.4,12.36V3.64A1.25,1.25,0,0,1,3.64,2.4h8.72A1.25,1.25,0,0,1,13.6,3.64Z"/></svg>'
+        },
+        {
+            key: "sfwswitch",
+            label: "SFW Mode",
+            selector: "#plugin_sfw",
+            /* SFWSwitch ships an odd FA "screen" glyph at a non-standard
+               viewBox that garbles when normalized; use a clean on-theme
+               eye-off (semantically right for a blur/SFW toggle) instead. */
+            icon: '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+        }
+    ];
+    function refractAppendPluginActionTiles() {
+        var drawer = document.querySelector(".refract-mobile-drawer");
+        var nav = document.querySelector("nav.top-nav");
+        if (!drawer || !nav) { return false; }
+
+        for (var i = 0; i < PLUGIN_ACTION_TILES.length; i++) {
+            var spec = PLUGIN_ACTION_TILES[i];
+            var src = nav.querySelector(spec.selector);
+            var existing = drawer.querySelector('.refract-drawer-tile[data-action="' + spec.key + '"]');
+            if (!src) { continue; }      // not mounted; reconcile below clears any stale tile
+            if (existing) { continue; }  // already mirrored
+
+            var tile = document.createElement("a");
+            tile.className = "refract-drawer-tile";
+            tile.setAttribute("href", "#");
+            tile.setAttribute("data-action", spec.key);
+            tile.setAttribute("data-action-selector", spec.selector);
+            tile.setAttribute("data-action-tile", "1");
+            tile.setAttribute("aria-label", spec.label);
+
+            var iconSpan = document.createElement("span");
+            iconSpan.className = "refract-drawer-tile-icon";
+            // Prefer a spec-provided icon (clean, on-theme); fall back to
+            // cloning the source button's own svg only when none is given.
+            var srcSvg = src.querySelector ? src.querySelector("svg") : null;
+            if (spec.icon) {
+                iconSpan.innerHTML = spec.icon;
+            } else if (srcSvg) {
+                var cloned = srcSvg.cloneNode(true);
+                cloned.removeAttribute("class");
+                cloned.removeAttribute("width");
+                cloned.removeAttribute("height");
+                cloned.removeAttribute("style");
+                cloned.removeAttribute("preserveAspectRatio");
+                refractNormalizeIconColor(cloned);
+                iconSpan.appendChild(cloned);
+            }
+            tile.appendChild(iconSpan);
+            drawer.appendChild(tile);
+        }
+
+        /* Reconcile: drop action tiles whose source button is gone. */
+        var atiles = drawer.querySelectorAll(".refract-drawer-tile[data-action-tile]");
+        for (var a = 0; a < atiles.length; a++) {
+            var sel = atiles[a].getAttribute("data-action-selector");
+            if (sel && !nav.querySelector(sel) && atiles[a].parentNode) {
+                atiles[a].parentNode.removeChild(atiles[a]);
+            }
+        }
         return true;
     }
 

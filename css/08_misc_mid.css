@@ -1327,8 +1327,15 @@ body.stash-liquid-glass .tag-card .thumbnail-section {
      tallest one's height. Fixed height + object-fit:cover gives every
      image the same height regardless of natural dimensions or column
      width, so cards stay uniform. */
-body.stash-liquid-glass .tag-card {
-    max-width: 220px;
+/* Desktop grid/list: the card honours the zoom-slider width (inline style
+   from useCardWidth), so no cap here; it must be free to grow with the
+   slider. The slick recommendation row pins its own 220px width below.
+   Mobile has no inline width, so keep the 220 cap there to stop Bootstrap
+   content-auto sizing. */
+@media (max-width: 767.98px) {
+    body.stash-liquid-glass .tag-card {
+        max-width: 220px;
+    }
 }
 body.stash-liquid-glass .slick-slider .tag-card {
     /* In slick contexts, .tag-card behaves as `display: inline-block` so
@@ -1352,7 +1359,10 @@ body.stash-liquid-glass .tag-card .tag-card-header {
     width: 100%;
     /* 124px on a 204px-wide header (220 card minus 16px thumbnail-section
        padding) gives ~5:3 landscape — clearly rectangular, not square. */
-    height: 124px;
+    /* aspect-ratio (not a fixed px height) so the image scales with the
+       zoomed card width instead of staying a 124px letterbox on wide
+       cards. 5:3 matches the old 124px-on-204px look at slick size. */
+    aspect-ratio: 5 / 3;
     overflow: hidden;
     border-radius: var(--radius-sm);
 }
@@ -1430,6 +1440,11 @@ body.stash-liquid-glass .tag-card .tag-description {
     line-height: 1.4;
     color: var(--text-muted) !important;
     margin-bottom: 0.4rem;
+    /* Clamp to 2 lines (Stash's TruncatedText hardcodes lineCount=3 via an
+       inline -webkit-line-clamp, so !important is needed to win). Caps how
+       far the footer can drift between a no-description and a long-
+       description card, keeping the row far more uniform. */
+    -webkit-line-clamp: 2 !important;
 }
 
 /* Sub-tags / parent-tags caption — small strip under the description */
