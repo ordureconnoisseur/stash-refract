@@ -121,7 +121,12 @@ body.stash-liquid-glass .video-js .vjs-tech {
     z-index: 1 !important;
     pointer-events: none !important;
     opacity: 0 !important;
-    transition: opacity 0.2s ease !important;
+    /* visibility:hidden in the hidden state so the center buttons
+       (.st-player-center is pointer-events:auto) can't swallow clicks
+       while invisible: opacity alone kept an unseen back-10 button
+       hit-testable in the middle of the frame. */
+    visibility: hidden !important;
+    transition: opacity 0.2s ease, visibility 0.2s ease !important;
     background: linear-gradient(
         to bottom,
         rgba(0, 0, 0, 0.32) 0%,
@@ -130,15 +135,33 @@ body.stash-liquid-glass .video-js .vjs-tech {
         rgba(0, 0, 0, 0.5) 100%
     ) !important;
 }
-/* Use video.js's `.vjs-user-active` class (driven by its inactivity
-   timer) instead of `:hover` on the container. In fullscreen the
-   container fills the viewport so `:hover` is ALWAYS true regardless
-   of mouse activity — controls never fade. video.js cycles user-
-   active/inactive correctly in fullscreen, so gating on that class
-   gives the right behaviour in both windowed and fullscreen modes. */
-body.stash-liquid-glass .video-js.vjs-user-active .st-player-overlay,
-body.stash-liquid-glass .video-js.vjs-paused .st-player-overlay {
+/* Pointer-only visibility. Previously gated on video.js's
+   `.vjs-user-active` and pinned visible while `.vjs-paused`, but vjs
+   reports user-activity for KEYBOARD input too, so space-to-pause
+   summoned the overlay for keyboard users, and the pause pin parked
+   it over the frame (forum-reported as intrusive on short clips).
+   refract.js now tracks the POINTER itself: `refract-pointer-active`
+   is set on mousemove/touchstart over the player and cleared after
+   2s of stillness or on mouseleave. Works in fullscreen, where
+   `:hover` on the container is always true and useless as a gate.
+   A not-yet-started video also shows the overlay as the initial
+   play affordance (the native big-play-button is hidden below). */
+body.stash-liquid-glass .video-js.refract-pointer-active .st-player-overlay,
+body.stash-liquid-glass .video-js:not(.vjs-has-started) .st-player-overlay {
     opacity: 1 !important;
+    visibility: visible !important;
+}
+/* While scrubbing the seek bar, hide the overlay so it doesn't sit on
+   the frame being previewed. Equal specificity to the show rules
+   above, so it must stay AFTER them in the file to win. */
+body.stash-liquid-glass .video-js.vjs-scrubbing .st-player-overlay {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+/* Suggestion Box opt-out ("Hide player center controls"): no center
+   overlay at all; the stock control bar is the whole player UI. */
+body.refract-hide-center-controls .st-player-overlay {
+    display: none !important;
 }
 .st-player-center {
     position: absolute !important;
@@ -784,17 +807,53 @@ body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider {
     margin: 0 !important;
 }
 
-/* Value column — fixed 3rem so values like "100%" / "360°" fit fully. */
+/* Value column — fixed narrow width holding just the swatch, so every
+   chip (and the slider right-edge) lines up in a clean vertical column. */
 body.stash-liquid-glass .scene-video-filter .row.form-group > .col-sm-2.filter-slider-value,
 body.stash-liquid-glass .scene-video-filter .filter-slider-value {
-    flex: 0 0 3rem !important;
-    max-width: 3rem !important;
-    text-align: right !important;
-    font-family: var(--font-mono, ui-monospace, monospace) !important;
-    font-size: 0.74rem !important;
-    color: var(--accent-bright) !important;
-    font-variant-numeric: tabular-nums !important;
+    flex: 0 0 1.6rem !important;
+    max-width: 1.6rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     padding: 0 !important;
+    margin-left: 0.6rem !important;
+}
+
+/* ── Filter swatch ───────────────────────────────────────────────────
+   refract.js swaps the numeric read-out on each colour/tonal filter slider
+   for a round chip. Its colour (set inline via background-color) is that
+   slider's own vanilla-track spectrum sampled at the current value — Hue
+   shows the current hue, Saturation grey→red, Brightness dark→light, R/G/B
+   dark→channel, etc. The number is hidden (kept as the chip's hover title);
+   clicking the chip still hits the cell's reset-to-default handler. A static
+   corner highlight over the solid fill keeps it reading as a glassy bead. */
+body.stash-liquid-glass .scene-video-filter .filter-slider-value.refract-has-swatch {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+body.stash-liquid-glass .refract-swatch-chip {
+    position: relative;
+    width: 1.15rem;
+    height: 1.15rem;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: #808080;
+    /* Corner highlight painted over the inline solid fill. */
+    background-image: radial-gradient(circle at 33% 28%, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 55%);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.45),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.22);
+    transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+body.stash-liquid-glass .refract-swatch-chip:hover {
+    transform: scale(1.18);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.5),
+        0 0 0 2px rgba(var(--accent-rgb), 0.4);
 }
 
 /* Header rows + button rows — let them be normal full-width rows. */
@@ -817,15 +876,11 @@ body.stash-liquid-glass .scene-video-filter .row.form-group > .col-6 {
     padding: 0 !important;
 }
 
-/* Defeat Stash's inline -webkit-line-clamp on .TruncatedText inside the
-   value cell — that was clipping "100%" → "1...". Override the line
-   clamp + display:-webkit-box so text flows naturally on a single line. */
+/* Numeric read-outs are removed entirely (filters show a live-preview
+   swatch instead; transforms show nothing). Hide every value cell's text
+   node — the exact value is still available as the swatch's hover title. */
 body.stash-liquid-glass .scene-video-filter .filter-slider-value .TruncatedText {
-    -webkit-line-clamp: unset !important;
-    display: block !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-    white-space: nowrap !important;
+    display: none !important;
 }
 
 /* Slider input — same accent-tracking pattern as the zoom slider in

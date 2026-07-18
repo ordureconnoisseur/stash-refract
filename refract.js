@@ -203,6 +203,10 @@
             var pluginSortDisabledBottomOn = pluginSortState[0];
             var setPluginSortDisabledBottomOn = pluginSortState[1];
 
+            var centerControlsState = R.useState(isCenterControlsHidden());
+            var centerControlsHiddenOn = centerControlsState[0];
+            var setCenterControlsHiddenOn = centerControlsState[1];
+
             /* Custom CSS Source state: { loaded, url } where url is
                the value Stash currently has set (empty if not set). */
             var cssSrc = R.useState({ loaded: false, url: "" });
@@ -279,6 +283,14 @@
                 scheduleServerSync();
                 applyPerformerCardHoverClass(next);
                 setPerfCardHoverOn(next);
+            }
+
+            function toggleCenterControlsHidden() {
+                var next = !centerControlsHiddenOn;
+                try { localStorage.setItem(HIDE_CENTER_CONTROLS_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyCenterControlsHiddenClass(next);
+                setCenterControlsHiddenOn(next);
             }
 
             function toggleCardBackExplicit() {
@@ -536,6 +548,28 @@
                                 )
                             )
                         ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-hide-center-controls" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Hide player center controls"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Remove the back / play / forward buttons that appear over the scene player, leaving only the stock control bar. For keyboard-driven viewing or short clips where the overlay gets in the way.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-hide-center-controls-toggle",
+                                        checked: centerControlsHiddenOn,
+                                        onChange: toggleCenterControlsHidden
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-hide-center-controls-toggle"
+                                    })
+                                )
+                            )
+                        ),
                         R.createElement("div", { className: "setting", id: "plugin-refract-view-minimiser" },
                             R.createElement("div", null,
                                 R.createElement("h3", null, "View-mode minimiser"),
@@ -675,6 +709,10 @@
     /* Settings → Plugins list: float disabled plugins to the bottom (the
        pre-v1.15 behaviour) instead of one flat A→Z run. Opt-in; default off. */
     var PLUGIN_SORT_DISABLED_BOTTOM_KEY = "refract.pluginSortDisabledBottom";
+    /* Scene player: remove the injected center overlay (back-10 / play /
+       forward-10) entirely, leaving the stock control bar. Opt-in;
+       default off (overlay shown). */
+    var HIDE_CENTER_CONTROLS_KEY = "refract.hideCenterControls";
     /* Explicit card-back labels are built but held back from public release:
        the toggle is hidden and isCardBackExplicit() is forced off while this is
        false. Flip to true to ship the feature (no other change needed). */
@@ -689,7 +727,7 @@
         LITE_MODE_STORAGE_KEY, LIGHT_MODE_STORAGE_KEY, LIGHT_TOGGLE_NAVBAR_KEY,
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
         MINIMAL_CARDS_STORAGE_KEY, RATING_STYLE_STORAGE_KEY, CARD_BACK_EXPLICIT_KEY,
-        PLUGIN_SORT_DISABLED_BOTTOM_KEY
+        PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY
     ];
 
     function isPluginSortDisabledBottom() {
@@ -849,6 +887,24 @@
         document.body.classList.toggle("refract-performer-card-hover", !!on);
     }
     applyPerformerCardHoverClass(isPerformerCardHover());
+
+    /* Scene-player center controls hide. Refract overlays back-10 /
+       play / forward-10 buttons on the scene player; this opt-in toggle
+       (in "The Suggestion Box") removes them entirely for keyboard-
+       first viewing. Defaults OFF (overlay shown). The overlay is
+       still injected either way so flipping the toggle takes effect
+       live; the `refract-hide-center-controls` body class display-
+       gates it in 06_scene_player.css. */
+    function isCenterControlsHidden() {
+        try {
+            return localStorage.getItem(HIDE_CENTER_CONTROLS_KEY) === "1";
+        } catch (e) { return false; }
+    }
+    function applyCenterControlsHiddenClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-hide-center-controls", !!on);
+    }
+    applyCenterControlsHiddenClass(isCenterControlsHidden());
 
     /* Scene card style. "refract" (default) = tidier minimal layout —
        description block hidden so the grid stays consistent across
@@ -1038,6 +1094,7 @@
             applyHelpButtonClass(isHelpButtonVisible());
             applyStudioBannerClass(isStudioBannerVisible());
             applyPerformerCardHoverClass(isPerformerCardHover());
+            applyCenterControlsHiddenClass(isCenterControlsHidden());
             applyCardStyleClass(getStoredCardStyle());
             applyRatingStyleClass(getStoredRatingStyle());
         } catch (e) { /* ignore */ }
@@ -6598,6 +6655,38 @@
                 });
                 playBtn.__refractPlayObs = playObs;
             }
+
+            /* Pointer-only visibility driver. The overlay used to show on
+               video.js's `.vjs-user-active` and stay pinned while
+               `.vjs-paused` — but vjs counts KEYBOARD input as user
+               activity, so space-to-pause summoned the buttons over the
+               frame for keyboard users (forum complaint; worst on short
+               clips). Track the pointer ourselves instead: mouse/touch
+               activity over the player sets `refract-pointer-active`
+               (the CSS show gate in 06_scene_player.css), 2s of pointer
+               stillness or leaving the player clears it. Keyboard input
+               and play/pause state changes never show the overlay.
+               Listeners live on the videojs node and die with it. */
+            var pointerTimer = null;
+            function pointerHide() {
+                if (pointerTimer) { clearTimeout(pointerTimer); pointerTimer = null; }
+                videojs.classList.remove("refract-pointer-active");
+            }
+            function pointerShow() {
+                videojs.classList.add("refract-pointer-active");
+                if (pointerTimer) { clearTimeout(pointerTimer); }
+                pointerTimer = setTimeout(function () {
+                    pointerTimer = null;
+                    videojs.classList.remove("refract-pointer-active");
+                }, 2000);
+            }
+            videojs.addEventListener("mousemove", pointerShow, { passive: true });
+            videojs.addEventListener("touchstart", pointerShow, { passive: true });
+            /* mouseleave doesn't bubble, and it's bound directly on the
+               videojs node (not capture), so it only fires when the
+               cursor leaves the player as a whole — no flicker when
+               moving between child controls. */
+            videojs.addEventListener("mouseleave", pointerHide);
         });
     }
 
@@ -9011,6 +9100,100 @@
     }
     setupNavbarReorder(); /* initial pass; re-runs via consolidated watcher */
 
+    /* ── Scene video-filter swatches ─────────────────────────────────────
+       Replace the numeric read-out at the end of each colour/tonal filter
+       slider (Brightness/Contrast/Gamma/Saturation/Hue/Warmth/R/G/B/Blur)
+       with a round chip whose colour is that slider's OWN spectrum sampled
+       at the current value — the same gradients Stash paints on the vanilla
+       slider tracks (see stash-fork Scenes/styles.scss). So the Hue chip
+       shows the current hue, Saturation goes grey→red, Brightness dark→light,
+       Warmth cool→warm, R/G/B dark→channel, etc. Pure colour maths, updated
+       live on input. Transforms (rotate/scale/aspect) are left blank. */
+    function fsLerp(a, b, t) { return Math.round(a + (b - a) * t); }
+    function fsRgb(r, g, b) { return "rgb(" + r + "," + g + "," + b + ")"; }
+    function fsMix(c1, c2, t) {
+        return fsRgb(fsLerp(c1[0], c2[0], t), fsLerp(c1[1], c2[1], t), fsLerp(c1[2], c2[2], t));
+    }
+    function fsTypeOf(input) {
+        var c = input.classList;
+        if (c.contains("brightness-slider")) { return "brightness"; }
+        if (c.contains("contrast-slider")) { return "contrast"; }
+        if (c.contains("gamma-slider")) { return "gamma"; }
+        if (c.contains("saturation-slider")) { return "saturation"; }
+        if (c.contains("hue-rotate-slider")) { return "hue"; }
+        if (c.contains("white-balance-slider")) { return "warmth"; }
+        if (c.contains("red-slider")) { return "red"; }
+        if (c.contains("green-slider")) { return "green"; }
+        if (c.contains("blue-slider")) { return "blue"; }
+        /* Blur is the only unclassed colour slider (rotate/scale/aspect are
+           transforms, left blank). It's uniquely max=250. */
+        if (input.getAttribute("max") === "250") { return "blur"; }
+        return null;
+    }
+    function filterSwatchColor(type, v) {
+        var t;
+        switch (type) {
+            /* 0-200, default 100 */
+            case "brightness": return fsMix([38, 38, 38], [255, 255, 255], v / 200);
+            case "contrast":   return fsMix([70, 70, 70], [232, 232, 232], v / 200);
+            case "gamma":      return fsMix([40, 40, 40], [240, 240, 240], v / 200);
+            case "saturation": return fsMix([198, 198, 199], [255, 71, 71], v / 200);
+            /* Hue-rotate 0-360 → the hue itself */
+            case "hue":        return "hsl(" + v + ", 80%, 55%)";
+            /* Warmth 0-200: cool blue → neutral → warm amber (vanilla stops) */
+            case "warmth":
+                t = v / 200;
+                return t <= 0.5
+                    ? fsMix([90, 138, 210], [83, 72, 72], t / 0.5)
+                    : fsMix([83, 72, 72], [252, 186, 8], (t - 0.5) / 0.5);
+            /* R/G/B channel gain 0-200% → dark → full channel */
+            case "red":   return fsRgb(fsLerp(0, 255, v / 200), 0, 0);
+            case "green": return fsRgb(0, fsLerp(0, 255, v / 200), 0);
+            case "blue":  return fsRgb(0, 0, fsLerp(0, 255, v / 200));
+            /* Blur 0-250: sharp slate → soft light (no vanilla gradient) */
+            case "blur":  return fsMix([72, 82, 98], [200, 214, 235], v / 250);
+        }
+        return "rgb(128,128,128)";
+    }
+    function setupVideoFilterSwatches() {
+        var panels = document.querySelectorAll(".scene-video-filter");
+        if (!panels.length) { return; }
+        for (var p = 0; p < panels.length; p++) {
+            var sliders = panels[p].querySelectorAll("input[type=\"range\"].filter-slider");
+            for (var i = 0; i < sliders.length; i++) {
+                (function (input) {
+                    var type = fsTypeOf(input);
+                    if (!type) { return; }
+                    var row = input.closest(".form-group");
+                    if (!row) { return; }
+                    var cell = row.querySelector(".filter-slider-value");
+                    if (!cell) { return; }
+                    cell.classList.add("refract-has-swatch");
+                    var chip = cell.querySelector(".refract-swatch-chip");
+                    if (!chip) {
+                        chip = document.createElement("span");
+                        chip.className = "refract-swatch-chip";
+                        cell.appendChild(chip);
+                    }
+                    var paint = function () {
+                        /* Re-query the chip each time: if React ever rebuilt the
+                           cell, the captured node would be detached. */
+                        var cur = cell.querySelector(".refract-swatch-chip");
+                        if (cur) { cur.style.backgroundColor = filterSwatchColor(type, Number(input.value)); }
+                        var tt = cell.querySelector(".TruncatedText");
+                        if (cur && tt) { cur.title = tt.textContent; }
+                    };
+                    if (!input.dataset.refractSwatch) {
+                        input.dataset.refractSwatch = "1";
+                        input.addEventListener("input", paint);
+                        input.addEventListener("change", paint);
+                    }
+                    paint();
+                })(sliders[i]);
+            }
+        }
+    }
+
     /* ── Consolidated mutation watcher ──────────────────────────────────
        Single global MutationObserver feeding all body-wide DOM watchers.
        Replaces 7 separate body-subtree observers — each used to fire on
@@ -9057,6 +9240,7 @@
             try { injectMarkerSeeAllButton(); } catch (e) {}
             try { injectPerformerCardFlip(); } catch (e) {}
             try { tagBulkDateInputGroups(); } catch (e) {}
+            try { setupVideoFilterSwatches(); } catch (e) {}
         }
         function sched() {
             clearTimeout(_t);
