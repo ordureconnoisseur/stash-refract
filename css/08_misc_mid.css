@@ -6920,13 +6920,13 @@ body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] {
    hides (rule near the .stash-duration-pill notes above), but keeps
    every chip except resolution hidden so duration stays only in the
    bottom pill row. Extra class = higher specificity than the hide. */
-body.stash-liquid-glass.refract-hide-scene-performers .scene-card .stash-performer-circles,
-body.stash-liquid-glass.refract-hide-scene-performers .scene-card .stash-performer-pill {
+body.stash-liquid-glass.refract-hide-scene-performers.refract-hide-scene-performers .scene-card .stash-performer-circles,
+body.stash-liquid-glass.refract-hide-scene-performers.refract-hide-scene-performers .scene-card .stash-performer-pill {
     display: none !important;
 }
-body.stash-liquid-glass.refract-minimal-cards.refract-show-scene-res .scene-card .scene-specs-overlay {
+body.stash-liquid-glass.refract-minimal-cards.refract-show-scene-res.refract-show-scene-res .scene-card .scene-specs-overlay {
     display: block !important;
 }
-body.stash-liquid-glass.refract-minimal-cards.refract-show-scene-res .scene-card .scene-specs-overlay > *:not(.overlay-resolution) {
+body.stash-liquid-glass.refract-minimal-cards.refract-show-scene-res.refract-show-scene-res .scene-card .scene-specs-overlay > *:not(.overlay-resolution) {
     display: none !important;
 }
