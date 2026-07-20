@@ -6668,29 +6668,29 @@
                 playBtn.__refractPlayObs = playObs;
             }
 
-            /* Pointer-only visibility driver. The overlay used to show on
-               video.js's `.vjs-user-active` and stay pinned while
-               `.vjs-paused` — but vjs counts KEYBOARD input as user
-               activity, so space-to-pause summoned the buttons over the
-               frame for keyboard users (forum complaint; worst on short
-               clips). Track the pointer ourselves instead: mouse/touch
-               activity over the player sets `refract-pointer-active`
-               (the CSS show gate in 06_scene_player.css), 2s of pointer
-               stillness or leaving the player clears it. Keyboard input
-               and play/pause state changes never show the overlay.
-               Listeners live on the videojs node and die with it. */
-            var pointerTimer = null;
-            function pointerHide() {
-                if (pointerTimer) { clearTimeout(pointerTimer); pointerTimer = null; }
+            /* Pointer discriminator for the overlay. vjs counts KEYBOARD
+               input as user activity, so gating on `.vjs-user-active`
+               alone summoned the buttons for keyboard users (forum
+               complaint; worst on short clips). But running our own
+               stillness TIMER (the first fix) made the overlay hide on a
+               different clock than the control bar, which hides on vjs's
+               inactivity timer — the two faded out at visibly different
+               moments. So `refract-pointer-active` now only answers "was
+               the latest activity pointer-born, over the player?": set on
+               mouse/touch activity, cleared on mouseleave or keydown, NO
+               timer of its own. The CSS show gate requires it AND
+               `.vjs-user-active`, so the hide moment (and the 1s fade,
+               matched in 06_scene_player.css) is vjs's own — overlay and
+               control bar leave together. Keyboard input still never
+               shows the overlay: it clears the flag before vjs marks
+               activity. Listeners live on the videojs node and die with
+               it; keydown is capture-phase so vjs handlers that stop
+               propagation can't starve it. */
+            function pointerClear() {
                 videojs.classList.remove("refract-pointer-active");
             }
             function pointerShow() {
                 videojs.classList.add("refract-pointer-active");
-                if (pointerTimer) { clearTimeout(pointerTimer); }
-                pointerTimer = setTimeout(function () {
-                    pointerTimer = null;
-                    videojs.classList.remove("refract-pointer-active");
-                }, 2000);
             }
             videojs.addEventListener("mousemove", pointerShow, { passive: true });
             videojs.addEventListener("touchstart", pointerShow, { passive: true });
@@ -6698,7 +6698,8 @@
                videojs node (not capture), so it only fires when the
                cursor leaves the player as a whole — no flicker when
                moving between child controls. */
-            videojs.addEventListener("mouseleave", pointerHide);
+            videojs.addEventListener("mouseleave", pointerClear);
+            videojs.addEventListener("keydown", pointerClear, true);
         });
     }
 
