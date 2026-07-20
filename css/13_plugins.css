@@ -350,18 +350,24 @@ body.stash-liquid-glass nav.top-nav #plugin_sfw::after {
 /* ═══════════════════════════════════════════════════════════════════
    ThumbPreviews plugin (CommunityScripts) — keep the card box stable
    On hover the plugin appends a scene-preview <video> into a performer
-   card's image link and hides the still image, but gives the video no box
-   of its own. Scene previews are landscape while performer images are
-   portrait, so the thumbnail box (overflow:hidden) changes height when the
-   video plays. That shifts and clips Refract's overlaid stat badges and
-   makes initPerformerCards re-measure the strip at the wrong size, so
-   --pc-badge-scale jumps and the badges resize. Fix: pin the video to
-   exactly the image's box, and keep the now-hidden image in the layout so
-   the card's dimensions never change on hover.
+   card's image link and crossfades the still image and the video via
+   inline opacity. The video is in-flow, and scene previews are landscape
+   while performer images are portrait, so the thumbnail box changed
+   height while the video played. That shifted and clipped Refract's
+   overlaid stat badges and made initPerformerCards re-measure the strip
+   at the wrong size (--pc-badge-scale jump). Fix: take the video out of
+   flow and pin it to the image's box. The image link is display:inline
+   natively, and inset:0 on an abs-pos child of an INLINE containing
+   block resolves against the degenerate line box, not the visual area
+   (the video rendered as an off-card sliver) - so the link must also be
+   forced display:block while the video is present. Diagnosed in the
+   live DOM 2026-07-20; the still image is NOT display:none'd by the
+   plugin, it stays in flow at opacity 0 and keeps defining the box.
    Only applies while a <video> is present (i.e. mid-hover); reverts the
    instant the plugin removes it on mouseleave.
    ═══════════════════════════════════════════════════════════════════ */
 body.stash-liquid-glass .performer-card .thumbnail-section > a:has(> video) {
+    display: block !important;
     position: relative !important;
 }
 body.stash-liquid-glass .performer-card .thumbnail-section > a > video {
@@ -372,17 +378,14 @@ body.stash-liquid-glass .performer-card .thumbnail-section > a > video {
     object-fit: cover !important;
     z-index: 0 !important;
 }
-/* The plugin sets display:none on the image once the video loads; force it
-   to stay in the layout (still invisible, opacity is the plugin's job) so it
-   keeps defining the card height. Without this the link would collapse,
-   since the video is now out of flow. */
+/* The still image fades via inline opacity but stays in flow, defining
+   the box the video pins to. Guard against any plugin version that
+   display:none's it instead, which would collapse the link now that the
+   video is out of flow. (The favorite heart needs no rule: it lives
+   OUTSIDE the link as an abs-pos sibling at z-index 3, already above
+   the video's z-index 0.) */
 body.stash-liquid-glass .performer-card .thumbnail-section > a:has(> video) > img {
     display: block !important;
-}
-/* Favorite heart lives in the same link, before the appended video; keep it
-   above the video's fill so the preview doesn't cover it. */
-body.stash-liquid-glass .performer-card .thumbnail-section > a:has(> video) > .favorite-button {
-    z-index: 2 !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
