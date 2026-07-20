@@ -1917,7 +1917,9 @@
                rather than a page to navigate to. Faking SPA navigation to it
                would silently do nothing (or throw), and there's no original
                click handler to forward to since we only clone the icon, not
-               the source node. Skip rather than half-support it. */
+               the source node. Skip here; controls that deserve mirroring
+               get a proxy-click entry in PLUGIN_ACTION_TILES instead (as
+               Ascension now does). */
             if (/^(javascript:|#)/i.test(href.replace(/^\s+/, ""))) { continue; }
             // Already rendered — still mark present so reconcile keeps it.
             if (drawer.querySelector('.refract-drawer-tile[data-href="' + refractAttrEscape(href) + '"]')) { present[href] = true; continue; }
@@ -2044,6 +2046,16 @@
                viewBox that garbles when normalized; use a clean on-theme
                eye-off (semantically right for a blur/SFW toggle) instead. */
             icon: '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+        },
+        {
+            key: "ascension",
+            label: "Ascension",
+            /* Ascension's ranking button: href="javascript:void(0);" with a
+               click handler (openRankingModal) bound to the anchor itself, so
+               the proxy-click pattern fires the modal. No spec icon — the
+               source button carries a clean currentColor flame svg that the
+               clone fallback below mirrors faithfully. */
+            selector: "#plugin_hon"
         }
     ];
     function refractAppendPluginActionTiles() {
