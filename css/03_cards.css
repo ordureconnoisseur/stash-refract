@@ -2001,3 +2001,18 @@ body.stash-liquid-glass .stash-perf-ocount:hover {
     color: var(--text);
 }
 
+
+/* ── Card-element visibility toggles (Suggestion Box) ─────────────────
+   Body classes set by refract.js from the refract.hideCardRatings /
+   hidePerfStats / hidePerfOCount settings. Plain display gates; the
+   JS that reads these elements (tiering, playing-card pills) runs
+   regardless, so flipping a toggle never loses data. */
+body.stash-liquid-glass.refract-hide-card-ratings :is(.scene-card, .performer-card, .studio-card, .gallery-card, .image-card, .grid-card) .rating-banner {
+    display: none !important;
+}
+body.stash-liquid-glass.refract-hide-perf-stats .performer-card .stash-perf-stats {
+    display: none !important;
+}
+body.stash-liquid-glass.refract-hide-perf-ocount .performer-card .stash-perf-stats .stash-perf-ocount {
+    display: none !important;
+}

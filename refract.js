@@ -207,6 +207,26 @@
             var centerControlsHiddenOn = centerControlsState[0];
             var setCenterControlsHiddenOn = centerControlsState[1];
 
+            var hideCardRatingsState = R.useState(isCardRatingsHidden());
+            var hideCardRatingsOn = hideCardRatingsState[0];
+            var setHideCardRatingsOn = hideCardRatingsState[1];
+
+            var hidePerfStatsState = R.useState(isPerfStatsHidden());
+            var hidePerfStatsOn = hidePerfStatsState[0];
+            var setHidePerfStatsOn = hidePerfStatsState[1];
+
+            var hidePerfOCountState = R.useState(isPerfOCountHidden());
+            var hidePerfOCountOn = hidePerfOCountState[0];
+            var setHidePerfOCountOn = hidePerfOCountState[1];
+
+            var hideScenePerformersState = R.useState(isScenePerformersHidden());
+            var hideScenePerformersOn = hideScenePerformersState[0];
+            var setHideScenePerformersOn = hideScenePerformersState[1];
+
+            var showSceneResState = R.useState(isSceneResShown());
+            var showSceneResOn = showSceneResState[0];
+            var setShowSceneResOn = showSceneResState[1];
+
             /* Custom CSS Source state: { loaded, url } where url is
                the value Stash currently has set (empty if not set). */
             var cssSrc = R.useState({ loaded: false, url: "" });
@@ -291,6 +311,46 @@
                 scheduleServerSync();
                 applyCenterControlsHiddenClass(next);
                 setCenterControlsHiddenOn(next);
+            }
+
+            function toggleHideCardRatings() {
+                var next = !hideCardRatingsOn;
+                try { localStorage.setItem(HIDE_CARD_RATINGS_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyCardRatingsHiddenClass(next);
+                setHideCardRatingsOn(next);
+            }
+
+            function toggleHidePerfStats() {
+                var next = !hidePerfStatsOn;
+                try { localStorage.setItem(HIDE_PERF_STATS_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyPerfStatsHiddenClass(next);
+                setHidePerfStatsOn(next);
+            }
+
+            function toggleHidePerfOCount() {
+                var next = !hidePerfOCountOn;
+                try { localStorage.setItem(HIDE_PERF_OCOUNT_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyPerfOCountHiddenClass(next);
+                setHidePerfOCountOn(next);
+            }
+
+            function toggleHideScenePerformers() {
+                var next = !hideScenePerformersOn;
+                try { localStorage.setItem(HIDE_SCENE_PERFORMERS_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyScenePerformersHiddenClass(next);
+                setHideScenePerformersOn(next);
+            }
+
+            function toggleShowSceneRes() {
+                var next = !showSceneResOn;
+                try { localStorage.setItem(SHOW_SCENE_RES_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applySceneResShownClass(next);
+                setShowSceneResOn(next);
             }
 
             function toggleCardBackExplicit() {
@@ -570,6 +630,116 @@
                                 )
                             )
                         ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-hide-card-ratings" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Hide card rating banners"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Remove the rating banner (stars or number) from scene, performer, and studio cards in grid views.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-hide-card-ratings-toggle",
+                                        checked: hideCardRatingsOn,
+                                        onChange: toggleHideCardRatings
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-hide-card-ratings-toggle"
+                                    })
+                                )
+                            )
+                        ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-hide-perf-stats" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Hide performer stat pills"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Remove the Rating / Age / O Count / Scenes badge strip from performer cards in grid views.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-hide-perf-stats-toggle",
+                                        checked: hidePerfStatsOn,
+                                        onChange: toggleHidePerfStats
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-hide-perf-stats-toggle"
+                                    })
+                                )
+                            )
+                        ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-hide-perf-ocount" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Hide O-count pill"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Remove just the O Count pill from the performer-card badge strip, keeping the other stats.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-hide-perf-ocount-toggle",
+                                        checked: hidePerfOCountOn,
+                                        onChange: toggleHidePerfOCount
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-hide-perf-ocount-toggle"
+                                    })
+                                )
+                            )
+                        ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-hide-scene-performers" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Hide performers on scene cards"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Remove the performer avatar row (and its compact pill form) from scene cards in grid views.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-hide-scene-performers-toggle",
+                                        checked: hideScenePerformersOn,
+                                        onChange: toggleHideScenePerformers
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-hide-scene-performers-toggle"
+                                    })
+                                )
+                            )
+                        ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-show-scene-res" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Show resolution on scene cards"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Bring back the native resolution chip that the tidy card layout hides (duration stays in the bottom pill row only).")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-show-scene-res-toggle",
+                                        checked: showSceneResOn,
+                                        onChange: toggleShowSceneRes
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-show-scene-res-toggle"
+                                    })
+                                )
+                            )
+                        ),
                         R.createElement("div", { className: "setting", id: "plugin-refract-view-minimiser" },
                             R.createElement("div", null,
                                 R.createElement("h3", null, "View-mode minimiser"),
@@ -713,6 +883,12 @@
        forward-10) entirely, leaving the stock control bar. Opt-in;
        default off (overlay shown). */
     var HIDE_CENTER_CONTROLS_KEY = "refract.hideCenterControls";
+    /* Card-element visibility toggles (Suggestion Box, forum-requested). */
+    var HIDE_CARD_RATINGS_KEY = "refract.hideCardRatings";
+    var HIDE_PERF_STATS_KEY = "refract.hidePerfStats";
+    var HIDE_PERF_OCOUNT_KEY = "refract.hidePerfOCount";
+    var HIDE_SCENE_PERFORMERS_KEY = "refract.hideScenePerformers";
+    var SHOW_SCENE_RES_KEY = "refract.showSceneRes";
     /* Explicit card-back labels are built but held back from public release:
        the toggle is hidden and isCardBackExplicit() is forced off while this is
        false. Flip to true to ship the feature (no other change needed). */
@@ -727,7 +903,9 @@
         LITE_MODE_STORAGE_KEY, LIGHT_MODE_STORAGE_KEY, LIGHT_TOGGLE_NAVBAR_KEY,
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
         MINIMAL_CARDS_STORAGE_KEY, RATING_STYLE_STORAGE_KEY, CARD_BACK_EXPLICIT_KEY,
-        PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY
+        PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY,
+        HIDE_CARD_RATINGS_KEY, HIDE_PERF_STATS_KEY, HIDE_PERF_OCOUNT_KEY,
+        HIDE_SCENE_PERFORMERS_KEY, SHOW_SCENE_RES_KEY
     ];
 
     function isPluginSortDisabledBottom() {
@@ -905,6 +1083,57 @@
         document.body.classList.toggle("refract-hide-center-controls", !!on);
     }
     applyCenterControlsHiddenClass(isCenterControlsHidden());
+
+    /* Card-element visibility toggles (Suggestion Box, forum-requested).
+       Each is a plain body-class display gate: rating banners on grid
+       cards, the performer-card stat-pill strip (or just its O-count
+       pill), the performer avatar row on scene cards, and re-showing
+       the native resolution chip that minimal card mode hides (CSS in
+       03_cards.css / 08_misc_mid.css). All default OFF. */
+    function isCardRatingsHidden() {
+        try { return localStorage.getItem(HIDE_CARD_RATINGS_KEY) === "1"; } catch (e) { return false; }
+    }
+    function applyCardRatingsHiddenClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-hide-card-ratings", !!on);
+    }
+    applyCardRatingsHiddenClass(isCardRatingsHidden());
+
+    function isPerfStatsHidden() {
+        try { return localStorage.getItem(HIDE_PERF_STATS_KEY) === "1"; } catch (e) { return false; }
+    }
+    function applyPerfStatsHiddenClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-hide-perf-stats", !!on);
+    }
+    applyPerfStatsHiddenClass(isPerfStatsHidden());
+
+    function isPerfOCountHidden() {
+        try { return localStorage.getItem(HIDE_PERF_OCOUNT_KEY) === "1"; } catch (e) { return false; }
+    }
+    function applyPerfOCountHiddenClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-hide-perf-ocount", !!on);
+    }
+    applyPerfOCountHiddenClass(isPerfOCountHidden());
+
+    function isScenePerformersHidden() {
+        try { return localStorage.getItem(HIDE_SCENE_PERFORMERS_KEY) === "1"; } catch (e) { return false; }
+    }
+    function applyScenePerformersHiddenClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-hide-scene-performers", !!on);
+    }
+    applyScenePerformersHiddenClass(isScenePerformersHidden());
+
+    function isSceneResShown() {
+        try { return localStorage.getItem(SHOW_SCENE_RES_KEY) === "1"; } catch (e) { return false; }
+    }
+    function applySceneResShownClass(on) {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-show-scene-res", !!on);
+    }
+    applySceneResShownClass(isSceneResShown());
 
     /* Scene card style. "refract" (default) = tidier minimal layout —
        description block hidden so the grid stays consistent across
@@ -1095,6 +1324,11 @@
             applyStudioBannerClass(isStudioBannerVisible());
             applyPerformerCardHoverClass(isPerformerCardHover());
             applyCenterControlsHiddenClass(isCenterControlsHidden());
+            applyCardRatingsHiddenClass(isCardRatingsHidden());
+            applyPerfStatsHiddenClass(isPerfStatsHidden());
+            applyPerfOCountHiddenClass(isPerfOCountHidden());
+            applyScenePerformersHiddenClass(isScenePerformersHidden());
+            applySceneResShownClass(isSceneResShown());
             applyCardStyleClass(getStoredCardStyle());
             applyRatingStyleClass(getStoredRatingStyle());
         } catch (e) { /* ignore */ }
