@@ -630,6 +630,17 @@
                                 )
                             )
                         ),
+                        R.createElement("div", { className: "setting refract-card-preview-setting", id: "plugin-refract-card-preview" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Card preview"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Sample cards painted by your current theme settings. Flip the visibility toggles below and watch them update live.")
+                            ),
+                            R.createElement("div", {
+                                className: "refract-card-preview",
+                                dangerouslySetInnerHTML: { __html: REFRACT_PREVIEW_HTML }
+                            })
+                        ),
                         R.createElement("div", { className: "setting", id: "plugin-refract-hide-card-ratings" },
                             R.createElement("div", null,
                                 R.createElement("h3", null, "Hide card rating banners"),
@@ -883,6 +894,65 @@
        forward-10) entirely, leaving the stock control bar. Opt-in;
        default off (overlay shown). */
     var HIDE_CENTER_CONTROLS_KEY = "refract.hideCenterControls";
+
+    /* Static mock cards for the Suggestion Box "Card preview" row. Real
+       .scene-card / .performer-card class structure so the SAME theme CSS
+       (card styles, rating modes, and the visibility toggles below) paints
+       them — no separate preview styling to keep in sync. Inert by
+       construction: data-stash-sc / data-stash-pc markers make every
+       refract card processor skip them, art is inline SVG data URIs (no
+       library content), and the container is pointer-events:none. */
+    var REFRACT_PREVIEW_ART_SCENE = "data:image/svg+xml;utf8," + encodeURIComponent(
+        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'>" +
+        "<rect width='16' height='9' fill='#262230'/>" +
+        "<circle cx='12.5' cy='2.6' r='1.1' fill='#4a3f63'/>" +
+        "<path d='M0 9 5.5 4.5 9 7l4-3 3 2.5V9z' fill='#383049'/>" +
+        "<path d='M0 9 4 6.5 7.5 9z' fill='#453a5c'/></svg>");
+    var REFRACT_PREVIEW_ART_PERF = "data:image/svg+xml;utf8," + encodeURIComponent(
+        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'>" +
+        "<rect width='2' height='3' fill='#2a2436'/>" +
+        "<circle cx='1' cy='1.05' r='0.42' fill='#4a3f63'/>" +
+        "<path d='M0.25 3a0.75 0.62 0 0 1 1.5 0z' fill='#4a3f63'/></svg>");
+    var REFRACT_PREVIEW_HTML =
+        '<div class="scene-card grid-card card refract-preview-card" data-stash-sc="1">' +
+            '<div class="thumbnail-section">' +
+                '<div class="scene-card-preview">' +
+                    '<img class="scene-card-preview-image" alt="" src="' + REFRACT_PREVIEW_ART_SCENE + '">' +
+                '</div>' +
+                '<div class="scene-specs-overlay"><span class="overlay-resolution">1080p</span><span class="overlay-duration">12:34</span></div>' +
+                '<div class="studio-overlay">Studio</div>' +
+            '</div>' +
+            '<div class="rating-banner">8.6</div>' +
+            '<div class="stash-performer-circles">' +
+                '<div class="stash-performer-avatars">' +
+                    '<a class="stash-performer-link"><img class="stash-performer-avatar" alt="" src="' + REFRACT_PREVIEW_ART_PERF + '"></a>' +
+                    '<a class="stash-performer-link"><img class="stash-performer-avatar" alt="" src="' + REFRACT_PREVIEW_ART_PERF + '"></a>' +
+                '</div>' +
+                '<div class="stash-card-counts">' +
+                    '<span class="stash-duration-pill">12:34</span>' +
+                    '<a class="stash-performer-pill"><span>2</span></a>' +
+                    '<span class="stash-o-count"><span>3</span></span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="refract-pc-tier-label"></div>' +
+            '<div class="card-section"><h5 class="card-section-title">Example Scene</h5></div>' +
+        '</div>' +
+        '<div class="performer-card grid-card card refract-preview-card" data-stash-pc="1">' +
+            '<div class="thumbnail-section"><a><img class="performer-card-image" alt="" src="' + REFRACT_PREVIEW_ART_PERF + '"></a>' +
+                '<div class="rating-banner">8.6</div>' +
+            '</div>' +
+            '<div class="refract-pc-tier-label"></div>' +
+            '<div class="card-section">' +
+                '<h5 class="card-section-title">Jane Example</h5>' +
+                '<div class="stash-perf-stats">' +
+                    '<span class="stash-perf-rating"><span class="stash-perf-label">Rating</span><span>8.6</span></span>' +
+                    '<span class="stash-perf-age"><span class="stash-perf-label">Age</span><span>29</span></span>' +
+                    '<span class="stash-perf-ocount"><span class="stash-perf-label">O Count</span><span>12</span></span>' +
+                    '<a class="stash-perf-scenes"><span class="stash-perf-label">Scenes</span><span>34</span></a>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
     /* Card-element visibility toggles (Suggestion Box, forum-requested). */
     var HIDE_CARD_RATINGS_KEY = "refract.hideCardRatings";
     var HIDE_PERF_STATS_KEY = "refract.hidePerfStats";

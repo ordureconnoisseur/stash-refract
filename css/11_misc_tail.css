@@ -1138,6 +1138,38 @@ body.stash-liquid-glass .refract-suggestion-body {
     border-top: 1px solid var(--glass-border);
 }
 
+/* ── Card preview (Suggestion Box) ───────────────────────────────────
+   Two inert mock cards (REFRACT_PREVIEW_HTML in refract.js) that the
+   normal card CSS paints, so every visibility toggle below shows its
+   effect live. The .setting row is stacked (not the usual label/control
+   split) so the cards get the full width; pointer-events:none keeps
+   links, hovers, and popovers dead — it's a picture, not a card. */
+body.stash-liquid-glass .refract-card-preview-setting {
+    display: block !important;
+}
+body.stash-liquid-glass .refract-card-preview {
+    pointer-events: none;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-top: 0.9rem;
+}
+body.stash-liquid-glass .refract-card-preview .refract-preview-card.scene-card {
+    width: 300px;
+    flex: 0 0 auto;
+}
+body.stash-liquid-glass .refract-card-preview .refract-preview-card.performer-card {
+    width: 190px;
+    flex: 0 0 auto;
+}
+body.stash-liquid-glass .refract-card-preview .refract-preview-card .scene-card-preview-image,
+body.stash-liquid-glass .refract-card-preview .refract-preview-card .performer-card-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 /* Refract plugin-settings toggle — used for the view-mode minimiser
    feature. Glass track + accent-tinted thumb when enabled. */
 body.stash-liquid-glass .refract-toggle {
