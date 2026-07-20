@@ -89,7 +89,7 @@ body.stash-liquid-glass.refract-rating-style-playing-card .performer-card .refra
    none so the checkbox is still clickable underneath, but it's hard
    to see what you're aiming at. When the user hovers near the
    checkbox, fade the banner so the circle is fully visible. */
-body.stash-liquid-glass.refract-rating-style-playing-card .performer-card:has(.card-check:hover) .refract-pc-name-banner,
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-check-hover .refract-pc-name-banner,
 body.stash-liquid-glass.refract-rating-style-playing-card .performer-card:has(.card-check:checked) .refract-pc-name-banner {
     opacity: 0;
     transition: opacity 0.15s ease;
@@ -632,13 +632,14 @@ body.stash-liquid-glass.refract-rating-style-playing-card :is(.performer-card, .
 /* Fade out the tier ribbon:
    - Performer cards: when the user hovers the favourite heart. The
      heart sits BEHIND the ribbon (z-index 3 vs ribbon z-index 7);
-     hiding the ribbon clears the click target.
+     hiding the ribbon clears the click target. .refract-fav-hover is
+     the JS marker class (delegated mouseover in refract.js) replacing
+     the old `:has(.favorite-button:hover)` form, which made Chrome
+     re-evaluate subjects grid-wide on scroll-hover.
    - Scene cards: on ANY hover. Scene cards have a thumbnail preview /
      hover-scrub action across most of their area, so the ribbon
-     should yield to the underlying card interaction.
-   `:has()` is supported per Refract's browser-compat target (README
-   "Compatibility" section). */
-body.stash-liquid-glass.refract-rating-style-playing-card .performer-card:has(.favorite-button:hover) .refract-pc-tier-label,
+     should yield to the underlying card interaction. */
+body.stash-liquid-glass.refract-rating-style-playing-card .performer-card.refract-fav-hover .refract-pc-tier-label,
 body.stash-liquid-glass.refract-rating-style-playing-card .scene-card:hover .refract-pc-tier-label {
     opacity: 0;
     transition: opacity 0.18s ease-out;

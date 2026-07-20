@@ -9273,6 +9273,38 @@
         }, 400);
     }, true);
 
+    // ── Card-control hover markers (":has(:hover)" perf replacement) ──
+    // Chrome re-evaluates `:has(...:hover)` rule subjects across the whole
+    // grid as elements pass under the cursor during scroll — profiled as the
+    // playing-card home-page jank (style recalc, not paint; see CLAUDE.md).
+    // Instead, delegated pointer events toggle plain marker classes on the
+    // owning card: `.refract-check-hover` while its .card-check select
+    // circle is hovered, `.refract-fav-hover` while its favourite heart is.
+    // CSS consumers: 03_cards.css (rating-banner fade), 16_playing_card.css
+    // (name-banner + tier-ribbon fades). The `:has(...:checked)` variants
+    // stay in CSS — they only invalidate on click, not on scroll.
+    (function () {
+        var HOVER_SEL = ".card-check, .favorite-button";
+        function classFor(hit) {
+            return hit.classList.contains("favorite-button") ? "refract-fav-hover" : "refract-check-hover";
+        }
+        document.addEventListener("mouseover", function (e) {
+            var hit = e.target.closest && e.target.closest(HOVER_SEL);
+            if (!hit) return;
+            var card = hit.closest(".scene-card, .performer-card");
+            if (card) card.classList.add(classFor(hit));
+        }, true);
+        document.addEventListener("mouseout", function (e) {
+            var hit = e.target.closest && e.target.closest(HOVER_SEL);
+            if (!hit) return;
+            // Moves between descendants of the same control are not a leave.
+            if (e.relatedTarget && e.relatedTarget.closest &&
+                e.relatedTarget.closest(HOVER_SEL) === hit) return;
+            var card = hit.closest(".scene-card, .performer-card");
+            if (card) card.classList.remove(classFor(hit));
+        }, true);
+    })();
+
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", boot);
     } else {

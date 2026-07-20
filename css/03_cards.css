@@ -482,9 +482,14 @@ body.stash-liquid-glass #performer-page .image-container .rating-banner {
    Scoped to direct-child rating-banner on scene cards (per the
    single-source-of-truth rule above); performer cards use the
    native nested banner. */
-body.stash-liquid-glass .scene-card:has(.card-check:hover) > .rating-banner,
+/* .refract-check-hover is a JS marker class (delegated mouseover in
+   refract.js) replacing `:has(.card-check:hover)` — Chrome re-evaluated
+   the :has() subjects across the whole grid on every scroll-hover
+   (playing-card home-page jank; see OPEN ISSUE in CLAUDE.md). The
+   `:checked` variant stays as :has() — it only invalidates on click. */
+body.stash-liquid-glass .scene-card.refract-check-hover > .rating-banner,
 body.stash-liquid-glass .scene-card:has(.card-check:checked) > .rating-banner,
-body.stash-liquid-glass .performer-card:has(.card-check:hover) .rating-banner,
+body.stash-liquid-glass .performer-card.refract-check-hover .rating-banner,
 body.stash-liquid-glass .performer-card:has(.card-check:checked) .rating-banner {
     opacity: 0;
     transition: opacity 0.15s ease;
