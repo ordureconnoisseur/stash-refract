@@ -348,6 +348,44 @@ body.stash-liquid-glass nav.top-nav #plugin_sfw::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   ThumbPreviews plugin (CommunityScripts) — keep the card box stable
+   On hover the plugin appends a scene-preview <video> into a performer
+   card's image link and hides the still image, but gives the video no box
+   of its own. Scene previews are landscape while performer images are
+   portrait, so the thumbnail box (overflow:hidden) changes height when the
+   video plays. That shifts and clips Refract's overlaid stat badges and
+   makes initPerformerCards re-measure the strip at the wrong size, so
+   --pc-badge-scale jumps and the badges resize. Fix: pin the video to
+   exactly the image's box, and keep the now-hidden image in the layout so
+   the card's dimensions never change on hover.
+   Only applies while a <video> is present (i.e. mid-hover); reverts the
+   instant the plugin removes it on mouseleave.
+   ═══════════════════════════════════════════════════════════════════ */
+body.stash-liquid-glass .performer-card .thumbnail-section > a:has(> video) {
+    position: relative !important;
+}
+body.stash-liquid-glass .performer-card .thumbnail-section > a > video {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    z-index: 0 !important;
+}
+/* The plugin sets display:none on the image once the video loads; force it
+   to stay in the layout (still invisible, opacity is the plugin's job) so it
+   keeps defining the card height. Without this the link would collapse,
+   since the video is now out of flow. */
+body.stash-liquid-glass .performer-card .thumbnail-section > a:has(> video) > img {
+    display: block !important;
+}
+/* Favorite heart lives in the same link, before the appended video; keep it
+   above the video's fill so the preview doesn't cover it. */
+body.stash-liquid-glass .performer-card .thumbnail-section > a:has(> video) > .favorite-button {
+    z-index: 2 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    Ascension (Sakoto's HotorNot fork) — performer-card battle-rank badge
    Ascension swaps a performer card's native .rating-banner for its
    `.hon-battle-rank-badge.hon-battle-rank-badge-compact`. Left to the
