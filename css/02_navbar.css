@@ -168,7 +168,8 @@ body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav:nth-of-type(2
    carries .nav-utility too — but we WANT this one shown + themed, so
    give it the same glass-button look here. */
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn,
-body.stash-liquid-glass nav.top-nav button.gs-trigger {
+body.stash-liquid-glass nav.top-nav button.gs-trigger,
+body.stash-liquid-glass nav.top-nav button.notification-btn {
     position: relative !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -199,7 +200,8 @@ body.stash-liquid-glass nav.top-nav button.gs-trigger {
    main nav-button rule uses (lines ~229-243) for the icons whose
    selector excludes .nav-utility. */
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn::before,
-body.stash-liquid-glass nav.top-nav button.gs-trigger::before {
+body.stash-liquid-glass nav.top-nav button.gs-trigger::before,
+body.stash-liquid-glass nav.top-nav button.notification-btn::before {
     content: "" !important;
     position: absolute !important;
     inset: 0 !important;
@@ -215,7 +217,8 @@ body.stash-liquid-glass nav.top-nav button.gs-trigger::before {
     transition: opacity 0.22s ease !important;
 }
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn:hover,
-body.stash-liquid-glass nav.top-nav button.gs-trigger:hover {
+body.stash-liquid-glass nav.top-nav button.gs-trigger:hover,
+body.stash-liquid-glass nav.top-nav button.notification-btn:hover {
     background: rgba(255, 255, 255, 0.06) !important;
     color: #fff !important;
     border: none !important;
@@ -223,21 +226,39 @@ body.stash-liquid-glass nav.top-nav button.gs-trigger:hover {
     transform: none !important;
 }
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn:hover::before,
-body.stash-liquid-glass nav.top-nav button.gs-trigger:hover::before {
+body.stash-liquid-glass nav.top-nav button.gs-trigger:hover::before,
+body.stash-liquid-glass nav.top-nav button.notification-btn:hover::before {
     opacity: 1 !important;
 }
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn svg,
-body.stash-liquid-glass nav.top-nav button.gs-trigger svg {
+body.stash-liquid-glass nav.top-nav button.gs-trigger svg,
+body.stash-liquid-glass nav.top-nav button.notification-btn svg {
     width: 0.9rem !important;
     height: 0.9rem !important;
 }
 
-/* Icons-only: kill text labels via font-size: 0 (UI Tweaks pattern). */
+/* stashNotifications bell extras (shares the gs-trigger look above).
+   The count badge is a span excluded from the label purge; restore its
+   font size (the .navbar-buttons font-size:0 would zero the number) and
+   let it ride the plugin's own offset positioning. Kill the Bootstrap
+   dropdown-toggle caret — a caret on an icon-square reads as clutter. */
+body.stash-liquid-glass nav.top-nav .notification-btn .notification-badge {
+    display: inline-block !important;
+    font-size: 0.68rem !important;
+    line-height: 1 !important;
+}
+body.stash-liquid-glass nav.top-nav .notification-btn.dropdown-toggle::after {
+    display: none !important;
+}
+
+/* Icons-only: kill text labels via font-size: 0 (UI Tweaks pattern).
+   stashNotifications' wrapper + count badge are SPANs that must survive
+   the span purge (the badge also gets its font-size restored below). */
 body.stash-liquid-glass nav.top-nav .nav-link,
 body.stash-liquid-glass nav.top-nav .navbar-buttons {
     font-size: 0 !important;
 }
-body.stash-liquid-glass nav.top-nav span,
+body.stash-liquid-glass nav.top-nav span:not(.notification-btn-container):not(.notification-badge),
 body.stash-liquid-glass nav.top-nav .stash-nav-label {
     display: none !important;
 }
@@ -623,8 +644,11 @@ html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:focus-vi
     }
 }
 
-/* Hide help, logout, donate, sidebar toggle (keep scoped to top nav; avoids beating .btn rule). */
-body.stash-liquid-glass nav.top-nav button.btn.nav-utility,
+/* Hide help, logout, donate, sidebar toggle (keep scoped to top nav; avoids beating .btn rule).
+   :not(.notification-btn) exempts stashNotifications' bell — a Dropdown
+   toggle that carries .nav-utility too but is a real control we keep
+   (themed with the gs-trigger rules above). */
+body.stash-liquid-glass nav.top-nav button.btn.nav-utility:not(.notification-btn),
 body.stash-liquid-glass nav.top-nav a[href="/logout"],
 body.stash-liquid-glass nav.top-nav a[href*="logout"],
 body.stash-liquid-glass nav.top-nav a.logout-button,
