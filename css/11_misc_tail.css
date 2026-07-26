@@ -1151,6 +1151,33 @@ body.stash-liquid-glass .refract-card-customiser .refract-suggestion-summary::af
     display: none;
 }
 
+/* Real-card preview: Stash's actual SceneCard/PerformerCard rendered
+   with library data. Constrain widths (the grid normally sizes cards
+   via JS useCardWidth, which doesn't run here) and lay them out like
+   the mock pair. Cursor stays default since clicks are swallowed. */
+body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards {
+    display: flex;
+    gap: 1.1rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    pointer-events: auto;
+}
+body.stash-liquid-glass .refract-card-preview-real .scene-card {
+    width: 300px !important;
+}
+body.stash-liquid-glass .refract-card-preview-real .performer-card {
+    width: 190px !important;
+}
+body.stash-liquid-glass .refract-card-preview-real a,
+body.stash-liquid-glass .refract-card-preview-real button:not(.refract-preview-shuffle) {
+    cursor: default !important;
+}
+body.stash-liquid-glass .refract-preview-shuffle {
+    margin-top: 0.6rem;
+    font-size: 0.78rem;
+    padding: 0.3rem 0.9rem;
+}
+
 /* Pointer note left in the old plugin-settings panel after the move to
    Settings -> Interface -> Refract. */
 body.stash-liquid-glass .refract-settings-moved-note {

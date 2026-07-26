@@ -158,6 +158,94 @@
        native string-input row. PluginID prop confirmed at runtime. */
     function buildAccentSwatchPicker() {
         var R = PluginApi.React;
+
+        /* Error boundary for the real-card preview: any render crash in
+           Stash's card components (schema drift, missing field) calls
+           onError so the preview falls back to the static mocks instead
+           of taking the whole settings panel down. ES5-style class. */
+        function PreviewBoundary(props) {
+            R.Component.call(this, props);
+            this.state = { err: false };
+        }
+        PreviewBoundary.prototype = Object.create(R.Component.prototype);
+        PreviewBoundary.prototype.constructor = PreviewBoundary;
+        PreviewBoundary.getDerivedStateFromError = function () { return { err: true }; };
+        PreviewBoundary.prototype.componentDidCatch = function () {
+            if (this.props.onError) { this.props.onError(); }
+        };
+        PreviewBoundary.prototype.render = function () {
+            return this.state.err ? null : this.props.children;
+        };
+
+        /* Live preview: one real scene + one real performer rendered with
+           Stash's own card components — pixel-identical to the grid, and
+           every refract processor treats them as real cards. Falls back
+           to the static mocks when the library is empty, the fetch
+           fails, the components are unavailable, or a card crashes.
+           Clicks are swallowed (capture phase) so card links can't
+           navigate away from settings; the shuffle button re-rolls and
+           persists the new pick. */
+        function RefractCardPreview() {
+            var st = R.useState({ loading: true, scene: null, performer: null, failed: false });
+            var pv = st[0], setPv = st[1];
+
+            function load(shuffle) {
+                setPv({ loading: true, scene: null, performer: null, failed: false });
+                var componentsReady = (PluginApi.utils && PluginApi.utils.loadComponents && PluginApi.loadableComponents && PluginApi.loadableComponents.SceneCard)
+                    ? PluginApi.utils.loadComponents([PluginApi.loadableComponents.SceneCard, PluginApi.loadableComponents.PerformerCard])
+                    : Promise.resolve();
+                Promise.all([componentsReady, refractFetchPreviewData(shuffle)])
+                    .then(function (rs) {
+                        var d = rs[1] || {};
+                        setPv({ loading: false, scene: d.scene || null, performer: d.performer || null,
+                                failed: !d.scene && !d.performer });
+                    })
+                    .catch(function () {
+                        setPv({ loading: false, scene: null, performer: null, failed: true });
+                    });
+            }
+            R.useEffect(function () { load(false); }, []);
+
+            var SceneCard = PluginApi.components.SceneCard;
+            var PerformerCard = PluginApi.components.PerformerCard;
+            var canReal = !pv.failed && SceneCard && PerformerCard && (pv.scene || pv.performer);
+
+            if (pv.loading) {
+                return R.createElement("div", { className: "refract-card-preview" },
+                    R.createElement("div", { className: "sub-heading" }, "Loading preview…"));
+            }
+            if (!canReal) {
+                /* Static mock fallback (empty library / error). */
+                return R.createElement("div", {
+                    className: "refract-card-preview",
+                    dangerouslySetInnerHTML: { __html: refractBuildPreviewHtml() }
+                });
+            }
+            function onCardError() {
+                setPv({ loading: false, scene: null, performer: null, failed: true });
+            }
+            return R.createElement("div", { className: "refract-card-preview refract-card-preview-real" },
+                R.createElement("div", {
+                    className: "refract-preview-cards",
+                    onClickCapture: function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                },
+                    pv.scene ? R.createElement(PreviewBoundary, { key: "s" + pv.scene.id, onError: onCardError },
+                        R.createElement(SceneCard, { scene: pv.scene })) : null,
+                    pv.performer ? R.createElement(PreviewBoundary, { key: "p" + pv.performer.id, onError: onCardError },
+                        R.createElement(PerformerCard, { performer: pv.performer })) : null
+                ),
+                R.createElement("button", {
+                    type: "button",
+                    className: "refract-preview-shuffle btn btn-secondary",
+                    title: "Show a different scene and performer",
+                    onClick: function () { load(true); }
+                }, "Shuffle")
+            );
+        }
+
         return function AccentSwatchPicker() {
             var stored = R.useState(getStoredAccent());
             var accent = stored[0];
@@ -504,12 +592,9 @@
                             R.createElement("div", null,
                                 R.createElement("h3", null, "Card preview"),
                                 R.createElement("div", { className: "sub-heading" },
-                                    "Sample cards painted by your current theme settings. Everything below updates them live as you change it.")
+                                    "A real scene and performer from your library, painted by your current settings. Everything below updates them live; shuffle picks different ones.")
                             ),
-                            R.createElement("div", {
-                                className: "refract-card-preview",
-                                dangerouslySetInnerHTML: { __html: refractBuildPreviewHtml() }
-                            })
+                            R.createElement(RefractCardPreview)
                         ),
                         R.createElement("div", { className: "setting", id: "plugin-refract-rating-style" },
                             R.createElement("div", null,
@@ -897,6 +982,39 @@
                 "."
             );
         });
+
+        /* In-tree host for the relocated settings panel. The panel must
+           live inside Stash's React tree (portalled from a patched
+           always-mounted component) rather than a standalone
+           ReactDOM.render root: the real-card preview renders Stash's
+           own SceneCard/PerformerCard, which need the app's
+           ConfigurationProvider / IntlProvider / Router contexts.
+           MainNavBar.UtilityItems is patchable and mounted on every
+           route; the host itself renders nothing in the navbar — it
+           only portals into the injected Interface section container
+           whenever that exists. */
+        var R3 = PluginApi.React;
+        var RefractSettingsPanel = buildAccentSwatchPicker();
+        function RefractInterfacePortalHost() {
+            var st = R3.useState(null);
+            var container = st[0], setContainer = st[1];
+            R3.useEffect(function () {
+                var t = setInterval(function () {
+                    var c = document.querySelector("#refract-settings-section > .card");
+                    if (c !== container) { setContainer(c || null); }
+                }, 400);
+                return function () { clearInterval(t); };
+            }, [container]);
+            if (!container) { return null; }
+            return PluginApi.ReactDOM.createPortal(R3.createElement(RefractSettingsPanel), container);
+        }
+        PluginApi.patch.instead("MainNavBar.UtilityItems", function () {
+            var args = Array.prototype.slice.call(arguments);
+            var next = args.pop();
+            var orig = next.apply(null, args);
+            return R3.createElement(R3.Fragment, null, orig,
+                R3.createElement(RefractInterfacePortalHost, { key: "refract-settings-host" }));
+        });
     }
     registerAccentPatch();
 
@@ -1024,6 +1142,123 @@
             '</div>' +
             '<div class="refract-pc-tier-label"></div>' +
         '</div>';
+    }
+
+    /* ── Real-card preview data ──────────────────────────────────────
+       The customiser preview renders Stash's ACTUAL SceneCard /
+       PerformerCard components with a real record from the library, so
+       it is pixel-identical to the grid (the static mocks above remain
+       as the fallback for empty libraries / fetch failures / render
+       errors). Picked ids persist so the preview is stable across
+       visits; the shuffle button re-rolls. */
+    var PREVIEW_SCENE_ID_KEY = "refract.previewSceneId";
+    var PREVIEW_PERF_ID_KEY = "refract.previewPerformerId";
+    /* Field sets validated against the live schema 2026-07-26. Generous
+       on purpose: the card components read deeply into the object. */
+    /* SceneCard reads .length on several arrays unguarded, so every
+       array the card touches must be present in the query. Gotcha
+       (2026-07-26): the schema on current Stash still ACCEPTS the
+       legacy `movies` field, but the card component reads `groups` —
+       querying movies validates fine and then crashes the card. So
+       default to the groups variant and fall back to movies only if
+       the groups query is rejected (older servers). */
+    /* Complete property inventory extracted from the minified SceneCard
+       chunk 2026-07-26: date details files(+fingerprints) galleries
+       groups id interactive_speed o_counter organized paths(screenshot
+       preview vtt interactive_heatmap) performers rating100 resume_time
+       scene_markers studio tags. */
+    var PREVIEW_SCENE_FIELDS_BASE =
+        "id title details date rating100 o_counter organized interactive interactive_speed resume_time " +
+        "files { id path basename width height duration video_codec frame_rate bit_rate size format " +
+            "fingerprints { type value } } " +
+        "paths { screenshot preview stream webp vtt sprite interactive_heatmap } " +
+        "studio { id name image_path } performers { id name gender image_path } " +
+        "tags { id name } galleries { id title } scene_markers { id title seconds } " +
+        "captions { language_code caption_type } " +
+        "stash_ids { endpoint stash_id }";
+    var PREVIEW_SCENE_FIELDS = PREVIEW_SCENE_FIELDS_BASE +
+        " groups { group { id name front_image_path } scene_index }";
+    var PREVIEW_SCENE_FIELDS_MOVIES = PREVIEW_SCENE_FIELDS_BASE +
+        " movies { movie { id name front_image_path } scene_index }";
+    var PREVIEW_PERF_FIELDS =
+        "id name disambiguation gender birthdate country image_path favorite " +
+        "rating100 o_counter scene_count image_count gallery_count group_count " +
+        "performer_count tags { id name } stash_ids { endpoint stash_id } alias_list";
+    function refractGqlQuery(query) {
+        return fetch("/graphql", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query: query })
+        }).then(function (r) { return r.json(); });
+    }
+    /* Resolve { scene, performer } for the preview. shuffle=true ignores
+       stored ids and re-rolls. Random picks prefer high-rated records
+       with performers so every card element is populated; if the filter
+       finds nothing (small library) it retries unfiltered. */
+    /* Which scene field set works on this server (groups vs legacy
+       movies); resolved on first failure and remembered for the session. */
+    var refractPreviewSceneFields = PREVIEW_SCENE_FIELDS;
+    function refractSceneQuery(buildQuery) {
+        return refractGqlQuery(buildQuery(refractPreviewSceneFields)).then(function (r) {
+            if (r.errors && refractPreviewSceneFields !== PREVIEW_SCENE_FIELDS_MOVIES &&
+                    JSON.stringify(r.errors).indexOf("groups") !== -1) {
+                refractPreviewSceneFields = PREVIEW_SCENE_FIELDS_MOVIES;
+                return refractGqlQuery(buildQuery(refractPreviewSceneFields));
+            }
+            return r;
+        });
+    }
+    function refractFetchPreviewData(shuffle) {
+        function randomScene(filtered) {
+            var f = filtered
+                ? ", scene_filter: { rating100: { value: 74, modifier: GREATER_THAN }, performer_count: { value: 0, modifier: GREATER_THAN } }"
+                : "";
+            return refractSceneQuery(function (F) {
+                return "query { findScenes(filter: { per_page: 1, sort: \"random\" }" + f + ") { scenes { " + F + " } } }";
+            }).then(function (r) {
+                    var s = r.data && r.data.findScenes.scenes[0];
+                    if (!s && filtered) { return randomScene(false); }
+                    return s || null;
+                });
+        }
+        function randomPerformer(filtered) {
+            var f = filtered
+                ? ", performer_filter: { rating100: { value: 74, modifier: GREATER_THAN }, scene_count: { value: 0, modifier: GREATER_THAN } }"
+                : "";
+            return refractGqlQuery("query { findPerformers(filter: { per_page: 1, sort: \"random\" }" + f + ") { performers { " + PREVIEW_PERF_FIELDS + " } } }")
+                .then(function (r) {
+                    var p = r.data && r.data.findPerformers.performers[0];
+                    if (!p && filtered) { return randomPerformer(false); }
+                    return p || null;
+                });
+        }
+        function byId(kind, id2, fields) {
+            return refractGqlQuery("query { " + kind + "(id: \"" + id2 + "\") { " + fields + " } }")
+                .then(function (r) { return (r.data && r.data[kind]) || null; });
+        }
+        var storedScene = null, storedPerf = null;
+        try {
+            storedScene = localStorage.getItem(PREVIEW_SCENE_ID_KEY);
+            storedPerf = localStorage.getItem(PREVIEW_PERF_ID_KEY);
+        } catch (e) { /* ignore */ }
+        var sceneP = (!shuffle && storedScene)
+            ? refractSceneQuery(function (F) {
+                return "query { findScene(id: \"" + storedScene + "\") { " + F + " } }";
+              }).then(function (r) {
+                var s = (r.data && r.data.findScene) || null;
+                return s || randomScene(true);
+              })
+            : randomScene(true);
+        var perfP = (!shuffle && storedPerf)
+            ? byId("findPerformer", storedPerf, PREVIEW_PERF_FIELDS).then(function (p) { return p || randomPerformer(true); })
+            : randomPerformer(true);
+        return Promise.all([sceneP, perfP]).then(function (rs) {
+            try {
+                if (rs[0]) { localStorage.setItem(PREVIEW_SCENE_ID_KEY, String(rs[0].id)); }
+                if (rs[1]) { localStorage.setItem(PREVIEW_PERF_ID_KEY, String(rs[1].id)); }
+            } catch (e) { /* ignore */ }
+            return { scene: rs[0], performer: rs[1] };
+        });
     }
 
     /* Card-element visibility toggles (Suggestion Box, forum-requested). */
@@ -9113,7 +9348,6 @@
        pointer note instead (see the PluginSettings patch). The settings
        component is built once and mounted with PluginApi.ReactDOM.render;
        if the SPA rebuilds the pane, the consolidated watcher re-injects. */
-    var RefractSettingsComponent = null;
     function injectInterfaceRefractSection() {
         if (typeof PluginApi === "undefined" || !PluginApi.React || !PluginApi.ReactDOM) { return; }
         var pane = document.querySelector("[id$='-tabpane-interface']");
@@ -9134,8 +9368,13 @@
         section.appendChild(card);
         pane.appendChild(section);
 
-        if (!RefractSettingsComponent) { RefractSettingsComponent = buildAccentSwatchPicker(); }
-        PluginApi.ReactDOM.render(PluginApi.React.createElement(RefractSettingsComponent), card);
+        /* The panel itself is mounted into this .card by the portal host
+           registered in registerAccentPatch — NOT a standalone
+           ReactDOM.render root. The portal keeps the panel inside
+           Stash's React tree so the real-card preview can render the
+           app's SceneCard/PerformerCard (they need ConfigurationProvider
+           / IntlProvider / Router context, which a standalone root
+           lacks — verified by crash 2026-07-26). */
 
         /* Deep link from the old plugin-panel note. */
         if (location.hash === "#refract") {
