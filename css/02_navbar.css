@@ -168,8 +168,7 @@ body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav:nth-of-type(2
    carries .nav-utility too — but we WANT this one shown + themed, so
    give it the same glass-button look here. */
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn,
-body.stash-liquid-glass nav.top-nav button.gs-trigger,
-body.stash-liquid-glass nav.top-nav button.notification-btn {
+body.stash-liquid-glass nav.top-nav button.gs-trigger {
     position: relative !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -200,8 +199,7 @@ body.stash-liquid-glass nav.top-nav button.notification-btn {
    main nav-button rule uses (lines ~229-243) for the icons whose
    selector excludes .nav-utility. */
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn::before,
-body.stash-liquid-glass nav.top-nav button.gs-trigger::before,
-body.stash-liquid-glass nav.top-nav button.notification-btn::before {
+body.stash-liquid-glass nav.top-nav button.gs-trigger::before {
     content: "" !important;
     position: absolute !important;
     inset: 0 !important;
@@ -217,8 +215,7 @@ body.stash-liquid-glass nav.top-nav button.notification-btn::before {
     transition: opacity 0.22s ease !important;
 }
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn:hover,
-body.stash-liquid-glass nav.top-nav button.gs-trigger:hover,
-body.stash-liquid-glass nav.top-nav button.notification-btn:hover {
+body.stash-liquid-glass nav.top-nav button.gs-trigger:hover {
     background: rgba(255, 255, 255, 0.06) !important;
     color: #fff !important;
     border: none !important;
@@ -226,37 +223,45 @@ body.stash-liquid-glass nav.top-nav button.notification-btn:hover {
     transform: none !important;
 }
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn:hover::before,
-body.stash-liquid-glass nav.top-nav button.gs-trigger:hover::before,
-body.stash-liquid-glass nav.top-nav button.notification-btn:hover::before {
+body.stash-liquid-glass nav.top-nav button.gs-trigger:hover::before {
     opacity: 1 !important;
 }
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn svg,
-body.stash-liquid-glass nav.top-nav button.gs-trigger svg,
-body.stash-liquid-glass nav.top-nav button.notification-btn svg {
+body.stash-liquid-glass nav.top-nav button.gs-trigger svg {
     width: 0.9rem !important;
     height: 0.9rem !important;
 }
 
-/* stashNotifications bell extras (shares the gs-trigger look above).
-   Bell icon at 1.15rem to match the other utility icons (16.1px
-   rendered) — the shared gs-trigger 0.9rem above is for the search
-   trigger and left the bell visibly undersized next to its siblings.
-   Kill the Bootstrap dropdown-toggle caret — a caret on an icon-square
-   reads as clutter. */
+/* stashNotifications bell. Square/hover/glare come from the shared
+   "consistent icon square" rule below (~line 370), which the bell's
+   selector is opted into. Here: hide the plugin's FA bell svg (the
+   ::after mask below replaces it with the theme's own glyph). */
 body.stash-liquid-glass nav.top-nav button.notification-btn svg {
+    display: none !important;
+}
+/* The ::after doubles as caret-killer and icon: border:none removes
+   Bootstrap's triangle, the mask paints the theme's circle-notification
+   glyph (user-supplied svgrepo icon) in currentColor at the same
+   1.15rem as the sibling utility icons. The plugin's FA bell svg is
+   display:none'd above. */
+body.stash-liquid-glass nav.top-nav .notification-btn.dropdown-toggle::after {
+    content: "" !important;
+    display: block !important;
     width: 1.15rem !important;
     height: 1.15rem !important;
+    border: none !important;
+    margin: 0 !important;
+    vertical-align: initial !important;
+    background-color: currentColor !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M19 8C20.6569 8 22 6.65685 22 5C22 3.34315 20.6569 2 19 2C17.3431 2 16 3.34315 16 5C16 6.65685 17.3431 8 19 8Z' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14.02 2.2C13.36 2.07 12.69 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 11.32 21.93 10.65 21.8 10.01' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain !important;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M19 8C20.6569 8 22 6.65685 22 5C22 3.34315 20.6569 2 19 2C17.3431 2 16 3.34315 16 5C16 6.65685 17.3431 8 19 8Z' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14.02 2.2C13.36 2.07 12.69 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 11.32 21.93 10.65 21.8 10.01' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain !important;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease !important;
 }
-/* Square the button like its .nav-utility siblings (2.7rem = 37.8px);
-   the btn's own horizontal padding made it 43px wide, pushing the bell
-   off-center and the badge deeper into the icon. */
-body.stash-liquid-glass nav.top-nav button.notification-btn {
-    width: 2.7rem !important;
-    height: 2.7rem !important;
-    padding: 0 !important;
-}
-body.stash-liquid-glass nav.top-nav .notification-btn.dropdown-toggle::after {
-    display: none !important;
+/* Same icon-shimmer the sibling utility icons get on hover
+   (rule ~455: scale + drop-shadow), applied to the mask icon. */
+body.stash-liquid-glass nav.top-nav button.notification-btn:hover::after {
+    transform: scale(1.04) !important;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.18)) !important;
 }
 /* Count badge: a small accent counter dot pinned to the button's
    top-right corner. Overrides both the plugin's own relative offsets
@@ -266,8 +271,13 @@ body.stash-liquid-glass nav.top-nav .notification-btn.dropdown-toggle::after {
    the bulk of a bordered pill. */
 body.stash-liquid-glass nav.top-nav .notification-btn .notification-badge {
     position: absolute !important;
-    top: 2px !important;
-    right: 2px !important;
+    /* 7px lands the badge centered on the icon's own notification-dot
+       (dot at 19,5 in the 24-unit viewBox, icon 16.1px centered in the
+       37.8px button) so the count REPLACES the dot rather than doubling
+       up next to it; when the plugin hides the badge at zero, the
+       icon's engraved dot shows instead. */
+    top: 7px !important;
+    right: 7px !important;
     left: auto !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -286,6 +296,9 @@ body.stash-liquid-glass nav.top-nav .notification-btn .notification-badge {
     box-shadow: 0 0 0 2px rgba(10, 8, 14, 0.55) !important;
     transform: none !important;
     margin: 0 !important;
+    /* Above the ::after mask icon, which as generated content paints
+       after (over) the badge span in tree order. */
+    z-index: 1 !important;
 }
 
 /* Icons-only: kill text labels via font-size: 0 (UI Tweaks pattern).
@@ -334,6 +347,12 @@ body.stash-liquid-glass nav.top-nav .navbar-nav .nav-item > .nav-link {
    CSS nesting collapses base + ::before + :hover + :hover::before + :active
    into one selector list (Safari 17.2+, Chrome 120+). */
 body.stash-liquid-glass.refract-show-help nav.top-nav .navbar-buttons > button.nav-utility[title="Help"],
+/* stashNotifications bell: a button.nav-utility (normally theme-hidden,
+   hence excluded from the button.btn line below) that we keep and want
+   IDENTICAL to its siblings — same square, hover lift, glare. The 4-class
+   specificity also outranks the generic .btn-primary:hover accent-tint
+   from the later button files. */
+body.stash-liquid-glass nav.top-nav button.btn.notification-btn,
 body.stash-liquid-glass nav.top-nav a.btn:where(:not(.brand-link):not(.navbar-brand button):not(.logout-button):not([href*="/logout"]):not([title="Help"]):not([aria-label="Help"]):not([href="/help"]):not([href*="/manual"]):not([href*="opencollective"]):not(.sidebar-toggle-button)),
 body.stash-liquid-glass nav.top-nav button.btn:where(:not(.brand-link):not(.navbar-brand button):not(.nav-utility):not(.logout-button):not([href*="/logout"]):not([title="Help"]):not([aria-label="Help"]):not([href="/help"]):not([href*="/manual"]):not([href*="opencollective"]):not(.sidebar-toggle-button)),
 body.stash-liquid-glass nav.top-nav .navbar-toggler {
@@ -401,6 +420,16 @@ body.stash-liquid-glass nav.top-nav .navbar-toggler {
             background 0.08s ease,
             box-shadow 0.08s ease !important;
     }
+}
+
+/* Bell resting state: its siblings render BARE at rest (their .minimal
+   styling beats the square base above), but the bell's 4-class opt-in
+   selector outranks .minimal, so the faint square showed only on the
+   bell. Blank it at rest; :hover in the shared rule has pseudo-class
+   specificity on top and still paints the square + lift. */
+body.stash-liquid-glass nav.top-nav button.btn.notification-btn {
+    background: transparent !important;
+    border-color: transparent !important;
 }
 
 /* Library column: some Stash builds use <a.nav-link><button> without .btn — match utility icon tiles. */
