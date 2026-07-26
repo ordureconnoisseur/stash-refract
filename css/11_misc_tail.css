@@ -1023,6 +1023,15 @@ body.stash-liquid-glass .refract-card-style-toggle {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-pill);
     padding: 3px;
+    /* In the Interface card the toggle is a flex item that Stash's
+       native .setting layout can shrink below its content, leaving the
+       last label poking out of the pill border. Never shrink. */
+    flex-shrink: 0 !important;
+    width: -moz-fit-content;
+    width: fit-content;
+}
+body.stash-liquid-glass .refract-segmented-btn {
+    white-space: nowrap;
 }
 body.stash-liquid-glass .refract-segmented-btn {
     appearance: none;

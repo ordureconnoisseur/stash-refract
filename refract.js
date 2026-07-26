@@ -9249,7 +9249,9 @@
         var card = document.createElement("div");
         card.className = "card";
         section.appendChild(card);
-        pane.appendChild(section);
+        /* TOP of the Interface tab (user request 2026-07-26): theme
+           settings are the most-touched thing on this page. */
+        pane.insertBefore(section, pane.firstChild);
 
         /* The panel itself is mounted into this .card by the portal host
            registered in registerAccentPatch — NOT a standalone
