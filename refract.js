@@ -239,10 +239,12 @@
                 ),
                 R.createElement("button", {
                     type: "button",
-                    className: "refract-preview-shuffle btn btn-secondary",
-                    title: "Show a different scene and performer",
-                    onClick: function () { load(true); }
-                }, "Shuffle")
+                    className: "refract-preview-shuffle",
+                    title: "Shuffle: show a different scene and performer",
+                    "aria-label": "Shuffle preview cards",
+                    onClick: function () { load(true); },
+                    dangerouslySetInnerHTML: { __html: PREVIEW_SHUFFLE_ICON_SVG }
+                })
             );
         }
 
@@ -960,6 +962,17 @@
         "<rect width='2' height='3' fill='#2a2436'/>" +
         "<circle cx='1' cy='1.05' r='0.42' fill='#4a3f63'/>" +
         "<path d='M0.25 3a0.75 0.62 0 0 1 1.5 0z' fill='#4a3f63'/></svg>");
+    /* Shuffle icon for the card preview: two fanned BLANK playing cards
+       (user-requested motif — svgrepo 521546 minus the suit marks),
+       stroke-based so it inherits currentColor. */
+    var PREVIEW_SHUFFLE_ICON_SVG =
+        '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+        '<rect x="3.4" y="5.6" width="10.2" height="14.2" rx="1.7" ' +
+            'transform="rotate(-9 8.5 12.7)" stroke="currentColor" stroke-width="1.6"/>' +
+        '<rect x="10.4" y="4.2" width="10.2" height="14.2" rx="1.7" ' +
+            'transform="rotate(9 15.5 11.3)" stroke="currentColor" stroke-width="1.6"/>' +
+        '</svg>';
+
     /* Gender glyph for the mock name banner — the real banner CLONES the
        native .gender-icon svg from the card title, which the mocks don't
        have, so carry a static venus copy with the same class. */

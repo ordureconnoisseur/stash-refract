@@ -1162,14 +1162,22 @@ body.stash-liquid-glass .refract-card-customiser .refract-suggestion-summary::af
 
 /* Real-card preview: Stash's actual SceneCard/PerformerCard rendered
    with library data. Constrain widths (the grid normally sizes cards
-   via JS useCardWidth, which doesn't run here) and lay them out like
-   the mock pair. Cursor stays default since clicks are swallowed. */
+   via JS useCardWidth, which doesn't run here). The pair is CENTERED
+   with a deliberate gap; the shuffle button is a glass icon square
+   pinned to the block's top-right corner (blank-cards glyph). Cursor
+   stays default on the cards since clicks are swallowed. */
+body.stash-liquid-glass .refract-card-preview-real {
+    position: relative;
+}
 body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards {
     display: flex;
-    gap: 1.1rem;
+    gap: 1.5rem;
     align-items: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
     pointer-events: auto;
+    /* keep centred content clear of the corner button */
+    padding: 0.25rem 3rem;
 }
 body.stash-liquid-glass .refract-card-preview-real .scene-card {
     width: 300px !important;
@@ -1182,9 +1190,33 @@ body.stash-liquid-glass .refract-card-preview-real button:not(.refract-preview-s
     cursor: default !important;
 }
 body.stash-liquid-glass .refract-preview-shuffle {
-    margin-top: 0.6rem;
-    font-size: 0.78rem;
-    padding: 0.3rem 0.9rem;
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    width: 2.3rem;
+    height: 2.3rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.15s;
+}
+body.stash-liquid-glass .refract-preview-shuffle:hover {
+    color: var(--accent-bright);
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(var(--accent-rgb), 0.4);
+}
+body.stash-liquid-glass .refract-preview-shuffle:active {
+    transform: scale(0.94);
+}
+body.stash-liquid-glass .refract-preview-shuffle svg {
+    width: 1.25rem;
+    height: 1.25rem;
 }
 
 /* Element chips in the customiser (Scene / Performer card elements
