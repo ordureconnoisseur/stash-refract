@@ -638,7 +638,7 @@
                             ),
                             R.createElement("div", {
                                 className: "refract-card-preview",
-                                dangerouslySetInnerHTML: { __html: REFRACT_PREVIEW_HTML }
+                                dangerouslySetInnerHTML: { __html: refractBuildPreviewHtml() }
                             })
                         ),
                         R.createElement("div", { className: "setting", id: "plugin-refract-hide-card-ratings" },
@@ -899,9 +899,15 @@
        .scene-card / .performer-card class structure so the SAME theme CSS
        (card styles, rating modes, and the visibility toggles below) paints
        them — no separate preview styling to keep in sync. Inert by
-       construction: data-stash-sc / data-stash-pc markers make every
-       refract card processor skip them, art is inline SVG data URIs (no
-       library content), and the container is pointer-events:none. */
+       construction: data-stash-sc / data-stash-pc markers make the CARD
+       processors (initSceneCards/initPerformerCards) skip them — which is
+       why JS-built furniture (name banner, pill icons, badge scale) must
+       be baked into the static markup — while tagFilledRatings still
+       iterates .rating-banner document-wide, so it DOES tier the mocks
+       from their "8.6" banners (that pass-through is what keeps the tier
+       ribbon/frames live in tiers + playing-card modes). Art is inline
+       SVG data URIs (no library content), and the container is
+       pointer-events:none. */
     var REFRACT_PREVIEW_ART_SCENE = "data:image/svg+xml;utf8," + encodeURIComponent(
         "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'>" +
         "<rect width='16' height='9' fill='#262230'/>" +
@@ -913,45 +919,78 @@
         "<rect width='2' height='3' fill='#2a2436'/>" +
         "<circle cx='1' cy='1.05' r='0.42' fill='#4a3f63'/>" +
         "<path d='M0.25 3a0.75 0.62 0 0 1 1.5 0z' fill='#4a3f63'/></svg>");
-    var REFRACT_PREVIEW_HTML =
-        '<div class="scene-card grid-card card refract-preview-card" data-stash-sc="1">' +
+    /* Gender glyph for the mock name banner — the real banner CLONES the
+       native .gender-icon svg from the card title, which the mocks don't
+       have, so carry a static venus copy with the same class. */
+    var REFRACT_PREVIEW_GENDER_SVG =
+        '<svg class="gender-icon" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true">' +
+        '<path d="M80 176a112 112 0 1 1 224 0A112 112 0 1 1 80 176zM224 349.1c81.9-15 144-86.8 ' +
+        '144-173.1C368 78.8 289.2 0 192 0S16 78.8 16 176c0 86.3 62.1 158.1 144 173.1V384H128' +
+        'c-17.7 0-32 14.3-32 32s14.3 32 32 32h32v32c0 17.7 14.3 32 32 32s32-14.3 32-32V448h32' +
+        'c17.7 0 32-14.3 32-32s-14.3-32-32-32H224V349.1z"/></svg>';
+
+    /* Built LAZILY (function, not a var) because it concatenates the shared
+       pill icon constants (STAR_SVG, CAKE_SVG, O_ICON_SVG, PLAY_SVG,
+       PEOPLE_ICON_SVG, TAG_ICON_SVG) which are declared further down the
+       file — by settings render time they're all assigned. Markup mirrors a
+       REAL processed card (dumped live 2026-07-26): name banner first child,
+       circles/counts INSIDE .card-section after the title, icons inside
+       every pill. --pc-badge-scale is JS-fitted on real cards; the mock
+       hardcodes a value tuned to its fixed 190px width. */
+    function refractBuildPreviewHtml() {
+        return '<div class="scene-card grid-card card refract-preview-card" data-stash-sc="1">' +
             '<div class="thumbnail-section">' +
-                '<div class="scene-card-preview">' +
-                    '<img class="scene-card-preview-image" alt="" src="' + REFRACT_PREVIEW_ART_SCENE + '">' +
-                '</div>' +
-                '<div class="scene-specs-overlay"><span class="overlay-resolution">1080p</span><span class="overlay-duration">12:34</span></div>' +
+                '<a class="scene-card-link">' +
+                    '<div class="scene-card-preview">' +
+                        '<img class="scene-card-preview-image" alt="" src="' + REFRACT_PREVIEW_ART_SCENE + '">' +
+                    '</div>' +
+                    '<div class="scene-specs-overlay"><span class="overlay-resolution">1080p</span><span class="overlay-duration">12:34</span></div>' +
+                '</a>' +
                 '<div class="studio-overlay">Studio</div>' +
             '</div>' +
+            /* DIRECT card child on purpose: 03_cards.css hides any banner
+               nested deeper (`.scene-card .rating-banner`) and re-shows
+               only `.scene-card > .rating-banner` — refract.js's injected
+               source-of-truth banner. The mock mirrors the injected one,
+               not Stash's hidden native nested banner. */
             '<div class="rating-banner">8.6</div>' +
-            '<div class="stash-performer-circles">' +
-                '<div class="stash-performer-avatars">' +
-                    '<a class="stash-performer-link"><img class="stash-performer-avatar" alt="" src="' + REFRACT_PREVIEW_ART_PERF + '"></a>' +
-                    '<a class="stash-performer-link"><img class="stash-performer-avatar" alt="" src="' + REFRACT_PREVIEW_ART_PERF + '"></a>' +
-                '</div>' +
-                '<div class="stash-card-counts">' +
-                    '<span class="stash-duration-pill">12:34</span>' +
-                    '<a class="stash-performer-pill"><span>2</span></a>' +
-                    '<span class="stash-o-count"><span>3</span></span>' +
+            '<div class="card-section">' +
+                '<a><h5 class="card-section-title">Example Scene</h5></a>' +
+                '<div class="stash-performer-circles">' +
+                    '<div class="stash-performer-avatars">' +
+                        '<a class="stash-performer-link"><img class="stash-performer-avatar" alt="" src="' + REFRACT_PREVIEW_ART_PERF + '"></a>' +
+                        '<a class="stash-performer-link"><img class="stash-performer-avatar" alt="" src="' + REFRACT_PREVIEW_ART_PERF + '"></a>' +
+                    '</div>' +
+                    '<div class="stash-card-counts">' +
+                        '<span class="stash-duration-pill">12:34</span>' +
+                        '<a class="stash-performer-pill">' + PEOPLE_ICON_SVG + '<span>2</span></a>' +
+                        '<span class="stash-o-count">' + O_ICON_SVG + '<span>3</span></span>' +
+                        '<a class="stash-tag-count">' + TAG_ICON_SVG + '<span>4</span></a>' +
+                    '</div>' +
                 '</div>' +
             '</div>' +
             '<div class="refract-pc-tier-label"></div>' +
-            '<div class="card-section"><h5 class="card-section-title">Example Scene</h5></div>' +
         '</div>' +
         '<div class="performer-card grid-card card refract-preview-card" data-stash-pc="1">' +
+            '<div class="refract-pc-name-banner">' + REFRACT_PREVIEW_GENDER_SVG +
+                '<span class="refract-pc-name-text" style="font-size: 0.85rem;">Jane Example</span>' +
+            '</div>' +
             '<div class="thumbnail-section"><a><img class="performer-card-image" alt="" src="' + REFRACT_PREVIEW_ART_PERF + '"></a>' +
                 '<div class="rating-banner">8.6</div>' +
             '</div>' +
-            '<div class="refract-pc-tier-label"></div>' +
             '<div class="card-section">' +
-                '<h5 class="card-section-title">Jane Example</h5>' +
-                '<div class="stash-perf-stats">' +
-                    '<span class="stash-perf-rating"><span class="stash-perf-label">Rating</span><span>8.6</span></span>' +
-                    '<span class="stash-perf-age"><span class="stash-perf-label">Age</span><span>29</span></span>' +
-                    '<span class="stash-perf-ocount"><span class="stash-perf-label">O Count</span><span>12</span></span>' +
-                    '<a class="stash-perf-scenes"><span class="stash-perf-label">Scenes</span><span>34</span></a>' +
+                '<a><h5 class="card-section-title">Jane Example</h5></a>' +
+                '<span class="stash-perf-country"><span class="stash-perf-country-name">United States</span></span>' +
+                '<div class="stash-perf-stats" style="--pc-badge-scale: 0.65;">' +
+                    '<span class="stash-perf-rating">' + STAR_SVG + '<span class="stash-perf-label">Rating</span><span>8.6</span></span>' +
+                    '<span class="stash-perf-age">' + CAKE_SVG + '<span class="stash-perf-label">Age</span><span>29</span></span>' +
+                    '<span class="stash-perf-ocount">' + O_ICON_SVG + '<span class="stash-perf-label">O Count</span><span>12</span></span>' +
+                    '<a class="stash-perf-scenes">' + PLAY_SVG + '<span class="stash-perf-label">Scenes</span><span>34</span></a>' +
                 '</div>' +
             '</div>' +
+            '<div class="refract-pc-tier-label"></div>' +
         '</div>';
+    }
 
     /* Card-element visibility toggles (Suggestion Box, forum-requested). */
     var HIDE_CARD_RATINGS_KEY = "refract.hideCardRatings";
