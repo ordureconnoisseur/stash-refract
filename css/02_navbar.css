@@ -247,8 +247,10 @@ body.stash-liquid-glass nav.top-nav button.notification-btn svg {
 body.stash-liquid-glass nav.top-nav .notification-btn.dropdown-toggle::after {
     content: "" !important;
     display: block !important;
-    width: 1.15rem !important;
-    height: 1.15rem !important;
+    /* Stroke-based ring reads optically smaller than the siblings'
+       solid glyphs at equal box size; 1.35rem compensates. */
+    width: 1.35rem !important;
+    height: 1.35rem !important;
     border: none !important;
     margin: 0 !important;
     vertical-align: initial !important;
@@ -256,6 +258,15 @@ body.stash-liquid-glass nav.top-nav .notification-btn.dropdown-toggle::after {
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M19 8C20.6569 8 22 6.65685 22 5C22 3.34315 20.6569 2 19 2C17.3431 2 16 3.34315 16 5C16 6.65685 17.3431 8 19 8Z' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14.02 2.2C13.36 2.07 12.69 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 11.32 21.93 10.65 21.8 10.01' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain !important;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M19 8C20.6569 8 22 6.65685 22 5C22 3.34315 20.6569 2 19 2C17.3431 2 16 3.34315 16 5C16 6.65685 17.3431 8 19 8Z' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14.02 2.2C13.36 2.07 12.69 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 11.32 21.93 10.65 21.8 10.01' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain !important;
     transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease !important;
+}
+/* When the count badge is showing, drop the icon's engraved dot from
+   the mask (arc-only variant): the translucent badge sits where the
+   dot lives and the stroke would ghost through it. Badge hidden at
+   zero -> full mask above keeps the dot. Single-element :has(), no
+   grid-scale perf concern. */
+body.stash-liquid-glass nav.top-nav .notification-btn.dropdown-toggle:has(.notification-badge)::after {
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M14.02 2.2C13.36 2.07 12.69 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 11.32 21.93 10.65 21.8 10.01' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain !important;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M14.02 2.2C13.36 2.07 12.69 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 11.32 21.93 10.65 21.8 10.01' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain !important;
 }
 /* Same icon-shimmer the sibling utility icons get on hover
    (rule ~455: scale + drop-shadow), applied to the mask icon. */
@@ -271,13 +282,13 @@ body.stash-liquid-glass nav.top-nav button.notification-btn:hover::after {
    the bulk of a bordered pill. */
 body.stash-liquid-glass nav.top-nav .notification-btn .notification-badge {
     position: absolute !important;
-    /* 7px lands the badge centered on the icon's own notification-dot
-       (dot at 19,5 in the 24-unit viewBox, icon 16.1px centered in the
-       37.8px button) so the count REPLACES the dot rather than doubling
-       up next to it; when the plugin hides the badge at zero, the
-       icon's engraved dot shows instead. */
-    top: 7px !important;
-    right: 7px !important;
+    /* 6px lands the badge centered where the icon's notification-dot
+       sits (dot at 19,5 in the 24-unit viewBox, icon 1.35rem centered
+       in the 2.7rem button), so the count takes the dot's place in the
+       ring's gap; at zero the plugin drops the badge and the mask's
+       engraved dot returns (see the :has() arc-only swap below). */
+    top: 4px !important;
+    right: 4px !important;
     left: auto !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -287,13 +298,18 @@ body.stash-liquid-glass nav.top-nav .notification-btn .notification-badge {
     height: 13px !important;
     padding: 0 3px !important;
     border-radius: 999px !important;
-    background: rgb(var(--accent-rgb)) !important;
+    /* Glassy accent, not a solid opaque disc, and no dark ring: the
+       flat rgb() + 2px black shadow read as a sticker on the theme's
+       glass surfaces. Translucent accent + blur matches the navbar. */
+    background: rgba(var(--accent-rgb), 0.55) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    backdrop-filter: blur(6px) !important;
     color: #fff !important;
     font-size: 0.58rem !important;
     font-weight: 700 !important;
     line-height: 1 !important;
-    border: none !important;
-    box-shadow: 0 0 0 2px rgba(10, 8, 14, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    box-shadow: none !important;
     transform: none !important;
     margin: 0 !important;
     /* Above the ::after mask icon, which as generated content paints
