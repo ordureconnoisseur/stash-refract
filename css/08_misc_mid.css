@@ -6912,21 +6912,12 @@ body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] {
 }
 
 
-/* ── Card-element visibility toggles (Suggestion Box), scene-card side ──
-   Body classes set by refract.js from refract.hideScenePerformers /
-   showSceneRes. The performer hide covers both representations (the
-   avatar circles row and minimal mode's compact pill). The resolution
-   toggle re-shows the native .scene-specs-overlay that minimal mode
-   hides (rule near the .stash-duration-pill notes above), but keeps
-   every chip except resolution hidden so duration stays only in the
-   bottom pill row. Extra class = higher specificity than the hide. */
-body.stash-liquid-glass.refract-hide-scene-performers.refract-hide-scene-performers .scene-card .stash-performer-circles,
-body.stash-liquid-glass.refract-hide-scene-performers.refract-hide-scene-performers .scene-card .stash-performer-pill {
-    display: none !important;
-}
-body.stash-liquid-glass.refract-minimal-cards.refract-show-scene-res.refract-show-scene-res .scene-card .scene-specs-overlay {
-    display: block !important;
-}
-body.stash-liquid-glass.refract-minimal-cards.refract-show-scene-res.refract-show-scene-res .scene-card .scene-specs-overlay > *:not(.overlay-resolution) {
+/* ── "Performers" customiser chip, scene-card side ────────────────────
+   Covers both representations: the avatar circles row and minimal
+   mode's compact pill. Doubled class outranks per-mode styling. (The
+   old show-resolution toggle is retired: the res chip now simply
+   follows the Scene card style — Classic shows it, tidy hides it.) */
+body.stash-liquid-glass.refract-sc-hide-performers.refract-sc-hide-performers .scene-card .stash-performer-circles,
+body.stash-liquid-glass.refract-sc-hide-performers.refract-sc-hide-performers .scene-card .stash-performer-pill {
     display: none !important;
 }

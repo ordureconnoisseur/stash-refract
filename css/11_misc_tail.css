@@ -1178,6 +1178,17 @@ body.stash-liquid-glass .refract-preview-shuffle {
     padding: 0.3rem 0.9rem;
 }
 
+/* Element chips in the customiser (Scene / Performer card elements
+   rows): reuse the segmented-btn look; a LIT chip (is-active) means
+   the element is shown on the card. */
+body.stash-liquid-glass .refract-card-elems {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: flex-end;
+    max-width: 24rem;
+}
+
 /* Pointer note left in the old plugin-settings panel after the move to
    Settings -> Interface -> Refract. */
 body.stash-liquid-glass .refract-settings-moved-note {

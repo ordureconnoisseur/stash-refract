@@ -2002,19 +2002,41 @@ body.stash-liquid-glass .stash-perf-ocount:hover {
 }
 
 
-/* ── Card-element visibility toggles (Suggestion Box) ─────────────────
-   Body classes set by refract.js from the refract.hideCardRatings /
-   hidePerfStats / hidePerfOCount settings. Toggle class doubled for specificity: mode styling in later files
-   (16_playing_card display:flex !important on the strip) ties a single
-   class and would win by order. Plain display gates; the
-   JS that reads these elements (tiering, playing-card pills) runs
-   regardless, so flipping a toggle never loses data. */
-body.stash-liquid-glass.refract-hide-card-ratings.refract-hide-card-ratings :is(.scene-card, .performer-card, .studio-card, .gallery-card, .image-card, .grid-card) .rating-banner {
+/* ── Card-element visibility gates (customiser chips) ─────────────────
+   Body classes set by refract.js from the CARD_ELEMS table; one gate
+   per element, split per card type. Toggle class doubled for
+   specificity: mode styling in later files (16_playing_card
+   display:flex !important on the strip) ties a single class and would
+   win by order. Plain display gates; the JS that reads these elements
+   (tiering, playing-card pills) runs regardless, so flipping a chip
+   never loses data. The "Performers" chip owns .stash-performer-pill
+   (its minimal-mode form, gated in 08_misc_mid); "Count pills" owns
+   the o-count + tag pills only. */
+body.stash-liquid-glass.refract-sc-hide-rating.refract-sc-hide-rating .scene-card .rating-banner {
     display: none !important;
 }
-body.stash-liquid-glass.refract-hide-perf-stats.refract-hide-perf-stats .performer-card .stash-perf-stats {
+body.stash-liquid-glass.refract-pc-hide-rating.refract-pc-hide-rating .performer-card .rating-banner {
     display: none !important;
 }
-body.stash-liquid-glass.refract-hide-perf-ocount.refract-hide-perf-ocount .performer-card .stash-perf-stats .stash-perf-ocount {
+body.stash-liquid-glass.refract-sc-hide-studio.refract-sc-hide-studio .scene-card .studio-overlay {
+    display: none !important;
+}
+body.stash-liquid-glass.refract-sc-hide-duration.refract-sc-hide-duration .scene-card .scene-specs-overlay .overlay-duration,
+body.stash-liquid-glass.refract-sc-hide-duration.refract-sc-hide-duration .scene-card .stash-duration-pill {
+    display: none !important;
+}
+body.stash-liquid-glass.refract-sc-hide-counts.refract-sc-hide-counts .scene-card .stash-o-count,
+body.stash-liquid-glass.refract-sc-hide-counts.refract-sc-hide-counts .scene-card .stash-tag-count {
+    display: none !important;
+}
+body.stash-liquid-glass.refract-pc-hide-stats.refract-pc-hide-stats .performer-card .stash-perf-stats {
+    display: none !important;
+}
+/* Country gate TRIPLES the class: playing-card's
+   .stash-perf-country.refract-country-with-rank rule ties a doubled
+   gate at 5 classes and wins on file order. */
+body.stash-liquid-glass.refract-pc-hide-country.refract-pc-hide-country.refract-pc-hide-country .performer-card .stash-perf-country,
+body.stash-liquid-glass.refract-pc-hide-country.refract-pc-hide-country.refract-pc-hide-country .performer-card .performer-card__country-flag,
+body.stash-liquid-glass.refract-pc-hide-country.refract-pc-hide-country.refract-pc-hide-country .performer-card .performer-card__country-string {
     display: none !important;
 }
