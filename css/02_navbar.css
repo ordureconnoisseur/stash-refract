@@ -282,33 +282,34 @@ body.stash-liquid-glass nav.top-nav button.notification-btn:hover::after {
    the bulk of a bordered pill. */
 body.stash-liquid-glass nav.top-nav .notification-btn .notification-badge {
     position: absolute !important;
-    /* 6px lands the badge centered where the icon's notification-dot
-       sits (dot at 19,5 in the 24-unit viewBox, icon 1.35rem centered
-       in the 2.7rem button), so the count takes the dot's place in the
-       ring's gap; at zero the plugin drops the badge and the mask's
-       engraved dot returns (see the :has() arc-only swap below). */
-    top: 4px !important;
-    right: 4px !important;
+    /* Corner placement: high enough that the arc's open ends stay
+       visible (a lower badge covered them and the ring read as a
+       closed circle); at zero the plugin drops the badge and the
+       mask's engraved dot returns (see the :has() arc-only swap
+       below). */
+    top: 3px !important;
+    right: 3px !important;
     left: auto !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    min-width: 13px !important;
+    min-width: 12px !important;
     width: auto !important;
-    height: 13px !important;
+    height: 12px !important;
     padding: 0 3px !important;
     border-radius: 999px !important;
-    /* Glassy accent, not a solid opaque disc, and no dark ring: the
-       flat rgb() + 2px black shadow read as a sticker on the theme's
-       glass surfaces. Translucent accent + blur matches the navbar. */
-    background: rgba(var(--accent-rgb), 0.55) !important;
-    -webkit-backdrop-filter: blur(6px) !important;
-    backdrop-filter: blur(6px) !important;
+    /* Solid accent, no border, no blur, no shadow. The earlier
+       translucent + backdrop-blur pass produced a dark edge halo at
+       real navbar size (user report), and any ring/border reads as
+       grime at 12px. Flat accent disc only. */
+    background: rgb(var(--accent-rgb)) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     color: #fff !important;
-    font-size: 0.58rem !important;
+    font-size: 0.55rem !important;
     font-weight: 700 !important;
     line-height: 1 !important;
-    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    border: none !important;
     box-shadow: none !important;
     transform: none !important;
     margin: 0 !important;
