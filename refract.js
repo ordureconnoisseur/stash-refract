@@ -464,29 +464,6 @@
                     ),
                     R.createElement("div", { className: "refract-accent-swatches" }, swatches)
                 ),
-                R.createElement("div", { className: "setting", id: "plugin-refract-rating-style" },
-                    R.createElement("div", null,
-                        R.createElement("h3", null, "Card rating style"),
-                        R.createElement("div", { className: "sub-heading" },
-                            R.createElement("b", null, "Minimal"), " (default) — accent-coloured halo for every rating; brightness scales with score. ",
-                            R.createElement("b", null, "Extravagant"), " — tier-based card frame, halo, and animations escalating from Bronze through Perfect. ",
-                            R.createElement("b", null, "Playing card"), " — trading-card layout for performer cards: name banner at the top with tier-glow, prominent stat strip along the bottom (rating, age, scenes, O count, country).")
-                    ),
-                    R.createElement("div", { className: "refract-setting-control refract-rating-style-toggle" },
-                        [
-                            { key: "intensity",    label: "Minimal" },
-                            { key: "tiers",        label: "Extravagant" },
-                            { key: "playing-card", label: "Playing card" }
-                        ].map(function (item) {
-                            return R.createElement("button", {
-                                key: item.key,
-                                type: "button",
-                                className: "refract-segmented-btn" + (ratingStyle === item.key ? " is-active" : ""),
-                                onClick: function () { pickRatingStyle(item.key); }
-                            }, item.label);
-                        })
-                    )
-                ),
                 R.createElement("div", { className: "setting", id: "plugin-refract-lite-mode" },
                     R.createElement("div", null,
                         R.createElement("h3", null, "Lite mode"),
@@ -509,60 +486,71 @@
                         )
                     )
                 ),
-                /* ── The Suggestion Box ─────────────────────────────────────
-                   A collapsed-by-default drawer of opt-in features that run
-                   against the theme's defaults but get requested often.
-                   Native <details> so it stays hidden until clicked open. */
-                R.createElement("details", { className: "refract-suggestion-box" },
+                /* â”€â”€ Card customiser â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                   Everything that changes how scene and performer cards look,
+                   collated around the live preview. Same drawer chrome as the
+                   Suggestion Box (shared refract-suggestion-box class). */
+                R.createElement("details", { className: "refract-suggestion-box refract-card-customiser" },
                     R.createElement("summary", { className: "refract-suggestion-summary" },
-                        R.createElement("h3", null, "The Suggestion Box"),
+                        R.createElement("h3", null, "Card customiser"),
                         R.createElement("div", { className: "sub-heading" },
-                            "Things I'd never pick myself. But you asked, so here they are. Enable at your own aesthetic risk.")
+                            "Every setting that changes how scene and performer cards look. The preview updates live as you change them.")
                     ),
                     R.createElement("div", { className: "refract-suggestion-body" },
-                        R.createElement("div", { className: "setting", id: "plugin-refract-studio-banner" },
+                        R.createElement("div", { className: "setting refract-card-preview-setting", id: "plugin-refract-card-preview" },
                             R.createElement("div", null,
-                                R.createElement("h3", null, "Studio banner"),
+                                R.createElement("h3", null, "Card preview"),
                                 R.createElement("div", { className: "sub-heading" },
-                                    "Show the studio's logo image above the scene title instead of the small muted studio name.")
+                                    "Sample cards painted by your current theme settings. Everything below updates them live as you change it.")
                             ),
-                            R.createElement("div", { className: "refract-setting-control" },
-                                R.createElement("div", { className: "custom-control custom-switch" },
-                                    R.createElement("input", {
-                                        type: "checkbox",
-                                        className: "custom-control-input",
-                                        id: "refract-studio-banner-toggle",
-                                        checked: studioBannerOn,
-                                        onChange: toggleStudioBanner
-                                    }),
-                                    R.createElement("label", {
-                                        className: "custom-control-label",
-                                        htmlFor: "refract-studio-banner-toggle"
-                                    })
-                                )
+                            R.createElement("div", {
+                                className: "refract-card-preview",
+                                dangerouslySetInnerHTML: { __html: refractBuildPreviewHtml() }
+                            })
+                        ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-rating-style" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Card rating style"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    R.createElement("b", null, "Minimal"), " (default) — accent-coloured halo for every rating; brightness scales with score. ",
+                                    R.createElement("b", null, "Extravagant"), " — tier-based card frame, halo, and animations escalating from Bronze through Perfect. ",
+                                    R.createElement("b", null, "Playing card"), " — trading-card layout for performer cards: name banner at the top with tier-glow, prominent stat strip along the bottom (rating, age, scenes, O count, country).")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control refract-rating-style-toggle" },
+                                [
+                                    { key: "intensity",    label: "Minimal" },
+                                    { key: "tiers",        label: "Extravagant" },
+                                    { key: "playing-card", label: "Playing card" }
+                                ].map(function (item) {
+                                    return R.createElement("button", {
+                                        key: item.key,
+                                        type: "button",
+                                        className: "refract-segmented-btn" + (ratingStyle === item.key ? " is-active" : ""),
+                                        onClick: function () { pickRatingStyle(item.key); }
+                                    }, item.label);
+                                })
                             )
                         ),
-                        R.createElement("div", { className: "setting", id: "plugin-refract-plugin-sort" },
-                            R.createElement("div", null,
-                                R.createElement("h3", null, "Group by enabled state"),
-                                R.createElement("div", { className: "sub-heading" },
-                                    "On the Settings → Plugins page, sort enabled plugins A→Z first, then disabled ones A→Z below. Off (default) is one flat A→Z list, matching Stash's native order. Reorders glide rather than snap.")
-                            ),
-                            R.createElement("div", { className: "refract-setting-control" },
-                                R.createElement("div", { className: "custom-control custom-switch" },
-                                    R.createElement("input", {
-                                        type: "checkbox",
-                                        className: "custom-control-input",
-                                        id: "refract-plugin-sort-toggle",
-                                        checked: pluginSortDisabledBottomOn,
-                                        onChange: togglePluginSortDisabledBottom
-                                    }),
-                                    R.createElement("label", {
-                                        className: "custom-control-label",
-                                        htmlFor: "refract-plugin-sort-toggle"
-                                    })
-                                )
-                            )
+                        R.createElement("div", { className: "setting", id: "plugin-refract-card-style" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "Scene card style"),
+                        R.createElement("div", { className: "sub-heading" },
+                            R.createElement("b", null, "Refract"), " (default) — tidier minimal layout; description block hidden so the grid stays consistent across scenes with and without descriptions. ",
+                            R.createElement("b", null, "Classic"), " — Stash's original card layout with description, file path, and details visible.")
+                    ),
+                    R.createElement("div", { className: "refract-setting-control refract-card-style-toggle" },
+                        [
+                            { key: "refract", label: "Refract" },
+                            { key: "classic", label: "Classic" }
+                        ].map(function (item) {
+                            return R.createElement("button", {
+                                key: item.key,
+                                type: "button",
+                                className: "refract-segmented-btn" + (cardStyle === item.key ? " is-active" : ""),
+                                onClick: function () { pickCardStyle(item.key); }
+                            }, item.label);
+                        })
+                    )
                         ),
                         (REFRACT_CARDBACK_EXPLICIT_ENABLED ? R.createElement("div", { className: "setting", id: "plugin-refract-cardback-explicit" },
                             R.createElement("div", null,
@@ -607,39 +595,6 @@
                                     })
                                 )
                             )
-                        ),
-                        R.createElement("div", { className: "setting", id: "plugin-refract-hide-center-controls" },
-                            R.createElement("div", null,
-                                R.createElement("h3", null, "Hide player center controls"),
-                                R.createElement("div", { className: "sub-heading" },
-                                    "Remove the back / play / forward buttons that appear over the scene player, leaving only the stock control bar. For keyboard-driven viewing or short clips where the overlay gets in the way.")
-                            ),
-                            R.createElement("div", { className: "refract-setting-control" },
-                                R.createElement("div", { className: "custom-control custom-switch" },
-                                    R.createElement("input", {
-                                        type: "checkbox",
-                                        className: "custom-control-input",
-                                        id: "refract-hide-center-controls-toggle",
-                                        checked: centerControlsHiddenOn,
-                                        onChange: toggleCenterControlsHidden
-                                    }),
-                                    R.createElement("label", {
-                                        className: "custom-control-label",
-                                        htmlFor: "refract-hide-center-controls-toggle"
-                                    })
-                                )
-                            )
-                        ),
-                        R.createElement("div", { className: "setting refract-card-preview-setting", id: "plugin-refract-card-preview" },
-                            R.createElement("div", null,
-                                R.createElement("h3", null, "Card preview"),
-                                R.createElement("div", { className: "sub-heading" },
-                                    "Sample cards painted by your current theme settings. Flip the visibility toggles below and watch them update live.")
-                            ),
-                            R.createElement("div", {
-                                className: "refract-card-preview",
-                                dangerouslySetInnerHTML: { __html: refractBuildPreviewHtml() }
-                            })
                         ),
                         R.createElement("div", { className: "setting", id: "plugin-refract-hide-card-ratings" },
                             R.createElement("div", null,
@@ -750,6 +705,85 @@
                                     })
                                 )
                             )
+                        )
+                    )
+                ),
+                /* ── The Suggestion Box ─────────────────────────────────────
+                   A collapsed-by-default drawer of opt-in features that run
+                   against the theme's defaults but get requested often.
+                   Native <details> so it stays hidden until clicked open. */
+                R.createElement("details", { className: "refract-suggestion-box" },
+                    R.createElement("summary", { className: "refract-suggestion-summary" },
+                        R.createElement("h3", null, "The Suggestion Box"),
+                        R.createElement("div", { className: "sub-heading" },
+                            "Things I'd never pick myself. But you asked, so here they are. Enable at your own aesthetic risk.")
+                    ),
+                    R.createElement("div", { className: "refract-suggestion-body" },
+                        R.createElement("div", { className: "setting", id: "plugin-refract-studio-banner" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Studio banner"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Show the studio's logo image above the scene title instead of the small muted studio name.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-studio-banner-toggle",
+                                        checked: studioBannerOn,
+                                        onChange: toggleStudioBanner
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-studio-banner-toggle"
+                                    })
+                                )
+                            )
+                        ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-plugin-sort" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Group by enabled state"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "On the Settings → Plugins page, sort enabled plugins A→Z first, then disabled ones A→Z below. Off (default) is one flat A→Z list, matching Stash's native order. Reorders glide rather than snap.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-plugin-sort-toggle",
+                                        checked: pluginSortDisabledBottomOn,
+                                        onChange: togglePluginSortDisabledBottom
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-plugin-sort-toggle"
+                                    })
+                                )
+                            )
+                        ),
+                        R.createElement("div", { className: "setting", id: "plugin-refract-hide-center-controls" },
+                            R.createElement("div", null,
+                                R.createElement("h3", null, "Hide player center controls"),
+                                R.createElement("div", { className: "sub-heading" },
+                                    "Remove the back / play / forward buttons that appear over the scene player, leaving only the stock control bar. For keyboard-driven viewing or short clips where the overlay gets in the way.")
+                            ),
+                            R.createElement("div", { className: "refract-setting-control" },
+                                R.createElement("div", { className: "custom-control custom-switch" },
+                                    R.createElement("input", {
+                                        type: "checkbox",
+                                        className: "custom-control-input",
+                                        id: "refract-hide-center-controls-toggle",
+                                        checked: centerControlsHiddenOn,
+                                        onChange: toggleCenterControlsHidden
+                                    }),
+                                    R.createElement("label", {
+                                        className: "custom-control-label",
+                                        htmlFor: "refract-hide-center-controls-toggle"
+                                    })
+                                )
+                            )
                         ),
                         R.createElement("div", { className: "setting", id: "plugin-refract-view-minimiser" },
                             R.createElement("div", null,
@@ -790,27 +824,6 @@
                                     onChange: function (e) { updateLogoUrl(e.target.value); }
                                 })
                             )
-                        ),
-                        R.createElement("div", { className: "setting", id: "plugin-refract-card-style" },
-                    R.createElement("div", null,
-                        R.createElement("h3", null, "Scene card style"),
-                        R.createElement("div", { className: "sub-heading" },
-                            R.createElement("b", null, "Refract"), " (default) — tidier minimal layout; description block hidden so the grid stays consistent across scenes with and without descriptions. ",
-                            R.createElement("b", null, "Classic"), " — Stash's original card layout with description, file path, and details visible.")
-                    ),
-                    R.createElement("div", { className: "refract-setting-control refract-card-style-toggle" },
-                        [
-                            { key: "refract", label: "Refract" },
-                            { key: "classic", label: "Classic" }
-                        ].map(function (item) {
-                            return R.createElement("button", {
-                                key: item.key,
-                                type: "button",
-                                className: "refract-segmented-btn" + (cardStyle === item.key ? " is-active" : ""),
-                                onClick: function () { pickCardStyle(item.key); }
-                            }, item.label);
-                        })
-                    )
                         )
                     )
                 ),
@@ -956,6 +969,13 @@
             '<div class="rating-banner">8.6</div>' +
             '<div class="card-section">' +
                 '<a><h5 class="card-section-title">Example Scene</h5></a>' +
+                /* Shown only in Classic card style (refract-minimal-cards
+                   hides .scene-card__details); lets the "Scene card style"
+                   segmented control visibly flip the preview. */
+                '<div class="scene-card__details">' +
+                    '<span class="scene-card__date">2026-01-01</span>' +
+                    '<span class="file-path extra-scene-info">D:\\Media\\Example Scene.mp4</span>' +
+                '</div>' +
                 '<div class="stash-performer-circles">' +
                     '<div class="stash-performer-avatars">' +
                         '<a class="stash-performer-link"><img class="stash-performer-avatar" alt="" src="' + REFRACT_PREVIEW_ART_PERF + '"></a>' +
@@ -969,6 +989,7 @@
                     '</div>' +
                 '</div>' +
             '</div>' +
+            '<hr>' + /* hidden in Refract card style, shown in Classic */
             '<div class="refract-pc-tier-label"></div>' +
         '</div>' +
         '<div class="performer-card grid-card card refract-preview-card" data-stash-pc="1">' +
