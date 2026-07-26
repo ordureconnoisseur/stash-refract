@@ -238,17 +238,54 @@ body.stash-liquid-glass nav.top-nav button.notification-btn svg {
 }
 
 /* stashNotifications bell extras (shares the gs-trigger look above).
-   The count badge is a span excluded from the label purge; restore its
-   font size (the .navbar-buttons font-size:0 would zero the number) and
-   let it ride the plugin's own offset positioning. Kill the Bootstrap
-   dropdown-toggle caret — a caret on an icon-square reads as clutter. */
-body.stash-liquid-glass nav.top-nav .notification-btn .notification-badge {
-    display: inline-block !important;
-    font-size: 0.68rem !important;
-    line-height: 1 !important;
+   Bell icon at 1.15rem to match the other utility icons (16.1px
+   rendered) — the shared gs-trigger 0.9rem above is for the search
+   trigger and left the bell visibly undersized next to its siblings.
+   Kill the Bootstrap dropdown-toggle caret — a caret on an icon-square
+   reads as clutter. */
+body.stash-liquid-glass nav.top-nav button.notification-btn svg {
+    width: 1.15rem !important;
+    height: 1.15rem !important;
+}
+/* Square the button like its .nav-utility siblings (2.7rem = 37.8px);
+   the btn's own horizontal padding made it 43px wide, pushing the bell
+   off-center and the badge deeper into the icon. */
+body.stash-liquid-glass nav.top-nav button.notification-btn {
+    width: 2.7rem !important;
+    height: 2.7rem !important;
+    padding: 0 !important;
 }
 body.stash-liquid-glass nav.top-nav .notification-btn.dropdown-toggle::after {
     display: none !important;
+}
+/* Count badge: a small accent counter dot pinned to the button's
+   top-right corner. Overrides both the plugin's own relative offsets
+   (top:-10px/left:-10px floated it half outside the button) and
+   refract's generic glass-pill .badge treatment (a grey blob that
+   dwarfed the bell). The dark ring separates it from the icon without
+   the bulk of a bordered pill. */
+body.stash-liquid-glass nav.top-nav .notification-btn .notification-badge {
+    position: absolute !important;
+    top: 2px !important;
+    right: 2px !important;
+    left: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 13px !important;
+    width: auto !important;
+    height: 13px !important;
+    padding: 0 3px !important;
+    border-radius: 999px !important;
+    background: rgb(var(--accent-rgb)) !important;
+    color: #fff !important;
+    font-size: 0.58rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    border: none !important;
+    box-shadow: 0 0 0 2px rgba(10, 8, 14, 0.55) !important;
+    transform: none !important;
+    margin: 0 !important;
 }
 
 /* Icons-only: kill text labels via font-size: 0 (UI Tweaks pattern).
