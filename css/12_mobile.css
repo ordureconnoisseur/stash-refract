@@ -113,9 +113,11 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
 
     /* Icon wrapper + three line spans that morph into an X.
-       `display` is !important to beat 02_navbar.css's global
-       `nav.top-nav span { display: none }` rule (which hides Stash's
-       label text spans). */
+       `display` is !important as a backstop against 02_navbar.css's
+       global `nav.top-nav span { display: none }` purge (which hides
+       Stash's label text spans). The real protection is that purge's
+       :not([class*="refract-"]) exemption: !important alone lost here
+       in v1.19.0 when the purge gained specificity. */
     body.stash-liquid-glass nav.top-nav .refract-burger .refract-burger-icon {
         position: relative;
         width: 18px;

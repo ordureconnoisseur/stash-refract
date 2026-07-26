@@ -253,12 +253,22 @@ body.stash-liquid-glass nav.top-nav .notification-btn.dropdown-toggle::after {
 
 /* Icons-only: kill text labels via font-size: 0 (UI Tweaks pattern).
    stashNotifications' wrapper + count badge are SPANs that must survive
-   the span purge (the badge also gets its font-size restored below). */
+   the span purge (the badge also gets its font-size restored below).
+
+   This purge exists to kill STASH's label-text spans. It must never
+   target refract's own injected spans, so [class*="refract-"] is
+   exempt wholesale. Do NOT go back to re-showing them one by one from
+   a later file: every :not() added here raises this selector's
+   specificity, and in v1.19.0 the two notification :not()s silently
+   overtook 12_mobile.css's burger-icon rules (equal class count, more
+   elements here) and blanked the mobile burger. Refract-injected spans
+   we DO want hidden get an explicit selector instead, like
+   .stash-nav-label below. */
 body.stash-liquid-glass nav.top-nav .nav-link,
 body.stash-liquid-glass nav.top-nav .navbar-buttons {
     font-size: 0 !important;
 }
-body.stash-liquid-glass nav.top-nav span:not(.notification-btn-container):not(.notification-badge),
+body.stash-liquid-glass nav.top-nav span:not(.notification-btn-container):not(.notification-badge):not([class*="refract-"]),
 body.stash-liquid-glass nav.top-nav .stash-nav-label {
     display: none !important;
 }
