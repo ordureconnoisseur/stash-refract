@@ -486,12 +486,15 @@
                         )
                     )
                 ),
-                /* â”€â”€ Card customiser â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                /* == Card customiser ==
                    Everything that changes how scene and performer cards look,
-                   collated around the live preview. Same drawer chrome as the
-                   Suggestion Box (shared refract-suggestion-box class). */
-                R.createElement("details", { className: "refract-suggestion-box refract-card-customiser" },
-                    R.createElement("summary", { className: "refract-suggestion-summary" },
+                   collated around the live preview. Shares the Suggestion
+                   Box's card chrome but renders as a plain ALWAYS-OPEN
+                   section, not a drawer (user request 2026-07-26); the
+                   .refract-card-customiser CSS modifier strips the
+                   chevron/cursor/hover from the header. */
+                R.createElement("div", { className: "refract-suggestion-box refract-card-customiser" },
+                    R.createElement("div", { className: "refract-suggestion-summary refract-customiser-header" },
                         R.createElement("h3", null, "Card customiser"),
                         R.createElement("div", { className: "sub-heading" },
                             "Every setting that changes how scene and performer cards look. The preview updates live as you change them.")
@@ -874,7 +877,6 @@
             setTimeout(registerAccentPatch, 100);
             return;
         }
-        var AccentSwatchPicker = buildAccentSwatchPicker();
         PluginApi.patch.instead("PluginSettings", function () {
             var args = Array.prototype.slice.call(arguments);
             var next = args.pop();
@@ -882,7 +884,18 @@
             if (!props || props.pluginID !== "refract") {
                 return next.apply(null, args);
             }
-            return PluginApi.React.createElement(AccentSwatchPicker);
+            /* The full settings panel moved to Settings -> Interface ->
+               Refract (injectInterfaceRefractSection); the plugin panel
+               keeps a quiet pointer so nobody hunts for vanished
+               settings. The #refract hash makes the injector scroll the
+               relocated section into view after the page loads. */
+            var R2 = PluginApi.React;
+            return R2.createElement("div", { className: "refract-settings-moved-note sub-heading" },
+                "Refract's settings have moved to ",
+                R2.createElement("a", { href: "/settings?tab=interface#refract" },
+                    "Settings → Interface → Refract"),
+                "."
+            );
         });
     }
     registerAccentPatch();
@@ -9092,6 +9105,45 @@
     }
     injectInterfaceHelpToggleSetting();
 
+    /* Relocated Refract settings: a full "Refract" section appended to
+       Settings -> Interface, so theme settings live with the rest of the
+       UI options instead of buried behind the Plugins list (user request
+       2026-07-26). Mirrors the native section shape exactly
+       (.setting-section > h1 + .card). The old plugin panel renders a
+       pointer note instead (see the PluginSettings patch). The settings
+       component is built once and mounted with PluginApi.ReactDOM.render;
+       if the SPA rebuilds the pane, the consolidated watcher re-injects. */
+    var RefractSettingsComponent = null;
+    function injectInterfaceRefractSection() {
+        if (typeof PluginApi === "undefined" || !PluginApi.React || !PluginApi.ReactDOM) { return; }
+        var pane = document.querySelector("[id$='-tabpane-interface']");
+        if (!pane) { return; }
+        if (pane.querySelector("#refract-settings-section")) { return; }
+        /* Wait for Stash's own sections so we append after them (an empty
+           pane means the tab hasn't finished rendering yet). */
+        if (!pane.querySelector(".setting-section")) { return; }
+
+        var section = document.createElement("div");
+        section.className = "setting-section refract-interface-section";
+        section.id = "refract-settings-section";
+        var h1 = document.createElement("h1");
+        h1.textContent = "Refract";
+        section.appendChild(h1);
+        var card = document.createElement("div");
+        card.className = "card";
+        section.appendChild(card);
+        pane.appendChild(section);
+
+        if (!RefractSettingsComponent) { RefractSettingsComponent = buildAccentSwatchPicker(); }
+        PluginApi.ReactDOM.render(PluginApi.React.createElement(RefractSettingsComponent), card);
+
+        /* Deep link from the old plugin-panel note. */
+        if (location.hash === "#refract") {
+            setTimeout(function () { section.scrollIntoView({ block: "start" }); }, 60);
+        }
+    }
+    injectInterfaceRefractSection();
+
     /* ── Navbar drag-to-reorder (iOS-style) ─────────────────────────────
        Pointer-events + FLIP animation so icons slide out of the way live.
        Saved order persisted to localStorage; re-applied via CSS `order`
@@ -9611,6 +9663,7 @@
             try { injectNavLightToggle(); } catch (e) {}
             try { injectInterfaceLightToggleSetting(); } catch (e) {}
             try { injectInterfaceHelpToggleSetting(); } catch (e) {}
+            try { injectInterfaceRefractSection(); } catch (e) {}
             try { setupNavbarReorder(); } catch (e) {}
             try { collapseDetailsTagsOverhaul(); } catch (e) {}
             try { setupOCounterLongPress(); } catch (e) {}

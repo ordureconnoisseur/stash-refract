@@ -1138,6 +1138,32 @@ body.stash-liquid-glass .refract-suggestion-body {
     border-top: 1px solid var(--glass-border);
 }
 
+/* Card customiser: shares the suggestion-box card chrome but renders as
+   a plain always-open section (plain divs, not details/summary), so the
+   header loses every drawer affordance. */
+body.stash-liquid-glass .refract-card-customiser .refract-suggestion-summary {
+    cursor: default;
+}
+body.stash-liquid-glass .refract-card-customiser .refract-suggestion-summary:hover {
+    background: transparent;
+}
+body.stash-liquid-glass .refract-card-customiser .refract-suggestion-summary::after {
+    display: none;
+}
+
+/* Pointer note left in the old plugin-settings panel after the move to
+   Settings -> Interface -> Refract. */
+body.stash-liquid-glass .refract-settings-moved-note {
+    padding: 0.35rem 0 0.5rem;
+}
+body.stash-liquid-glass .refract-settings-moved-note a {
+    color: var(--accent-bright);
+    text-decoration: none;
+}
+body.stash-liquid-glass .refract-settings-moved-note a:hover {
+    text-decoration: underline;
+}
+
 /* ── Card preview (Suggestion Box) ───────────────────────────────────
    Two inert mock cards (REFRACT_PREVIEW_HTML in refract.js) that the
    normal card CSS paints, so every visibility toggle below shows its
