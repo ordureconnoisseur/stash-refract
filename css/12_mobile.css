@@ -113,6 +113,43 @@ body.stash-liquid-glass .refract-mobile-drawer {
         max-height: calc(100vh - 24px - 4.8rem - env(safe-area-inset-bottom, 0px)) !important;
     }
 
+    /* ── Refract settings section on phones ─────────────────────────
+       The desktop label/control split crams at phone width: labels
+       wrap word-per-line down the screen while wide controls (accent
+       swatches, segmented pills, the card preview) overflow off the
+       right edge. Stack every row vertically, controls under their
+       label, everything wrapping within the viewport. */
+    body.stash-liquid-glass #refract-settings-section .setting {
+        display: block !important;
+    }
+    body.stash-liquid-glass #refract-settings-section .refract-setting-control {
+        margin-left: 0 !important;
+        margin-top: 0.7rem !important;
+        justify-content: flex-start !important;
+        flex-wrap: wrap !important;
+    }
+    body.stash-liquid-glass #refract-settings-section .refract-accent-swatches {
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
+        max-width: 100% !important;
+    }
+    body.stash-liquid-glass #refract-settings-section .refract-card-elems {
+        justify-content: flex-start !important;
+        max-width: none !important;
+    }
+    /* Card preview: cards cap at viewport width; the side padding that
+       reserves room for the corner shuffle button becomes TOP padding
+       so nothing is squeezed off-screen. */
+    body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards {
+        padding: 2.6rem 0.25rem 0.25rem !important;
+    }
+    body.stash-liquid-glass .refract-card-preview-real .scene-card {
+        width: min(300px, 100%) !important;
+    }
+    body.stash-liquid-glass .refract-card-preview-real .performer-card {
+        width: min(190px, 100%) !important;
+    }
+
     /* ── Burger button (RETIRED from the top nav 2026-07-28) ────────
        The bottom dock's last tile is now the drawer opener; the
        injected top-nav .refract-burger stays in the DOM but is never
