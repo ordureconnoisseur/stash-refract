@@ -182,7 +182,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         right: 0;
         bottom: 0;
         z-index: 110;
-        height: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+        height: calc(4.6rem + env(safe-area-inset-bottom, 0px));
         box-sizing: border-box;
         align-items: center;
         justify-content: space-around;
@@ -203,8 +203,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        height: 2.7rem;
-        min-width: 2.7rem;
+        height: 3.1rem;
+        min-width: 3.1rem;
         align-self: center;
         border-radius: 999px;
         border: none;
@@ -239,12 +239,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
        room so the last row of cards isn't parked under the pill. */
     body.stash-liquid-glass .main.container-fluid,
     body.stash-liquid-glass main.container-fluid {
-        padding-bottom: calc(4.4rem + env(safe-area-inset-bottom, 0px)) !important;
+        padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
     }
     /* Floating pager (09_buttons.css pins it at bottom: 1.5rem) would
        sit behind the dock; lift it above the bar. */
     body.stash-liquid-glass [data-pager-row="float"] {
-        bottom: calc(4.2rem + env(safe-area-inset-bottom, 0px)) !important;
+        bottom: calc(5.3rem + env(safe-area-inset-bottom, 0px)) !important;
     }
     /* multiView's floating picking launcher: hidden on mobile for now
        (fights the dock for the bottom edge; a proper mobile placement
@@ -347,7 +347,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         /* Anchored ABOVE the bottom dock (the drawer's opener) and
            rising from it — not dropping from the retired top bar. */
         top: auto;
-        bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+        bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px));
         left: 12px;
         right: 12px;
         background: rgba(20, 20, 24, 0.92);
