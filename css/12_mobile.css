@@ -105,6 +105,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .filtered-list-toolbar {
         top: 0.5rem !important;
     }
+    /* TagSidebar plugin panel: same story — its desktop offset clears
+       the navbar; on mobile start at the top and stop above the dock. */
+    body.stash-liquid-glass .tag-sidebar__panel {
+        top: 12px !important;
+        height: calc(100vh - 24px - 4.8rem - env(safe-area-inset-bottom, 0px)) !important;
+        max-height: calc(100vh - 24px - 4.8rem - env(safe-area-inset-bottom, 0px)) !important;
+    }
 
     /* ── Burger button (RETIRED from the top nav 2026-07-28) ────────
        The bottom dock's last tile is now the drawer opener; the
