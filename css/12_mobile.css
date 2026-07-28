@@ -215,6 +215,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass [data-pager-row="float"] {
         bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)) !important;
     }
+    /* multiView's floating picking launcher: hidden on mobile for now
+       (fights the dock for the bottom edge; a proper mobile placement
+       is TBD). Desktop untouched. */
+    body.stash-liquid-glass #mv-launcher {
+        display: none !important;
+    }
 
     /* ── Backdrop scrim ───────────────────────────────────────────── */
     body.stash-liquid-glass .refract-burger-scrim {
