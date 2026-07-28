@@ -737,6 +737,34 @@ body.stash-liquid-glass:not(.refract-native-sidebar) .sidebar-pane-content {
     margin-left: 0 !important;
 }
 
+/* When the native sidebar IS enabled, skin it like the TagSidebar
+   side-tab panel (13_plugins.css): floated off the left edge in glass
+   instead of a square panel fused to the viewport edge. margin-left
+   (not left) so Stash's slide-in animation is untouched; top+bottom
+   pinning instead of a height calc so the native fixed-position
+   re-rooting quirk (its box resolves ~49px down) can't double-offset
+   a hardcoded height. */
+body.stash-liquid-glass.refract-native-sidebar .sidebar {
+    top: calc(var(--nav-btn-size) + 2.6rem) !important;
+    bottom: 12px !important;
+    height: auto !important;
+    max-height: none !important;
+    margin-left: 12px !important;
+    background: rgba(16, 16, 20, 0.92) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg-sat) !important;
+            backdrop-filter: var(--glass-blur-lg-sat) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius) !important;
+    box-shadow: var(--shadow-lg) !important;
+    scrollbar-width: thin;
+    scrollbar-color: var(--glass-border) transparent;
+}
+body.stash-liquid-glass.refract-native-sidebar .sidebar::-webkit-scrollbar { width: 6px; }
+body.stash-liquid-glass.refract-native-sidebar .sidebar::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 3px;
+}
+
 /* Image lists now use the same sticky-pill toolbar design as scene/
    performer lists. But inside a gallery → Images tab the panel is its
    own scroll container (height = grid track), so the viewport-level
