@@ -761,9 +761,8 @@ body.stash-liquid-glass nav.top-nav a:has(svg[data-icon="circle-question"]),
 body.stash-liquid-glass nav.top-nav a:has(svg.fa-circle-question) {
     display: none !important;
 }
-/* Sidebar toggle: hidden with the sidebar itself; comes back with the
-   refract-native-sidebar opt-in (see 04_filters.css). */
-body.stash-liquid-glass:not(.refract-native-sidebar) nav.top-nav .sidebar-toggle-button {
+/* Sidebar toggle: hidden with the sidebar itself (see 04_filters.css). */
+body.stash-liquid-glass nav.top-nav .sidebar-toggle-button {
     display: none !important;
 }
 

@@ -356,9 +356,6 @@
             var filterTagsOn = filterTagsState[0];
             var setFilterTagsOn = filterTagsState[1];
 
-            var nativeSidebarState = R.useState(isNativeSidebar());
-            var nativeSidebarOn = nativeSidebarState[0];
-            var setNativeSidebarOn = nativeSidebarState[1];
 
             /* Card element visibility: one state map driven by the
                CARD_ELEMS table (key -> hidden bool). */
@@ -464,13 +461,6 @@
                 setFilterTagsOn(next);
             }
 
-            function toggleNativeSidebar() {
-                var next = !nativeSidebarOn;
-                try { localStorage.setItem(NATIVE_SIDEBAR_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
-                scheduleServerSync();
-                applyNativeSidebarClass(next);
-                setNativeSidebarOn(next);
-            }
 
             function toggleCardElem(key) {
                 var nextHidden = !cardElems[key];
@@ -861,28 +851,6 @@
                                 )
                             )
                         ),
-                        R.createElement("div", { className: "setting", id: "plugin-refract-native-sidebar" },
-                            R.createElement("div", null,
-                                R.createElement("h3", null, "Native list sidebar"),
-                                R.createElement("div", { className: "sub-heading" },
-                                    "Bring back Stash's left filter sidebar and its toggle button on list pages. Off (default) hides it since the top filter toolbar covers the same controls.")
-                            ),
-                            R.createElement("div", { className: "refract-setting-control" },
-                                R.createElement("div", { className: "custom-control custom-switch" },
-                                    R.createElement("input", {
-                                        type: "checkbox",
-                                        className: "custom-control-input",
-                                        id: "refract-native-sidebar-toggle",
-                                        checked: nativeSidebarOn,
-                                        onChange: toggleNativeSidebar
-                                    }),
-                                    R.createElement("label", {
-                                        className: "custom-control-label",
-                                        htmlFor: "refract-native-sidebar-toggle"
-                                    })
-                                )
-                            )
-                        ),
                         R.createElement("div", { className: "setting", id: "plugin-refract-view-minimiser" },
                             R.createElement("div", null,
                                 R.createElement("h3", null, "View-mode minimiser"),
@@ -1069,7 +1037,6 @@
        default off (overlay shown). */
     var HIDE_CENTER_CONTROLS_KEY = "refract.hideCenterControls";
     var SHOW_FILTER_TAGS_KEY = "refract.showFilterTags";
-    var NATIVE_SIDEBAR_KEY = "refract.nativeSidebar";
 
     /* Static mock cards for the Suggestion Box "Card preview" row. Real
        .scene-card / .performer-card class structure so the SAME theme CSS
@@ -1368,7 +1335,7 @@
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
         MINIMAL_CARDS_STORAGE_KEY, RATING_STYLE_STORAGE_KEY, CARD_BACK_EXPLICIT_KEY,
         PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY,
-        SHOW_FILTER_TAGS_KEY, NATIVE_SIDEBAR_KEY, DOCK_ITEMS_KEY
+        SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY
     ].concat(CARD_ELEMS.map(function (d) { return d.key; }));
 
     function isPluginSortDisabledBottom() {
@@ -1563,21 +1530,6 @@
     }
     applyFilterTagsShownClass(isFilterTagsShown());
 
-    /* Native list sidebar. Theme hides Stash's left filter sidebar (and
-       its toggle button) as redundant next to the top toolbar; this
-       opt-in restores it (forum request, Seneschal 2026-07). Gates in
-       04_filters.css + 02_navbar.css. */
-    function isNativeSidebar() {
-        try {
-            return localStorage.getItem(NATIVE_SIDEBAR_KEY) === "1";
-        } catch (e) { return false; }
-    }
-    function applyNativeSidebarClass(on) {
-        if (!document.body) { return; }
-        document.body.classList.toggle("refract-native-sidebar", !!on);
-    }
-    applyNativeSidebarClass(isNativeSidebar());
-
     /* Scene card style. "refract" (default) = tidier minimal layout —
        description block hidden so the grid stays consistent across
        scenes with and without descriptions. "classic" = Stash's
@@ -1768,7 +1720,6 @@
             applyPerformerCardHoverClass(isPerformerCardHover());
             applyCenterControlsHiddenClass(isCenterControlsHidden());
             applyFilterTagsShownClass(isFilterTagsShown());
-            applyNativeSidebarClass(isNativeSidebar());
             applyCardElemClasses();
             applyCardStyleClass(getStoredCardStyle());
             applyRatingStyleClass(getStoredRatingStyle());
