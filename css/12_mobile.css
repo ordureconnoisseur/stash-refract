@@ -171,30 +171,30 @@ body.stash-liquid-glass .refract-mobile-drawer {
        burger tile at the end opening the full drawer. Sits above the
        scrim (z 110 > 99) so the burger doubles as the close control
        while the drawer is open. */
-    /* Styled as the bottom counterpart of the retired floating top
-       navbar: same glass background, border, radius, blur, and accent
-       glow halo (--shadow-navbar), same 12px side insets. */
+    /* Edge-to-edge native tab bar, sized like binge mobile's bottom
+       nav (3.5rem content height, near-black, hairline top border,
+       12px blur, safe-area folded INSIDE the bar so it reads as part
+       of the device chrome rather than a floating element). */
     body.stash-liquid-glass .refract-mobile-dock {
         display: flex !important;
         position: fixed;
-        left: 12px;
-        right: 12px;
-        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        left: 0;
+        right: 0;
+        bottom: 0;
         z-index: 110;
+        height: calc(3.5rem + env(safe-area-inset-bottom, 0px));
+        box-sizing: border-box;
         align-items: center;
-        justify-content: space-between;
-        gap: 0.2rem;
-        padding: 0.4rem 0.65rem;
-        /* iPhone-style rounding: a large radius concentric with the
-           device's display corners (~55px corner radius minus the 12px
-           inset). Taller than half the bar height, so it renders as a
-           smooth capsule like the iOS dock. */
-        border-radius: 2.7rem;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        -webkit-backdrop-filter: var(--glass-blur);
-        backdrop-filter: var(--glass-blur);
-        box-shadow: var(--shadow-navbar);
+        justify-content: space-around;
+        gap: 0;
+        padding: 0 0.5rem env(safe-area-inset-bottom, 0px);
+        border-radius: 0;
+        background: rgba(10, 10, 10, 0.92);
+        border: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        box-shadow: none;
     }
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item {
         flex: 1 1 0;
@@ -203,6 +203,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         justify-content: center;
         height: 2.7rem;
         min-width: 2.7rem;
+        align-self: center;
         border-radius: 999px;
         border: none;
         background: transparent;
@@ -236,12 +237,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
        room so the last row of cards isn't parked under the pill. */
     body.stash-liquid-glass .main.container-fluid,
     body.stash-liquid-glass main.container-fluid {
-        padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px)) !important;
+        padding-bottom: calc(4.4rem + env(safe-area-inset-bottom, 0px)) !important;
     }
     /* Floating pager (09_buttons.css pins it at bottom: 1.5rem) would
        sit behind the dock; lift it above the bar. */
     body.stash-liquid-glass [data-pager-row="float"] {
-        bottom: calc(5rem + env(safe-area-inset-bottom, 0px)) !important;
+        bottom: calc(4.2rem + env(safe-area-inset-bottom, 0px)) !important;
     }
     /* multiView's floating picking launcher: hidden on mobile for now
        (fights the dock for the bottom edge; a proper mobile placement
@@ -344,7 +345,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         /* Anchored ABOVE the bottom dock (the drawer's opener) and
            rising from it — not dropping from the retired top bar. */
         top: auto;
-        bottom: calc(4.9rem + env(safe-area-inset-bottom, 0px));
+        bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
         left: 12px;
         right: 12px;
         background: rgba(20, 20, 24, 0.92);

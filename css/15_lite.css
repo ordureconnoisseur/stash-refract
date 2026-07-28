@@ -54,12 +54,16 @@ body.stash-liquid-glass.refract-lite .dropdown-menu {
        low alpha reads as transparent film over scrolling content.
        Pin to fully opaque dark. */
 body.stash-liquid-glass.refract-lite nav.top-nav.navbar,
-body.stash-liquid-glass.refract-lite .refract-mobile-dock,
 body.stash-liquid-glass.refract-lite .refract-mobile-drawer,
 body.stash-liquid-glass.refract-lite .filtered-list-toolbar::before,
 body.stash-liquid-glass.refract-lite .pagination,
 body.stash-liquid-glass.refract-lite .detail-header {
     background: rgb(35, 35, 35) !important;
+}
+/* The tab-bar dock is near-black in base mode; pin it fully opaque at
+   its own colour rather than the lighter platform grey. */
+body.stash-liquid-glass.refract-lite .refract-mobile-dock {
+    background: rgb(10, 10, 10) !important;
 }
 
 /* ── 5. Cards: no hover lift, dark drop-shadow instead of accent
