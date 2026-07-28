@@ -1426,9 +1426,27 @@
             return localStorage.getItem(LIGHT_MODE_STORAGE_KEY) === "1";
         } catch (e) { return false; }
     }
+    /* Safari on iOS (and Chrome on Android) tint the browser chrome —
+       the status-bar strip above the page — from the theme-color meta,
+       which Stash never sets, so it renders WHITE against the dark
+       theme on phones. Maintain one matching the page's top-edge
+       colour (the --bg-1 end of the body gradient), tracking light
+       mode. */
+    function refractApplyThemeColorMeta(lightOn) {
+        if (!document.head) { return; }
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (!meta) {
+            meta = document.createElement("meta");
+            meta.setAttribute("name", "theme-color");
+            document.head.appendChild(meta);
+        }
+        meta.setAttribute("content", lightOn ? "#fafafa" : "#111111");
+    }
+
     function applyLightModeClass(on) {
         if (!document.body) { return; }
         document.body.classList.toggle("refract-light", !!on);
+        refractApplyThemeColorMeta(!!on);
     }
     applyLightModeClass(isLightModeEnabled());
 
