@@ -248,6 +248,53 @@
             );
         }
 
+        /* Mobile dock configuration: a grid of every dock candidate
+           (core routes + plugin tiles, harvested live from the drawer),
+           click to toggle membership. Lit = in the dock. */
+        function DockConfigGrid() {
+            var candSt = R.useState(refractDockCandidates);
+            var cands = candSt[0], setCands = candSt[1];
+            var selSt = R.useState(refractGetDockSelection);
+            var sel = selSt[0], setSel = selSt[1];
+            R.useEffect(function () {
+                /* Plugin tiles appear asynchronously as the navbar is
+                   scanned; poll until the candidate list stops growing. */
+                var t = setInterval(function () {
+                    var c = refractDockCandidates();
+                    if (c.length !== cands.length) { setCands(c); }
+                }, 1000);
+                return function () { clearInterval(t); };
+            }, [cands.length]);
+            function toggle(key) {
+                var next = sel.indexOf(key) !== -1
+                    ? sel.filter(function (k) { return k !== key; })
+                    : sel.concat([key]);
+                try { localStorage.setItem(DOCK_ITEMS_KEY, JSON.stringify(next)); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                setSel(next);
+                refractRebuildMobileDock();
+            }
+            if (!cands.length) {
+                return R.createElement("div", { className: "sub-heading" },
+                    "Icons load once the navbar has been scanned…");
+            }
+            return R.createElement("div", { className: "refract-dock-grid" },
+                cands.map(function (c) {
+                    var on = sel.indexOf(c.key) !== -1;
+                    return R.createElement("button", {
+                        key: c.key,
+                        type: "button",
+                        className: "refract-dock-grid-item" + (on ? " is-active" : ""),
+                        title: c.label,
+                        "aria-label": c.label,
+                        "aria-pressed": on ? "true" : "false",
+                        onClick: function () { toggle(c.key); },
+                        dangerouslySetInnerHTML: { __html: c.iconHtml }
+                    });
+                })
+            );
+        }
+
         return function AccentSwatchPicker() {
             var stored = R.useState(getStoredAccent());
             var accent = stored[0];
@@ -698,6 +745,14 @@
                         cardElemsRow("scene", "Scene card elements", "plugin-refract-scene-elems"),
                         cardElemsRow("performer", "Performer card elements", "plugin-refract-performer-elems")
                     )
+                ),
+                R.createElement("div", { className: "setting refract-dock-config-setting", id: "plugin-refract-dock-config" },
+                    R.createElement("div", null,
+                        R.createElement("h3", null, "Mobile dock"),
+                        R.createElement("div", { className: "sub-heading" },
+                            "Choose which icons sit in the bottom bar on narrow screens; lit icons are shown. Plugin buttons included. The burger is always last, and everything stays reachable from its drawer.")
+                    ),
+                    R.createElement(DockConfigGrid)
                 ),
                 /* ── The Suggestion Box ─────────────────────────────────────
                    A collapsed-by-default drawer of opt-in features that run
@@ -1305,7 +1360,7 @@
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
         MINIMAL_CARDS_STORAGE_KEY, RATING_STYLE_STORAGE_KEY, CARD_BACK_EXPLICIT_KEY,
         PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY,
-        SHOW_FILTER_TAGS_KEY, NATIVE_SIDEBAR_KEY
+        SHOW_FILTER_TAGS_KEY, NATIVE_SIDEBAR_KEY, DOCK_ITEMS_KEY
     ].concat(CARD_ELEMS.map(function (d) { return d.key; }));
 
     function isPluginSortDisabledBottom() {
@@ -2271,30 +2326,117 @@
        shows it under 900px. Partially answers the forum "two taps per
        action" complaint without giving up the drawer as the overflow
        strategy. */
-    /* Settings dropped from the dock (user call 2026-07-28): still one
-       tap away inside the drawer, and the bar breathes better with
-       four routes + burger. */
-    var MOBILE_DOCK_ROUTES = ["/scenes", "/performers", "/studios", "/tags"];
+    /* Dock contents are USER-CONFIGURABLE (Settings -> Interface ->
+       Refract -> Mobile dock): a click-to-select icon grid persisted as
+       a JSON key array. Default: the four core routes + burger. */
+    var MOBILE_DOCK_DEFAULT = ["/scenes", "/performers", "/studios", "/tags"];
+    var DOCK_ITEMS_KEY = "refract.dockItems";
+
+    function refractGetDockSelection() {
+        try {
+            var raw = localStorage.getItem(DOCK_ITEMS_KEY);
+            if (raw) {
+                var arr = JSON.parse(raw);
+                if (Object.prototype.toString.call(arr) === "[object Array]" && arr.length) {
+                    return arr;
+                }
+            }
+        } catch (e) { /* fall through to default */ }
+        return MOBILE_DOCK_DEFAULT.slice();
+    }
+
+    /* Every dock candidate, harvested from the DRAWER's tiles — the
+       drawer is already the canonical registry of everything mirrorable
+       (hardcoded routes, plugin route tiles, plugin ACTION tiles like
+       DiceR / SFWSwitch / Ascension). Keys: the route href, or
+       "action:<key>" for action tiles. Off-tiles (routes the user
+       disabled in Stash's menu settings) are excluded. */
+    function refractDockCandidates() {
+        var out = [];
+        var tiles = document.querySelectorAll(
+            ".refract-mobile-drawer .refract-drawer-tile:not(.refract-drawer-tile-off)");
+        for (var i = 0; i < tiles.length; i++) {
+            var t = tiles[i];
+            var actionKey = t.getAttribute("data-action");
+            var href = t.getAttribute("data-href");
+            var key = actionKey ? ("action:" + actionKey) : href;
+            if (!key) { continue; }
+            var icon = t.querySelector(".refract-drawer-tile-icon");
+            out.push({
+                key: key,
+                label: t.getAttribute("aria-label") || key,
+                iconHtml: icon ? icon.innerHTML : "",
+                href: href || null,
+                actionSelector: t.getAttribute("data-action-selector") || null,
+                target: t.getAttribute("target") || null,
+                aliases: t.getAttribute("data-aliases") || ""
+            });
+        }
+        return out;
+    }
+
+    function refractDockItemsFromSelection() {
+        var sel = refractGetDockSelection();
+        var cands = refractDockCandidates();
+        var items = [];
+        var i;
+        if (cands.length) {
+            for (i = 0; i < cands.length; i++) {
+                if (sel.indexOf(cands[i].key) !== -1) { items.push(cands[i]); }
+            }
+        } else {
+            /* Drawer not built yet (very early load): hardcoded route
+               fallback so the dock appears immediately; the signature
+               check below swaps in the full set once tiles exist. */
+            for (i = 0; i < MOBILE_NAV_ITEMS.length; i++) {
+                var it = MOBILE_NAV_ITEMS[i];
+                if (sel.indexOf(it.href) !== -1) {
+                    items.push({
+                        key: it.href, label: it.label, href: it.href,
+                        iconHtml: MOBILE_NAV_ICONS[it.icon] || "",
+                        actionSelector: null, target: null,
+                        aliases: (it.aliases || []).join(" ")
+                    });
+                }
+            }
+        }
+        return items;
+    }
+
     function injectMobileDock() {
-        if (document.querySelector(".refract-mobile-dock")) { return true; }
         if (!document.body) { return false; }
+        var items = refractDockItemsFromSelection();
+        var sig = items.map(function (x) { return x.key; }).join("|");
+        var existing = document.querySelector(".refract-mobile-dock");
+        if (existing) {
+            /* Idempotent per configuration: rebuild only when the item
+               set changed (selection edited, or plugin tiles arrived). */
+            if (existing.getAttribute("data-sig") === sig) { return true; }
+            existing.parentNode.removeChild(existing);
+        }
         var dock = document.createElement("nav");
         dock.className = "refract-mobile-dock";
         dock.setAttribute("aria-label", "Quick navigation");
+        dock.setAttribute("data-sig", sig);
 
         var html = "";
-        for (var i = 0; i < MOBILE_DOCK_ROUTES.length; i++) {
-            var item = null;
-            for (var k = 0; k < MOBILE_NAV_ITEMS.length; k++) {
-                if (MOBILE_NAV_ITEMS[k].href === MOBILE_DOCK_ROUTES[i]) { item = MOBILE_NAV_ITEMS[k]; break; }
+        for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            if (item.actionSelector) {
+                html +=
+                    '<button type="button" class="refract-dock-item" data-action-selector="' +
+                        refractAttrEscape(item.actionSelector) + '" aria-label="' + item.label + '">' +
+                        item.iconHtml +
+                    '</button>';
+            } else {
+                html +=
+                    '<a class="refract-dock-item" href="' + item.href + '" data-href="' + item.href + '"' +
+                        (item.aliases ? ' data-aliases="' + item.aliases + '"' : '') +
+                        (item.target ? ' target="' + item.target + '" rel="noopener noreferrer"' : '') +
+                        ' aria-label="' + item.label + '">' +
+                        item.iconHtml +
+                    '</a>';
             }
-            if (!item) { continue; }
-            html +=
-                '<a class="refract-dock-item" href="' + item.href + '" data-href="' + item.href + '"' +
-                    ((item.aliases && item.aliases.length) ? ' data-aliases="' + item.aliases.join(" ") + '"' : '') +
-                    ' aria-label="' + item.label + '">' +
-                    (MOBILE_NAV_ICONS[item.icon] || "") +
-                '</a>';
         }
         html +=
             '<button type="button" class="refract-dock-item refract-dock-burger" aria-label="All pages" aria-expanded="false">' +
@@ -2319,6 +2461,22 @@
             }
             var tile = e.target.closest(".refract-dock-item");
             if (!tile) { return; }
+            /* Action tiles proxy-click the plugin's live navbar control
+               (same pattern as the drawer). */
+            var actionSel = tile.getAttribute("data-action-selector");
+            if (actionSel) {
+                e.preventDefault();
+                refractCloseBurger();
+                var liveBtn = document.querySelector(actionSel);
+                if (liveBtn) { liveBtn.click(); }
+                return;
+            }
+            /* Standalone-app launchers (binge / Stash TV etc.) keep the
+               native new-tab anchor behaviour. */
+            if (tile.getAttribute("target") === "_blank") {
+                refractCloseBurger();
+                return;
+            }
             e.preventDefault();
             refractCloseBurger();
             var href = tile.getAttribute("data-href");
@@ -2331,6 +2489,13 @@
         document.body.appendChild(dock);
         refractMarkActiveDockItem();
         return true;
+    }
+
+    /* Force-rebuild after a selection change in settings. */
+    function refractRebuildMobileDock() {
+        var d = document.querySelector(".refract-mobile-dock");
+        if (d && d.parentNode) { d.parentNode.removeChild(d); }
+        injectMobileDock();
     }
 
     function refractMarkActiveDockItem() {

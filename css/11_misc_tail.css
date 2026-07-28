@@ -1249,8 +1249,50 @@ body.stash-liquid-glass .refract-settings-moved-note a:hover {
    effect live. The .setting row is stacked (not the usual label/control
    split) so the cards get the full width; pointer-events:none keeps
    links, hovers, and popovers dead — it's a picture, not a card. */
-body.stash-liquid-glass .refract-card-preview-setting {
+body.stash-liquid-glass .refract-card-preview-setting,
+body.stash-liquid-glass .refract-dock-config-setting {
     display: block !important;
+}
+
+/* ── Mobile dock config grid ─────────────────────────────────────────
+   One square chip per dock candidate (core routes + plugin tiles);
+   lit = shown in the mobile bottom bar. */
+body.stash-liquid-glass .refract-dock-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.6rem;
+}
+body.stash-liquid-glass .refract-dock-grid-item {
+    width: 2.7rem;
+    height: 2.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.12s;
+}
+body.stash-liquid-glass .refract-dock-grid-item svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+body.stash-liquid-glass .refract-dock-grid-item:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.07);
+}
+body.stash-liquid-glass .refract-dock-grid-item:active {
+    transform: scale(0.92);
+}
+body.stash-liquid-glass .refract-dock-grid-item.is-active {
+    color: var(--accent-bright);
+    background: var(--accent-tint);
+    border-color: rgba(var(--accent-rgb), 0.45);
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.25);
 }
 body.stash-liquid-glass .refract-card-preview {
     pointer-events: none;
