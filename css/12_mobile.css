@@ -206,6 +206,11 @@ body.stash-liquid-glass .refract-mobile-drawer {
         height: 3.1rem;
         min-width: 3.1rem;
         align-self: center;
+        /* Nudge the icons slightly ABOVE true centre — the bar reads
+           better with the visual weight sitting a touch high (margin
+           trick rather than transform, which :active's press-scale
+           would overwrite). */
+        margin-bottom: 10px;
         border-radius: 999px;
         border: none;
         background: transparent;
