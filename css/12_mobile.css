@@ -99,6 +99,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .main.container-fluid {
         padding-top: 12px !important;
     }
+    /* The sticky filter toolbar pins below the navbar on desktop
+       (top: nav-btn-size + 2.6rem); with the top bar retired it should
+       hug the top edge instead. */
+    body.stash-liquid-glass .filtered-list-toolbar {
+        top: 0.5rem !important;
+    }
 
     /* ── Burger button (RETIRED from the top nav 2026-07-28) ────────
        The bottom dock's last tile is now the drawer opener; the
