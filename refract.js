@@ -2271,7 +2271,10 @@
        shows it under 900px. Partially answers the forum "two taps per
        action" complaint without giving up the drawer as the overflow
        strategy. */
-    var MOBILE_DOCK_ROUTES = ["/scenes", "/performers", "/studios", "/tags", "/settings"];
+    /* Settings dropped from the dock (user call 2026-07-28): still one
+       tap away inside the drawer, and the bar breathes better with
+       four routes + burger. */
+    var MOBILE_DOCK_ROUTES = ["/scenes", "/performers", "/studios", "/tags"];
     function injectMobileDock() {
         if (document.querySelector(".refract-mobile-dock")) { return true; }
         if (!document.body) { return false; }
