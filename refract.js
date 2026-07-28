@@ -2933,6 +2933,19 @@
                source button carries a clean currentColor flame svg that the
                clone fallback below mirrors faithfully. */
             selector: "#plugin_hon"
+        },
+        {
+            key: "multiview",
+            label: "Multiview",
+            /* multiView's floating picking launcher is BODY-level (not a
+               navbar control) and hidden on mobile by 12_mobile.css; this
+               tile mirrors its open button so launches work from the
+               drawer. Exists only while picking mode is on — the tile
+               appears/disappears with it. Its two counters (scene picks +
+               filter slots) collapse into ONE combined badge, painted by
+               the badge pass below. */
+            selector: "#mv-open-btn",
+            scope: "body"
         }
     ];
     function refractAppendPluginActionTiles() {
@@ -2942,7 +2955,10 @@
 
         for (var i = 0; i < PLUGIN_ACTION_TILES.length; i++) {
             var spec = PLUGIN_ACTION_TILES[i];
-            var src = nav.querySelector(spec.selector);
+            /* scope "body": the control lives outside the navbar (e.g.
+               multiView's floating launcher). */
+            var root = spec.scope === "body" ? document : nav;
+            var src = root.querySelector(spec.selector);
             var existing = drawer.querySelector('.refract-drawer-tile[data-action="' + spec.key + '"]');
             if (!src) { continue; }      // not mounted; reconcile below clears any stale tile
             if (existing) { continue; }  // already mirrored
@@ -2953,6 +2969,7 @@
             tile.setAttribute("data-action", spec.key);
             tile.setAttribute("data-action-selector", spec.selector);
             tile.setAttribute("data-action-tile", "1");
+            if (spec.scope) { tile.setAttribute("data-action-scope", spec.scope); }
             tile.setAttribute("aria-label", spec.label);
 
             var iconSpan = document.createElement("span");
@@ -2980,8 +2997,34 @@
         var atiles = drawer.querySelectorAll(".refract-drawer-tile[data-action-tile]");
         for (var a = 0; a < atiles.length; a++) {
             var sel = atiles[a].getAttribute("data-action-selector");
-            if (sel && !nav.querySelector(sel) && atiles[a].parentNode) {
+            var aroot = atiles[a].getAttribute("data-action-scope") === "body" ? document : nav;
+            if (sel && !aroot.querySelector(sel) && atiles[a].parentNode) {
                 atiles[a].parentNode.removeChild(atiles[a]);
+            }
+        }
+
+        /* multiview tile badge: ONE combined number (scene picks + filter
+           slots) instead of the launcher's two separate counters. The
+           counters keep their textContent even while display:none'd at
+           zero, so parse-and-sum is safe. */
+        var mvTile = drawer.querySelector('.refract-drawer-tile[data-action="multiview"]');
+        if (mvTile) {
+            var mvScenes = document.getElementById("mv-scene-count");
+            var mvFilters = document.getElementById("mv-filter-count");
+            var mvTotal = (parseInt(mvScenes && mvScenes.textContent, 10) || 0)
+                + (parseInt(mvFilters && mvFilters.textContent, 10) || 0);
+            var mvBadge = mvTile.querySelector(".refract-drawer-tile-badge");
+            if (mvTotal > 0) {
+                if (!mvBadge) {
+                    mvBadge = document.createElement("span");
+                    mvBadge.className = "refract-drawer-tile-badge";
+                    mvTile.appendChild(mvBadge);
+                }
+                if (mvBadge.textContent !== String(mvTotal)) {
+                    mvBadge.textContent = String(mvTotal);
+                }
+            } else if (mvBadge && mvBadge.parentNode) {
+                mvBadge.parentNode.removeChild(mvBadge);
             }
         }
         return true;
