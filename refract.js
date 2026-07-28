@@ -265,8 +265,13 @@
                 }, 1000);
                 return function () { clearInterval(t); };
             }, [cands.length]);
+            var MAX_DOCK_ICONS = 6;
             function toggle(key) {
-                var next = sel.indexOf(key) !== -1
+                var isOn = sel.indexOf(key) !== -1;
+                /* Hard cap: more than 6 + burger squeezes the bar into
+                   uselessness on narrow phones. */
+                if (!isOn && sel.length >= MAX_DOCK_ICONS) { return; }
+                var next = isOn
                     ? sel.filter(function (k) { return k !== key; })
                     : sel.concat([key]);
                 try { localStorage.setItem(DOCK_ITEMS_KEY, JSON.stringify(next)); } catch (e) { /* ignore */ }
@@ -274,6 +279,7 @@
                 setSel(next);
                 refractRebuildMobileDock();
             }
+            var full = sel.length >= MAX_DOCK_ICONS;
             if (!cands.length) {
                 return R.createElement("div", { className: "sub-heading" },
                     "Icons load once the navbar has been scanned…");
@@ -281,13 +287,15 @@
             return R.createElement("div", { className: "refract-dock-grid" },
                 cands.map(function (c) {
                     var on = sel.indexOf(c.key) !== -1;
+                    var blocked = !on && full;
                     return R.createElement("button", {
                         key: c.key,
                         type: "button",
-                        className: "refract-dock-grid-item" + (on ? " is-active" : ""),
-                        title: c.label,
+                        className: "refract-dock-grid-item" + (on ? " is-active" : "") + (blocked ? " is-blocked" : ""),
+                        title: blocked ? (c.label + " (dock is full: 6 max)") : c.label,
                         "aria-label": c.label,
                         "aria-pressed": on ? "true" : "false",
+                        "aria-disabled": blocked ? "true" : "false",
                         onClick: function () { toggle(c.key); },
                         dangerouslySetInnerHTML: { __html: c.iconHtml }
                     });
@@ -750,7 +758,7 @@
                     R.createElement("div", null,
                         R.createElement("h3", null, "Mobile dock"),
                         R.createElement("div", { className: "sub-heading" },
-                            "Choose which icons sit in the bottom bar on narrow screens; lit icons are shown. Plugin buttons included. The burger is always last, and everything stays reachable from its drawer.")
+                            "Choose which icons sit in the bottom bar on narrow screens; lit icons are shown, up to six. Plugin buttons included. The burger is always last, and everything stays reachable from its drawer.")
                     ),
                     R.createElement(DockConfigGrid)
                 ),

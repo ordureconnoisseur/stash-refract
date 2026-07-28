@@ -1294,6 +1294,11 @@ body.stash-liquid-glass .refract-dock-grid-item.is-active {
     border-color: rgba(var(--accent-rgb), 0.45);
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.25);
 }
+/* Dock full (6 selected): unselected chips dim out until a slot frees. */
+body.stash-liquid-glass .refract-dock-grid-item.is-blocked {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
 body.stash-liquid-glass .refract-card-preview {
     pointer-events: none;
     display: flex;
