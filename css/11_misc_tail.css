@@ -1077,13 +1077,14 @@ body.stash-liquid-glass .refract-logo-input:focus {
    Refract plugin-settings panel (native <details>). Styled as a bordered
    card with a clickable summary header + a chevron that rotates on open. */
 body.stash-liquid-glass .refract-suggestion-box {
-    margin-top: 0.75rem;
+    /* A clear inset from the section .card's edges: at the previous
+       1px gap the inner and outer borders nearly touched and read as
+       an accidental double border. 12px breathing room + a tighter
+       radius than the card's 12px (concentric: inner radius shrinks
+       with inset) makes the nesting look deliberate. */
+    margin: 0.75rem 12px 12px;
     border: 1px solid var(--glass-border);
-    /* Nested nearly flush (1px inset) inside the section's .card,
-       which Stash rounds at 12px — the old var(--radius) (16px) made
-       the INNER box rounder than its container, a visible mismatch at
-       every corner. Match the card. */
-    border-radius: 12px;
+    border-radius: 8px;
     background: rgba(255, 255, 255, 0.02);
     overflow: hidden;
 }
