@@ -89,7 +89,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
 
     /* ── Burger button ────────────────────────────────────────────── */
-    body.stash-liquid-glass:not(.refract-no-mobile-drawer) nav.top-nav .refract-burger {
+    body.stash-liquid-glass nav.top-nav .refract-burger {
         display: inline-flex !important;
         align-items: center;
         justify-content: center;
@@ -201,17 +201,17 @@ body.stash-liquid-glass .refract-mobile-drawer {
     /* ── Hide Stash's navbar children entirely on mobile ──────────────
        Refract builds its own mobile nav from scratch. Keep .navbar-brand
        (home link), the contextual /new button mirror, and our burger.
-       body.refract-no-mobile-drawer (Suggestion Box opt-out, forum
-       request VersGeek 2026-07) skips the whole takeover: the inline
-       icon navbar stays, one tap per action. */
-    body.stash-liquid-glass:not(.refract-no-mobile-drawer) nav.top-nav > *:not(.navbar-brand):not(.refract-burger):not(.refract-mobile-new) {
+       (A drawer opt-out was tried 2026-07-28 and pulled the same day:
+       an inline icon navbar overflows as soon as a few plugins add nav
+       items, and the drawer IS the overflow strategy. Needs a real
+       design — e.g. inline icons + overflow-only drawer — before it
+       comes back; see VersGeek's forum request.) */
+    body.stash-liquid-glass nav.top-nav > *:not(.navbar-brand):not(.refract-burger):not(.refract-mobile-new) {
         display: none !important;
     }
 
-    /* ── Mobile "New" button — mirror of Stash's /new contextual btn ─
-       (Redundant when the drawer is opted out: the native inline nav
-       incl. its New button stays visible.) */
-    body.stash-liquid-glass:not(.refract-no-mobile-drawer) nav.top-nav .refract-mobile-new {
+    /* ── Mobile "New" button — mirror of Stash's /new contextual btn ─ */
+    body.stash-liquid-glass nav.top-nav .refract-mobile-new {
         display: inline-flex !important;
         align-items: center;
         justify-content: center;

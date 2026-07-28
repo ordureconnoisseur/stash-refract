@@ -305,10 +305,6 @@
             var nativeSidebarOn = nativeSidebarState[0];
             var setNativeSidebarOn = nativeSidebarState[1];
 
-            var mobileDrawerState = R.useState(!isMobileDrawerDisabled());
-            var mobileDrawerOn = mobileDrawerState[0];
-            var setMobileDrawerOn = mobileDrawerState[1];
-
             /* Card element visibility: one state map driven by the
                CARD_ELEMS table (key -> hidden bool). */
             var cardElemsState = R.useState(function () {
@@ -419,14 +415,6 @@
                 scheduleServerSync();
                 applyNativeSidebarClass(next);
                 setNativeSidebarOn(next);
-            }
-
-            function toggleMobileDrawer() {
-                var nextOn = !mobileDrawerOn;
-                try { localStorage.setItem(NO_MOBILE_DRAWER_KEY, nextOn ? "0" : "1"); } catch (e) { /* ignore */ }
-                scheduleServerSync();
-                applyMobileDrawerClass(!nextOn);
-                setMobileDrawerOn(nextOn);
             }
 
             function toggleCardElem(key) {
@@ -832,28 +820,6 @@
                                 )
                             )
                         ),
-                        R.createElement("div", { className: "setting", id: "plugin-refract-mobile-drawer" },
-                            R.createElement("div", null,
-                                R.createElement("h3", null, "Mobile navigation drawer"),
-                                R.createElement("div", { className: "sub-heading" },
-                                    "On narrow screens, replace the navbar with a burger button and tile drawer. Turn off to keep the inline icon navbar on mobile: one tap per action instead of two.")
-                            ),
-                            R.createElement("div", { className: "refract-setting-control" },
-                                R.createElement("div", { className: "custom-control custom-switch" },
-                                    R.createElement("input", {
-                                        type: "checkbox",
-                                        className: "custom-control-input",
-                                        id: "refract-mobile-drawer-toggle",
-                                        checked: mobileDrawerOn,
-                                        onChange: toggleMobileDrawer
-                                    }),
-                                    R.createElement("label", {
-                                        className: "custom-control-label",
-                                        htmlFor: "refract-mobile-drawer-toggle"
-                                    })
-                                )
-                            )
-                        ),
                         R.createElement("div", { className: "setting", id: "plugin-refract-view-minimiser" },
                             R.createElement("div", null,
                                 R.createElement("h3", null, "View-mode minimiser"),
@@ -1041,7 +1007,6 @@
     var HIDE_CENTER_CONTROLS_KEY = "refract.hideCenterControls";
     var SHOW_FILTER_TAGS_KEY = "refract.showFilterTags";
     var NATIVE_SIDEBAR_KEY = "refract.nativeSidebar";
-    var NO_MOBILE_DRAWER_KEY = "refract.noMobileDrawer";
 
     /* Static mock cards for the Suggestion Box "Card preview" row. Real
        .scene-card / .performer-card class structure so the SAME theme CSS
@@ -1340,7 +1305,7 @@
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
         MINIMAL_CARDS_STORAGE_KEY, RATING_STYLE_STORAGE_KEY, CARD_BACK_EXPLICIT_KEY,
         PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY,
-        SHOW_FILTER_TAGS_KEY, NATIVE_SIDEBAR_KEY, NO_MOBILE_DRAWER_KEY
+        SHOW_FILTER_TAGS_KEY, NATIVE_SIDEBAR_KEY
     ].concat(CARD_ELEMS.map(function (d) { return d.key; }));
 
     function isPluginSortDisabledBottom() {
@@ -1550,22 +1515,6 @@
     }
     applyNativeSidebarClass(isNativeSidebar());
 
-    /* Mobile drawer opt-out. Refract normally replaces the navbar with
-       a burger + tile drawer under 900px; icon-only nav actually fits
-       most phones, and the drawer costs two taps per action (forum
-       request, VersGeek 2026-07). Opting out keeps the inline icon
-       navbar at every width. Gates in 12_mobile.css. */
-    function isMobileDrawerDisabled() {
-        try {
-            return localStorage.getItem(NO_MOBILE_DRAWER_KEY) === "1";
-        } catch (e) { return false; }
-    }
-    function applyMobileDrawerClass(disabled) {
-        if (!document.body) { return; }
-        document.body.classList.toggle("refract-no-mobile-drawer", !!disabled);
-    }
-    applyMobileDrawerClass(isMobileDrawerDisabled());
-
     /* Scene card style. "refract" (default) = tidier minimal layout —
        description block hidden so the grid stays consistent across
        scenes with and without descriptions. "classic" = Stash's
@@ -1757,7 +1706,6 @@
             applyCenterControlsHiddenClass(isCenterControlsHidden());
             applyFilterTagsShownClass(isFilterTagsShown());
             applyNativeSidebarClass(isNativeSidebar());
-            applyMobileDrawerClass(isMobileDrawerDisabled());
             applyCardElemClasses();
             applyCardStyleClass(getStoredCardStyle());
             applyRatingStyleClass(getStoredRatingStyle());
@@ -9877,7 +9825,12 @@
         }
         return "rgb(128,128,128)";
     }
+    /* WIP — held back from public release (user call 2026-07-28): the
+       swatch treatment isn't finished. Flip to true to resume; all the
+       code below and the .refract-has-swatch CSS stay in place. */
+    var REFRACT_FILTER_SWATCHES_ENABLED = false;
     function setupVideoFilterSwatches() {
+        if (!REFRACT_FILTER_SWATCHES_ENABLED) { return; }
         var panels = document.querySelectorAll(".scene-video-filter");
         if (!panels.length) { return; }
         for (var p = 0; p < panels.length; p++) {
