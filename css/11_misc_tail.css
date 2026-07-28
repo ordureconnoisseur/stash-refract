@@ -1079,7 +1079,11 @@ body.stash-liquid-glass .refract-logo-input:focus {
 body.stash-liquid-glass .refract-suggestion-box {
     margin-top: 0.75rem;
     border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
+    /* Nested nearly flush (1px inset) inside the section's .card,
+       which Stash rounds at 12px — the old var(--radius) (16px) made
+       the INNER box rounder than its container, a visible mismatch at
+       every corner. Match the card. */
+    border-radius: 12px;
     background: rgba(255, 255, 255, 0.02);
     overflow: hidden;
 }
@@ -1269,9 +1273,7 @@ body.stash-liquid-glass .refract-dock-grid-item {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    /* CIRCLES, matching the dock's circular active glow — the rounded
-       squares clashed with the feature they configure. */
-    border-radius: 50%;
+    border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--glass-border);
     color: var(--text-muted);
