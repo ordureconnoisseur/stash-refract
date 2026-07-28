@@ -137,6 +137,22 @@ body.stash-liquid-glass .refract-mobile-drawer {
         justify-content: flex-start !important;
         max-width: none !important;
     }
+    /* Breathing room between a row's text and its control: the accent
+       swatches and chip grids aren't .refract-setting-control wrappers,
+       so the stacked-layout margin above missed them. */
+    body.stash-liquid-glass #refract-settings-section .refract-accent-swatches,
+    body.stash-liquid-glass #refract-settings-section .refract-dock-grid,
+    body.stash-liquid-glass #refract-settings-section .refract-card-elems {
+        margin-top: 0.8rem !important;
+    }
+    /* Stacked rows inside the customiser body ran together with no
+       visual separation; hairline dividers restore the rhythm the
+       side-by-side desktop layout gets from its row borders. */
+    body.stash-liquid-glass #refract-settings-section .refract-suggestion-body > .setting + .setting {
+        border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+        padding-top: 1rem !important;
+        margin-top: 0.2rem !important;
+    }
     /* Card preview: cards cap at viewport width; the side padding that
        reserves room for the corner shuffle button becomes TOP padding
        so nothing is squeezed off-screen. */

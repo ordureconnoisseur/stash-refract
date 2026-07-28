@@ -1269,7 +1269,9 @@ body.stash-liquid-glass .refract-dock-grid-item {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius-sm);
+    /* CIRCLES, matching the dock's circular active glow — the rounded
+       squares clashed with the feature they configure. */
+    border-radius: 50%;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--glass-border);
     color: var(--text-muted);
