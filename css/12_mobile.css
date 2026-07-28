@@ -89,6 +89,17 @@ body.stash-liquid-glass .refract-mobile-drawer {
         position: unset !important;
     }
 
+    /* ── No top bar on mobile (2026-07-28) ──────────────────────────
+       The bottom dock owns navigation; the floating top navbar (brand
+       orb + New mirror) is retired entirely and its top clearance is
+       reclaimed. */
+    body.stash-liquid-glass nav.top-nav.navbar {
+        display: none !important;
+    }
+    body.stash-liquid-glass .main.container-fluid {
+        padding-top: 12px !important;
+    }
+
     /* ── Burger button (RETIRED from the top nav 2026-07-28) ────────
        The bottom dock's last tile is now the drawer opener; the
        injected top-nav .refract-burger stays in the DOM but is never
@@ -147,26 +158,26 @@ body.stash-liquid-glass .refract-mobile-drawer {
        burger tile at the end opening the full drawer. Sits above the
        scrim (z 110 > 99) so the burger doubles as the close control
        while the drawer is open. */
+    /* Styled as the bottom counterpart of the retired floating top
+       navbar: same glass background, border, radius, blur, and accent
+       glow halo (--shadow-navbar), same 12px side insets. */
     body.stash-liquid-glass .refract-mobile-dock {
         display: flex !important;
         position: fixed;
-        left: 50%;
-        transform: translateX(-50%);
-        bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px));
-        width: min(94vw, 30rem);
+        left: 12px;
+        right: 12px;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
         z-index: 110;
         align-items: center;
         justify-content: space-between;
         gap: 0.2rem;
-        padding: 0.4rem 0.55rem;
-        border-radius: 999px;
-        background: rgba(18, 15, 24, 0.78);
+        padding: 0.4rem 0.65rem;
+        border-radius: var(--radius);
+        background: var(--glass-bg);
         border: 1px solid var(--glass-border);
-        -webkit-backdrop-filter: var(--glass-blur-md-sat);
-        backdrop-filter: var(--glass-blur-md-sat);
-        box-shadow:
-            0 10px 34px rgba(0, 0, 0, 0.5),
-            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+        box-shadow: var(--shadow-navbar);
     }
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item {
         flex: 1 1 0;
@@ -208,12 +219,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
        room so the last row of cards isn't parked under the pill. */
     body.stash-liquid-glass .main.container-fluid,
     body.stash-liquid-glass main.container-fluid {
-        padding-bottom: calc(4.4rem + env(safe-area-inset-bottom, 0px)) !important;
+        padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px)) !important;
     }
     /* Floating pager (09_buttons.css pins it at bottom: 1.5rem) would
-       sit behind the dock; lift it above the pill. */
+       sit behind the dock; lift it above the bar. */
     body.stash-liquid-glass [data-pager-row="float"] {
-        bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)) !important;
+        bottom: calc(5rem + env(safe-area-inset-bottom, 0px)) !important;
     }
     /* multiView's floating picking launcher: hidden on mobile for now
        (fights the dock for the bottom edge; a proper mobile placement
@@ -313,7 +324,10 @@ body.stash-liquid-glass .refract-mobile-drawer {
         gap: 9px;
         padding: 13px;
         position: fixed;
-        top: 64px;
+        /* Anchored ABOVE the bottom dock (the drawer's opener) and
+           rising from it — not dropping from the retired top bar. */
+        top: auto;
+        bottom: calc(4.9rem + env(safe-area-inset-bottom, 0px));
         left: 12px;
         right: 12px;
         background: rgba(20, 20, 24, 0.92);
@@ -325,12 +339,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
             var(--shadow-xl),
             inset 0 0 0 1px rgba(var(--accent-rgb), 0.08);
         z-index: 100;
-        max-height: calc(100vh - 80px);
+        max-height: calc(100vh - 7rem);
         overflow-y: auto;
-        /* Closed state — invisible, non-interactive, anchored top-right. */
+        /* Closed state — invisible, non-interactive; slides UP from the
+           dock on open. */
         opacity: 0;
-        transform: translateY(-12px) scale(0.96);
-        transform-origin: top right;
+        transform: translateY(12px) scale(0.96);
+        transform-origin: bottom center;
         pointer-events: none;
         transition:
             opacity 0.22s ease,
