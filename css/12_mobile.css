@@ -189,12 +189,14 @@ body.stash-liquid-glass .refract-mobile-drawer {
         gap: 0;
         padding: 0 0.5rem env(safe-area-inset-bottom, 0px);
         border-radius: 0;
-        background: rgba(10, 10, 10, 0.92);
+        /* Refract's own tab-bar material (the approved variant-A look);
+           only the SIZE comes from binge mobile. */
+        background: rgb(28, 26, 33);
         border: none;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-        -webkit-backdrop-filter: blur(12px);
-        backdrop-filter: blur(12px);
-        box-shadow: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.09);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
     }
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item {
         flex: 1 1 0;

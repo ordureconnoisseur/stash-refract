@@ -60,11 +60,8 @@ body.stash-liquid-glass.refract-lite .pagination,
 body.stash-liquid-glass.refract-lite .detail-header {
     background: rgb(35, 35, 35) !important;
 }
-/* The tab-bar dock is near-black in base mode; pin it fully opaque at
-   its own colour rather than the lighter platform grey. */
-body.stash-liquid-glass.refract-lite .refract-mobile-dock {
-    background: rgb(10, 10, 10) !important;
-}
+/* The tab-bar dock is already opaque (rgb(28,26,33), no blur) in base
+   mode, so lite needs no override; kept here as documentation. */
 
 /* ── 5. Cards: no hover lift, dark drop-shadow instead of accent
        glow halo. Keeps a sense of depth on hover without the GPU
