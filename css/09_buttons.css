@@ -157,9 +157,12 @@ body.stash-liquid-glass [data-stash-filter] select {
     padding: 0 8px !important;
 }
 
-/* ── Active filter chips — hidden (filter button badge shows count) ── */
-body.stash-liquid-glass .filter-tags,
-body.stash-liquid-glass .wrap-tags {
+/* ── Active filter chips — hidden by default (filter button badge shows
+   the count); the refract-show-filter-tags body class (Suggestion Box
+   toggle, forum request) re-shows them so filters can be dismissed
+   without opening the menu. ── */
+body.stash-liquid-glass:not(.refract-show-filter-tags) .filter-tags,
+body.stash-liquid-glass:not(.refract-show-filter-tags) .wrap-tags {
     display: none !important;
 }
 

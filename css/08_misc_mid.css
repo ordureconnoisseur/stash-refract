@@ -1679,14 +1679,26 @@ body.stash-liquid-glass .scene-marker-card hr:has(+ .card-popovers:empty) {
    `object-fit: contain` image + a subtle dark tile background to make
    light logos pop. Group/movie cards show poster art with cover-fit. */
 body.stash-liquid-glass .studio-card .studio-card-header,
-body.stash-liquid-glass .studio-card .studio-card-image-container,
+body.stash-liquid-glass .studio-card .studio-card-image-container {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    position: relative;
+}
+/* Group / movie cards carry PORTRAIT poster art (DVD covers, ~2:3);
+   the old shared 4:3 landscape crop cut the top and bottom off every
+   cover (forum report, Seneschal 2026-07). Portrait ratio + cover-fit
+   shows the art essentially uncropped, matching Stash's native
+   vertical group cards. */
 body.stash-liquid-glass .group-card .group-card-header,
 body.stash-liquid-glass .group-card .group-card-image-container,
 body.stash-liquid-glass .movie-card .movie-card-header,
 body.stash-liquid-glass .movie-card .movie-card-image-container {
     display: block;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 2 / 3;
     overflow: hidden;
     border-radius: var(--radius-sm);
     position: relative;

@@ -370,6 +370,8 @@ body.stash-liquid-glass.refract-show-help nav.top-nav .navbar-buttons > button.n
    specificity also outranks the generic .btn-primary:hover accent-tint
    from the later button files. */
 body.stash-liquid-glass nav.top-nav button.btn.notification-btn,
+/* StashInteractiveTools' Handy button: same opt-in as the bell. */
+body.stash-liquid-glass nav.top-nav .stash-interactive-tools-utility-item button.btn,
 body.stash-liquid-glass nav.top-nav a.btn:where(:not(.brand-link):not(.navbar-brand button):not(.logout-button):not([href*="/logout"]):not([title="Help"]):not([aria-label="Help"]):not([href="/help"]):not([href*="/manual"]):not([href*="opencollective"]):not(.sidebar-toggle-button)),
 body.stash-liquid-glass nav.top-nav button.btn:where(:not(.brand-link):not(.navbar-brand button):not(.nav-utility):not(.logout-button):not([href*="/logout"]):not([title="Help"]):not([aria-label="Help"]):not([href="/help"]):not([href*="/manual"]):not([href*="opencollective"]):not(.sidebar-toggle-button)),
 body.stash-liquid-glass nav.top-nav .navbar-toggler {
@@ -444,7 +446,8 @@ body.stash-liquid-glass nav.top-nav .navbar-toggler {
    selector outranks .minimal, so the faint square showed only on the
    bell. Blank it at rest; :hover in the shared rule has pseudo-class
    specificity on top and still paints the square + lift. */
-body.stash-liquid-glass nav.top-nav button.btn.notification-btn {
+body.stash-liquid-glass nav.top-nav button.btn.notification-btn,
+body.stash-liquid-glass nav.top-nav .stash-interactive-tools-utility-item button.btn {
     background: transparent !important;
     border-color: transparent !important;
 }
@@ -740,8 +743,11 @@ html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:focus-vi
 /* Hide help, logout, donate, sidebar toggle (keep scoped to top nav; avoids beating .btn rule).
    :not(.notification-btn) exempts stashNotifications' bell — a Dropdown
    toggle that carries .nav-utility too but is a real control we keep
-   (themed with the gs-trigger rules above). */
-body.stash-liquid-glass nav.top-nav button.btn.nav-utility:not(.notification-btn),
+   (themed with the gs-trigger rules above). The :where() exempts
+   StashInteractiveTools' Handy button (forum report user037951) at
+   ZERO added specificity — never add exemptions via bare :not() here,
+   that specificity bump is what broke the mobile burger in 1.19.0. */
+body.stash-liquid-glass nav.top-nav button.btn.nav-utility:not(.notification-btn):where(:not(.stash-interactive-tools-utility-item button)),
 body.stash-liquid-glass nav.top-nav a[href="/logout"],
 body.stash-liquid-glass nav.top-nav a[href*="logout"],
 body.stash-liquid-glass nav.top-nav a.logout-button,
@@ -751,9 +757,13 @@ body.stash-liquid-glass nav.top-nav [title="Log out"],
 body.stash-liquid-glass nav.top-nav [aria-label="Help"],
 body.stash-liquid-glass nav.top-nav [title="Help"],
 body.stash-liquid-glass nav.top-nav a[href*="opencollective"],
-body.stash-liquid-glass nav.top-nav .sidebar-toggle-button,
 body.stash-liquid-glass nav.top-nav a:has(svg[data-icon="circle-question"]),
 body.stash-liquid-glass nav.top-nav a:has(svg.fa-circle-question) {
+    display: none !important;
+}
+/* Sidebar toggle: hidden with the sidebar itself; comes back with the
+   refract-native-sidebar opt-in (see 04_filters.css). */
+body.stash-liquid-glass:not(.refract-native-sidebar) nav.top-nav .sidebar-toggle-button {
     display: none !important;
 }
 

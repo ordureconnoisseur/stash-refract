@@ -75,8 +75,21 @@ body.stash-liquid-glass .refract-mobile-drawer {
 
 @media (max-width: 900px) {
 
+    /* ── Forum-reported mobile fixes (obatzdamelt, thread 2026-07) ──
+       1. Detail-page tab strips (performer/scene/image pages) overflow
+          off-screen on narrow viewports; let them wrap.
+       2. The filter / saved-filters popover panes can't scroll or be
+          selected on the performers/tags pages; the theme's positioned
+          sidebar-pane traps them. Unset restores native behavior. */
+    body.stash-liquid-glass .nav-tabs {
+        flex-wrap: wrap !important;
+    }
+    body.stash-liquid-glass .detail-body .sidebar-pane {
+        position: unset !important;
+    }
+
     /* ── Burger button ────────────────────────────────────────────── */
-    body.stash-liquid-glass nav.top-nav .refract-burger {
+    body.stash-liquid-glass:not(.refract-no-mobile-drawer) nav.top-nav .refract-burger {
         display: inline-flex !important;
         align-items: center;
         justify-content: center;
@@ -187,13 +200,18 @@ body.stash-liquid-glass .refract-mobile-drawer {
 
     /* ── Hide Stash's navbar children entirely on mobile ──────────────
        Refract builds its own mobile nav from scratch. Keep .navbar-brand
-       (home link), the contextual /new button mirror, and our burger. */
-    body.stash-liquid-glass nav.top-nav > *:not(.navbar-brand):not(.refract-burger):not(.refract-mobile-new) {
+       (home link), the contextual /new button mirror, and our burger.
+       body.refract-no-mobile-drawer (Suggestion Box opt-out, forum
+       request VersGeek 2026-07) skips the whole takeover: the inline
+       icon navbar stays, one tap per action. */
+    body.stash-liquid-glass:not(.refract-no-mobile-drawer) nav.top-nav > *:not(.navbar-brand):not(.refract-burger):not(.refract-mobile-new) {
         display: none !important;
     }
 
-    /* ── Mobile "New" button — mirror of Stash's /new contextual btn ─ */
-    body.stash-liquid-glass nav.top-nav .refract-mobile-new {
+    /* ── Mobile "New" button — mirror of Stash's /new contextual btn ─
+       (Redundant when the drawer is opted out: the native inline nav
+       incl. its New button stays visible.) */
+    body.stash-liquid-glass:not(.refract-no-mobile-drawer) nav.top-nav .refract-mobile-new {
         display: inline-flex !important;
         align-items: center;
         justify-content: center;

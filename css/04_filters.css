@@ -720,17 +720,20 @@ body.stash-liquid-glass .filtered-list-toolbar::before {
     pointer-events: none !important;
 }
 
-/* Hide Stash's redundant left filter sidebar entirely — the top filter
-   toolbar already exposes search/saved-filters/edit-filter/etc., so the
-   sidebar duplicates UI. Also kill the sidebar-toggle button and the
-   sidebar-pane-content's hard-coded margin-left so the main list fills
-   the row instead of leaving a 235px reservation for the hidden sidebar. */
-body.stash-liquid-glass .sidebar,
-body.stash-liquid-glass [class*="col-"]:has(> .sidebar),
-body.stash-liquid-glass .sidebar-toggle-button-container {
+/* Hide Stash's redundant left filter sidebar by default — the top
+   filter toolbar already exposes search/saved-filters/edit-filter/etc.,
+   so the sidebar duplicates UI. Also kill the sidebar-toggle button and
+   the sidebar-pane-content's hard-coded margin-left so the main list
+   fills the row instead of leaving a 235px reservation for the hidden
+   sidebar. The refract-native-sidebar body class (Suggestion Box
+   toggle, forum request Seneschal 2026-07) restores native behavior:
+   sidebar, toggle button, and margin all come back. */
+body.stash-liquid-glass:not(.refract-native-sidebar) .sidebar,
+body.stash-liquid-glass:not(.refract-native-sidebar) [class*="col-"]:has(> .sidebar),
+body.stash-liquid-glass:not(.refract-native-sidebar) .sidebar-toggle-button-container {
     display: none !important;
 }
-body.stash-liquid-glass .sidebar-pane-content {
+body.stash-liquid-glass:not(.refract-native-sidebar) .sidebar-pane-content {
     margin-left: 0 !important;
 }
 
