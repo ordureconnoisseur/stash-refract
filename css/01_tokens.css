@@ -154,6 +154,18 @@ body.stash-liquid-glass {
     letter-spacing: 0.005em;
 }
 
+/* ROOT element background. Stash leaves <html> white and only darkens
+   body/.main — iOS Safari exposes the html background in the strip
+   under the expanded URL bar and on rubber-band overscroll, painting a
+   white band above/below the dark theme on phones. Match the theme's
+   top-edge colour (and the light variant). */
+html:has(body.stash-liquid-glass) {
+    background-color: var(--bg-1, #111) !important;
+}
+html:has(body.stash-liquid-glass.refract-light) {
+    background-color: #fafafa !important;
+}
+
 /* Some Stash views set explicit fonts; force them back to theme font. */
 body.stash-liquid-glass .card-section-title,
 body.stash-liquid-glass .TruncatedText,
