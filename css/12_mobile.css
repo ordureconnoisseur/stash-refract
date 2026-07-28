@@ -185,7 +185,11 @@ body.stash-liquid-glass .refract-mobile-drawer {
         justify-content: space-between;
         gap: 0.2rem;
         padding: 0.4rem 0.65rem;
-        border-radius: var(--radius);
+        /* iPhone-style rounding: a large radius concentric with the
+           device's display corners (~55px corner radius minus the 12px
+           inset). Taller than half the bar height, so it renders as a
+           smooth capsule like the iOS dock. */
+        border-radius: 2.7rem;
         background: var(--glass-bg);
         border: 1px solid var(--glass-border);
         -webkit-backdrop-filter: var(--glass-blur);
