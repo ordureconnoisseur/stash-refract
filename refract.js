@@ -2212,23 +2212,24 @@
         return true;
     }
 
-    /* Open / close — toggles body class which animates the drawer. */
+    /* Open / close — toggles body class which animates the drawer. Both
+       burger instances (legacy top-nav one and the bottom dock's) get
+       the is-open X morph so whichever is visible reads correctly. */
+    function refractSetBurgerState(open) {
+        var bs = document.querySelectorAll(".refract-burger, .refract-dock-burger");
+        for (var i = 0; i < bs.length; i++) {
+            bs[i].classList.toggle("is-open", open);
+            bs[i].setAttribute("aria-expanded", open ? "true" : "false");
+        }
+    }
     function refractOpenBurger() {
         document.body.classList.add("refract-burger-open");
-        var b = document.querySelector(".refract-burger");
-        if (b) {
-            b.classList.add("is-open");
-            b.setAttribute("aria-expanded", "true");
-        }
+        refractSetBurgerState(true);
         refractMarkActiveDrawerTile();
     }
     function refractCloseBurger() {
         if (!document.body.classList.contains("refract-burger-open")) { return; }
-        var b = document.querySelector(".refract-burger");
-        if (b) {
-            b.classList.remove("is-open");
-            b.setAttribute("aria-expanded", "false");
-        }
+        refractSetBurgerState(false);
         document.body.classList.remove("refract-burger-open");
     }
 
@@ -2261,6 +2262,94 @@
         stats:      '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
         settings:   '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>'
     };
+
+    /* Mobile bottom dock — iOS-style fixed pill bar with the essential
+       routes one tap away (Scenes, Performers, Studios, Tags, Settings)
+       and a burger tile at the end that opens the full drawer for
+       everything else (secondary pages + plugin tiles). Replaces the
+       top-nav burger as the drawer opener on mobile; 12_mobile.css
+       shows it under 900px. Partially answers the forum "two taps per
+       action" complaint without giving up the drawer as the overflow
+       strategy. */
+    var MOBILE_DOCK_ROUTES = ["/scenes", "/performers", "/studios", "/tags", "/settings"];
+    function injectMobileDock() {
+        if (document.querySelector(".refract-mobile-dock")) { return true; }
+        if (!document.body) { return false; }
+        var dock = document.createElement("nav");
+        dock.className = "refract-mobile-dock";
+        dock.setAttribute("aria-label", "Quick navigation");
+
+        var html = "";
+        for (var i = 0; i < MOBILE_DOCK_ROUTES.length; i++) {
+            var item = null;
+            for (var k = 0; k < MOBILE_NAV_ITEMS.length; k++) {
+                if (MOBILE_NAV_ITEMS[k].href === MOBILE_DOCK_ROUTES[i]) { item = MOBILE_NAV_ITEMS[k]; break; }
+            }
+            if (!item) { continue; }
+            html +=
+                '<a class="refract-dock-item" href="' + item.href + '" data-href="' + item.href + '"' +
+                    ((item.aliases && item.aliases.length) ? ' data-aliases="' + item.aliases.join(" ") + '"' : '') +
+                    ' aria-label="' + item.label + '">' +
+                    (MOBILE_NAV_ICONS[item.icon] || "") +
+                '</a>';
+        }
+        html +=
+            '<button type="button" class="refract-dock-item refract-dock-burger" aria-label="All pages" aria-expanded="false">' +
+                '<span class="refract-burger-icon" aria-hidden="true">' +
+                    '<span class="refract-burger-line"></span>' +
+                    '<span class="refract-burger-line"></span>' +
+                    '<span class="refract-burger-line"></span>' +
+                '</span>' +
+            '</button>';
+        dock.innerHTML = html;
+
+        dock.addEventListener("click", function (e) {
+            if (!e.target || !e.target.closest) { return; }
+            var burger = e.target.closest(".refract-dock-burger");
+            if (burger) {
+                if (document.body.classList.contains("refract-burger-open")) {
+                    refractCloseBurger();
+                } else {
+                    refractOpenBurger();
+                }
+                return;
+            }
+            var tile = e.target.closest(".refract-dock-item");
+            if (!tile) { return; }
+            e.preventDefault();
+            refractCloseBurger();
+            var href = tile.getAttribute("data-href");
+            if (href && window.location.pathname !== href) {
+                window.history.pushState(null, "", href);
+                window.dispatchEvent(new PopStateEvent("popstate"));
+            }
+        });
+
+        document.body.appendChild(dock);
+        refractMarkActiveDockItem();
+        return true;
+    }
+
+    function refractMarkActiveDockItem() {
+        var dock = document.querySelector(".refract-mobile-dock");
+        if (!dock) { return; }
+        var path = window.location.pathname;
+        var tiles = dock.querySelectorAll(".refract-dock-item[data-href]");
+        for (var i = 0; i < tiles.length; i++) {
+            var t = tiles[i];
+            var routes = [t.getAttribute("data-href")]
+                .concat((t.getAttribute("data-aliases") || "").split(" ").filter(Boolean));
+            var active = false;
+            for (var r = 0; r < routes.length; r++) {
+                if (path === routes[r] || path.indexOf(routes[r] + "/") === 0 ||
+                        (routes[r] === "/settings" && path.indexOf("/settings") === 0)) {
+                    active = true;
+                    break;
+                }
+            }
+            t.classList.toggle("is-active", active);
+        }
+    }
 
     function injectMobileDrawer() {
         if (document.querySelector(".refract-mobile-drawer")) { return true; }
@@ -2758,9 +2847,11 @@
             var t = e.target;
             if (!t || !t.closest) { return; }
             if (t.closest(".refract-burger")) { return; }
-            // Scrim + drawer-tile clicks are handled by their own listeners.
+            // Scrim + drawer-tile + dock clicks are handled by their own
+            // listeners (the dock burger toggles; dock tiles close+navigate).
             if (t.closest(".refract-burger-scrim")) { return; }
             if (t.closest(".refract-mobile-drawer")) { return; }
+            if (t.closest(".refract-mobile-dock")) { return; }
             refractCloseBurger();
         });
 
@@ -2773,6 +2864,7 @@
         function onLocationChange() {
             refractCloseBurger();
             refractMarkActiveDrawerTile();
+            refractMarkActiveDockItem();
         }
         if (typeof PluginApi !== "undefined" && PluginApi && PluginApi.Event && PluginApi.Event.addEventListener) {
             PluginApi.Event.addEventListener("stash:location", onLocationChange);
@@ -3569,6 +3661,7 @@
                 safeRun(injectBurgerScrim);
                 safeRun(injectToolbarDropdownScrim);
                 safeRun(injectMobileDrawer);
+                safeRun(injectMobileDock);
                 safeRun(refractApplyNavIcons);
                 safeRun(refractifyCardPopoverIcons);
                 safeRun(refractAppendPluginDrawerTiles);
@@ -5464,6 +5557,7 @@
                 injectBurgerScrim();
                 injectToolbarDropdownScrim();
                 injectMobileDrawer();
+                injectMobileDock();
                 refractApplyNavIcons();
                 refractAppendPluginDrawerTiles();
                 normalizeSettingsSidebarNavItems();
@@ -5498,6 +5592,7 @@
         injectBurgerScrim();
         injectToolbarDropdownScrim();
         injectMobileDrawer();
+        injectMobileDock();
         refractApplyNavIcons();
         refractAppendPluginDrawerTiles();
         normalizeSettingsSidebarNavItems();

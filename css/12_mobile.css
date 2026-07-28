@@ -69,6 +69,7 @@
 body.stash-liquid-glass nav.top-nav .refract-burger,
 body.stash-liquid-glass nav.top-nav .refract-mobile-new,
 body.stash-liquid-glass .refract-burger-scrim,
+body.stash-liquid-glass .refract-mobile-dock,
 body.stash-liquid-glass .refract-mobile-drawer {
     display: none;
 }
@@ -88,56 +89,23 @@ body.stash-liquid-glass .refract-mobile-drawer {
         position: unset !important;
     }
 
-    /* ── Burger button ────────────────────────────────────────────── */
-    body.stash-liquid-glass nav.top-nav .refract-burger {
-        display: inline-flex !important;
-        align-items: center;
-        justify-content: center;
-        width: var(--nav-btn-size);
-        height: var(--nav-btn-size);
-        flex: 0 0 auto;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: var(--radius-sm);
-        color: var(--text);
-        padding: 0;
-        cursor: pointer;
-        position: relative;
-        order: 99;
-        margin-left: auto;
-        transition:
-            background 0.18s ease,
-            border-color 0.18s ease,
-            color 0.18s ease,
-            box-shadow 0.22s ease;
-    }
-    body.stash-liquid-glass nav.top-nav .refract-burger:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(255, 255, 255, 0.20);
-    }
-    /* Open state — accent halo */
-    body.stash-liquid-glass nav.top-nav .refract-burger.is-open {
-        color: var(--accent);
-        background: var(--accent-tint);
-        border-color: var(--accent-glow);
-        box-shadow:
-            0 0 18px rgba(var(--accent-rgb), 0.45),
-            inset 0 0 0 1px rgba(var(--accent-rgb), 0.18);
-    }
+    /* ── Burger button (RETIRED from the top nav 2026-07-28) ────────
+       The bottom dock's last tile is now the drawer opener; the
+       injected top-nav .refract-burger stays in the DOM but is never
+       shown (default display:none above, no re-show here). The
+       icon-line + X-morph styles below are shared by the dock burger. */
 
-    /* Icon wrapper + three line spans that morph into an X.
-       `display` is !important as a backstop against 02_navbar.css's
-       global `nav.top-nav span { display: none }` purge (which hides
-       Stash's label text spans). The real protection is that purge's
-       :not([class*="refract-"]) exemption: !important alone lost here
-       in v1.19.0 when the purge gained specificity. */
-    body.stash-liquid-glass nav.top-nav .refract-burger .refract-burger-icon {
+    /* Icon wrapper + three line spans that morph into an X. `display`
+       is !important as a backstop against 02_navbar.css's global
+       `nav.top-nav span { display: none }` purge (only relevant for
+       the legacy nav instance; the dock lives outside nav.top-nav). */
+    body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger) .refract-burger-icon {
         position: relative;
         width: 18px;
         height: 14px;
         display: block !important;
     }
-    body.stash-liquid-glass nav.top-nav .refract-burger .refract-burger-line {
+    body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger) .refract-burger-line {
         position: absolute;
         left: 0;
         width: 100%;
@@ -152,27 +120,100 @@ body.stash-liquid-glass .refract-mobile-drawer {
             transform 0.22s cubic-bezier(0.34, 1.2, 0.64, 1) 0.12s,
             opacity 0.12s ease;
     }
-    /* When open, full opacity so the X reads as boldly as the accent halo. */
-    body.stash-liquid-glass nav.top-nav .refract-burger.is-open .refract-burger-line {
+    body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger).is-open .refract-burger-line {
         opacity: 1;
     }
-    body.stash-liquid-glass nav.top-nav .refract-burger .refract-burger-line:nth-child(1) { top: 0; }
-    body.stash-liquid-glass nav.top-nav .refract-burger .refract-burger-line:nth-child(2) { top: 6px; }
-    body.stash-liquid-glass nav.top-nav .refract-burger .refract-burger-line:nth-child(3) { top: 12px; }
+    body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger) .refract-burger-line:nth-child(1) { top: 0; }
+    body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger) .refract-burger-line:nth-child(2) { top: 6px; }
+    body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger) .refract-burger-line:nth-child(3) { top: 12px; }
 
     /* X morph — top + bottom lines slide to middle then rotate */
-    body.stash-liquid-glass nav.top-nav .refract-burger.is-open .refract-burger-line:nth-child(1) {
+    body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger).is-open .refract-burger-line:nth-child(1) {
         top: 6px;
         transform: rotate(45deg);
     }
-    body.stash-liquid-glass nav.top-nav .refract-burger.is-open .refract-burger-line:nth-child(2) {
+    body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger).is-open .refract-burger-line:nth-child(2) {
         opacity: 0;
         transform: scaleX(0);
         transition-delay: 0s;
     }
-    body.stash-liquid-glass nav.top-nav .refract-burger.is-open .refract-burger-line:nth-child(3) {
+    body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger).is-open .refract-burger-line:nth-child(3) {
         top: 6px;
         transform: rotate(-45deg);
+    }
+
+    /* ── Bottom dock — iOS-style pill bar with the essential routes ──
+       Scenes / Performers / Studios / Tags / Settings one tap away,
+       burger tile at the end opening the full drawer. Sits above the
+       scrim (z 110 > 99) so the burger doubles as the close control
+       while the drawer is open. */
+    body.stash-liquid-glass .refract-mobile-dock {
+        display: flex !important;
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px));
+        width: min(94vw, 30rem);
+        z-index: 110;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.2rem;
+        padding: 0.4rem 0.55rem;
+        border-radius: 999px;
+        background: rgba(18, 15, 24, 0.78);
+        border: 1px solid var(--glass-border);
+        -webkit-backdrop-filter: var(--glass-blur-md-sat);
+        backdrop-filter: var(--glass-blur-md-sat);
+        box-shadow:
+            0 10px 34px rgba(0, 0, 0, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item {
+        flex: 1 1 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 2.7rem;
+        min-width: 2.7rem;
+        border-radius: 999px;
+        border: none;
+        background: transparent;
+        color: var(--text-muted);
+        padding: 0;
+        cursor: pointer;
+        text-decoration: none;
+        transition: color 0.16s ease, background 0.16s ease, transform 0.14s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item svg {
+        width: 1.3rem;
+        height: 1.3rem;
+    }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item:active {
+        transform: scale(0.9);
+    }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item.is-active {
+        color: var(--accent-bright);
+        background: var(--accent-tint);
+        box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.3);
+    }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger.is-open {
+        color: var(--accent);
+        background: var(--accent-tint);
+        box-shadow:
+            0 0 18px rgba(var(--accent-rgb), 0.45),
+            inset 0 0 0 1px rgba(var(--accent-rgb), 0.18);
+    }
+
+    /* Clear the dock: give the app's scroll content bottom breathing
+       room so the last row of cards isn't parked under the pill. */
+    body.stash-liquid-glass .main.container-fluid,
+    body.stash-liquid-glass main.container-fluid {
+        padding-bottom: calc(4.4rem + env(safe-area-inset-bottom, 0px)) !important;
+    }
+    /* Floating pager (09_buttons.css pins it at bottom: 1.5rem) would
+       sit behind the dock; lift it above the pill. */
+    body.stash-liquid-glass [data-pager-row="float"] {
+        bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)) !important;
     }
 
     /* ── Backdrop scrim ───────────────────────────────────────────── */
