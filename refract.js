@@ -2272,34 +2272,6 @@
        action" complaint without giving up the drawer as the overflow
        strategy. */
     var MOBILE_DOCK_ROUTES = ["/scenes", "/performers", "/studios", "/tags", "/settings"];
-
-    /* Adaptive dock rounding: match the DEVICE's display corner radius
-       so the dock nests concentrically with the screen corners. No web
-       API exposes the value, but iPhone corner radii are published
-       per-model and the model class is identifiable from the logical
-       screen width. Value minus the dock's 12px inset = concentric.
-       Non-iPhone (Android / desktop RDM) keeps the CSS fallback
-       capsule. */
-    function refractApplyDockRadius() {
-        try {
-            if (!/iPhone/.test(navigator.userAgent)) { return; }
-            var w = Math.min(screen.width, screen.height);
-            /* logical-width -> display corner radius (pt), per published
-               device metrics. 375 is ambiguous (X-family 39 / 12-13
-               mini 44); 44 splits the difference safely. */
-            var CORNER = {
-                320: 0, 375: 44, 390: 47.33, 393: 55, 402: 62,
-                414: 41.5, 428: 53.33, 430: 55, 440: 62
-            };
-            var r = CORNER[w];
-            if (r === undefined) { r = 55; } /* future models: assume modern */
-            if (r === 0) { return; }        /* home-button iPhones: square screen */
-            document.documentElement.style.setProperty(
-                "--refract-dock-radius", Math.max(18, Math.round((r - 12) * 100) / 100) + "px");
-        } catch (e) { /* keep CSS fallback */ }
-    }
-    refractApplyDockRadius();
-
     function injectMobileDock() {
         if (document.querySelector(".refract-mobile-dock")) { return true; }
         if (!document.body) { return false; }

@@ -185,25 +185,16 @@ body.stash-liquid-glass .refract-mobile-drawer {
         justify-content: space-between;
         gap: 0.2rem;
         padding: 0.4rem 0.65rem;
-        /* Adaptive iPhone-style rounding: refract.js sets
-           --refract-dock-radius from the device's published display
-           corner radius (per-model, minus the 12px inset) so the dock
-           nests concentrically with the screen corners. Fallback
-           capsule for Android/unknown devices. */
-        border-radius: var(--refract-dock-radius, 2.7rem);
+        /* iPhone-style rounding: a large radius concentric with the
+           device's display corners (~55px corner radius minus the 12px
+           inset). Taller than half the bar height, so it renders as a
+           smooth capsule like the iOS dock. */
+        border-radius: 2.7rem;
         background: var(--glass-bg);
         border: 1px solid var(--glass-border);
         -webkit-backdrop-filter: var(--glass-blur);
         backdrop-filter: var(--glass-blur);
         box-shadow: var(--shadow-navbar);
-    }
-    /* Apple's corners are continuous-curvature, not circular arcs;
-       squircle matches them where supported (Chrome 139+/Safari 26),
-       harmless no-op elsewhere. */
-    @supports (corner-shape: squircle) {
-        body.stash-liquid-glass .refract-mobile-dock {
-            corner-shape: squircle;
-        }
     }
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item {
         flex: 1 1 0;
