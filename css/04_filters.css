@@ -746,9 +746,14 @@ body.stash-liquid-glass:not(.refract-native-sidebar) .sidebar-pane-content {
    a hardcoded height. */
 body.stash-liquid-glass.refract-native-sidebar .sidebar {
     top: calc(var(--nav-btn-size) + 2.6rem) !important;
-    bottom: 12px !important;
-    height: auto !important;
-    max-height: none !important;
+    bottom: auto !important;
+    /* HUG the content: the accordion is sparse when collapsed, and a
+       viewport-pinned panel left a huge empty void below it (looked
+       abandoned). fit-content grows as sections expand, capped so tall
+       expansions scroll inside the card. */
+    height: -moz-fit-content !important;
+    height: fit-content !important;
+    max-height: calc(100vh - var(--nav-btn-size) - 2.6rem - 60px) !important;
     margin-left: 12px !important;
     background: rgba(16, 16, 20, 0.92) !important;
     -webkit-backdrop-filter: var(--glass-blur-lg-sat) !important;
