@@ -138,6 +138,16 @@ Refract themes the UIs of these plugins so they sit naturally inside the glass a
 - **Extravagant on long grids**: tier animations multiply with card count. A page of 60+ rated cards can feel heavy on integrated graphics; Lite mode strips the animations while keeping the tier colours.
 - **Third-party plugin UIs**: plugins that inject their own modals or panels (and don't reuse Stash's standard Bootstrap classes) won't be themed until Refract gets a rule for them. File an issue with the plugin name if you want one added.
 
+## Support
+
+Free, and staying that way. If it has earned a place in your setup and you feel like
+chipping in, there is [GitHub Sponsors](https://github.com/sponsors/ordureconnoisseur)
+and [Ko-fi](https://ko-fi.com/ordureconnoisseur).
+
+Current goal: an Apple Developer Program membership (99 USD/year). That is the one
+thing standing between the iOS ports of binge and multiview and a build that lasts
+longer than seven days on someone else's phone.
+
 ## Credits
 
 - Performer **Edit Tags** tab — image + description hover popup inspired by [Performer Tags Overhaul](https://github.com/RollainKraus/stash-plugins) by RollainKraus.
