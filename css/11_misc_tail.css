@@ -1004,7 +1004,8 @@ body.stash-liquid-glass .setting#plugin-refract-view-minimiser > .refract-settin
 body.stash-liquid-glass .setting#plugin-refract-custom-logo > .refract-setting-control,
 body.stash-liquid-glass .setting#plugin-refract-studio-banner > .refract-setting-control,
 body.stash-liquid-glass .setting#plugin-refract-perf-card-hover > .refract-setting-control,
-body.stash-liquid-glass .setting#plugin-refract-rating-style > .refract-setting-control {
+body.stash-liquid-glass .setting#plugin-refract-perf-card-style > .refract-setting-control,
+body.stash-liquid-glass .setting#plugin-refract-flourish > .refract-setting-control {
     display: flex !important;
     justify-content: flex-end !important;
     align-items: center !important;
@@ -1012,10 +1013,10 @@ body.stash-liquid-glass .setting#plugin-refract-rating-style > .refract-setting-
     margin-left: auto !important;
 }
 
-/* Refract segmented control — used for the rating-style toggle AND
-   the scene-card-style toggle. Glass-pill buttons; the active one
-   fills with accent tint. */
-body.stash-liquid-glass .refract-rating-style-toggle,
+/* Refract segmented control — used by the card-style toggles (scene and
+   performer) and the rating-flourish toggle. Glass-pill buttons; the
+   active one fills with accent tint. */
+body.stash-liquid-glass .refract-flourish-toggle,
 body.stash-liquid-glass .refract-card-style-toggle {
     display: inline-flex !important;
     gap: 4px !important;
@@ -1152,18 +1153,10 @@ body.stash-liquid-glass .refract-suggestion-body {
     border-top: 1px solid var(--glass-border);
 }
 
-/* Card customiser: shares the suggestion-box card chrome but renders as
-   a plain always-open section (plain divs, not details/summary), so the
-   header loses every drawer affordance. */
-body.stash-liquid-glass .refract-card-customiser .refract-suggestion-summary {
-    cursor: default;
-}
-body.stash-liquid-glass .refract-card-customiser .refract-suggestion-summary:hover {
-    background: transparent;
-}
-body.stash-liquid-glass .refract-card-customiser .refract-suggestion-summary::after {
-    display: none;
-}
+/* Card customiser: a real <details> drawer since 2026-08-17, so it KEEPS the
+   suggestion-box header affordances (pointer cursor, hover wash, chevron).
+   The overrides that used to strip them, back when this was an always-open
+   section built from plain divs, are gone. */
 
 /* Real-card preview: Stash's actual SceneCard/PerformerCard rendered
    with library data. Constrain widths (the grid normally sizes cards
@@ -1184,11 +1177,25 @@ body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards {
     /* keep centred content clear of the corner button */
     padding: 0.25rem 3rem;
 }
+/* Widths are in the ratio the real grid uses, or the preview lies about the
+   shape of the cards it is previewing. Measured at zoom-1: scene 305px,
+   performer 253px, i.e. the performer is ~83% of the scene's width. At 190px
+   the performer card read as elongated next to a 300px scene card even though
+   its image was a correct 2:3 — it was squeezed horizontally, not stretched. */
+/* Sized to a REAL zoom level, not to whatever fits. Measured off the scenes
+   page zoom slider: 236 / 285 / 359 / 482px. The preview used to sit at 292,
+   effectively level 1 (second smallest), where the card's own furniture reads
+   cramped. Level 2 (359) is the smallest size at which a scene card looks like
+   itself; the performer keeps the grid's 0.83 width ratio.
+
+   At this size the pair no longer fits the 589px row, so `.refract-preview-cards`
+   (flex-wrap) stacks them. That is the accepted trade: a preview that shows the
+   cards honestly beats one that shows two shrunken cards side by side. */
 body.stash-liquid-glass .refract-card-preview-real .scene-card {
-    width: 300px !important;
+    width: 359px !important;
 }
 body.stash-liquid-glass .refract-card-preview-real .performer-card {
-    width: 190px !important;
+    width: 298px !important;
 }
 body.stash-liquid-glass .refract-card-preview-real a,
 body.stash-liquid-glass .refract-card-preview-real button:not(.refract-preview-shuffle) {
@@ -1198,6 +1205,11 @@ body.stash-liquid-glass .refract-preview-shuffle {
     position: absolute;
     top: 0.25rem;
     right: 0.25rem;
+    /* The preview wrapper is `pointer-events: none` so the fake cards are
+       inert; `.refract-preview-cards` re-enables itself, but this button
+       sat inside that dead zone and could not be clicked with a mouse
+       (a scripted .click() still fired, which is why it looked alive). */
+    pointer-events: auto;
     width: 2.3rem;
     height: 2.3rem;
     display: inline-flex;
@@ -1468,4 +1480,1638 @@ body.stash-liquid-glass .modal-dialog.manual .markdown table tbody tr:hover {
 }
 body.stash-liquid-glass .modal-dialog.manual .markdown table a {
     color: var(--accent-bright) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Card elements block (v1.22)
+   Replaces the two chip rows. Full width inside its .setting so the two
+   columns line up with the two cards in the Card preview above it: scene
+   on the left, performer on the right.
+   ───────────────────────────────────────────────────────────────────── */
+body.stash-liquid-glass .refract-card-elems-setting {
+    display: block !important;
+}
+body.stash-liquid-glass .refract-seg {
+    display: inline-flex;
+    gap: 0.12rem;
+    padding: 0.15rem;
+    border-radius: var(--radius-pill);
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--glass-border);
+}
+body.stash-liquid-glass .refract-seg .refract-segmented-btn {
+    padding: 0.16rem 0.5rem;
+    font-size: 0.68rem;
+}
+
+/* Keyboard focus. The segmented buttons are the panel's most-used control
+   and had NO focus style anywhere — tabbing through Card style, Rating
+   flourish, Left/Right, the layering row and the rating-system mirror gave
+   no visible position. Offset inward so the ring sits inside the pill's
+   track rather than colliding with the neighbouring button. */
+body.stash-liquid-glass .refract-segmented-btn:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: -1px;
+    border-radius: var(--radius-pill);
+}
+
+@media (max-width: 800px) {
+    }
+
+/* Restore the card's own heart colours at the same specificity. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .favorite-button {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .favorite-button.favorite {
+    color: #f472b6 !important;
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CARD PREVIEW — STYLE BOUNDARY
+   The preview renders REAL Stash cards inside the settings panel, so the
+   panel's own styling reaches them by two separate routes:
+
+     1. INHERITANCE — text-align, colour, font and friends flow down from
+        the panel's control column into the cards.
+     2. SPECIFICITY — 136 panel selectors are scoped with an ID
+        (`:is(#settings-container, ...)`), which outranks EVERY card rule
+        regardless of !important. 51 of those target buttons.
+
+   Fixing the leaks one property at a time produced a new bug each time
+   anyone looked at this panel: a purple heart in a rounded box,
+   right-aligned scene titles, stripped plugin buttons. This block is the
+   boundary instead of the patches.
+
+   It cannot be done from the panel side: excluding the preview would mean
+   editing 136 selectors across three files.
+
+   Baseline values are MEASURED against a real grid card, not guessed.
+   Font metrics (size, line-height, letter-spacing) are deliberately left
+   INHERITED: they come from body, the panel does not touch them, and
+   pinning them in px would fight the theme's own scaling.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* 1. Inherited baseline. Pins the inherited properties a settings panel
+      realistically sets, so none of them can flow into a card. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview {
+    text-align: left;
+    color: var(--text);
+    font-family: var(--theme-font-stack);
+    font-weight: 400;
+    font-style: normal;
+    text-transform: none;
+    text-indent: 0;
+    white-space: normal;
+    word-spacing: normal;
+    direction: ltr;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview .refract-preview-cards {
+    text-align: left;
+}
+
+/* 1b. The hover scrubber is dead weight here and it LEAKS. Its indicator
+      is positioned BELOW the card in the grid too (measured: grid y175 on a
+      160 card, preview y180 on a 170 card) and gets painted purple by
+      Stash's JS on real mouse movement. In the grid the row below hides
+      the overspill; the preview has open space under the card, so it shows
+      as a stray bar sitting under the card's own grey progress bar.
+      The preview is inert by design (pointer-events none, clicks captured),
+      so a scrub control cannot be used here at all — hide it outright. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview .hover-scrubber {
+    display: none !important;
+}
+
+/* 2. Button chrome. The panel paints every button as a settings button, so
+      the card's own buttons have to be restated here at matching ID-level
+      specificity. This is the ONE place to add a button when a plugin
+      grows a new one on a card; values mirror the rules named beside each. */
+
+/* Stash's native heart is chrome-less — the only one with no box. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .favorite-button {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .favorite-button.favorite {
+    color: #f472b6 !important;                     /* 03_cards: .favorite-button.favorite */
+}
+/* advanced-rating's heart. NOTE the two variants: the toolbar button
+   (.adv-favourite-btn, light glass) and the CARD overlay
+   (.adv-favourite-card-btn, DARK glass + white heart, 13_plugins:994).
+   A card carries BOTH classes, so matching on .adv-favourite-btn alone
+   painted the card overlay in the toolbar's light colours — that is the
+   odd pale heart that showed up top-right on preview cards. Only the card
+   variant can appear in the preview, so only it is restated here. */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .adv-favourite-card-btn {
+    background: rgba(0, 0, 0, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: var(--radius-sm) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .adv-favourite-card-btn.adv-favourite-btn--on {
+    background: rgba(236, 72, 153, 0.14) !important;
+    border-color: rgba(236, 72, 153, 0.6) !important;
+    color: #f472b6 !important;
+    box-shadow: 0 0 12px rgba(236, 72, 153, 0.3) !important;
+}
+/* multiview's add button — dark glass box (13_plugins: .mv-add-btn) */
+body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .mv-add-btn {
+    background: rgba(0, 0, 0, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: var(--radius-sm) !important;
+    color: #fff !important;
+    box-shadow: none !important;
+}
+
+/* ── Card preview: one card at a time ────────────────────────────────
+   Sized to a real zoom level, the two cards no longer fit side by side.
+   Rather than shrink them back or stack two tall cards, the customiser
+   points at ONE card type and the type-specific settings follow it.
+   Shared settings (rating flourish, rating system, performer hover) stay
+   visible in both, so nothing that affects both types can hide behind a
+   card-type switch. */
+body.stash-liquid-glass .refract-preview-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    width: 100%;
+}
+body.stash-liquid-glass .refract-preview-head > div:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+body.stash-liquid-glass .refract-preview-kind-toggle {
+    flex: 0 0 auto;
+    display: inline-flex !important;
+    gap: 4px !important;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-pill);
+    padding: 3px;
+    margin-left: auto !important;
+}
+/* Show only the card being edited. Both stay mounted so the shuffle keeps
+   fetching a matched pair and switching costs no request.
+   Target the CARD itself, not a wrapper: the preview's error boundary renders
+   its child directly, so `.refract-preview-cards > *` IS the card and a
+   `:has()` wrapper selector matched nothing. */
+/* SUPERSEDED by the stacked-grid carousel further down: the inactive card is
+   `visibility: hidden` there so it still contributes height and the box never
+   jumps. `display: none` here would take it out of layout again, and forcing
+   it back with `display: block` would break the card's own flex column. */
+body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards > * {
+    animation: refractPreviewSettle 0.32s cubic-bezier(0.22, 1.2, 0.36, 1) both;
+}
+@keyframes refractPreviewSettle {
+    from { opacity: 0; transform: translateY(6px) scale(0.985); }
+    to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards > * {
+        animation: none;
+    }
+}
+
+/* The cards row is shrink-to-fit, so `justify-content: center` only centred
+   the card within the row's own width — with two cards that filled the
+   setting and looked centred; with one it left the card hugging the left.
+   Give the row the full width so the card centres in the panel. */
+body.stash-liquid-glass .refract-card-preview-real,
+body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards {
+    width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CARD CUSTOMISER — corner touch
+   The panel is a card and the things that change it, not a stack of settings
+   rows. Three bands: a rail, a stage (card plus the four global settings
+   riding its right edge), and the presets as pictures.
+
+   Per-element visibility lives ON the card: hover a quadrant, click a chip.
+   The old six-row element list is gone, not restyled.
+
+   Everything accent-coloured uses the theme's own --accent tokens, never a
+   fixed hue, because the accent is one of eight user choices.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.stash-liquid-glass .refract-cc-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem 1.25rem;
+}
+
+/* ── Rail ─────────────────────────────────────────────────────────────── */
+body.stash-liquid-glass .refract-cc-rail {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 30px;
+}
+body.stash-liquid-glass .refract-cc-kind {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+}
+body.stash-liquid-glass .refract-cc-kind-btn {
+    appearance: none;
+    padding: 5px 13px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: none;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+body.stash-liquid-glass .refract-cc-kind-btn:hover {
+    color: var(--text);
+}
+body.stash-liquid-glass .refract-cc-kind-btn.is-active {
+    background: rgba(var(--accent-rgb), 0.2);
+    border-color: rgba(var(--accent-rgb), 0.42);
+    color: var(--accent-bright);
+    font-weight: 600;
+}
+/* The face segment: nested in the tab strip after "Performer card", split
+   from the tabs by a hairline. Front|Back are radios; the glyph turns with
+   the card. */
+body.stash-liquid-glass .refract-cc-face {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 4px;
+    padding-left: 7px;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+body.stash-liquid-glass .refract-cc-face-icon {
+    display: flex;
+    margin-right: 3px;
+    color: var(--text-muted);
+    transition: transform 0.34s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+body.stash-liquid-glass .refract-cc-face-icon svg {
+    width: 13px;
+    height: 13px;
+    display: block;
+}
+body.stash-liquid-glass .refract-cc-face-icon.is-back {
+    transform: rotate(180deg);
+    color: var(--accent-bright);
+}
+body.stash-liquid-glass .refract-cc-face-btn {
+    appearance: none;
+    padding: 4px 9px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: none;
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+body.stash-liquid-glass .refract-cc-face-btn:hover {
+    color: var(--text);
+}
+body.stash-liquid-glass .refract-cc-face-btn.is-active {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: var(--text);
+    font-weight: 600;
+}
+body.stash-liquid-glass .refract-cc-face-btn:focus-visible,
+body.stash-liquid-glass .refract-cc-kind-btn:focus-visible,
+body.stash-liquid-glass .refract-cc-shuffle:focus-visible,
+body.stash-liquid-glass .refract-cc-seg-btn:focus-visible,
+body.stash-liquid-glass .refract-cc-chip:focus-visible,
+body.stash-liquid-glass .refract-cc-preset:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
+}
+body.stash-liquid-glass .refract-cc-rail-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+body.stash-liquid-glass .refract-cc-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    opacity: 0.75;
+}
+body.stash-liquid-glass .refract-cc-shuffle {
+    appearance: none;
+    white-space: nowrap;
+    padding: 5px 11px;
+    border-radius: 7px;
+    border: 1px solid var(--glass-border);
+    background: none;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-dim, var(--text-muted));
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+/* The Plain toggle: a Shuffle-shaped button that holds its state. */
+body.stash-liquid-glass .refract-cc-plain.is-on {
+    background: rgba(var(--accent-rgb), 0.2);
+    border-color: rgba(var(--accent-rgb), 0.6);
+    color: var(--accent-bright);
+}
+body.stash-liquid-glass .refract-cc-shuffle:hover {
+    border-color: rgba(var(--accent-rgb), 0.5);
+    color: var(--text);
+}
+
+/* ── Stage ────────────────────────────────────────────────────────────── */
+body.stash-liquid-glass .refract-cc-stage {
+    /* Card sizes: scene 440x253, performer 264x396. Both are real
+       zoom-slider proportions, so each card looks like itself. */
+    --refract-cc-scene-w: 440px;
+    /* The performer preview is GRID width (a zoom-1 grid card measures ~263).
+       At 216 it was smaller than the thing it previewed, and the dossier's
+       five-row cap did not fit it, so the default back opened broken. */
+    --refract-cc-perf-w: 264px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    /* The stage is the card's height and nothing more. It used to reserve a
+       fixed 348px for a tiles column; the tiles live in the strip below now,
+       and the two cards are different heights by nature (253 vs 396). */
+    min-height: 0;
+    padding: 4px 0;
+}
+body.stash-liquid-glass .refract-cc-cardslot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+/* The scene card gets a fixed slot so card and tiles stay centred as one unit
+   and the tiles never shift when the card's own height changes. */
+body.stash-liquid-glass .refract-cc-stage.refract-preview-kind-scene .refract-cc-cardslot {
+    width: 452px;
+}
+body.stash-liquid-glass .refract-cc-stage .refract-card-preview-real,
+body.stash-liquid-glass .refract-cc-stage .refract-preview-cards {
+    width: auto;
+    padding: 0;
+    display: block;
+}
+/* Only the card being edited is in the layout. It was stacked with the other
+   one at one point to hold the box height; the stage's min-height does that
+   job now, and `display: none` is what lets the corner overlay sit exactly on
+   the visible card instead of on a box sized to the taller of the two. */
+body.stash-liquid-glass .refract-preview-kind-scene .refract-preview-cards .performer-card,
+body.stash-liquid-glass .refract-preview-kind-performer .refract-preview-cards .scene-card {
+    display: none !important;
+}
+body.stash-liquid-glass .refract-cc-stage .scene-card {
+    width: var(--refract-cc-scene-w) !important;
+}
+body.stash-liquid-glass .refract-cc-stage .performer-card {
+    width: var(--refract-cc-perf-w) !important;
+}
+
+/* ── Corner touch ─────────────────────────────────────────────────────── */
+/* Above everything the card itself draws. At z-index 5 this sat UNDER the
+   card back (z-index 8 in the card's own stacking context), which was
+   invisible while the back's middle was empty and became a dead control
+   surface the moment the tray filled it: elementFromPoint over the tray
+   returned a tray cell, so the zone never lit. The preview card sits at 40,
+   so this has to clear that too. */
+body.stash-liquid-glass .refract-cc-corners {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+}
+body.stash-liquid-glass .refract-cc-hit {
+    position: absolute;
+    width: 50%;
+    height: 44%;
+    cursor: pointer;
+}
+/* The base shield: the whole card, under every band. Nothing on the card may
+   receive the pointer while the customiser is open -- a scene card that starts
+   playing its preview under the editor is not editable. Emitted first, so every
+   real band sits on top of it. */
+body.stash-liquid-glass .refract-cc-hit-shield {
+    inset: 0;
+    width: auto;
+    height: auto;
+    cursor: default;
+}
+body.stash-liquid-glass .refract-cc-hit-tl { top: 0; left: 0; }
+body.stash-liquid-glass .refract-cc-hit-tr { top: 0; right: 0; }
+body.stash-liquid-glass .refract-cc-hit-bl { bottom: 0; left: 0; }
+body.stash-liquid-glass .refract-cc-hit-br { bottom: 0; right: 0; }
+
+body.stash-liquid-glass .refract-cc-ring {
+    position: absolute;
+    width: 46%;
+    height: 40%;
+    border-radius: 9px;
+    border: 1.5px dashed rgba(var(--accent-rgb), 0.85);
+    background: rgba(var(--accent-rgb), 0.1);
+    pointer-events: none;
+}
+/* Focus on a band: the same dashed ring the hover draws, as an outline, so a
+   keyboard user sees which band is armed. */
+body.stash-liquid-glass .refract-cc-hit:focus-visible {
+    outline: 1.5px dashed rgba(var(--accent-rgb), 0.85);
+    outline-offset: -3px;
+    border-radius: 9px;
+}
+/* The intro: one pulse per band, staggered from the JS, then gone. The
+   preview stays exactly as it was; only the rings breathe. */
+body.stash-liquid-glass .refract-cc-ring.is-intro {
+    opacity: 0;
+    animation: refract-cc-intro 1.1s ease-in-out 1 both;
+}
+@keyframes refract-cc-intro {
+    0%   { opacity: 0; }
+    35%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass .refract-cc-ring.is-intro { animation: none; opacity: 0; }
+}
+body.stash-liquid-glass .refract-cc-ring-tl { top: 3px; left: 3px; }
+body.stash-liquid-glass .refract-cc-ring-tr { top: 3px; right: 3px; }
+body.stash-liquid-glass .refract-cc-ring-bl { bottom: 3px; left: 3px; }
+body.stash-liquid-glass .refract-cc-ring-br { bottom: 3px; right: 3px; }
+
+/* Chips sit vertically centred on the hovered side, clear of both top
+   corners, so they never cover the element they are describing. */
+body.stash-liquid-glass .refract-cc-chips {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 6;
+}
+
+body.stash-liquid-glass .refract-cc-chips-tl,
+body.stash-liquid-glass .refract-cc-chips-bl {
+    left: 8px;
+    align-items: flex-start;
+}
+body.stash-liquid-glass .refract-cc-chips-tr,
+body.stash-liquid-glass .refract-cc-chips-br {
+    right: 8px;
+    align-items: flex-end;
+}
+/* The slot menu: two even columns of stats, Remove alone beneath. */
+body.stash-liquid-glass .refract-cc-slot-menu {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    gap: 4px 6px;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 10px;
+    background: rgba(8, 8, 11, 0.55);
+    -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+}
+body.stash-liquid-glass .refract-cc-slot-menu .refract-cc-chip {
+    justify-content: flex-start;
+}
+/* Under the list: Move left, Move right, Remove in one row, set off from
+   the values above by a hairline. They act on the SLOT, the values fill it. */
+body.stash-liquid-glass .refract-cc-slot-menu-foot {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 2px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+body.stash-liquid-glass .refract-cc-slot-move {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+body.stash-liquid-glass .refract-cc-slot-move[disabled] {
+    opacity: 0.35;
+    cursor: default;
+}
+body.stash-liquid-glass .refract-cc-slot-move[disabled]:hover {
+    background: rgba(10, 10, 13, 0.82);
+    border-color: var(--glass-border);
+}
+/* Adding: the menu says what it is asking, because no slot chip is under it
+   yet to say so. */
+body.stash-liquid-glass .refract-cc-slot-menu-head {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 2px 0 1px;
+}
+/* A SLOT chip, not a toggle. It names what the pill under it currently shows
+   and opens the list of stats; it has no on/off state, so it carries no box --
+   the box is the vocabulary for "this is on". Slightly tighter and lighter so a
+   row of six reads as a row of labels rather than six switches. */
+body.stash-liquid-glass .refract-cc-chip-slot {
+    padding-left: 9px;
+    background: rgba(10, 10, 13, 0.82);
+    border-style: dashed;
+    border-color: rgba(var(--accent-rgb), 0.55);
+}
+body.stash-liquid-glass .refract-cc-chip-slot:hover {
+    border-style: solid;
+    background: rgba(var(--accent-rgb), 0.24);
+}
+body.stash-liquid-glass .refract-cc-chip {
+    appearance: none;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 9px;
+    border-radius: 7px;
+    background: rgba(10, 10, 13, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    font-size: 0.71rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.14s, color 0.14s, background 0.14s;
+}
+body.stash-liquid-glass .refract-cc-chip.is-on {
+    border-color: rgba(var(--accent-rgb), 0.5);
+    color: var(--text);
+    font-weight: 600;
+}
+body.stash-liquid-glass .refract-cc-chip:hover {
+    border-color: rgba(var(--accent-rgb), 0.8);
+    color: var(--text);
+}
+body.stash-liquid-glass .refract-cc-chip-box {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    flex: 0 0 auto;
+}
+body.stash-liquid-glass .refract-cc-chip.is-on .refract-cc-chip-box {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+body.stash-liquid-glass .refract-cc-chip-swap .refract-cc-chip-box {
+    border-radius: 50%;
+}
+
+/* ── Setting tiles ──────────────────────────────────────────────────────
+   No longer beside the card: they live in the strip under the stage, in two
+   labelled groups (see .refract-cc-strip). */
+body.stash-liquid-glass .refract-cc-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 11px 13px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.028);
+    border: 1px solid var(--glass-border);
+}
+body.stash-liquid-glass .refract-cc-tile-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text);
+}
+/* One line under the title saying what the choice does. The strip's tiles
+   used to be bare labels; "Performer card on hover: On/Off" told nobody what
+   was on. */
+body.stash-liquid-glass .refract-cc-tile-note {
+    margin-top: -4px;
+    font-size: 0.66rem;
+    line-height: 1.35;
+    color: var(--text-muted);
+}
+
+/* ── The strip ──────────────────────────────────────────────────────────
+   Under the stage, above the looks: two labelled groups. "Scene card" /
+   "Performer card" holds what belongs to the card on the stage; "Both cards"
+   holds what reaches both, or past them. Under a tab named for one card the
+   flourish and the popover read as that card's; the label is what stops that.
+   Reset lives in the second group's head: it is the one action that touches
+   the whole customiser. */
+body.stash-liquid-glass .refract-cc-strip {
+    display: grid;
+    /* The single tile gives a little to the three: "Minimal | Extravagant"
+       needs ~150px of segment and the flourish tile has to hold it. */
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 3fr);
+    gap: 0;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--glass-border);
+}
+body.stash-liquid-glass .refract-cc-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+}
+body.stash-liquid-glass .refract-cc-group-both {
+    border-left: 1px solid var(--glass-border);
+    padding-left: 12px;
+    margin-left: 12px;
+}
+body.stash-liquid-glass .refract-cc-group-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 24px;
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+body.stash-liquid-glass .refract-cc-group-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    grid-auto-flow: column;
+    gap: 8px;
+    flex: 1 1 auto;
+}
+body.stash-liquid-glass .refract-cc-group-tiles .refract-cc-tile {
+    min-width: 0;
+}
+/* Four tiles across ~700px: the segments give up their fixed padding and
+   share the tile's width, so "Minimal | Extravagant" fits a 165px tile. */
+body.stash-liquid-glass .refract-cc-strip .refract-cc-seg {
+    width: 100%;
+    max-width: 100%;
+}
+body.stash-liquid-glass .refract-cc-strip .refract-cc-seg-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 5px 5px;
+    font-size: 0.68rem;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+body.stash-liquid-glass .refract-cc-reset {
+    appearance: none;
+    padding: 4px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--glass-border);
+    background: none;
+    font: inherit;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+body.stash-liquid-glass .refract-cc-reset:hover {
+    color: var(--text);
+    border-color: rgba(255, 120, 120, 0.55);
+    background: rgba(255, 120, 120, 0.08);
+}
+body.stash-liquid-glass .refract-cc-reset:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
+}
+body.stash-liquid-glass .refract-cc-seg {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    width: fit-content;
+    margin-top: auto;
+}
+body.stash-liquid-glass .refract-cc-seg-btn {
+    appearance: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: none;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+body.stash-liquid-glass .refract-cc-seg-btn:hover {
+    color: var(--text);
+}
+body.stash-liquid-glass .refract-cc-seg-btn.is-active {
+    background: rgba(var(--accent-rgb), 0.2);
+    border-color: rgba(var(--accent-rgb), 0.42);
+    color: var(--accent-bright);
+    font-weight: 600;
+}
+
+/* ── Looks ────────────────────────────────────────────────────────────── */
+body.stash-liquid-glass .refract-cc-looks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+body.stash-liquid-glass .refract-cc-looks-head {
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+/* ═══════════════════════════════════════════════════════════════════════
+   LOOKS — six miniatures, drawn from each look's own flags
+   Three columns rather than four, so each picture is ~215px and its
+   silhouette is legible: the whole point is that Mirrored is visibly the
+   other hand and Poster is visibly empty. The miniature takes the SHAPE of
+   the card being edited, landscape or portrait, so the row previews the same
+   thing the stage does.
+
+   Flat fills and 1px borders only. No blur, no glow, no motion, so it is
+   identical in lite mode, in light mode, and under any of the eight accents.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.stash-liquid-glass .refract-cc-preset-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+body.stash-liquid-glass .refract-cc-preset {
+    appearance: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+}
+body.stash-liquid-glass .refract-cc-preset-art {
+    position: relative;
+    display: block;
+    height: 118px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    transition: border-color 0.15s, background 0.15s;
+}
+body.stash-liquid-glass .refract-cc-preset:hover .refract-cc-preset-art {
+    border-color: rgba(var(--accent-rgb), 0.55);
+    background: rgba(255, 255, 255, 0.045);
+}
+
+/* The miniature itself. Landscape by default; the performer state swaps it
+   for a centred 2:3 portrait so the row matches the card on the stage. */
+/* The miniature is the CARD's shape, at the card's proportions. It used to be
+   whatever the tile left over (189x92, a 2.05 ratio against the card's 1.74),
+   with every part at a fixed pixel size, which is why nothing lined up: the
+   sash sat in the extreme corner as a thin wedge and the logo sat beside it,
+   so the shipped look's signature crossing read as two things side by side.
+   Everything below is a PERCENTAGE of the miniature, so both card shapes and
+   any future size stay honest. */
+body.stash-liquid-glass .refract-cc-preset-inner {
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100px;
+    aspect-ratio: 440 / 253;
+    border-radius: 5px;
+    overflow: hidden;
+    /* Texture, not stripes. The old 7px/14px at .075/.035 read as loud
+       diagonal banding that fought every part drawn on top of it. */
+    background: repeating-linear-gradient(135deg,
+        rgba(255, 255, 255, 0.05) 0 5px,
+        rgba(255, 255, 255, 0.025) 5px 10px);
+}
+body.stash-liquid-glass .refract-cc-preset-performer .refract-cc-preset-inner {
+    aspect-ratio: 216 / 324;
+}
+/* Gold, not accent: on this row accent means "the look in force" and only
+   that. The tier ring is a fact about the look (it shows the sash), drawn in
+   the sash's own colour. */
+body.stash-liquid-glass .refract-cc-preset-art.is-extravagant .refract-cc-preset-inner {
+    box-shadow: inset 0 0 0 1.5px rgba(216, 180, 94, 0.7);
+}
+
+/* ── Parts: one grammar, three weights ────────────────────────────────────
+   The first pass chased accuracy and lost the craft. Five different fill
+   alphas, radii ranging from 2px to a pill to a polygon, a stat row drawn as
+   a repeating gradient so its inner pills had square corners, and performer
+   circles so small they merged into a smudge.
+
+   The miniature is a DIAGRAM, not a tiny illustration. Its job is to let you
+   tell six looks apart at a glance, so it gets one vocabulary:
+
+     accent   exactly two things, the rating star and the tier sash, because
+              those two ARE the tier story and nothing else should compete
+     strong   the one piece of primary text: scene title, performer name
+     quiet    all supporting furniture: logo, country, duration, counts,
+              performers, stat pills
+
+   Every bar is radius 2px, every pill is a pill, every circle is a circle,
+   and everything keeps a 4% gutter from the edges. */
+body.stash-liquid-glass .refract-cc-preset-inner {
+    --art-strong: rgba(255, 255, 255, 0.58);
+    --art-quiet: rgba(255, 255, 255, 0.34);
+}
+body.stash-liquid-glass .refract-cc-art-title,
+body.stash-liquid-glass .refract-cc-art-name {
+    position: absolute;
+    left: 4%;
+    height: 4.5%;
+    border-radius: 2px;
+    background: var(--art-strong);
+    z-index: 1;
+}
+body.stash-liquid-glass .refract-cc-art-title {
+    bottom: 5%;
+    width: 46%;
+}
+/* The performer's name reads across the TOP. It was a 75%-wide gradient slab,
+   which at 100px tall is a grey mass, not a name. Same text bar as the scene
+   title, so both miniatures speak the same language. */
+body.stash-liquid-glass .refract-cc-art-name {
+    top: 5%;
+    /* Runs to 80%, under the sash. The real name banner spans x0-75% and the
+       sash cuts through its tail; at 52% the two never met and the miniature
+       showed a crossing that does not happen and missed one that does. */
+    width: 76%;
+}
+body.stash-liquid-glass .refract-cc-art-country {
+    position: absolute;
+    left: 4%;
+    bottom: 17%;
+    width: 34%;
+    height: 4%;
+    border-radius: 2px;
+    background: var(--art-quiet);
+}
+
+/* Rows of furniture: real children, evenly spaced, properly rounded. */
+body.stash-liquid-glass .refract-cc-art-extras,
+body.stash-liquid-glass .refract-cc-art-stats {
+    position: absolute;
+    display: flex;
+    align-items: stretch;
+}
+body.stash-liquid-glass .refract-cc-art-extras i,
+body.stash-liquid-glass .refract-cc-art-stats i {
+    flex: 1;
+    border-radius: 99px;
+    background: var(--art-quiet);
+}
+/* Duration and count pills, bottom right of a scene card. */
+body.stash-liquid-glass .refract-cc-art-extras {
+    right: 4%;
+    bottom: 5%;
+    width: 22%;
+    height: 5.5%;
+    gap: 8%;
+}
+/* The performer stat row spans nearly the full width: four pills, x4-96%. */
+body.stash-liquid-glass .refract-cc-art-stats {
+    left: 4%;
+    right: 4%;
+    bottom: 4%;
+    height: 10%;
+    gap: 3.5%;
+}
+/* The back's strip can carry up to six, so the gap tightens as the count goes
+   up rather than the pills becoming slivers. */
+body.stash-liquid-glass .refract-cc-preset-back .refract-cc-art-stats {
+    gap: 2.5%;
+}
+/* Performer avatars on a scene card: overlapping circles, which is what they
+   are. Three radial gradients inside a 17% box merged into one smudge. */
+/* Explicit width and absolute children, NOT a shrink-to-fit flex row with a
+   percentage overlap margin: that margin resolves against the container's own
+   width, which was itself waiting on the children, and all three circles
+   collapsed into one. */
+body.stash-liquid-glass .refract-cc-art-people {
+    position: absolute;
+    left: 4%;
+    bottom: 14%;
+    width: 13%;
+    height: 8%;
+}
+body.stash-liquid-glass .refract-cc-art-people i {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--art-quiet);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+}
+body.stash-liquid-glass .refract-cc-art-people i:nth-child(1) { left: 0; }
+body.stash-liquid-glass .refract-cc-art-people i:nth-child(2) { left: 28%; }
+body.stash-liquid-glass .refract-cc-art-people i:nth-child(3) { left: 56%; }
+
+/* Accent, and only here. Flat fills: a gradient on the sash next to a flat
+   star made the pair look like two unrelated objects at this size. */
+body.stash-liquid-glass .refract-cc-art-rating {
+    position: absolute;
+    top: 5%;
+    left: 4%;
+    width: 11.5%;
+    aspect-ratio: 1;
+    background: rgba(var(--accent-rgb), 0.95);
+    /* The SAME rounded-star mask the real badge uses, lifted from 03_cards.css.
+       A clip-path polygon gave hard needle points; the badge on the card is a
+       soft rounded star, so the miniature was drawing a different object. */
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z' fill='black' stroke='black' stroke-width='0.4' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z' fill='black' stroke='black' stroke-width='0.4' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+    -webkit-mask-size: contain;
+            mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+            mask-position: center;
+}
+body.stash-liquid-glass .refract-cc-art-rating.is-right {
+    left: auto;
+    right: 4%;
+}
+body.stash-liquid-glass .refract-cc-art-ribbon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 26%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    z-index: 2;
+}
+body.stash-liquid-glass .refract-cc-art-ribbon::after {
+    content: "";
+    position: absolute;
+    top: 24%;
+    right: -34%;
+    width: 140%;
+    height: 26%;
+    transform: rotate(45deg);
+    background: rgb(var(--accent-rgb));
+}
+body.stash-liquid-glass .refract-cc-art-ribbon.is-left {
+    right: auto;
+    left: 0;
+}
+body.stash-liquid-glass .refract-cc-art-ribbon.is-left::after {
+    right: auto;
+    left: -34%;
+    transform: rotate(-45deg);
+}
+body.stash-liquid-glass .refract-cc-preset-performer .refract-cc-art-ribbon {
+    width: 34%;
+}
+
+/* The studio logo. Quiet, so it does not compete with the title, but a step
+   above the rest of the furniture so it still survives being crossed. */
+body.stash-liquid-glass .refract-cc-art-logo {
+    position: absolute;
+    top: 6%;
+    right: 24%;
+    width: 19%;
+    height: 5.5%;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.44);
+    z-index: 1;
+}
+/* The logo in the bottom-right corner, where the count pills were; the pills
+   step up above it (see the .is-lifted extras). */
+body.stash-liquid-glass .refract-cc-art-logo.is-bottom {
+    top: auto;
+    bottom: 5%;
+    right: 4%;
+}
+body.stash-liquid-glass .refract-cc-art-extras.is-lifted {
+    bottom: 17%;
+}
+body.stash-liquid-glass .refract-cc-art-logo.is-left {
+    right: auto;
+    left: 24%;
+}
+/* Crossed: pushed into the sash's corner so the diagonal cuts across it,
+   which is what the real card does. */
+body.stash-liquid-glass .refract-cc-art-logo.is-crossed {
+    right: 4%;
+    top: 11%;
+}
+body.stash-liquid-glass .refract-cc-art-logo.is-crossed.is-left {
+    right: auto;
+    left: 4%;
+}
+/* Logo first: same crossing, other winner. The sash is z-index 2. */
+body.stash-liquid-glass .refract-cc-art-logo.is-over {
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.95);
+}
+body.stash-liquid-glass .refract-cc-preset-performer .refract-cc-art-logo {
+    display: none;
+}
+
+body.stash-liquid-glass .refract-cc-preset-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-dim, var(--text-muted));
+}
+
+/* ── Narrow ───────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+    body.stash-liquid-glass .refract-cc-stage,
+    body.stash-liquid-glass .refract-cc-stage.refract-preview-kind-performer {
+        flex-direction: column;
+        min-height: 0;
+    }
+    body.stash-liquid-glass .refract-cc-stage.refract-preview-kind-scene .refract-cc-cardslot {
+        width: auto;
+    }
+    body.stash-liquid-glass .refract-cc-preset-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    body.stash-liquid-glass .refract-cc-strip {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    body.stash-liquid-glass .refract-cc-group-both {
+        border-left: none;
+        padding-left: 0;
+        margin-left: 0;
+    }
+    body.stash-liquid-glass .refract-cc-group-tiles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    body.stash-liquid-glass .refract-cc-rail {
+        flex-wrap: wrap;
+    }
+    body.stash-liquid-glass .refract-cc-hint {
+        display: none;
+    }
+}
+
+/* ── Measured corrections ─────────────────────────────────────────────── */
+body.stash-liquid-glass .refract-cc-cardbox {
+    position: relative;
+    display: inline-flex;
+}
+
+/* The preview's face control lives in the tab strip (.refract-cc-face) as a
+   Front|Back segment nested after "Performer card". It was a button in the
+   rail beside Shuffle, which read as an action or a third card; before that it
+   sat on the card, where it ate the hover band underneath. */
+body.stash-liquid-glass .refract-cc-stage.is-back .refract-cc-cardbox .performer-card {
+    animation: refract-cc-turn 0.42s cubic-bezier(0.33, 1, 0.68, 1);
+}
+@keyframes refract-cc-turn {
+    from { transform: perspective(1100px) rotateY(-82deg); }
+    to   { transform: perspective(1100px) rotateY(0deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass .refract-cc-stage.is-back .refract-cc-cardbox .performer-card {
+        animation: none;
+    }
+    body.stash-liquid-glass .refract-cc-face-icon { transition: none; }
+}
+
+/* The corner hit zones cover the card, so the grid's hover lift fired the
+   whole time you were using them: measured 440x253 painting as 462x266, which
+   both jiggled the card and threw the rings out of line with it. There is no
+   hover state to express here anyway, since hovering IS the interaction. */
+body.stash-liquid-glass .refract-cc-stage .scene-card,
+body.stash-liquid-glass .refract-cc-stage .performer-card,
+body.stash-liquid-glass .refract-cc-stage .scene-card:hover,
+body.stash-liquid-glass .refract-cc-stage .performer-card:hover {
+    transform: none !important;
+}
+/* Nothing INSIDE the preview card may take the pointer while the customiser
+   is open. Measured: after any chip click re-rendered the card, Stash's
+   `.preview-scrubber` (438x246, absolutely positioned across the whole
+   thumbnail) answered `elementFromPoint` ahead of the hit layer, and every band
+   went dead -- hover a corner, no ring, no chips. Rather than chase which
+   re-render puts it on top, the card and everything in it is made
+   pointer-transparent here; the hit layer is the only thing that listens. The
+   card is a picture in this panel, not a control. */
+body.stash-liquid-glass .refract-cc-stage .refract-card-preview,
+body.stash-liquid-glass .refract-cc-stage .refract-card-preview * {
+    pointer-events: none !important;
+}
+/* ...except the flip button on the card back, which the preview keeps live. */
+body.stash-liquid-glass .refract-cc-stage .refract-card-flip-btn {
+    pointer-events: auto !important;
+}
+/* The card box must hug the card EXACTLY, or the rings and hit zones sit
+   proud of the corners they point at. Measured 450x276 around a 440x253 card:
+   Stash's own `.card` margin plus the preview wrapper's padding. */
+body.stash-liquid-glass .refract-cc-cardbox .refract-card-preview-real,
+body.stash-liquid-glass .refract-cc-cardbox .refract-preview-cards,
+body.stash-liquid-glass .refract-cc-cardbox .scene-card,
+body.stash-liquid-glass .refract-cc-cardbox .performer-card {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Honest look-filtering costs constant height: six looks on a scene card, three
+   on a performer card, measured as an 827 / 703 panel and a 124px jump on every
+   switch. Reserve two rows and CENTRE what is there. Three tiles then float in
+   a taller box, which reads as breathing room rather than as the hole a
+   top-aligned half-empty grid would leave. */
+body.stash-liquid-glass .refract-cc-preset-grid {
+    min-height: 296px;
+    /* start, NOT center: centring split the spare row above and below the
+       tiles, which put a visible gap directly under the LOOKS label and read
+       as a rendering fault. Pushed to the bottom edge of the panel it reads as
+       padding instead. */
+    align-content: start;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Studio as text
+   The studio can be a logo in a corner, or its NAME set before the scene
+   title. As text it stops competing for a corner, which is the one thing the
+   corner-touch model cannot solve by moving things around: four corners, more
+   than four elements that want one.
+
+   The name comes from the logo image's `alt`, so it appears on exactly the
+   cards that would have shown a logo and nothing is invented for the rest.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.stash-liquid-glass.refract-sc-studio-text .scene-card .studio-overlay {
+    display: none !important;
+}
+/* The title is an ANONYMOUS flex item once a span is put beside it inside the
+   flex `h5`, and an anonymous item cannot be given a min-width, so the studio
+   name starved it down to a single ellipsis ("GIRLCUM ...") on the preview
+   card. Blocking the heading lets the two flow as one line and the existing
+   ellipsis truncates the whole string, which is what "STUDIO - title" wants. */
+body.stash-liquid-glass.refract-sc-studio-text .scene-card h5.card-section-title {
+    display: block;
+}
+body.stash-liquid-glass .refract-sc-studio-name {
+    font-weight: 700;
+    font-size: 0.84em;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    /* Never let a long studio name push the title out: the name gets at most
+       its own share and the title keeps the rest. */
+    white-space: nowrap;
+}
+body.stash-liquid-glass .refract-sc-studio-name::after {
+    content: "\00B7";
+    margin: 0 0.42em;
+    font-weight: 500;
+    letter-spacing: 0;
+    opacity: 0.55;
+}
+
+/* The miniature draws it where it actually sits: on the title line, with the
+   title stepping aside for it. */
+body.stash-liquid-glass .refract-cc-art-logo.is-inline {
+    top: auto;
+    right: auto;
+    left: 4%;
+    bottom: 5%;
+    width: 13%;
+    height: 4.5%;
+    background: var(--art-strong);
+}
+body.stash-liquid-glass .refract-cc-art-title.is-shifted {
+    left: 20%;
+    width: 36%;
+}
+
+/* ── The card back in the customiser ──────────────────────────────────────
+   The back previews on the performer card, so the stage shows the performer
+   for it too, and the image band gets its own ring shape: full width, not a
+   corner. */
+body.stash-liquid-glass .refract-preview-kind-back .refract-preview-cards .scene-card {
+    display: none !important;
+}
+body.stash-liquid-glass .refract-preview-kind-back .refract-preview-cards .performer-card {
+    display: flex !important;
+}
+body.stash-liquid-glass .refract-cc-stage.refract-preview-kind-back .performer-card {
+    width: var(--refract-cc-perf-w) !important;
+}
+body.stash-liquid-glass .refract-cc-hit-img {
+    position: absolute;
+    top: 32%;
+    left: 0;
+    right: 0;
+    height: 36%;
+    width: auto;
+    cursor: pointer;
+}
+body.stash-liquid-glass .refract-cc-ring-img {
+    top: 33%;
+    left: 5px;
+    right: 5px;
+    bottom: auto;
+    width: auto;
+    height: 34%;
+}
+/* The source chips are a row across the band's middle, not a corner stack. */
+/* Three source chips in a row are ~210px; the preview performer card is 216px
+   wide, so they spilled out of both edges. Wrap and pad instead of shrinking
+   the text, since these are the labels that have to be readable. */
+body.stash-liquid-glass .refract-cc-chips-img {
+    top: 50%;
+    left: 0;
+    right: 0;
+    padding: 0 6px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+/* The performer FRONT's bottom band. Measured on a 216x323 preview: country
+   y264-275 and the stat strip y278-314, both full width. They are 3px apart, so
+   they are one band rather than two unhittable slivers. */
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-hit-bottom {
+    position: absolute;
+    top: 78%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: auto;
+    cursor: pointer;
+}
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-ring-bottom {
+    top: 80.5%;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    width: auto;
+    height: auto;
+}
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-chips-bottom {
+    top: auto;
+    bottom: 24%;
+    left: 0;
+    right: 0;
+    transform: none;
+    padding: 0 6px 14px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+/* The name band. The banner runs x0-75%, y0-11% (measured), so the band is
+   the top-left strip up to where the sash corner starts, and the ring hugs the
+   banner rather than a quadrant of the card. */
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-hit-tl {
+    top: 0;
+    left: 0;
+    width: 55%;
+    height: 22%;
+}
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-ring-tl {
+    top: 4px;
+    left: 4px;
+    width: 72%;
+    height: 14%;
+}
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-chips-tl {
+    top: 20%;
+    transform: none;
+    left: 8px;
+}
+/* Its sash corner, same geometry as the back's -- it is the same element. */
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-hit-tr {
+    top: 0;
+    right: 0;
+    width: 45%;
+    height: 29%;
+}
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-ring-tr {
+    top: 4px;
+    right: 4px;
+    width: 44%;
+    height: 27%;
+}
+
+/* The back's stat strip is one band across the bottom, so it gets one zone
+   rather than two half-row corners. */
+body.stash-liquid-glass .refract-cc-hit-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: 32%;
+    cursor: pointer;
+}
+body.stash-liquid-glass .refract-cc-ring-bottom {
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    top: auto;
+    width: auto;
+    height: 22%;
+}
+/* Over the strip they configure, not over the tray. These rendered at 63-73% of
+   card height, which is inside the TRAY's band (48-84%): they covered the
+   element you were not editing, and once up they latched the strip's zone so
+   the tray band became unreachable -- its own "Two rows" chip was effectively
+   undiscoverable. */
+body.stash-liquid-glass .refract-cc-chips-bottom {
+    top: auto;
+    bottom: 17%;
+    left: 0;
+    right: 0;
+    transform: none;
+    padding: 0 6px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ── The back's four zones ────────────────────────────────────────────────
+   Sash corner, image, tray, stat strip. These are FIXED regions of the card,
+   not the elements themselves, which is what lets a switched-off tray still
+   be hoverable in the place it would sit: one chip brings it back, and no
+   stub has to be drawn to hang a control off.
+
+   The image band and the sash corner overlap on purpose. The band runs the
+   full width across the top; the corner sits on it. DOM order decides, and
+   the JS emits the corner second for exactly this reason. */
+/* Band geometry, measured against what each band actually governs on a 216x323
+   preview card rather than guessed:
+
+     the image   fills the whole card (y 1-322)
+     the sash    y 0-92, top right, overflowing the corner
+     the tray    y 203-268
+     the strip   y 271-312
+
+   The bands were 0-48 / 48-84 / 84-100%, which put the tray's dashed ring 45px
+   above the tray. Each ring now sits on its target and each band covers the run
+   of card that leads to it. */
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-hit-img {
+    top: 0;
+    height: 52%;
+}
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-hit-tr {
+    width: 45%;
+    height: 29%;
+}
+/* The sash is a rotated bar clipped by the corner; its visible triangle runs to
+   about y92 of 323 and in from 55% of the width. */
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-ring-tr {
+    top: 4px;
+    right: 4px;
+    width: 44%;
+    height: 27%;
+}
+/* The image really is the whole card, so this rings the band that leads to it
+   rather than implying the picture stops at 45%. */
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-ring-img {
+    top: 5px;
+    height: 49%;
+}
+body.stash-liquid-glass .refract-cc-hit-tray {
+    position: absolute;
+    top: 52%;
+    left: 0;
+    right: 0;
+    height: 32%;
+    width: auto;
+    cursor: pointer;
+}
+/* ON the tray. Its height moves with its content -- a two-row tray measures
+   y172-268 of 323 and a one-row tray y203-268 -- so this is fitted to the
+   two-row default (53.3% to 83%) and runs a little tall on one row, rather than
+   the reverse, which would leave the ring floating clear of what it points at. */
+body.stash-liquid-glass .refract-cc-ring-tray {
+    top: 53.3%;
+    left: 5px;
+    right: 5px;
+    bottom: auto;
+    width: auto;
+    height: 29.7%;
+}
+/* Two chips, centred over the tray they describe. A column would cover it. */
+body.stash-liquid-glass .refract-cc-chips-tray {
+    top: 63%;
+    left: 0;
+    right: 0;
+    transform: none;
+    padding: 0 6px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+/* The stat strip is the bottom sixth now that the tray owns the middle. */
+body.stash-liquid-glass .refract-cc-hit-bottom {
+    height: 16%;
+}
+/* These two override the block further up, which is where the earlier attempt
+   to move the chips went and why nothing happened. Consolidated here, with the
+   numbers measured off the live card rather than guessed.
+
+   Strip measures y271-312 of a 323px card; the ring sat at 276-318, hanging
+   below the thing it points at. */
+body.stash-liquid-glass .refract-cc-ring-bottom {
+    bottom: 11px;
+    height: 13%;
+}
+/* Just above the strip, and OVERLAPPING it, so the trip from a pill to its own
+   chip never crosses bare card belonging to another band. */
+body.stash-liquid-glass .refract-cc-chips-bottom {
+    bottom: 13%;
+    padding-bottom: 16px;
+}
+
+/* ── The back's two looks ─────────────────────────────────────────────────
+   Same miniature grammar as the front's: name strong, sash accent, furniture
+   quiet. The only new part is the tray, and it is drawn as what it is -- a
+   panel of six cells -- because that is the single thing that tells the two
+   looks apart. */
+body.stash-liquid-glass .refract-cc-preset-back .refract-cc-preset-inner {
+    aspect-ratio: 216 / 324;
+}
+body.stash-liquid-glass .refract-cc-preset-back .refract-cc-art-ribbon {
+    width: 34%;
+}
+body.stash-liquid-glass .refract-cc-art-tray {
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    bottom: 19%;
+    height: 33%;
+    padding: 4%;
+    border-radius: 3px;
+    background: rgba(6, 6, 8, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4%;
+    z-index: 1;
+}
+body.stash-liquid-glass .refract-cc-art-tray i {
+    border-radius: 1.5px;
+    background: var(--art-quiet);
+}
+/* Mirror has no tray, so its middle says what it does have instead: one
+   picture, chosen separately from the front's. */
+/* The dossier's miniature: a big score block, ranked bars, a media strip. It
+   has to read as a different SHAPE at a glance because it IS a different
+   anatomy -- and it has to be honest about WHICH shape, which the first version
+   was not. That one drew a corner sash the dossier does not have (its tier is a
+   chip in the header) and reduced the score, the bars and the strip to four
+   identical grey lines, so the richest look was drawn as the plainest one. */
+body.stash-liquid-glass .refract-cc-art-score {
+    position: absolute;
+    left: 30%;
+    top: 13%;
+    right: 7%;
+    height: 20%;
+    border-radius: 3px;
+    background: linear-gradient(135deg,
+        rgba(var(--accent-rgb), 0.85), rgba(var(--accent-rgb), 0.45));
+    z-index: 1;
+}
+/* The tier CHIP, top right, in place of a sash. */
+body.stash-liquid-glass .refract-cc-art-chip {
+    position: absolute;
+    top: 4.5%;
+    right: 6%;
+    width: 22%;
+    height: 6%;
+    border-radius: 99px;
+    box-shadow: inset 0 0 0 1.5px rgba(var(--accent-rgb), 0.9);
+    z-index: 2;
+}
+/* The 3-up media strip, which is a real part of this face. */
+body.stash-liquid-glass .refract-cc-art-strip {
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    bottom: 6%;
+    height: 15%;
+    display: flex;
+    gap: 4%;
+    z-index: 1;
+}
+body.stash-liquid-glass .refract-cc-art-strip i {
+    flex: 1;
+    border-radius: 2px;
+    background: var(--art-quiet);
+}
+body.stash-liquid-glass .refract-cc-art-rows {
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    bottom: 24%;
+    height: 34%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 1;
+}
+body.stash-liquid-glass .refract-cc-art-rows i {
+    height: 13%;
+    border-radius: 2px;
+    background: var(--art-quiet);
+}
+/* Ranked, so the block reads as ratings rather than lines of text. */
+body.stash-liquid-glass .refract-cc-art-rows i:nth-child(1) { width: 92%; }
+body.stash-liquid-glass .refract-cc-art-rows i:nth-child(2) { width: 74%; }
+body.stash-liquid-glass .refract-cc-art-rows i:nth-child(3) { width: 58%; }
+body.stash-liquid-glass .refract-cc-art-rows i:nth-child(4) { width: 40%; }
+/* Three looks, three columns -- the same grid the front's looks use, so the two
+   tabs stop drawing the same component at two different widths. */
+body.stash-liquid-glass .refract-cc-preset-grid.refract-cc-preset-back {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+body.stash-liquid-glass .refract-cc-art-imgmark {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    transform: translate(-50%, -50%);
+    width: 24%;
+    aspect-ratio: 3 / 2;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 1.5px var(--art-quiet);
+    z-index: 1;
+}
+body.stash-liquid-glass .refract-cc-art-imgmark::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 34%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--art-quiet);
+}
+/* The looks row on the back is a CHOICE, not six shortcuts, so the one in
+   force is marked. The front's presets set many things at once and have no
+   single "current" to mark, which is why only the back gets this. */
+body.stash-liquid-glass .refract-cc-preset.is-active .refract-cc-preset-art {
+    border-color: rgba(var(--accent-rgb), 0.85);
+    box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.5);
+}
+body.stash-liquid-glass .refract-cc-preset.is-active .refract-cc-preset-label {
+    color: var(--text);
+}
+/* A look the library cannot use (Dossier without category ratings): kept in
+   its place, greyed, and it SAYS why under its name -- a tooltip alone is a
+   mystery on touch. */
+body.stash-liquid-glass .refract-cc-preset.is-unavailable {
+    cursor: not-allowed;
+}
+body.stash-liquid-glass .refract-cc-preset.is-unavailable .refract-cc-preset-art {
+    opacity: 0.4;
+    filter: saturate(0.4);
+}
+body.stash-liquid-glass .refract-cc-preset.is-unavailable:hover .refract-cc-preset-art {
+    border-color: var(--glass-border);
+    background: rgba(255, 255, 255, 0.02);
+}
+body.stash-liquid-glass .refract-cc-preset.is-unavailable[data-reason]::after {
+    content: attr(data-reason);
+    margin-top: -4px;
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+}
+/* An element hidden by the flourish rather than by a toggle: present, grey,
+   unclickable, its label saying which. */
+body.stash-liquid-glass .refract-cc-chip.is-dimmed,
+body.stash-liquid-glass .refract-cc-chip.is-dimmed:hover {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-style: dashed;
 }

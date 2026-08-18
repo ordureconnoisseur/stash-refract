@@ -193,14 +193,14 @@ body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .studio-o
    filters off, the ribbon halo flattened to one cheap shadow, the shimmer
    stopped. Scoped to the FRONT scaffold (.refract-pc-*) only — the card
    back's blurred photo backdrop and one-at-a-time dossier stay intact. */
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-name-text,
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-name-banner .gender-icon,
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-tier-label,
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-tier-label::after {
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card :is(.performer-card, .scene-card) .refract-pc-name-text,
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card :is(.performer-card, .scene-card) .refract-pc-name-banner .gender-icon,
+body.stash-liquid-glass.refract-lite.refract-flourish-tiers :is(.performer-card, .scene-card) .refract-pc-tier-label,
+body.stash-liquid-glass.refract-lite.refract-flourish-tiers :is(.performer-card, .scene-card) .refract-pc-tier-label::after {
     filter: none !important;
     animation: none !important;
 }
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-tier-label {
+body.stash-liquid-glass.refract-lite.refract-flourish-tiers :is(.performer-card, .scene-card) .refract-pc-tier-label {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
 }
 /* The name's neon glow (filter) is stripped above, leaving light text that
@@ -210,7 +210,7 @@ body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.perf
    a sticker stroke. Lite-only; full mode keeps its glow untouched. */
 /* Applies to every tier now: Legendary + Perfect names are solid white
    too, so there's no background-clip text for the shadow to break. */
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.performer-card, .scene-card) .refract-pc-name-text {
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card :is(.performer-card, .scene-card) .refract-pc-name-text {
     text-shadow:
         0 1px 2px rgba(0, 0, 0, 0.8),
         0 0 6px rgba(0, 0, 0, 0.45) !important;
@@ -224,22 +224,22 @@ body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card :is(.perf
    layout, border, and tier-coloured fill/text (all paint-only, no
    compositor cost) but flattens the glow to one cheap depth shadow,
    kills the icon/number filters, and drops the hover lift + halo. */
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > *,
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > *:hover {
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card .performer-card .stash-perf-stats > *,
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card .performer-card .stash-perf-stats > *:hover {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
     transform: none !important;
     /* White border to match the flat-white text + icon below. */
     border-color: rgba(255, 255, 255, 0.9) !important;
 }
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > span,
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > svg {
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card .performer-card .stash-perf-stats > * > span,
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card .performer-card .stash-perf-stats > * > svg {
     filter: none !important;
 }
 /* Readability: in lite, drop the tier-colour gradient/fill on the pill
    label, value AND icon and paint them flat white, which reads clearly
    over the translucent fill (the gold-on-gold fix). The border (above) is
    whitened to match. No blur/shadow, just a colour swap. */
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > span {
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card .performer-card .stash-perf-stats > * > span {
     background: none !important;
     -webkit-background-clip: initial !important;
             background-clip: initial !important;
@@ -250,7 +250,7 @@ body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performe
        it's cheap, like the rating banner's own text-shadow. */
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
 }
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performer-card .stash-perf-stats > * > svg {
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card .performer-card .stash-perf-stats > * > svg {
     fill: #fff !important;
     /* Matching single drop-shadow on the white icon. */
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7)) !important;
@@ -268,12 +268,12 @@ body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .performe
    static ring so scroll raster stays light while the tier COLOUR
    identity is kept. The rotating ::after ring freezes into a static
    coloured frame (legendary/perfect keep their multi-hue border). */
-body.stash-liquid-glass.refract-lite:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) :is(.performer-card, .scene-card)[class*="refract-card-tier-"],
-body.stash-liquid-glass.refract-lite:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) :is(.performer-card, .scene-card)[class*="refract-card-tier-"]::before,
-body.stash-liquid-glass.refract-lite:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) :is(.performer-card, .scene-card)[class*="refract-card-tier-"]::after {
+body.stash-liquid-glass.refract-lite.refract-flourish-tiers :is(.performer-card, .scene-card)[class*="refract-card-tier-"],
+body.stash-liquid-glass.refract-lite.refract-flourish-tiers :is(.performer-card, .scene-card)[class*="refract-card-tier-"]::before,
+body.stash-liquid-glass.refract-lite.refract-flourish-tiers :is(.performer-card, .scene-card)[class*="refract-card-tier-"]::after {
     animation: none !important;
 }
-body.stash-liquid-glass.refract-lite:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) :is(.performer-card, .scene-card)[class*="refract-card-tier-"] {
+body.stash-liquid-glass.refract-lite.refract-flourish-tiers :is(.performer-card, .scene-card)[class*="refract-card-tier-"] {
     translate: none !important;
     scale: none !important;
     rotate: none !important;
@@ -289,17 +289,16 @@ body.stash-liquid-glass.refract-lite:is(.refract-rating-style-tiers, .refract-ra
 }
 /* The sheen sweep (::before) rests off-canvas at opacity 0 when frozen,
    so it just adds a dead compositing layer — drop it entirely. */
-body.stash-liquid-glass.refract-lite:is(.refract-rating-style-tiers, .refract-rating-style-playing-card) :is(.performer-card, .scene-card)[class*="refract-card-tier-"]::before {
+body.stash-liquid-glass.refract-lite.refract-flourish-tiers :is(.performer-card, .scene-card)[class*="refract-card-tier-"]::before {
     display: none !important;
 }
 /* Card-back foil/holo shimmer (only ever on the single flipped card, but
    no reason to animate it in lite either). */
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .refract-cb,
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .refract-cb::after,
-body.stash-liquid-glass.refract-lite.refract-rating-style-playing-card .refract-cb-score-num {
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card .refract-cb,
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card .refract-cb::after,
+body.stash-liquid-glass.refract-lite.refract-perf-layout-card .refract-cb-score-num {
     animation: none !important;
 }
-
 /* ── EXPERIMENTAL: skip rendering offscreen cards in list grids ──────
    content-visibility:auto lets the browser skip layout, paint AND image
    decode for any card scrolled out of view, doing that work only as the

@@ -434,7 +434,17 @@ body.stash-liquid-glass .performer-card .hon-battle-rank-badge.hon-battle-rank-b
             backdrop-filter: none !important;
     box-shadow: none !important;
     pointer-events: auto !important;
-    font-size: 0.92rem !important;
+    /* Measured: the country caption it sits in is 9.8px, and this was
+       0.92rem = 12.88px -- 31% larger. In a 15px row with `align-items:
+       center` the taller box overhung the caption at BOTH ends, so the
+       read-out looked like it had slipped off the line, and its bottom
+       came within 3px of the stat strip (an emoji-sized glyph routinely
+       paints outside its line box, so it touched the pills).
+
+       Matched to the caption's own scale instead. It stays heavier and
+       warmer than the nationality beside it, which is enough to separate
+       them without a second type size on one line. */
+    font-size: 0.78rem !important;
     font-weight: 700 !important;
     line-height: 1 !important;
     color: rgba(255, 255, 255, 0.92) !important;
@@ -451,7 +461,11 @@ body.stash-liquid-glass .performer-card .hon-battle-rank-badge.hon-battle-rank-b
    (a stretch flex-column). Right-align it so the rank stays pinned to the
    card's right edge — the same side it sits on when a country caption IS
    present (pushed right in a space-between row). Direct-child selector so
-   it only targets the fallback, never the country-nested case. */
+   it only targets the fallback, never the country-nested case.
+
+   NOTE: this rule alone does not decide the fallback's position. The
+   `.refract-chin-with-rank` rule further down is one class more specific
+   and pins the badge absolutely; see the layout-scoped override beside it. */
 body.stash-liquid-glass .performer-card .card-section > .refract-ascension-badge {
     align-self: flex-end !important;
 }
@@ -464,13 +478,17 @@ body.stash-liquid-glass .performer-card .card-section > .refract-ascension-badge
    so it stays legible over any card image. Sized a touch above the
    number's cap height so the flame reads clearly. */
 body.stash-liquid-glass .performer-card .refract-ascension-icon {
-    width: 1.15em !important;
-    height: 1.15em !important;
+    /* 1em, not 1.15em. Above 1em the flame is taller than the line box it
+       sits in, which is what pushed the read-out into the pill strip. */
+    width: 1em !important;
+    height: 1em !important;
     flex: 0 0 auto !important;
     overflow: visible !important;
+    /* Tighter halo. A 5px ember glow on a 15px line reached the pills
+       below even when the glyph itself did not. */
     filter:
-        drop-shadow(0 0 1.5px rgba(255, 180, 70, 0.95))
-        drop-shadow(0 0 5px rgba(255, 90, 20, 0.6))
+        drop-shadow(0 0 1.2px rgba(255, 180, 70, 0.95))
+        drop-shadow(0 0 3.5px rgba(255, 90, 20, 0.55))
         drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55)) !important;
 }
 
@@ -497,7 +515,8 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-total
    The grounding shadow lives on the badge container instead. */
 body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-text {
     font-weight: 800 !important;
-    font-size: 0.92rem !important;
+    /* Follows the container down; see the note on the badge's font-size. */
+    font-size: 0.78rem !important;
     letter-spacing: 0.01em !important;
     background: linear-gradient(180deg, #ffd24a 0%, #ff7a18 48%, #e11d2a 100%) !important;
     -webkit-background-clip: text !important;
@@ -2571,4 +2590,68 @@ body.stash-liquid-glass .tag-sidebar__toggle:hover {
 body.stash-liquid-glass .tag-sidebar--open .tag-sidebar__toggle {
     left: calc(var(--tag-sidebar-panel-width, 360px) + 12px) !important;
     margin-left: 0 !important;
+}
+
+/* ── Ascension rank on the chin (non playing-card modes) ─────────────
+   Sits on the NAME's line, pinned to the right edge — the same side and
+   relationship it has in playing-card mode, where it rides the country
+   caption.
+
+   Positioned rather than in-flow: the chin is a flex COLUMN, so an
+   in-flow child takes a whole line of its own and makes the chin taller
+   (which is exactly what it used to do). refract.js keeps it a child of
+   the chin and out of the <a> that wraps the name, so the performer link
+   never swallows it.
+
+   The grounding drop-shadows are dropped here too. They exist because in
+   playing-card mode the badge sits over the card IMAGE; on the chin it is
+   over a solid panel and they just read as shading. The flame keeps its
+   warm gradient and its own tight ember glow.
+   ─────────────────────────────────────────────────────────────────── */
+body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank {
+    position: relative;
+}
+body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank > .refract-ascension-badge {
+    position: absolute !important;
+    /* matches the chin's own padding, so it aligns to the name's line */
+    top: 0.48rem !important;
+    right: 0.61rem !important;
+    margin: 0 !important;
+    font-size: 0.84rem !important;
+    filter: none !important;
+}
+/* ...but ONLY in Classic, where the chin really does hold the name and
+   pinning to its top edge lands on that line.
+
+   In the Refract playing-card layout the name is the banner at the TOP of
+   the card and this chin holds the STAT STRIP instead, so `top: 0.48rem`
+   pinned the rank onto the pills. Measured on a performer with no country:
+   badge 324-336, strip 329-371 — 7px into the pills, straight through their
+   labels. It only shows on performers with no country, which is why it
+   looked like it broke "in some places".
+
+   Back into flow, `order: -1` so it takes the row the country caption would
+   have had, directly above the pills. The chin is content-sized and
+   bottom-anchored, so it grows upward to fit rather than pushing anything
+   off the card. One class more specific than the rule above, so it wins. */
+body.stash-liquid-glass.refract-perf-layout-card .performer-card .card-section.refract-chin-with-rank > .refract-ascension-badge {
+    position: static !important;
+    order: -1 !important;
+    align-self: flex-end !important;
+    top: auto !important;
+    right: auto !important;
+    margin: 0 0 0.14rem auto !important;
+}
+body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank > .refract-ascension-badge .refract-ascension-icon {
+    filter:
+        drop-shadow(0 0 1.5px rgba(255, 180, 70, 0.95))
+        drop-shadow(0 0 5px rgba(255, 90, 20, 0.6)) !important;
+}
+/* Keep a long name clear of the rank instead of running under it. The
+   margin goes on the TITLE, not on the link that wraps it: the title is
+   `overflow: hidden` + `nowrap`, and overflow clips at the padding edge,
+   so padding on the wrapper would not actually reserve the space —
+   shrinking the title's own box does. */
+body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank h5.card-section-title {
+    margin-right: 3.4rem !important;
 }

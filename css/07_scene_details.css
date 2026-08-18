@@ -1319,39 +1319,39 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
    card. cqw values are calibrated to the grid look at ~280px wide; grid
    cards keep their fixed rem. (Favourited-hidden-until-hover and the heart
    position carry over from the playing-card rules.) */
-body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card {
+body.stash-liquid-glass.refract-perf-layout-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card {
     container-type: inline-size !important;
 }
-body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .favorite-button {
+body.stash-liquid-glass.refract-perf-layout-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .favorite-button {
     top: 4.3cqw !important;
     right: 6.3cqw !important;
     width: 20.5cqw !important;
     height: 20.5cqw !important;
     padding: 0 !important;
 }
-body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .favorite-button svg {
+body.stash-liquid-glass.refract-perf-layout-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .favorite-button svg {
     width: 100% !important;
     height: 100% !important;
     font-size: inherit !important;
 }
-body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .refract-pc-name-banner {
+body.stash-liquid-glass.refract-perf-layout-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .refract-pc-name-banner {
     padding: 2.8cqw 4cqw !important;
     gap: 2cqw !important;
 }
-body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .refract-pc-name-banner .gender-icon {
+body.stash-liquid-glass.refract-perf-layout-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .refract-pc-name-banner .gender-icon {
     width: 7.7cqw !important;
     height: 7.7cqw !important;
 }
 /* Tier ribbon (diagonal sash) — fixed rem geometry (top 1.4 / right -3 /
    width 11 / 0.72rem text) likewise scaled to cqw so the sash + its text
    shrink with the card. Calibrated to match the grid at ~280px. */
-body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card[class*="refract-card-tier-"] .refract-pc-tier-label {
+body.stash-liquid-glass.refract-flourish-tiers :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card[class*="refract-card-tier-"] .refract-pc-tier-label {
     top: 8cqw !important;
     right: -17cqw !important;
     width: 63cqw !important;
     padding: 1.7cqw 0 !important;
 }
-body.stash-liquid-glass.refract-rating-style-playing-card :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card[class*="refract-card-tier-"] .refract-pc-tier-label::after {
+body.stash-liquid-glass.refract-flourish-tiers :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card[class*="refract-card-tier-"] .refract-pc-tier-label::after {
     font-size: 4.1cqw !important;
 }
 

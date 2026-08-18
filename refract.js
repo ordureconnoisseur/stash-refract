@@ -156,6 +156,25 @@
        PluginApi.patch.instead("PluginSettings"), so the plugin panel for
        Refract Theme renders our React component instead of Stash's broken
        native string-input row. PluginID prop confirmed at runtime. */
+    /* Quiet support line at the foot of the settings panel. Muted, passive,
+       and below every real setting - no banner, no dismiss state. */
+    function refractSupportNote(R) {
+        function link(href, label) {
+            return R.createElement("a", {
+                href: href,
+                target: "_blank",
+                rel: "noopener noreferrer"
+            }, label);
+        }
+        return R.createElement("div", { className: "setting refract-support" },
+            R.createElement("div", { className: "sub-heading" },
+                "Refract is free. ",
+                link("https://github.com/sponsors/ordureconnoisseur", "Sponsor"),
+                " or ",
+                link("https://ko-fi.com/ordureconnoisseur", "Ko-fi"),
+                " if you would like to chip in."));
+    }
+
     function buildAccentSwatchPicker() {
         var R = PluginApi.React;
 
@@ -185,11 +204,21 @@
            Clicks are swallowed (capture phase) so card links can't
            navigate away from settings; the shuffle button re-rolls and
            persists the new pick. */
+        var refractPreviewReload = null;
+        var refractPreviewHeldSize = null;
         function RefractCardPreview() {
             var st = R.useState({ loading: true, scene: null, performer: null, failed: false });
             var pv = st[0], setPv = st[1];
 
+            /* The loading state keeps the box the last card had. Without it
+               the box collapsed to one line of text on every reload -- and a
+               stat pick reloads -- so the pointer, sitting on a chip over the
+               card, was suddenly outside the corner layer: mouseleave, band
+               cleared, menu closed. Move left/right relies on the menu staying
+               open through the write. */
             function load(shuffle) {
+                var held = document.querySelector("#plugin-refract-card-preview .refract-card-preview");
+                if (held && held.offsetWidth) { refractPreviewHeldSize = { w: held.offsetWidth, h: held.offsetHeight }; }
                 setPv({ loading: true, scene: null, performer: null, failed: false });
                 var componentsReady = (PluginApi.utils && PluginApi.utils.loadComponents && PluginApi.loadableComponents && PluginApi.loadableComponents.SceneCard)
                     ? PluginApi.utils.loadComponents([PluginApi.loadableComponents.SceneCard, PluginApi.loadableComponents.PerformerCard])
@@ -204,6 +233,11 @@
                         setPv({ loading: false, scene: null, performer: null, failed: true });
                     });
             }
+            /* The rail owns Shuffle now, and the rail is rendered by the panel,
+               not by this component. Publish `load` on a module slot during
+               render (before any early return, so it cannot be skipped by the
+               loading/mock branches) rather than through a hook. */
+            refractPreviewReload = function () { load(true); };
             R.useEffect(function () { load(false); }, []);
 
             var SceneCard = PluginApi.components.SceneCard;
@@ -211,8 +245,12 @@
             var canReal = !pv.failed && SceneCard && PerformerCard && (pv.scene || pv.performer);
 
             if (pv.loading) {
-                return R.createElement("div", { className: "refract-card-preview" },
-                    R.createElement("div", { className: "sub-heading" }, "Loading preview…"));
+                return R.createElement("div", {
+                    className: "refract-card-preview refract-card-preview-loading",
+                    style: refractPreviewHeldSize
+                        ? { minWidth: refractPreviewHeldSize.w + "px", minHeight: refractPreviewHeldSize.h + "px" }
+                        : undefined
+                }, R.createElement("div", { className: "sub-heading" }, "Loading preview…"));
             }
             if (!canReal) {
                 /* Static mock fallback (empty library / error). */
@@ -237,14 +275,7 @@
                     pv.performer ? R.createElement(PreviewBoundary, { key: "p" + pv.performer.id, onError: onCardError },
                         R.createElement(PerformerCard, { performer: pv.performer })) : null
                 ),
-                R.createElement("button", {
-                    type: "button",
-                    className: "refract-preview-shuffle",
-                    title: "Shuffle: show a different scene and performer",
-                    "aria-label": "Shuffle preview cards",
-                    onClick: function () { load(true); },
-                    dangerouslySetInnerHTML: { __html: PREVIEW_SHUFFLE_ICON_SVG }
-                })
+                null
             );
         }
 
@@ -316,9 +347,201 @@
             var logoUrl = logoState[0];
             var setLogoUrl = logoState[1];
 
-            var ratingState = R.useState(getStoredRatingStyle());
-            var ratingStyle = ratingState[0];
-            var setRatingStyle = ratingState[1];
+            /* Drawer open/closed. Local only, deliberately NOT in
+               REFRACT_SYNC_KEYS: whether a panel is expanded is per-device
+               convenience, not part of how the theme looks. Defaults open, so
+               nothing changes for anyone who never touches it. */
+            var customiserOpenState = R.useState(isCustomiserOpen());
+            var customiserOpen = customiserOpenState[0];
+            var setCustomiserOpen = customiserOpenState[1];
+            function setCustomiserOpenPref(open) {
+                if (open === customiserOpen) { return; }
+                try { localStorage.setItem(CUSTOMISER_OPEN_KEY, open ? "1" : "0"); } catch (e) { /* ignore */ }
+                setCustomiserOpen(open);
+            }
+
+            /* Which card the customiser is currently pointed at. Drives the
+               preview and the type-specific settings; shared settings
+               (flourish, rating system, hover) stay visible in both, because
+               hiding a setting that affects BOTH card types behind a card-type
+               switch would be a lie. Local only, like the drawer state. */
+            /* The previewed back is plain DOM, not React, so it has to be
+               rebuilt by hand whenever anything it renders from changes. It
+               retries briefly because the preview card arrives asynchronously
+               from its own query. */
+            R.useEffect(function () {
+                var tries = 0;
+                var want = editingBack ? "back" : previewKind;
+                /* Rebuild once per render, because any setting could have
+                   changed what the back renders and its markup is a template,
+                   not a live view. */
+                var built = refractSyncPreviewBack(want);
+                var t = null;
+                if (!built) {
+                    /* The preview card arrives from its own query, so on first
+                       paint there may be nothing to attach to yet. */
+                    t = setInterval(function () {
+                        tries += 1;
+                        if (refractSyncPreviewBack(want) || tries > 40) { clearInterval(t); t = null; }
+                    }, 150);
+                }
+                /* ...and keep watch while the back is the face being edited.
+                   RefractCardPreview owns the card and re-renders on its own
+                   schedule -- shuffling, its query resolving -- which replaces
+                   the card node and takes the back's plain DOM with it. That
+                   is a child re-render, so THIS effect does not run again and
+                   the preview sat blank until something else moved. Cheap
+                   non-destructive re-assert: it only rebuilds when the back has
+                   actually gone, so it never thrashes a healthy one. */
+                var watch = null;
+                if (editingBack) {
+                    watch = setInterval(function () {
+                        var card = document.querySelector("#plugin-refract-card-preview .performer-card");
+                        if (card && !card.querySelector(".refract-card-back")) {
+                            refractSyncPreviewBack("back");
+                        }
+                    }, 400);
+                }
+                return function () {
+                    if (t) { clearInterval(t); }
+                    if (watch) { clearInterval(watch); }
+                };
+            });
+
+            /* Which quadrant of the preview card is being hovered, or null.
+               Deliberately NOT persisted: it is a pointer position, not a
+               preference, and it must be cleared on every card-type switch. */
+            var zoneState = R.useState(null);
+            var zone = zoneState[0];
+            var setZoneRaw = zoneState[1];
+
+            /* A band's chips do not fit inside the band. The stat strip's band
+               is 52px tall on a 323px card and its chips need ~58px, so they
+               render above it -- inside the TRAY's band. Moving the pointer
+               from the strip to its own chips therefore crossed the tray's hit
+               area, which swapped the zone and took the chips away before they
+               could be clicked. Measured: the swap happened 30px into a 58px
+               journey, which made the stat slots impossible to edit.
+
+               Rather than shuffle rectangles until the gaps close -- they
+               cannot all close, the bands are adjacent by construction -- the
+               switch is given a short grace period. Entering a DIFFERENT band
+               only schedules the change; landing on any chip cancels it. The
+               first hover is still instant, because there is nothing to
+               protect when no band is open yet. */
+            function setZone(z) {
+                if (refractZoneTimer) { clearTimeout(refractZoneTimer); refractZoneTimer = null; }
+                setZoneRaw(z);
+            }
+            function enterZone(z) {
+                if (refractZoneTimer) { clearTimeout(refractZoneTimer); refractZoneTimer = null; }
+                if (z === zone) { return; }
+                if (zone === null) { setZoneRaw(z); return; }
+                refractZoneTimer = setTimeout(function () {
+                    refractZoneTimer = null;
+                    setZoneRaw(z);
+                }, 220);
+            }
+            /* Landing on the chips cancels a pending swap AND re-asserts the
+               band, so a slow diagonal across a corner cannot strand you. */
+            function holdZone(z) {
+                if (refractZoneTimer) { clearTimeout(refractZoneTimer); refractZoneTimer = null; }
+                if (z !== zone) { setZoneRaw(z); }
+            }
+            /* Armed when the panel is first SEEN this session, not when it
+               mounts: the settings page mounts it far below the fold, and a
+               pulse that played while the user was reading the accent picker
+               was a pulse nobody saw. */
+            var introState = R.useState(false);
+            var introOn = introState[0];
+            R.useEffect(function () {
+                var seen = false;
+                try { seen = sessionStorage.getItem("refract.ccIntroShown") === "1"; } catch (e) { seen = true; }
+                if (seen || typeof IntersectionObserver === "undefined") { return undefined; }
+                var t = null, arm = null, io = null;
+                var stage = document.getElementById("plugin-refract-card-preview");
+                if (!stage) { return undefined; }
+                var inView = function () {
+                    var b = stage.getBoundingClientRect();
+                    var vh = window.innerHeight || document.documentElement.clientHeight;
+                    return b.height > 0 && b.top >= -b.height * 0.2 && b.bottom <= vh + b.height * 0.2;
+                };
+                /* The page paints the panel near the top for a moment before
+                   the content above it lands, so "intersecting" at mount is a
+                   lie. Observation starts after the layout has settled, and a
+                   hit must still be in view 400ms later to count. */
+                arm = setTimeout(function () {
+                    io = new IntersectionObserver(function (entries) {
+                        if (!entries.some(function (en) { return en.isIntersecting; })) { return; }
+                        setTimeout(function () {
+                            if (!io || !inView()) { return; }
+                            io.disconnect(); io = null;
+                            try { sessionStorage.setItem("refract.ccIntroShown", "1"); } catch (e) { /* ignore */ }
+                            introState[1](true);
+                            t = setTimeout(function () { introState[1](false); }, 2600);
+                        }, 400);
+                    }, { threshold: 0.6 });
+                    io.observe(stage);
+                }, 1500);
+                return function () {
+                    if (arm) { clearTimeout(arm); }
+                    if (io) { io.disconnect(); }
+                    if (t) { clearTimeout(t); }
+                };
+            }, []);
+            /* Session-only, like the preview kind: what the preview shows is a
+               device thing, not a preference. */
+            var plainState = R.useState(refractPreviewPlain);
+            var plainOn = plainState[0];
+            var setPlainOn = plainState[1];
+            var previewKindState = R.useState(storedPreviewKind());
+            var previewKind = previewKindState[0];
+            var setPreviewKindState = previewKindState[1];
+            function setPreviewKind(kind) {
+                if (kind === previewKind) { return; }
+                try { localStorage.setItem(PREVIEW_KIND_KEY, kind); } catch (e) { /* ignore */ }
+                setPreviewKindState(kind);
+            }
+
+
+            var perfCardStyleState = R.useState(getPerfCardStyle());
+            var perfCardStyle = perfCardStyleState[0];
+            var setPerfCardStyle = perfCardStyleState[1];
+
+            /* MUST come after perfCardStyle above. These were declared higher
+               up and read `perfCardStyle` before its `var` had been assigned:
+               the declaration hoists but the value does not, so canFlipPreview
+               computed against `undefined` and the flip tab never rendered. */
+            /* The back is a SIDE of the performer card, not a third card type.
+               It was a tab beside "Scene card" and "Performer card", which put
+               one card's two faces on the same footing as two different cards
+               and made the flip -- the thing the back exists for -- invisible
+               in the very place you configure it. It is a flip on the card now.
+
+               Not persisted: which face you left the editor on is a pointer
+               position, not a preference, and a customiser that reopens
+               showing the back would bury the front. */
+            var previewSideState = R.useState("front");
+            var previewSideRaw = previewSideState[0];
+            var setPreviewSideState = previewSideState[1];
+            /* Only the Refract performer layout has a back at all, so every
+               other combination is pinned to the front rather than offered a
+               flip that would preview nothing. */
+            var canFlipPreview = previewKind === "performer" && perfCardStyle === "refract";
+            var previewSide = canFlipPreview ? previewSideRaw : "front";
+            var editingBack = previewSide === "back";
+            /* Which CARD_ELEMS group the zones and chips are reading. */
+            var elemGroup = editingBack ? "back" : previewKind;
+            function setPreviewSide(side) {
+                if (side === previewSideRaw) { return; }
+                setZone(null);
+                setPillMenu(null);
+                setPreviewSideState(side);
+            }
+
+            var flourishState = R.useState(getFlourish());
+            var flourish = flourishState[0];
+            var setFlourish = flourishState[1];
 
             var liteState = R.useState(isLiteModeEnabled());
             var liteOn = liteState[0];
@@ -340,9 +563,6 @@
             var perfCardHoverOn = perfCardHoverState[0];
             var setPerfCardHoverOn = perfCardHoverState[1];
 
-            var cardBackExplicitState = R.useState(isCardBackExplicit());
-            var cardBackExplicitOn = cardBackExplicitState[0];
-            var setCardBackExplicitOn = cardBackExplicitState[1];
 
             var pluginSortState = R.useState(isPluginSortDisabledBottom());
             var pluginSortDisabledBottomOn = pluginSortState[0];
@@ -366,6 +586,345 @@
             });
             var cardElems = cardElemsState[0];
             var setCardElems = cardElemsState[1];
+
+            /* Side + layering for the top-edge elements. `__layer` rides along
+               in the same map so one setState covers a preset. */
+            /* Any back already built is stale the moment one of these
+               changes: the back's markup is a template, not a live view. */
+            function dropBuiltBacks() {
+                var builts = document.querySelectorAll(".performer-card .refract-card-back");
+                for (var bi = 0; bi < builts.length; bi++) {
+                    if (builts[bi].parentNode) { builts[bi].parentNode.removeChild(builts[bi]); }
+                }
+            }
+            var trayOnState = R.useState(storedTrayOn);
+            var trayOn = trayOnState[0];
+            function pickTrayOn(v) {
+                if (trayOn === v) { return; }
+                try { localStorage.setItem(TRAY_KEY, v ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyBackClasses();
+                dropBuiltBacks();
+                trayOnState[1](v);
+            }
+            var trayPhotosState = R.useState(storedTrayPhotos);
+            var trayPhotos = trayPhotosState[0];
+            function pickTrayPhotos(v) {
+                if (trayPhotos === v) { return; }
+                try { localStorage.setItem(TRAY_PHOTOS_KEY, v ? "1" : "0"); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                dropBuiltBacks();
+                trayPhotosState[1](v);
+            }
+            /* The back's stat slots, in order, and which one has its menu
+               open. The menu index is NOT persisted: it is a pointer position. */
+            var backStyleState = R.useState(storedBackStyle);
+            var backStyleStored = backStyleState[0];
+            /* The stored preference and what the card really builds are two
+               different things on a library with no category ratings: the pref
+               may say dossier while every card falls back to the gallery. The
+               customiser drew the stored one -- Dossier marked active, no bands
+               offered, "fixed layout" in the hint -- over a preview that was a
+               gallery you could not touch. Everything below reads the EFFECTIVE
+               style; the stored one is only what the Dossier look writes. */
+            var hasCatsState = R.useState(refractLibraryHasCategories());
+            var hasCats = hasCatsState[0];
+            R.useEffect(function () {
+                var live = true;
+                refractOnCategoriesKnown(function (v) { if (live) { hasCatsState[1](!!v); } });
+                return function () { live = false; };
+            }, []);
+            var backStyle = (backStyleStored === "dossier" && hasCats) ? "dossier" : "gallery";
+            function pickBackStyle(v) {
+                if (backStyleStored === v) { return; }
+                try { localStorage.setItem(BACK_STYLE_KEY, v); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                dropBuiltBacks();
+                backStyleState[1](v);
+            }
+            var backPillsState = R.useState(backPillsPref);
+            var backPills = backPillsState[0];
+            var pillMenuState = R.useState(null);
+            var pillMenu = pillMenuState[0];
+            var setPillMenu = pillMenuState[1];
+            function writeBackPills(list) {
+                try { localStorage.setItem(BACK_PILLS_KEY, list.join(",")); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                dropBuiltBacks();
+                backPillsState[1](list);
+            }
+            /* The FRONT's slot list, same shape. Cards are rebuilt by removing
+               their marker so initPerformerCards runs again on them. */
+            var frontPillsState = R.useState(frontPillsPref);
+            var frontPills = frontPillsState[0];
+            function writeFrontPills(list) {
+                try { localStorage.setItem(FRONT_PILLS_KEY, list.join(",")); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                var cards = document.querySelectorAll(".performer-card[data-stash-pc]");
+                for (var ci = 0; ci < cards.length; ci++) {
+                    cards[ci].removeAttribute("data-stash-pc");
+                    var oldRow = cards[ci].querySelector(".stash-perf-stats:not(.refract-mb-stats)");
+                    if (oldRow && oldRow.parentNode) { oldRow.parentNode.removeChild(oldRow); }
+                    var oldBanner = cards[ci].querySelector(".refract-pc-name-banner:not(.refract-mb-name)");
+                    if (oldBanner && oldBanner.parentNode) { oldBanner.parentNode.removeChild(oldBanner); }
+                    var oldTier = cards[ci].querySelector(".refract-pc-tier-label:not(.refract-mb-sash)");
+                    if (oldTier && oldTier.parentNode) { oldTier.parentNode.removeChild(oldTier); }
+                    var oldCountry = cards[ci].querySelector(".stash-perf-country");
+                    if (oldCountry && oldCountry.parentNode) {
+                        /* Ascension's rank badge is HOSTED inside the country
+                           caption (integrateAscensionBadges moves it there).
+                           It is the plugin's own node, not ours: hand it back
+                           to the card before the caption goes, so the next
+                           pass can adopt it again rather than find it gone. */
+                        var hostedBadge = oldCountry.querySelector(".hon-battle-rank-badge");
+                        if (hostedBadge) {
+                            hostedBadge.classList.remove("refract-ascension-badge");
+                            cards[ci].appendChild(hostedBadge);
+                        }
+                        oldCountry.parentNode.removeChild(oldCountry);
+                    }
+                    /* Everything initPerformerCards injects is gone; it can run
+                       clean on this card again. */
+                }
+                try { initPerformerCards(); } catch (e) { /* the observer will */ }
+                frontPillsState[1](list);
+                if (refractPreviewReload) { refractPreviewReload(); }
+            }
+
+            /* One editor for both strips. `face` picks the list, the catalogue,
+               the writer and the cap; everything else is identical, which is
+               the point -- the two strips are the same component. */
+            function slotApi(face) {
+                var back = face === "back";
+                return {
+                    list: back ? backPills : frontPills,
+                    cat: back ? BACK_STATS : FRONT_STATS,
+                    def: back ? backStatDef : frontStatDef,
+                    max: back ? BACK_PILLS_MAX : FRONT_PILLS_MAX,
+                    write: back ? writeBackPills : writeFrontPills
+                };
+            }
+            function setPillAt(face, i, key) {
+                var a = slotApi(face);
+                var next = a.list.slice();
+                /* A stat can only be in the strip once, so assigning one that is
+                   already somewhere else MOVES it rather than duplicating it.
+                   `i` one past the end is the pending "Add stat" slot. */
+                var was = next.indexOf(key);
+                if (was !== -1 && was !== i) { next.splice(was, 1); if (was < i) { i -= 1; } }
+                if (i > next.length) { i = next.length; }
+                next[i] = key;
+                a.write(next);
+            }
+            /* C5. A slot's neighbours swap; the menu follows the pill. */
+            function movePill(face, i, dir) {
+                var a = slotApi(face);
+                var j = i + dir;
+                if (j < 0 || j >= a.list.length) { return; }
+                var next = a.list.slice();
+                var t = next[i]; next[i] = next[j]; next[j] = t;
+                a.write(next);
+                setPillMenu(j);
+            }
+            function removePillAt(face, i) {
+                var a = slotApi(face);
+                var next = a.list.slice();
+                next.splice(i, 1);
+                a.write(next);
+            }
+            /* Opens the menu for the slot one past the end. Nothing is written
+               until a stat is picked: "Add stat" used to append the first free
+               stat at once and then ask, so a change of mind cost a Remove. */
+            function addPill(face) {
+                var a = slotApi(face);
+                if (a.list.length >= a.max) { return; }
+                setPillMenu(a.list.length);
+            }
+            function slotChips(face) {
+                var a = slotApi(face);
+                var pending = pillMenu !== null && pillMenu === a.list.length && a.list.length < a.max;
+                if (pillMenu !== null && (a.list[pillMenu] !== undefined || pending)) {
+                    var cur = pending ? null : a.list[pillMenu];
+                    /* On the back the rating has two forms, and both live HERE
+                       now -- as two entries of the one Rating slot -- rather
+                       than as a separate radio in the sash corner. That radio
+                       and this slot were two controls over one fact: pick Edge
+                       there and the Rating slot chip stayed, pointing at a pill
+                       that no longer drew. One control, honest chip. */
+                    var entries = [];
+                    a.cat.forEach(function (st) {
+                        if (face === "back" && st.key === "rating") {
+                            entries.push({ st: st, mode: "pill", label: "Rating pill" });
+                            entries.push({ st: st, mode: "edge", label: "Rating edge meter" });
+                        } else {
+                            entries.push({ st: st, mode: null, label: st.menu || st.label });
+                        }
+                    });
+                    var menu = entries.map(function (en) {
+                        var st = en.st;
+                        var isCur = cur !== null && st.key === cur && (en.mode === null || en.mode === ratingDisp);
+                        var taken = a.list.indexOf(st.key) !== -1 && st.key !== cur;
+                        return R.createElement("button", {
+                            key: st.key + (en.mode || ""),
+                            type: "button",
+                            className: "refract-cc-chip" + (isCur ? " is-on" : ""),
+                            role: "radio",
+                            "aria-checked": isCur ? "true" : "false",
+                            title: taken ? "Move " + en.label + " to this slot" : en.label,
+                            onClick: function () {
+                                if (en.mode) { pickRatingDisp(en.mode); }
+                                setPillAt(face, pillMenu, st.key);
+                                setPillMenu(null);
+                            }
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }), en.label);
+                    });
+                    /* Wrapped in its own grid: eight options centre-wrapped into
+                       four ragged rows over the card image, each indented
+                       differently, read as accidental. Two even columns read
+                       as a list. Remove sits apart underneath, because it is
+                       not another value. */
+                    var foot = pending
+                        ? [R.createElement("button", {
+                            key: "__cancel",
+                            type: "button",
+                            className: "refract-cc-chip refract-cc-chip-swap refract-cc-slot-remove",
+                            title: "Add nothing",
+                            onClick: function () { setPillMenu(null); }
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }), "Cancel")]
+                        : [R.createElement("button", {
+                            key: "__left",
+                            type: "button",
+                            className: "refract-cc-chip refract-cc-chip-swap refract-cc-slot-move",
+                            disabled: pillMenu === 0,
+                            title: "Swap with the pill to its left",
+                            onClick: function () { movePill(face, pillMenu, -1); }
+                        }, "\u2190 Move left"),
+                        R.createElement("button", {
+                            key: "__right",
+                            type: "button",
+                            className: "refract-cc-chip refract-cc-chip-swap refract-cc-slot-move",
+                            disabled: pillMenu === a.list.length - 1,
+                            title: "Swap with the pill to its right",
+                            onClick: function () { movePill(face, pillMenu, 1); }
+                        }, "Move right \u2192"),
+                        R.createElement("button", {
+                            key: "__rm",
+                            type: "button",
+                            className: "refract-cc-chip refract-cc-chip-swap refract-cc-slot-remove",
+                            title: "Take this pill off the strip",
+                            onClick: function () { var i = pillMenu; setPillMenu(null); removePillAt(face, i); }
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }), "Remove")];
+                    return [R.createElement("div", { key: "__menu", className: "refract-cc-slot-menu" + (pending ? " is-pending" : "") },
+                        pending ? R.createElement("div", { key: "__head", className: "refract-cc-slot-menu-head" }, "Add which stat?") : null,
+                        menu,
+                        R.createElement("div", { key: "__foot", className: "refract-cc-slot-menu-foot" }, foot)
+                    )];
+                }
+                var slots = a.list.map(function (k, i) {
+                    var d = a.def(k);
+                    var lbl = d ? d.label : k;
+                    if (face === "back" && k === "rating" && ratingDisp === "edge") { lbl = "Rating (edge)"; }
+                    return R.createElement("button", {
+                        key: k + i,
+                        type: "button",
+                        className: "refract-cc-chip refract-cc-chip-slot",
+                        title: "Change what this pill shows",
+                        onClick: function () { setPillMenu(i); }
+                    }, lbl);
+                });
+                if (a.list.length < a.max) {
+                    slots.push(R.createElement("button", {
+                        key: "__add",
+                        type: "button",
+                        className: "refract-cc-chip refract-cc-chip-swap",
+                        title: "Add another pill to the strip",
+                        onClick: function () { addPill(face); }
+                    }, R.createElement("span", { className: "refract-cc-chip-box" }), "Add stat"));
+                }
+                return slots;
+            }
+            var trayRowsState = R.useState(storedTrayRows);
+            var trayRows = trayRowsState[0];
+            function pickTrayRows(v) {
+                if (trayRows === v) { return; }
+                try { localStorage.setItem(TRAY_ROWS_KEY, String(v)); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                dropBuiltBacks();
+                trayRowsState[1](v);
+            }
+            var ratingDispState = R.useState(storedRatingDisp);
+            var ratingDisp = ratingDispState[0];
+            function pickRatingDisp(v) {
+                if (ratingDisp === v) { return; }
+                try { localStorage.setItem(RATING_DISP_KEY, v); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyBackClasses();
+                dropBuiltBacks();
+                ratingDispState[1](v);
+            }
+            var backSrcState = R.useState(storedBackSrc);
+            var backSrc = backSrcState[0];
+            var setBackSrcState = backSrcState[1];
+            function pickBackSrc(v) {
+                if (backSrc === v) { return; }
+                try { localStorage.setItem(BACK_SRC_KEY, v); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                dropBuiltBacks();
+                setBackSrcState(v);
+            }
+            var studioModeState = R.useState(storedStudioMode);
+            var studioMode = studioModeState[0];
+            var setStudioModeState = studioModeState[1];
+            function pickStudioMode(v) {
+                if (studioMode === v) { return; }
+                try { localStorage.setItem(STUDIO_MODE_KEY, v); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyStudioModeClass();
+                applyStudioTextPrefix();
+                setStudioModeState(v);
+            }
+            var cardSidesState = R.useState(function () {
+                var m = {};
+                CARD_ELEMS.forEach(function (d) { if (d.sideKey) { m[d.key] = cardElemSide(d); } });
+                m.__layer = tierLayerPref();
+                return m;
+            });
+            var cardSides = cardSidesState[0];
+            var setCardSides = cardSidesState[1];
+
+            /* Mirror of Stash's OWN rating system setting. Not a refract
+               setting and deliberately not in REFRACT_SYNC_KEYS — it is
+               surfaced here only so you don't have to go and find it. */
+            var ratingSysState = R.useState(function () {
+                return document.body.classList.contains("refract-rating-system-stars") ? "stars" : "decimal";
+            });
+            var ratingSys = ratingSysState[0];
+            var setRatingSys = ratingSysState[1];
+            function setRatingSystem(v) {
+                if (ratingSys === v) { return; }
+                setRatingSys(v);
+                /* Stash stores this LOWERCASE and carries a starPrecision
+                   alongside the type ({ type: "decimal", starPrecision:
+                   "tenth" }), and configureUISetting replaces the whole
+                   object. So read it back first and change only the type,
+                   otherwise the user's precision is silently clobbered. */
+                gql("query { configuration { ui } }")
+                    .then(function (res) {
+                        var ui = (res && res.data && res.data.configuration
+                            && res.data.configuration.ui) || {};
+                        var cur = ui.ratingSystemOptions || {};
+                        var opts = {};
+                        Object.keys(cur).forEach(function (k) { opts[k] = cur[k]; });
+                        opts.type = (v === "stars") ? "stars" : "decimal";
+                        if (!opts.starPrecision) { opts.starPrecision = "tenth"; }
+                        return gqlWithVars(
+                            'mutation($v: Any){ configureUISetting(key: "ratingSystemOptions", value: $v) }',
+                            { v: opts }
+                        );
+                    })
+                    .then(function () { refractFetchRatingSystem(); })
+                    .catch(function () { /* no perms / offline — Stash keeps what it had */ });
+            }
 
             /* Custom CSS Source state: { loaded, url } where url is
                the value Stash currently has set (empty if not set). */
@@ -404,12 +963,24 @@
                 });
             }
 
-            function pickRatingStyle(style) {
-                try { localStorage.setItem(RATING_STYLE_STORAGE_KEY, style); } catch (e) { /* ignore */ }
+            function pickPerfCardStyle(style) {
+                try { localStorage.setItem(PERF_CARD_STYLE_KEY, style); } catch (e) { /* ignore */ }
                 scheduleServerSync();
-                applyRatingStyleClass(style);
-                setRatingStyle(style);
+                applyCardModeClasses();
+                setPerfCardStyle(style);
+            }
+
+            function pickFlourish(v) {
+                try { localStorage.setItem(FLOURISH_KEY, v); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyCardModeClasses();
+                setFlourish(v);
+                /* Tier classes are only applied in Extravagant, so the cards
+                   have to be re-tagged when this flips either way. Scene cards
+                   come from tagFilledRatings; performer cards cannot be
+                   re-read and need the captured rating instead. */
                 tagFilledRatings();
+                retagPerformerTiers();
             }
 
             function pickCardStyle(style) {
@@ -474,43 +1045,818 @@
                 setCardElems(m);
             }
 
-            /* One "elements" row per card type: chips are LIT when the
-               element is shown; click to hide. Replaces the 1.19 pile of
-               per-request switch rows. */
-            function cardElemsRow(group, title, elemId) {
-                return R.createElement("div", { className: "setting refract-card-elems-setting", id: elemId },
+            function setElemSide(d, side) {
+                if (!d.sideKey || cardSides[d.key] === side) { return; }
+                try { localStorage.setItem(d.sideKey, side); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyCardSideClasses();
+                var m = {};
+                Object.keys(cardSides).forEach(function (k) { m[k] = cardSides[k]; });
+                m[d.key] = side;
+                setCardSides(m);
+            }
+
+            /* Presets APPLY, they do not latch: with this many rows most real
+               configurations match no preset, so nothing is ever shown as the
+               "current" one. They exist mainly so the names people already
+               know still get them there in one click. */
+            /* Six LOOKS, not six permutations. The old four were three different
+               fixes for the same overlap plus one that dropped two pills, so
+               four pictures came out nearly identical and the row read as
+               decoration. These differ in silhouette:
+
+                 Default     the shipped look, sash across the logo
+                 Mirrored    the same card, other hand
+                 No clash    logo steps aside, nothing overlaps
+                 Logo first  keep the overlap, logo wins
+                 Details     no sash, no logo, every fact kept, calm rating
+                 Poster      artwork and title, nothing else
+
+               A look sets the FLOURISH too. Without that, every look is stuck
+               with tier frames and a sash, and "quiet" is unreachable. */
+            /* Six LOOKS, not six permutations. They differ in silhouette, and
+               each one is a full statement: elements, sides, layering, the
+               flourish AND how the studio is expressed.
+
+                 Default          the shipped look, sash across the logo
+                 Studio in title  the studio becomes text, freeing the corner
+                 No clash         logo steps aside, both stay in corners
+                 Logo first       keep the overlap, logo wins
+                 Details          no sash, no logo, every fact kept, calm rating
+                 Poster           artwork and title, nothing else
+
+               "Mirrored" was dropped: the defaults are rating left, ribbon
+               right, studio right, and it set exactly the opposite of each,
+               which is precisely what one click of the "Swap top corners" chip
+               already does. It was a shortcut to a button, not a look.
+
+               Three of these answer the same conflict, the sash crossing the
+               logo, in three genuinely different ways: move the logo, reorder
+               the two, or stop making the studio a logo at all. */
+            /* `tip` is one sentence per card type, what the look changes: a
+               row of six pictures with the one tooltip "sets every element"
+               left the difference between Default and Logo first to a squint.
+               `pills` (performer only) is the front strip's stat selection;
+               a look that carries one lands on a definite strip. */
+            var CARD_PRESETS = [
+                { label: "Default", hide: [], sides: {}, layer: "ribbon",
+                  flourish: "extravagant", studio: "logo",
+                  pills: FRONT_PILLS_DEFAULT.slice(),
+                  tip: { scene: "Everything on: rating badge left, tier sash and studio logo right, performers and counts in the chin. Extravagant.",
+                         performer: "Everything on: name banner, tier sash, country, and the four default stat pills. Extravagant." } },
+                { label: "Studio in title", hide: [], sides: {}, layer: "ribbon",
+                  flourish: "extravagant", studio: "text",
+                  tip: { scene: "The studio's name goes before the title, so the corner logo is gone and the sash has the top right to itself.",
+                         performer: "" } },
+                { label: "No clash", hide: [], sides: { "refract.scHideStudio": "left" },
+                  layer: "ribbon", flourish: "extravagant", studio: "logo",
+                  tip: { scene: "Studio logo moved to the top left, so it never sits under the tier sash.",
+                         performer: "" } },
+                { label: "Logo first", hide: [], sides: {}, layer: "logo",
+                  flourish: "extravagant", studio: "logo",
+                  tip: { scene: "Same corners as Default, but the studio logo is drawn OVER the sash instead of under it.",
+                         performer: "" } },
+                { label: "Details", sides: {}, layer: "ribbon", flourish: "minimal", studio: "logo",
+                  hide: ["refract.scHideTier", "refract.scHideStudio", "refract.pcHideTier"],
+                  tip: { scene: "No sash, no studio logo, but performers, duration and counts stay. Sets the flourish to Minimal.",
+                         performer: "No sash; name, country and stats stay. Sets the flourish to Minimal." } },
+                { label: "Poster", sides: {}, layer: "ribbon", flourish: "minimal", studio: "logo",
+                  hide: ["refract.scHideTier", "refract.scHideStudio", "refract.scHideDuration",
+                         "refract.scHidePerformers", "refract.scHideOCount", "refract.scHideTagCount",
+                         "refract.scHideDate", "refract.scHideResolution",
+                         "refract.pcHideTier", "refract.pcHideCountry", "refract.pcHideStats"],
+                  tip: { scene: "Just the image and the title. Rating stays. Sets the flourish to Minimal.",
+                         performer: "Just the image and the name. Sets the flourish to Minimal." } },
+                /* Performer only: the strip carries body facts instead of
+                   library counts. Signatures on the scene tab include no
+                   pills, so there it dedupes into Default. */
+                { label: "Vitals", hide: [], sides: {}, layer: "ribbon",
+                  flourish: "extravagant", studio: "logo",
+                  pills: ["height", "measure", "career", "scenes"],
+                  tip: { scene: "",
+                         performer: "Everything on, with the strip showing height, measurements, career and scene count." } }
+            ];
+            /* A look sets THIS tab's card and nothing else. It used to write
+               every CARD_ELEMS key regardless of group: "Poster" on the Scene
+               tab hid the performer card's tier, country and stats; "Default"
+               on the Performer tab un-hid the scene's studio, reset every scene
+               side and forced the studio back to a logo. Two tabs labelled as
+               two cards, looks that behaved as one global preset, and nothing
+               on screen said the other tab had moved.
+
+               The one thing a look may still change outside its card is the
+               flourish, because Minimal/Extravagant is the difference between
+               "Details" and "Default" -- and the look's title says so. */
+            function applyCardPreset(p) {
+                var elemMap = {};
+                Object.keys(cardElems).forEach(function (k) { elemMap[k] = cardElems[k]; });
+                CARD_ELEMS.forEach(function (d) {
+                    if (d.group !== elemGroup) { return; }
+                    var hidden = p.hide.indexOf(d.key) !== -1;
+                    try { localStorage.setItem(d.key, hidden ? "1" : "0"); } catch (e) { /* ignore */ }
+                    elemMap[d.key] = hidden;
+                });
+                var sideMap = {};
+                Object.keys(cardSides).forEach(function (k) { sideMap[k] = cardSides[k]; });
+                CARD_ELEMS.forEach(function (d) {
+                    if (d.group !== elemGroup || !d.sideKey) { return; }
+                    var s = p.sides[d.key] || d.sideDefault;
+                    try { localStorage.setItem(d.sideKey, s); } catch (e) { /* ignore */ }
+                    sideMap[d.key] = s;
+                });
+                if (elemGroup === "scene") {
+                    try { localStorage.setItem(TIER_LAYER_KEY, p.layer); } catch (e) { /* ignore */ }
+                    sideMap.__layer = p.layer;
+                    if (p.studio) { pickStudioMode(p.studio); }
+                }
+                if (elemGroup === "performer" && p.pills && p.pills.join(",") !== frontPills.join(",")) {
+                    writeFrontPills(p.pills.slice());
+                }
+                if (p.flourish && p.flourish !== flourish) { pickFlourish(p.flourish); }
+                scheduleServerSync();
+                applyCardElemClasses();
+                applyCardSideClasses();
+                setCardElems(elemMap);
+                setCardSides(sideMap);
+            }
+
+
+
+
+            /* The tier ribbon IS a tier flourish, so it only exists in
+               Extravagant — listing it under Minimal would be a dead row. */
+            function elemAvailable(d) {
+                if (d.noop) { return false; }
+                /* The name banner is a Refract-layout element; in Classic it is
+                   display:none, so a chip for it would ring a corner and do
+                   nothing -- the exact defect the no-op Rating banner had. */
+                if (d.key === "refract.pcHideName" && perfCardStyle !== "refract") { return false; }
+                if (d.classicOnly && cardStyle !== "classic") { return false; }
+                return !d.tier || flourish === "extravagant";
+            }
+            /* Available in principle but switched off by the FLOURISH: shown as
+               a disabled chip that says why, rather than vanishing -- two paths
+               hide the same element and one used to leave no trace. */
+            function elemDimmedByFlourish(d) {
+                if (d.noop) { return false; }
+                if (d.key === "refract.pcHideName" && perfCardStyle !== "refract") { return false; }
+                return !!d.tier && flourish !== "extravagant";
+            }
+
+
+            /* Its own row, NOT part of Card elements. It is not an element of a
+               card at all — it is Stash's global setting, mirrored — and
+               nesting it under "Card elements" implied it belonged to the
+               visibility list. Same label-left / control-right shape as every
+               other setting in this panel. */
+            function ratingSystemRow() {
+                return R.createElement("div", { className: "setting", id: "plugin-refract-rating-system" },
                     R.createElement("div", null,
-                        R.createElement("h3", null, title),
+                        R.createElement("h3", null, "Rating system"),
                         R.createElement("div", { className: "sub-heading" },
-                            "Lit chips are shown on the card; click one to hide it.")
+                            "Stash's own setting, mirrored here. Affects ratings everywhere, not just cards.")
                     ),
-                    R.createElement("div", { className: "refract-setting-control refract-card-elems" },
-                        CARD_ELEMS.filter(function (d) { return d.group === group; }).map(function (d) {
+                    R.createElement("div", { className: "refract-setting-control refract-flourish-toggle" },
+                        [["decimal", "Decimal"], ["stars", "Stars"]].map(function (o) {
                             return R.createElement("button", {
-                                key: d.key,
+                                key: o[0],
                                 type: "button",
-                                className: "refract-segmented-btn" + (cardElems[d.key] ? "" : " is-active"),
-                                onClick: function () { toggleCardElem(d.key); }
-                            }, d.label);
+                                className: "refract-segmented-btn" + (ratingSys === o[0] ? " is-active" : ""),
+                                "aria-pressed": ratingSys === o[0] ? "true" : "false",
+                                onClick: function () { setRatingSystem(o[0]); }
+                            }, o[1]);
                         })
                     )
                 );
             }
 
-            function toggleCardBackExplicit() {
-                var next = !cardBackExplicitOn;
-                try { localStorage.setItem(CARD_BACK_EXPLICIT_KEY, next ? "1" : "0"); } catch (e) { /* ignore */ }
-                scheduleServerSync();
-                setCardBackExplicitOn(next);
-                /* Drop any already-built card backs so they rebuild with the
-                   new label set on the next flip. */
-                var builts = document.querySelectorAll(".performer-card .refract-card-back");
-                for (var bi = 0; bi < builts.length; bi++) {
-                    var pc = builts[bi].closest && builts[bi].closest(".performer-card");
-                    if (pc) { pc.classList.remove("refract-show-back"); }
-                    if (builts[bi].parentNode) { builts[bi].parentNode.removeChild(builts[bi]); }
-                }
+            /* == Corner touch ==========================================
+               The card IS the control surface. Each quadrant owns the
+               elements that sit in that corner: hovering one rings it and
+               floats those elements as chips, and clicking a chip toggles the
+               element. This replaces the six-row element list outright, which
+               is why no list appears anywhere below. */
+            /* "Studio logo" is the wrong word for it once it is text. */
+            function elemLabel(d) {
+                if (d.key === "refract.scHideStudio" && studioMode === "text") { return "Studio name"; }
+                return d.label;
             }
+            function zoneOfElem(d) {
+                if (ELEM_ZONE_FIXED[d.key]) { return ELEM_ZONE_FIXED[d.key]; }
+                /* As text the studio is no longer in a corner at all: it sits on
+                   the title line. Its control follows it, because the whole
+                   premise here is that a corner owns what sits there. */
+                if (d.key === "refract.scHideStudio" && studioMode === "text") { return "bl"; }
+                if (cardSides[d.key] === "bottom") { return "br"; }
+                return cardSides[d.key] === "left" ? "tl" : "tr";
+            }
+            function elemsInZone(z) {
+                return CARD_ELEMS.filter(function (d) {
+                    return d.group === elemGroup && elemAvailable(d) && zoneOfElem(d) === z;
+                });
+            }
+            function topEdgeHasSides() {
+                return CARD_ELEMS.some(function (d) {
+                    return d.group === elemGroup && d.sideKey;
+                });
+            }
+            /* One write, not one per element. `setElemSide` reads the
+               `cardSides` closure and replaces the whole map, so calling it in
+               a loop would keep only the last element's move. */
+            function swapTopCorners() {
+                var m = {};
+                Object.keys(cardSides).forEach(function (k) { m[k] = cardSides[k]; });
+                CARD_ELEMS.forEach(function (d) {
+                    if (d.group !== elemGroup || !d.sideKey) { return; }
+                    /* Not on the top edge, so not part of the swap. */
+                    if (cardSides[d.key] === "bottom") { return; }
+                    var next = cardSides[d.key] === "left" ? "right" : "left";
+                    try { localStorage.setItem(d.sideKey, next); } catch (e) { /* ignore */ }
+                    m[d.key] = next;
+                });
+                scheduleServerSync();
+                setCardSides(m);
+                applyCardSideClasses();
+            }
+            function zoneChips(z) {
+                if (z === "img") {
+                    /* A radio, not toggles: exactly one source is in use, and
+                       the whole point of this zone is that the back can differ
+                       from the front. */
+                    return [
+                        ["portrait", "Portrait"],
+                        ["scene", "Top scene"],
+                        ["photo", "Top photo"]
+                    ].map(function (o) {
+                        return R.createElement("button", {
+                            key: o[0],
+                            type: "button",
+                            className: "refract-cc-chip" + (backSrc === o[0] ? " is-on" : ""),
+                            role: "radio",
+                            "aria-checked": backSrc === o[0] ? "true" : "false",
+                            onClick: function () { pickBackSrc(o[0]); }
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]);
+                    });
+                }
+                if (z === "tray") {
+                    return [
+                        ["__tray", "Tray", trayOn, function () { pickTrayOn(!trayOn); }],
+                        ["__photos", "Photos in tray", trayPhotos, function () { pickTrayPhotos(!trayPhotos); }],
+                        ["__rows", "Two rows", trayRows === 2, function () { pickTrayRows(trayRows === 2 ? 1 : 2); }]
+                    ].map(function (o) {
+                        return R.createElement("button", {
+                            key: o[0],
+                            type: "button",
+                            className: "refract-cc-chip" + (o[2] ? " is-on" : ""),
+                            "aria-pressed": o[2] ? "true" : "false",
+                            onClick: o[3]
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]);
+                    });
+                }
+                /* Every pill is its own control. The chips sit in a centred
+                   row directly over the strip, one per slot and in the same
+                   order, so clicking the chip reads as clicking the pill under
+                   it. Seven on/off toggles could express the same SET but never
+                   the same order, and framed the job as choosing what to hide. */
+                if (editingBack && z === "bottom") { return slotChips("back"); }
+                var chips = elemsInZone(z).map(function (d) {
+                    var shown = !cardElems[d.key];
+                    return R.createElement("button", {
+                        key: d.key,
+                        type: "button",
+                        className: "refract-cc-chip" + (shown ? " is-on" : ""),
+                        "aria-pressed": shown ? "true" : "false",
+                        "aria-label": elemLabel(d) + ", " + (d.group === "scene" ? "scene card" : "performer card"),
+                        onClick: function () { toggleCardElem(d.key); }
+                    }, R.createElement("span", { className: "refract-cc-chip-box" }), elemLabel(d));
+                });
+                /* Elements this corner WOULD hold if the flourish allowed: the
+                   tier sash under Minimal. Left in as a disabled chip that says
+                   so, because two paths hide the same element and this one used
+                   to leave no trace. */
+                CARD_ELEMS.forEach(function (d) {
+                    if (d.group !== elemGroup || !elemDimmedByFlourish(d) || zoneOfElem(d) !== z) { return; }
+                    chips.push(R.createElement("button", {
+                        key: d.key + "__dim",
+                        type: "button",
+                        className: "refract-cc-chip is-dimmed",
+                        disabled: true,
+                        "aria-disabled": "true",
+                        title: "Hidden by the Minimal flourish. Set Rating flourish to Extravagant to show it."
+                    }, R.createElement("span", { className: "refract-cc-chip-box" }), elemLabel(d) + " (Minimal)"));
+                });
+                /* An action chip, like Swap: it states what it will do, not a
+                   state it is in. Only where the studio actually is. */
+                if (previewKind === "scene" && !cardElems["refract.scHideStudio"]
+                        && zoneOfElem({ key: "refract.scHideStudio" }) === z
+                        && studioMode !== "text") {
+                    var atBottom = cardSides["refract.scHideStudio"] === "bottom";
+                    chips.push(R.createElement("button", {
+                        key: "__studiopos",
+                        type: "button",
+                        className: "refract-cc-chip refract-cc-chip-swap",
+                        title: atBottom
+                            ? "Put the studio logo back in a top corner"
+                            : "Put the studio logo in the bottom-right corner, above the count pills",
+                        onClick: function () {
+                            setElemSide({ key: "refract.scHideStudio", sideKey: "refract.scStudioSide" },
+                                atBottom ? "right" : "bottom");
+                        }
+                    }, R.createElement("span", { className: "refract-cc-chip-box" }),
+                        atBottom ? "Move to top" : "Move to bottom corner"));
+                }
+                if (previewKind === "scene" && !cardElems["refract.scHideStudio"]
+                        && zoneOfElem({ key: "refract.scHideStudio" }) === z) {
+                    chips.push(R.createElement("button", {
+                        key: "__studiomode",
+                        type: "button",
+                        className: "refract-cc-chip refract-cc-chip-swap",
+                        title: studioMode === "text"
+                            ? "Put the studio back in the corner as its logo"
+                            : "Set the studio's name before the scene title instead",
+                        onClick: function () { pickStudioMode(studioMode === "text" ? "logo" : "text"); }
+                    }, R.createElement("span", { className: "refract-cc-chip-box" }),
+                        studioMode === "text" ? "Show as logo" : "Show as text"));
+                }
+                /* The performer FRONT's bottom band: Country and the strip
+                   as toggles, and -- while the strip is shown, in the Refract
+                   layout -- one chip per slot, exactly as on the back. */
+                if (!editingBack && previewKind === "performer" && z === "bottom"
+                        && perfCardStyle === "refract" && !cardElems["refract.pcHideStats"]) {
+                    if (pillMenu !== null) { return slotChips("front"); }
+                    chips = chips.concat(slotChips("front"));
+                }
+                /* Where the rating is DRAWN. A radio: it has one home at a
+                   time, and the sash is not one of them -- that carries the
+                   tier and only the tier, exactly as on the front. */
+                if ((z === "tl" || z === "tr") && topEdgeHasSides()) {
+                    chips.push(R.createElement("button", {
+                        key: "__swap",
+                        type: "button",
+                        className: "refract-cc-chip refract-cc-chip-swap",
+                        title: "Mirror every top-edge element to the opposite corner",
+                        onClick: swapTopCorners
+                    }, R.createElement("span", { className: "refract-cc-chip-box" }), "Swap top corners"));
+                }
+                return chips;
+            }
+            function cornerLayer() {
+                /* A performer card's top-left holds nothing toggleable now that
+                   the no-op rating is gone, and ringing an empty corner
+                   promises a control that never appears. */
+                var chips = zone ? zoneChips(zone) : [];
+                /* One new zone the front never needed: the image itself. It is
+                   the only element on the back that is a CHOICE rather than a
+                   toggle, so its chips behave as a radio row. */
+                /* The back has no top-left zone: the name banner lives there and
+                   is never toggleable, exactly as on the front. */
+                /* Order is DOM order, and these overlap: the image band runs
+                   the full width across the top, and the sash corner sits ON
+                   it. Later wins, so the corner has to come second or the
+                   band swallows it. */
+                /* The bands describe the GALLERY's anatomy. The dossier has
+                   its own fixed layout with nothing to move, so it is offered
+                   no regions rather than regions that would lie. */
+                /* The bands describe the GALLERY's anatomy. The dossier has
+                   its own fixed layout with nothing to move, so it is offered
+                   no regions rather than regions that would lie. */
+                var zones = editingBack
+                    ? (backStyle === "dossier" ? [] : ["img", "tr", "tray", "bottom"])
+                    : (previewKind === "performer"
+                        /* The performer front has exactly two places anything
+                           can be moved: the sash in the top-right corner, and
+                           the country + stats band across the bottom. Four
+                           quadrants promised control in two corners that hold
+                           nothing -- the top-left offered no chips at all. */
+                        ? ["tl", "tr", "bottom"]
+                        : ["tl", "tr", "bl", "br"]);
+                /* Hover is the fast path; focus, Enter/Space and a tap all
+                   LATCH the band (holdZone, no grace period), so the editor
+                   works without a pointer that hovers. */
+                var ZONE_NAMES = {
+                    tl: "Top left corner", tr: "Top right corner",
+                    bl: "Bottom left corner", br: "Bottom right corner",
+                    bottom: "Bottom band", img: "Image band", tray: "Tray band"
+                };
+                var hits = zones.map(function (z) {
+                    return R.createElement("div", {
+                        key: z,
+                        className: "refract-cc-hit refract-cc-hit-" + z,
+                        role: "button",
+                        tabIndex: 0,
+                        "aria-label": (ZONE_NAMES[z] || z) + ": show its controls",
+                        onMouseEnter: function () { enterZone(z); },
+                        onFocus: function () { holdZone(z); },
+                        onClick: function () { holdZone(z); },
+                        onKeyDown: function (e) {
+                            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); holdZone(z); }
+                        }
+                    });
+                });
+                /* A base shield under the bands, covering the whole card.
+
+                   The bands do not tile it: four 44%-tall quadrants left a 39px
+                   horizontal gap down the middle, and a scene card's zones left
+                   31px. The pointer reaching the CARD through that gap is what
+                   started Stash's hover preview -- the scene began playing
+                   mid-edit, which is why the scene card felt uneditable. It also
+                   let the card's own hover chrome fire under the editor.
+
+                   With the shield the pointer can never touch the card while the
+                   customiser is open, and the bands are free to be exactly the
+                   size of what they point at instead of being stretched to meet
+                   each other. Entering it clears the band, through the same
+                   grace period as any other switch. */
+                hits.unshift(R.createElement("div", {
+                    key: "__shield",
+                    className: "refract-cc-hit refract-cc-hit-shield",
+                    onMouseEnter: function () { enterZone(null); }
+                }));
+                /* First open this session: every band's ring pulses once, in
+                   sequence, so the card announces itself as the control
+                   surface. Nothing else on screen says "hover the card". */
+                var introRings = introOn ? zones.map(function (z, i) {
+                    return R.createElement("div", {
+                        key: "__intro-" + z,
+                        className: "refract-cc-ring refract-cc-ring-" + z + " is-intro",
+                        style: { animationDelay: (i * 140) + "ms" }
+                    });
+                }) : null;
+                return R.createElement("div", {
+                    className: "refract-cc-corners",
+                    onMouseLeave: function () { setZone(null); setPillMenu(null); }
+                },
+                    hits,
+                    introRings,
+                    chips.length ? R.createElement("div", { className: "refract-cc-ring refract-cc-ring-" + zone }) : null,
+                    chips.length ? R.createElement("div", {
+                        className: "refract-cc-chips refract-cc-chips-" + zone,
+                        onMouseEnter: function () { holdZone(zone); },
+                        onMouseMove: function () { holdZone(zone); }
+                    }, chips) : null
+                );
+            }
+
+            /* == The four global settings, as tiles beside the card =====
+               Deliberately narrow and titled only, so they read as secondary
+               to the card. Every one is a two-value segmented control, which
+               is why the hover switch became On / Off. */
+            function segTile(id, title, opts, value, onPick, note) {
+                return R.createElement("div", { className: "refract-cc-tile", id: id },
+                    R.createElement("div", { className: "refract-cc-tile-title" }, title),
+                    note ? R.createElement("div", { className: "refract-cc-tile-note" }, note) : null,
+                    R.createElement("div", { className: "refract-cc-seg" },
+                        opts.map(function (o) {
+                            return R.createElement("button", {
+                                key: o[0],
+                                type: "button",
+                                className: "refract-cc-seg-btn" + (value === o[0] ? " is-active" : ""),
+                                "aria-pressed": value === o[0] ? "true" : "false",
+                                onClick: function () { onPick(o[0]); }
+                            }, o[1]);
+                        })
+                    )
+                );
+            }
+            /* Beside the card: only what belongs to THIS card. Everything that
+               reaches both cards (or past them) used to sit here too, under a
+               tab named for one card, so "Rating flourish" on the Scene tab
+               looked like a scene setting and quietly changed the performer
+               card. Those live in the "Both cards" strip below the stage now.
+
+               No "Rating display" tile on the back either. It was the same
+               choice as the Rating slot's menu, under a third name -- one
+               setting, two controls, two vocabularies. */
+            function settingTiles() {
+                if (editingBack || previewKind !== "scene") {
+                    return [segTile("plugin-refract-perf-card-style", "Performer card style",
+                        [["refract", "Refract"], ["classic", "Classic"]], perfCardStyle, pickPerfCardStyle,
+                        perfCardStyle === "refract"
+                            ? "Name banner, stat pills, and the card back."
+                            : "Stash's own layout. No name banner, no card back.")];
+                }
+                return [segTile("plugin-refract-card-style", "Scene card style",
+                    [["refract", "Refract"], ["classic", "Classic"]], cardStyle, pickCardStyle,
+                    cardStyle === "refract"
+                        ? "Tidier chin: the description is hidden."
+                        : "Stash's own layout, with the description.")];
+            }
+            /* The settings that reach both cards, or past them, in one strip
+               that says so. Not per tab: the tab is which card you are
+               editing, and these do not care. */
+            /* One strip, two labelled groups: "This card" (the tab's card, so
+               the head names it) and "Both cards". The per-card tile used to
+               sit beside the card in its own column, which with one tile left
+               was a tile floating in a void beside a 395px card. */
+            function bothCardsStrip() {
+                var thisCard = (editingBack || previewKind !== "scene") ? "Performer card" : "Scene card";
+                return R.createElement("div", { className: "refract-cc-strip" },
+                    R.createElement("div", { className: "refract-cc-group refract-cc-group-this" },
+                        R.createElement("div", { className: "refract-cc-group-head" },
+                            R.createElement("span", null, thisCard)),
+                        R.createElement("div", { className: "refract-cc-group-tiles" }, settingTiles())
+                    ),
+                    R.createElement("div", { className: "refract-cc-group refract-cc-group-both" },
+                        R.createElement("div", { className: "refract-cc-group-head" },
+                            R.createElement("span", null, "Both cards"),
+                            R.createElement("button", {
+                                type: "button",
+                                className: "refract-cc-reset",
+                                title: "Put every card setting back to how Refract ships it",
+                                onClick: resetCardCustomiser
+                            }, "Reset card customiser")
+                        ),
+                        R.createElement("div", { className: "refract-cc-group-tiles" },
+                            segTile("plugin-refract-flourish", "Rating flourish",
+                                [["minimal", "Minimal"], ["extravagant", "Extravagant"]], flourish, pickFlourish,
+                                "Extravagant draws the tier sash and the neon; Minimal draws neither."),
+                            segTile("plugin-refract-perf-card-hover", "Performer popover",
+                                [["off", "Name"], ["on", "Card"]], perfCardHoverOn ? "on" : "off",
+                                function (v) { if ((v === "on") !== !!perfCardHoverOn) { togglePerfCardHover(); } },
+                                "What hovering a performer on a scene card shows."),
+                            segTile("plugin-refract-rating-system", "Rating system",
+                                [["decimal", "Decimal"], ["stars", "Stars"]], ratingSys, setRatingSystem,
+                                "Stash's own setting. Changes ratings everywhere.")
+                        )
+                    )
+                );
+            }
+            /* D1. Every card-customiser key goes; the four settings in the
+               strip stay, because they are Stash-wide or theme-wide and the
+               confirm says so. The page reloads once the server copy has been
+               replaced, so every piece of state -- fourteen of them in this
+               component alone, plus the body classes and every built card --
+               starts from the shipped defaults rather than being walked back
+               one setter at a time. */
+            function resetCardCustomiser() {
+                var ok = window.confirm(
+                    "Reset the card customiser?\n\n"
+                    + "Every element, side, look, stat pill, tray and back setting on both cards goes back to how Refract ships.\n"
+                    + "Rating flourish, card styles, the performer popover and the rating system are not touched.\n\n"
+                    + "The page will reload.");
+                if (!ok) { return; }
+                REFRACT_CARD_RESET_KEYS.forEach(function (k) {
+                    try { localStorage.removeItem(k); } catch (e) { /* ignore */ }
+                });
+                if (refractSyncTimer) { clearTimeout(refractSyncTimer); refractSyncTimer = null; }
+                gqlWithVars(
+                    'mutation($v: Any){ configureUISetting(key: "refract", value: $v) }',
+                    { v: snapshotRefractSettings() }
+                ).catch(function () { /* offline: localStorage is already clear */ })
+                    .then(function () { window.location.reload(); });
+            }
+
+            /* == Looks =================================================
+               Presets stop being four text chips and become four small
+               pictures of the card, drawn from each preset's own flags so a
+               preset can never illustrate something it does not do. */
+            function presetArt(p) {
+                var hid = function (k) { return p.hide.indexOf(k) !== -1; };
+                var scene = previewKind === "scene";
+                var ext = (p.flourish || flourish) === "extravagant";
+                var side = function (k, dflt) { return p.sides[k] || dflt; };
+                if (!scene) {
+                    /* Measured off a live performer card, as fractions of it:
+                       name banner x0-75% y0-11%, tier sash top-right crossing
+                       the name's tail, country x4-75% y81-85%, stat pills
+                       x4-96% y86-97%. It has NO corner rating badge and its
+                       title sits at the TOP, so drawing a scene card's
+                       furniture on it was wrong in every part but the sash. */
+                    return {
+                        performer: true,
+                        ext: ext,
+                        name: !hid("refract.pcHideName"),
+                        ribbon: ext && !hid("refract.pcHideTier"),
+                        country: !hid("refract.pcHideCountry"),
+                        stats: !hid("refract.pcHideStats")
+                    };
+                }
+                return {
+                    performer: false,
+                    ext: ext,
+                    rating: !hid("refract.scHideRating"),
+                    ratingRight: side("refract.scHideRating", "left") === "right",
+                    /* The sash is a tier flourish, so a Minimal look cannot have
+                       one no matter what the hide list says. */
+                    ribbon: ext && !hid("refract.scHideTier"),
+                    ribbonLeft: side("refract.scHideTier", "right") === "left",
+                    logo: !hid("refract.scHideStudio"),
+                    /* Each miniature shows what ITS look produces, so the
+                       studio's form comes from the look, not from whatever the
+                       card happens to be set to right now. */
+                    logoInline: p.studio === "text",
+                    logoLeft: p.studio !== "text" && side("refract.scHideStudio", "right") === "left",
+                    logoBottom: p.studio !== "text" && side("refract.scHideStudio", "right") === "bottom",
+                    /* Do the sash and the logo actually cross in this look?
+                       They do when both sit on the same side. */
+                    logoCrossed: p.studio !== "text" && ext && !hid("refract.scHideTier")
+                        && side("refract.scHideStudio", "right") !== "bottom"
+                        && side("refract.scHideStudio", "right") === side("refract.scHideTier", "right"),
+                    logoOver: p.layer === "logo",
+                    people: !hid("refract.scHidePerformers"),
+                    extras: !(hid("refract.scHideDuration") && hid("refract.scHideOCount") && hid("refract.scHideTagCount"))
+                };
+            }
+            /* A look that lands on exactly the same card as an earlier one is
+               not a look, it is a duplicate picture. On a performer card there
+               is no studio logo, no side to pick and no rating banner, so
+               Default, Mirrored, No clash and Logo first all produce the
+               identical card. Signature each look against the elements this
+               card type actually HAS, and keep the first of each. */
+            function lookSignature(p) {
+                var parts = [];
+                var hasSides = false;
+                CARD_ELEMS.forEach(function (d) {
+                    if (d.group !== elemGroup || d.noop) { return; }
+                    parts.push(d.key + (p.hide.indexOf(d.key) !== -1 ? "0" : "1"));
+                    /* In text mode the studio has no corner, so its side and the
+                       ribbon-over-logo layer decide nothing, and looks that
+                       differ only by those become the same card. */
+                    var sideCounts = d.sideKey
+                        && !(d.key === "refract.scHideStudio" && p.studio === "text");
+                    if (sideCounts) { hasSides = true; parts.push(p.sides[d.key] || d.sideDefault); }
+                });
+                /* Layering only decides anything where sides exist to clash. */
+                if (hasSides && p.studio !== "text") { parts.push(p.layer); }
+                parts.push(p.flourish || flourish);
+                /* Only where a studio exists. A performer card has none, so
+                   "Studio in title" produces the identical card to Default
+                   there and must dedupe away like the others. */
+                if (previewKind === "scene") { parts.push(p.studio || "logo"); }
+                /* And only the performer card has a front strip to select. */
+                if (previewKind === "performer") { parts.push((p.pills || FRONT_PILLS_DEFAULT).join(",")); }
+                return parts.join("|");
+            }
+            function visibleLooks() {
+                var seen = {};
+                var out = [];
+                CARD_PRESETS.forEach(function (p) {
+                    var sig = lookSignature(p);
+                    if (seen[sig]) { return; }
+                    seen[sig] = 1;
+                    out.push(p);
+                });
+                return out;
+            }
+            /* The back has two positions of ONE anatomy, not two anatomies.
+               Gallery is the tray on; Mirror is the tray off with a separate
+               image, which is exactly the back that shipped before the tray
+               existed. Naming them as looks is what let the "Back style"
+               switch go away. */
+
+            var BACK_LOOKS = [
+                /* Three, not five. Contact sheet and Stats were each one or two
+                   chip clicks away from Gallery -- "tray with no pills" and
+                   "pills with no tray" are states the chips already express, and
+                   a look that only re-states a chip is a duplicate control with
+                   a picture on it. Their miniatures gave it away: Stats and
+                   Mirror drew the same card and differed only by a pill count
+                   nobody counts.
+
+                   Mirror stays because its difference is NOT a chip: it is the
+                   only look that changes the back's IMAGE SOURCE, which is what
+                   request #172 asked for.
+
+                   `pills` is the whole stat selection, so a look always lands on
+                   a definite card rather than inheriting what came before it. */
+                { key: "dossier", label: "Dossier", style: "dossier", tray: false, rows: 2,
+                  pills: ["rating", "height", "career", "scenes"] },
+                { key: "gallery", label: "Gallery", style: "gallery", tray: true, rows: 2,
+                  pills: ["rating", "height", "career", "scenes"] },
+                { key: "mirror", label: "Mirror", style: "gallery", tray: false, rows: 2,
+                  pills: ["rating", "height", "career", "scenes"] }
+            ];
+            function applyBackLook(p) {
+                setPillMenu(null);
+                pickBackStyle(p.style);
+                /* The dossier draws none of these, so it leaves them alone:
+                   switching to it and back should return the gallery you had,
+                   not a gallery this look happened to specify. */
+                if (p.style === "dossier") { return; }
+                pickTrayOn(p.tray);
+                pickTrayRows(p.rows);
+                writeBackPills(p.pills.slice());
+                /* Mirror only says something if the two faces differ, and they
+                   only differ if the back is not showing the front's portrait.
+                   Nudge the source, but never overwrite a deliberate choice of
+                   top photo. */
+                if (!p.tray && backSrc === "portrait") { pickBackSrc("scene"); }
+            }
+            /* A look is "in force" when the card already matches it, so the row
+               marks what you are looking at rather than what you last clicked. */
+            function backLookActive(p) {
+                if (backStyle !== p.style) { return false; }
+                /* A different anatomy has nothing else to match on. */
+                if (p.style === "dossier") { return true; }
+                if (trayOn !== p.tray) { return false; }
+                if (p.tray && trayRows !== p.rows) { return false; }
+                return backPills.join(",") === p.pills.join(",");
+            }
+            function backLookPicture(p) {
+                var on = backLookActive(p);
+                var unavailable = p.style === "dossier" && !hasCats;
+                var part = function (name, n) {
+                    var kids = [];
+                    for (var i = 0; i < (n || 0); i++) { kids.push(R.createElement("i", { key: i })); }
+                    return R.createElement("span", { className: "refract-cc-art-" + name }, kids);
+                };
+                return R.createElement("button", {
+                    key: p.key,
+                    type: "button",
+                    className: "refract-cc-preset" + (on ? " is-active" : "") + (unavailable ? " is-unavailable" : ""),
+                    "aria-pressed": on ? "true" : "false",
+                    "aria-disabled": unavailable ? "true" : "false",
+                    disabled: unavailable,
+                    title: unavailable
+                        ? "Needs category ratings (the advanced-rating plugin). This library has none, so the back falls back to the gallery."
+                        : {
+                        dossier: "The score, the category ratings and a media strip. The default.",
+                        gallery: "Their top-rated media over the back's own image, with four stats.",
+                        mirror: "No tray: the front's face again, with its own image source."
+                    }[p.key],
+                    /* The label carries the reason too, because a greyed tile
+                       with only a tooltip is a mystery on touch. */
+                    "data-reason": unavailable ? "needs category ratings" : null,
+                    onClick: function () { applyBackLook(p); }
+                },
+                    R.createElement("span", {
+                        className: "refract-cc-preset-art is-extravagant"
+                    },
+                        R.createElement("span", { className: "refract-cc-preset-inner" }, [
+                            p.style === "dossier" ? part("score") : null,
+                            part("name"),
+                            /* The dossier has no corner sash -- its tier is a
+                               CHIP in the header -- so drawing one was the
+                               miniature describing a card that does not exist. */
+                            p.style === "dossier" ? part("chip") : part("ribbon"),
+                            p.style === "dossier"
+                                ? part("rows", 4)
+                                : (p.tray ? part("tray", p.rows === 1 ? 3 : 6) : part("imgmark")),
+                            /* The miniature draws what ITS look produces, so a
+                               look with no stats shows no strip at all. */
+                            p.style === "dossier"
+                                ? part("strip", 3)
+                                : (p.pills.length
+                                    /* Draw the ACTUAL count, not a capped four.
+                                       Capped, Stats (six) and Mirror (four)
+                                       drew the same picture, and two looks that
+                                       produce different cards must not. */
+                                    ? part("stats", p.pills.length)
+                                    : null)
+                        ])
+                    ),
+                    R.createElement("span", { className: "refract-cc-preset-label" }, p.label)
+                );
+            }
+            function presetPicture(p) {
+                var a = presetArt(p);
+                /* Repeated furniture (performer circles, the two scene pills, the
+                   four stat pills) is drawn as real child elements rather than
+                   as a repeating gradient. The gradient version could not round
+                   its inner edges, so a "row of pills" came out as one pill
+                   with three square blocks inside it. */
+                var part = function (name, cls, n) {
+                    var kids = [];
+                    for (var i = 0; i < (n || 0); i++) { kids.push(R.createElement("i", { key: i })); }
+                    return R.createElement("span", { className: "refract-cc-art-" + name + (cls || "") }, kids);
+                };
+                var inner = a.performer
+                    ? [
+                        a.name ? part("name") : null,
+                        a.country ? part("country") : null,
+                        a.stats ? part("stats", "", 4) : null,
+                        a.ribbon ? part("ribbon") : null
+                    ]
+                    : [
+                        part("title", (a.logo && a.logoInline) ? " is-shifted" : ""),
+                        a.people ? part("people", "", 3) : null,
+                        a.extras ? part("extras", (a.logo && a.logoBottom) ? " is-lifted" : "", 2) : null,
+                        a.rating ? part("rating", a.ratingRight ? " is-right" : "") : null,
+                        a.ribbon ? part("ribbon", a.ribbonLeft ? " is-left" : "") : null,
+                        a.logo ? part("logo",
+                            a.logoInline ? " is-inline" : (
+                                (a.logoLeft ? " is-left" : "")
+                                + (a.logoBottom ? " is-bottom" : "")
+                                + (a.logoCrossed ? " is-crossed" : "")
+                                + (a.logoCrossed && a.logoOver ? " is-over" : ""))) : null
+                    ];
+                var tip = (p.tip && p.tip[previewKind]) || "";
+                return R.createElement("button", {
+                    key: p.label,
+                    type: "button",
+                    className: "refract-cc-preset",
+                    title: (tip ? tip + " " : "") + "Adjust anything afterwards.",
+                    onClick: function () { applyCardPreset(p); }
+                },
+                    R.createElement("span", {
+                        className: "refract-cc-preset-art" + (a.ext ? " is-extravagant" : "")
+                    },
+                        R.createElement("span", { className: "refract-cc-preset-inner" }, inner)
+                    ),
+                    R.createElement("span", { className: "refract-cc-preset-label" }, p.label)
+                );
+            }
+
 
             function toggleLight() {
                 var next = !lightOn;
@@ -632,116 +1978,158 @@
                 ),
                 /* == Card customiser ==
                    Everything that changes how scene and performer cards look,
-                   collated around the live preview. Shares the Suggestion
-                   Box's card chrome but renders as a plain ALWAYS-OPEN
-                   section, not a drawer (user request 2026-07-26); the
-                   .refract-card-customiser CSS modifier strips the
-                   chevron/cursor/hover from the header. */
-                R.createElement("div", { className: "refract-suggestion-box refract-card-customiser" },
-                    R.createElement("div", { className: "refract-suggestion-summary refract-customiser-header" },
+                   collated around the live preview. Same native <details>
+                   drawer as the Suggestion Box below, so there is one
+                   collapse idiom in this panel and the keyboard/ARIA
+                   behaviour comes for free.
+
+                   It was an always-open section from 2026-07-26 until it grew
+                   a preview, five settings and the elements grid; collapsible
+                   again 2026-08-17. `open` is CONTROLLED by state, not just an
+                   initial attribute: this panel re-renders on every setting
+                   change, and an uncontrolled attribute would snap the drawer
+                   back to its initial value each time. */
+                R.createElement("details", {
+                    className: "refract-suggestion-box refract-card-customiser",
+                    open: customiserOpen,
+                    onToggle: function (e) { setCustomiserOpenPref(e.currentTarget.open); }
+                },
+                    R.createElement("summary", { className: "refract-suggestion-summary refract-customiser-header" },
                         R.createElement("h3", null, "Card customiser"),
                         R.createElement("div", { className: "sub-heading" },
-                            "Every setting that changes how scene and performer cards look. The preview updates live as you change them.")
+                            "Everything that changes how cards look, around a live preview.")
                     ),
-                    R.createElement("div", { className: "refract-suggestion-body" },
-                        R.createElement("div", { className: "setting refract-card-preview-setting", id: "plugin-refract-card-preview" },
-                            R.createElement("div", null,
-                                R.createElement("h3", null, "Card preview"),
-                                R.createElement("div", { className: "sub-heading" },
-                                    "A real scene and performer from your library, painted by your current settings. Everything below updates them live; shuffle picks different ones.")
-                            ),
-                            R.createElement(RefractCardPreview)
-                        ),
-                        R.createElement("div", { className: "setting", id: "plugin-refract-rating-style" },
-                            R.createElement("div", null,
-                                R.createElement("h3", null, "Card rating style"),
-                                R.createElement("div", { className: "sub-heading" },
-                                    R.createElement("b", null, "Minimal"), " (default) — accent-coloured halo for every rating; brightness scales with score. ",
-                                    R.createElement("b", null, "Extravagant"), " — tier-based card frame, halo, and animations escalating from Bronze through Perfect. ",
-                                    R.createElement("b", null, "Playing card"), " — trading-card layout for performer cards: name banner at the top with tier-glow, prominent stat strip along the bottom (rating, age, scenes, O count, country).")
-                            ),
-                            R.createElement("div", { className: "refract-setting-control refract-rating-style-toggle" },
+                    R.createElement("div", { className: "refract-suggestion-body refract-cc-body" },
+                        /* == Corner touch ==================================
+                           The panel is a card and the things that change it,
+                           not a stack of settings rows. Three bands:
+
+                             rail   card type, and what to do with the card
+                             stage  the card, with the four global settings
+                                    riding its right edge as one centred unit
+                             looks  the presets, as pictures of the card
+
+                           Per-element visibility is NOT here. It lives on the
+                           card itself: hover a quadrant, click a chip. The
+                           card is the only object on screen that knows where
+                           an element actually sits, so it does the explaining
+                           that a six-row list of labels could not. */
+                        R.createElement("div", { className: "refract-cc-rail" },
+                            R.createElement("div", {
+                                className: "refract-cc-kind",
+                                role: "tablist",
+                                "aria-label": "Which card to edit"
+                            },
+                                /* Two cards, two tabs. The performer card's
+                                   BACK is not a third card -- it is the same
+                                   card turned over, reached by the flip on the
+                                   card itself. */
                                 [
-                                    { key: "intensity",    label: "Minimal" },
-                                    { key: "tiers",        label: "Extravagant" },
-                                    { key: "playing-card", label: "Playing card" }
-                                ].map(function (item) {
+                                    { key: "scene", label: "Scene card" },
+                                    { key: "performer", label: "Performer card" }
+                                ].map(function (o) {
                                     return R.createElement("button", {
-                                        key: item.key,
+                                        key: o.key,
                                         type: "button",
-                                        className: "refract-segmented-btn" + (ratingStyle === item.key ? " is-active" : ""),
-                                        onClick: function () { pickRatingStyle(item.key); }
-                                    }, item.label);
-                                })
+                                        role: "tab",
+                                        "aria-selected": previewKind === o.key ? "true" : "false",
+                                        className: "refract-cc-kind-btn" + (previewKind === o.key ? " is-active" : ""),
+                                        onClick: function () {
+                                            setZone(null);
+                                            setPreviewSideState("front");
+                                            setPreviewKind(o.key);
+                                        }
+                                    }, o.label);
+                                }),
+                                /* The face, as a segment nested in the tab it
+                                   belongs to. It sat by Shuffle as one "Back"
+                                   button, which read as a third card or as an
+                                   action; here it is plainly the performer
+                                   card's front or back. Only present when the
+                                   card has a back to show. */
+                                (canFlipPreview && previewKind === "performer") ? R.createElement("div", {
+                                    key: "__face",
+                                    className: "refract-cc-face",
+                                    role: "radiogroup",
+                                    "aria-label": "Which face of the performer card"
+                                },
+                                    R.createElement("span", {
+                                        className: "refract-cc-face-icon" + (editingBack ? " is-back" : ""),
+                                        "aria-hidden": "true",
+                                        dangerouslySetInnerHTML: { __html: REFRACT_FLIP_ICON }
+                                    }),
+                                    [["front", "Front"], ["back", "Back"]].map(function (f) {
+                                        var on = (editingBack ? "back" : "front") === f[0];
+                                        return R.createElement("button", {
+                                            key: f[0],
+                                            type: "button",
+                                            role: "radio",
+                                            "aria-checked": on ? "true" : "false",
+                                            className: "refract-cc-face-btn" + (on ? " is-active" : ""),
+                                            title: f[0] === "back" ? "Show the back of the card" : "Show the front of the card",
+                                            onClick: function () { setPreviewSide(f[0]); }
+                                        }, f[1]);
+                                    })
+                                ) : null
+                            ),
+                            R.createElement("div", { className: "refract-cc-rail-right" },
+                                R.createElement("span", { className: "refract-cc-hint" },
+                                    editingBack
+                                        ? (backStyle === "dossier"
+                                            ? "The dossier has a fixed layout; pick another look to arrange one"
+                                            : "Hover a band of the back to change what sits there")
+                                        : "Hover a corner of the card to change what sits there"),
+                                R.createElement("button", {
+                                    type: "button",
+                                    className: "refract-cc-shuffle refract-cc-plain" + (plainOn ? " is-on" : ""),
+                                    "aria-pressed": plainOn ? "true" : "false",
+                                    title: plainOn
+                                        ? "Showing a scene with no studio or rating and an unrated performer. Click for the usual well-rated picks."
+                                        : "Preview the worst case: a scene with no studio or rating, an unrated performer. No logo, no sash, no tier.",
+                                    onClick: function () {
+                                        var next = !plainOn;
+                                        refractPreviewPlain = next;
+                                        setPlainOn(next);
+                                        if (refractPreviewReload) { refractPreviewReload(); }
+                                    }
+                                }, "Plain card"),
+                                R.createElement("button", {
+                                    type: "button",
+                                    className: "refract-cc-shuffle",
+                                    title: "Show a different scene and performer",
+                                    onClick: function () {
+                                        if (refractPreviewReload) { refractPreviewReload(); }
+                                    }
+                                }, "Shuffle")
                             )
                         ),
-                        R.createElement("div", { className: "setting", id: "plugin-refract-card-style" },
-                    R.createElement("div", null,
-                        R.createElement("h3", null, "Scene card style"),
-                        R.createElement("div", { className: "sub-heading" },
-                            R.createElement("b", null, "Refract"), " (default) — tidier minimal layout; description block hidden so the grid stays consistent across scenes with and without descriptions. ",
-                            R.createElement("b", null, "Classic"), " — Stash's original card layout with description, file path, and details visible.")
-                    ),
-                    R.createElement("div", { className: "refract-setting-control refract-card-style-toggle" },
-                        [
-                            { key: "refract", label: "Refract" },
-                            { key: "classic", label: "Classic" }
-                        ].map(function (item) {
-                            return R.createElement("button", {
-                                key: item.key,
-                                type: "button",
-                                className: "refract-segmented-btn" + (cardStyle === item.key ? " is-active" : ""),
-                                onClick: function () { pickCardStyle(item.key); }
-                            }, item.label);
-                        })
-                    )
-                        ),
-                        (REFRACT_CARDBACK_EXPLICIT_ENABLED ? R.createElement("div", { className: "setting", id: "plugin-refract-cardback-explicit" },
-                            R.createElement("div", null,
-                                R.createElement("h3", null, "Explicit card-back labels"),
-                                R.createElement("div", { className: "sub-heading" },
-                                    "Playing-card mode flips performer cards to a stats dossier on the back. Off (default) uses tame labels (Rating, Scenes, O-Count). On swaps in the cheeky ones (Slut Score, Scenes Conquered, Loads Tributed).")
-                            ),
-                            R.createElement("div", { className: "refract-setting-control" },
-                                R.createElement("div", { className: "custom-control custom-switch" },
-                                    R.createElement("input", {
-                                        type: "checkbox",
-                                        className: "custom-control-input",
-                                        id: "refract-cardback-explicit-toggle",
-                                        checked: cardBackExplicitOn,
-                                        onChange: toggleCardBackExplicit
-                                    }),
-                                    R.createElement("label", {
-                                        className: "custom-control-label",
-                                        htmlFor: "refract-cardback-explicit-toggle"
-                                    })
+                        R.createElement("div", {
+                            className: "refract-cc-stage refract-preview-kind-"
+                                + (editingBack ? "back" : previewKind)
+                                + (canFlipPreview ? " refract-cc-can-flip" : "")
+                                + (editingBack ? " is-back" : ""),
+                            id: "plugin-refract-card-preview"
+                        },
+                            R.createElement("div", { className: "refract-cc-cardslot" },
+                                /* The corner layer hangs off a box that shrink-wraps
+                                   the CARD, so an overlay pinned to it sits on the
+                                   card's own edges. */
+                                R.createElement("div", { className: "refract-cc-cardbox" },
+                                    R.createElement(RefractCardPreview),
+                                    cornerLayer()
                                 )
                             )
-                        ) : null),
-                        R.createElement("div", { className: "setting", id: "plugin-refract-perf-card-hover" },
-                            R.createElement("div", null,
-                                R.createElement("h3", null, "Performer card on hover"),
-                                R.createElement("div", { className: "sub-heading" },
-                                    "Hovering a performer circle on a scene card shows a card-style popover (image + name) instead of just the name.")
-                            ),
-                            R.createElement("div", { className: "refract-setting-control" },
-                                R.createElement("div", { className: "custom-control custom-switch" },
-                                    R.createElement("input", {
-                                        type: "checkbox",
-                                        className: "custom-control-input",
-                                        id: "refract-perf-card-hover-toggle",
-                                        checked: perfCardHoverOn,
-                                        onChange: togglePerfCardHover
-                                    }),
-                                    R.createElement("label", {
-                                        className: "custom-control-label",
-                                        htmlFor: "refract-perf-card-hover-toggle"
-                                    })
-                                )
-                            )
                         ),
-                        cardElemsRow("scene", "Scene card elements", "plugin-refract-scene-elems"),
-                        cardElemsRow("performer", "Performer card elements", "plugin-refract-performer-elems")
+                        bothCardsStrip(),
+                        R.createElement("div", { className: "refract-cc-looks" },
+                            R.createElement("div", { className: "refract-cc-looks-head" }, "Looks"),
+                            R.createElement("div", {
+                                className: "refract-cc-preset-grid refract-cc-preset-"
+                                    + (editingBack ? "back" : previewKind)
+                            }, editingBack
+                                ? BACK_LOOKS.map(backLookPicture)
+                                : visibleLooks().map(presetPicture))
+                        )
                     )
                 ),
                 R.createElement("div", { className: "setting refract-dock-config-setting", id: "plugin-refract-dock-config" },
@@ -930,7 +2318,8 @@
                             )
                         )
                     );
-                })()
+                })(),
+                refractSupportNote(R)
             );
         };
     }
@@ -1027,8 +2416,14 @@
     var STUDIO_BANNER_STORAGE_KEY = "refract.studioBanner";
     var PERFORMER_CARD_HOVER_KEY = "refract.performerCardHover";
     var MINIMAL_CARDS_STORAGE_KEY = "refract.minimalCards";
-    var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";
-    var CARD_BACK_EXPLICIT_KEY = "refract.cardBackExplicit";
+    var RATING_STYLE_STORAGE_KEY = "refract.ratingStyle";   /* retired; read once by migrateRatingStyle */
+    var PERF_CARD_STYLE_KEY = "refract.perfCardStyle";      /* "refract" | "classic" */
+    var CUSTOMISER_OPEN_KEY = "refract.customiserOpen";     /* drawer state, local only */
+    /* Pending band switch, held outside the component because there is exactly
+       one customiser and it must survive a re-render. */
+    var refractZoneTimer = null;
+    var PREVIEW_KIND_KEY = "refract.previewKind";           /* "scene" | "performer", local only */
+    var FLOURISH_KEY = "refract.flourish";                  /* "minimal" | "extravagant" */
     /* Settings → Plugins list: float disabled plugins to the bottom (the
        pre-v1.15 behaviour) instead of one flat A→Z run. Opt-in; default off. */
     var PLUGIN_SORT_DISABLED_BOTTOM_KEY = "refract.pluginSortDisabledBottom";
@@ -1037,41 +2432,6 @@
        default off (overlay shown). */
     var HIDE_CENTER_CONTROLS_KEY = "refract.hideCenterControls";
     var SHOW_FILTER_TAGS_KEY = "refract.showFilterTags";
-
-    /* Static mock cards for the Suggestion Box "Card preview" row. Real
-       .scene-card / .performer-card class structure so the SAME theme CSS
-       (card styles, rating modes, and the visibility toggles below) paints
-       them — no separate preview styling to keep in sync. Inert by
-       construction: data-stash-sc / data-stash-pc markers make the CARD
-       processors (initSceneCards/initPerformerCards) skip them — which is
-       why JS-built furniture (name banner, pill icons, badge scale) must
-       be baked into the static markup — while tagFilledRatings still
-       iterates .rating-banner document-wide, so it DOES tier the mocks
-       from their "8.6" banners (that pass-through is what keeps the tier
-       ribbon/frames live in tiers + playing-card modes). Art is inline
-       SVG data URIs (no library content), and the container is
-       pointer-events:none. */
-    var REFRACT_PREVIEW_ART_SCENE = "data:image/svg+xml;utf8," + encodeURIComponent(
-        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'>" +
-        "<rect width='16' height='9' fill='#262230'/>" +
-        "<circle cx='12.5' cy='2.6' r='1.1' fill='#4a3f63'/>" +
-        "<path d='M0 9 5.5 4.5 9 7l4-3 3 2.5V9z' fill='#383049'/>" +
-        "<path d='M0 9 4 6.5 7.5 9z' fill='#453a5c'/></svg>");
-    var REFRACT_PREVIEW_ART_PERF = "data:image/svg+xml;utf8," + encodeURIComponent(
-        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'>" +
-        "<rect width='2' height='3' fill='#2a2436'/>" +
-        "<circle cx='1' cy='1.05' r='0.42' fill='#4a3f63'/>" +
-        "<path d='M0.25 3a0.75 0.62 0 0 1 1.5 0z' fill='#4a3f63'/></svg>");
-    /* Shuffle icon for the card preview: two fanned BLANK playing cards
-       (user-requested motif — svgrepo 521546 minus the suit marks),
-       stroke-based so it inherits currentColor. */
-    var PREVIEW_SHUFFLE_ICON_SVG =
-        '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-        '<rect x="3.4" y="5.6" width="10.2" height="14.2" rx="1.7" ' +
-            'transform="rotate(-9 8.5 12.7)" stroke="currentColor" stroke-width="1.6"/>' +
-        '<rect x="10.4" y="4.2" width="10.2" height="14.2" rx="1.7" ' +
-            'transform="rotate(9 15.5 11.3)" stroke="currentColor" stroke-width="1.6"/>' +
-        '</svg>';
 
     /* Gender glyph for the mock name banner — the real banner CLONES the
        native .gender-icon svg from the card title, which the mocks don't
@@ -1154,29 +2514,6 @@
         '</div>';
     }
 
-    /* ── Real-card preview data ──────────────────────────────────────
-       The customiser preview renders Stash's ACTUAL SceneCard /
-       PerformerCard components with a real record from the library, so
-       it is pixel-identical to the grid (the static mocks above remain
-       as the fallback for empty libraries / fetch failures / render
-       errors). Picked ids persist so the preview is stable across
-       visits; the shuffle button re-rolls. */
-    var PREVIEW_SCENE_ID_KEY = "refract.previewSceneId";
-    var PREVIEW_PERF_ID_KEY = "refract.previewPerformerId";
-    /* Field sets validated against the live schema 2026-07-26. Generous
-       on purpose: the card components read deeply into the object. */
-    /* SceneCard reads .length on several arrays unguarded, so every
-       array the card touches must be present in the query. Gotcha
-       (2026-07-26): the schema on current Stash still ACCEPTS the
-       legacy `movies` field, but the card component reads `groups` —
-       querying movies validates fine and then crashes the card. So
-       default to the groups variant and fall back to movies only if
-       the groups query is rejected (older servers). */
-    /* Complete property inventory extracted from the minified SceneCard
-       chunk 2026-07-26: date details files(+fingerprints) galleries
-       groups id interactive_speed o_counter organized paths(screenshot
-       preview vtt interactive_heatmap) performers rating100 resume_time
-       scene_markers studio tags. */
     var PREVIEW_SCENE_FIELDS_BASE =
         "id title details date rating100 o_counter organized interactive interactive_speed resume_time " +
         "files { id path basename width height duration video_codec frame_rate bit_rate size format " +
@@ -1218,10 +2555,19 @@
             return r;
         });
     }
+    /* "Plain" picks the worst case on purpose: a scene with no studio and no
+       rating, a performer with no rating. That is the card with no logo, no
+       sash and no tier -- the state where the counts lift, the corner empties
+       and the chin has to hold on its own -- and the preview never showed it,
+       because the default pick is a well-rated card by design. */
+    var refractPreviewPlain = false;
     function refractFetchPreviewData(shuffle) {
+        var plain = refractPreviewPlain;
         function randomScene(filtered) {
             var f = filtered
-                ? ", scene_filter: { rating100: { value: 74, modifier: GREATER_THAN }, performer_count: { value: 0, modifier: GREATER_THAN } }"
+                ? (plain
+                    ? ", scene_filter: { rating100: { value: 0, modifier: IS_NULL }, studios: { value: [], modifier: IS_NULL }, performer_count: { value: 0, modifier: GREATER_THAN } }"
+                    : ", scene_filter: { rating100: { value: 74, modifier: GREATER_THAN }, performer_count: { value: 0, modifier: GREATER_THAN } }")
                 : "";
             return refractSceneQuery(function (F) {
                 return "query { findScenes(filter: { per_page: 1, sort: \"random\" }" + f + ") { scenes { " + F + " } } }";
@@ -1233,7 +2579,9 @@
         }
         function randomPerformer(filtered) {
             var f = filtered
-                ? ", performer_filter: { rating100: { value: 74, modifier: GREATER_THAN }, scene_count: { value: 0, modifier: GREATER_THAN } }"
+                ? (plain
+                    ? ", performer_filter: { rating100: { value: 0, modifier: IS_NULL }, scene_count: { value: 0, modifier: GREATER_THAN } }"
+                    : ", performer_filter: { rating100: { value: 74, modifier: GREATER_THAN }, scene_count: { value: 0, modifier: GREATER_THAN } }")
                 : "";
             return refractGqlQuery("query { findPerformers(filter: { per_page: 1, sort: \"random\" }" + f + ") { performers { " + PREVIEW_PERF_FIELDS + " } } }")
                 .then(function (r) {
@@ -1279,24 +2627,386 @@
        body classes, and the settings UI. Resolution is deliberately
        absent: the res chip follows the Scene card style (Classic shows
        it, the tidy layout hides it) and is not an independent choice. */
+    /* `sideKey` marks the elements that live on the card's TOP EDGE and can
+       therefore sit left or right. The bottom edge is spoken for (title bar +
+       performer row + duration/count pills), so there are two places, not
+       four. The tier ribbon is the only one that crosses a corner rather than
+       sitting in the row, which is why it is the only one that needs a
+       layering choice when it shares a side. */
     var CARD_ELEMS = [
-        { key: "refract.scHideRating",     cls: "refract-sc-hide-rating",     group: "scene",     label: "Rating banner" },
-        { key: "refract.scHideStudio",     cls: "refract-sc-hide-studio",     group: "scene",     label: "Studio" },
+        { key: "refract.scHideRating",     cls: "refract-sc-hide-rating",     group: "scene",     label: "Rating banner",
+          sideKey: "refract.scRatingSide", sideDefault: "left",  sideCls: "refract-sc-rating-right" },
+        { key: "refract.scHideTier",       cls: "refract-sc-hide-tier",       group: "scene",     label: "Tier ribbon", tier: true,
+          sideKey: "refract.scTierSide",   sideDefault: "right", sideCls: "refract-sc-tier-left" },
+        /* The studio has THREE positions, not two: the top-left and top-right
+           corners, and the bottom-right corner beside the count pills. The
+           extra body class is applied when the side is "bottom"; the count
+           cluster lifts out of its way in CSS. `sideCls` still names the
+           left class so everything that reads it keeps working. */
+        { key: "refract.scHideStudio",     cls: "refract-sc-hide-studio",     group: "scene",     label: "Studio logo",
+          sideKey: "refract.scStudioSide", sideDefault: "right", sideCls: "refract-sc-studio-left",
+          sides: ["left", "right", "bottom"], bottomCls: "refract-sc-studio-bottom" },
         { key: "refract.scHideDuration",   cls: "refract-sc-hide-duration",   group: "scene",     label: "Duration" },
         { key: "refract.scHidePerformers", cls: "refract-sc-hide-performers", group: "scene",     label: "Performers" },
-        { key: "refract.scHideCounts",     cls: "refract-sc-hide-counts",     group: "scene",     label: "Count pills" },
-        { key: "refract.pcHideRating",     cls: "refract-pc-hide-rating",     group: "performer", label: "Rating banner" },
+        /* "Count pills" was one switch over two pills that answer different
+           questions (how often, how tagged); each is its own now. The old key
+           migrates in applyCardElemClasses. */
+        { key: "refract.scHideOCount",     cls: "refract-sc-hide-ocount",     group: "scene",     label: "O count" },
+        { key: "refract.scHideTagCount",   cls: "refract-sc-hide-tagcount",   group: "scene",     label: "Tag count" },
+        /* Only the Classic scene card shows a date line and a resolution
+           badge; the Refract layout hides both by design (the tidy chin). So
+           these are offered only there -- a chip for a thing the layout never
+           draws would be the no-op Rating banner all over again. */
+        { key: "refract.scHideDate",       cls: "refract-sc-hide-date",       group: "scene",     label: "Date", classicOnly: true },
+        { key: "refract.scHideResolution", cls: "refract-sc-hide-resolution", group: "scene",     label: "Resolution", classicOnly: true },
+        /* NO-OP. Its rule hides `.performer-card .rating-banner`, and a
+           performer card never renders one: checked live across four
+           performers under BOTH card styles, always ABSENT. The performer's
+           rating is one of the stat pills along the bottom, so "Stat pills"
+           already covers it. Offering this was a control that did nothing. */
+        { key: "refract.pcHideRating",     cls: "refract-pc-hide-rating",     group: "performer", label: "Rating banner", noop: true },
+        { key: "refract.pcHideTier",       cls: "refract-pc-hide-tier",       group: "performer", label: "Tier ribbon", tier: true },
+        /* The one element that was never toggleable, and the reason the
+           performer card's top-left corner offered nothing. Hidden, the card
+           is a pure picture, which is a legitimate wall. Deliberately in no
+           look: hiding a name is an act, not a style. */
+        { key: "refract.pcHideName",       cls: "refract-pc-hide-name",       group: "performer", label: "Name" },
         { key: "refract.pcHideCountry",    cls: "refract-pc-hide-country",    group: "performer", label: "Country" },
-        { key: "refract.pcHideStats",      cls: "refract-pc-hide-stats",      group: "performer", label: "Stat pills" }
+        { key: "refract.pcHideStats",      cls: "refract-pc-hide-stats",      group: "performer", label: "Stat pills" },
+        /* The BACK of a performer card. In "mirror" style the back is the same
+           face as the front configured differently, so it has its own copies of
+           the same kinds of element rather than sharing the front's. */
+        /* The sash is the back's only on/off element. Its STATS are not
+           toggles any more: the strip is an ordered list of slots and each slot
+           holds whichever stat you put in it, which is what the back was always
+           claiming to be ("its own selection"). Seven checkboxes could express
+           the same set but never the same ORDER, and made you think in terms of
+           what to hide rather than what to show. See BACK_STATS. */
+        { key: "refract.mbHideTier",       cls: "refract-mb-hide-tier",       group: "back", label: "Tier ribbon", tier: true }
     ];
+    /* Which quadrant of the card each element lives in. Top-edge scene
+       elements are absent on purpose: their corner follows their own
+       Left/Right side. Performer top elements are fixed, because the name
+       banner owns the edge between them and neither can move. */
+    var ELEM_ZONE_FIXED = {
+        /* Scene-card elements really do live in corners. */
+        "refract.scHidePerformers": "bl",
+        "refract.scHideDuration":   "br",
+        "refract.scHideOCount":     "br",
+        "refract.scHideTagCount":   "br",
+        "refract.scHideDate":       "bl",
+        "refract.scHideResolution": "br",
+        /* The performer card's do NOT. Measured on a 216px preview, the country
+           caption runs x9-207 and the stat strip x9-207 -- both the full width
+           of the card. Pinned to "bl" and "br" they got a half-width ring each,
+           so every ring pointed at half of its element and at half of the other
+           one, and the two top corners promised controls that were not there.
+           They share the bottom BAND, the way the back's strip does. */
+        "refract.pcHideCountry":    "bottom",
+        "refract.pcHideStats":      "bottom",
+        "refract.pcHideName":       "tl",
+        "refract.pcHideRating":     "tl",
+        "refract.pcHideTier":       "tr",
+        /* The back's stats live in ONE strip across the bottom, so they share
+           one zone. Splitting them across bl and br would ring half a row. */
+        "refract.mbHideTier":       "tr"
+    };
+    var TIER_LAYER_KEY = "refract.scTierLayer";
+    /* The studio can be a logo in a corner, or the studio's NAME set before the
+       scene title. "text" moves it out of the corner entirely, which is why it
+       is a mode rather than another on/off. */
+    var STUDIO_MODE_KEY = "refract.scStudioMode";
+    /* The card back. One anatomy: which image it uses, whether the media tray
+       is on, and where the rating is drawn. There is deliberately no "style"
+       key any more -- Mirror is this same face with the tray off. */
+    var BACK_SRC_KEY = "refract.cbSrc";
+    /* Explicit card-back labels are built but held back from public release:
+       the toggle is hidden and isCardBackExplicit() is forced off while this is
+       false. Flip to true to ship the feature (no other change needed). */
+    var REFRACT_CARDBACK_EXPLICIT_ENABLED = false;
+    var CARD_BACK_EXPLICIT_KEY = "refract.cardBackExplicit";
+
+    /* Which face the back wears. "gallery" is the image-and-tray anatomy every
+       other look configures; "dossier" is the stats sheet, which is a different
+       anatomy and therefore a different builder rather than another
+       arrangement of the same one. */
+    var BACK_STYLE_KEY = "refract.cbStyle";
+    /* Which stats the back's strip carries, in order. Six slots maximum:
+       seven pills wrap to a second row at 285px and the strip stops reading as
+       a strip. */
+    var BACK_PILLS_KEY = "refract.cbPills";
+    var BACK_PILLS_MAX = 6;
+    var TRAY_KEY = "refract.cbTray";
+    var TRAY_PHOTOS_KEY = "refract.cbTrayPhotos";
+    /* Two rows of three, or one. One row leaves the image most of the card and
+       still says "there is more here"; two makes the tray the subject. */
+    var TRAY_ROWS_KEY = "refract.cbTrayRows";
+
+    /* Every stat the back can hold. `icon` matters as much as the value: the
+       front's pill is a two-column grid with the icon in column 1 and the value
+       in column 2, so a pill WITHOUT an icon leaves column 1 empty and the
+       number sits visibly off-centre. That is also what made the back's pills
+       read as almost-but-not-quite the front's. With icons they are the same
+       component, and the two faces differ only in WHICH stats they carry --
+       which was the point. */
+    var BACK_STATS = [
+        { key: "rating",  label: "Rating",  icon: "STAR" },
+        { key: "height",  label: "Height",  icon: "HEIGHT" },
+        { key: "career",  label: "Career",  icon: "HOURGLASS" },
+        /* The pill says "Stats" because "Measurements" will not fit a pill;
+           the menu says Measurements because "Stats" inside a list of stats
+           says nothing. */
+        { key: "measure", label: "Stats",   menu: "Measurements", icon: "TAPE" },
+        { key: "weight",  label: "Weight",  icon: "WEIGHT" },
+        { key: "o",       label: "O Count", icon: "O" },
+        { key: "scenes",  label: "Scenes",  icon: "PLAY" }
+    ];
+    var BACK_PILLS_DEFAULT = ["rating", "height", "career", "scenes"];
+
+    /* The FRONT strip is a slot list too. It was a fixed four (rating, age,
+       o-count, scenes) behind one on/off chip, while the back's was editable
+       per pill -- the inconsistency was the complaint. Same catalogue as the
+       back plus age, which lives on the front. Four of these are read straight
+       off Stash's card DOM; the other four need a query, batched once per
+       grid rather than once per card. */
+    var FRONT_PILLS_KEY = "refract.pcPills";
+    var FRONT_PILLS_MAX = 6;
+    var FRONT_STATS = [
+        { key: "rating",  label: "Rating",  icon: "STAR",      dom: true },
+        { key: "age",     label: "Age",     icon: "CAKE",      dom: true },
+        { key: "o",       label: "O Count", icon: "O",         dom: true },
+        { key: "scenes",  label: "Scenes",  icon: "PLAY",      dom: true },
+        { key: "height",  label: "Height",  icon: "HEIGHT" },
+        { key: "career",  label: "Career",  icon: "HOURGLASS" },
+        /* The pill says "Stats" because "Measurements" will not fit a pill;
+           the menu says Measurements because "Stats" inside a list of stats
+           says nothing. */
+        { key: "measure", label: "Stats",   menu: "Measurements", icon: "TAPE" },
+        { key: "weight",  label: "Weight",  icon: "WEIGHT" }
+    ];
+    var FRONT_PILLS_DEFAULT = ["rating", "age", "o", "scenes"];
+    function frontStatDef(key) {
+        for (var i = 0; i < FRONT_STATS.length; i++) {
+            if (FRONT_STATS[i].key === key) { return FRONT_STATS[i]; }
+        }
+        return null;
+    }
+    function frontPillsPref() {
+        var raw;
+        try { raw = localStorage.getItem(FRONT_PILLS_KEY); } catch (e) { raw = null; }
+        if (raw == null) { return FRONT_PILLS_DEFAULT.slice(); }
+        var out = [];
+        String(raw).split(",").forEach(function (k) {
+            k = k.trim();
+            if (k && frontStatDef(k) && out.indexOf(k) === -1) { out.push(k); }
+        });
+        return out.slice(0, FRONT_PILLS_MAX);
+    }
+    /* The class the front's CSS knows each pill by. Rating/age/scenes keep
+       their historic names; o-count is `stash-perf-ocount` on the front. */
+    function frontPillClass(key) {
+        return key === "o" ? "stash-perf-ocount" : ("stash-perf-" + key);
+    }
+    function frontStatIcon(name) {
+        return name === "CAKE" ? CAKE_SVG : backStatIcon(name);
+    }
+    function backStatIcon(name) {
+        return name === "STAR" ? STAR_SVG
+             : name === "PLAY" ? PLAY_SVG
+             : name === "O" ? O_ICON_SVG
+             : name === "HEIGHT" ? HEIGHT_SVG
+             : name === "HOURGLASS" ? HOURGLASS_SVG
+             : name === "TAPE" ? TAPE_SVG
+             : name === "WEIGHT" ? WEIGHT_SVG
+             : "";
+    }
+    function backStatDef(key) {
+        for (var i = 0; i < BACK_STATS.length; i++) {
+            if (BACK_STATS[i].key === key) { return BACK_STATS[i]; }
+        }
+        return null;
+    }
+    /* The DOSSIER is the default. It is the face that makes the flip worth
+       making: the only one carrying something neither side of the card can
+       otherwise show, the per-category ratings. The gallery face -- the front's
+       shell around a media tray -- reads as a re-skinned front, because three
+       quarters of it is inherited from the front by construction.
+
+       The gallery stays as the picture-led alternative, and is used
+       automatically for anyone whose library has no category ratings at all,
+       since an empty dossier is a worse default than a picture. */
+    function backStylePref() {
+        try {
+            var v = localStorage.getItem(BACK_STYLE_KEY);
+            if (v === "gallery" || v === "dossier") { return v; }
+        } catch (e) { /* fall through */ }
+        return "dossier";
+    }
+    function storedBackStyle() { return backStylePref(); }
+    function backPillsPref() {
+        var raw;
+        try { raw = localStorage.getItem(BACK_PILLS_KEY); } catch (e) { raw = null; }
+        if (raw == null) { return BACK_PILLS_DEFAULT.slice(); }
+        /* An empty string is a real answer -- the Contact sheet look has no
+           strip at all -- so it is not treated as "unset". */
+        var out = [];
+        String(raw).split(",").forEach(function (k) {
+            k = k.trim();
+            if (k && backStatDef(k) && out.indexOf(k) === -1) { out.push(k); }
+        });
+        return out.slice(0, BACK_PILLS_MAX);
+    }
+    /* "pill" is a stat pill in the bottom strip; "edge" is a bar along the
+       bottom edge. The sash carries the TIER and nothing else -- putting the
+       rating on it too was a third home for one fact and a second thing for the
+       sash to mean. */
+    var RATING_DISP_KEY = "refract.cbRating";
+    var CARD_SIDE_KEYS = CARD_ELEMS.filter(function (d) { return d.sideKey; })
+        .map(function (d) { return d.sideKey; })
+        .concat([TIER_LAYER_KEY, STUDIO_MODE_KEY, BACK_SRC_KEY, BACK_PILLS_KEY, FRONT_PILLS_KEY,
+            BACK_STYLE_KEY, TRAY_KEY, TRAY_PHOTOS_KEY, TRAY_ROWS_KEY,
+            RATING_DISP_KEY, CARD_BACK_EXPLICIT_KEY]);
+    /* What "Reset card customiser" clears: every element, side and back key.
+       Not the flourish, the card styles, the popover or the rating system --
+       those reach past the cards. */
+    var REFRACT_CARD_RESET_KEYS = CARD_ELEMS.map(function (d) { return d.key; }).concat(CARD_SIDE_KEYS);
+
     function isCardElemHidden(key) {
         try { return localStorage.getItem(key) === "1"; } catch (e) { return false; }
     }
+    function cardElemSide(d) {
+        if (!d.sideKey) { return null; }
+        try {
+            var v = localStorage.getItem(d.sideKey);
+            var ok = d.sides || ["left", "right"];
+            return ok.indexOf(v) !== -1 ? v : d.sideDefault;
+        } catch (e) { return d.sideDefault; }
+    }
+    function storedStudioMode() { return studioModePref(); }
+    function storedBackSrc() { return backSrcPref(); }
+    function storedTrayOn() { return trayOnPref(); }
+    function storedTrayPhotos() { return trayPhotosPref(); }
+    function storedTrayRows() { return trayRowsPref(); }
+    function storedRatingDisp() { return ratingDispPref(); }
+    /* The tray is the reason the back exists, so it is on unless turned off. */
+    function trayOnPref() {
+        try { return localStorage.getItem(TRAY_KEY) !== "0"; } catch (e) { return true; }
+    }
+    function trayPhotosPref() {
+        try { return localStorage.getItem(TRAY_PHOTOS_KEY) !== "0"; } catch (e) { return true; }
+    }
+    function trayRowsPref() {
+        try { return localStorage.getItem(TRAY_ROWS_KEY) === "1" ? 1 : 2; } catch (e) { return 2; }
+    }
+    function ratingDispPref() {
+        try {
+            /* "sash" was a third option and is gone; anything stored from then
+               lands on the pill, which is where the rating started. */
+            return localStorage.getItem(RATING_DISP_KEY) === "edge" ? "edge" : "pill";
+        } catch (e) { return "pill"; }
+    }
+    function effectiveRatingDisp() { return ratingDispPref(); }
+    function backSrcPref() {
+        try {
+            var v = localStorage.getItem(BACK_SRC_KEY);
+            return (v === "portrait" || v === "photo") ? v : "scene";
+        } catch (e) { return "scene"; }
+    }
+    function studioModePref() {
+        try { return localStorage.getItem(STUDIO_MODE_KEY) === "text" ? "text" : "logo"; }
+        catch (e) { return "logo"; }
+    }
+    function applyStudioModeClass() {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-sc-studio-text", studioModePref() === "text");
+    }
+    /* The tray is always in the DOM -- its region has to stay hoverable even
+       when switched off, so that one chip can bring it back -- which means the
+       switch is a class, not a branch in the builder. */
+    function applyBackClasses() {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-cb-tray-off", !trayOnPref());
+    }
+    /* Set the studio's NAME before the scene title. The name is only available
+       where Stash rendered a `.studio-overlay` (measured: 13 of 40 cards on the
+       scenes page), and it lives in the logo image's `alt`, so this shows the
+       studio on exactly the cards that would have shown a logo. Nothing is
+       invented for cards that never had one.
+
+       A new node inside a React-managed <h5>, not a moved one: the consolidated
+       observer re-runs this after every re-render, which is the same contract
+       the performer circles use. */
+    function applyStudioTextPrefix() {
+        /* Own the body class here rather than relying on the module-eval call:
+           that one runs before `document.body` is guaranteed and lost the race
+           on some loads, which left the name injected AND the logo still
+           showing. This runs from the consolidated observer, so it cannot. */
+        applyStudioModeClass();
+        var on = studioModePref() === "text";
+        var cards = document.querySelectorAll(".scene-card");
+        for (var i = 0; i < cards.length; i++) {
+            var card = cards[i];
+            var title = card.querySelector("h5.card-section-title");
+            if (!title) { continue; }
+            var existing = title.querySelector(".refract-sc-studio-name");
+            var name = "";
+            if (on) {
+                var overlay = card.querySelector(".studio-overlay");
+                if (overlay) {
+                    var img = overlay.querySelector("img");
+                    name = ((img && img.alt) || overlay.textContent || "").trim();
+                }
+            }
+            if (!name) {
+                if (existing && existing.parentNode) { existing.parentNode.removeChild(existing); }
+                continue;
+            }
+            if (existing) {
+                if (existing.textContent !== name) { existing.textContent = name; }
+                continue;
+            }
+            var span = document.createElement("span");
+            span.className = "refract-sc-studio-name";
+            span.textContent = name;
+            title.insertBefore(span, title.firstChild);
+        }
+    }
+    function tierLayerPref() {
+        try { return localStorage.getItem(TIER_LAYER_KEY) === "logo" ? "logo" : "ribbon"; }
+        catch (e) { return "ribbon"; }
+    }
+    /* The one-time split of "Count pills" into O count and Tag count. Runs on
+       every apply, because the boot sync can write the old key back from a
+       server copy saved before the split; it is a no-op once the key is gone. */
+    function migrateCountPills() {
+        try {
+            var old = localStorage.getItem("refract.scHideCounts");
+            if (old === null) { return; }
+            if (localStorage.getItem("refract.scHideOCount") === null) { localStorage.setItem("refract.scHideOCount", old); }
+            if (localStorage.getItem("refract.scHideTagCount") === null) { localStorage.setItem("refract.scHideTagCount", old); }
+            localStorage.removeItem("refract.scHideCounts");
+        } catch (e) { /* ignore */ }
+    }
     function applyCardElemClasses() {
         if (!document.body) { return; }
+        migrateCountPills();
         CARD_ELEMS.forEach(function (d) {
             document.body.classList.toggle(d.cls, isCardElemHidden(d.key));
         });
+    }
+    /* Only the NON-default side gets a class, so the shipped layout costs no
+       extra CSS and nothing changes for anyone who never opens this. */
+    function applyCardSideClasses() {
+        if (!document.body) { return; }
+        CARD_ELEMS.forEach(function (d) {
+            if (!d.sideKey) { return; }
+            var side = cardElemSide(d);
+            /* The left class means LEFT, not merely "not the default": with a
+               third position in play, "bottom" must not light it. */
+            document.body.classList.toggle(d.sideCls, side === "left");
+            if (d.bottomCls) { document.body.classList.toggle(d.bottomCls, side === "bottom"); }
+        });
+        document.body.classList.toggle("refract-sc-tier-under", tierLayerPref() === "logo");
     }
     /* One-time migration from the retired 1.19 toggle keys; the O-count
        and show-resolution toggles are retired outright. */
@@ -1320,11 +3030,8 @@
         } catch (e) { /* ignore */ }
     })();
     applyCardElemClasses();
-    /* Explicit card-back labels are built but held back from public release:
-       the toggle is hidden and isCardBackExplicit() is forced off while this is
-       false. Flip to true to ship the feature (no other change needed). */
-    var REFRACT_CARDBACK_EXPLICIT_ENABLED = false;
-    var RATING_STYLES = ["intensity", "tiers", "playing-card"];
+    applyCardSideClasses();
+    applyStudioModeClass();
 
     /* Settings mirrored to Stash's server-side UI config (see the
        settings-sync block below). RATING_SYSTEM is deliberately excluded:
@@ -1333,10 +3040,10 @@
         ACCENT_STORAGE_KEY, VIEW_MINIMISER_STORAGE_KEY, LOGO_URL_STORAGE_KEY,
         LITE_MODE_STORAGE_KEY, LIGHT_MODE_STORAGE_KEY, LIGHT_TOGGLE_NAVBAR_KEY,
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
-        MINIMAL_CARDS_STORAGE_KEY, RATING_STYLE_STORAGE_KEY, CARD_BACK_EXPLICIT_KEY,
+        MINIMAL_CARDS_STORAGE_KEY, PERF_CARD_STYLE_KEY, FLOURISH_KEY,
         PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY,
         SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY
-    ].concat(CARD_ELEMS.map(function (d) { return d.key; }));
+    ].concat(CARD_ELEMS.map(function (d) { return d.key; })).concat(CARD_SIDE_KEYS);
 
     function isPluginSortDisabledBottom() {
         try {
@@ -1571,25 +3278,73 @@
     }
     applyCardStyleClass(getStoredCardStyle());
 
-    /* Card rating style. "intensity" (default, Minimal) = accent glow
-       scales with score — uniform-coloured but progressively brighter
-       for higher ratings. "tiers" (Extravagant) = collectible-card tier
-       system (Bronze → Perfect) with per-tier frame, halo, and escalating
-       animations. */
-    function getStoredRatingStyle() {
+    /* The old single "Card rating style" (intensity / tiers / playing-card)
+       bundled two independent axes and is retired. It is now:
+
+         Performer card style  refract | classic   -> LAYOUT
+           "refract" is the old playing-card layout (name banner on top, stat
+           strip along the bottom). Drives `.refract-perf-layout-card`.
+
+         Rating flourish       minimal | extravagant -> TREATMENT
+           "minimal" is the accent halo that brightens with score; the tier
+           frames, halos and animations (Bronze -> Perfect) and the tier ribbon
+           are "extravagant". Drives `.refract-flourish-tiers`.
+
+       Both default to the shipped look (Classic + Minimal). Only the non-
+       default emits a class, so an untouched install carries neither.
+       Scene card style stays its own setting; the two card types have always
+       had independent layouts and merging them would lose combinations. */
+    function storedPreviewKind() {
         try {
-            var v = localStorage.getItem(RATING_STYLE_STORAGE_KEY);
-            if (v && RATING_STYLES.indexOf(v) !== -1) { return v; }
-        } catch (e) { /* ignore */ }
-        return "intensity";
+            var v = localStorage.getItem(PREVIEW_KIND_KEY);
+            /* "back" was its own tab once. Anyone carrying that value lands on
+               the performer card, which is the thing the back belongs to. */
+            if (v === "back") { return "performer"; }
+            return v === "performer" ? v : "scene";
+        } catch (e) { return "scene"; }
     }
-    function applyRatingStyleClass(style) {
+    function isCustomiserOpen() {
+        try { return localStorage.getItem(CUSTOMISER_OPEN_KEY) !== "0"; }
+        catch (e) { return true; }
+    }
+    /* Defaults are REFRACT and EXTRAVAGANT. They were Classic and Minimal,
+       which on a fresh install hid the entire back/flip story -- the customiser
+       had no Back button, no dossier, no slot chips, no performer-page control,
+       all gated on the Refract layout -- and left the "Name" chip a no-op.
+       Anyone with a stored value keeps it; only the never-set case moves. */
+    function getPerfCardStyle() {
+        try {
+            return localStorage.getItem(PERF_CARD_STYLE_KEY) === "classic" ? "classic" : "refract";
+        } catch (e) { return "refract"; }
+    }
+    function getFlourish() {
+        try {
+            return localStorage.getItem(FLOURISH_KEY) === "minimal" ? "minimal" : "extravagant";
+        } catch (e) { return "extravagant"; }
+    }
+    function applyCardModeClasses() {
         if (!document.body) { return; }
-        RATING_STYLES.forEach(function (s) {
-            document.body.classList.toggle("refract-rating-style-" + s, s === style);
-        });
+        document.body.classList.toggle("refract-perf-layout-card", getPerfCardStyle() === "refract");
+        document.body.classList.toggle("refract-flourish-tiers", getFlourish() === "extravagant");
     }
-    applyRatingStyleClass(getStoredRatingStyle());
+    /* One-time migration off the retired key, same shape as
+       migrateCardElemKeys. Runs before the first apply. */
+    (function migrateRatingStyle() {
+        try {
+            var old = localStorage.getItem(RATING_STYLE_STORAGE_KEY);
+            if (!old) { return; }
+            if (localStorage.getItem(PERF_CARD_STYLE_KEY) === null) {
+                localStorage.setItem(PERF_CARD_STYLE_KEY,
+                    old === "playing-card" ? "refract" : "classic");
+            }
+            if (localStorage.getItem(FLOURISH_KEY) === null) {
+                localStorage.setItem(FLOURISH_KEY,
+                    old === "intensity" ? "minimal" : "extravagant");
+            }
+            localStorage.removeItem(RATING_STYLE_STORAGE_KEY);
+        } catch (e) { /* ignore */ }
+    })();
+    applyCardModeClasses();
 
     /* View-mode minimiser feature toggle. Default enabled — Refract
        collapses Stash's row of view-mode buttons into a single icon +
@@ -1739,8 +3494,9 @@
             applyCenterControlsHiddenClass(isCenterControlsHidden());
             applyFilterTagsShownClass(isFilterTagsShown());
             applyCardElemClasses();
+            applyCardSideClasses();
             applyCardStyleClass(getStoredCardStyle());
-            applyRatingStyleClass(getStoredRatingStyle());
+            applyCardModeClasses();
         } catch (e) { /* ignore */ }
     }
 
@@ -3241,8 +4997,16 @@
             .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
+    /* A card turning over: two offset card outlines and a short arc between
+       them. The previous glyph was a refresh/reload arrow pair, which everyone
+       reads as "reload" -- the one thing a flip is not. */
     var REFRACT_FLIP_ICON =
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>';
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<rect x="3" y="6" width="9" height="13" rx="1.6"/>' +
+        '<path d="M14 5h5.4A1.6 1.6 0 0 1 21 6.6V17"/>' +
+        '<path d="M16 8.5l-2.5-3 2.5-3"/>' +
+        '<path d="M8 21l2.5-2.5L8 16"/>' +
+        '</svg>';
 
     /* Category display order, mirroring the advanced-rating plugin. The plugin
        stores its performer criteria as an ordered `performer_criteria_ids` list
@@ -3279,7 +5043,7 @@
     }
 
     function injectPerformerCardFlip() {
-        if (!document.body.classList.contains("refract-rating-style-playing-card")) { return; }
+        if (!document.body.classList.contains("refract-perf-layout-card")) { return; }
         refractLoadARCategoryOrder();
         var cards = document.querySelectorAll(".performer-card:not([data-refract-flip])");
         for (var i = 0; i < cards.length; i++) {
@@ -3301,8 +5065,26 @@
                     refractDoPerformerFlip(card, pid);
                 });
                 card.appendChild(btn);
+                /* Build the back on HOVER, not on click. Its thumbnails load
+                   async, so a back built at the moment the turn starts can
+                   land half-painted -- the one moment the whole feature is
+                   selling itself. The tab takes 200ms to slide in and a human
+                   takes longer than that to aim at it, so hovering buys the
+                   images a free head start at no cost to anyone who never
+                   flips. */
+                card.addEventListener("mouseenter", function () {
+                    if (card.querySelector(".refract-card-back")) { return; }
+                    refractBuildPerformerBack(card, pid);
+                });
             })(cards[i]);
         }
+    }
+
+    function refractPrefersReducedMotion() {
+        try {
+            return !!(window.matchMedia
+                && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+        } catch (e) { return false; }
     }
 
     /* Two-phase flip: spin the whole card to its edge (rotateY -90deg, where
@@ -3319,8 +5101,20 @@
         if (toBack && !card.querySelector(".refract-card-back")) {
             refractBuildPerformerBack(card, pid);
         }
+        /* Someone who has asked the OS for less motion gets the face, not the
+           turn. The flip is feedback, not decoration, so the state change still
+           happens -- instantly. */
+        if (refractPrefersReducedMotion()) {
+            card.classList.toggle("refract-show-back", toBack);
+            return;
+        }
         card._rfxFlipBusy = true;
         card.style.zIndex = "200";
+        /* Blurring under an animating perspective transform is the most
+           expensive thing this card can do, and the pills carry a backdrop
+           filter. Drop it for the ~475ms of the turn rather than slowing the
+           turn down: nobody reads a pill edge-on. */
+        card.classList.add("refract-flipping");
         /* Phase 1: turn to the edge (-90deg). */
         card.style.transition = "transform 0.24s ease-in";
         card.style.transform = "perspective(1200px) rotateY(-90deg)";
@@ -3331,8 +5125,12 @@
                continuous flip, and BOTH faces come to rest at rotateY(0) so
                nothing is ever mirrored (no scaleX trickery, no accumulation,
                and the state survives a React re-render). */
-            if (toBack) { card.classList.add("refract-show-back"); }
-            else { card.classList.remove("refract-show-back"); }
+            if (toBack) {
+                card.classList.add("refract-show-back");
+                /* Now that it has a box, the strip can be measured and fitted. */
+                var shown = card.querySelector(".refract-card-back");
+                if (shown) { refractFitBackStats(shown); }
+            } else { card.classList.remove("refract-show-back"); }
             card.style.transition = "none";
             card.style.transform = "perspective(1200px) rotateY(90deg)";
             void card.offsetWidth;
@@ -3343,12 +5141,938 @@
                 card.style.transition = "";
                 card.style.transform = "";
                 card.style.zIndex = "";
+                card.classList.remove("refract-flipping");
                 card._rfxFlipBusy = false;
             }, 250);
         }, 235);
     }
 
+    /* One query, shared by both back styles. Everything either face needs is
+       already here, which is why a scene-sourced image or a different stat
+       selection costs no extra request. */
+    var REFRACT_FLIP_QUERY =
+        'query RefractFlip($id: ID!) {' +
+        '  findPerformer(id: $id) { id rating100 favorite o_counter scene_count measurements height_cm weight career_length custom_fields tags { id name } }' +
+        '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count scenes { id title rating100 paths { screenshot } } }' +
+        '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count images { id paths { thumbnail } } }' +
+        '}';
+    /* The customiser previews the back by building it onto the preview's real
+       performer card and showing that face directly. No flip animation: this
+       is a preview, and a card that spins every time you toggle a chip is
+       noise. Rebuilt from scratch on every change because the back's markup is
+       a template, not a live view. */
+    function refractSyncPreviewBack(kind) {
+        var card = document.querySelector("#plugin-refract-card-preview .performer-card");
+        if (!card) { return false; }
+        if (kind !== "back") {
+            var stale = card.querySelector(".refract-card-back");
+            if (stale && stale.parentNode) { stale.parentNode.removeChild(stale); }
+            card.classList.remove("refract-show-back");
+            return true;
+        }
+        /* Resolve the performer BEFORE tearing anything down. This removed the
+           old back first and only then looked for the link, so any moment the
+           preview card was mid-re-render -- which it is every time a setting
+           changes, since RefractCardPreview refetches -- left a card with its
+           front hidden by `refract-show-back` and no back to show: a blank
+           rectangle that stayed blank until something else moved.
+
+           Nothing is destroyed unless there is something to put in its place. */
+        var link = card.querySelector('a[href*="/performers/"]');
+        var m = link ? String(link.getAttribute("href") || "").match(/\/performers\/(\d+)/) : null;
+        if (!m) { return false; }
+        var old = card.querySelector(".refract-card-back");
+        if (old && old.parentNode) { old.parentNode.removeChild(old); }
+        refractBuildPerformerBack(card, m[1]);
+        card.classList.add("refract-show-back");
+        /* The strip is measurable only once the back is displayed, and the
+           values arrive with the query, so fit on both. */
+        var built = card.querySelector(".refract-card-back");
+        if (built) {
+            refractFitBackStats(built);
+            setTimeout(function () { refractFitBackStats(built); }, 400);
+            setTimeout(function () { refractFitBackStats(built); }, 1200);
+        }
+        return true;
+    }
+
+    /* == The per-performer card back ==========================================
+       A global rule covers almost everyone: the back uses their portrait, their
+       top scene or their top photo. This is the exception for the one performer
+       where that rule picks the wrong thing.
+
+       Stored in the performer's own `custom_fields`, so it lives in the library
+       database, syncs to every device and is covered by backups. NOT
+       localStorage. */
+    var BACK_OVERRIDE_FIELD = "refract_back";
+
+    function refractBackOverride(cf) {
+        try {
+            var raw = cf && cf[BACK_OVERRIDE_FIELD];
+            if (!raw) { return null; }
+            var o = (typeof raw === "string") ? JSON.parse(raw) : raw;
+            if (!o || !o.path) { return null; }
+            o.path = refractRelPath(o.path);
+            return o;
+        } catch (e) { return null; }
+    }
+
+    /* ALWAYS `partial`. `full` replaces the whole map, and other plugins keep
+       their own keys in there (hotornot_stats is already in this library), so a
+       full write would silently destroy another plugin's data. */
+    /* Stash builds `paths.*` as absolute URLs from the REQUEST host, so an
+       override saved while on localhost stores "http://localhost:9999/..." and
+       then breaks for the same library reached over a domain or a tailnet.
+       Store it host-relative and let the browser resolve it. */
+    function refractRelPath(u) {
+        u = String(u || "");
+        /* Only THIS host is stripped. An external URL keeps its host, or it
+           would be turned into a path on this Stash that does not exist. */
+        var m = u.match(/^(https?:\/\/[^/]+)/i);
+        if (m && m[1].toLowerCase() === String(location.origin).toLowerCase()) { return u.slice(m[1].length); }
+        return u;
+    }
+
+    function refractSetBackOverride(pid, val) {
+        var m = "mutation RefractBackOverride($id: ID!, $cf: CustomFieldsInput!) {" +
+                "  performerUpdate(input: { id: $id, custom_fields: $cf }) { id }" +
+                "}";
+        var cf;
+        if (val) {
+            var partial = {};
+            partial[BACK_OVERRIDE_FIELD] = JSON.stringify(val);
+            cf = { partial: partial };
+        } else {
+            cf = { remove: [BACK_OVERRIDE_FIELD] };
+        }
+        return gqlWithVars(m, { id: String(pid), cf: cf });
+    }
+
+    /* == The two photos on the performer page ==================================
+       The header image is a PHOTO, not the card, so its other side is the
+       other PHOTO -- the one this performer's card back will use -- not the
+       whole back face. A flip tab turns the photo over to it.
+
+       (A first version turned it over to the entire card back, dossier and
+       all. That confused two things: the page shows pictures, the card shows
+       faces. The back photo is what you are choosing here; the card is where
+       it ends up.)
+
+       SETTING the back photo happens where Stash sets the front one: in the
+       edit toolbar. Stash's own "Set image…" is relabelled "Set image
+       (front)…" and an identical "Set image (back)…" sits beside it, with the
+       same kind of menu Stash's opens -- from this performer's scenes and
+       photos, from a file, from a URL, or back to the default. A control row
+       under the photo came before that; it was a second place to set images
+       on a page that already had one, and it looked like nothing else there.
+
+       Setting the FRONT is Stash's own button doing its own thing; Refract
+       touches nothing about the front image. Setting the BACK writes the
+       per-performer override into custom_fields; "Use default" clears it.
+
+       Nothing React owns is moved. Stash's <img> stays where it is and is
+       hidden; a stage the same size sits over it and holds a copy of the front
+       and, once built, the back. The stage tracks the image's box through a
+       ResizeObserver, so the collapsed header and window resizes keep it in
+       register. */
+    var REFRACT_PB_QUERY =
+        'query RefractPerformerBack($id: ID!) {' +
+        '  findPerformer(id: $id) { id name gender rating100 custom_fields }' +
+        '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 12, sort: "rating", direction: DESC }) { scenes { id title paths { screenshot } } }' +
+        '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 12, sort: "rating", direction: DESC }) { images { id title paths { thumbnail } } }' +
+        '}';
+
+    function refractPerformerIdFromUrl() {
+        var m = String(location.pathname).match(/^\/performers\/(\d+)/);
+        return m ? m[1] : null;
+    }
+
+    function applyPerformerBackControl() {
+        var pid = refractPerformerIdFromUrl();
+        var host = document.querySelector(".detail-header-image");
+        if (!pid || !host) { refractApplyBackToolbar(); return; }
+        var img = host.querySelector("img.performer");
+        /* The back only exists in the Refract performer layout, so in Classic
+           the page keeps Stash's plain image and nothing is added. */
+        if (!document.body.classList.contains("refract-perf-layout-card") || !img) {
+            var stale = host.querySelector(".refract-pp");
+            if (stale && stale.parentNode) { stale.parentNode.removeChild(stale); }
+            host.classList.remove("refract-pp-host");
+            refractApplyBackToolbar();
+            return;
+        }
+        var existing = host.querySelector(".refract-pp");
+        if (existing && existing.getAttribute("data-pid") === pid) { refractApplyBackToolbar(); return; }
+        if (existing && existing.parentNode) { existing.parentNode.removeChild(existing); }
+
+        host.classList.add("refract-pp-host");
+        var root = document.createElement("div");
+        root.className = "refract-pp";
+        root.setAttribute("data-pid", pid);
+        root.innerHTML =
+            '<div class="refract-pp-stage">' +
+            '  <div class="refract-pp-front" style="background-image:url(\'' + String(img.getAttribute("src") || "").replace(/'/g, "%27") + '\')"></div>' +
+            '  <button type="button" class="refract-card-flip-btn refract-pp-flip" title="Show back photo" aria-label="Show back photo">' + REFRACT_FLIP_ICON + '</button>' +
+            '</div>';
+        host.appendChild(root);
+
+        /* The stage sits on the photo's box. Showing the front, it IS the
+           photo's box. Showing the back, it keeps the width and takes the BACK
+           photo's own height -- the back is not cropped to the front's shape,
+           it is its own picture at its own aspect. The frame changes shape at
+           the edge-on moment of the flip, where nothing is visible. */
+        var stage = root.querySelector(".refract-pp-stage");
+        var backRatio = null;   /* height / width of the back photo, once known */
+        var showingBack = false;
+        var fit = function () {
+            var hb = host.getBoundingClientRect(), ib = img.getBoundingClientRect();
+            if (!ib.width) { return; }
+            var h = (showingBack && backRatio) ? Math.round(ib.width * backRatio) : ib.height;
+            stage.style.left = (ib.left - hb.left) + "px";
+            stage.style.top = (ib.top - hb.top) + "px";
+            stage.style.width = ib.width + "px";
+            stage.style.height = h + "px";
+        };
+        root._rfxSetBack = function (on, ratio) { showingBack = on; if (ratio) { backRatio = ratio; } fit(); };
+        fit();
+        requestAnimationFrame(fit);
+        if (typeof ResizeObserver !== "undefined") {
+            var ro = new ResizeObserver(fit);
+            ro.observe(img);
+            ro.observe(host);
+        }
+        if (img.complete) { fit(); } else { img.addEventListener("load", fit, { once: true }); }
+        /* The front copy still opens Stash's lightbox, as the image did. */
+        root.querySelector(".refract-pp-front").addEventListener("click", function () {
+            var b = img.closest("button");
+            if (b) { b.click(); }
+        });
+
+        gqlWithVars(REFRACT_PB_QUERY, { id: pid }).then(function (res) {
+            var d = res && res.data;
+            if (!d) { return; }
+            refractRenderPageCard(root, host, img, pid, d);
+            refractApplyBackToolbar();
+        }).catch(function () { /* the flip stays; the toolbar button waits for data */ });
+    }
+
+    function refractRenderPageCard(root, host, img, pid, d) {
+        var perf = d.findPerformer || {};
+        var over = refractBackOverride(perf.custom_fields);
+        var scenes = (d.findScenes && d.findScenes.scenes) || [];
+        var images = (d.findImages && d.findImages.images) || [];
+        var stage = root.querySelector(".refract-pp-stage");
+        var flipBtn = stage.querySelector(".refract-pp-flip");
+        var face = "front";
+        var busy = false;
+
+        /* The back photo, resolved exactly as the card resolves it: the
+           override if one is set, else the global rule -- top scene, top photo,
+           or the portrait itself. Same inputs, so what you see here is what
+           the card will use. */
+        function backPhotoUrl() {
+            if (over && over.path) { return over.path; }
+            var src = backSrcPref();
+            if (src === "scene" && scenes[0] && scenes[0].paths && scenes[0].paths.screenshot) { return scenes[0].paths.screenshot; }
+            if (src === "photo" && images[0] && images[0].paths && images[0].paths.thumbnail) { return images[0].paths.thumbnail; }
+            return img.getAttribute("src") || "";
+        }
+        var backRatioKnown = null;
+        function buildBack(done) {
+            var el = stage.querySelector(".refract-pp-backimg");
+            if (!el) {
+                el = document.createElement("div");
+                el.className = "refract-pp-backimg";
+                stage.insertBefore(el, flipBtn);
+            }
+            var url = String(backPhotoUrl());
+            el.style.backgroundImage = "url('" + url.replace(/'/g, "%27") + "')";
+            /* Its natural shape decides the frame's height on the back. */
+            var probe = new Image();
+            probe.onload = function () {
+                backRatioKnown = probe.naturalWidth ? (probe.naturalHeight / probe.naturalWidth) : null;
+                if (done) { done(); }
+            };
+            probe.onerror = function () { backRatioKnown = null; if (done) { done(); } };
+            probe.src = url;
+        }
+        function labelFlip() {
+            var t = face === "back" ? "Show front photo" : "Show back photo";
+            flipBtn.setAttribute("title", t);
+            flipBtn.setAttribute("aria-label", t);
+        }
+
+        function flip() {
+            if (busy) { return; }
+            var toBack = face === "front";
+            busy = true;
+            var go = function () {
+                if (refractPrefersReducedMotion()) {
+                    face = toBack ? "back" : "front";
+                    stage.classList.toggle("is-back", toBack);
+                    root._rfxSetBack(toBack, backRatioKnown);
+                    busy = false;
+                    labelFlip();
+                    return;
+                }
+                stage.style.transition = "transform 0.24s ease-in";
+                stage.style.transform = "perspective(1200px) rotateY(-90deg)";
+                setTimeout(function () {
+                    face = toBack ? "back" : "front";
+                    stage.classList.toggle("is-back", toBack);
+                    /* Edge-on: the frame takes the new photo's shape unseen. */
+                    root._rfxSetBack(toBack, backRatioKnown);
+                    labelFlip();
+                    stage.style.transition = "none";
+                    stage.style.transform = "perspective(1200px) rotateY(90deg)";
+                    void stage.offsetWidth;
+                    stage.style.transition = "transform 0.24s ease-out";
+                    stage.style.transform = "perspective(1200px) rotateY(0deg)";
+                    setTimeout(function () {
+                        stage.style.transition = "";
+                        stage.style.transform = "";
+                        busy = false;
+                    }, 250);
+                }, 235);
+            };
+            /* Going to the back, the photo's shape must be known before the
+               turn starts, or the frame would resize after landing. */
+            if (toBack) { buildBack(go); } else { go(); }
+        }
+        flipBtn.addEventListener("click", function (e) {
+            e.preventDefault(); e.stopPropagation(); flip();
+        });
+
+        /* Writes the override (or clears it), then re-resolves the back photo
+           here and drops any built back for this performer elsewhere. Returns
+           the write, so the toolbar can say "Saving…" honestly. */
+        function chooseBack(val) {
+            over = val;
+            var p = refractSetBackOverride(pid, val);
+            /* This performer's back, wherever it is built, is stale. */
+            var built = document.querySelectorAll('.performer-card a[href$="/performers/' + pid + '"]');
+            for (var i = 0; i < built.length; i++) {
+                var c = built[i].closest ? built[i].closest(".performer-card") : null;
+                var b = c && c.querySelector(".refract-card-back");
+                if (b && b.parentNode) { b.parentNode.removeChild(b); }
+            }
+            if (face === "back") { buildBack(function () { root._rfxSetBack(true, backRatioKnown); }); }
+            return p;
+        }
+
+        /* Their own media, in a dialog: the top scenes and photos, portrait
+           cells at the crop the card will use. Choosing writes at once; there
+           is no save step, so there is nothing to abandon halfway. */
+        function openPicker(onDone) {
+            refractCloseBackPicker();
+            var wrap = document.createElement("div");
+            wrap.className = "refract-pb-backdrop";
+            var pick = document.createElement("div");
+            pick.className = "refract-pb-picker";
+            pick.setAttribute("role", "dialog");
+            pick.setAttribute("aria-label", "Pick this performer’s back photo");
+            var cells = "";
+            var anyScene = scenes.some(function (sc) { return sc.paths && sc.paths.screenshot; });
+            var anyImage = images.some(function (im) { return im.paths && im.paths.thumbnail; });
+            if (anyScene) { cells += '<div class="refract-pb-group">Scenes</div>'; }
+            scenes.forEach(function (sc) {
+                if (!sc.paths || !sc.paths.screenshot) { return; }
+                cells += '<button type="button" class="refract-pb-cell" data-kind="scene" data-id="' + sc.id +
+                    '" aria-label="Use scene: ' + refractFlipEscHtml(sc.title || ("scene " + sc.id)) + '"' +
+                    ' title="' + refractFlipEscHtml(sc.title || ("Scene " + sc.id)) + '"' +
+                    ' data-path="' + refractFlipEscHtml(sc.paths.screenshot) + '">' +
+                    '<span class="refract-pb-cell-art" style="background-image:url(\'' +
+                    String(sc.paths.screenshot).replace(/'/g, "%27") + '\')"></span></button>';
+            });
+            if (anyImage) { cells += '<div class="refract-pb-group">Photos</div>'; }
+            images.forEach(function (im) {
+                if (!im.paths || !im.paths.thumbnail) { return; }
+                cells += '<button type="button" class="refract-pb-cell" data-kind="image" data-id="' + im.id +
+                    '" aria-label="Use photo: ' + refractFlipEscHtml(im.title || ("photo " + im.id)) + '"' +
+                    ' title="' + refractFlipEscHtml(im.title || ("Photo " + im.id)) + '"' +
+                    ' data-path="' + refractFlipEscHtml(im.paths.thumbnail) + '">' +
+                    '<span class="refract-pb-cell-art" style="background-image:url(\'' +
+                    String(im.paths.thumbnail).replace(/'/g, "%27") + '\')"></span></button>';
+            });
+            if (!anyScene && !anyImage) {
+                cells += '<div class="refract-pb-empty">This performer has no scenes or photos to pick from yet.</div>';
+            }
+            pick.innerHTML = '<div class="refract-pb-picker-head">' +
+                '<span>Back photo: pick from ' + refractFlipEscHtml(perf.name || "this performer") + '’s scenes and photos</span>' +
+                '<button type="button" class="refract-pb-btn refract-pb-cancel">Cancel</button></div>' +
+                '<div class="refract-pb-grid">' + cells + '</div>';
+            wrap.appendChild(pick);
+            document.body.appendChild(wrap);
+            var close = function () { if (wrap.parentNode) { wrap.parentNode.removeChild(wrap); } document.removeEventListener("keydown", onKey); };
+            var onKey = function (e) { if (e.key === "Escape") { close(); } };
+            document.addEventListener("keydown", onKey);
+            wrap.addEventListener("mousedown", function (e) { if (e.target === wrap) { close(); } });
+            pick.querySelector(".refract-pb-cancel").addEventListener("click", close);
+            pick.querySelector(".refract-pb-grid").addEventListener("click", function (e) {
+                var cell = e.target.closest ? e.target.closest(".refract-pb-cell") : null;
+                if (!cell) { return; }
+                close();
+                var p = chooseBack({
+                    kind: cell.getAttribute("data-kind"),
+                    id: cell.getAttribute("data-id"),
+                    path: refractRelPath(cell.getAttribute("data-path"))
+                });
+                if (onDone) { onDone(p); }
+            });
+        }
+
+        root._rfx = {
+            pid: pid,
+            hasOverride: function () { return !!over; },
+            chooseBack: chooseBack,
+            openPicker: openPicker
+        };
+    }
+
+    function refractCloseBackPicker() {
+        var w = document.querySelector(".refract-pb-backdrop");
+        if (w && w.parentNode) { w.parentNode.removeChild(w); }
+    }
+
+    /* A file, shrunk to fit a card. The card back never shows more than a few
+       hundred pixels of it, and the value lives in a custom field on the
+       performer, so a full-size upload would be a megabyte where 100KB does. */
+    function refractShrinkImageFile(file, maxEdge, quality) {
+        return new Promise(function (resolve, reject) {
+            var fr = new FileReader();
+            fr.onerror = function () { reject(new Error("could not read the file")); };
+            fr.onload = function () {
+                var im = new Image();
+                im.onload = function () {
+                    try {
+                        var w = im.naturalWidth, h = im.naturalHeight;
+                        if (!w || !h) { reject(new Error("not an image")); return; }
+                        var k = Math.min(1, maxEdge / Math.max(w, h));
+                        var cw = Math.max(1, Math.round(w * k)), ch = Math.max(1, Math.round(h * k));
+                        var cv = document.createElement("canvas");
+                        cv.width = cw; cv.height = ch;
+                        cv.getContext("2d").drawImage(im, 0, 0, cw, ch);
+                        resolve(cv.toDataURL("image/jpeg", quality));
+                    } catch (e) { reject(e); }
+                };
+                im.onerror = function () { reject(new Error("not an image")); };
+                im.src = String(fr.result);
+            };
+            fr.readAsDataURL(file);
+        });
+    }
+
+    /* Small stroke icons for the menu, in the flip glyph's manner. */
+    var REFRACT_PB_ICONS = {
+        media: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="13" height="13" rx="1.6"/><path d="M8 4h11a2 2 0 0 1 2 2v11"/><path d="M3 17l4-4 3 3 2-2 4 4"/><circle cx="8.5" cy="11" r="1.2"/></svg>',
+        file:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>',
+        link:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>',
+        undo:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7v6h6"/><path d="M3.5 13A9 9 0 1 0 6 6.3L3 9"/></svg>'
+    };
+
+    /* == The edit toolbar: "Set image (front)…" and "Set image (back)…" ======
+       Stash renders "Set image…" as a plain button whose only child is a text
+       node; the label is swapped in place and re-asserted on every tick,
+       because React re-renders it. The twin is a real sibling with the same
+       classes, inserted after it, and it opens a menu shaped like Stash's own
+       popover, on the same footing: from this performer's scenes and photos,
+       from a file, from a URL, or the default. */
+    function refractApplyBackToolbar() {
+        /* Stash renders the toolbar twice (the full header and its compact
+           twin), so every one gets the treatment. */
+        var toolbars = document.querySelectorAll(".detail-header.edit .details-edit");
+        var root = document.querySelector(".refract-pp[data-pid]");
+        var rfx = root && root._rfx;
+        var mine = document.querySelectorAll(".refract-set-back-btn");
+        var i, j;
+        if (!toolbars.length || !rfx) {
+            for (i = 0; i < mine.length; i++) { if (mine[i].parentNode) { mine[i].parentNode.removeChild(mine[i]); } }
+            refractCloseBackPopover();
+            return;
+        }
+        for (i = 0; i < toolbars.length; i++) {
+            var stashBtn = null;
+            var btns = toolbars[i].querySelectorAll("button.btn-secondary");
+            for (j = 0; j < btns.length; j++) {
+                if (btns[j].classList.contains("refract-set-back-btn")) { continue; }
+                var tn = btns[j].firstChild;
+                if (tn && tn.nodeType === 3 && /^Set image/.test(tn.nodeValue)) { stashBtn = btns[j]; break; }
+            }
+            var own = toolbars[i].querySelector(".refract-set-back-btn");
+            if (!stashBtn) {
+                if (own && own.parentNode) { own.parentNode.removeChild(own); }
+                continue;
+            }
+            if (stashBtn.firstChild.nodeValue !== "Set image (front)…") {
+                stashBtn.firstChild.nodeValue = "Set image (front)…";
+            }
+            if (own && own.previousElementSibling !== stashBtn) {
+                own.parentNode.removeChild(own); own = null;
+            }
+            if (!own) {
+                own = document.createElement("button");
+                own.type = "button";
+                own.className = "mr-2 btn btn-secondary refract-set-back-btn";
+                own.textContent = "Set image (back)…";
+                own.setAttribute("aria-haspopup", "true");
+                own.addEventListener("click", function (e) {
+                    e.preventDefault(); e.stopPropagation();
+                    var me = e.currentTarget;
+                    if (document.querySelector(".refract-pb-pop")) { refractCloseBackPopover(); return; }
+                    var r2 = document.querySelector(".refract-pp[data-pid]");
+                    if (r2 && r2._rfx) { refractOpenBackPopover(me, r2._rfx); }
+                });
+                stashBtn.parentNode.insertBefore(own, stashBtn.nextSibling);
+            }
+        }
+    }
+
+    function refractCloseBackPopover() {
+        var p = document.querySelector(".refract-pb-pop");
+        if (p && p._rfxClose) { p._rfxClose(); } else if (p && p.parentNode) { p.parentNode.removeChild(p); }
+    }
+
+    function refractOpenBackPopover(btn, rfx) {
+        refractCloseBackPopover();
+        var pop = document.createElement("div");
+        pop.className = "fade show popover bs-popover-top refract-pb-pop";
+        pop.setAttribute("role", "menu");
+        pop.setAttribute("x-placement", "top");
+        var hasOver = rfx.hasOverride();
+        pop.innerHTML =
+            '<div class="arrow"></div>' +
+            '<div class="popover-body">' +
+            '  <div><button type="button" class="minimal btn btn-primary" data-act="media">' + REFRACT_PB_ICONS.media + '<span>From their scenes and photos…</span></button></div>' +
+            '  <div><label class="image-input form-label refract-pb-filelbl"><button type="button" class="btn btn-secondary" data-act="filebtn">' + REFRACT_PB_ICONS.file + '<span>From file…</span></button>' +
+            '    <input type="file" class="form-control-file" accept=".jpg,.jpeg,.png,.webp,.gif" data-act="file"></label></div>' +
+            '  <div><button type="button" class="minimal btn btn-primary" data-act="url">' + REFRACT_PB_ICONS.link + '<span>From URL…</span></button></div>' +
+            '  <div><button type="button" class="minimal btn btn-primary" data-act="default"' + (hasOver ? '' : ' disabled title="The back already uses the default"') + '>' + REFRACT_PB_ICONS.undo + '<span>Use default</span></button></div>' +
+            '</div>';
+        document.body.appendChild(pop);
+
+        var place = function () {
+            var b = btn.getBoundingClientRect();
+            var pw = pop.offsetWidth, ph = pop.offsetHeight;
+            var left = b.left + window.scrollX + b.width / 2 - pw / 2;
+            left = Math.max(8, Math.min(left, window.scrollX + document.documentElement.clientWidth - pw - 8));
+            var top = b.top + window.scrollY - ph - 10;
+            pop.style.position = "absolute";
+            pop.style.left = left + "px";
+            pop.style.top = top + "px";
+            var arrow = pop.querySelector(".arrow");
+            if (arrow) { arrow.style.left = Math.round(b.left + window.scrollX + b.width / 2 - left - 8) + "px"; }
+        };
+        place();
+
+        var onDoc = function (e) {
+            if (pop.contains(e.target) || btn.contains(e.target)) { return; }
+            close();
+        };
+        var onKey = function (e) { if (e.key === "Escape") { close(); } };
+        var close = function () {
+            document.removeEventListener("mousedown", onDoc, true);
+            document.removeEventListener("keydown", onKey);
+            window.removeEventListener("resize", place);
+            if (pop.parentNode) { pop.parentNode.removeChild(pop); }
+        };
+        pop._rfxClose = close;
+        setTimeout(function () { document.addEventListener("mousedown", onDoc, true); }, 0);
+        document.addEventListener("keydown", onKey);
+        window.addEventListener("resize", place);
+
+        /* The button says what is happening: "Saving…", then back to its
+           name; "Could not save" for a moment if the write failed. */
+        var report = function (p) {
+            if (!p || !p.then) { return; }
+            var was = btn.textContent;
+            btn.textContent = "Saving…";
+            btn.disabled = true;
+            p.then(function () {
+                btn.textContent = was; btn.disabled = false;
+            }).catch(function (err) {
+                btn.textContent = "Could not save"; btn.disabled = false;
+                /* The reason rides on the tooltip; a bare failure is a puzzle. */
+                btn.setAttribute("title", "Could not save the back image: " + String((err && err.message) || err || "unknown error"));
+                setTimeout(function () { btn.textContent = was; }, 2200);
+            });
+        };
+
+        pop.addEventListener("click", function (e) {
+            var t = e.target.closest ? e.target.closest("[data-act]") : null;
+            if (!t) { return; }
+            var act = t.getAttribute("data-act");
+            if (act === "filebtn" || act === "file") { return; }   /* the label opens the input */
+            e.preventDefault();
+            if (act === "media") { close(); rfx.openPicker(report); return; }
+            if (act === "default") { close(); report(rfx.chooseBack(null)); return; }
+            if (act === "url") {
+                close();
+                var u = window.prompt("Image URL for the back of " + "this performer's card:", "");
+                if (!u) { return; }
+                u = String(u).trim();
+                if (!/^https?:\/\//i.test(u) && !/^\//.test(u)) { return; }
+                report(rfx.chooseBack({ kind: "url", path: refractRelPath(u) }));
+            }
+        });
+        pop.querySelector('input[data-act="file"]').addEventListener("change", function (e) {
+            var f = e.target.files && e.target.files[0];
+            close();
+            if (!f) { return; }
+            report(refractShrinkImageFile(f, 900, 0.82).then(function (dataUri) {
+                return rfx.chooseBack({ kind: "file", name: f.name, path: dataUri });
+            }));
+        });
+    }
+
+    /* == The gallery back =====================================================
+       ONE anatomy, not a choice between two. The back is the front's own shell
+       (name banner, tier sash, stat strip) wrapped around a middle the front
+       cannot hold: a tray of this performer's top-rated media.
+
+       That middle is what earns the flip. The mirror back that came before was
+       right about everything except its reason to exist: it gave the turn
+       nothing the front lacked. It survives here as a LOOK rather than a style
+       -- tray off, a separate image chosen -- which is why there is no
+       "Back style" switch any more. Mirror and Gallery are two positions of
+       the same anatomy.
+
+       Its own image source and its own stat selection are untouched, so #172
+       stays answered: portrait on the front, a scene still on the back, chosen
+       by the user, with the theme never claiming to know which image is which.
+
+       Sized in `cqw` against the card's inline-size container, calibrated at
+       ~285px wide, the same approach 07_scene_details.css already uses. */
     function refractBuildPerformerBack(card, pid) {
+        /* The dossier is not a configuration of the face below -- it is a
+           different one -- so it gets the card outright rather than being
+           folded into a builder that would have to ignore most of itself. */
+        if (backStylePref() === "dossier" && refractLibraryHasCategories()) {
+            return refractBuildDossierBack(card, pid);
+        }
+        return refractBuildGalleryBack(card, pid);
+    }
+
+    /* The dossier's body IS the category ratings. On a library with none, every
+       card would turn over to "No category ratings yet" -- an empty state as the
+       default, which is the worst thing a default can be. One cheap check,
+       cached: does ANY performer tag look like `Category: N`? The answer cannot
+       change without a tag edit, so it is asked once per page life. */
+    var refractHasCatsCache = null;
+    var refractHasCatsListeners = [];
+    /* Anyone rendering from the answer subscribes here; the query resolves into
+       it. The customiser needs this because it renders before the query returns
+       and would otherwise show the optimistic answer for good. */
+    function refractOnCategoriesKnown(fn) {
+        if (refractHasCatsCache !== null && refractHasCatsSettled) { fn(refractHasCatsCache); return; }
+        refractHasCatsListeners.push(fn);
+    }
+    var refractHasCatsSettled = false;
+    function refractLibraryHasCategories() {
+        if (refractHasCatsCache !== null) { return refractHasCatsCache; }
+        /* Optimistic until proven otherwise: the query below settles it, and a
+           first flip drawing the dossier on a library that has categories is
+           the common case. */
+        refractHasCatsCache = true;
+        gqlWithVars(
+            /* MATCHES_REGEX against the same shape REFRACT_CATEGORY_RE accepts.
+               The first version asked for ONE tag whose name merely CONTAINED
+               ":" -- on a library where the first such tag was, say, "Ratio:
+               4:3", it would have concluded there were no categories at all
+               and put every card on the gallery face. */
+            'query { findTags(filter: { per_page: 1 }, tag_filter: { name: { value: ":\\\\s*[0-5]$", modifier: MATCHES_REGEX } })' +
+            ' { tags { id name } } }', {}
+        ).then(function (res) {
+            var tags = (res && res.data && res.data.findTags && res.data.findTags.tags) || [];
+            var any = tags.some(function (t) { return REFRACT_CATEGORY_RE.test(t.name || ""); });
+            if (!any) {
+                refractHasCatsCache = false;
+                /* Anything already built on the optimistic answer is wrong. */
+                var built = document.querySelectorAll(".performer-card .refract-card-back");
+                for (var i = 0; i < built.length; i++) {
+                    if (built[i].parentNode) { built[i].parentNode.removeChild(built[i]); }
+                }
+            }
+            refractHasCatsSettled = true;
+            var ls = refractHasCatsListeners.splice(0);
+            ls.forEach(function (fn) { try { fn(refractHasCatsCache); } catch (e) { /* ignore */ } });
+        }).catch(function () {
+            refractHasCatsSettled = true;
+            var ls2 = refractHasCatsListeners.splice(0);
+            ls2.forEach(function (fn) { try { fn(refractHasCatsCache); } catch (e) { /* ignore */ } });
+        });
+        return refractHasCatsCache;
+    }
+    /* What the card will actually build, as opposed to what is stored. */
+    function effectiveBackStyle() {
+        return (backStylePref() === "dossier" && refractLibraryHasCategories()) ? "dossier" : "gallery";
+    }
+
+    function refractBuildGalleryBack(card, pid) {
+        var back = document.createElement("div");
+        back.className = "refract-card-back refract-mirror-back";
+        var img = card.querySelector("img.performer-card-image");
+        var portrait = img ? (img.getAttribute("src") || "") : "";
+        var nameEl = card.querySelector(".performer-name");
+        var name = nameEl ? (nameEl.textContent || "").trim() : "";
+
+        /* Reuse the FRONT's own name banner rather than approximating it. Its
+           rule is a plain descendant selector, so the same markup inside the
+           back inherits the identical treatment: left-aligned at the very top
+           edge, Albert Sans 400, the gender glyph, the text-shadow stack, and
+           the right quarter left clear for the tier sash. Centring a bold copy
+           of it, as the first pass did, was not a mirror of anything. */
+        var srcBanner = card.querySelector(".refract-pc-name-banner");
+        var bannerHtml;
+        if (srcBanner) {
+            /* Marked, so hiding the FRONT's name leaves the back's alone --
+               same arrangement as the sash clone. */
+            var bannerClone = srcBanner.cloneNode(true);
+            bannerClone.classList.add("refract-mb-name");
+            bannerHtml = bannerClone.outerHTML;
+        } else {
+            bannerHtml = '<div class="refract-pc-name-banner refract-mb-name"><span class="refract-pc-name">' +
+                refractFlipEscHtml(name) + '</span></div>';
+        }
+
+        /* The tier sash the same way: the FRONT's own element, cloned. An
+           earlier pass drew a bespoke sash here and derived its own tier from
+           the rating, which meant a second implementation of the same idea that
+           could drift from the front and needed its own colour rules. Cloning
+           gives the back the identical sash for free -- same geometry, same
+           tier tint from the card's own `refract-card-tier-*` class, same
+           behaviour at every tier -- and there is exactly one sash in the
+           codebase again.
+
+           The clone carries `refract-mb-sash` so the two faces stay
+           independently toggleable: the front's hide gate excludes it and the
+           back's own gate targets it. */
+        var srcSash = card.querySelector(".refract-pc-tier-label");
+        var sashHtml = "";
+        if (srcSash) {
+            var sashClone = srcSash.cloneNode(true);
+            sashClone.classList.add("refract-mb-sash");
+            sashHtml = sashClone.outerHTML;
+        }
+
+        back.innerHTML =
+            '<div class="refract-mb-img"></div>' +
+            '<div class="refract-mb-scrim refract-mb-scrim-top"></div>' +
+            '<div class="refract-mb-scrim refract-mb-scrim-bot"></div>' +
+            bannerHtml +
+            sashHtml +
+            /* The tray. Emitted always, even when switched off or empty: the
+               region-touch zones are fixed areas of the card, so the place a
+               switched-off tray WOULD sit still has to be hoverable for the
+               chip that brings it back. CSS hides it; the DOM keeps the slot. */
+            '<div class="refract-mb-tray">' +
+            '<div class="refract-mb-tray-head">' +
+            '<span class="refract-mb-tray-title">Top rated</span>' +
+            '<span class="refract-mb-tray-count"></span>' +
+            '</div>' +
+            '<div class="refract-mb-tray-grid"></div>' +
+            '</div>' +
+            /* The rating's third form: a 3px fill along the bottom edge,
+               echoing the scene card's resume bar. Survives lite mode and
+               scans across a whole grid at a glance. */
+            '<div class="refract-mb-edge"><i></i></div>' +
+            /* The SAME stat strip the front uses, not a bespoke set of chips.
+               `.stash-perf-stats > *` is a descendant rule, so this inherits the
+               front's pill exactly: the tier-tinted gradient, the 18px radius,
+               the label-over-value grid. The back differs by WHICH stats it
+               carries, not by how they look. Building my own dark chips made
+               the back read as the stat pills done worse. */
+            '<div class="stash-perf-stats refract-mb-stats">' +
+            backPillsPref().map(refractMirrorPill).join("") +
+            '</div>';
+        /* NO "SIDE B" mark. The design added one to stop the flip feeling
+           pointless when both faces are configured identically, but it read as
+           a floating label with nothing to attach to. The back is already
+           unmistakable without it: a different image by default, a rating
+           badge the front does not have, and different stats in the bottom
+           corners. */
+        card.appendChild(back);
+        refractPaintBack(back, portrait, null);
+
+        gqlWithVars(REFRACT_FLIP_QUERY, { id: pid }).then(function (res) {
+            var d = res && res.data;
+            refractPaintBack(back, portrait, d);
+        }).catch(function () { /* the portrait fallback is already painted */ });
+    }
+
+    /* One pill, in the front's own markup shape EXACTLY: icon, then label,
+       then value. The icon is not decoration -- the pill is a two-column grid
+       and the icon holds column 1, so a pill without one leaves that column
+       empty and pushes the number off its centre. */
+    function refractMirrorPill(key) {
+        var d = backStatDef(key);
+        if (!d) { return ""; }
+        return '<span class="stash-perf-' + key + ' refract-mb-p refract-mb-p-' + key +
+            ' refract-mb-empty">' +
+            backStatIcon(d.icon) +
+            '<span class="stash-perf-label">' + refractFlipEscHtml(d.label) + '</span>' +
+            '<span class="refract-mb-v"></span></span>';
+    }
+
+    /* Painting is split out because it runs twice: once immediately with the
+       portrait so the back is never blank, then again when the query lands. */
+    function refractPaintBack(back, portrait, d) {
+        var p = d && d.findPerformer;
+        var scenes = (d && d.findScenes && d.findScenes.scenes) || [];
+        var images = (d && d.findImages && d.findImages.images) || [];
+        /* An override beats the global rule; that is the whole point of it. */
+        var over = refractBackOverride(p && p.custom_fields);
+        var src = backSrcPref();
+        var url = portrait;
+        if (over) {
+            url = over.path;
+        } else if (src === "scene" && scenes[0] && scenes[0].paths && scenes[0].paths.screenshot) {
+            url = scenes[0].paths.screenshot;
+        } else if (src === "photo" && images[0] && images[0].paths && images[0].paths.thumbnail) {
+            url = images[0].paths.thumbnail;
+        }
+        var el = back.querySelector(".refract-mb-img");
+        if (el && url) { el.style.backgroundImage = "url('" + String(url).replace(/'/g, "%27") + "')"; }
+        if (!p) { return; }
+
+        var mode = effectiveRatingDisp();
+        /* The rating exists on the back if the performer has one. WHERE it goes
+           is the Rating display control: a pill (only if a slot holds it) or
+           the edge meter. */
+        var rating10 = refractCardRating10(back, p);
+        var hasRating = rating10 != null;
+        back.setAttribute("data-rating-mode", hasRating ? mode : "none");
+
+        /* Nothing is written onto the sash. It is the front's element and it
+           says what the front's says: the tier, and only the tier. */
+        var edge = back.querySelector(".refract-mb-edge i");
+        if (edge && rating10 != null) {
+            edge.style.width = Math.max(0, Math.min(100, rating10 * 10)) + "%";
+        }
+
+        var set = function (sel, text) {
+            var n = back.querySelector(sel);
+            if (!n) { return; }
+            var v = n.querySelector(".refract-mb-v");
+            if (text === null || text === undefined || text === "") {
+                n.classList.add("refract-mb-empty");
+                return;
+            }
+            n.classList.remove("refract-mb-empty");
+            if (v) { v.textContent = text; } else { n.textContent = text; }
+        };
+        /* Values only. Each pill carries its own label above the number, the
+           way the front's do, so nothing needs a unit glued onto it. The
+           rating pill is only ONE of three places the rating can live, so it
+           fills only when that is the mode in force. */
+        set(".refract-mb-p-rating", (mode === "pill" && rating10 != null)
+            ? refractFlipRating(rating10) : null);
+        set(".refract-mb-p-height", p.height_cm ? (p.height_cm + " cm") : null);
+        set(".refract-mb-p-career", refractCareerLabel(p.career_length));
+        set(".refract-mb-p-measure", p.measurements || null);
+        set(".refract-mb-p-weight", p.weight ? (p.weight + " kg") : null);
+        set(".refract-mb-p-o", p.o_counter != null ? String(p.o_counter) : null);
+        set(".refract-mb-p-scenes", p.scene_count != null ? String(p.scene_count) : null);
+
+        refractFitBackStats(back);
+        refractPaintTray(back, d);
+    }
+
+    /* The front measures its strip and shrinks the pills to an exact fit; the
+       back had no such pass and wore a hardcoded scale instead, which is why it
+       never quite matched. Same algorithm, same floor: measure at full size and
+       multiply toward a fit, a few passes converging because the borders do not
+       scale. Now the two strips are the same component at the same size, and
+       the back's can hold six pills without a magic number. */
+    /* Must run while the back is VISIBLE. It is `display: none` until the card
+       is turned over, and a hidden element measures 0, so calling this from the
+       paint alone was a no-op every time -- the strip kept the scale it was
+       born with. It is called again on the flip, and from the preview when the
+       back is shown. */
+    /* The dossier's category rows, fitted to the height the panel really has.
+       Runs from the same places the strip fitter does, i.e. whenever the back
+       is measurable. */
+    function refractFitDossierCats(back) {
+        /* The name first: it shares its row with the tier chip and used to run
+           straight into it on long names. Step the size down, and only then
+           let the ellipsis (CSS) take what is left. */
+        var name = back.querySelector(".refract-cb-name");
+        if (name) {
+            name.style.fontSize = "";
+            var steps = [1.18, 1.04, 0.92];
+            for (var k = 0; k < steps.length && name.scrollWidth > name.clientWidth + 1; k++) {
+                name.style.fontSize = steps[k] + "rem";
+            }
+        }
+        var assets = back.querySelector(".refract-cb-assets");
+        var grid = back.querySelector(".refract-cb-grid");
+        var more = back.querySelector(".refract-cb-more");
+        if (!assets || !grid || !more) { return; }
+        var rows = grid.querySelectorAll(".refract-cb-stat");
+        if (!rows.length) { return; }
+        for (var i = 0; i < rows.length; i++) { rows[i].classList.remove("refract-cb-cut"); }
+        more.setAttribute("hidden", "");
+        if (!(assets.clientHeight > 0)) { return; }
+        if (grid.scrollHeight <= grid.clientHeight + 1) { return; }
+        /* Real layout, not arithmetic: show the count line, then cut rows off
+           the end until the grid no longer overflows. At most eight passes. */
+        more.removeAttribute("hidden");
+        var visible = rows.length;
+        while (visible > 1 && grid.scrollHeight > grid.clientHeight + 1) {
+            visible -= 1;
+            rows[visible].classList.add("refract-cb-cut");
+            more.textContent = "+" + (rows.length - visible) + " more";
+        }
+    }
+
+    function refractFitBackStats(back) {
+        refractFitDossierCats(back);
+        var row = back.querySelector(".refract-mb-stats");
+        if (!row) { return; }
+        var pills = row.querySelectorAll(".refract-mb-p");
+        for (var k = 0; k < pills.length; k++) { pills[k].classList.remove("refract-mb-dropped"); }
+        row.style.setProperty("--pc-badge-scale", 1);
+        var avail = row.clientWidth;
+        if (!(avail > 0)) { return; }
+
+        /* DISCRETE steps, not a continuous ratio. The continuous version fitted
+           each card exactly and so emitted a different real number for every
+           one -- measured 0.7329 / 0.7271 / 0.6672 on three adjacent cards,
+           i.e. the same word at 6.16px, 6.11px and 5.60px across one grid. A
+           system has a few sizes; it does not compute one per instance. */
+        var STEPS = [1, 0.85, 0.7];
+        for (var i = 0; i < STEPS.length; i++) {
+            row.style.setProperty("--pc-badge-scale", STEPS[i]);
+            if (row.scrollWidth <= avail + 1) { return; }
+        }
+        /* Still too wide at the smallest step. Drop trailing pills rather than
+           shrink further: below ~7px a letterspaced uppercase label is texture,
+           not a label, and four readable stats beat six unreadable ones. */
+        for (var j = pills.length - 1; j > 0; j--) {
+            pills[j].classList.add("refract-mb-dropped");
+            if (row.scrollWidth <= avail + 1) { return; }
+        }
+    }
+
+    /* == The dossier back ====================================================
+       A SECOND anatomy, and the only one. Everything else on the back is a
+       configuration of the gallery face -- same shell, different contents --
+       but this is a stats sheet: a title bar, the score as the hero, a 3-up
+       media strip, the category ratings, and a vitals footer.
+
+       It was deleted when the back became one anatomy, and that was too broad
+       a cut. It holds something no other face does and no configuration of the
+       gallery face can: the per-category ratings from the advanced-rating
+       plugin, parsed out of the performer's `Category: N` tags and drawn as
+       named 5-segment bars. That is the strongest form of the argument the
+       whole back rests on -- content the front cannot hold -- so it comes back
+       as a look rather than staying deleted for tidiness.
+
+       It does NOT share the gallery's controls. The tray, the stat slots and
+       the image source describe the gallery's anatomy and mean nothing here,
+       so choosing this look hands the card over to a different builder and the
+       region bands step aside.
+       ======================================================================== */
+    function refractBuildDossierBack(card, pid) {
         var back = document.createElement("div");
         back.className = "refract-card-back";
         var img = card.querySelector("img.performer-card-image");
@@ -3400,13 +6124,7 @@
             titleEl2.insertBefore(gIcon, nameEl2);
         }
 
-        var q =
-            'query RefractFlip($id: ID!) {' +
-            '  findPerformer(id: $id) { id rating100 favorite o_counter scene_count measurements height_cm weight career_length tags { id name } }' +
-            '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 3, sort: "rating", direction: DESC }) { scenes { id title rating100 paths { screenshot } } }' +
-            '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 3, sort: "rating", direction: DESC }) { images { id paths { thumbnail } } }' +
-            '}';
-        gqlWithVars(q, { id: pid }).then(function (res) {
+        gqlWithVars(REFRACT_FLIP_QUERY, { id: pid }).then(function (res) {
             var d = res && res.data;
             var p = d && d.findPerformer;
             var scenes = d && d.findScenes && d.findScenes.scenes;
@@ -3532,6 +6250,12 @@
         if (assets) {
             var h = '<div class="refract-cb-assets-head"><span>' + L.assets + '</span>' +
                 (cats.length ? '<span class="refract-cb-assets-n">' + cats.length + '</span>' : '') + '</div>';
+            /* Every row is emitted; refractFitDossierCats then hides the
+               trailing ones that do not fit the room the panel actually has
+               and writes "+N more" from what it hid. A fixed cap of five was
+               wrong in both directions: on a 216px preview five did not fit,
+               and on a wide face there was room for all eight. */
+            var hidden = 0;
             if (shown.length) {
                 h += '<div class="refract-cb-grid">';
                 shown.forEach(function (c) {
@@ -3542,6 +6266,7 @@
                         '<span class="refract-cb-stat-val">' + c.score + '</span></div>';
                 });
                 h += '</div>';
+                h += '<div class="refract-cb-more" hidden></div>';
             } else {
                 h += '<div class="refract-cb-empty">No ' + (explicit ? 'assets rated' : 'category ratings') + ' yet</div>';
             }
@@ -3566,6 +6291,150 @@
             }).join("");
         }
     }
+
+    /* == The tray =============================================================
+       Six of their best, taken off the same query the rest of the back already
+       runs, so it costs no extra request. Scenes and photos interleave when
+       both are wanted, which is what makes the row read as a library rather
+       than a filmstrip.
+
+       An empty tray is not an empty panel: with nothing rated, the tray is
+       removed outright and the card lands on exactly the mirror look. The
+       degraded state is a designed state, not a hole. */
+    function refractPaintTray(back, d) {
+        var grid = back.querySelector(".refract-mb-tray-grid");
+        var tray = back.querySelector(".refract-mb-tray");
+        if (!grid || !tray) { return; }
+        var scenes = (d && d.findScenes && d.findScenes.scenes) || [];
+        var images = (d && d.findImages && d.findImages.images) || [];
+        var withPhotos = trayPhotosPref();
+
+        var pool = [];
+        scenes.forEach(function (sc) {
+            if (sc && sc.paths && sc.paths.screenshot) {
+                pool.push({ tag: "SC", url: sc.paths.screenshot, label: sc.title || ("Scene " + sc.id) });
+            }
+        });
+        if (withPhotos) {
+            var photos = [];
+            images.forEach(function (im) {
+                if (im && im.paths && im.paths.thumbnail) {
+                    photos.push({ tag: "PH", url: im.paths.thumbnail, label: "Photo " + im.id });
+                }
+            });
+            /* Interleave rather than concatenate: six scene stills followed by
+               nothing is the same filmstrip the front already implies. */
+            var mixed = [];
+            var n = Math.max(pool.length, photos.length);
+            for (var i = 0; i < n; i++) {
+                if (pool[i]) { mixed.push(pool[i]); }
+                if (photos[i]) { mixed.push(photos[i]); }
+            }
+            pool = mixed;
+        }
+        var cells = pool.slice(0, trayRowsPref() === 1 ? 3 : 6);
+        tray.classList.toggle("refract-mb-tray-empty", cells.length === 0);
+        /* One row when there is little to show, rather than a 3x2 grid with
+           four holes in it. */
+        tray.classList.toggle("refract-mb-tray-thin", cells.length > 0 && cells.length < 3);
+
+        /* Tag a cell only when the tray is MIXED. Six cells each labelled "SC"
+           is the clearest tell of an unedited design: repeating a label on every
+           member of a homogeneous set says nothing six times. When they are all
+           one kind the heading says so once, and the cells are just pictures. */
+        var kinds = {};
+        cells.forEach(function (c) { kinds[c.tag] = 1; });
+        var mixed = Object.keys(kinds).length > 1;
+        var html = "";
+        cells.forEach(function (c) {
+            html += '<span class="refract-mb-cell" style="background-image:url(\'' +
+                String(c.url).replace(/'/g, "%27") + '\')" title="' +
+                refractFlipEscHtml(c.label) + '">' +
+                (mixed ? '<span class="refract-mb-cell-tag">' + c.tag + '</span>' : '') +
+                '</span>';
+        });
+        grid.innerHTML = html;
+
+        var title = back.querySelector(".refract-mb-tray-title");
+        if (title) {
+            title.textContent = mixed ? "Top rated"
+                : (kinds.PH ? "Top rated photos" : "Top rated scenes");
+        }
+
+        var count = back.querySelector(".refract-mb-tray-count");
+        if (count) {
+            var ns = (d && d.findScenes && d.findScenes.count) || 0;
+            var ni = (d && d.findImages && d.findImages.count) || 0;
+            /* "1283 SC / 0 PH" prints a zero as though it meant something.
+               The count says what the six were drawn FROM, so an empty library
+               just drops out of the line. */
+            count.textContent = (withPhotos && ni > 0) ? (ns + " SC / " + ni + " PH") : (ns + " SC");
+        }
+    }
+
+    /* `career_length` is free text and comes in as anything from "9" to
+       "2017 - 2023". A bare year range in a corner pill reads as noise, so a
+       plain number gets its unit and anything else is left as the user wrote
+       it. */
+    function refractCareerLabel(v) {
+        if (!v) { return null; }
+        var t = String(v).trim().replace(/\s+/g, " ");
+        if (!t) { return null; }
+        if (/^\d+$/.test(t)) { return t + " yrs"; }
+        /* Stash stores career_length as free text, and an open-ended range
+           ("2018 -") rendered literally as a year with a dash hanging off it,
+           which is not a fact anyone can read at pill size. Any year or year
+           range becomes a SPAN, counted to now when it is open-ended. */
+        var m = t.match(/^(\d{4})\s*[-\u2013\u2014]?\s*(\d{4})?$/);
+        if (m) {
+            var start = parseInt(m[1], 10);
+            var end = m[2] ? parseInt(m[2], 10) : new Date().getFullYear();
+            var span = Math.max(0, end - start);
+            return span <= 0 ? "<1 yr" : (span + (span === 1 ? " yr" : " yrs"));
+        }
+        /* Anything else is the user's own words; keep it only if it can fit. */
+        return t.length <= 9 ? t : null;
+    }
+
+    /* The front's read-out, arrived at the front's way. This did its own
+       arithmetic and disagreed with the card it was printed on: decimal mode
+       showed the raw 0-100 (95) against the front's 0-10 (9.5), and stars mode
+       rounded to one decimal (4.8) against the front's two (4.75). One fact,
+       one card, two numbers -- which is on its own enough to make the back look
+       unfinished. Same scale, same rounding, both modes. */
+    /* Takes the 0-10 value, not rating100: that is the scale the front works
+       in, and parity with the front is the entire point. */
+    function refractFlipRating(v10) {
+        if (!document.body || !document.body.classList.contains("refract-rating-system-stars")) {
+            return String(v10);
+        }
+        return String(Math.round((v10 / 2) * 100) / 100);
+    }
+
+    /* The rating the FRONT of this very card is showing.
+
+       Reading `rating100` off the query looked obviously right and was wrong:
+       measured on one card the front said 9.5 and the back said 4.9, i.e. 9.8
+       -- not a rounding difference, a different NUMBER. The front's rating pass
+       does not use `rating100` directly (advanced-rating computes its own
+       overall) and it publishes the result on the card as `data-refract-rating`
+       on a 0-10 scale. Read that and the two faces cannot disagree, whatever
+       produced it. `rating100` stays as the fallback for a card whose front
+       pass has not run. */
+    function refractCardRating10(back, p) {
+        var card = back && back.closest ? back.closest(".performer-card") : null;
+        var attr = card && card.getAttribute("data-refract-rating");
+        if (attr) {
+            var v = parseFloat(attr);
+            if (isFinite(v)) { return v; }
+        }
+        return (p && p.rating100 != null) ? p.rating100 / 10 : null;
+    }
+
+
+
+
+
 
     function markActiveUtilityButtons() {
         var currentPath = refractPathFromLocation();
@@ -4208,6 +7077,22 @@
 
         section.appendChild(row);
 
+        /* The chin's height, published on the card. The studio logo's
+           bottom-corner position has to clear the chin, and the logo's
+           containing block is the CARD (measured: `bottom: 0.45rem` landed it
+           on the title, not above it), so the CSS needs the chin's height to
+           subtract. It is one line in the Refract layout and taller in
+           Classic, and it can change on resize, hence the observer. */
+        var chinPublish = function () {
+            var h = section.offsetHeight;
+            if (h > 0) { card.style.setProperty("--refract-chin-h", h + "px"); }
+        };
+        requestAnimationFrame(chinPublish);
+        if (typeof ResizeObserver !== "undefined" && !section._rfxChinRO) {
+            section._rfxChinRO = new ResizeObserver(chinPublish);
+            section._rfxChinRO.observe(section);
+        }
+
         /* Tag portrait thumbnails so the minimal-mode cover-fill CSS can
            opt them out — for vertical scenes the cover behaviour would
            crop heavily. The image often isn't loaded yet, so check
@@ -4445,6 +7330,23 @@
        a flat tier-coloured mark. The gradient def rides inside the SVG;
        its id is shared across every injected flame (all identical, so a
        `url(#)` reference resolving to the first is fine). */
+    /* Four more glyphs in the front's own idiom: solid, currentColor, sized
+       to the same 10px box as STAR/CAKE/PLAY so they sit on the pill's icon
+       row without a second visual language. */
+    var HEIGHT_SVG =
+        '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true">' +
+        '<path d="M12 1.5l4.2 5.2h-3v10.6h3L12 22.5 7.8 17.3h3V6.7h-3L12 1.5z"/></svg>';
+    var HOURGLASS_SVG =
+        '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true">' +
+        '<path d="M5 2h14v2.2h-1.1c0 3-1.9 5.6-4.6 6.8v1.9c2.7 1.3 4.6 3.9 4.6 6.9H19V22H5v-2.2h1.1' +
+        'c0-3 1.9-5.6 4.6-6.9v-1.9C8 9.8 6.1 7.2 6.1 4.2H5V2z"/></svg>';
+    var TAPE_SVG =
+        '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true">' +
+        '<path d="M3 4.5h18v3.4H3V4.5zm3.4 5.8h11.2v3.4H6.4v-3.4zM3 16.1h18v3.4H3v-3.4z"/></svg>';
+    var WEIGHT_SVG =
+        '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" fill-rule="evenodd" aria-hidden="true">' +
+        '<path d="M8.6 3h6.8l3.9 18H4.7L8.6 3zm3.4 3.1a2.1 2.1 0 100 4.2 2.1 2.1 0 000-4.2z"/></svg>';
+
     var ASCENSION_FLAME_SVG =
         '<svg class="refract-ascension-icon" viewBox="0 0 512 512" aria-hidden="true">' +
         '<defs><linearGradient id="refract-flame-grad" x1="0.5" y1="0" x2="0.5" y2="1">' +
@@ -4488,13 +7390,28 @@
        race-winning immediate observer), so applying the tier here makes
        it survive regardless of whether the banner lives long enough for
        tagFilledRatings to see it. Thresholds mirror tagFilledRatings. */
+    /* Re-apply performer tier classes from the rating captured at init.
+
+       Performer cards are tiered exactly once, inside initPerformerCards
+       (`.performer-card:not([data-stash-pc])`), because the rating is read off
+       the native banner that Ascension deletes moments later. Nothing re-reads
+       it, so flipping the flourish used to leave performer cards on their old
+       tier until a reload, while scene cards updated immediately from the
+       observer tick. applyCardTier strips the old tier first, so this handles
+       both directions. */
+    function retagPerformerTiers() {
+        document.querySelectorAll(".performer-card[data-refract-rating]").forEach(function (card) {
+            var v = parseFloat(card.getAttribute("data-refract-rating"));
+            if (isFinite(v) && v > 0) { applyCardTier(card, v); }
+        });
+    }
+
     function applyCardTier(card, v) {
         if (!card) { return; }
         ["bronze", "silver", "gold", "diamond", "legendary", "perfect"].forEach(function (t) {
             card.classList.remove("refract-card-tier-" + t);
         });
-        var heavyMode = document.body.classList.contains("refract-rating-style-tiers")
-            || document.body.classList.contains("refract-rating-style-playing-card");
+        var heavyMode = document.body.classList.contains("refract-flourish-tiers");
         if (heavyMode && v >= 5) {
             var tier = v >= 10  ? "perfect"
                      : v >= 9.5 ? "legendary"
@@ -4504,6 +7421,58 @@
                      :            "bronze";
             card.classList.add("refract-card-tier-" + tier);
         }
+    }
+
+    /* Query-sourced front stats, batched. Every card that needs one queues
+       here during initPerformerCards; one `findPerformers(performer_ids)`
+       request per tick serves them all, instead of forty single fetches. */
+    var refractFrontFillQueue = [];
+    var refractFrontFillTimer = null;
+    function refractQueueFrontFill(card, row, pid, keys, hadDomValue) {
+        refractFrontFillQueue.push({ card: card, row: row, pid: pid, keys: keys, had: hadDomValue });
+        if (refractFrontFillTimer) { return; }
+        refractFrontFillTimer = setTimeout(refractFlushFrontFill, 30);
+    }
+    function refractFlushFrontFill() {
+        refractFrontFillTimer = null;
+        var batch = refractFrontFillQueue.splice(0);
+        if (!batch.length) { return; }
+        var ids = [];
+        batch.forEach(function (b) { if (ids.indexOf(parseInt(b.pid, 10)) === -1) { ids.push(parseInt(b.pid, 10)); } });
+        gqlWithVars(
+            'query RefractFrontStats($ids: [Int!]) { findPerformers(performer_ids: $ids, filter: { per_page: -1 })' +
+            ' { performers { id height_cm career_length measurements weight } } }',
+            { ids: ids }
+        ).then(function (res) {
+            var list = (res && res.data && res.data.findPerformers && res.data.findPerformers.performers) || [];
+            var byId = {};
+            list.forEach(function (pf) { byId[String(pf.id)] = pf; });
+            batch.forEach(function (b) {
+                var pf = byId[String(b.pid)];
+                var any = b.had;
+                b.keys.forEach(function (k) {
+                    var el = b.row.querySelector('[data-refract-stat="' + k + '"]');
+                    if (!el) { return; }
+                    var v = null;
+                    if (pf) {
+                        if (k === "height") { v = pf.height_cm ? (pf.height_cm + " cm") : null; }
+                        else if (k === "career") { v = refractCareerLabel(pf.career_length); }
+                        else if (k === "measure") { v = pf.measurements || null; }
+                        else if (k === "weight") { v = pf.weight ? (pf.weight + " kg") : null; }
+                    }
+                    var valSpan = el.querySelector("span:not(.stash-perf-label)");
+                    if (v != null) {
+                        el.classList.remove("stash-perf-empty");
+                        if (valSpan) { valSpan.textContent = v; }
+                        any = true;
+                    }
+                });
+                /* Nothing on the strip has a value after all: take it away, the
+                   same rule the DOM-only path applies up front. */
+                if (!any && b.row.parentNode) { b.row.parentNode.removeChild(b.row); }
+                else if (b.card._rfxRefit) { b.card._rfxRefit(); }
+            });
+        }).catch(function () { /* the placeholders stay as dashes */ });
     }
 
     function initPerformerCards() {
@@ -4560,7 +7529,11 @@
                 }
                 if (ratingNum && ratingNum > 0) {
                     /* Tier the card now, from the banner we just read —
-                       before Ascension can delete it (see applyCardTier). */
+                       before Ascension can delete it (see applyCardTier).
+                       Keep the value: this is the ONLY moment the rating is
+                       readable, and the tier has to be recomputable later
+                       when the rating flourish is toggled (retagPerformerTiers). */
+                    card.setAttribute("data-refract-rating", String(ratingNum));
                     applyCardTier(card, ratingNum);
                     /* If the user has Stash's rating system set to stars,
                        show the rating chip on a 0–5 scale to match their
@@ -4684,11 +7657,51 @@
             tierLabel.className = "refract-pc-tier-label";
             card.appendChild(tierLabel);
 
-            /* Only show the stat strip if at least one of the four pills
-               has a real value — a performer with no rating/age/scenes/O
-               gets no row of all-"-" placeholders. */
-            if (anyStat) {
+            /* The four DOM-sourced pills above are built on every card in a
+               fixed order. In the Refract layout the SLOT LIST now decides
+               which of them survive, in what order, and which query-sourced
+               pills join them. Classic keeps the historic four: its pill
+               styling is bespoke per class and knows nothing of the others. */
+            var layoutCard = document.body.classList.contains("refract-perf-layout-card");
+            var frontSlots = layoutCard ? frontPillsPref() : FRONT_PILLS_DEFAULT.slice();
+            var built = { rating: rEl, age: ageSpan, o: oEl, scenes: scenesA };
+            var wantsQuery = [];
+            if (layoutCard) {
+                Object.keys(built).forEach(function (k) {
+                    if (frontSlots.indexOf(k) === -1 && built[k].parentNode) {
+                        built[k].parentNode.removeChild(built[k]);
+                    }
+                });
+                frontSlots.forEach(function (k, i) {
+                    var d = frontStatDef(k);
+                    if (!d) { return; }
+                    var el = built[k];
+                    if (!el) {
+                        /* A query-sourced pill: built empty in the front's own
+                           markup shape, filled once the batch returns. */
+                        el = document.createElement("span");
+                        el.className = frontPillClass(k) + " stash-perf-empty";
+                        el.setAttribute("data-refract-stat", k);
+                        el.innerHTML = frontStatIcon(d.icon) +
+                            '<span class="stash-perf-label">' + escapeHtml(d.label) + '</span>' +
+                            "<span>-</span>";
+                        row.appendChild(el);
+                        wantsQuery.push(k);
+                    }
+                    /* Inline `order` beats the class order rules, so the slot
+                       list is the order you see. */
+                    el.style.order = String(i);
+                });
+            }
+            /* The strip is shown if any pill has a value, or if a query pill
+               may still get one; the batch fill removes it again if not. */
+            if (anyStat || wantsQuery.length) {
                 section.appendChild(row);
+            }
+            if (wantsQuery.length) {
+                var link0 = card.querySelector('a[href*="/performers/"]');
+                var pm = link0 && (link0.getAttribute("href") || "").match(/\/performers\/(\d+)/);
+                if (pm) { refractQueueFrontFill(card, row, pm[1], wantsQuery, anyStat); }
             }
 
             /* Combined shrink-to-fit for the stat strip + name banner.
@@ -4701,12 +7714,14 @@
                that assignment has happened or `bannerInner` is
                undefined and we skip the name pass. */
             var refitPending = false;
+            /* Exposed so the batched stat fill can re-fit once values land. */
+            card._rfxRefit = function () { refit(); };
             function refit() {
                 if (refitPending) { return; }
                 refitPending = true;
                 requestAnimationFrame(function () {
                     refitPending = false;
-                    if (!document.body.classList.contains("refract-rating-style-playing-card")) { return; }
+                    if (!document.body.classList.contains("refract-perf-layout-card")) { return; }
                     /* Stat strip — high scene counts (3 digits) push
                        chips off the right edge, so shrink to fit. Use a
                        CONTINUOUS ratio rather than a coarse ladder: the
@@ -4927,7 +7942,7 @@
        lookup, so we re-sync on every mutation cycle (Stash toggles the
        class reactively when the user clicks the heart). */
     function syncPerformerCardHearts() {
-        var inPlayingCard = document.body.classList.contains("refract-rating-style-playing-card");
+        var inPlayingCard = document.body.classList.contains("refract-perf-layout-card");
         document.querySelectorAll(".performer-card").forEach(function (card) {
             var isFav = !!card.querySelector(".favorite-button.favorite");
             var existing = card.querySelector(":scope > .refract-heart-particles");
@@ -4979,7 +7994,7 @@
         /* Only playing-card mode shows the `.stash-perf-country` caption;
            in other rating styles it's CSS-hidden, so nesting the rank
            into it would hide it too, so fall back to the chin there. */
-        var pcMode = document.body.classList.contains("refract-rating-style-playing-card");
+        var pcMode = document.body.classList.contains("refract-perf-layout-card");
         badges.forEach(function (badge) {
             badge.classList.add("refract-ascension-badge");
             /* Ascension renders "undefinedW/L/D" when a performer has no
@@ -5029,18 +8044,21 @@
                 country.appendChild(badge);
                 return;
             }
-            /* Fallback (no country caption / non-playing-card): sit in the
-               chin, just above the stat pills. */
+            /* Fallback (no country caption / non-playing-card): sit on the
+               NAME's line, at the right edge.
+
+               It stays a CHILD OF THE CHIN and is positioned there by CSS
+               rather than being appended into the name element, for two
+               reasons: the chin is a flex COLUMN, so any in-flow child costs a
+               whole extra line and makes the chin taller; and the name is
+               wrapped in an <a> to the performer, so nesting the rank inside
+               it would swallow the rank's own click target. */
             if (!section) { return; }
-            var anchor = section.querySelector(":scope > .stash-perf-stats");
-            if (anchor) {
-                if (badge.parentElement === section && badge.nextElementSibling === anchor) {
-                    return;
-                }
-                section.insertBefore(badge, anchor);
-            } else if (!(badge.parentElement === section && badge === section.lastElementChild)) {
-                section.appendChild(badge);
+            section.classList.add("refract-chin-with-rank");
+            if (badge.parentElement === section && badge === section.lastElementChild) {
+                return;
             }
+            section.appendChild(badge);
         });
     }
 
@@ -8284,9 +11302,8 @@
                top of each performer card). The "intensity" (mono) mode
                is left untouched: just the existing banner glow that
                scales with --refract-rating. */
-            var inTiersMode = document.body.classList.contains("refract-rating-style-tiers");
-            var inPlayingCardMode = document.body.classList.contains("refract-rating-style-playing-card");
-            if (card && (inTiersMode || inPlayingCardMode) && v >= 5) {
+            var inTiersMode = document.body.classList.contains("refract-flourish-tiers");
+            if (card && inTiersMode && v >= 5) {
                 var tier;
                 if (v >= 10)      { tier = "perfect"; }
                 else if (v >= 9.5) { tier = "legendary"; }
@@ -10177,6 +13194,9 @@
             try { relocateDateFixLinks(); } catch (e) {}
             try { reformatSceneStats(); } catch (e) {}
             try { injectStudioName(); } catch (e) {}
+            try { applyStudioTextPrefix(); } catch (e) {}
+            try { applyPerformerBackControl(); } catch (e) {}
+            try { applyBackClasses(); } catch (e) {}
             try { fixSceneTaggerDetails(); } catch (e) {}
             try { relocateTaggerBatchButtons(); } catch (e) {}
             try { injectTaggerSearchClose(); } catch (e) {}
