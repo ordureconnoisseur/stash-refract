@@ -4997,18 +4997,19 @@
             .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
-    /* The flip, reduced to what survives 13px: the fold axis, a SOLID panel
-       on one side and a GHOST panel on the other. Solid is the face you see,
-       outline is the face you would turn to; when the rail mirrors the glyph
-       for "Back", the solid side swaps, so the icon itself says which face is
-       up. The stock glyphs tried (refresh arrows, drawn card outlines, SVG
-       Repo's mirrored brackets) all carried interior detail that turns to mush
-       below 16px. */
+    /* Solar's "flip horizontal" pennants (CC-BY, svgrepo 528971), adapted for
+       13px: two EQUAL pennants folding toward a solid axis -- symmetric in
+       shape, so nothing looks lopsided -- with the near one filled and the far
+       one outlined, which is what says "this face / the face you would turn
+       to". The stock version keeps its dashed axis and open stroke ends, which
+       is detail that turns to noise below 16px; the fill/outline split reads
+       at any size. currentColor throughout, so it tints with its button, and
+       the rail's mirror on "Back" swaps which pennant is the solid one. */
     var REFRACT_FLIP_ICON =
         '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
-        '<path d="M12 3.5v17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
-        '<rect x="3.2" y="6.5" width="5.2" height="11" rx="1.3" fill="currentColor"/>' +
-        '<rect x="16.6" y="7.5" width="3.2" height="9" rx="1" stroke="currentColor" stroke-width="2" fill="none" opacity="0.55"/>' +
+        '<path d="M2 5.88641C2 4.18426 2 3.33319 2.54242 3.05405C3.08484 2.77491 3.77738 3.26959 5.16247 4.25894L6.74371 5.3884C7.35957 5.8283 7.6675 6.04825 7.83375 6.3713C8 6.69435 8 7.07277 8 7.8296V16.1705C8 16.9273 8 17.3057 7.83375 17.6288C7.6675 17.9518 7.35957 18.1718 6.74372 18.6117L5.16248 19.7411C3.77738 20.7305 3.08484 21.2251 2.54242 20.946C2 20.6669 2 19.8158 2 18.1136V5.88641Z" fill="currentColor"/>' +
+        '<path d="M22 5.88641C22 4.18426 22 3.33319 21.4576 3.05405C20.9152 2.77491 20.2226 3.26959 18.8375 4.25894L17.2563 5.3884C16.6404 5.8283 16.3325 6.04825 16.1662 6.3713C16 6.69435 16 7.07277 16 7.8296V16.1705C16 16.9273 16 17.3057 16.1662 17.6288C16.3325 17.9518 16.6404 18.1718 17.2563 18.6117L18.8375 19.7411C20.2226 20.7305 20.9152 21.2251 21.4576 20.946C22 20.6669 22 19.8158 22 18.1136V5.88641Z" stroke="currentColor" stroke-width="1.6" opacity="0.6"/>' +
+        '<path d="M12 3v18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' +
         '</svg>';
 
     /* Category display order, mirroring the advanced-rating plugin. The plugin
