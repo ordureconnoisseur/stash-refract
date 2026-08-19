@@ -2091,6 +2091,17 @@ body.stash-liquid-glass.refract-sc-hide-date.refract-sc-hide-date .scene-card .s
 body.stash-liquid-glass.refract-sc-hide-resolution.refract-sc-hide-resolution .scene-card .scene-specs-overlay .overlay-resolution {
     display: none !important;
 }
+/* Title off = a pure poster. The whole title row goes (the studio-text
+   prefix rides inside it and goes with it, correctly: it is title furniture). */
+body.stash-liquid-glass.refract-sc-hide-title.refract-sc-hide-title .scene-card .card-section-title {
+    display: none !important;
+}
+/* Ascension's rank read-out, wherever it is parked (inside the country
+   caption or standalone in the chin). Tripled like the country gate, to beat
+   the plugin-styling rules that place it. */
+body.stash-liquid-glass.refract-pc-hide-rank.refract-pc-hide-rank.refract-pc-hide-rank .performer-card .hon-battle-rank-badge {
+    display: none !important;
+}
 /* `:not(.refract-mb-stats)` is load-bearing. The back reuses the front's stat
    pill component -- that is the whole point of it, it inherits the tier tint
    and the label-over-value grid for free -- so it also carries

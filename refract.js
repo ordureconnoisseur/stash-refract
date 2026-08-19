@@ -452,39 +452,53 @@
                mounts: the settings page mounts it far below the fold, and a
                pulse that played while the user was reading the accent picker
                was a pulse nobody saw. */
+            /* The card's tier class, mirrored onto the stage: the stage's
+               ::before glow and floor shadow tint themselves from --seal, so
+               a gold card sits in gold light and an unrated card in plain
+               dark. A MutationObserver because the tier lands asynchronously
+               (tagFilledRatings) on a card this component does not render. */
+            R.useEffect(function () {
+                var stage = document.getElementById("plugin-refract-card-preview");
+                if (!stage || typeof MutationObserver === "undefined") { return undefined; }
+                var sync = function () {
+                    var card = stage.querySelector(".scene-card, .performer-card");
+                    var m = card && (card.className || "").match(/refract-card-tier-\w+/);
+                    var want = m ? ("refract-cc-" + m[0].slice("refract-card-".length)) : "";
+                    var have = (stage.className.match(/refract-cc-tier-\w+/) || [""])[0];
+                    if (want !== have) {
+                        if (have) { stage.classList.remove(have); }
+                        if (want) { stage.classList.add(want); }
+                    }
+                };
+                sync();
+                var mo = new MutationObserver(sync);
+                mo.observe(stage, { subtree: true, attributes: true, attributeFilter: ["class"], childList: true });
+                return function () { mo.disconnect(); };
+            }, []);
             var introState = R.useState(false);
             var introOn = introState[0];
             R.useEffect(function () {
                 var seen = false;
                 try { seen = sessionStorage.getItem("refract.ccIntroShown") === "1"; } catch (e) { seen = true; }
                 if (seen || typeof IntersectionObserver === "undefined") { return undefined; }
-                var t = null, arm = null, io = null;
+                var t = null, io = null;
                 var stage = document.getElementById("plugin-refract-card-preview");
                 if (!stage) { return undefined; }
-                var inView = function () {
-                    var b = stage.getBoundingClientRect();
-                    var vh = window.innerHeight || document.documentElement.clientHeight;
-                    return b.height > 0 && b.top >= -b.height * 0.2 && b.bottom <= vh + b.height * 0.2;
-                };
-                /* The page paints the panel near the top for a moment before
-                   the content above it lands, so "intersecting" at mount is a
-                   lie. Observation starts after the layout has settled, and a
-                   hit must still be in view 400ms later to count. */
-                arm = setTimeout(function () {
-                    io = new IntersectionObserver(function (entries) {
-                        if (!entries.some(function (en) { return en.isIntersecting; })) { return; }
-                        setTimeout(function () {
-                            if (!io || !inView()) { return; }
-                            io.disconnect(); io = null;
-                            try { sessionStorage.setItem("refract.ccIntroShown", "1"); } catch (e) { /* ignore */ }
-                            introState[1](true);
-                            t = setTimeout(function () { introState[1](false); }, 2600);
-                        }, 400);
-                    }, { threshold: 0.6 });
-                    io.observe(stage);
-                }, 1500);
+                /* Fires on the FIRST real sight of the stage. The previous
+                   gates (1.5s arming delay + a 400ms still-in-view confirm)
+                   were built against a settle-layout ghost and ate the pulse
+                   entirely -- the one orchestrated moment never played. A
+                   0.6 threshold on the observer is protection enough: the
+                   pre-settle layout never shows 60% of the stage. */
+                io = new IntersectionObserver(function (entries) {
+                    if (!entries.some(function (en) { return en.isIntersecting; })) { return; }
+                    io.disconnect(); io = null;
+                    try { sessionStorage.setItem("refract.ccIntroShown", "1"); } catch (e) { /* ignore */ }
+                    introState[1](true);
+                    t = setTimeout(function () { introState[1](false); }, 2600);
+                }, { threshold: 0.6 });
+                io.observe(stage);
                 return function () {
-                    if (arm) { clearTimeout(arm); }
                     if (io) { io.disconnect(); }
                     if (t) { clearTimeout(t); }
                 };
@@ -1124,7 +1138,8 @@
                   hide: ["refract.scHideTier", "refract.scHideStudio", "refract.scHideDuration",
                          "refract.scHidePerformers", "refract.scHideOCount", "refract.scHideTagCount",
                          "refract.scHideDate", "refract.scHideResolution",
-                         "refract.pcHideTier", "refract.pcHideCountry", "refract.pcHideStats"],
+                         "refract.pcHideTier", "refract.pcHideCountry", "refract.pcHideStats",
+                         "refract.pcHideRank"],
                   tip: { scene: "Just the image and the title. Rating stays. Sets the flourish to Minimal.",
                          performer: "Just the image and the name. Sets the flourish to Minimal." } },
                 /* Performer only: the strip carries body facts instead of
@@ -1192,6 +1207,11 @@
                    nothing -- the exact defect the no-op Rating banner had. */
                 if (d.key === "refract.pcHideName" && perfCardStyle !== "refract") { return false; }
                 if (d.classicOnly && cardStyle !== "classic") { return false; }
+                /* A chip for another plugin's element only exists where that
+                   plugin does. */
+                if (d.plugin === "ascension" && !document.body.classList.contains("refract-has-ascension")) { return false; }
+                /* The dossier's own panels: only offered on the dossier. */
+                if (d.dossier && !(editingBack && backStyle === "dossier")) { return false; }
                 return !d.tier || flourish === "extravagant";
             }
             /* Available in principle but switched off by the FLOURISH: shown as
@@ -1203,32 +1223,6 @@
                 return !!d.tier && flourish !== "extravagant";
             }
 
-
-            /* Its own row, NOT part of Card elements. It is not an element of a
-               card at all — it is Stash's global setting, mirrored — and
-               nesting it under "Card elements" implied it belonged to the
-               visibility list. Same label-left / control-right shape as every
-               other setting in this panel. */
-            function ratingSystemRow() {
-                return R.createElement("div", { className: "setting", id: "plugin-refract-rating-system" },
-                    R.createElement("div", null,
-                        R.createElement("h3", null, "Rating system"),
-                        R.createElement("div", { className: "sub-heading" },
-                            "Stash's own setting, mirrored here. Affects ratings everywhere, not just cards.")
-                    ),
-                    R.createElement("div", { className: "refract-setting-control refract-flourish-toggle" },
-                        [["decimal", "Decimal"], ["stars", "Stars"]].map(function (o) {
-                            return R.createElement("button", {
-                                key: o[0],
-                                type: "button",
-                                className: "refract-segmented-btn" + (ratingSys === o[0] ? " is-active" : ""),
-                                "aria-pressed": ratingSys === o[0] ? "true" : "false",
-                                onClick: function () { setRatingSystem(o[0]); }
-                            }, o[1]);
-                        })
-                    )
-                );
-            }
 
             /* == Corner touch ==========================================
                The card IS the control surface. Each quadrant owns the
@@ -1421,7 +1415,7 @@
                    its own fixed layout with nothing to move, so it is offered
                    no regions rather than regions that would lie. */
                 var zones = editingBack
-                    ? (backStyle === "dossier" ? [] : ["img", "tr", "tray", "bottom"])
+                    ? (backStyle === "dossier" ? ["dmedia", "dfoot"] : ["img", "tr", "tray", "bottom"])
                     : (previewKind === "performer"
                         /* The performer front has exactly two places anything
                            can be moved: the sash in the top-right corner, and
@@ -1436,7 +1430,8 @@
                 var ZONE_NAMES = {
                     tl: "Top left corner", tr: "Top right corner",
                     bl: "Bottom left corner", br: "Bottom right corner",
-                    bottom: "Bottom band", img: "Image band", tray: "Tray band"
+                    bottom: "Bottom band", img: "Image band", tray: "Tray band",
+                    dmedia: "Media strip", dfoot: "Collector footer"
                 };
                 var hits = zones.map(function (z) {
                     return R.createElement("div", {
@@ -1595,15 +1590,29 @@
                     + "Rating flourish, card styles, the performer popover and the rating system are not touched.\n\n"
                     + "The page will reload.");
                 if (!ok) { return; }
-                REFRACT_CARD_RESET_KEYS.forEach(function (k) {
-                    try { localStorage.removeItem(k); } catch (e) { /* ignore */ }
-                });
+                /* SERVER FIRST. The old order cleared localStorage, pushed,
+                   and reloaded in a .then chained after a .catch -- so an
+                   offline push still reloaded, boot pulled the untouched
+                   server copy back, and the confirmed reset silently undid
+                   itself. Now the post-reset snapshot is computed without
+                   touching anything, pushed, and only a confirmed write
+                   clears the local keys and reloads. A failure changes
+                   NOTHING and says so. */
+                var after = snapshotRefractSettings();
+                REFRACT_CARD_RESET_KEYS.forEach(function (k) { delete after[k]; });
                 if (refractSyncTimer) { clearTimeout(refractSyncTimer); refractSyncTimer = null; }
                 gqlWithVars(
                     'mutation($v: Any){ configureUISetting(key: "refract", value: $v) }',
-                    { v: snapshotRefractSettings() }
-                ).catch(function () { /* offline: localStorage is already clear */ })
-                    .then(function () { window.location.reload(); });
+                    { v: after }
+                ).then(function (res) {
+                    if (!res || !res.data) { throw new Error("no data"); }
+                    REFRACT_CARD_RESET_KEYS.forEach(function (k) {
+                        try { localStorage.removeItem(k); } catch (e) { /* ignore */ }
+                    });
+                    window.location.reload();
+                }).catch(function () {
+                    window.alert("Could not reach the server, so nothing was reset. Your settings are unchanged.");
+                });
             }
 
             /* == Looks =================================================
@@ -1808,8 +1817,34 @@
                     R.createElement("span", { className: "refract-cc-preset-label" }, p.label)
                 );
             }
+            /* Does the CURRENT card match this look exactly? The back row
+               has marked its look from the start; the front rows never did,
+               which read as an unexplained inconsistency. Same meaning here:
+               the ring marks what you are looking at, not what you last
+               clicked. */
+            function presetMatchesCurrent(p) {
+                if ((p.flourish || flourish) !== flourish) { return false; }
+                var i, d;
+                for (i = 0; i < CARD_ELEMS.length; i++) {
+                    d = CARD_ELEMS[i];
+                    if (d.group !== elemGroup || d.noop) { continue; }
+                    if (!!cardElems[d.key] !== (p.hide.indexOf(d.key) !== -1)) { return false; }
+                    if (d.sideKey && elemGroup === "scene") {
+                        if ((cardSides[d.key] || d.sideDefault) !== (p.sides[d.key] || d.sideDefault)) { return false; }
+                    }
+                }
+                if (elemGroup === "scene") {
+                    if ((cardSides.__layer || "ribbon") !== p.layer) { return false; }
+                    if (studioMode !== (p.studio || "logo")) { return false; }
+                }
+                if (elemGroup === "performer") {
+                    if (frontPills.join(",") !== (p.pills || FRONT_PILLS_DEFAULT).join(",")) { return false; }
+                }
+                return true;
+            }
             function presetPicture(p) {
                 var a = presetArt(p);
+                var on = presetMatchesCurrent(p);
                 /* Repeated furniture (performer circles, the two scene pills, the
                    four stat pills) is drawn as real child elements rather than
                    as a repeating gradient. The gradient version could not round
@@ -1844,7 +1879,8 @@
                 return R.createElement("button", {
                     key: p.label,
                     type: "button",
-                    className: "refract-cc-preset",
+                    className: "refract-cc-preset" + (on ? " is-active" : ""),
+                    "aria-pressed": on ? "true" : "false",
                     title: (tip ? tip + " " : "") + "Adjust anything afterwards.",
                     onClick: function () { applyCardPreset(p); }
                 },
@@ -2076,7 +2112,7 @@
                                 R.createElement("span", { className: "refract-cc-hint" },
                                     editingBack
                                         ? (backStyle === "dossier"
-                                            ? "The dossier has a fixed layout; pick another look to arrange one"
+                                            ? "The grid is fixed; hover the media strip or the footer to switch them off"
                                             : "Hover a band of the back to change what sits there")
                                         : "Hover a corner of the card to change what sits there"),
                                 R.createElement("button", {
@@ -2365,6 +2401,21 @@
         function RefractInterfacePortalHost() {
             var st = R3.useState(null);
             var container = st[0], setContainer = st[1];
+            /* The panel reads every preference into useState at mount, and on
+               a fresh device it mounts BEFORE the server pull lands: shipped
+               defaults shown as the current state, over a library configured
+               otherwise, and any click in that window syncs stale values up.
+               When the pull settles, remount the whole panel (key change) so
+               every hook re-reads the now-correct localStorage. One remount,
+               only ever on the first settle, invisible when nothing changed. */
+            var epochSt = R3.useState(refractSyncSettled ? 1 : 0);
+            R3.useEffect(function () {
+                var live = true;
+                refractOnSettingsSynced(function () {
+                    if (live) { epochSt[1](1); }
+                });
+                return function () { live = false; };
+            }, []);
             var tokenRef = R3.useRef({});
             R3.useEffect(function () {
                 var t = setInterval(function () {
@@ -2393,7 +2444,8 @@
                 return function () { clearInterval(t); };
             }, [container]);
             if (!container) { return null; }
-            return PluginApi.ReactDOM.createPortal(R3.createElement(RefractSettingsPanel), container);
+            return PluginApi.ReactDOM.createPortal(
+                R3.createElement(RefractSettingsPanel, { key: "sync-" + epochSt[0] }), container);
         }
         PluginApi.patch.instead("MainNavBar.UtilityItems", function () {
             var args = Array.prototype.slice.call(arguments);
@@ -2659,6 +2711,9 @@
            draws would be the no-op Rating banner all over again. */
         { key: "refract.scHideDate",       cls: "refract-sc-hide-date",       group: "scene",     label: "Date", classicOnly: true },
         { key: "refract.scHideResolution", cls: "refract-sc-hide-resolution", group: "scene",     label: "Resolution", classicOnly: true },
+        /* The last untoggleable scene element. Off, the card is a pure
+           poster -- same legitimate wall as hiding the performer's name. */
+        { key: "refract.scHideTitle",      cls: "refract-sc-hide-title",      group: "scene",     label: "Title" },
         /* NO-OP. Its rule hides `.performer-card .rating-banner`, and a
            performer card never renders one: checked live across four
            performers under BOTH card styles, always ABSENT. The performer's
@@ -2673,6 +2728,11 @@
         { key: "refract.pcHideName",       cls: "refract-pc-hide-name",       group: "performer", label: "Name" },
         { key: "refract.pcHideCountry",    cls: "refract-pc-hide-country",    group: "performer", label: "Country" },
         { key: "refract.pcHideStats",      cls: "refract-pc-hide-stats",      group: "performer", label: "Stat pills" },
+        /* Ascension's rank read-out. Its visibility used to be a side effect
+           of the Country chip (the badge is HOSTED inside the country caption
+           when one exists); now it has its own switch and survives the
+           country's. Only offered when Ascension is actually installed. */
+        { key: "refract.pcHideRank",       cls: "refract-pc-hide-rank",       group: "performer", label: "Rank badge", plugin: "ascension" },
         /* The BACK of a performer card. In "mirror" style the back is the same
            face as the front configured differently, so it has its own copies of
            the same kinds of element rather than sharing the front's. */
@@ -2682,7 +2742,13 @@
            claiming to be ("its own selection"). Seven checkboxes could express
            the same set but never the same ORDER, and made you think in terms of
            what to hide rather than what to show. See BACK_STATS. */
-        { key: "refract.mbHideTier",       cls: "refract-mb-hide-tier",       group: "back", label: "Tier ribbon", tier: true }
+        { key: "refract.mbHideTier",       cls: "refract-mb-hide-tier",       group: "back", label: "Tier ribbon", tier: true },
+        /* The dossier's two switchable panels. Its ratings grid stays fixed
+           (that layout IS the look), but the media strip and the collector
+           footer are additions a purist may not want -- and the dossier being
+           the DEFAULT back with zero knobs was its own finding. */
+        { key: "refract.cbHideMedia",      cls: "refract-cb-hide-media",      group: "back", label: "Media strip", dossier: true },
+        { key: "refract.cbHideFoot",       cls: "refract-cb-hide-foot",       group: "back", label: "Collector footer", dossier: true }
     ];
     /* Which quadrant of the card each element lives in. Top-edge scene
        elements are absent on purpose: their corner follows their own
@@ -2709,7 +2775,11 @@
         "refract.pcHideTier":       "tr",
         /* The back's stats live in ONE strip across the bottom, so they share
            one zone. Splitting them across bl and br would ring half a row. */
-        "refract.mbHideTier":       "tr"
+        "refract.mbHideTier":       "tr",
+        "refract.pcHideRank":       "bottom",
+        "refract.scHideTitle":      "bl",
+        "refract.cbHideMedia":      "dmedia",
+        "refract.cbHideFoot":       "dfoot"
     };
     var TIER_LAYER_KEY = "refract.scTierLayer";
     /* The studio can be a logo in a corner, or the studio's NAME set before the
@@ -3503,12 +3573,41 @@
     /* Boot reconcile: pull the server copy. If present, it wins — write it
        into localStorage and re-apply. If absent (first run after upgrade),
        migrate the current localStorage settings up to the server. */
+    /* Server keys that were split or renamed live on in old server copies
+       (and are re-imported forever on devices that never re-push). Each maps
+       an old server key onto the new local keys it feeds, applied only when
+       the server has no opinion on the new keys itself. */
+    var REFRACT_SYNC_LEGACY = {
+        "refract.scHideCounts": ["refract.scHideOCount", "refract.scHideTagCount"]
+    };
+    /* Settled-sync listeners: the customiser mounts before this pull lands
+       and must re-read everything once it does (the first-visit panel used
+       to show shipped defaults over a server copy that said otherwise). */
+    var refractSyncSettled = false;
+    var refractSyncListeners = [];
+    function refractOnSettingsSynced(fn) {
+        if (refractSyncSettled) { fn(); return; }
+        refractSyncListeners.push(fn);
+    }
+    function refractSettleSync() {
+        refractSyncSettled = true;
+        var ls = refractSyncListeners.splice(0);
+        ls.forEach(function (fn) { try { fn(); } catch (e) { /* ignore */ } });
+    }
     function initSettingsSync() {
+        /* What each key held when the pull STARTED: a key the user changes
+           while the pull is in flight wins over the server copy, instead of
+           being silently reverted a second after they set it. */
+        var atBoot = {};
+        REFRACT_SYNC_KEYS.forEach(function (k) {
+            try { atBoot[k] = localStorage.getItem(k); } catch (e) { atBoot[k] = null; }
+        });
         gql("query { configuration { ui } }").then(function (res) {
             var ui = res && res.data && res.data.configuration && res.data.configuration.ui;
             var server = ui && ui.refract;
             if (server && typeof server === "object" && Object.keys(server).length) {
                 var changed = false;
+                var editedInFlight = false;
                 REFRACT_SYNC_KEYS.forEach(function (k) {
                     if (!Object.prototype.hasOwnProperty.call(server, k)) { return; }
                     var sv = server[k];
@@ -3516,16 +3615,35 @@
                     sv = String(sv);
                     var cur = null;
                     try { cur = localStorage.getItem(k); } catch (e) { /* ignore */ }
+                    if (cur !== atBoot[k]) { editedInFlight = true; return; }
                     if (cur !== sv) {
                         try { localStorage.setItem(k, sv); changed = true; } catch (e) { /* ignore */ }
                     }
                 });
+                /* Old-name keys in the server copy feed their successors,
+                   unless the server already carries the successors. */
+                Object.keys(REFRACT_SYNC_LEGACY).forEach(function (oldK) {
+                    var sv = server[oldK];
+                    if (sv === null || sv === undefined) { return; }
+                    REFRACT_SYNC_LEGACY[oldK].forEach(function (newK) {
+                        if (Object.prototype.hasOwnProperty.call(server, newK)) { return; }
+                        var cur = null;
+                        try { cur = localStorage.getItem(newK); } catch (e) { /* ignore */ }
+                        if (cur === null) {
+                            try { localStorage.setItem(newK, String(sv)); changed = true; } catch (e) { /* ignore */ }
+                        }
+                    });
+                });
                 if (changed) { reapplyRefractSettings(); }
+                /* Anything edited mid-pull goes back up so the server copy
+                   converges instead of staying one change behind. */
+                if (editedInFlight) { scheduleServerSync(); }
             } else if (Object.keys(snapshotRefractSettings()).length) {
                 /* No server copy yet — migrate current localStorage up. */
                 scheduleServerSync();
             }
-        }).catch(function () { /* no server / no auth — stay on localStorage */ });
+            refractSettleSync();
+        }).catch(function () { refractSettleSync(); /* no server / no auth — stay on localStorage */ });
     }
     initSettingsSync();
 
@@ -4996,6 +5114,13 @@
             .replace(/&/g, "&amp;").replace(/</g, "&lt;")
             .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
+    /* A URL bound for style="background-image:url('...')" built as an HTML
+       string: the single-quote swap covers the url() context and the entity
+       escape covers the attribute context. Every value is a Stash-shaped URL
+       today, but relying on Stash never emitting a quote is not a contract. */
+    function refractCssUrlAttr(u) {
+        return refractFlipEscHtml(String(u == null ? "" : u).replace(/'/g, "%27"));
+    }
 
     /* Solar's "flip horizontal" pennants (CC-BY, svgrepo 528971), adapted for
        13px: two EQUAL pennants folding toward a solid axis -- symmetric in
@@ -5300,14 +5425,23 @@
            the page keeps Stash's plain image and nothing is added. */
         if (!document.body.classList.contains("refract-perf-layout-card") || !img) {
             var stale = host.querySelector(".refract-pp");
-            if (stale && stale.parentNode) { stale.parentNode.removeChild(stale); }
+            if (stale) {
+                if (stale._rfxRo) { stale._rfxRo.disconnect(); }
+                if (stale.parentNode) { stale.parentNode.removeChild(stale); }
+            }
             host.classList.remove("refract-pp-host");
             refractApplyBackToolbar();
             return;
         }
         var existing = host.querySelector(".refract-pp");
         if (existing && existing.getAttribute("data-pid") === pid) { refractApplyBackToolbar(); return; }
-        if (existing && existing.parentNode) { existing.parentNode.removeChild(existing); }
+        /* The old stage's ResizeObserver dies WITH the old stage. It used to
+           survive: one orphaned observer per rebuild, each firing fit()
+           against a detached node and pinning its closure. */
+        if (existing) {
+            if (existing._rfxRo) { existing._rfxRo.disconnect(); }
+            if (existing.parentNode) { existing.parentNode.removeChild(existing); }
+        }
 
         host.classList.add("refract-pp-host");
         var root = document.createElement("div");
@@ -5326,11 +5460,33 @@
            it is its own picture at its own aspect. The frame changes shape at
            the edge-on moment of the flip, where nothing is visible. */
         var stage = root.querySelector(".refract-pp-stage");
+        var frontCopy = root.querySelector(".refract-pp-front");
         var backRatio = null;   /* height / width of the back photo, once known */
         var showingBack = false;
+        var lastSrc = img.getAttribute("src") || "";
+        /* React owns the <img> and replaces it -- Stash's own "Set image
+           (front)" swaps the node. fit() re-resolves it every pass instead of
+           closing over a node that may be detached, and the front copy
+           follows a changed src, so the stage never freezes on a dead photo. */
+        var liveImg = function () {
+            if (!img.isConnected) {
+                var fresh = host.querySelector("img.performer");
+                if (fresh) {
+                    img = fresh;
+                    if (ro) { ro.observe(img); }
+                }
+            }
+            return img;
+        };
         var fit = function () {
-            var hb = host.getBoundingClientRect(), ib = img.getBoundingClientRect();
+            var im = liveImg();
+            var hb = host.getBoundingClientRect(), ib = im.getBoundingClientRect();
             if (!ib.width) { return; }
+            var src = im.getAttribute("src") || "";
+            if (src && src !== lastSrc) {
+                lastSrc = src;
+                frontCopy.style.backgroundImage = "url('" + src.replace(/'/g, "%27") + "')";
+            }
             var h = (showingBack && backRatio) ? Math.round(ib.width * backRatio) : ib.height;
             stage.style.left = (ib.left - hb.left) + "px";
             stage.style.top = (ib.top - hb.top) + "px";
@@ -5338,17 +5494,19 @@
             stage.style.height = h + "px";
         };
         root._rfxSetBack = function (on, ratio) { showingBack = on; if (ratio) { backRatio = ratio; } fit(); };
+        var ro = null;
         fit();
         requestAnimationFrame(fit);
         if (typeof ResizeObserver !== "undefined") {
-            var ro = new ResizeObserver(fit);
+            ro = new ResizeObserver(fit);
             ro.observe(img);
             ro.observe(host);
+            root._rfxRo = ro;
         }
         if (img.complete) { fit(); } else { img.addEventListener("load", fit, { once: true }); }
         /* The front copy still opens Stash's lightbox, as the image did. */
-        root.querySelector(".refract-pp-front").addEventListener("click", function () {
-            var b = img.closest("button");
+        frontCopy.addEventListener("click", function () {
+            var b = liveImg().closest("button");
             if (b) { b.click(); }
         });
 
@@ -5391,13 +5549,22 @@
             }
             var url = String(backPhotoUrl());
             el.style.backgroundImage = "url('" + url.replace(/'/g, "%27") + "')";
-            /* Its natural shape decides the frame's height on the back. */
-            var probe = new Image();
-            probe.onload = function () {
-                backRatioKnown = probe.naturalWidth ? (probe.naturalHeight / probe.naturalWidth) : null;
+            /* Its natural shape decides the frame's height on the back. The
+               probe is bounded: a request that neither loads nor errors used
+               to leave busy=true forever, a dead flip button. */
+            var settled = false;
+            var finish = function (ratio) {
+                if (settled) { return; }
+                settled = true;
+                backRatioKnown = ratio;
                 if (done) { done(); }
             };
-            probe.onerror = function () { backRatioKnown = null; if (done) { done(); } };
+            var probe = new Image();
+            probe.onload = function () {
+                finish(probe.naturalWidth ? (probe.naturalHeight / probe.naturalWidth) : null);
+            };
+            probe.onerror = function () { finish(null); };
+            setTimeout(function () { finish(backRatioKnown); }, 5000);
             probe.src = url;
         }
         function labelFlip() {
@@ -5486,7 +5653,7 @@
                     ' title="' + refractFlipEscHtml(sc.title || ("Scene " + sc.id)) + '"' +
                     ' data-path="' + refractFlipEscHtml(sc.paths.screenshot) + '">' +
                     '<span class="refract-pb-cell-art" style="background-image:url(\'' +
-                    String(sc.paths.screenshot).replace(/'/g, "%27") + '\')"></span></button>';
+                    refractCssUrlAttr(sc.paths.screenshot) + '\')"></span></button>';
             });
             if (anyImage) { cells += '<div class="refract-pb-group">Photos</div>'; }
             images.forEach(function (im) {
@@ -5496,7 +5663,7 @@
                     ' title="' + refractFlipEscHtml(im.title || ("Photo " + im.id)) + '"' +
                     ' data-path="' + refractFlipEscHtml(im.paths.thumbnail) + '">' +
                     '<span class="refract-pb-cell-art" style="background-image:url(\'' +
-                    String(im.paths.thumbnail).replace(/'/g, "%27") + '\')"></span></button>';
+                    refractCssUrlAttr(im.paths.thumbnail) + '\')"></span></button>';
             });
             if (!anyScene && !anyImage) {
                 cells += '<div class="refract-pb-empty">This performer has no scenes or photos to pick from yet.</div>';
@@ -5508,6 +5675,7 @@
             wrap.appendChild(pick);
             document.body.appendChild(wrap);
             var close = function () { if (wrap.parentNode) { wrap.parentNode.removeChild(wrap); } document.removeEventListener("keydown", onKey); };
+            wrap._rfxClose = close;
             var onKey = function (e) { if (e.key === "Escape") { close(); } };
             document.addEventListener("keydown", onKey);
             wrap.addEventListener("mousedown", function (e) { if (e.target === wrap) { close(); } });
@@ -5535,7 +5703,11 @@
 
     function refractCloseBackPicker() {
         var w = document.querySelector(".refract-pb-backdrop");
-        if (w && w.parentNode) { w.parentNode.removeChild(w); }
+        /* Through the picker's own close, which owns the document keydown
+           listener -- removing just the node orphaned one listener per
+           reopen. */
+        if (w && w._rfxClose) { w._rfxClose(); }
+        else if (w && w.parentNode) { w.parentNode.removeChild(w); }
     }
 
     /* A file, shrunk to fit a card. The card back never shows more than a few
@@ -5555,7 +5727,14 @@
                         var cw = Math.max(1, Math.round(w * k)), ch = Math.max(1, Math.round(h * k));
                         var cv = document.createElement("canvas");
                         cv.width = cw; cv.height = ch;
-                        cv.getContext("2d").drawImage(im, 0, 0, cw, ch);
+                        var ctx = cv.getContext("2d");
+                        /* JPEG has no alpha; an unpainted canvas encodes as
+                           black. Paint the card's own ground colour first, so
+                           a transparent PNG lands on the theme's dark rather
+                           than a void. */
+                        ctx.fillStyle = "#101014";
+                        ctx.fillRect(0, 0, cw, ch);
+                        ctx.drawImage(im, 0, 0, cw, ch);
                         resolve(cv.toDataURL("image/jpeg", quality));
                     } catch (e) { reject(e); }
                 };
@@ -6087,7 +6266,7 @@
         var cl = (card.className || "").match(/refract-card-tier-(\w+)/);
         if (cl) { tier = cl[1]; }
         var photo = imgSrc
-            ? ' style="background-image:url(\'' + imgSrc.replace(/'/g, "%27") + '\')"' : '';
+            ? ' style="background-image:url(\'' + refractCssUrlAttr(imgSrc) + '\')"' : '';
 
         /* Fixed, NON-SCROLLING dossier with the STATS as the hero: a title bar
            (name top-left, tier chip top-right), a hero row pairing the portrait
@@ -6181,6 +6360,28 @@
     }
 
     function refractFillPerformerBack(back, p, scenes, images) {
+        /* The backdrop follows the SAME back-image resolution as the gallery
+           and the performer page: per-performer override first, then the
+           global rule (top scene / top photo / portrait). It used to stay the
+           front image no matter what, so "Set image (back)" and the image
+           band did nothing on the default back while the performer-page flip
+           showed the choice -- the feature contradicting itself. The build
+           pass still paints the portrait first so the back is never blank;
+           this repaints once the data lands. */
+        var bp = back.querySelector(".refract-back-photo");
+        if (bp) {
+            var bOver = refractBackOverride(p && p.custom_fields);
+            var bSrc = backSrcPref();
+            var bUrl = null;
+            if (bOver && bOver.path) {
+                bUrl = bOver.path;
+            } else if (bSrc === "scene" && scenes && scenes[0] && scenes[0].paths && scenes[0].paths.screenshot) {
+                bUrl = scenes[0].paths.screenshot;
+            } else if (bSrc === "photo" && images && images[0] && images[0].paths && images[0].paths.thumbnail) {
+                bUrl = images[0].paths.thumbnail;
+            }
+            if (bUrl) { bp.style.backgroundImage = "url('" + String(bUrl).replace(/'/g, "%27") + "')"; }
+        }
         var explicit = isCardBackExplicit();
         var L = explicit ? {
             score: "Slut Score", assets: "Assets", scenes: "On-Cam Fucks", o: "Loads", topscene: "Best Fuck"
@@ -6224,7 +6425,7 @@
                     var rate = (m.rate != null) ? '<span class="refract-cb-media-rate">&#9733; ' + m.rate + '</span>' : '';
                     return '<a class="refract-cb-media-item" href="' + refractFlipEscHtml(m.href) + '">' +
                         '<div class="refract-cb-media-img" style="background-image:url(\'' +
-                        String(m.url).replace(/'/g, "%27") + '\')"></div>' + tag + rate + '</a>';
+                        refractCssUrlAttr(m.url) + '\')"></div>' + tag + rate + '</a>';
                 }).join("");
                 mediaEl.addEventListener("click", refractMediaNavClick);
             }
@@ -6352,7 +6553,7 @@
         var html = "";
         cells.forEach(function (c) {
             html += '<span class="refract-mb-cell" style="background-image:url(\'' +
-                String(c.url).replace(/'/g, "%27") + '\')" title="' +
+                refractCssUrlAttr(c.url) + '\')" title="' +
                 refractFlipEscHtml(c.label) + '">' +
                 (mixed ? '<span class="refract-mb-cell-tag">' + c.tag + '</span>' : '') +
                 '</span>';
@@ -8037,7 +8238,9 @@
                the RIGHT edge of the card. The marker class turns the caption
                into a space-between flex row (name left, rank right), and we
                append the badge as its last child. */
-            var country = (pcMode && section)
+            /* A country the user has HIDDEN is no host: the badge would die
+               with it, its visibility a side effect of an unrelated chip. */
+            var country = (pcMode && section && !document.body.classList.contains("refract-pc-hide-country"))
                 ? section.querySelector(":scope > .stash-perf-country")
                 : null;
             if (country) {

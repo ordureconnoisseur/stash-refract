@@ -725,3 +725,48 @@ body.stash-liquid-glass.refract-light .form-switch .form-check-input:checked {
         inset 0 1px 2px rgba(var(--accent-rgb), 0.10),
         0 0 0 3px rgba(var(--accent-rgb), 0.10) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Card customiser in light mode. The panel was built dark-first: the look
+   miniatures draw their parts in translucent WHITE (--art-*), which is
+   invisible on a light tile, and the rail/segments/chips keep near-black
+   fills that read as mud on the light page. Flip the art to ink, lighten
+   the control grounds, and keep accent meaning what it means.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.stash-liquid-glass.refract-light .refract-cc-preset-art {
+    background: rgba(20, 22, 34, 0.05);
+    border-color: rgba(20, 22, 34, 0.14);
+}
+/* The vars live ON the inner (base rule), so the override must too --
+   inherited values from the tile would lose to them. */
+body.stash-liquid-glass.refract-light .refract-cc-preset-inner {
+    --art-strong: rgba(20, 22, 34, 0.62);
+    --art-quiet: rgba(20, 22, 34, 0.34);
+    background: repeating-linear-gradient(135deg,
+        rgba(20, 22, 34, 0.07) 0 5px,
+        rgba(20, 22, 34, 0.035) 5px 10px);
+}
+body.stash-liquid-glass.refract-light .refract-cc-kind,
+body.stash-liquid-glass.refract-light .refract-cc-seg {
+    background: rgba(20, 22, 34, 0.08);
+}
+body.stash-liquid-glass.refract-light .refract-cc-chip,
+body.stash-liquid-glass.refract-light .refract-cc-chip-slot {
+    background: rgba(255, 255, 255, 0.88);
+    border-color: rgba(20, 22, 34, 0.22);
+    color: rgba(20, 22, 34, 0.85);
+}
+body.stash-liquid-glass.refract-light .refract-cc-slot-menu {
+    background: rgba(255, 255, 255, 0.92);
+}
+body.stash-liquid-glass.refract-light .refract-cc-tile {
+    background: rgba(20, 22, 34, 0.035);
+}
+body.stash-liquid-glass.refract-light .refract-cc-cardslot::after {
+    background: radial-gradient(50% 100% at 50% 50%, rgba(20, 22, 34, 0.28), transparent 75%);
+}
+body.stash-liquid-glass.refract-light .refract-cc-reset:hover {
+    border-color: rgba(190, 40, 40, 0.5);
+    background: rgba(190, 40, 40, 0.07);
+    color: rgba(120, 20, 20, 0.9);
+}

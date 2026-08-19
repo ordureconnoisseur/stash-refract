@@ -1785,10 +1785,12 @@ body.stash-liquid-glass .refract-cc-face-btn {
 body.stash-liquid-glass .refract-cc-face-btn:hover {
     color: var(--text);
 }
+/* Accent, dimmer than the tab's: the same vocabulary at a lower rank. The
+   neutral grey it had read as DISABLED next to the glowing tab. */
 body.stash-liquid-glass .refract-cc-face-btn.is-active {
-    background: rgba(255, 255, 255, 0.09);
-    border-color: rgba(255, 255, 255, 0.14);
-    color: var(--text);
+    background: rgba(var(--accent-rgb), 0.12);
+    border-color: rgba(var(--accent-rgb), 0.3);
+    color: var(--accent-bright);
     font-weight: 600;
 }
 body.stash-liquid-glass .refract-cc-face-btn:focus-visible,
@@ -1851,8 +1853,50 @@ body.stash-liquid-glass .refract-cc-stage {
        fixed 348px for a tiles column; the tiles live in the strip below now,
        and the two cards are different heights by nature (253 vs 396). */
     min-height: 0;
-    padding: 4px 0;
+    padding: 10px 0 14px;
+    position: relative;
 }
+
+/* The stage borrows the preview card's tier (a refract-cc-tier-* class the
+   panel mirrors from the card) and lights the room with it: a seal-tinted
+   pool of light behind the card and a floor shadow under it. An unrated card
+   gets the accent, faintly. The card was a neon jewel on a dead field; now
+   the box is complicit. */
+body.stash-liquid-glass .refract-cc-tier-bronze    { --cc-seal-rgb: 205, 127, 50; }
+body.stash-liquid-glass .refract-cc-tier-silver    { --cc-seal-rgb: 216, 219, 226; }
+body.stash-liquid-glass .refract-cc-tier-gold      { --cc-seal-rgb: 245, 197, 66; }
+body.stash-liquid-glass .refract-cc-tier-diamond   { --cc-seal-rgb: 185, 242, 255; }
+body.stash-liquid-glass .refract-cc-tier-legendary { --cc-seal-rgb: 208, 139, 255; }
+body.stash-liquid-glass .refract-cc-tier-perfect   { --cc-seal-rgb: 255, 255, 255; }
+/* On the CARDSLOT, which shrink-wraps the card -- on the stage (full panel
+   width) the pool became a wall-to-wall wash. Oversized ~40% beyond the card
+   so it reads as light falling off, not a painted box. */
+body.stash-liquid-glass .refract-cc-cardslot::before {
+    content: "";
+    position: absolute;
+    inset: -18% -22%;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(50% 46% at 50% 54%,
+        rgba(var(--cc-seal-rgb, var(--accent-rgb)), 0.13), transparent 70%);
+}
+body.stash-liquid-glass .refract-cc-cardslot::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -10px;
+    width: 72%;
+    height: 16px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(50% 100% at 50% 50%, rgba(0, 0, 0, 0.55), transparent 75%);
+}
+body.stash-liquid-glass .refract-cc-cardslot > * {
+    position: relative;
+    z-index: 1;
+}
+
 body.stash-liquid-glass .refract-cc-cardslot {
     position: relative;
     display: flex;
@@ -2045,8 +2089,10 @@ body.stash-liquid-glass .refract-cc-chip {
     display: flex;
     align-items: center;
     gap: 7px;
-    padding: 5px 9px;
-    border-radius: 7px;
+    padding: 5px 11px;
+    /* Capsule, like the stat pills these edit: the controls read as "of the
+       card", not as form furniture. */
+    border-radius: 999px;
     background: rgba(10, 10, 13, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.18);
     font-size: 0.71rem;
@@ -2141,11 +2187,6 @@ body.stash-liquid-glass .refract-cc-group-head {
     justify-content: space-between;
     gap: 1rem;
     min-height: 24px;
-    font-size: 0.66rem;
-    font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--text-muted);
 }
 body.stash-liquid-glass .refract-cc-group-tiles {
     display: grid;
@@ -2156,6 +2197,14 @@ body.stash-liquid-glass .refract-cc-group-tiles {
 }
 body.stash-liquid-glass .refract-cc-group-tiles .refract-cc-tile {
     min-width: 0;
+}
+/* "This card" outranks the three Both-cards tiles: a whisper of the active
+   tab's accent on its border and crown. */
+body.stash-liquid-glass .refract-cc-group-this .refract-cc-tile {
+    border-color: rgba(var(--accent-rgb), 0.22);
+    background:
+        linear-gradient(rgba(var(--accent-rgb), 0.05), transparent 45%),
+        rgba(255, 255, 255, 0.028);
 }
 /* Four tiles across ~700px: the segments give up their fixed padding and
    share the tile's width, so "Minimal | Extravagant" fits a 165px tile. */
@@ -2234,7 +2283,11 @@ body.stash-liquid-glass .refract-cc-looks {
     flex-direction: column;
     gap: 0.6rem;
 }
-body.stash-liquid-glass .refract-cc-looks-head {
+/* Section heads stay in the panel's own UI type. Concert One was tried here
+   and rejected: the display face belongs to the CARD, and a settings panel
+   borrowing it read as a new font, not a gesture. */
+body.stash-liquid-glass .refract-cc-looks-head,
+body.stash-liquid-glass .refract-cc-group-head > span {
     font-size: 0.66rem;
     font-weight: 600;
     letter-spacing: 0.16em;
@@ -2308,14 +2361,33 @@ body.stash-liquid-glass .refract-cc-preset-inner {
         rgba(255, 255, 255, 0.05) 0 5px,
         rgba(255, 255, 255, 0.025) 5px 10px);
 }
-body.stash-liquid-glass .refract-cc-preset-performer .refract-cc-preset-inner {
+body.stash-liquid-glass .refract-cc-preset-performer .refract-cc-preset-inner,
+body.stash-liquid-glass .refract-cc-preset-back .refract-cc-preset-inner {
     aspect-ratio: 216 / 324;
+    height: auto;
+    width: calc(100% - 18px);
+    top: 9px;
+    bottom: 9px;
+}
+/* Portrait tabs: the tile takes the MINIATURE's shape instead of parking a
+   90px portrait in a 440px landscape box -- the old lower third of the panel
+   was three near-empty grey rectangles. More, smaller tiles per row; the art
+   is bigger than before despite the smaller tile. */
+body.stash-liquid-glass .refract-cc-preset-grid.refract-cc-preset-performer,
+body.stash-liquid-glass .refract-cc-preset-grid.refract-cc-preset-back {
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+    max-width: 720px;
+}
+body.stash-liquid-glass .refract-cc-preset-performer .refract-cc-preset-art,
+body.stash-liquid-glass .refract-cc-preset-back .refract-cc-preset-art {
+    height: auto;
+    aspect-ratio: 2 / 3;
 }
 /* Gold, not accent: on this row accent means "the look in force" and only
    that. The tier ring is a fact about the look (it shows the sash), drawn in
    the sash's own colour. */
 body.stash-liquid-glass .refract-cc-preset-art.is-extravagant .refract-cc-preset-inner {
-    box-shadow: inset 0 0 0 1.5px rgba(216, 180, 94, 0.7);
+    box-shadow: inset 0 0 0 1.5px rgba(245, 197, 66, 0.55);
 }
 
 /* ── Parts: one grammar, three weights ────────────────────────────────────
@@ -2563,6 +2635,10 @@ body.stash-liquid-glass .refract-cc-preset-label {
     }
     body.stash-liquid-glass .refract-cc-group-tiles {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+        /* The base rule's column auto-flow would spill every extra tile into
+           implicit columns PAST the two declared ones -- the whole page
+           scrolled sideways at 1000px. Rows here. */
+        grid-auto-flow: row;
     }
     body.stash-liquid-glass .refract-cc-rail {
         flex-wrap: wrap;
@@ -2645,6 +2721,12 @@ body.stash-liquid-glass .refract-cc-preset-grid {
        as a rendering fault. Pushed to the bottom edge of the panel it reads as
        padding instead. */
     align-content: start;
+}
+/* Portrait grids are one row of small tiles; reserving two landscape rows
+   under them was most of the dead space. */
+body.stash-liquid-glass .refract-cc-preset-grid.refract-cc-preset-performer,
+body.stash-liquid-glass .refract-cc-preset-grid.refract-cc-preset-back {
+    min-height: 0;
 }
 
 
@@ -2919,7 +3001,7 @@ body.stash-liquid-glass .refract-cc-ring-tray {
 }
 /* Two chips, centred over the tray they describe. A column would cover it. */
 body.stash-liquid-glass .refract-cc-chips-tray {
-    top: 63%;
+    top: 46%;
     left: 0;
     right: 0;
     transform: none;
@@ -2930,6 +3012,58 @@ body.stash-liquid-glass .refract-cc-chips-tray {
     align-items: center;
     gap: 4px;
 }
+/* The dossier's two switchable panels: the media strip band and the
+   collector footer band, measured off the built card (header ~10%, hero to
+   ~28%, ratings to ~66%, media ~66-86%, foot ~86-100%). */
+body.stash-liquid-glass .refract-cc-hit-dmedia {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 60%;
+    width: auto;
+    height: 26%;
+    cursor: pointer;
+}
+body.stash-liquid-glass .refract-cc-hit-dfoot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    width: auto;
+    height: 14%;
+    cursor: pointer;
+}
+body.stash-liquid-glass .refract-cc-ring-dmedia {
+    left: 5px;
+    right: 5px;
+    top: 64%;
+    width: auto;
+    height: 20%;
+}
+body.stash-liquid-glass .refract-cc-ring-dfoot {
+    left: 5px;
+    right: 5px;
+    bottom: 4px;
+    top: auto;
+    width: auto;
+    height: 11%;
+}
+body.stash-liquid-glass .refract-cc-chips-dmedia,
+body.stash-liquid-glass .refract-cc-chips-dfoot {
+    left: 0;
+    right: 0;
+    transform: none;
+    padding: 0 6px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+body.stash-liquid-glass .refract-cc-chips-dmedia { top: 48%; }
+body.stash-liquid-glass .refract-cc-chips-dfoot { top: auto; bottom: 16%; }
+
 /* The stat strip is the bottom sixth now that the tray owns the middle. */
 body.stash-liquid-glass .refract-cc-hit-bottom {
     height: 16%;
@@ -2956,9 +3090,6 @@ body.stash-liquid-glass .refract-cc-chips-bottom {
    quiet. The only new part is the tray, and it is drawn as what it is -- a
    panel of six cells -- because that is the single thing that tells the two
    looks apart. */
-body.stash-liquid-glass .refract-cc-preset-back .refract-cc-preset-inner {
-    aspect-ratio: 216 / 324;
-}
 body.stash-liquid-glass .refract-cc-preset-back .refract-cc-art-ribbon {
     width: 34%;
 }
@@ -3083,7 +3214,17 @@ body.stash-liquid-glass .refract-cc-preset.is-active .refract-cc-preset-art {
     box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.5);
 }
 body.stash-liquid-glass .refract-cc-preset.is-active .refract-cc-preset-label {
-    color: var(--text);
+    color: var(--accent-bright);
+}
+body.stash-liquid-glass .refract-cc-preset.is-active .refract-cc-preset-label::before {
+    content: "";
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: var(--accent-bright);
+    vertical-align: middle;
 }
 /* A look the library cannot use (Dossier without category ratings): kept in
    its place, greyed, and it SAYS why under its name -- a tooltip alone is a
@@ -3092,8 +3233,18 @@ body.stash-liquid-glass .refract-cc-preset.is-unavailable {
     cursor: not-allowed;
 }
 body.stash-liquid-glass .refract-cc-preset.is-unavailable .refract-cc-preset-art {
-    opacity: 0.4;
-    filter: saturate(0.4);
+    opacity: 0.3;
+    filter: saturate(0.15);
+}
+/* A diagonal strike across the art: the dimming alone barely read, because
+   the normal minis are already near-black. */
+body.stash-liquid-glass .refract-cc-preset.is-unavailable .refract-cc-preset-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top right,
+        transparent calc(50% - 1px), rgba(255, 255, 255, 0.45) calc(50% - 1px),
+        rgba(255, 255, 255, 0.45) calc(50% + 1px), transparent calc(50% + 1px));
 }
 body.stash-liquid-glass .refract-cc-preset.is-unavailable:hover .refract-cc-preset-art {
     border-color: var(--glass-border);

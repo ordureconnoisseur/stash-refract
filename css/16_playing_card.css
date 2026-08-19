@@ -1863,6 +1863,15 @@ body.stash-liquid-glass .refract-cb-foot-item {
     letter-spacing: 0.06em;
     color: rgba(255, 255, 255, 0.5);
 }
+/* The dossier's switchable panels (customiser chips). The ratings grid is
+   flex 1 1 auto, so it absorbs the freed room and the fitter shows more
+   category rows -- switching the strip off is also how you see all eight. */
+body.stash-liquid-glass.refract-cb-hide-media.refract-cb-hide-media .refract-card-back .refract-cb-media {
+    display: none !important;
+}
+body.stash-liquid-glass.refract-cb-hide-foot.refract-cb-hide-foot .refract-card-back .refract-cb-foot {
+    display: none !important;
+}
 body.stash-liquid-glass .refract-cb-foot-item b {
     color: var(--seal);
     font-size: 0.78rem;
