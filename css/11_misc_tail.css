@@ -1941,6 +1941,9 @@ body.stash-liquid-glass .refract-cc-corners {
     position: absolute;
     inset: 0;
     z-index: 60;
+    /* Clips the ring's spotlight shadow to the card's own silhouette. */
+    overflow: hidden;
+    border-radius: 14px;
 }
 body.stash-liquid-glass .refract-cc-hit {
     position: absolute;
@@ -1996,30 +1999,72 @@ body.stash-liquid-glass .refract-cc-ring.is-intro {
 body.stash-liquid-glass .refract-cc-ring-tl { top: 3px; left: 3px; }
 body.stash-liquid-glass .refract-cc-ring-tr { top: 3px; right: 3px; }
 body.stash-liquid-glass .refract-cc-ring-bl { bottom: 3px; left: 3px; }
-body.stash-liquid-glass .refract-cc-ring-br { bottom: 3px; right: 3px; }
-
-/* Chips sit vertically centred on the hovered side, clear of both top
-   corners, so they never cover the element they are describing. */
+body.stash-liquid-glass .refract-cc-ring-br { bottom: 3px; right: 3px; }/* ── The armed band: spotlight + one tray ─────────────────────────────────
+   Arming a band does two things now. The REST of the card dims (the ring
+   carries an oversized box-shadow, clipped by the corners layer), so the
+   ringed band is literally the lit thing, and the chips live in ONE glass
+   tray docked beside the ring -- below a top band, above a bottom one --
+   instead of raining individual pills across the artwork. The tray is an
+   object; the old chips were confetti. */
+body.stash-liquid-glass .refract-cc-ring:not(.is-intro) {
+    box-shadow: 0 0 0 640px rgba(7, 7, 11, 0.45);
+}
 body.stash-liquid-glass .refract-cc-chips {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     gap: 4px;
     z-index: 6;
+    width: max-content;
+    max-width: calc(100% - 8px);
+    padding: 5px 6px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(10, 10, 15, 0.86);
+    -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
 }
-
+/* Inside the tray the chips go quiet -- the tray carries the ground now --
+   while the slot chips and every on/hover state keep their own voices. */
+/* The slot menu is its own panel; a tray around it would be a box in a
+   box. The tray goes transparent and lets the menu carry the ground. */
+body.stash-liquid-glass .refract-cc-chips:has(.refract-cc-slot-menu) {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+    padding: 0;
+}
+body.stash-liquid-glass .refract-cc-chips .refract-cc-chip:not(.refract-cc-chip-slot) {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+body.stash-liquid-glass .refract-cc-chips .refract-cc-chip:not(.refract-cc-chip-slot):hover {
+    background: rgba(var(--accent-rgb), 0.2);
+    border-color: rgba(var(--accent-rgb), 0.55);
+}
+/* Placement is one number per zone: below the top rings, above the bottom
+   ones, measured against each card's own ring geometry. */
 body.stash-liquid-glass .refract-cc-chips-tl,
-body.stash-liquid-glass .refract-cc-chips-bl {
-    left: 8px;
-    align-items: flex-start;
-}
-body.stash-liquid-glass .refract-cc-chips-tr,
-body.stash-liquid-glass .refract-cc-chips-br {
-    right: 8px;
-    align-items: flex-end;
-}
+body.stash-liquid-glass .refract-cc-chips-tr { top: 46%; }
+body.stash-liquid-glass .refract-cc-chips-bl,
+body.stash-liquid-glass .refract-cc-chips-br { bottom: 46%; }
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-chips-tl { top: 19%; }
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-chips-tr { top: 33%; }
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-chips-bottom { top: auto; bottom: 21%; }
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-chips-img { top: 40%; }
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-chips-tr { top: 33%; }
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-chips-tray { top: 44%; }
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-chips-bottom { top: auto; bottom: 19%; }
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-chips-dmedia { top: 50%; }
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-chips-dfoot { top: auto; bottom: 17%; }
+
 /* The slot menu: two even columns of stats, Remove alone beneath. */
 body.stash-liquid-glass .refract-cc-slot-menu {
     display: grid;
@@ -2365,9 +2410,9 @@ body.stash-liquid-glass .refract-cc-preset-performer .refract-cc-preset-inner,
 body.stash-liquid-glass .refract-cc-preset-back .refract-cc-preset-inner {
     aspect-ratio: 216 / 324;
     height: auto;
-    width: calc(100% - 18px);
-    top: 9px;
-    bottom: 9px;
+    width: calc(100% - 26px);
+    top: 13px;
+    bottom: 13px;
 }
 /* Portrait tabs: the tile takes the MINIATURE's shape instead of parking a
    90px portrait in a 440px landscape box -- the old lower third of the panel
@@ -2429,17 +2474,18 @@ body.stash-liquid-glass .refract-cc-art-title {
    title, so both miniatures speak the same language. */
 body.stash-liquid-glass .refract-cc-art-name {
     top: 5%;
-    /* Runs to 80%, under the sash. The real name banner spans x0-75% and the
-       sash cuts through its tail; at 52% the two never met and the miniature
-       showed a crossing that does not happen and missed one that does. */
-    width: 76%;
+    /* STOPS SHORT of the sash. The real banner does run under it, but at
+       118px the "crossing" read as the name bar ramming the ribbon --
+       elements touching, not layers layering. A clean gap wins at this
+       size. */
+    width: 58%;
 }
 body.stash-liquid-glass .refract-cc-art-country {
     position: absolute;
     left: 4%;
-    bottom: 17%;
-    width: 34%;
-    height: 4%;
+    bottom: 18.5%;
+    width: 30%;
+    height: 3.6%;
     border-radius: 2px;
     background: var(--art-quiet);
 }
@@ -2467,12 +2513,20 @@ body.stash-liquid-glass .refract-cc-art-extras {
 }
 /* The performer stat row spans nearly the full width: four pills, x4-96%. */
 body.stash-liquid-glass .refract-cc-art-stats {
-    left: 4%;
-    right: 4%;
-    bottom: 4%;
-    height: 10%;
-    gap: 3.5%;
+    left: 5%;
+    right: 5%;
+    bottom: 5%;
+    height: 8.5%;
+    gap: 4%;
 }
+/* Vitals: same slots, different stats -- drawn as squared, varied-width
+   pills so the tile is visibly not Default. Two identical tiles side by
+   side made no sense. */
+body.stash-liquid-glass .refract-cc-art-stats.is-alt i {
+    border-radius: 3px;
+}
+body.stash-liquid-glass .refract-cc-art-stats.is-alt i:nth-child(1) { flex: 1.5; }
+body.stash-liquid-glass .refract-cc-art-stats.is-alt i:nth-child(3) { flex: 0.7; }
 /* The back's strip can carry up to six, so the gap tightens as the count goes
    up rather than the pills becoming slivers. */
 body.stash-liquid-glass .refract-cc-preset-back .refract-cc-art-stats {
@@ -2510,9 +2564,12 @@ body.stash-liquid-glass .refract-cc-art-rating {
     position: absolute;
     top: 5%;
     left: 4%;
-    width: 11.5%;
+    /* A small corner badge, like the thing it depicts. At 11.5% the star was
+       the most prominent element of every scene tile -- the miniature led
+       with an accent shout the real card does not make. */
+    width: 8%;
     aspect-ratio: 1;
-    background: rgba(var(--accent-rgb), 0.95);
+    background: rgba(var(--accent-rgb), 0.85);
     /* The SAME rounded-star mask the real badge uses, lifted from 03_cards.css.
        A clip-path polygon gave hard needle points; the badge on the card is a
        soft rounded star, so the miniature was drawing a different object. */
@@ -2557,8 +2614,9 @@ body.stash-liquid-glass .refract-cc-art-ribbon.is-left::after {
     left: -34%;
     transform: rotate(-45deg);
 }
-body.stash-liquid-glass .refract-cc-preset-performer .refract-cc-art-ribbon {
-    width: 34%;
+body.stash-liquid-glass .refract-cc-preset-performer .refract-cc-art-ribbon,
+body.stash-liquid-glass .refract-cc-preset-back .refract-cc-art-ribbon {
+    width: 30%;
 }
 
 /* The studio logo. Quiet, so it does not compete with the title, but a step
@@ -2585,13 +2643,18 @@ body.stash-liquid-glass .refract-cc-art-extras.is-lifted {
 }
 body.stash-liquid-glass .refract-cc-art-logo.is-left {
     right: auto;
-    left: 24%;
+    /* Clear of the rating star (4-12%) by a full gutter. They sat flush and
+       read as one broken object. */
+    left: 17%;
 }
 /* Crossed: pushed into the sash's corner so the diagonal cuts across it,
    which is what the real card does. */
 body.stash-liquid-glass .refract-cc-art-logo.is-crossed {
     right: 4%;
     top: 11%;
+    /* The halo separates the bar from the sash it crosses: deliberate
+       layering instead of two elements touching by accident. */
+    box-shadow: 0 0 0 2px rgba(14, 14, 19, 0.9);
 }
 body.stash-liquid-glass .refract-cc-art-logo.is-crossed.is-left {
     right: auto;
@@ -2815,21 +2878,6 @@ body.stash-liquid-glass .refract-cc-ring-img {
     width: auto;
     height: 34%;
 }
-/* The source chips are a row across the band's middle, not a corner stack. */
-/* Three source chips in a row are ~210px; the preview performer card is 216px
-   wide, so they spilled out of both edges. Wrap and pad instead of shrinking
-   the text, since these are the labels that have to be readable. */
-body.stash-liquid-glass .refract-cc-chips-img {
-    top: 50%;
-    left: 0;
-    right: 0;
-    padding: 0 6px;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-}
 /* The performer FRONT's bottom band. Measured on a 216x323 preview: country
    y264-275 and the stat strip y278-314, both full width. They are 3px apart, so
    they are one band rather than two unhittable slivers. */
@@ -2851,19 +2899,6 @@ body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-ring-bottom 
     width: auto;
     height: auto;
 }
-body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-chips-bottom {
-    top: auto;
-    bottom: 24%;
-    left: 0;
-    right: 0;
-    transform: none;
-    padding: 0 6px 14px;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-}
 /* The name band. The banner runs x0-75%, y0-11% (measured), so the band is
    the top-left strip up to where the sash corner starts, and the ring hugs the
    banner rather than a quadrant of the card. */
@@ -2878,11 +2913,6 @@ body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-ring-tl {
     left: 4px;
     width: 72%;
     height: 14%;
-}
-body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-chips-tl {
-    top: 20%;
-    transform: none;
-    left: 8px;
 }
 /* Its sash corner, same geometry as the back's -- it is the same element. */
 body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-hit-tr {
@@ -2916,24 +2946,6 @@ body.stash-liquid-glass .refract-cc-ring-bottom {
     top: auto;
     width: auto;
     height: 22%;
-}
-/* Over the strip they configure, not over the tray. These rendered at 63-73% of
-   card height, which is inside the TRAY's band (48-84%): they covered the
-   element you were not editing, and once up they latched the strip's zone so
-   the tray band became unreachable -- its own "Two rows" chip was effectively
-   undiscoverable. */
-body.stash-liquid-glass .refract-cc-chips-bottom {
-    top: auto;
-    bottom: 17%;
-    left: 0;
-    right: 0;
-    transform: none;
-    padding: 0 6px;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
 }
 
 /* ── The back's four zones ────────────────────────────────────────────────
@@ -2999,19 +3011,6 @@ body.stash-liquid-glass .refract-cc-ring-tray {
     width: auto;
     height: 29.7%;
 }
-/* Two chips, centred over the tray they describe. A column would cover it. */
-body.stash-liquid-glass .refract-cc-chips-tray {
-    top: 46%;
-    left: 0;
-    right: 0;
-    transform: none;
-    padding: 0 6px;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-}
 /* The dossier's two switchable panels: the media strip band and the
    collector footer band, measured off the built card (header ~10%, hero to
    ~28%, ratings to ~66%, media ~66-86%, foot ~86-100%). */
@@ -3049,20 +3048,6 @@ body.stash-liquid-glass .refract-cc-ring-dfoot {
     width: auto;
     height: 11%;
 }
-body.stash-liquid-glass .refract-cc-chips-dmedia,
-body.stash-liquid-glass .refract-cc-chips-dfoot {
-    left: 0;
-    right: 0;
-    transform: none;
-    padding: 0 6px;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-}
-body.stash-liquid-glass .refract-cc-chips-dmedia { top: 48%; }
-body.stash-liquid-glass .refract-cc-chips-dfoot { top: auto; bottom: 16%; }
 
 /* The stat strip is the bottom sixth now that the tray owns the middle. */
 body.stash-liquid-glass .refract-cc-hit-bottom {
@@ -3077,12 +3062,6 @@ body.stash-liquid-glass .refract-cc-hit-bottom {
 body.stash-liquid-glass .refract-cc-ring-bottom {
     bottom: 11px;
     height: 13%;
-}
-/* Just above the strip, and OVERLAPPING it, so the trip from a pill to its own
-   chip never crosses bare card belonging to another band. */
-body.stash-liquid-glass .refract-cc-chips-bottom {
-    bottom: 13%;
-    padding-bottom: 16px;
 }
 
 /* ── The back's two looks ─────────────────────────────────────────────────

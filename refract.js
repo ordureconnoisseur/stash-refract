@@ -1637,7 +1637,12 @@
                         name: !hid("refract.pcHideName"),
                         ribbon: ext && !hid("refract.pcHideTier"),
                         country: !hid("refract.pcHideCountry"),
-                        stats: !hid("refract.pcHideStats")
+                        stats: !hid("refract.pcHideStats"),
+                        /* A look that changes the STRIP's contents (Vitals) has
+                           to look different from one that does not, or two
+                           tiles sit side by side drawing the identical card.
+                           Squared, varied-width pills = "different stats". */
+                        altStats: !!(p.pills && p.pills.join(",") !== FRONT_PILLS_DEFAULT.join(","))
                     };
                 }
                 return {
@@ -1859,7 +1864,7 @@
                     ? [
                         a.name ? part("name") : null,
                         a.country ? part("country") : null,
-                        a.stats ? part("stats", "", 4) : null,
+                        a.stats ? part("stats", a.altStats ? " is-alt" : "", 4) : null,
                         a.ribbon ? part("ribbon") : null
                     ]
                     : [
