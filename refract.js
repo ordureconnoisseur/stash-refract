@@ -205,6 +205,7 @@
            navigate away from settings; the shuffle button re-rolls and
            persists the new pick. */
         var refractPreviewReload = null;
+        var refractPreviewRefresh = null;
         var refractPreviewHeldSize = null;
         function RefractCardPreview() {
             var st = R.useState({ loading: true, scene: null, performer: null, failed: false });
@@ -237,7 +238,13 @@
                not by this component. Publish `load` on a module slot during
                render (before any early return, so it cannot be skipped by the
                loading/mock branches) rather than through a hook. */
+            /* Two doors. Shuffle wants a NEW pick; everything else -- editing a
+               pill, applying a look -- wants the SAME card redrawn. They shared
+               one function that always shuffled, so every touch of the strip
+               threw a different performer on the stage and you lost the thing
+               you were looking at. */
             refractPreviewReload = function () { load(true); };
+            refractPreviewRefresh = function () { load(false); };
             R.useEffect(function () { load(false); }, []);
 
             var SceneCard = PluginApi.components.SceneCard;
@@ -475,6 +482,54 @@
                 mo.observe(stage, { subtree: true, attributes: true, attributeFilter: ["class"], childList: true });
                 return function () { mo.disconnect(); };
             }, []);
+            /* Where the real pills ARE. Measured off the drawn strip rather
+               than derived from the list, because the strip's visual order is
+               inline `order` (so DOM order lies) and the back's fitter drops
+               pills that do not fit. Sorted by x, the boxes line up with the
+               slot list one for one. */
+            var pillBoxesState = R.useState([]);
+            var pillBoxes = pillBoxesState[0];
+            R.useEffect(function () {
+                var live = true, raf = null, t = null;
+                var measure = function () {
+                    if (!live) { return; }
+                    var want = [];
+                    if (zone === "bottom") {
+                        var box = document.querySelector("#plugin-refract-card-preview .refract-cc-cardbox");
+                        var strip = box && (editingBack
+                            ? box.querySelector(".refract-card-back .refract-mb-stats")
+                            : box.querySelector(".stash-perf-stats:not(.refract-mb-stats)"));
+                        if (strip) {
+                            var br = box.getBoundingClientRect();
+                            Array.prototype.forEach.call(strip.children, function (n) {
+                                var r = n.getBoundingClientRect();
+                                if (!r.width || !r.height) { return; }
+                                want.push({
+                                    left: Math.round(r.left - br.left),
+                                    top: Math.round(r.top - br.top),
+                                    width: Math.round(r.width),
+                                    height: Math.round(r.height)
+                                });
+                            });
+                            want.sort(function (x, y) { return x.left - y.left; });
+                        }
+                    }
+                    if (JSON.stringify(want) !== JSON.stringify(pillBoxes)) { pillBoxesState[1](want); }
+                };
+                /* AFTER paint, not during commit. Measured inline, the back's
+                   pills come back 0x0 every time -- the strip is in the DOM but
+                   has no box yet -- and because nothing else re-renders, the
+                   zero stuck and the back never got hit targets. A frame later
+                   they measure 54x29. The 220ms follow-up covers the back being
+                   rebuilt from its own query after the first frame. */
+                raf = requestAnimationFrame(measure);
+                t = setTimeout(measure, 220);
+                return function () {
+                    live = false;
+                    if (raf) { cancelAnimationFrame(raf); }
+                    if (t) { clearTimeout(t); }
+                };
+            });
             var introState = R.useState(false);
             var introOn = introState[0];
             R.useEffect(function () {
@@ -702,7 +757,7 @@
                 }
                 try { initPerformerCards(); } catch (e) { /* the observer will */ }
                 frontPillsState[1](list);
-                if (refractPreviewReload) { refractPreviewReload(); }
+                if (refractPreviewRefresh) { refractPreviewRefresh(); }
             }
 
             /* One editor for both strips. `face` picks the list, the catalogue,
@@ -828,24 +883,28 @@
                             title: "Take this pill off the strip",
                             onClick: function () { var i = pillMenu; setPillMenu(null); removePillAt(face, i); }
                         }, R.createElement("span", { className: "refract-cc-chip-box" }), "Remove")];
+                    /* The menu says WHICH pill it is editing. Opened from the pill
+                       itself the connection is already made by the ring around
+                       it, but the card is 264px wide and the menu nearly fills
+                       it, so the name is what survives at a glance. */
+                    var curDef = cur ? a.def(cur) : null;
+                    var headText = pending
+                        ? "Add which stat?"
+                        : ((curDef ? (curDef.menu || curDef.label) : "This pill")
+                            + (face === "back" && cur === "rating" && ratingDisp === "edge" ? " (edge)" : ""));
                     return [R.createElement("div", { key: "__menu", className: "refract-cc-slot-menu" + (pending ? " is-pending" : "") },
-                        pending ? R.createElement("div", { key: "__head", className: "refract-cc-slot-menu-head" }, "Add which stat?") : null,
+                        R.createElement("div", { key: "__head", className: "refract-cc-slot-menu-head" }, headText),
                         menu,
                         R.createElement("div", { key: "__foot", className: "refract-cc-slot-menu-foot" }, foot)
                     )];
                 }
-                var slots = a.list.map(function (k, i) {
-                    var d = a.def(k);
-                    var lbl = d ? d.label : k;
-                    if (face === "back" && k === "rating" && ratingDisp === "edge") { lbl = "Rating (edge)"; }
-                    return R.createElement("button", {
-                        key: k + i,
-                        type: "button",
-                        className: "refract-cc-chip refract-cc-chip-slot",
-                        title: "Change what this pill shows",
-                        onClick: function () { setPillMenu(i); }
-                    }, lbl);
-                });
+                /* No slot proxies any more. A row of chips NAMING the pills sat
+                   in the band's tray jumbled among the band's own toggles, and
+                   picking one opened a big list -- two hops and a vocabulary
+                   ("slot") that exists nowhere on the card. The pill on the
+                   card is the control now (see pillHits): the band's tray keeps
+                   only what belongs to the whole strip. */
+                var slots = [];
                 if (a.list.length < a.max) {
                     slots.push(R.createElement("button", {
                         key: "__add",
@@ -1477,6 +1536,29 @@
                     className: "refract-cc-hit refract-cc-hit-shield",
                     onMouseEnter: function () { enterZone(null); }
                 }));
+                /* One hit per drawn pill, laid exactly over it. Above the band
+                   it sits in, below the tray. Hovering a pill HOLDS the band
+                   (the grace timer would otherwise treat the pill as leaving
+                   it), and clicking one opens that pill's own menu. */
+                var pillFace = editingBack ? "back" : "front";
+                var pillHits = (zone === "bottom" ? pillBoxes : []).map(function (b, i) {
+                    var open = pillMenu === i;
+                    return R.createElement("button", {
+                        key: "__pill" + i,
+                        type: "button",
+                        className: "refract-cc-pill-hit" + (open ? " is-open" : ""),
+                        style: { left: b.left + "px", top: b.top + "px", width: b.width + "px", height: b.height + "px" },
+                        title: open ? "Close" : "Change what this pill shows",
+                        "aria-label": "Pill " + (i + 1) + " of " + pillBoxes.length + ": change what it shows",
+                        "aria-expanded": open ? "true" : "false",
+                        onMouseEnter: function () { holdZone("bottom"); },
+                        onClick: function (e) {
+                            e.preventDefault(); e.stopPropagation();
+                            setPillMenu(open ? null : i);
+                        }
+                    });
+                });
+
                 /* First open this session: every band's ring pulses once, in
                    sequence, so the card announces itself as the control
                    surface. Nothing else on screen says "hover the card". */
@@ -1492,6 +1574,7 @@
                     onMouseLeave: function () { setZone(null); setPillMenu(null); }
                 },
                     hits,
+                    pillHits,
                     introRings,
                     chips.length ? R.createElement("div", { className: "refract-cc-ring refract-cc-ring-" + zone }) : null,
                     chips.length ? R.createElement("div", {
@@ -2490,6 +2573,17 @@
        one customiser and it must survive a re-render. */
     var refractZoneTimer = null;
     var PREVIEW_KIND_KEY = "refract.previewKind";           /* "scene" | "performer", local only */
+    /* WHICH scene and performer the preview is showing. Both were USED by
+       refractFetchPreviewData and never DECLARED, so every read threw a
+       ReferenceError that the surrounding try/catch swallowed: the stored ids
+       came back null, the "keep the same card" branch never ran, and the
+       preview picked a fresh random card on every single reload -- including
+       the reload after each pill edit. Editing one pill threw a different
+       performer on the stage, which made the whole panel feel unstable.
+       Device-local, deliberately outside REFRACT_SYNC_KEYS: which card you are
+       previewing is not a preference to carry between machines. */
+    var PREVIEW_SCENE_ID_KEY = "refract.previewSceneId";    /* local only */
+    var PREVIEW_PERF_ID_KEY = "refract.previewPerfId";      /* local only */
     var FLOURISH_KEY = "refract.flourish";                  /* "minimal" | "extravagant" */
     /* Settings → Plugins list: float disabled plugins to the bottom (the
        pre-v1.15 behaviour) instead of one flat A→Z run. Opt-in; default off. */

@@ -2053,6 +2053,40 @@ body.stash-liquid-glass .refract-cc-chips > .refract-cc-chip {
     flex: 1 1 auto;
     justify-content: center;
 }
+/* Each drawn pill, as its own control. Laid exactly over the real pill:
+   above the band it belongs to, below the tray. Resting state is invisible --
+   the pills already look like the objects they are, and outlining four of them
+   at once would be noise -- so it appears on hover, and the OPEN one holds a
+   solid accent ring while its menu is up. */
+body.stash-liquid-glass .refract-cc-pill-hit {
+    position: absolute;
+    z-index: 5;
+    appearance: none;
+    padding: 0;
+    border: 1.5px solid transparent;
+    border-radius: 999px;
+    background: none;
+    cursor: pointer;
+    transition: border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
+}
+body.stash-liquid-glass .refract-cc-pill-hit:hover {
+    border-color: rgba(var(--accent-rgb), 0.75);
+    background: rgba(var(--accent-rgb), 0.14);
+}
+body.stash-liquid-glass .refract-cc-pill-hit:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
+}
+/* The pill under the open menu. Lit from inside the scrim, so the eye goes
+   menu -> pill without a leader line. */
+body.stash-liquid-glass .refract-cc-pill-hit.is-open {
+    border-color: var(--accent-bright);
+    background: rgba(var(--accent-rgb), 0.2);
+    box-shadow:
+        0 0 0 3px rgba(var(--accent-rgb), 0.28),
+        0 0 14px rgba(var(--accent-rgb), 0.5);
+}
+
 /* A corner band's tray docks to the corner it belongs to. Centred on the card
    it read as floating near the ring rather than attached to it; the band
    zones (full-width by nature) stay centred. */
