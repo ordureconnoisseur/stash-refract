@@ -163,6 +163,25 @@ body.stash-liquid-glass .video-js.vjs-user-inactive .st-player-overlay {
 /* While scrubbing the seek bar, hide the overlay so it doesn't sit on
    the frame being previewed. Equal specificity to the show rules
    above, so it must stay AFTER them in the file to win. */
+/* Loading spinner. video.js draws `.vjs-loading-spinner` at the centre of
+   the player with no z-index of its own, and refract's centre-control
+   overlay sits at `z-index: 1` over the same point -- so while a scene
+   buffers or seeks, the spinner rendered UNDERNEATH the play button, both
+   fighting for the exact same 1002.5 x 464 centre.
+   Stand the controls down while the player is waiting. The spinner is the
+   thing to look at during a buffer, and this reuses the treatment already
+   used for scrubbing right below. */
+body.stash-liquid-glass .video-js:is(.vjs-waiting, .vjs-seeking) .st-player-overlay {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.12s ease !important;
+}
+/* ...and put the spinner above the overlay regardless, so it is never
+   occluded even in a state that does not carry those classes. */
+body.stash-liquid-glass .video-js .vjs-loading-spinner {
+    z-index: 3 !important;
+}
+
 body.stash-liquid-glass .video-js.vjs-scrubbing .st-player-overlay {
     opacity: 0 !important;
     visibility: hidden !important;

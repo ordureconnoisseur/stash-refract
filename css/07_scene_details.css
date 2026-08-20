@@ -660,6 +660,12 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     display: flex !important;
     flex-wrap: wrap !important;
     align-items: center !important;
+    /* Packed left, NOT space-between. space-between reads fine on a
+       single row, but once the toolbar wraps it justifies each line
+       independently -- the second line holds the counters group and the
+       multiview button, so it shoved them to opposite ends of the panel
+       and left a 150.8px hole between them. */
+    justify-content: flex-start !important;
     gap: 0.35rem !important;
     row-gap: 0.35rem !important;
     margin: 0 0 0.65rem 0 !important;
