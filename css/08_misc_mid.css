@@ -3307,35 +3307,27 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-circl
     pointer-events: auto;
 }
 
-/* O-count in minimal mode — match the accent-glass treatment used by
-   .stash-tag-count and .stash-performer-pill so all three pills in the
-   row share one visual language. No backdrop-filter (GPU layer cost). */
-body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-o-count {
-    padding: 0.18em 0.6em !important;
-    background: var(--accent-tint) !important;
-    border: 1px solid var(--accent-glow) !important;
-    border-radius: var(--radius-pill) !important;
-    color: var(--accent-bright) !important;
-    font-size: var(--fs-xs) !important;
-    font-weight: 600 !important;
-    line-height: 1 !important;
-    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.2) !important;
-}
-body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-o-count:hover {
-    background: rgba(var(--accent-rgb), 0.22) !important;
-    color: var(--accent-bright) !important;
-    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.4) !important;
-}
+/* The o-count's pill treatment used to be patched in HERE, for this layout
+   only, which is exactly how Classic ended up with a bare one. It is the
+   base rule now and applies to both layouts. */
 
-/* Force pill icons AND numbers to white in minimal mode. Background +
-   border still carry the accent tint, so the pill reads as a glassy
-   accent-tinted chip with crisp white content. */
-body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-o-count,
-body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-o-count svg,
-body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-tag-count,
-body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-tag-count .stash-tag-icon,
-body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill,
-body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill .stash-performer-icon {
+/* Pill icons AND numbers in white. Background + border still carry the accent
+   tint, so each pill reads as a glassy accent-tinted chip with crisp white
+   content.
+
+   Not gated to a layout any more. It was, and that left the row's content
+   colour depending on which layout you were in -- and on Classic it split the
+   row in two by accident: the tag count is an <a>, so the theme's generic
+   anchor colour (five classes of specificity) beat its own rule and made it
+   white anyway, while the o-count is a <span> that nothing overrode and stayed
+   accent purple. Two pills, same row, same chrome, different colour, for no
+   reason anybody chose. */
+body.stash-liquid-glass .scene-card .stash-o-count,
+body.stash-liquid-glass .scene-card .stash-o-count svg,
+body.stash-liquid-glass .scene-card .stash-tag-count,
+body.stash-liquid-glass .scene-card .stash-tag-count .stash-tag-icon,
+body.stash-liquid-glass .scene-card .stash-performer-pill,
+body.stash-liquid-glass .scene-card .stash-performer-pill .stash-performer-icon {
     color: #fff !important;
 }
 
@@ -3791,24 +3783,41 @@ body.stash-liquid-glass .stash-card-counts {
     flex-shrink: 0;
 }
 
-/* O count badge on scene cards — muted style, sits next to the accent
-   tag-count pill so consumption metrics group together but don't
-   compete for attention. */
+/* O count badge on scene cards. The SAME pill as .stash-tag-count and
+   .stash-performer-pill beside it, because it is the same kind of thing in the
+   same row.
+
+   It used to be bare muted text here -- deliberately, on the argument that
+   consumption metrics should not compete for attention -- and then the Refract
+   layout patched it up to a pill so the three would share one visual language.
+   Two intents, and whichever layout you were looking at decided which one you
+   got: on Classic the o-count sat next to a 35x16 glass pill as 19x10 of grey
+   text with no background, border, radius or padding. One treatment now, and
+   this is the one, because "quieter" was being expressed by being the only
+   bare item in a row of pills, which reads as unfinished rather than as
+   restrained. Its own smaller icon and shorter number carry the difference. */
 body.stash-liquid-glass .stash-o-count {
     display: inline-flex;
     align-items: center;
-    gap: 0.22rem;
+    gap: 0.2rem;
     font-size: var(--fs-xs);
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--accent-bright);
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-glow);
+    border-radius: var(--radius-pill);
+    padding: 0.18em 0.6em;
     line-height: 1;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.2);
     flex-shrink: 0;
     white-space: nowrap;
+    /* Not a link, unlike the tag count: it opens nothing. */
     cursor: default;
-    transition: color 0.15s ease;
+    transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 body.stash-liquid-glass .stash-o-count:hover {
-    color: var(--text);
+    background: rgba(var(--accent-rgb), 0.22);
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.38);
 }
 body.stash-liquid-glass .stash-o-count svg {
     width: 0.95em;

@@ -351,13 +351,12 @@ body.stash-liquid-glass.refract-light .stash-tag-count,
 body.stash-liquid-glass.refract-light .stash-tag-count * {
     color: var(--accent-bright) !important;
 }
+/* Same row, same pill, same colour. This forced the o-count muted while the
+   tag count beside it was forced accent -- the dark theme's split repeated
+   here, so fixing one theme alone would have left the other wrong. */
 body.stash-liquid-glass.refract-light .stash-o-count,
 body.stash-liquid-glass.refract-light .stash-o-count * {
-    color: var(--text-muted) !important;
-}
-body.stash-liquid-glass.refract-light .stash-o-count:hover,
-body.stash-liquid-glass.refract-light .stash-o-count:hover * {
-    color: var(--text) !important;
+    color: var(--accent-bright) !important;
 }
 
 /* Tag list popup — flip dark glass to light glass */
