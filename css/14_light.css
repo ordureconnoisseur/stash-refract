@@ -742,6 +742,10 @@ body.stash-liquid-glass.refract-light .refract-cc-preset-art {
 body.stash-liquid-glass.refract-light .refract-cc-preset-inner {
     --art-strong: rgba(20, 22, 34, 0.62);
     --art-quiet: rgba(20, 22, 34, 0.34);
+    --art-logo: rgba(20, 22, 34, 0.48);
+    /* The halo is the tile's GROUND, so it flips with the theme. */
+    --art-halo: rgba(255, 255, 255, 0.92);
+    --art-over: rgba(20, 22, 34, 0.95);
     background: repeating-linear-gradient(135deg,
         rgba(20, 22, 34, 0.07) 0 5px,
         rgba(20, 22, 34, 0.035) 5px 10px);
@@ -786,6 +790,18 @@ body.stash-liquid-glass.refract-light .refract-cc-chips .refract-cc-chip:not(.re
     background: rgba(20, 22, 34, 0.05);
     border-color: rgba(20, 22, 34, 0.16);
 }
+/* A DIM, not a wash. The white scrim bleached the photo and read as
+   "disabled / loading"; darkening reads as a spotlight in either theme. */
 body.stash-liquid-glass.refract-light .refract-cc-ring:not(.is-intro) {
-    box-shadow: 0 0 0 640px rgba(240, 240, 246, 0.45);
+    box-shadow: 0 0 0 640px rgba(20, 22, 34, 0.34);
+    animation: refract-cc-arm-light 0.18s ease-out both;
+}
+@keyframes refract-cc-arm-light {
+    from { box-shadow: 0 0 0 640px rgba(20, 22, 34, 0); }
+    to   { box-shadow: 0 0 0 640px rgba(20, 22, 34, 0.34); }
+}
+body.stash-liquid-glass.refract-light .refract-cc-slot-menu {
+    background: rgba(255, 255, 255, 0.94);
+    border-color: rgba(20, 22, 34, 0.18);
+    box-shadow: 0 10px 26px rgba(20, 22, 34, 0.25);
 }
