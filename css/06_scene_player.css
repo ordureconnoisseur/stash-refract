@@ -1036,7 +1036,13 @@ body.stash-liquid-glass .video-js .refract-src {
     flex-direction: column;
     gap: 0.42rem;
     padding: 0.55rem 0.6rem;
-    min-width: 19rem;
+    /* Wide enough that a group's options fit on one line instead of
+       wrapping an orphan onto a second. Measured: Format needs ~204px
+       and Projection ~231px for all four chips; at the old 19rem the
+       options column was 165px, so nearly every group broke its last
+       chip onto a line of its own and the panel read as a ragged stack.
+       Wider here buys a much SHORTER panel. */
+    min-width: 24rem;
     text-align: left;
     border-radius: 0.6rem;
     background: rgba(12, 12, 16, 0.94);
@@ -1083,16 +1089,20 @@ body.stash-liquid-glass .video-js .refract-src-head {
 body.stash-liquid-glass .video-js .refract-src-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 3px;
 }
 body.stash-liquid-glass .video-js .refract-src-row > .refract-src-opt {
     flex: 0 0 auto;
+}
+/* Stash's own VR control, folded into this panel's Projection group. */
+body.stash-liquid-glass .video-js .vjs-control-bar .refract-vr-folded {
+    display: none !important;
 }
 body.stash-liquid-glass .video-js .refract-src-opt,
 body.stash-liquid-glass .video-js .refract-src-direct {
     appearance: none;
     /* No flex-grow: the grid track sets the width now. */
-    padding: 4px 9px;
+    padding: 4px 8px;
     text-align: center;
     white-space: nowrap;
     border-radius: 999px;

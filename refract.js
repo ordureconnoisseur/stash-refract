@@ -7742,138 +7742,52 @@
        Stash's own <li>s stay in the DOM, untouched and merely hidden, and every
        click is forwarded to one of them -- so video.js runs its own handler and
        keeps its own state. Nothing here reimplements playback. */
-    /* VR projection. Stash ships the machinery (videojs-vr, wired up in
-       vrmode.ts) but only ever shows its menu button when the scene carries
-       the tag named by the "VR Tag" setting under Settings > Interface >
-       Scene Player:
+    /* VR projection. Stash owns the question of whether a scene IS VR:
+       vrmode.ts adds its menu button only when the scene carries the tag
+       named by the "VR Tag" setting (Settings > Interface > Scene
+       Player), and removes it otherwise. Earlier this drove the
+       videojs-vr plugin directly, which put a Projection row on EVERY
+       scene -- clutter on the 99% that are flat, and not what Stash
+       means by VR.
 
-           showButton = scene.tags.some(tag => vrTag === tag.name)
+       So the group now appears only when Stash's own VR control is
+       present, and it forwards clicks to that control's items -- the same
+       contract as Format, Resolution and Speed. Stash's button is then
+       hidden, because the panel is showing it.
 
-       With that setting empty -- the default -- `showButton` is false for
-       every scene and Stash calls removeButton(), so the control simply is
-       not there. Nothing in refract was hiding it.
-
-       The plugin itself is imported unconditionally, so the projection API is
-       live on any scene whether or not the tag is set. These options drive it
-       directly, which puts VR back on every scene and puts it where the rest
-       of the playback choices already live rather than as a separate button.
-       Labels and projection strings match vrmode.ts exactly. */
-    var REFRACT_VR_MODES = [
-        { v: "NONE",   label: "Off" },
-        { v: "180_LR", label: "180 LR" },
-        { v: "360_TB", label: "360 TB" },
-        { v: "360",    label: "360 Mono" }
-    ];
-    var refractVrProjection = "NONE";
-
-    function refractVrPlugin() {
-        /* `window.videojs` is not exposed by Stash, but video.js leaves a
-           back-reference to the player on its own root element. */
-        var el = document.querySelector(".video-js");
-        if (!el || !el.player || typeof el.player.vr !== "function") { return null; }
-        try { return el.player.vr(); } catch (e) { return null; }
-    }
-
-    function refractApplyVr(projection) {
-        var vr = refractVrPlugin();
-        if (!vr || typeof vr.setProjection !== "function") { return false; }
-        try {
-            /* Same two calls, in the same order, as vrmode.ts loadVR(). */
-            vr.setProjection(projection);
-            if (typeof vr.init === "function") { vr.init(); }
-            refractVrProjection = projection;
-            return true;
-        } catch (e) { return false; }
-    }
-
-    /* ── Rating: a trigger, not a 94px star row ───────────────────────
-       Stash's five-star widget was the widest control in a 338px column
-       and pushed everything else out of the toolbar. It is also NOT the
-       same value as the Advanced Rating plugin's chip beside it -- the
-       stars are Stash's own 0-5 rating, the chip is the plugin's
-       multi-criteria score -- so it could not simply be dropped.
-
-       Instead it collapses to one pill showing the current rating, and
-       the real widget opens beneath it on click. The stars are NEVER
-       moved in the DOM: they are React-managed, and relocating them
-       desyncs the fiber (the same trap documented for the date field).
-       CSS positions them into the popover while they stay exactly where
-       React put them; every click still lands on Stash's own button. */
-    function refractRatingValue(stars) {
-        var num = stars.querySelector(".star-rating-number");
-        if (num && num.textContent.trim()) { return num.textContent.trim(); }
-        /* No number rendered (stars mode) -- read it off the fill classes,
-           which carry a 0-100 fill per star. */
-        var btns = stars.querySelectorAll("button[class*='star-fill-']");
-        var total = 0;
-        Array.prototype.forEach.call(btns, function (b) {
-            var m = (b.className || "").toString().match(/star-fill-(\d+)/);
-            if (m) { total += parseInt(m[1], 10) / 100; }
-        });
-        if (!total) { return ""; }
-        return String(Math.round(total * 10) / 10);
-    }
-
-    function refractCloseRatingPopovers(except) {
-        var open = document.querySelectorAll(".refract-rating-open");
-        Array.prototype.forEach.call(open, function (h) {
-            if (h === except) { return; }
-            h.classList.remove("refract-rating-open");
-            var t = h.querySelector(".refract-rating-trigger");
-            if (t) { t.setAttribute("aria-expanded", "false"); }
-        });
-    }
-
-    var refractRatingGlobalsBound = false;
-    function refractBindRatingGlobals() {
-        if (refractRatingGlobalsBound) { return; }
-        refractRatingGlobalsBound = true;
-        document.addEventListener("click", function (e) {
-            if (e.target.closest && e.target.closest(".refract-rating-host")) { return; }
-            refractCloseRatingPopovers(null);
-        }, true);
-        document.addEventListener("keydown", function (e) {
-            if (e.key === "Escape") { refractCloseRatingPopovers(null); }
-        });
-    }
-
-    function initSceneRatingPopover() {
-        var bars = document.querySelectorAll(".scene-toolbar, .image-toolbar");
-        Array.prototype.forEach.call(bars, function (bar) {
-            var stars = bar.querySelector(".rating-stars");
-            if (!stars) { return; }
-            var host = stars.parentElement;
-            if (!host) { return; }
-            host.classList.add("refract-rating-host");
-
-            var trig = host.querySelector(".refract-rating-trigger");
-            if (!trig) {
-                trig = document.createElement("button");
-                trig.type = "button";
-                trig.className = "refract-rating-trigger";
-                trig.setAttribute("aria-haspopup", "true");
-                trig.setAttribute("aria-expanded", "false");
-                trig.innerHTML = STAR_SVG + '<span class="refract-rating-trigger-val"></span>';
-                host.insertBefore(trig, stars);
-                trig.addEventListener("click", function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    var willOpen = !host.classList.contains("refract-rating-open");
-                    refractCloseRatingPopovers(host);
-                    host.classList.toggle("refract-rating-open", willOpen);
-                    trig.setAttribute("aria-expanded", willOpen ? "true" : "false");
-                });
-                refractBindRatingGlobals();
+       The button carries no distinguishing class (it is a stock videojs
+       MenuButton), so it is identified by its items, which are fixed by
+       vrmode.ts: 180 LR / 360 TB / 360 Mono / Off. */
+    function refractVrMenuButton() {
+        var btns = document.querySelectorAll(".vjs-control-bar .vjs-menu-button");
+        for (var i = 0; i < btns.length; i++) {
+            var items = btns[i].querySelectorAll(".vjs-menu-item");
+            var labels = [];
+            for (var j = 0; j < items.length; j++) {
+                labels.push(String(items[j].textContent || "").replace(/,\s*selected\s*$/i, "").trim());
             }
+            if (labels.indexOf("360 Mono") !== -1 && labels.indexOf("180 LR") !== -1) { return btns[i]; }
+        }
+        return null;
+    }
 
-            /* Refresh the read-out every pass: React rewrites the fill
-               classes in place when the rating changes. */
-            var val = refractRatingValue(stars);
-            var out = trig.querySelector(".refract-rating-trigger-val");
-            if (out && out.textContent !== val) { out.textContent = val; }
-            trig.classList.toggle("is-rated", !!val);
-            trig.title = val ? ("Rating " + val + " - click to change") : "Set a rating";
+    function refractVrModes() {
+        var host = refractVrMenuButton();
+        if (!host) { return []; }
+        var out = [];
+        Array.prototype.forEach.call(host.querySelectorAll(".vjs-menu-item"), function (li) {
+            var label = String(li.textContent || "").replace(/,\s*selected\s*$/i, "").trim();
+            if (label) { out.push({ label: label, li: li }); }
         });
+        return out;
+    }
+
+    function refractCurrentVr() {
+        var modes = refractVrModes();
+        for (var i = 0; i < modes.length; i++) {
+            if (modes[i].li.classList.contains("vjs-selected")) { return modes[i].label; }
+        }
+        return null;
     }
 
     /* The playback-rate control is a sibling menu button on the control
@@ -7986,11 +7900,12 @@
                 });
                 html += "</div></div>";
             }
-            if (refractVrPlugin()) {
+            var vrModes = refractVrModes();
+            if (vrModes.length) {
                 html += '<div class="refract-src-group"><div class="refract-src-head">Projection</div><div class="refract-src-row">';
-                REFRACT_VR_MODES.forEach(function (m) {
+                vrModes.forEach(function (m) {
                     html += '<button type="button" class="refract-src-opt" data-kind="vr" data-v="' +
-                        refractFlipEscHtml(m.v) + '">' + refractFlipEscHtml(m.label) + "</button>";
+                        refractFlipEscHtml(m.label) + '">' + refractFlipEscHtml(m.label) + "</button>";
                 });
                 html += "</div></div>";
             }
@@ -8016,11 +7931,13 @@
                     return;
                 }
                 if (kind === "vr") {
-                    /* Projection is not a source, so it never forwards a click
-                       into Stash's hidden <li> list. */
-                    refractApplyVr(b.getAttribute("data-v"));
+                    var wantVr = b.getAttribute("data-v");
+                    var ms = refractVrModes();
+                    for (var mi = 0; mi < ms.length; mi++) {
+                        if (ms[mi].label === wantVr) { ms[mi].li.click(); break; }
+                    }
                     Array.prototype.forEach.call(panel.querySelectorAll('[data-kind="vr"]'), function (o) {
-                        o.classList.toggle("is-on", o.getAttribute("data-v") === refractVrProjection);
+                        o.classList.toggle("is-on", o.getAttribute("data-v") === wantVr);
                     });
                     return;
                 }
@@ -8051,7 +7968,10 @@
         var d = panel.querySelector(".refract-src-direct");
         if (d) { d.classList.toggle("is-on", !!(cur && cur.direct)); }
         mark('[data-kind="rate"]', refractCurrentRate());
-        mark('[data-kind="vr"]', refractVrProjection);
+        mark('[data-kind="vr"]', refractCurrentVr());
+        /* Stash's own VR button is redundant once the panel carries it. */
+        var vrBtn = refractVrMenuButton();
+        if (vrBtn) { vrBtn.classList.add("refract-vr-folded"); }
         mark('[data-kind="format"]', cur && !cur.direct ? cur.format : null);
         mark('[data-kind="res"]', cur && !cur.direct ? cur.res : null);
         /* An offer this file does not have is shown as unavailable rather than
