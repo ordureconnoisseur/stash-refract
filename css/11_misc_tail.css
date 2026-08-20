@@ -2035,12 +2035,6 @@ body.stash-liquid-glass .refract-cc-ring:not(.is-intro) {
     from { box-shadow: 0 0 0 640px rgba(7, 7, 11, 0); }
     to   { box-shadow: 0 0 0 640px rgba(7, 7, 11, 0.45); }
 }
-@media (prefers-reduced-motion: reduce) {
-    body.stash-liquid-glass .refract-cc-ring:not(.is-intro),
-    body.stash-liquid-glass .refract-cc-chips {
-        animation: none;
-    }
-}
 body.stash-liquid-glass .refract-cc-chips {
     position: absolute;
     left: 50%;
@@ -2088,6 +2082,44 @@ body.stash-liquid-glass .refract-cc-cardbox .scene-card {
     scale: none !important;
     rotate: none !important;
     transform: none !important;
+}
+
+/* Each drawn ELEMENT, as its own control -- the pill treatment one level up.
+   A corner that holds a sash, a logo and a rating badge cannot put their
+   actions in one shared tray without leaving "Move to bottom corner" unable to
+   say what it moves. Invisible at rest (three outlines at once is the noise
+   the spotlight exists to avoid), ringed on hover, solid while its menu is
+   open. Squared, not capsule: these are banners and badges, not pills. */
+body.stash-liquid-glass .refract-cc-elem-hit {
+    position: absolute;
+    z-index: 5;
+    appearance: none;
+    padding: 0;
+    border: 1.5px solid transparent;
+    border-radius: 8px;
+    background: none;
+    cursor: pointer;
+    transition: border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
+}
+body.stash-liquid-glass .refract-cc-elem-hit:hover {
+    border-color: rgba(var(--accent-rgb), 0.75);
+    background: rgba(var(--accent-rgb), 0.14);
+}
+body.stash-liquid-glass .refract-cc-elem-hit:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
+}
+body.stash-liquid-glass .refract-cc-elem-hit.is-open {
+    border-color: var(--accent-bright);
+    background: rgba(var(--accent-rgb), 0.2);
+    box-shadow:
+        0 0 0 3px rgba(var(--accent-rgb), 0.28),
+        0 0 14px rgba(var(--accent-rgb), 0.5);
+}
+/* Two columns, like the stat menu. auto-fit/max-content collapsed to ONE
+   column, which made a six-row tower taller than a 253px scene card. */
+body.stash-liquid-glass .refract-cc-slot-menu.is-elem {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 /* Each drawn pill, as its own control. Laid exactly over the real pill:
@@ -2145,6 +2177,14 @@ body.stash-liquid-glass .refract-cc-chips-br {
     from { opacity: 0; }
     to   { opacity: 1; }
 }
+/* AFTER the rules it nulls. Declared above them it had equal specificity and
+   lost on order, so the tray still faded under prefers-reduced-motion. */
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass .refract-cc-ring:not(.is-intro),
+    body.stash-liquid-glass .refract-cc-chips {
+        animation: none !important;
+    }
+}
 /* Inside the tray the chips go quiet -- the tray carries the ground now --
    while the slot chips and every on/hover state keep their own voices. */
 /* The slot menu is its own panel; a tray around it would be a box in a
@@ -2156,6 +2196,18 @@ body.stash-liquid-glass .refract-cc-chips:has(.refract-cc-slot-menu) {
     -webkit-backdrop-filter: none;
             backdrop-filter: none;
     padding: 0;
+    /* CENTRED on the card, whatever band it was opened from. The corner bands
+       dock their tray to a corner, which is right for a row of chips and wrong
+       for a menu: a six-row menu docked to the top-right ran off the bottom of
+       a 253px scene card and the corners layer -- which clips the spotlight --
+       clipped the menu with it. The ring on the element and the menu's own
+       heading carry the connection; proximity was never doing that work. */
+    left: 50%;
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    max-width: calc(100% - 16px);
 }
 body.stash-liquid-glass .refract-cc-chips .refract-cc-chip:not(.refract-cc-chip-slot) {
     background: rgba(255, 255, 255, 0.05);

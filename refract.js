@@ -438,6 +438,7 @@
                protect when no band is open yet. */
             function setZone(z) {
                 if (refractZoneTimer) { clearTimeout(refractZoneTimer); refractZoneTimer = null; }
+                if (z !== zone) { elemMenuState[1](null); elemHoverState[1](null); }
                 setZoneRaw(z);
             }
             function enterZone(z) {
@@ -491,6 +492,29 @@
             var pillBoxes = pillBoxesState[0];
             var pillHoverState = R.useState(null);
             var pillHover = pillHoverState[0];
+            /* The focused ELEMENT, by key -- the same idea as pillMenu one
+               level up: click the thing on the card, get the thing's own
+               controls. */
+            var elemMenuState = R.useState(null);
+            var elemMenu = elemMenuState[0];
+            var elemHoverState = R.useState(null);
+            var elemHover = elemHoverState[0];
+            var elemBoxesState = R.useState({});
+            var elemBoxes = elemBoxesState[0];
+            /* Escape closes whichever menu is open. Every other layer in the
+               panel already does (the back-photo picker, the toolbar popover);
+               these two trapped you. */
+            R.useEffect(function () {
+                if (pillMenu === null && elemMenu === null) { return undefined; }
+                var onKey = function (e) {
+                    if (e.key !== "Escape") { return; }
+                    e.stopPropagation();
+                    setPillMenu(null);
+                    elemMenuState[1](null);
+                };
+                document.addEventListener("keydown", onKey);
+                return function () { document.removeEventListener("keydown", onKey); };
+            }, [pillMenu, elemMenu]);
             R.useEffect(function () {
                 var live = true, timers = [], raf = null;
                 var measure = function () {
@@ -531,6 +555,46 @@
                         }
                     }
                     if (JSON.stringify(want) !== JSON.stringify(pillBoxes)) { pillBoxesState[1](want); }
+
+                    /* Every element of the armed zone that is actually drawn,
+                       so each can carry its own hit target. Same "present but
+                       not laid out is not ready" rule as the pills. */
+                    var eb = {};
+                    if (zone) {
+                        var cbox = document.querySelector("#plugin-refract-card-preview .refract-cc-cardbox");
+                        /* The preview holds BOTH cards at once and hides one
+                           in CSS, so a `.scene-card, .performer-card` query
+                           returns whichever comes first in the DOM -- the scene
+                           card -- and the performer front measured nothing.
+                           Name the card this tab is editing. */
+                        var root = cbox && (editingBack
+                            ? cbox.querySelector(".refract-card-back")
+                            : cbox.querySelector(previewKind === "performer" ? ".performer-card" : ".scene-card"));
+                        if (root) {
+                            var rb = cbox.getBoundingClientRect();
+                            CARD_ELEMS.forEach(function (d) {
+                                if (!d.sel || d.group !== elemGroup) { return; }
+                                if (cardElems[d.key] || !elemAvailable(d)) { return; }
+                                if (zoneOfElem(d) !== zone) { return; }
+                                /* The strip belongs to the pills while they are
+                                   editable; two overlapping targets over one
+                                   object is worse than none. */
+                                if (d.key === "refract.pcHideStats" && pillStripEditable()) { return; }
+                                var n;
+                                try { n = root.querySelector(d.sel); } catch (e) { n = null; }
+                                if (!n) { return; }
+                                var r = n.getBoundingClientRect();
+                                if (!r.width || !r.height) { return; }
+                                eb[d.key] = {
+                                    left: Math.round(r.left - rb.left),
+                                    top: Math.round(r.top - rb.top),
+                                    width: Math.round(r.width),
+                                    height: Math.round(r.height)
+                                };
+                            });
+                        }
+                    }
+                    if (JSON.stringify(eb) !== JSON.stringify(elemBoxes)) { elemBoxesState[1](eb); }
                 };
                 /* Staggered, because the strip settles at its own pace: after
                    paint, then again while the back finishes its own query. */
@@ -845,14 +909,24 @@
                         var st = en.st;
                         var isCur = cur !== null && st.key === cur && (en.mode === null || en.mode === ratingDisp);
                         var taken = a.list.indexOf(st.key) !== -1 && st.key !== cur;
+                        /* ADDING a stat that is already on the strip would MOVE
+                           it -- an "add" gesture that removes a pill. Offered
+                           as a disabled option instead, so the strip's contents
+                           still read honestly. Moving stays available from the
+                           pill that already holds it. */
+                        var blocked = pending && taken;
                         return R.createElement("button", {
                             key: st.key + (en.mode || ""),
                             type: "button",
-                            className: "refract-cc-chip" + (isCur ? " is-on" : ""),
+                            className: "refract-cc-chip" + (isCur ? " is-on" : "") + (blocked ? " is-dimmed" : ""),
                             role: "radio",
+                            disabled: blocked,
                             "aria-checked": isCur ? "true" : "false",
-                            title: taken ? "Move " + en.label + " to this slot" : en.label,
+                            title: blocked
+                                ? en.label + " is already on the strip"
+                                : (taken ? "Move " + en.label + " to this slot" : en.label),
                             onClick: function () {
+                                if (blocked) { return; }
                                 if (en.mode) { pickRatingDisp(en.mode); }
                                 setPillAt(face, pillMenu, st.key);
                                 setPillMenu(null);
@@ -1343,7 +1417,72 @@
                 setCardSides(m);
                 applyCardSideClasses();
             }
+            /* One element's own controls, opened by clicking the element on the
+               card. Everything here acts on THAT element and says its name, so
+               "Move to bottom corner" can no longer be a chip in a shared tray
+               that three elements were sitting in. */
+            var SIDE_LABEL = { left: "Top left", right: "Top right", bottom: "Bottom right" };
+            function elemDef(key) {
+                for (var i = 0; i < CARD_ELEMS.length; i++) {
+                    if (CARD_ELEMS[i].key === key) { return CARD_ELEMS[i]; }
+                }
+                return null;
+            }
+            function elemActionMenu(d) {
+                var rows = [];
+                var isStudio = d.key === "refract.scHideStudio";
+                /* Where it sits. Until now the only way to move one of these
+                   was "Swap top corners", which moved ALL of them. */
+                if (d.sideKey && !(isStudio && studioMode === "text")) {
+                    var sides = d.sides || ["left", "right"];
+                    var cur = cardSides[d.key] || d.sideDefault;
+                    sides.forEach(function (sd) {
+                        rows.push(R.createElement("button", {
+                            key: "side-" + sd,
+                            type: "button",
+                            className: "refract-cc-chip" + (cur === sd ? " is-on" : ""),
+                            role: "radio",
+                            "aria-checked": cur === sd ? "true" : "false",
+                            title: "Put " + elemLabel(d).toLowerCase() + " in the " + SIDE_LABEL[sd].toLowerCase() + " corner",
+                            onClick: function () { setElemSide(d, sd); elemMenuState[1](null); }
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }), SIDE_LABEL[sd]));
+                    });
+                }
+                /* The studio is the one element with a FORM as well as a place:
+                   a logo in a corner, or its name set before the title. */
+                if (isStudio) {
+                    [["logo", "As logo"], ["text", "As title text"]].forEach(function (o) {
+                        rows.push(R.createElement("button", {
+                            key: "mode-" + o[0],
+                            type: "button",
+                            className: "refract-cc-chip" + (studioMode === o[0] ? " is-on" : ""),
+                            role: "radio",
+                            "aria-checked": studioMode === o[0] ? "true" : "false",
+                            title: o[0] === "text"
+                                ? "Set the studio's name before the scene title instead"
+                                : "Put the studio back in a corner as its logo",
+                            onClick: function () { pickStudioMode(o[0]); elemMenuState[1](null); }
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]));
+                    });
+                }
+                return [R.createElement("div", { key: "__emenu", className: "refract-cc-slot-menu is-elem" },
+                    R.createElement("div", { key: "__head", className: "refract-cc-slot-menu-head" }, elemLabel(d)),
+                    rows,
+                    R.createElement("div", { key: "__foot", className: "refract-cc-slot-menu-foot" },
+                        R.createElement("button", {
+                            key: "__hide",
+                            type: "button",
+                            className: "refract-cc-chip refract-cc-chip-swap refract-cc-slot-remove",
+                            title: "Take " + elemLabel(d).toLowerCase() + " off the card",
+                            onClick: function () { elemMenuState[1](null); toggleCardElem(d.key); }
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }), "Hide it")
+                    )
+                )];
+            }
             function zoneChips(z) {
+                /* A focused element owns the tray while its menu is open. */
+                var fd = elemMenu ? elemDef(elemMenu) : null;
+                if (fd && zoneOfElem(fd) === z) { return elemActionMenu(fd); }
                 if (z === "img") {
                     /* A radio, not toggles: exactly one source is in use, and
                        the whole point of this zone is that the back can differ
@@ -1364,18 +1503,31 @@
                     });
                 }
                 if (z === "tray") {
+                    /* Mirror is the tray OFF. Its two settings survive so the
+                       gallery you had comes back intact when you switch look,
+                       but they cannot act while there is no tray, so they say
+                       so instead of writing invisibly. */
+                    var trayOff = !trayOn;
                     return [
                         ["__tray", "Tray", trayOn, function () { pickTrayOn(!trayOn); }],
                         ["__photos", "Photos in tray", trayPhotos, function () { pickTrayPhotos(!trayPhotos); }],
                         ["__rows", "Two rows", trayRows === 2, function () { pickTrayRows(trayRows === 2 ? 1 : 2); }]
                     ].map(function (o) {
+                        /* The two tray SETTINGS cannot act while there is no
+                           tray (the Mirror look). Disabled with a reason, the
+                           way the Minimal tier chip is -- they used to write
+                           silently to a hidden element. */
+                        var dead = trayOff && o[0] !== "__tray";
                         return R.createElement("button", {
                             key: o[0],
                             type: "button",
-                            className: "refract-cc-chip" + (o[2] ? " is-on" : ""),
+                            className: "refract-cc-chip" + (o[2] ? " is-on" : "") + (dead ? " is-dimmed" : ""),
                             "aria-pressed": o[2] ? "true" : "false",
-                            onClick: o[3]
-                        }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]);
+                            disabled: dead,
+                            title: dead ? "Needs the tray. Switch Tray on, or pick the Gallery look." : undefined,
+                            onClick: function () { if (!dead) { o[3](); } }
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }),
+                            o[1] + (dead ? " (no tray)" : ""));
                     });
                 }
                 /* Every pill is its own control. The chips sit in a centred
@@ -1410,39 +1562,12 @@
                         title: "Hidden by the Minimal flourish. Set Rating flourish to Extravagant to show it."
                     }, R.createElement("span", { className: "refract-cc-chip-box" }), elemLabel(d) + " (Minimal)"));
                 });
-                /* An action chip, like Swap: it states what it will do, not a
-                   state it is in. Only where the studio actually is. */
-                if (previewKind === "scene" && !cardElems["refract.scHideStudio"]
-                        && zoneOfElem({ key: "refract.scHideStudio" }) === z
-                        && studioMode !== "text") {
-                    var atBottom = cardSides["refract.scHideStudio"] === "bottom";
-                    chips.push(R.createElement("button", {
-                        key: "__studiopos",
-                        type: "button",
-                        className: "refract-cc-chip refract-cc-chip-swap",
-                        title: atBottom
-                            ? "Put the studio logo back in a top corner"
-                            : "Put the studio logo in the bottom-right corner, above the count pills",
-                        onClick: function () {
-                            setElemSide({ key: "refract.scHideStudio", sideKey: "refract.scStudioSide" },
-                                atBottom ? "right" : "bottom");
-                        }
-                    }, R.createElement("span", { className: "refract-cc-chip-box" }),
-                        atBottom ? "Move to top" : "Move to bottom corner"));
-                }
-                if (previewKind === "scene" && !cardElems["refract.scHideStudio"]
-                        && zoneOfElem({ key: "refract.scHideStudio" }) === z) {
-                    chips.push(R.createElement("button", {
-                        key: "__studiomode",
-                        type: "button",
-                        className: "refract-cc-chip refract-cc-chip-swap",
-                        title: studioMode === "text"
-                            ? "Put the studio back in the corner as its logo"
-                            : "Set the studio's name before the scene title instead",
-                        onClick: function () { pickStudioMode(studioMode === "text" ? "logo" : "text"); }
-                    }, R.createElement("span", { className: "refract-cc-chip-box" }),
-                        studioMode === "text" ? "Show as logo" : "Show as text"));
-                }
+                /* The studio's "Move to bottom corner" and "Show as text" chips
+                   used to sit HERE, in the corner's shared tray, next to the
+                   Tier ribbon and Rating banner toggles -- so the tray offered
+                   "Move to bottom corner" with nothing saying which of the
+                   three elements it would move. They live in the studio's own
+                   menu now, reached by clicking the studio on the card. */
                 /* The performer FRONT's bottom band: Country and the strip
                    as toggles, and -- while the strip is shown, in the Refract
                    layout -- one chip per slot, exactly as on the back. */
@@ -1512,7 +1637,21 @@
                    no-op Rating chip's defect, one level up. */
                 var zoneChipMap = {};
                 zones.forEach(function (z) { zoneChipMap[z] = zoneChips(z); });
-                zones = zones.filter(function (z) { return zoneChipMap[z].length > 0; });
+                zones = zones.filter(function (z) {
+                    /* The strip's band survives on the strength of the PILLS.
+                       At the 6-pill cap "Add stat" correctly disappears, and on
+                       the back that was the band's only chip -- so the band was
+                       dropped and the strip could never be armed, edited,
+                       reordered or emptied again. Three clicks into a dead end
+                       whose only exit was Reset. */
+                    /* NOT gated on pillBoxes: those are only measured while
+                       the zone is ARMED, and the zone cannot be armed if this
+                       filter has already dropped it -- the first attempt at
+                       this fix deadlocked on exactly that. Editability is the
+                       honest test and needs no measurement. */
+                    if (z === "bottom" && pillStripEditable()) { return true; }
+                    return zoneChipMap[z].length > 0;
+                });
                 var chips = (zone && zoneChipMap[zone]) ? zoneChipMap[zone] : [];
                 /* Hover is the fast path; focus, Enter/Space and a tap all
                    LATCH the band (holdZone, no grace period), so the editor
@@ -1565,6 +1704,7 @@
                    Classic performer layout the hits used to render over the
                    plain stat text -- tabbable, ringed on hover, and opening
                    nothing, because the menu is Refract-layout only. */
+                var z0 = zone;
                 var pillsLive = zone === "bottom" && pillStripEditable() ? pillBoxes : [];
                 var pillHits = pillsLive.map(function (b, i) {
                     var open = pillMenu === i;
@@ -1582,6 +1722,7 @@
                         onBlur: function () { pillHoverState[1](null); },
                         onClick: function (e) {
                             e.preventDefault(); e.stopPropagation();
+                            elemMenuState[1](null);
                             setPillMenu(open ? null : i);
                         }
                     });
@@ -1595,8 +1736,51 @@
                    The whole ROW, not the single pill: sweeping across four
                    pills would otherwise redraw the scrim four times, and the
                    pill you are on already has its own ring. */
+                /* One hit per drawn element of this band -- the pill idea, one
+                   level up. The band's tray keeps the on/off toggles (you
+                   cannot click an element that is not drawn); everything about
+                   a PARTICULAR element is behind the element itself. */
+                var elemHits = [];
+                Object.keys(elemBoxes).forEach(function (k) {
+                    var b = elemBoxes[k];
+                    var d = elemDef(k);
+                    if (!d) { return; }
+                    var open = elemMenu === k;
+                    elemHits.push(R.createElement("button", {
+                        key: "__el" + k,
+                        type: "button",
+                        className: "refract-cc-elem-hit" + (open ? " is-open" : ""),
+                        style: { left: b.left + "px", top: b.top + "px", width: b.width + "px", height: b.height + "px" },
+                        title: open ? "Close" : elemLabel(d) + " - move, change or hide it",
+                        "aria-label": elemLabel(d) + ": move, change or hide it",
+                        "aria-expanded": open ? "true" : "false",
+                        onMouseEnter: function () { holdZone(z0); elemHoverState[1](k); },
+                        onMouseLeave: function () { elemHoverState[1](null); },
+                        onFocus: function () { holdZone(z0); elemHoverState[1](k); },
+                        onBlur: function () { elemHoverState[1](null); },
+                        onClick: function (e) {
+                            e.preventDefault(); e.stopPropagation();
+                            setPillMenu(null);
+                            elemMenuState[1](open ? null : k);
+                        }
+                    }));
+                });
+
                 var ringStyle = null;
-                if (pillsLive.length && (pillHover !== null || pillMenu !== null)) {
+                var focusEl = elemMenu || elemHover;
+                if (focusEl && elemBoxes[focusEl]) {
+                    var fb = elemBoxes[focusEl];
+                    var fp = 4;
+                    ringStyle = {
+                        left: (fb.left - fp) + "px",
+                        top: (fb.top - fp) + "px",
+                        width: (fb.width + fp * 2) + "px",
+                        height: (fb.height + fp * 2) + "px",
+                        right: "auto",
+                        bottom: "auto",
+                        borderRadius: "10px"
+                    };
+                } else if (pillsLive.length && (pillHover !== null || pillMenu !== null)) {
                     var x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
                     pillsLive.forEach(function (b) {
                         if (b.left < x1) { x1 = b.left; }
@@ -1628,12 +1812,16 @@
                 }) : null;
                 return R.createElement("div", {
                     className: "refract-cc-corners",
-                    onMouseLeave: function () { setZone(null); setPillMenu(null); pillHoverState[1](null); }
+                    onMouseLeave: function () {
+                        setZone(null); setPillMenu(null); pillHoverState[1](null);
+                        elemMenuState[1](null); elemHoverState[1](null);
+                    }
                 },
                     hits,
                     pillHits,
+                    elemHits,
                     introRings,
-                    chips.length ? R.createElement("div", {
+                    (chips.length || pillsLive.length) ? R.createElement("div", {
                         className: "refract-cc-ring refract-cc-ring-" + zone
                             + (ringStyle ? " is-tight" : ""),
                         style: ringStyle || undefined
@@ -2269,7 +2457,9 @@
                             ),
                             R.createElement("div", { className: "refract-cc-rail-right" },
                                 R.createElement("span", { className: "refract-cc-hint" },
-                                    (zone === "bottom" && pillStripEditable())
+                                    (zone && Object.keys(elemBoxes).length && !(zone === "bottom" && pillStripEditable()))
+                                        ? "Click an element to move, change or hide it"
+                                        : (zone === "bottom" && pillStripEditable() && pillBoxes.length)
                                         /* The pills are the one control the
                                            card cannot advertise: the tray says
                                            "Add stat", nothing says the pills
@@ -2867,9 +3057,16 @@
        sitting in the row, which is why it is the only one that needs a
        layering choice when it shares a side. */
     var CARD_ELEMS = [
+        /* `sel` is where the element is DRAWN on the card. The customiser lays
+           a hit target over it so the OBJECT is its own control -- the same
+           move the stat pills made. Without it, a corner holding three
+           elements had to put their actions in one shared tray, where "Move to
+           bottom corner" could not say WHICH of the three it moved. */
         { key: "refract.scHideRating",     cls: "refract-sc-hide-rating",     group: "scene",     label: "Rating banner",
+          sel: ":scope > .rating-banner",
           sideKey: "refract.scRatingSide", sideDefault: "left",  sideCls: "refract-sc-rating-right" },
         { key: "refract.scHideTier",       cls: "refract-sc-hide-tier",       group: "scene",     label: "Tier ribbon", tier: true,
+          sel: ".refract-pc-tier-label",
           sideKey: "refract.scTierSide",   sideDefault: "right", sideCls: "refract-sc-tier-left" },
         /* The studio has THREE positions, not two: the top-left and top-right
            corners, and the bottom-right corner beside the count pills. The
@@ -2877,43 +3074,55 @@
            cluster lifts out of its way in CSS. `sideCls` still names the
            left class so everything that reads it keeps working. */
         { key: "refract.scHideStudio",     cls: "refract-sc-hide-studio",     group: "scene",     label: "Studio logo",
+          sel: ".studio-overlay, .refract-sc-studio-name",
           sideKey: "refract.scStudioSide", sideDefault: "right", sideCls: "refract-sc-studio-left",
           sides: ["left", "right", "bottom"], bottomCls: "refract-sc-studio-bottom" },
-        { key: "refract.scHideDuration",   cls: "refract-sc-hide-duration",   group: "scene",     label: "Duration" },
-        { key: "refract.scHidePerformers", cls: "refract-sc-hide-performers", group: "scene",     label: "Performers" },
+        { key: "refract.scHideDuration",   cls: "refract-sc-hide-duration",   group: "scene",     label: "Duration",
+          sel: ".stash-duration-pill, .scene-specs-overlay .overlay-duration" },
+        { key: "refract.scHidePerformers", cls: "refract-sc-hide-performers", group: "scene",     label: "Performers",
+          sel: ".stash-performer-avatars" },
         /* "Count pills" was one switch over two pills that answer different
            questions (how often, how tagged); each is its own now. The old key
            migrates in applyCardElemClasses. */
-        { key: "refract.scHideOCount",     cls: "refract-sc-hide-ocount",     group: "scene",     label: "O count" },
-        { key: "refract.scHideTagCount",   cls: "refract-sc-hide-tagcount",   group: "scene",     label: "Tag count" },
+        { key: "refract.scHideOCount",     cls: "refract-sc-hide-ocount",     group: "scene",     label: "O count",
+          sel: ".stash-o-count" },
+        { key: "refract.scHideTagCount",   cls: "refract-sc-hide-tagcount",   group: "scene",     label: "Tag count",
+          sel: ".stash-tag-count" },
         /* Only the Classic scene card shows a date line and a resolution
            badge; the Refract layout hides both by design (the tidy chin). So
            these are offered only there -- a chip for a thing the layout never
            draws would be the no-op Rating banner all over again. */
-        { key: "refract.scHideDate",       cls: "refract-sc-hide-date",       group: "scene",     label: "Date", classicOnly: true },
-        { key: "refract.scHideResolution", cls: "refract-sc-hide-resolution", group: "scene",     label: "Resolution", classicOnly: true },
+        { key: "refract.scHideDate",       cls: "refract-sc-hide-date",       group: "scene",     label: "Date", classicOnly: true,
+          sel: ".scene-card__date" },
+        { key: "refract.scHideResolution", cls: "refract-sc-hide-resolution", group: "scene",     label: "Resolution", classicOnly: true,
+          sel: ".scene-specs-overlay .overlay-resolution" },
         /* The last untoggleable scene element. Off, the card is a pure
            poster -- same legitimate wall as hiding the performer's name. */
-        { key: "refract.scHideTitle",      cls: "refract-sc-hide-title",      group: "scene",     label: "Title" },
+        { key: "refract.scHideTitle",      cls: "refract-sc-hide-title",      group: "scene",     label: "Title",
+          sel: ".card-section-title" },
         /* NO-OP. Its rule hides `.performer-card .rating-banner`, and a
            performer card never renders one: checked live across four
            performers under BOTH card styles, always ABSENT. The performer's
            rating is one of the stat pills along the bottom, so "Stat pills"
            already covers it. Offering this was a control that did nothing. */
         { key: "refract.pcHideRating",     cls: "refract-pc-hide-rating",     group: "performer", label: "Rating banner", noop: true },
-        { key: "refract.pcHideTier",       cls: "refract-pc-hide-tier",       group: "performer", label: "Tier ribbon", tier: true },
+        { key: "refract.pcHideTier",       cls: "refract-pc-hide-tier",       group: "performer", label: "Tier ribbon", tier: true,
+          sel: ".refract-pc-tier-label:not(.refract-mb-sash)" },
         /* The one element that was never toggleable, and the reason the
            performer card's top-left corner offered nothing. Hidden, the card
            is a pure picture, which is a legitimate wall. Deliberately in no
            look: hiding a name is an act, not a style. */
-        { key: "refract.pcHideName",       cls: "refract-pc-hide-name",       group: "performer", label: "Name" },
-        { key: "refract.pcHideCountry",    cls: "refract-pc-hide-country",    group: "performer", label: "Country" },
+        { key: "refract.pcHideName",       cls: "refract-pc-hide-name",       group: "performer", label: "Name",
+          sel: ".refract-pc-name-banner:not(.refract-mb-name)" },
+        { key: "refract.pcHideCountry",    cls: "refract-pc-hide-country",    group: "performer", label: "Country",
+          sel: ".stash-perf-country" },
         { key: "refract.pcHideStats",      cls: "refract-pc-hide-stats",      group: "performer", label: "Stat pills" },
         /* Ascension's rank read-out. Its visibility used to be a side effect
            of the Country chip (the badge is HOSTED inside the country caption
            when one exists); now it has its own switch and survives the
            country's. Only offered when Ascension is actually installed. */
-        { key: "refract.pcHideRank",       cls: "refract-pc-hide-rank",       group: "performer", label: "Rank badge", plugin: "ascension" },
+        { key: "refract.pcHideRank",       cls: "refract-pc-hide-rank",       group: "performer", label: "Rank badge", plugin: "ascension",
+          sel: ".hon-battle-rank-badge" },
         /* The BACK of a performer card. In "mirror" style the back is the same
            face as the front configured differently, so it has its own copies of
            the same kinds of element rather than sharing the front's. */
@@ -2923,13 +3132,16 @@
            claiming to be ("its own selection"). Seven checkboxes could express
            the same set but never the same ORDER, and made you think in terms of
            what to hide rather than what to show. See BACK_STATS. */
-        { key: "refract.mbHideTier",       cls: "refract-mb-hide-tier",       group: "back", label: "Tier ribbon", tier: true },
+        { key: "refract.mbHideTier",       cls: "refract-mb-hide-tier",       group: "back", label: "Tier ribbon", tier: true,
+          sel: ".refract-mb-sash" },
         /* The dossier's two switchable panels. Its ratings grid stays fixed
            (that layout IS the look), but the media strip and the collector
            footer are additions a purist may not want -- and the dossier being
            the DEFAULT back with zero knobs was its own finding. */
-        { key: "refract.cbHideMedia",      cls: "refract-cb-hide-media",      group: "back", label: "Media strip", dossier: true },
-        { key: "refract.cbHideFoot",       cls: "refract-cb-hide-foot",       group: "back", label: "Collector footer", dossier: true }
+        { key: "refract.cbHideMedia",      cls: "refract-cb-hide-media",      group: "back", label: "Media strip", dossier: true,
+          sel: ".refract-cb-media" },
+        { key: "refract.cbHideFoot",       cls: "refract-cb-hide-foot",       group: "back", label: "Collector footer", dossier: true,
+          sel: ".refract-cb-foot" }
     ];
     /* Which quadrant of the card each element lives in. Top-edge scene
        elements are absent on purpose: their corner follows their own
