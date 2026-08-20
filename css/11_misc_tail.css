@@ -2075,9 +2075,11 @@ body.stash-liquid-glass .refract-cc-chips {
     padding: 5px 6px;
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(10, 10, 15, 0.86);
-    -webkit-backdrop-filter: blur(10px);
-            backdrop-filter: blur(10px);
+    /* Same recipe as the slot menu it turns into, and the same reason: a card
+       is an image, and the brightest part of one will beat a 14 % scrim. */
+    background: rgba(10, 10, 15, 0.94);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
+            backdrop-filter: blur(16px) saturate(1.1);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
     /* The whole arm is one moment: the scrim fades in, the tray with it. */
     animation: refract-cc-tray-in 0.18s ease-out both;
@@ -2296,11 +2298,16 @@ body.stash-liquid-glass .refract-cc-slot-menu {
     justify-content: center;
     padding: 6px;
     border-radius: 12px;
-    /* The tray's recipe exactly -- two glasses an inch apart was two systems. */
+    /* The tray's recipe exactly -- two glasses an inch apart was two systems.
+       Nearly opaque, because this one carries eight lines of dense text and
+       sits wherever the pill it belongs to happens to be. Over the dossier's
+       hero the old 0.86 let a 100-point rating banner read straight through
+       four of the chips, and a menu you can read the card through is not a
+       menu. Glass is for the frame, not for the content. */
     border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(10, 10, 15, 0.86);
-    -webkit-backdrop-filter: blur(10px);
-            backdrop-filter: blur(10px);
+    background: rgba(10, 10, 15, 0.965);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
+            backdrop-filter: blur(16px) saturate(1.1);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
 }
 body.stash-liquid-glass .refract-cc-slot-menu .refract-cc-chip {
@@ -2382,6 +2389,20 @@ body.stash-liquid-glass .refract-cc-chip:hover {
     border-color: rgba(var(--accent-rgb), 0.8);
     color: var(--text);
 }
+/* THREE KINDS OF CONTROL, THREE GLYPHS.
+
+   The panel has always had three: switches (this element is on the card),
+   choices (it sits HERE, and nowhere else), and actions (add a stat, remove
+   this pill). It had two glyphs. Every choice in the customiser -- the
+   studio's Where and As, the back's picture, every stat menu -- wore the
+   switch's square tick box, so three mutually exclusive options read as three
+   independent checkboxes, one of which happened to be ticked. And "Add stat"
+   wore an empty circle, which reads as a state that is currently off rather
+   than as a button.
+
+   Square with a fill  = a switch. On or off, independent of its neighbours.
+   Ring with a dot     = a choice. Exactly one of this group is true.
+   No glyph at all     = an action. Not a state, so nothing to show. */
 body.stash-liquid-glass .refract-cc-chip-box {
     width: 11px;
     height: 11px;
@@ -2393,8 +2414,35 @@ body.stash-liquid-glass .refract-cc-chip.is-on .refract-cc-chip-box {
     background: var(--accent);
     border-color: var(--accent);
 }
-body.stash-liquid-glass .refract-cc-chip-swap .refract-cc-chip-box {
+/* A choice. Round, and when it is the one in force it draws a ring around a
+   dot rather than filling solid -- the inset shadow punches the tray's own
+   dark back through the middle. Keyed on the ROLE, so every radio in the
+   panel gets it without anyone remembering to ask. */
+body.stash-liquid-glass .refract-cc-chip[role="radio"] .refract-cc-chip-box {
     border-radius: 50%;
+}
+body.stash-liquid-glass .refract-cc-chip[role="radio"].is-on .refract-cc-chip-box {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 2px rgba(10, 10, 15, 0.94);
+}
+/* An action. `.refract-cc-chip-swap` is Add stat, Move left, Move right and
+   Remove -- none of which is a state, so none of which has anything to draw.
+   The empty circle they used to wear made "Add stat" look like a switch that
+   was off, sitting in a tray of switches that were on. */
+body.stash-liquid-glass .refract-cc-chip-swap .refract-cc-chip-box {
+    display: none;
+}
+/* Losing the glyph loses the 7px gap with it, so the label would sit closer to
+   the left edge than to the right. Even it up, and let an action read as the
+   button it is: brighter than an unticked switch, because it is not off. */
+body.stash-liquid-glass .refract-cc-chip.refract-cc-chip-swap {
+    padding-left: 13px;
+    padding-right: 13px;
+    color: var(--text);
+}
+body.stash-liquid-glass .refract-cc-chip.refract-cc-chip-swap:hover:not([disabled]) {
+    border-color: rgba(var(--accent-rgb), 0.6);
 }
 
 /* ── Setting tiles ──────────────────────────────────────────────────────
