@@ -490,20 +490,25 @@
             var pillBoxesState = R.useState([]);
             var pillBoxes = pillBoxesState[0];
             R.useEffect(function () {
-                var live = true, raf = null, t = null;
+                var live = true, timers = [], raf = null;
                 var measure = function () {
                     if (!live) { return; }
-                    var want = [];
+                    var want = [], laidOut = false;
                     if (zone === "bottom") {
                         var box = document.querySelector("#plugin-refract-card-preview .refract-cc-cardbox");
-                        var strip = box && (editingBack
-                            ? box.querySelector(".refract-card-back .refract-mb-stats")
-                            : box.querySelector(".stash-perf-stats:not(.refract-mb-stats)"));
-                        if (strip) {
+                        /* Which strip is DRAWN, rather than which one the state
+                           says should be: both faces are laid out at once (the
+                           front strip keeps its box while the back is showing),
+                           so the card's own class is the honest answer. */
+                        var showBack = !!(box && box.querySelector(".performer-card.refract-show-back"));
+                        var strip = box && ((showBack && box.querySelector(".refract-card-back .refract-mb-stats"))
+                            || box.querySelector(".stash-perf-stats:not(.refract-mb-stats)"));
+                        if (strip && strip.children.length) {
                             var br = box.getBoundingClientRect();
                             Array.prototype.forEach.call(strip.children, function (n) {
                                 var r = n.getBoundingClientRect();
                                 if (!r.width || !r.height) { return; }
+                                laidOut = true;
                                 want.push({
                                     left: Math.round(r.left - br.left),
                                     top: Math.round(r.top - br.top),
@@ -512,22 +517,27 @@
                                 });
                             });
                             want.sort(function (x, y) { return x.left - y.left; });
+                            /* The back's strip is REBUILT under us -- its pills
+                               measure 0x0 on some frames and their real size on
+                               others. Logged: want 4 -> want 0 -> want 4 within
+                               35ms. A zero landing between two good frames used
+                               to wipe the boxes, which is why the back's hit
+                               targets appeared or not depending on the race.
+                               A strip that exists but has no box yet is "not
+                               ready", never "empty". */
+                            if (!laidOut && pillBoxes.length) { return; }
                         }
                     }
                     if (JSON.stringify(want) !== JSON.stringify(pillBoxes)) { pillBoxesState[1](want); }
                 };
-                /* AFTER paint, not during commit. Measured inline, the back's
-                   pills come back 0x0 every time -- the strip is in the DOM but
-                   has no box yet -- and because nothing else re-renders, the
-                   zero stuck and the back never got hit targets. A frame later
-                   they measure 54x29. The 220ms follow-up covers the back being
-                   rebuilt from its own query after the first frame. */
+                /* Staggered, because the strip settles at its own pace: after
+                   paint, then again while the back finishes its own query. */
                 raf = requestAnimationFrame(measure);
-                t = setTimeout(measure, 220);
+                [80, 200, 420].forEach(function (ms) { timers.push(setTimeout(measure, ms)); });
                 return function () {
                     live = false;
                     if (raf) { cancelAnimationFrame(raf); }
-                    if (t) { clearTimeout(t); }
+                    timers.forEach(clearTimeout);
                 };
             });
             var introState = R.useState(false);
@@ -1453,6 +1463,15 @@
                 }
                 return chips;
             }
+            /* Can a pill on the drawn strip be edited? The back's strip always
+               can (its band only exists on the gallery/mirror looks); the
+               front's needs the Refract layout and a shown strip. Both the hit
+               targets and the rail's hint read this, so they cannot disagree. */
+            function pillStripEditable() {
+                if (editingBack) { return true; }
+                return previewKind === "performer" && perfCardStyle === "refract"
+                    && !cardElems["refract.pcHideStats"];
+            }
             function cornerLayer() {
                 /* A performer card's top-left holds nothing toggleable now that
                    the no-op rating is gone, and ringing an empty corner
@@ -1540,8 +1559,11 @@
                    it sits in, below the tray. Hovering a pill HOLDS the band
                    (the grace timer would otherwise treat the pill as leaving
                    it), and clicking one opens that pill's own menu. */
-                var pillFace = editingBack ? "back" : "front";
-                var pillHits = (zone === "bottom" ? pillBoxes : []).map(function (b, i) {
+                /* Gated exactly as the MENU is gated in zoneChips. Under the
+                   Classic performer layout the hits used to render over the
+                   plain stat text -- tabbable, ringed on hover, and opening
+                   nothing, because the menu is Refract-layout only. */
+                var pillHits = (zone === "bottom" && pillStripEditable() ? pillBoxes : []).map(function (b, i) {
                     var open = pillMenu === i;
                     return R.createElement("button", {
                         key: "__pill" + i,
@@ -2208,11 +2230,22 @@
                             ),
                             R.createElement("div", { className: "refract-cc-rail-right" },
                                 R.createElement("span", { className: "refract-cc-hint" },
-                                    editingBack
-                                        ? (backStyle === "dossier"
-                                            ? "The grid is fixed; hover the media strip or the footer to switch them off"
-                                            : "Hover a band of the back to change what sits there")
-                                        : "Hover a corner of the card to change what sits there"),
+                                    (zone === "bottom" && pillStripEditable())
+                                        /* The pills are the one control the
+                                           card cannot advertise: the tray says
+                                           "Add stat", nothing says the pills
+                                           already there can be CHANGED, so the
+                                           fair reading is that the strip is
+                                           add-and-remove only. Said here, in
+                                           the panel's own place for
+                                           instructions, only while the strip is
+                                           the thing being looked at. */
+                                        ? "Click a pill to change what it shows"
+                                        : editingBack
+                                            ? (backStyle === "dossier"
+                                                ? "The grid is fixed; hover the media strip or the footer to switch them off"
+                                                : "Hover a band of the back to change what sits there")
+                                            : "Hover a corner of the card to change what sits there"),
                                 R.createElement("button", {
                                     type: "button",
                                     className: "refract-cc-shuffle refract-cc-plain" + (plainOn ? " is-on" : ""),
