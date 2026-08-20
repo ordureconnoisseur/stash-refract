@@ -1142,61 +1142,81 @@ body.stash-liquid-glass .video-js .refract-src-rate {
     min-height: 26px;
 }
 body.stash-liquid-glass .video-js .refract-src-slider {
-    appearance: none;
     -webkit-appearance: none;
+    appearance: none;
     flex: 1 1 auto;
     min-width: 0;
-    height: 4px;
+    height: 1.2rem;
     margin: 0;
-    border-radius: 999px;
+    padding: 0;
     background: transparent;
     accent-color: var(--accent);
     cursor: pointer;
+}
+body.stash-liquid-glass .video-js .refract-src-slider:focus {
     outline: none;
 }
 body.stash-liquid-glass .video-js .refract-src-slider:focus-visible {
-    outline: 2px solid var(--accent-bright);
-    outline-offset: 4px;
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.22);
+    border-radius: var(--radius-sm);
 }
-/* Chrome draws its OWN track from `::-webkit-slider-runnable-track`;
-   the background set on the input is not it. Without this the track
-   rendered in the browser's default blue -- which the styled thumb hid
-   just well enough to miss in the numbers. */
+/* Same anatomy as the zoom slider in 04_filters.css: a 5px carved track,
+   a 12px accent thumb, and the filled-left portion drawn by a very wide
+   box-shadow on the thumb that the track's overflow clips. It was a
+   bespoke 4px track with a dark-ringed thumb before, which is the one
+   slider in refract that did not look like the others. */
 body.stash-liquid-glass .video-js .refract-src-slider::-webkit-slider-runnable-track {
-    height: 4px;
+    height: 5px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.16);
-    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-inset-track);
+    overflow: hidden;
 }
 body.stash-liquid-glass .video-js .refract-src-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    /* Centre a 13px thumb on a 4px track. */
-    margin-top: -4.5px;
-    width: 13px;
-    height: 13px;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    margin-top: -4px;
     border-radius: 50%;
-    background: var(--accent-bright);
-    border: 2px solid rgba(10, 10, 12, 0.9);
-    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.55);
-    transition: transform 0.12s ease;
+    background: rgba(var(--accent-rgb), 0.78);
+    border: none;
+    box-shadow:
+        -100vw 0 0 calc(100vw - 6px) rgba(var(--accent-rgb), 0.45),
+        0 0 10px rgba(var(--accent-rgb), 0.45);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-body.stash-liquid-glass .video-js .refract-src-slider:hover::-webkit-slider-thumb,
-body.stash-liquid-glass .video-js .refract-src-slider:active::-webkit-slider-thumb {
+body.stash-liquid-glass .video-js .refract-src-slider:hover::-webkit-slider-thumb {
     transform: scale(1.15);
+    box-shadow:
+        -100vw 0 0 calc(100vw - 6px) rgba(var(--accent-rgb), 0.6),
+        0 0 14px rgba(var(--accent-rgb), 0.6);
 }
-body.stash-liquid-glass .video-js .refract-src-slider::-moz-range-thumb {
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    background: var(--accent-bright);
-    border: 2px solid rgba(10, 10, 12, 0.9);
-    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.55);
+body.stash-liquid-glass .video-js .refract-src-slider:active::-webkit-slider-thumb {
+    transform: scale(1.04);
 }
 body.stash-liquid-glass .video-js .refract-src-slider::-moz-range-track {
-    height: 4px;
+    height: 5px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-inset-track);
 }
+body.stash-liquid-glass .video-js .refract-src-slider::-moz-range-progress {
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(var(--accent-rgb), 0.45);
+}
+body.stash-liquid-glass .video-js .refract-src-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(var(--accent-rgb), 0.78);
+    border: none;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.45);
+}
+
 /* The readout is the only number here, so it gets a fixed box: without
    one the slider's length changed as the label went 1x -> 1.25x. */
 body.stash-liquid-glass .video-js .refract-src-rate-val {
@@ -1267,4 +1287,13 @@ body.stash-liquid-glass .video-js .refract-src-direct.is-on {
 body.stash-liquid-glass .video-js .refract-src-opt[disabled] {
     opacity: 0.35;
     cursor: default;
+}
+
+/* The source-selector measured 36x38 while every other control in the
+   bar is 36x36, so its rounded-square background was a rectangle and the
+   glyph sat off-centre in it. Its 38px line-height was setting the
+   height. */
+body.stash-liquid-glass .video-js .vjs-control-bar .vjs-menu-button {
+    height: 36px !important;
+    line-height: 36px !important;
 }

@@ -2099,7 +2099,10 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger:fo
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars {
     position: absolute !important;
     top: calc(100% + 8px) !important;
+    /* Spans the toolbar so the Advanced Ratings control can sit inside
+       the same panel, at its right edge. */
     left: 0 !important;
+    right: 0 !important;
     z-index: 60 !important;
     display: flex !important;
     align-items: center !important;
@@ -2144,4 +2147,31 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rati
     body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars {
         transition: none !important;
     }
+}
+
+
+/* ── One rating control, not two ──────────────────────────────────────
+   Stash's own 0-5 rating and the Advanced Ratings plugin's score are two
+   different numbers wearing the same star, and they were two separate
+   controls sitting side by side in a 338px toolbar. They are one entry
+   point now: the trigger opens a panel holding both, with the star row
+   for Stash's rating on the left and the plugin's own button on the
+   right. Neither is reimplemented -- the stars are still Stash's, the
+   button is still the plugin's, both merely repositioned by CSS. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .adv-rating-btn {
+    display: none !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host.refract-rating-open .adv-rating-btn {
+    display: inline-flex !important;
+    position: absolute !important;
+    /* Optically centred against the 24px star row inside the panel's
+       0.45rem padding and 1px border. */
+    top: calc(100% + 14px) !important;
+    right: 0.55rem !important;
+    margin: 0 !important;
+    z-index: 61 !important;
+}
+/* Room at the right end of the panel for that button. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars {
+    padding-right: 4.2rem !important;
 }
