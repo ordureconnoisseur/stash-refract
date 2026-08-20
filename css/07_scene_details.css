@@ -673,6 +673,23 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, 
     align-items: center !important;
     gap: 0.3rem !important;
     flex-wrap: nowrap !important;
+    /* Size to content. Stash sets `.scene-toolbar .scene-toolbar-group
+       { width: 100% }`, so each group measured the full 338px against
+       real content of 189px and 145px. Once the toolbar was allowed to
+       wrap, that put every group on a row of its own and left the
+       multiview button orphaned on a third. */
+    width: auto !important;
+    flex: 0 0 auto !important;
+}
+
+/* Two deliberate rows: the rating cluster, then the counters and the
+   multiview button together. The three items total ~360px against a
+   column that only ever offers 338-358px, so a second row is always
+   needed -- forcing the break here keeps it the SAME two rows at every
+   panel width, instead of letting a few pixels of viewport decide
+   whether the multiview button rides along or hangs alone. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > :is(.scene-toolbar-group, .image-toolbar-group):first-child {
+    flex-basis: 100% !important;
 }
 /* The group's `gap` is the only spacing. It was being added to the
    Advanced Rating plugin's own `margin-left: 8px` and to refract's
