@@ -1999,10 +1999,13 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     gap: 0.2rem !important;
     justify-content: space-between !important;
 }
+/* The groups stop being boxes so the toolbar spaces the CONTROLS, not
+   the three groups. Spacing three groups across the row left two large
+   holes once the star widget moved into its popover; with `contents`
+   the toolbar's own `space-between` distributes all eight controls
+   evenly across the full width, whatever the panel is doing. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) {
-    gap: 0.2rem !important;
-    justify-content: space-between !important;
-    flex: 0 1 auto !important;
+    display: contents !important;
 }
 /* Icon-only controls stay perfectly round: square box, pill radius. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, #operation-menu, .mv-scene-page-btn, .mv-scene-btn, .adv-favourite-btn) {
@@ -2029,4 +2032,116 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars {
     flex: 0 1 auto !important;
     min-width: 0 !important;
+}
+
+/* ── Rating trigger + popover ─────────────────────────────────────────
+   The five-star widget was 94px of a 338px toolbar and the single reason
+   the row could not hold its controls at full size. It collapses to one
+   pill here and opens on click. The stars are positioned into the
+   popover by CSS ONLY -- they stay where React put them in the DOM,
+   because moving a React-managed node desyncs its fiber. */
+/* The popover anchors to the TOOLBAR, not to the group that holds the
+   stars: that group is `display: contents` so it generates no box and
+   cannot be a containing block. The trigger is the first control in the
+   row, so the toolbar's left edge is the right anchor anyway. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
+    position: relative !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.2rem !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    padding: 0 0.4rem !important;
+    flex: 0 0 auto !important;
+    border-radius: var(--radius-pill) !important;
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-muted) !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger svg {
+    width: 12px !important;
+    height: 12px !important;
+    flex: 0 0 auto !important;
+}
+/* Unrated: a bare circle, no empty value box taking width. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger:not(.is-rated) {
+    width: 26px !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger:not(.is-rated) .refract-rating-trigger-val {
+    display: none !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger.is-rated {
+    color: var(--accent-bright) !important;
+    border-color: var(--accent-glow) !important;
+    background: var(--accent-tint) !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger:hover,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host.refract-rating-open .refract-rating-trigger {
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border-bright) !important;
+    color: #fff !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger:focus-visible {
+    outline: 2px solid var(--accent-bright) !important;
+    outline-offset: 2px !important;
+}
+
+/* The popover. The stars keep their place in the DOM and are painted here. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    left: 0 !important;
+    z-index: 60 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.15rem !important;
+    padding: 0.45rem 0.55rem !important;
+    border-radius: var(--radius-sm) !important;
+    /* Opaque, not glass. This floats over the tab strip, and at 0.97 alpha
+       the tab labels still read through from behind the stars. A popover
+       has to occlude what it covers. */
+    background: #16161c !important;
+    border: 1px solid var(--glass-border-bright) !important;
+    box-shadow: var(--shadow-xl) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(-4px) !important;
+    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host.refract-rating-open .rating-stars {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: none !important;
+}
+/* Full-size stars in the popover — they were shrunk to 15px only to
+   survive the toolbar, and this is a hit target now. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars button {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars button svg {
+    width: 24px !important;
+    height: 24px !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars .star-rating-number {
+    margin-left: 0.35rem !important;
+    font-size: var(--fs-sm) !important;
+    color: var(--text) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars {
+        transition: none !important;
+    }
 }
