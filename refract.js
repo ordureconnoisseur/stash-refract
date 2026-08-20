@@ -3172,6 +3172,14 @@
         CARD_ELEMS.forEach(function (d) {
             document.body.classList.toggle(d.cls, isCardElemHidden(d.key));
         });
+        /* Ascension's rank badge is HOSTED inside the country caption when a
+           country is shown, so hiding the country used to take the badge down
+           with it -- its visibility hanging off an unrelated chip. The hosting
+           logic already refuses a hidden caption and falls back to the chin,
+           but it only runs from the DOM observer, which watches childList and
+           never sees a body CLASS change. Re-home the badges here, at the one
+           place every element-visibility change passes through. */
+        try { integrateAscensionBadges(); } catch (e) { /* Ascension absent */ }
     }
     /* Only the NON-default side gets a class, so the shipped layout costs no
        extra CSS and nothing changes for anyone who never opens this. */
