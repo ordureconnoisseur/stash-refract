@@ -8014,7 +8014,6 @@
                 safeRun(stripRatingBannerToNumber);
                 safeRun(initCardTilts);
                 safeRun(initSceneCards);
-                safeRun(initSceneRatingPopover);
                 safeRun(initPerformerCards);
                 safeRun(syncPerformerCardHearts);
                 safeRun(integrateAscensionBadges);
