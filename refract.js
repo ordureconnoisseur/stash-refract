@@ -590,8 +590,31 @@
                                 if (!ns || !ns.length) { return; }
                                 var r = null;
                                 for (var qi = 0; qi < ns.length; qi++) {
-                                    var rr = ns[qi].getBoundingClientRect();
-                                    if (rr.width && rr.height) { r = rr; break; }
+                                    var node = ns[qi];
+                                    var rr = node.getBoundingClientRect();
+                                    if (!rr.width || !rr.height) { continue; }
+                                    /* An element that is a picture, or wraps
+                                       one, is outlined where the PICTURE is.
+                                       The studio logo's box is a fixed slot and
+                                       the artwork is letterboxed inside it, so
+                                       the box was a different shape from the
+                                       logo on every single card. */
+                                    /* Exactly one picture, or none. A wrapper
+                                       holding SEVERAL -- the performer avatar
+                                       row -- is its own shape, and hugging the
+                                       first of them would shrink the target to
+                                       one face out of three. (Avatars are
+                                       `cover` today, so this changes nothing
+                                       now; it stops it changing later.) */
+                                    var ims = node.tagName === "IMG"
+                                        ? [node] : node.querySelectorAll("img");
+                                    var im = ims.length === 1 ? ims[0] : null;
+                                    if (im) {
+                                        var pr = refractPaintedRect(im);
+                                        if (pr.width && pr.height) { rr = pr; }
+                                    }
+                                    r = rr;
+                                    break;
                                 }
                                 if (!r) { return; }
                                 eb[d.key] = {
@@ -3804,6 +3827,49 @@
         "refract.scHideTier": ["refract.scTierSide", "right"],
         "refract.scHideStudio": ["refract.scStudioSide", "right"]
     };
+    /* WHERE AN IMAGE ACTUALLY PAINTS.
+
+       A studio logo is an <img> with `object-fit: contain` inside a box of
+       fixed size, so the artwork is letterboxed and the shape of what you SEE
+       depends entirely on that studio's file. Measured across one grid: the
+       same 112x50 box paints 112x8.5 for a 1351x102 wordmark and 112x41 for a
+       182x67 square-ish mark -- a five-fold difference in height between two
+       cards side by side. The box says almost nothing about where the logo is,
+       which is why an outline drawn on the box lined up with nothing and
+       lined up differently on every card.
+
+       `object-position` decides where the letterboxed rectangle sits in the
+       leftover space; Chrome reports it as two percentages or two lengths, and
+       both are handled. Anything but contain/scale-down fills the box, so the
+       box is already the answer. */
+    function refractPaintedRect(n) {
+        var r = n.getBoundingClientRect();
+        var nw = n.naturalWidth, nh = n.naturalHeight;
+        /* Not loaded yet: the box is the best guess, and the measure pass runs
+           again on a timer, so a late image corrects itself. */
+        if (!nw || !nh || !r.width || !r.height) { return r; }
+        var cs;
+        try { cs = window.getComputedStyle(n); } catch (e) { return r; }
+        var fit = cs.objectFit;
+        if (fit !== "contain" && fit !== "scale-down") { return r; }
+        var sc = Math.min(r.width / nw, r.height / nh);
+        if (fit === "scale-down") { sc = Math.min(sc, 1); }
+        var w = nw * sc, h = nh * sc;
+        var slackX = r.width - w, slackY = r.height - h;
+        var pos = String(cs.objectPosition || "50% 50%").trim().split(/\s+/);
+        var axis = function (raw, slack) {
+            if (raw === undefined) { return slack / 2; }
+            var v = parseFloat(raw);
+            if (isNaN(v)) { return slack / 2; }
+            return /%$/.test(raw) ? slack * (v / 100) : v;
+        };
+        return {
+            left: r.left + axis(pos[0], slackX),
+            top: r.top + axis(pos.length > 1 ? pos[1] : pos[0], slackY),
+            width: w,
+            height: h
+        };
+    }
     function normaliseSceneCorners() {
         var moved = false;
         try {
