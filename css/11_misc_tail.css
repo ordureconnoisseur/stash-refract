@@ -3149,6 +3149,37 @@ body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-ring-tl {
     width: 72%;
     height: 14%;
 }
+/* The flip tab's band. The tab is not in a corner, and it is not even fully
+   ON the card: measured on the preview it is a 27x40 tab at y45-55% that
+   `translate`s 27px PAST the card's right edge, so it hangs off the frame the
+   way a bookmark does. A band flush with the card edge overlapped it by one
+   pixel; this one reaches out to where the tab really is. */
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-hit-edge {
+    position: absolute;
+    top: 36%;
+    right: -10%;
+    left: auto;
+    bottom: auto;
+    width: 30%;
+    height: 28%;
+    cursor: pointer;
+}
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-ring-edge {
+    top: 43.5%;
+    right: -10%;
+    left: auto;
+    bottom: auto;
+    width: 11.5%;
+    height: 13%;
+}
+/* Left of the tab, not over it: this is the one tray whose band is against a
+   card edge, so centring it would put it half off the card. */
+body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-chips-edge {
+    top: 50%;
+    left: auto;
+    right: 24%;
+    transform: translateY(-50%);
+}
 /* Its sash corner, same geometry as the back's -- it is the same element. */
 body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-hit-tr {
     top: 0;
@@ -3214,6 +3245,29 @@ body.stash-liquid-glass .refract-preview-kind-back .refract-cc-hit-tr {
     width: 45%;
     height: 29%;
 }
+/* The back's name strip. It is the FRONT's banner cloned onto the back, so it
+   is the same element in the same place and takes the same band -- the two
+   faces read alike because they are alike. It sits on the image band and comes
+   after it in DOM order, which is the only reason it can be hit at all. */
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-hit-tl {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: auto;
+    width: 55%;
+    height: 22%;
+    cursor: pointer;
+}
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-ring-tl {
+    top: 4px;
+    left: 4px;
+    right: auto;
+    bottom: auto;
+    width: 76%;
+    height: 12%;
+}
+body.stash-liquid-glass .refract-preview-kind-back .refract-cc-chips-tl { top: 25%; }
 /* The sash is a rotated bar clipped by the corner; its visible triangle runs to
    about y92 of 323 and in from 55% of the width. */
 body.stash-liquid-glass .refract-preview-kind-back .refract-cc-ring-tr {

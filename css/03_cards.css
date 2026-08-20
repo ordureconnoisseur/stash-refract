@@ -2107,6 +2107,12 @@ body.stash-liquid-glass.refract-sc-hide-date.refract-sc-hide-date .scene-card .s
 body.stash-liquid-glass.refract-sc-hide-resolution.refract-sc-hide-resolution .scene-card .scene-specs-overlay .overlay-resolution {
     display: none !important;
 }
+/* The description Stash prints under the title on a Classic card. Refract's
+   chin never draws it, so like the date and the resolution this only bites
+   there. */
+body.stash-liquid-glass.refract-sc-hide-details.refract-sc-hide-details .scene-card .scene-card__description {
+    display: none !important;
+}
 /* Title off = a pure poster. The whole title row goes (the studio-text
    prefix rides inside it and goes with it, correctly: it is title furniture). */
 body.stash-liquid-glass.refract-sc-hide-title.refract-sc-hide-title .scene-card .card-section-title {

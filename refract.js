@@ -1439,6 +1439,12 @@
                 if (d.classicOnly && cardStyle !== "classic") { return null; }
                 if (d.plugin === "ascension" && !document.body.classList.contains("refract-has-ascension")) { return null; }
                 if (d.dossier && !(editingBack && backStyle === "dossier")) { return null; }
+                /* The mirror side of the same statement. These three are parts
+                   of the gallery/mirror anatomy and the dossier draws none of
+                   them; until now nothing SAID so -- they were kept off it by
+                   the accident that the dossier is offered different bands, an
+                   implicit rule doing a gate's job. */
+                if (d.gallery && (!editingBack || backStyle === "dossier")) { return null; }
                 if (d.tier && flourish !== "extravagant") {
                     return { blocked: true, reason: "Needs the Extravagant rating flourish" };
                 }
@@ -1627,8 +1633,12 @@
                    row directly over the strip, one per slot and in the same
                    order, so clicking the chip reads as clicking the pill under
                    it. Seven on/off toggles could express the same SET but never
-                   the same order, and framed the job as choosing what to hide. */
-                if (editingBack && z === "bottom") { return slotChips("back"); }
+                   the same order, and framed the job as choosing what to hide.
+                   Its on/off chip joins them below, the way the front's does --
+                   the back's band used to return slot chips and NOTHING else,
+                   so the one thing you could not do to the back's strip was
+                   turn it off. */
+                if (editingBack && z === "bottom" && pillMenu !== null) { return slotChips("back"); }
                 var chips = elemsInZone(z).map(function (d) {
                     var st = elemState(d) || { blocked: false };
                     var shown = !cardElems[d.key];
@@ -1676,6 +1686,13 @@
                     if (pillMenu !== null) { return slotChips("front"); }
                     chips = chips.concat(slotChips("front"));
                 }
+                /* Same shape on the back: the strip's own switch, then a chip
+                   per slot -- and no slots offered once the strip is off,
+                   because a list of what a hidden strip would carry is a
+                   control that cannot be seen to work. */
+                if (editingBack && z === "bottom" && !cardElems["refract.mbHideStats"]) {
+                    chips = chips.concat(slotChips("back"));
+                }
                 return chips;
             }
             /* Can a pill on the drawn strip be edited? The back's strip always
@@ -1708,14 +1725,23 @@
                    its own fixed layout with nothing to move, so it is offered
                    no regions rather than regions that would lie. */
                 var zones = editingBack
-                    ? (backStyle === "dossier" ? ["dmedia", "dfoot"] : ["img", "tr", "tray", "bottom"])
+                    /* The gallery back mirrors the front's anatomy, so it
+                       gets the front's bands: the picture, the name strip over
+                       its top-left, the sash corner, the tray, the strip. "img"
+                       comes FIRST because it runs the full width of the top and
+                       the other two sit ON it -- later wins, and a band that
+                       swallows its neighbours is the defect this order exists
+                       to avoid. The name band was the last piece missing: its
+                       chip pointed at a band the back never offered, so the
+                       switch existed and could not be reached. */
+                    ? (backStyle === "dossier" ? ["dmedia", "dfoot"] : ["img", "tl", "tr", "tray", "bottom"])
                     : (previewKind === "performer"
                         /* The performer front has exactly two places anything
                            can be moved: the sash in the top-right corner, and
                            the country + stats band across the bottom. Four
                            quadrants promised control in two corners that hold
                            nothing -- the top-left offered no chips at all. */
-                        ? ["tl", "tr", "bottom"]
+                        ? ["tl", "tr", "edge", "bottom"]
                         : ["tl", "tr", "bl", "br"]);
                 /* Built ONCE per zone, then used twice: to drop bands that
                    have nothing to offer, and to render the armed one. A zone
@@ -3185,6 +3211,14 @@
           sel: ".scene-card__date" },
         { key: "refract.scHideResolution", cls: "refract-sc-hide-resolution", group: "scene",     label: "Resolution", classicOnly: true,
           sel: ".scene-specs-overlay .overlay-resolution" },
+        /* The third and last Classic-only element: the scene's own description
+           under the title. Stash draws it, Refract's chin does not, and it was
+           the one thing on a Classic card with no switch at all.
+           `.file-path` and the file-size overlay beside it are deliberately NOT
+           offered: Stash has its own setting for those ("show extra file info")
+           and a second switch over one thing is how a panel starts lying. */
+        { key: "refract.scHideDetails",    cls: "refract-sc-hide-details",    group: "scene",     label: "Description", classicOnly: true,
+          sel: ".scene-card__description" },
         /* The last untoggleable scene element. Off, the card is a pure
            poster -- same legitimate wall as hiding the performer's name. */
         { key: "refract.scHideTitle",      cls: "refract-sc-hide-title",      group: "scene",     label: "Title",
@@ -3212,6 +3246,13 @@
            country's. Only offered when Ascension is actually installed. */
         { key: "refract.pcHideRank",       cls: "refract-pc-hide-rank",       group: "performer", label: "Rank badge", plugin: "ascension",
           sel: ".hon-battle-rank-badge" },
+        /* The flip tab, and with it the whole back. Every OTHER thing about the
+           back was configurable -- its face, its picture, its stats, its tray,
+           each panel of the dossier -- except whether you wanted one. The back
+           is built lazily on first flip, so this costs nothing when off; it
+           takes the tab off the card and leaves a plain picture. */
+        { key: "refract.pcHideBack",       cls: "refract-pc-hide-back",       group: "performer", label: "Flip tab",
+          sel: ".refract-card-flip-btn" },
         /* The BACK of a performer card. In "mirror" style the back is the same
            face as the front configured differently, so it has its own copies of
            the same kinds of element rather than sharing the front's. */
@@ -3221,8 +3262,16 @@
            claiming to be ("its own selection"). Seven checkboxes could express
            the same set but never the same ORDER, and made you think in terms of
            what to hide rather than what to show. See BACK_STATS. */
-        { key: "refract.mbHideTier",       cls: "refract-mb-hide-tier",       group: "back", label: "Tier ribbon", tier: true,
+        { key: "refract.mbHideTier",       cls: "refract-mb-hide-tier",       group: "back", label: "Tier ribbon", tier: true, gallery: true,
           sel: ".refract-mb-sash" },
+        /* The back's own copies of two elements the front could always switch
+           off and the back could not. The back is not the front: you may want
+           the name on the picture side and the numbers alone on the back, or
+           the reverse. Both were fixed furniture. */
+        { key: "refract.mbHideName",       cls: "refract-mb-hide-name",       group: "back", label: "Name", gallery: true,
+          sel: ".refract-mb-name" },
+        { key: "refract.mbHideStats",      cls: "refract-mb-hide-stats",      group: "back", label: "Stat pills", gallery: true,
+          sel: ".refract-mb-stats" },
         /* The dossier's two switchable panels. Its ratings grid stays fixed
            (that layout IS the look), but the media strip and the collector
            footer are additions a purist may not want -- and the dossier being
@@ -3258,8 +3307,19 @@
         /* The back's stats live in ONE strip across the bottom, so they share
            one zone. Splitting them across bl and br would ring half a row. */
         "refract.mbHideTier":       "tr",
+        "refract.mbHideName":       "tl",
+        /* With the strip's slot chips, exactly as the front's on/off sits with
+           the front's. One band, one strip, one place to ask about it. */
+        "refract.mbHideStats":      "bottom",
         "refract.pcHideRank":       "bottom",
         "refract.scHideTitle":      "bl",
+        "refract.scHideDetails":    "bl",
+        /* Measured on the preview: the flip tab is a 27x40 tab on the card's
+           RIGHT EDGE at y45-55%, which is no corner at all. In "tr" its chip
+           sat in a tray whose band stopped at 29% -- a control naming an
+           element you could not reach from it. Its own thin band, where it
+           actually is. */
+        "refract.pcHideBack":       "edge",
         "refract.cbHideMedia":      "dmedia",
         "refract.cbHideFoot":       "dfoot"
     };
@@ -3303,6 +3363,10 @@
        which was the point. */
     var BACK_STATS = [
         { key: "rating",  label: "Rating",  icon: "STAR" },
+        /* The front carried Age and the back could not, for no reason beyond
+           the flip query not asking for a birthdate. The two strips are the
+           same component and now offer the same catalogue. */
+        { key: "age",     label: "Age",     icon: "CAKE" },
         { key: "height",  label: "Height",  icon: "HEIGHT" },
         { key: "career",  label: "Career",  icon: "HOURGLASS" },
         /* The pill says "Stats" because "Measurements" will not fit a pill;
@@ -3364,6 +3428,7 @@
     }
     function backStatIcon(name) {
         return name === "STAR" ? STAR_SVG
+             : name === "CAKE" ? CAKE_SVG
              : name === "PLAY" ? PLAY_SVG
              : name === "O" ? O_ICON_SVG
              : name === "HEIGHT" ? HEIGHT_SVG
@@ -3371,6 +3436,19 @@
              : name === "TAPE" ? TAPE_SVG
              : name === "WEIGHT" ? WEIGHT_SVG
              : "";
+    }
+    /* Whole years from a YYYY-MM-DD birthdate, or null. The front reads its
+       age straight off Stash's own card markup; the back has only the record,
+       so it does the arithmetic once here rather than in the painter. */
+    function refractAgeFrom(bd) {
+        if (!bd) { return null; }
+        var m = String(bd).match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (!m) { return null; }
+        var now = new Date();
+        var y = now.getFullYear() - Number(m[1]);
+        var mo = (now.getMonth() + 1) - Number(m[2]);
+        if (mo < 0 || (mo === 0 && now.getDate() < Number(m[3]))) { y -= 1; }
+        return (y > 0 && y < 130) ? String(y) : null;
     }
     function backStatDef(key) {
         for (var i = 0; i < BACK_STATS.length; i++) {
@@ -5866,7 +5944,7 @@
        selection costs no extra request. */
     var REFRACT_FLIP_QUERY =
         'query RefractFlip($id: ID!) {' +
-        '  findPerformer(id: $id) { id rating100 favorite o_counter scene_count measurements height_cm weight career_length custom_fields tags { id name } }' +
+        '  findPerformer(id: $id) { id rating100 favorite o_counter scene_count measurements height_cm weight career_length birthdate custom_fields tags { id name } }' +
         '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count scenes { id title rating100 paths { screenshot } } }' +
         '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count images { id paths { thumbnail } } }' +
         '}';
@@ -6734,6 +6812,7 @@
            fills only when that is the mode in force. */
         set(".refract-mb-p-rating", (mode === "pill" && rating10 != null)
             ? refractFlipRating(rating10) : null);
+        set(".refract-mb-p-age", refractAgeFrom(p.birthdate));
         set(".refract-mb-p-height", p.height_cm ? (p.height_cm + " cm") : null);
         set(".refract-mb-p-career", refractCareerLabel(p.career_length));
         set(".refract-mb-p-measure", p.measurements || null);

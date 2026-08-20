@@ -1879,6 +1879,22 @@ body.stash-liquid-glass .refract-cb-foot-item {
 /* The dossier's switchable panels (customiser chips). The ratings grid is
    flex 1 1 auto, so it absorbs the freed room and the fitter shows more
    category rows -- switching the strip off is also how you see all eight. */
+/* The back's own name banner and stat strip. Both are clones of front
+   components, so both are matched by the FRONT's gates too -- which is why
+   every one of these selectors is scoped inside `.refract-card-back` and the
+   front's are scoped with `:not(.refract-mb-*)`. The two faces carry different
+   things and switch independently; that is the whole point of a back. */
+body.stash-liquid-glass.refract-mb-hide-name.refract-mb-hide-name .refract-card-back .refract-mb-name {
+    display: none !important;
+}
+body.stash-liquid-glass.refract-mb-hide-stats.refract-mb-hide-stats .refract-card-back .refract-mb-stats {
+    display: none !important;
+}
+/* No flip tab, no back. Tripled because the tab is drawn by Refract's own
+   card pass and its base rule already carries two classes. */
+body.stash-liquid-glass.refract-pc-hide-back.refract-pc-hide-back.refract-pc-hide-back .performer-card .refract-card-flip-btn {
+    display: none !important;
+}
 body.stash-liquid-glass.refract-cb-hide-media.refract-cb-hide-media .refract-card-back .refract-cb-media {
     display: none !important;
 }
