@@ -707,7 +707,7 @@ body.stash-liquid-glass #stash-table .stash-row .col-form-label {
 }
 body.stash-liquid-glass #stash-table .stash-row h6.d-md-none {
     color: var(--text-muted) !important;
-    font-size: 0.75rem;
+    font-size: var(--fs-sm);
     margin-bottom: 0.25rem;
 }
 body.stash-liquid-glass #stash-table .setting {
@@ -1665,7 +1665,7 @@ body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).car
     opacity: 1;
 }
 body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card h6 {
-    font-size: 0.75rem !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-muted) !important;
     margin: 0 0 0.5rem 0 !important;
     font-weight: 600;
@@ -2597,7 +2597,7 @@ body.stash-liquid-glass .refract-tag-editor__title-wrap {
     min-width: 0;
 }
 body.stash-liquid-glass .refract-tag-editor__title {
-    font-size: 0.98rem;
+    font-size: var(--fs-md);
     font-weight: 600;
     margin: 0;
     letter-spacing: 0.015em;
@@ -2605,7 +2605,7 @@ body.stash-liquid-glass .refract-tag-editor__title {
 }
 body.stash-liquid-glass .refract-tag-editor__summary {
     color: var(--text-muted);
-    font-size: 0.76rem;
+    font-size: var(--fs-sm);
     font-variant-numeric: tabular-nums;
 }
 body.stash-liquid-glass .refract-tag-editor__actions {
@@ -2668,7 +2668,7 @@ body.stash-liquid-glass .refract-tag-editor__search-input {
     border: none;
     color: var(--text);
     padding: 0.55rem 0;
-    font-size: 0.86rem;
+    font-size: var(--fs-base);
     outline: none;
 }
 body.stash-liquid-glass .refract-tag-editor__search-input::placeholder {
@@ -2714,7 +2714,7 @@ body.stash-liquid-glass .refract-tag-editor__group-header-main {
 }
 body.stash-liquid-glass .refract-tag-editor__group-title {
     color: var(--text);
-    font-size: 0.92rem;
+    font-size: var(--fs-md);
     font-weight: 600;
     letter-spacing: 0.01em;
     overflow: hidden;
@@ -2871,7 +2871,7 @@ body.stash-liquid-glass .refract-tag-editor__tag {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
-    font-size: 0.76rem !important;
+    font-size: var(--fs-sm) !important;
     line-height: 1.25 !important;
     cursor: pointer;
     text-align: center;

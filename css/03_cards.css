@@ -567,7 +567,7 @@ body.stash-liquid-glass.refract-rating-system-stars .rating-banner {
     justify-content: center !important;
     padding: 0 !important;
     line-height: 1 !important;
-    font-size: 0.95rem !important;
+    font-size: var(--fs-md) !important;
     font-weight: 700 !important;
     color: #fff !important;
     font-variant-numeric: tabular-nums;
@@ -1838,7 +1838,7 @@ body.stash-liquid-glass .performer-card {
 
 /* Name: single line, prominent */
 body.stash-liquid-glass .performer-card .card-section-title {
-    font-size: 0.95rem !important;
+    font-size: var(--fs-md) !important;
     font-weight: 700 !important;
     line-height: 1.25 !important;
     margin: 0 !important;

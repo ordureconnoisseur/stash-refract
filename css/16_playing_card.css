@@ -516,7 +516,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .stash-perf-cou
     border: none !important;
     box-shadow: none !important;
     color: rgba(255, 255, 255, 0.95) !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     letter-spacing: 0.03em !important;
     line-height: 1 !important;
@@ -625,7 +625,7 @@ body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .scene-card)
 
 /* Ribbon text — painted on ::after with gradient text-clip. */
 body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .scene-card)[class*="refract-card-tier-"] .refract-pc-tier-label::after {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 900;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -1633,7 +1633,7 @@ body.stash-liquid-glass .refract-cb-fav {
     top: 6px;
     right: 8px;
     z-index: 2;
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     color: #ff5d7a;
     text-shadow: 0 0 8px rgba(255, 93, 122, 0.9);
 }
@@ -1726,7 +1726,7 @@ body.stash-liquid-glass .refract-cb-assets {
     overflow: hidden;
 }
 body.stash-liquid-glass .refract-cb-loading {
-    font-size: 0.66rem;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     padding: 6px 2px;
 }
@@ -1777,7 +1777,7 @@ body.stash-liquid-glass .refract-cb-stat {
 }
 body.stash-liquid-glass .refract-cb-stat-name {
     flex: 0 0 42%;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: rgba(255, 255, 255, 0.88);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1805,7 +1805,7 @@ body.stash-liquid-glass .refract-s4 .refract-cb-seg.on { background: #9bd64a; bo
 body.stash-liquid-glass .refract-s5 .refract-cb-seg.on { background: #4ade80; box-shadow: 0 0 7px rgba(74, 222, 128, 0.6); }
 body.stash-liquid-glass .refract-cb-stat-val {
     flex: 0 0 auto;
-    font-size: 0.76rem;
+    font-size: var(--fs-sm);
     font-weight: 800;
     color: var(--seal);
     font-variant-numeric: tabular-nums;
@@ -1837,7 +1837,7 @@ body.stash-liquid-glass .refract-cb-more {
 }
 body.stash-liquid-glass .refract-cb-empty {
     margin: auto;
-    font-size: 0.66rem;
+    font-size: var(--fs-xs);
     font-style: italic;
     color: var(--text-muted);
     text-align: center;
@@ -1874,7 +1874,7 @@ body.stash-liquid-glass.refract-cb-hide-foot.refract-cb-hide-foot .refract-card-
 }
 body.stash-liquid-glass .refract-cb-foot-item b {
     color: var(--seal);
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     font-weight: 800;
     font-variant-numeric: tabular-nums;
 }
@@ -1974,7 +1974,7 @@ body.stash-liquid-glass .refract-pb-btn {
     border-radius: 0.4rem;
     border: 1px solid var(--glass-border);
     background: none;
-    font-size: 0.68rem;
+    font-size: var(--fs-xs);
     font-weight: 500;
     color: var(--text-muted);
     cursor: pointer;
@@ -2065,7 +2065,7 @@ body.stash-liquid-glass .refract-pb-picker-head {
     justify-content: space-between;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--text);
 }
@@ -2137,4 +2137,24 @@ body.stash-liquid-glass .performer-card.refract-flipping,
 body.stash-liquid-glass .performer-card.refract-flipping * {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+}
+
+/* The stat strip's spacing is its own `gap` and nothing else.
+   `.stash-perf-age { margin-right: auto }` and
+   `.stash-perf-ocount { margin-right: 0.5rem }` belong to the NON
+   playing-card performer layout (03_cards.css) and were leaking in.
+   The `auto` is the one that mattered: in a `space-between` row it
+   absorbs every pixel of free space at a single position, so the strip
+   measured gaps of 4.70 / 4.95 / 11.70px against a declared 4.72, and
+   the middle gap took 26 distinct values across 40 cards.
+
+   This is also what defeated the discrete size ladder. The fitter's
+   comment blamed the ladder for leaving "a big random gap between the
+   chips" when a step overshot -- but an evenly-shared surplus is not
+   random. The auto margin collecting all of it in one place was. With
+   these reset, an overshoot spreads evenly and the ladder works, which
+   is what the comment three rules above still says the JS does. */
+body.stash-liquid-glass.refract-perf-layout-card .performer-card .stash-perf-stats > * {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }

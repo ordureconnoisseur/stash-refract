@@ -8518,29 +8518,35 @@
                 requestAnimationFrame(function () {
                     refitPending = false;
                     if (!document.body.classList.contains("refract-perf-layout-card")) { return; }
-                    /* Stat strip — high scene counts (3 digits) push
-                       chips off the right edge, so shrink to fit. Use a
-                       CONTINUOUS ratio rather than a coarse ladder: the
-                       old [1, 0.92, 0.84, ...] steps could overshoot and
-                       leave the row only ~85% full, and because the strip
-                       is `justify-content: space-between` that surplus got
-                       spread into a big random gap between the chips. We
-                       measure the natural content width at full scale and
-                       multiply the scale toward an exact fit; the 2px
-                       borders don't scale so a few corrective passes
-                       converge geometrically on the right value. */
+                    /* Stat strip — high scene counts (3 digits) push chips
+                       off the right edge, so shrink to fit.
+
+                       DISCRETE steps, matching refractFitBackStats and the
+                       rule it states: a system has a few sizes, it does not
+                       compute one per instance. The continuous ratio this
+                       replaces fitted every card exactly and so emitted a
+                       different real number for each one -- measured across
+                       one screen of 40 identical 250.16px cards: 22 distinct
+                       pill font sizes (12.10 to 13.51px), 20 label sizes and
+                       22 pill heights, with six chip rows in a single grid
+                       row landing on five different baselines.
+
+                       The ladder was tried before and reverted because an
+                       overshoot "got spread into a big random gap between the
+                       chips". That was a misdiagnosis: an evenly shared
+                       surplus is not random. `.stash-perf-age` was carrying
+                       `margin-right: auto` leaked in from the non-playing-card
+                       layout, which in a space-between row collects ALL the
+                       slack at one position. 16_playing_card.css now resets
+                       those margins, so a step's surplus distributes evenly
+                       and the ladder is usable again. */
                     row.style.setProperty("--pc-badge-scale", 1);
                     var pcAvail = row.clientWidth;
                     if (pcAvail > 0 && row.scrollWidth > pcAvail + 1) {
-                        var pcFit = 1;
-                        /* Floor 0.45 (was 0.6): on a narrow card or with a wide
-                           fallback font (Concert One not loaded), four pill
-                           labels could still overflow at 0.6 and the last chip
-                           clipped. 6 passes converge even in that extreme case. */
-                        for (var pi = 0; pi < 6 && row.scrollWidth > pcAvail + 1; pi++) {
-                            pcFit = Math.max(0.45, pcFit * (pcAvail - 1) / row.scrollWidth);
-                            row.style.setProperty("--pc-badge-scale", pcFit);
-                            if (pcFit <= 0.45) { break; }
+                        var PC_STEPS = [1, 0.85, 0.7, 0.55, 0.45];
+                        for (var pi = 0; pi < PC_STEPS.length; pi++) {
+                            row.style.setProperty("--pc-badge-scale", PC_STEPS[pi]);
+                            if (row.scrollWidth <= pcAvail + 1) { break; }
                         }
                     }
                     /* Name banner — Concert One is moderately wide;

@@ -432,7 +432,7 @@ body.stash-liquid-glass .filter-item-header {
     border-radius: var(--radius-sm) !important;
     padding: 0.45rem 0.4rem !important;
     color: var(--text-muted) !important;
-    font-size: 0.84rem !important;
+    font-size: var(--fs-base) !important;
     cursor: pointer !important;
     text-align: left !important;
     box-shadow: none !important;
@@ -509,7 +509,7 @@ body.stash-liquid-glass .modifier-option.btn-primary {
     color: var(--text-muted) !important;
     border-radius: var(--radius-pill) !important;
     padding: 0.18rem 0.65rem !important;
-    font-size: 0.75rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 400 !important;
     height: auto !important;
     min-height: unset !important;

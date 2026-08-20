@@ -101,6 +101,7 @@ body.stash-liquid-glass {
     --fs-xs:   0.72rem;   /* 10.08px  counters, overlay metadata      */
     --fs-sm:   0.8rem;    /* 11.2px   pills, chips, badges            */
     --fs-base: 0.875rem;  /* 12.25px  controls: buttons, tabs, inputs */
+    --fs-md:   0.92rem;   /* 12.88px  card titles, dense headings   */
     --fs-body: 1rem;      /* 14px     body copy, detail values        */
     --fs-lg:   1.25rem;   /* 17.5px   sub-headings                    */
     --fs-xl:   2rem;      /* 28px     page title                      */

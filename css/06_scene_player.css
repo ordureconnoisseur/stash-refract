@@ -1049,7 +1049,7 @@ body.stash-liquid-glass .video-js .refract-src-direct {
     background: rgba(255, 255, 255, 0.06);
     color: #fff;
     font: inherit;
-    font-size: 0.76rem;
+    font-size: var(--fs-sm);
     line-height: 1.2;
     text-transform: none;
     cursor: pointer;

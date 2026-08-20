@@ -64,7 +64,7 @@ body.stash-liquid-glass .include-exclude-button {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 0.75rem !important;
+    font-size: var(--fs-sm) !important;
     opacity: 0.38;
     transition: opacity 0.15s, color 0.15s !important;
 }
@@ -96,19 +96,19 @@ body.stash-liquid-glass .search-result .scene-link:hover {
 
 /* Scene metadata text */
 body.stash-liquid-glass .scene-metadata h4 {
-    font-size: 0.95rem;
+    font-size: var(--fs-md);
     font-weight: 600;
     margin-bottom: 0.3rem;
     color: #fff;
 }
 body.stash-liquid-glass .scene-metadata h5 {
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     color: var(--text-muted);
     margin-bottom: 0.2rem;
     font-weight: 400;
 }
 body.stash-liquid-glass .scene-metadata .font-weight-bold {
-    font-size: 0.75rem;
+    font-size: var(--fs-sm);
     color: var(--accent-bright);
     opacity: 0.85;
 }
@@ -122,7 +122,7 @@ body.stash-liquid-glass .scene-details {
     align-items: center;
 }
 body.stash-liquid-glass .scene-details a {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: var(--text-muted) !important;
     text-decoration: none;
     transition: color 0.15s;
@@ -132,7 +132,7 @@ body.stash-liquid-glass .scene-details a:hover {
     color: #fff !important;
 }
 body.stash-liquid-glass .search-result > div > h5 {
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     color: var(--text-muted);
     margin-bottom: 0.25rem;
     font-weight: 400;
@@ -143,7 +143,7 @@ body.stash-liquid-glass .entity-name {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     font-family: inherit;
     color: var(--text-muted);
     margin-top: 0.55rem;
@@ -171,7 +171,7 @@ body.stash-liquid-glass .search-result .btn-group .btn {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text-muted) !important;
-    font-size: 0.75rem !important;
+    font-size: var(--fs-sm) !important;
     padding: 0.25rem 0.65rem !important;
     border-radius: 0 !important;
     transition: background 0.15s, color 0.15s, border-color 0.15s !important;
@@ -207,7 +207,7 @@ body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn):not
     color: #fff !important;
     border-radius: var(--radius-pill) !important;
     padding: 0.3rem 1.25rem !important;
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
     letter-spacing: 0.04em !important;
     margin-top: 0.5rem;
@@ -230,7 +230,7 @@ body.stash-liquid-glass .search-result .tag-item.badge .btn.btn-primary {
     color: var(--text-muted) !important;
     border-radius: var(--radius-sm) !important;
     line-height: 1 !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     transition: color 0.15s, background 0.15s !important;
 }
 body.stash-liquid-glass .search-result .tag-item.badge .btn.btn-primary:hover {
@@ -257,7 +257,7 @@ body.stash-liquid-glass .search-result .react-select__multi-value {
 }
 body.stash-liquid-glass .search-result .react-select__multi-value__label {
     color: var(--accent-bright) !important;
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     padding: 0.1rem 0.4rem !important;
 }
 body.stash-liquid-glass .search-result .react-select__multi-value__remove {
@@ -278,7 +278,7 @@ body.stash-liquid-glass .search-result .form-group {
 }
 body.stash-liquid-glass .search-result .form-group .form-label,
 body.stash-liquid-glass .search-result .form-group .col-form-label {
-    font-size: 0.75rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     color: var(--text-muted) !important;
     font-family: inherit !important;
@@ -293,7 +293,7 @@ body.stash-liquid-glass .search-result .form-group .react-select__control {
 /* Studio / performer select in entity row — single-value value container */
 body.stash-liquid-glass .search-result .studio-select .react-select__control,
 body.stash-liquid-glass .search-result .performer-select .react-select__control {
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     font-family: inherit !important;
     border-radius: 0 !important;
 }
@@ -453,7 +453,7 @@ body.stash-liquid-glass .Lightbox-header-right > * > .btn {
 body.stash-liquid-glass .Lightbox-header-indicator {
     color: var(--text) !important;
     font-variant-numeric: tabular-nums;
-    font-size: 0.85rem;
+    font-size: var(--fs-base);
 }
 body.stash-liquid-glass .Lightbox-header-indicator span {
     color: var(--text-muted) !important;
@@ -567,7 +567,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show .popover-header {
     background: transparent !important;
     border-bottom: 1px solid var(--glass-border) !important;
     color: var(--accent-bright) !important;
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -579,11 +579,11 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show .popover-body {
 }
 body.stash-liquid-glass:has(.Lightbox) .popover.show .form-label {
     color: var(--text-muted) !important;
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
 }
 body.stash-liquid-glass:has(.Lightbox) .popover.show .form-text {
     color: var(--text-muted) !important;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     opacity: 0.7;
 }
 body.stash-liquid-glass:has(.Lightbox) .popover.show input.form-control,
@@ -597,7 +597,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control {
     line-height: 1 !important;
     padding: 0 0.7rem !important;
     margin: 0 !important;
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     box-sizing: border-box !important;
     vertical-align: middle;
 }
@@ -645,7 +645,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-input[type="che
 }
 body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-label {
     color: var(--text) !important;
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     cursor: pointer;
 }
 
@@ -707,7 +707,7 @@ body.stash-liquid-glass .Lightbox-footer-right { justify-self: end !important; }
 /* Image filename + gallery link in footer centre */
 body.stash-liquid-glass .Lightbox-footer-center .image-link {
     color: var(--text) !important;
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     text-decoration: none;
     margin-right: 0.6rem;
     transition: color 0.15s;
@@ -717,7 +717,7 @@ body.stash-liquid-glass .Lightbox-footer-center .image-link:hover {
 }
 body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link {
     color: var(--accent-bright) !important;
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -788,7 +788,7 @@ body.stash-liquid-glass .Lightbox-footer-center > .refract-lb-count {
 /* Mirrored image count from the (hidden) header indicator — small,
    muted, sits directly under the filename / gallery link. */
 body.stash-liquid-glass .refract-lb-count {
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 500 !important;
     color: var(--text-muted) !important;
     font-variant-numeric: tabular-nums !important;
@@ -815,7 +815,7 @@ body.stash-liquid-glass .Lightbox-footer .o-counter {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     font-variant-numeric: tabular-nums !important;
     line-height: 1 !important;
@@ -855,7 +855,7 @@ body.stash-liquid-glass .Lightbox-footer .Lightbox-header-indicator {
     border-right: 1px solid var(--glass-border);
     color: var(--text);
     font-variant-numeric: tabular-nums;
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     white-space: nowrap;
 }
 body.stash-liquid-glass .Lightbox-footer .Lightbox-header-indicator > span,
@@ -939,7 +939,7 @@ body.stash-liquid-glass .refract-accent-swatch.is-active {
 body.stash-liquid-glass .refract-light-toggle {
     background: var(--glass-bg-strong) !important;
     color: var(--text) !important;
-    font-size: 0.95rem !important;
+    font-size: var(--fs-md) !important;
     line-height: 1 !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -1039,7 +1039,7 @@ body.stash-liquid-glass .refract-segmented-btn {
     background: transparent !important;
     border: none !important;
     color: var(--text-muted) !important;
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     padding: 0.3rem 0.75rem;
     border-radius: var(--radius-pill);
@@ -1065,7 +1065,7 @@ body.stash-liquid-glass .refract-logo-input {
     color: var(--text) !important;
     border-radius: var(--radius-sm) !important;
     padding: 0.4rem 0.75rem !important;
-    font-size: 0.85rem !important;
+    font-size: var(--fs-base) !important;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 body.stash-liquid-glass .refract-logo-input:focus {
@@ -1110,7 +1110,7 @@ body.stash-liquid-glass .refract-suggestion-summary:hover {
 }
 body.stash-liquid-glass .refract-suggestion-summary h3 {
     margin: 0;
-    font-size: 1.05rem;
+    font-size: var(--fs-body);
     font-weight: 600;
     color: var(--text);
 }
@@ -1415,7 +1415,7 @@ body.stash-liquid-glass .modal-dialog.manual .markdown pre code {
     padding: 0 !important;
     border: none !important;
     color: var(--text) !important;
-    font-size: 0.85rem !important;
+    font-size: var(--fs-base) !important;
 }
 body.stash-liquid-glass .modal-dialog.manual .markdown :not(pre) > code {
     background: rgba(255, 255, 255, 0.06) !important;
@@ -1501,7 +1501,7 @@ body.stash-liquid-glass .refract-seg {
 }
 body.stash-liquid-glass .refract-seg .refract-segmented-btn {
     padding: 0.16rem 0.5rem;
-    font-size: 0.68rem;
+    font-size: var(--fs-xs);
 }
 
 /* Keyboard focus. The segmented buttons are the panel's most-used control
@@ -1727,7 +1727,7 @@ body.stash-liquid-glass .refract-cc-kind-btn {
     border-radius: 6px;
     border: 1px solid transparent;
     background: none;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 500;
     color: var(--text-muted);
     cursor: pointer;
@@ -1775,7 +1775,7 @@ body.stash-liquid-glass .refract-cc-face-btn {
     border-radius: 6px;
     border: 1px solid transparent;
     background: none;
-    font-size: 0.68rem;
+    font-size: var(--fs-xs);
     font-weight: 500;
     color: var(--text-muted);
     cursor: pointer;
@@ -1808,7 +1808,7 @@ body.stash-liquid-glass .refract-cc-rail-right {
     gap: 0.75rem;
 }
 body.stash-liquid-glass .refract-cc-hint {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     opacity: 0.75;
 }
@@ -1819,7 +1819,7 @@ body.stash-liquid-glass .refract-cc-shuffle {
     border-radius: 7px;
     border: 1px solid var(--glass-border);
     background: none;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 500;
     color: var(--text-dim, var(--text-muted));
     cursor: pointer;
@@ -2281,7 +2281,7 @@ body.stash-liquid-glass .refract-cc-slot-move[disabled]:hover {
 body.stash-liquid-glass .refract-cc-slot-menu-head {
     grid-column: 1 / -1;
     text-align: center;
-    font-size: 0.66rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -2357,7 +2357,7 @@ body.stash-liquid-glass .refract-cc-tile {
     border: 1px solid var(--glass-border);
 }
 body.stash-liquid-glass .refract-cc-tile-title {
-    font-size: 0.75rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     line-height: 1.2;
     color: var(--text);
@@ -2367,7 +2367,7 @@ body.stash-liquid-glass .refract-cc-tile-title {
    was on. */
 body.stash-liquid-glass .refract-cc-tile-note {
     margin-top: -4px;
-    font-size: 0.66rem;
+    font-size: var(--fs-xs);
     line-height: 1.35;
     color: var(--text-muted);
 }
@@ -2434,7 +2434,7 @@ body.stash-liquid-glass .refract-cc-strip .refract-cc-seg-btn {
     flex: 1 1 auto;
     min-width: 0;
     padding: 5px 5px;
-    font-size: 0.68rem;
+    font-size: var(--fs-xs);
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2446,7 +2446,7 @@ body.stash-liquid-glass .refract-cc-reset {
     border: 1px solid var(--glass-border);
     background: none;
     font: inherit;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     font-weight: 500;
     letter-spacing: 0;
     text-transform: none;
@@ -2478,7 +2478,7 @@ body.stash-liquid-glass .refract-cc-seg-btn {
     border-radius: 6px;
     border: 1px solid transparent;
     background: none;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 500;
     color: var(--text-muted);
     cursor: pointer;
@@ -2506,7 +2506,7 @@ body.stash-liquid-glass .refract-cc-looks {
    borrowing it read as a new font, not a gesture. */
 body.stash-liquid-glass .refract-cc-looks-head,
 body.stash-liquid-glass .refract-cc-group-head > span {
-    font-size: 0.66rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -2861,7 +2861,7 @@ body.stash-liquid-glass .refract-cc-preset-performer .refract-cc-art-logo {
 }
 
 body.stash-liquid-glass .refract-cc-preset-label {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--text-dim, var(--text-muted));
 }

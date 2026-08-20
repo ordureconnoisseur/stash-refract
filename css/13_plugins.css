@@ -56,7 +56,7 @@ body.stash-liquid-glass .mv-filter-badge {
     border: none !important;
     border-radius: 0 !important;
     color: var(--accent-bright) !important;
-    font-size: 0.95rem !important;
+    font-size: var(--fs-md) !important;
     font-weight: 700 !important;
     line-height: 1 !important;
     font-variant-numeric: tabular-nums !important;
@@ -2054,7 +2054,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup-header-main {
     flex: 1 1 auto;
 }
 body.stash-liquid-glass .details-tags-overhaul__title {
-    font-size: 0.92rem;
+    font-size: var(--fs-md);
     font-weight: 700;
     color: var(--text);
     line-height: 1.2;
@@ -2317,7 +2317,7 @@ body.stash-liquid-glass .tag-sidebar__header {
     margin-bottom: 0.7rem !important;
 }
 body.stash-liquid-glass .tag-sidebar__eyebrow {
-    font-size: 0.92rem !important;
+    font-size: var(--fs-md) !important;
     font-weight: 700 !important;
     color: var(--text) !important;
     letter-spacing: 0.01em !important;
@@ -2617,7 +2617,7 @@ body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank > .
     top: 0.48rem !important;
     right: 0.61rem !important;
     margin: 0 !important;
-    font-size: 0.84rem !important;
+    font-size: var(--fs-base) !important;
     filter: none !important;
 }
 /* ...but ONLY in Classic, where the chin really does hold the name and
@@ -2640,7 +2640,42 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .card-section.r
     align-self: flex-end !important;
     top: auto !important;
     right: auto !important;
-    margin: 0 0 0.14rem auto !important;
+    /* No bottom margin. It was 0.14rem here and nowhere else, and it is
+       part of why the same badge sat 8.39px above the card bottom when a
+       country was present and 13.14px when it was not. */
+    margin: 0 0 0 auto !important;
+    /* Restore the two things the Classic rule above strips. It sets
+       `font-size: 0.84rem` and `filter: none` on the stated premise that
+       on the chin the badge sits "over a solid panel" -- true in Classic,
+       false here, because 16_playing_card.css makes this chin
+       `background: transparent` so the badge floats over the raw
+       photograph. That left the no-country badge as the only text on the
+       card with no legibility treatment at all, and it is the one element
+       that cannot fall back to a text-shadow: the rank number is a
+       gradient clipped to text, so the container's filter was its only
+       protection. Also brings it back to the same size as the
+       country-nested variant (was 11.76px against 11.2px). */
+    font-size: var(--fs-sm) !important;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.62)) !important;
+}
+/* Match the country-nested variant's ember halo too — this case had a
+   wider 1.5px/5px glow against 1.2px/3.5px, so the same badge glowed
+   differently depending only on whether a country was set. */
+body.stash-liquid-glass.refract-perf-layout-card .performer-card .card-section.refract-chin-with-rank > .refract-ascension-badge .refract-ascension-icon {
+    filter:
+        drop-shadow(0 0 1.2px rgba(255, 180, 70, 0.95))
+        drop-shadow(0 0 3.5px rgba(255, 90, 20, 0.55))
+        drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55)) !important;
+}
+/* The chin's first child is Stash's title link, whose h5 is display:none
+   in this layout. It is a 0px-tall flex item that still consumes one
+   2.8px column gap — and because the badge takes `order: -1`, that dead
+   gap lands ABOVE the content on a card with a country and BELOW it on a
+   card without one. Nothing is lost by removing it: the h5 inside is
+   already hidden, so the link has no height and no hit area, and the
+   card's image link is untouched. */
+body.stash-liquid-glass.refract-perf-layout-card .performer-card .card-section > a:has(> h5.card-section-title) {
+    display: none !important;
 }
 body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank > .refract-ascension-badge .refract-ascension-icon {
     filter:
