@@ -1980,198 +1980,313 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
 
 /* ── Wall / masonry view ────────────────────────────────────────────── */
 
-/* ── Toolbar fits one row ─────────────────────────────────────────────
-   Eight controls in a 338px column. Measured budget before this block:
-   stars 94 + rating chip 50.2 + heart 30 + play-count 46 + o-count 46.5
-   + organised 26 + kebab 26 + multiview 26 = 344.7, plus seven gaps at
-   3.5 = 369.2 against 338. Every one of these is padding, not content:
-   the count pills carry 7px each side on BOTH their icon and their
-   value for an 11px glyph and a 6px digit. */
-/* The row fills its column by spreading the leftover into the gaps,
-   NOT by squashing the controls. The previous pass hard-set the
-   icon-only buttons to 24px while they are 26px tall, and they carry
-   `border-radius: 9999px` -- so a pill radius on a non-square box drew
-   them as vertical ovals. Nothing is given a width smaller than its
-   natural shape now; the controls sit at their true size and
-   `space-between` distributes the ~6px of slack across the seven joints
-   so the row still reaches both edges. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
-    gap: 0.2rem !important;
-    justify-content: space-between !important;
-}
-/* The groups stop being boxes so the toolbar spaces the CONTROLS, not
-   the three groups. Spacing three groups across the row left two large
-   holes once the star widget moved into its popover; with `contents`
-   the toolbar's own `space-between` distributes all eight controls
-   evenly across the full width, whatever the panel is doing. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) {
-    display: contents !important;
-}
-/* Icon-only controls stay perfectly round: square box, pill radius. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, #operation-menu, .mv-scene-page-btn, .mv-scene-btn, .adv-favourite-btn) {
-    width: 26px !important;
-    min-width: 26px !important;
-    height: 26px !important;
-    aspect-ratio: 1 / 1 !important;
-    padding: 0 !important;
-    margin-left: 0 !important;
-    flex: 0 0 auto !important;
-}
-/* Pills keep enough padding to read as pills rather than as tubes. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button > .btn {
-    padding-left: 0.3rem !important;
-    padding-right: 0.3rem !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
-    padding-left: 0.45rem !important;
-    padding-right: 0.45rem !important;
-    gap: 0.25rem !important;
-}
-/* The star row is the one elastic thing here: it is the widest control
-   and the only one that can give width back without distorting. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars {
-    flex: 0 1 auto !important;
-    min-width: 0 !important;
+/* ───────────────────────────────────────────────────────────────────
+   Scene-detail panel — v3 composition (1b "Marquee" + 2c "Chips")
+   From the Claude Design project "Token and Stash markup", implementing
+   `Scene Panel v3.dc.html`. Supersedes the v2 one-row toolbar and the
+   v2 rating popover, both removed above rather than layered over.
+
+   Composition, top to bottom:
+     marquee   studio / title / spec pills
+     state     the five stars + rating value ..... operations, multiview
+               [3 plays] [0 O] [Not favourite] [Not organised]
+     tabs      the same six destinations
+     tags      no cap, no inner scrollbar
+
+   Four selectors in the source patch were written against an assumed
+   DOM. Checked on the live instance, three were wrong and are corrected
+   here; the fourth needed no injection at all:
+     - Both counters are `.count-button.increment-only`; there is no
+       `.o-counter` class. They are told apart by their inner button's
+       title, so `:has()` does it with no JS tagging.
+     - The favourite is `button.adv-favourite-btn` as a DIRECT child of
+       the group, not `> span > span > button`, and it carries
+       `aria-pressed`.
+     - Operations is `group > span > div.dropdown > button`, so
+       `margin-left: auto` on the BUTTON pushes against the wrong box.
+       The wrapper spans go `display: contents` and the auto margin sits
+       on `div.dropdown`, which keeps its own box so its menu still
+       positions against it.
+     - Specs are already `span.date`, `.frame-rate` and `.resolution`
+       around a `.divider`, so no `.st-spec` injection is needed.
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Type scale, local to the panel. Six steps, 10px floor. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
+    --sp-title: 21px;
+    --sp-value: 15px;
+    --sp-body: 13px;
+    --sp-chip: 11.5px;
+    --sp-tab: 11px;
+    --sp-label: 10px;
 }
 
-/* ── Rating trigger + popover ─────────────────────────────────────────
-   The five-star widget was 94px of a 338px toolbar and the single reason
-   the row could not hold its controls at full size. It collapses to one
-   pill here and opens on click. The stars are positioned into the
-   popover by CSS ONLY -- they stay where React put them in the DOM,
-   because moving a React-managed node desyncs its fiber. */
-/* The popover anchors to the TOOLBAR, not to the group that holds the
-   stars: that group is `display: contents` so it generates no box and
-   cannot be a containing block. The trigger is the first control in the
-   row, so the toolbar's left edge is the right anchor anyway. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
-    position: relative !important;
+/* ── Marquee ──────────────────────────────────────────────────────── */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-header, .image-header) {
+    font-size: var(--sp-title) !important;
+    line-height: 1.22 !important;
+    letter-spacing: -0.015em !important;
+    margin-top: 0.7rem !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.2rem !important;
-    height: 26px !important;
-    min-width: 26px !important;
-    padding: 0 0.4rem !important;
-    flex: 0 0 auto !important;
-    border-radius: var(--radius-pill) !important;
-    background: var(--glass-bg) !important;
-    border: 1px solid var(--glass-border) !important;
-    color: var(--text-muted) !important;
-    font-size: var(--fs-sm) !important;
-    font-weight: 600 !important;
-    line-height: 1 !important;
-    cursor: pointer !important;
-    transition: background 0.15s, border-color 0.15s, color 0.15s !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger svg {
-    width: 12px !important;
-    height: 12px !important;
-    flex: 0 0 auto !important;
-}
-/* Unrated: a bare circle, no empty value box taking width. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger:not(.is-rated) {
-    width: 26px !important;
-    padding: 0 !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger:not(.is-rated) .refract-rating-trigger-val {
-    display: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger.is-rated {
-    color: var(--accent-bright) !important;
-    border-color: var(--accent-glow) !important;
-    background: var(--accent-tint) !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger:hover,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host.refract-rating-open .refract-rating-trigger {
-    background: var(--glass-bg-strong) !important;
-    border-color: var(--glass-border-bright) !important;
-    color: #fff !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-trigger:focus-visible {
-    outline: 2px solid var(--accent-bright) !important;
-    outline-offset: 2px !important;
-}
-
-/* The popover. The stars keep their place in the DOM and are painted here. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars {
-    position: absolute !important;
-    top: calc(100% + 8px) !important;
-    /* Spans the toolbar so the Advanced Ratings control can sit inside
-       the same panel, at its right edge. */
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 60 !important;
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) {
     display: flex !important;
     align-items: center !important;
-    gap: 0.15rem !important;
-    padding: 0.45rem 0.55rem !important;
-    border-radius: var(--radius-sm) !important;
-    /* Opaque, not glass. This floats over the tab strip, and at 0.97 alpha
-       the tab labels still read through from behind the stars. A popover
-       has to occlude what it covers. */
-    background: #16161c !important;
-    border: 1px solid var(--glass-border-bright) !important;
-    box-shadow: var(--shadow-xl) !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    transform: translateY(-4px) !important;
-    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s !important;
+    gap: 5px !important;
+    margin: 0.7rem 0 0 0 !important;
+    flex-wrap: wrap !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host.refract-rating-open .rating-stars {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) > span > span {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) :is(.date, .frame-rate, .resolution) {
+    padding: 3px 9px !important;
+    border-radius: var(--radius-pill) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: rgba(255, 255, 255, 0.86) !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    font-variant-numeric: tabular-nums !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .divider {
+    display: none !important;
+}
+
+/* ── State: one anchor row, one chip row ──────────────────────────── */
+/* The ::after is a zero-height 100%-basis flex item: a line break, so
+   both rows live in one flex container with no injected nodes. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    row-gap: 9px !important;
+    column-gap: 5px !important;
+    margin: 0.9rem 0 0 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    position: relative !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar)::after {
+    content: "";
+    flex: 0 0 100%;
+    height: 0;
+    order: 5;
+}
+/* Groups AND their span wrappers dissolve, so the real controls are the
+   flex items and `order` can address them directly. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group),
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > span > span {
+    display: contents !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) span:empty {
+    display: none !important;
+}
+
+/* Anchor: Stash's own five stars, back at readable size. This is what
+   the v2 row lost -- something that says the row is about this scene. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars {
+    order: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    position: static !important;
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
     transform: none !important;
 }
-/* Full-size stars in the popover — they were shrunk to 15px only to
-   survive the toolbar, and this is a hit target now. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars button {
-    width: 24px !important;
-    height: 24px !important;
-    min-width: 24px !important;
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars button {
+    width: 17px !important;
+    height: 17px !important;
+    min-width: 17px !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars button svg {
-    width: 24px !important;
-    height: 24px !important;
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars button svg {
+    width: 17px !important;
+    height: 17px !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars .star-rating-number {
-    margin-left: 0.35rem !important;
-    font-size: var(--fs-sm) !important;
-    color: var(--text) !important;
+/* Advanced Ratings value beside the stars. Absent -> the stars alone are
+   the anchor and nothing reflows. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
+    order: 2 !important;
+    display: inline-flex !important;
+    align-items: baseline !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    padding: 0 0 0 5px !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-size: var(--sp-value) !important;
+    font-weight: 700 !important;
+    font-variant-numeric: tabular-nums !important;
+    color: var(--accent-light) !important;
 }
-@media (prefers-reduced-motion: reduce) {
-    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars {
-        transition: none !important;
-    }
-}
-
-
-/* ── One rating control, not two ──────────────────────────────────────
-   Stash's own 0-5 rating and the Advanced Ratings plugin's score are two
-   different numbers wearing the same star, and they were two separate
-   controls sitting side by side in a 338px toolbar. They are one entry
-   point now: the trigger opens a panel holding both, with the star row
-   for Stash's rating on the left and the plugin's own button on the
-   right. Neither is reimplemented -- the stars are still Stash's, the
-   button is still the plugin's, both merely repositioned by CSS. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .adv-rating-btn {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn .adv-rating-btn-star,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn .adv-rating-btn-plus {
     display: none !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host.refract-rating-open .adv-rating-btn {
-    display: inline-flex !important;
-    position: absolute !important;
-    /* Optically centred against the 24px star row inside the panel's
-       0.45rem padding and 1px border. */
-    top: calc(100% + 14px) !important;
-    right: 0.55rem !important;
-    margin: 0 !important;
-    z-index: 61 !important;
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn::after {
+    content: "Rating";
+    margin-left: 6px;
+    font-size: var(--sp-label);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.38);
 }
-/* Room at the right end of the panel for that button. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .refract-rating-host .rating-stars {
-    padding-right: 4.2rem !important;
+
+/* Actions: right of the anchor, behind a hairline, read as a different
+   kind of object than the chips. The auto margin sits on the wrapper
+   that still has a box, so a missing plugin leaves no gap. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) div.dropdown {
+    order: 3 !important;
+    display: block !important;
+    margin-left: auto !important;
+    padding-left: 7px !important;
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.12) !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn {
+    order: 4 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(#operation-menu, .mv-scene-page-btn) {
+    width: 26px !important;
+    min-width: 26px !important;
+    height: 26px !important;
+    padding: 0 !important;
+    border-radius: var(--radius-pill) !important;
+}
+
+/* Counters -> word chips. Still Stash's buttons, still incrementing; the
+   word is a pseudo-element so React never sees it. Told apart by the
+   inner button's title, because both carry the same class. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button {
+    height: 24px !important;
+    padding: 0 !important;
+    border-radius: var(--radius-pill) !important;
+    border: 1px solid var(--glass-border) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    overflow: hidden !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) {
+    order: 6 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) {
+    order: 7 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .btn {
+    height: 24px !important;
+    padding: 0 !important;
+    font-size: var(--sp-chip) !important;
+    font-weight: 600 !important;
+    font-variant-numeric: tabular-nums !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-icon {
+    display: none !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-value {
+    padding: 0 10px !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) .count-value::after {
+    content: " plays";
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) .count-value::after {
+    content: " O";
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Toggles -> word chips, with the off state drawn AS an off state:
+   dashed, dimmed, and saying so. Neither needs a hover to read. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn) {
+    width: auto !important;
+    min-width: 0 !important;
+    height: 24px !important;
+    padding: 0 10px !important;
+    gap: 5px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    border-radius: var(--radius-pill) !important;
+    font-size: var(--sp-chip) !important;
+    font-weight: 500 !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px dashed rgba(255, 255, 255, 0.16) !important;
+    color: rgba(255, 255, 255, 0.42) !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn {
+    order: 8 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button {
+    order: 9 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn) svg {
+    width: 11px !important;
+    height: 11px !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn::after {
+    content: "Not favourite";
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button::after {
+    content: "Not organised";
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized::after {
+    content: "Organised";
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn[aria-pressed="true"]::after {
+    content: "Favourited";
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn[aria-pressed="true"] {
+    background: var(--accent-tint) !important;
+    border: 1px solid rgba(var(--accent-rgb), 0.36) !important;
+    color: var(--accent-light) !important;
+    font-weight: 600 !important;
+}
+
+/* ── Tags take the reclaimed space ────────────────────────────────── */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list {
+    max-height: none !important;
+    min-height: 0 !important;
+    gap: 5px !important;
+    margin: 0.55rem 0 0 0 !important;
+    overflow-y: visible !important;
+    -webkit-mask-image: none !important;
+            mask-image: none !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.tag-link.badge.badge-secondary {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.tag-link.badge a {
+    padding: 4px 9px !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
+    font-size: var(--sp-label) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+    margin: 1rem 0 0 0 !important;
+}
+
+/* ── Tab strip — same six destinations, one step larger ───────────── */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs {
+    margin: 0.9rem 0 0 0 !important;
+    border-radius: var(--radius-sm) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link {
+    font-size: var(--sp-tab) !important;
+    font-weight: 600 !important;
+    padding: 0.375rem 0.35rem !important;
 }

@@ -7895,96 +7895,6 @@
         return null;
     }
 
-    /* ── Rating: a trigger, not a 94px star row ───────────────────────
-       Stash's five-star widget was the widest control in a 338px column
-       and pushed everything else out of the toolbar. It is also NOT the
-       same value as the Advanced Rating plugin's chip beside it -- the
-       stars are Stash's own 0-5 rating, the chip is the plugin's
-       multi-criteria score -- so it could not simply be dropped.
-
-       Instead it collapses to one pill showing the current rating, and
-       the real widget opens beneath it on click. The stars are NEVER
-       moved in the DOM: they are React-managed, and relocating them
-       desyncs the fiber (the same trap documented for the date field).
-       CSS positions them into the popover while they stay exactly where
-       React put them; every click still lands on Stash's own button. */
-    function refractRatingValue(stars) {
-        var num = stars.querySelector(".star-rating-number");
-        if (num && num.textContent.trim()) { return num.textContent.trim(); }
-        /* No number rendered (stars mode) -- read it off the fill classes,
-           which carry a 0-100 fill per star. */
-        var btns = stars.querySelectorAll("button[class*='star-fill-']");
-        var total = 0;
-        Array.prototype.forEach.call(btns, function (b) {
-            var m = (b.className || "").toString().match(/star-fill-(\d+)/);
-            if (m) { total += parseInt(m[1], 10) / 100; }
-        });
-        if (!total) { return ""; }
-        return String(Math.round(total * 10) / 10);
-    }
-
-    function refractCloseRatingPopovers(except) {
-        var open = document.querySelectorAll(".refract-rating-open");
-        Array.prototype.forEach.call(open, function (h) {
-            if (h === except) { return; }
-            h.classList.remove("refract-rating-open");
-            var t = h.querySelector(".refract-rating-trigger");
-            if (t) { t.setAttribute("aria-expanded", "false"); }
-        });
-    }
-
-    var refractRatingGlobalsBound = false;
-    function refractBindRatingGlobals() {
-        if (refractRatingGlobalsBound) { return; }
-        refractRatingGlobalsBound = true;
-        document.addEventListener("click", function (e) {
-            if (e.target.closest && e.target.closest(".refract-rating-host")) { return; }
-            refractCloseRatingPopovers(null);
-        }, true);
-        document.addEventListener("keydown", function (e) {
-            if (e.key === "Escape") { refractCloseRatingPopovers(null); }
-        });
-    }
-
-    function initSceneRatingPopover() {
-        var bars = document.querySelectorAll(".scene-toolbar, .image-toolbar");
-        Array.prototype.forEach.call(bars, function (bar) {
-            var stars = bar.querySelector(".rating-stars");
-            if (!stars) { return; }
-            var host = stars.parentElement;
-            if (!host) { return; }
-            host.classList.add("refract-rating-host");
-
-            var trig = host.querySelector(".refract-rating-trigger");
-            if (!trig) {
-                trig = document.createElement("button");
-                trig.type = "button";
-                trig.className = "refract-rating-trigger";
-                trig.setAttribute("aria-haspopup", "true");
-                trig.setAttribute("aria-expanded", "false");
-                trig.innerHTML = STAR_SVG + '<span class="refract-rating-trigger-val"></span>';
-                host.insertBefore(trig, stars);
-                trig.addEventListener("click", function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    var willOpen = !host.classList.contains("refract-rating-open");
-                    refractCloseRatingPopovers(host);
-                    host.classList.toggle("refract-rating-open", willOpen);
-                    trig.setAttribute("aria-expanded", willOpen ? "true" : "false");
-                });
-                refractBindRatingGlobals();
-            }
-
-            /* Refresh the read-out every pass: React rewrites the fill
-               classes in place when the rating changes. */
-            var val = refractRatingValue(stars);
-            var out = trig.querySelector(".refract-rating-trigger-val");
-            if (out && out.textContent !== val) { out.textContent = val; }
-            trig.classList.toggle("is-rated", !!val);
-            trig.title = val ? ("Rating " + val + " - click to change") : "Set a rating";
-        });
-    }
-
     function refractParseSourceLabel(text) {
         var t = String(text || "").replace(/,\s*selected\s*$/i, "").trim();
         if (!t) { return null; }
@@ -8220,7 +8130,6 @@
                 safeRun(stripRatingBannerToNumber);
                 safeRun(initCardTilts);
                 safeRun(initSceneCards);
-                safeRun(initSceneRatingPopover);
                 safeRun(initPerformerCards);
                 safeRun(syncPerformerCardHearts);
                 safeRun(integrateAscensionBadges);
