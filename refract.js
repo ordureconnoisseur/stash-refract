@@ -1236,8 +1236,8 @@
                hidden and nothing is lost -- the user asked for "disable the
                rating badge or something", and moving is the version of that
                which you can undo by looking at it. */
-            var SCENE_CORNER_KEYS = ["refract.scHideRating", "refract.scHideTier", "refract.scHideStudio"];
-            var RATING_KEY = "refract.scHideRating";
+            var SCENE_CORNER_KEYS = REFRACT_CORNER_KEYS;
+            var RATING_KEY = REFRACT_RATING_KEY;
             /* Which corner an element really occupies: nothing if it is hidden,
                gated off by the flourish, sent to the bottom, or -- for the
                studio -- set as title text, which is not a corner at all. */
@@ -1249,17 +1249,21 @@
                 return (sd === "left" || sd === "right") ? sd : null;
             }
             /* Who this placement will shift, so the menu can say so first. */
+            /* What the menu PROMISES before you click is the resolver's own
+               answer, run on a copy -- not a second, hand-kept summary of it
+               that could drift out of step with what actually happens. */
             function displacedBy(key, side) {
                 var out = [];
                 if (elemGroup !== "scene" || (side !== "left" && side !== "right")) { return out; }
                 if (SCENE_CORNER_KEYS.indexOf(key) === -1) { return out; }
-                if (key === RATING_KEY) {
-                    SCENE_CORNER_KEYS.forEach(function (k) {
-                        if (k !== RATING_KEY && cornerSideOf(k, cardSides) === side) { out.push(k); }
-                    });
-                } else if (cornerSideOf(RATING_KEY, cardSides) === side) {
-                    out.push(RATING_KEY);
-                }
+                var before = {};
+                Object.keys(cardSides).forEach(function (k) { before[k] = cardSides[k]; });
+                before[key] = side;
+                var after = refractResolveCorners(before, cornerSideOf, key);
+                SCENE_CORNER_KEYS.forEach(function (k) {
+                    var was = cornerSideOf(k, cardSides);
+                    if (k !== key && was !== null && after[k] !== was) { out.push(k); }
+                });
                 return out;
             }
             function setElemSide(d, side) {
@@ -1268,26 +1272,8 @@
                 Object.keys(cardSides).forEach(function (k) { m[k] = cardSides[k]; });
                 m[d.key] = side;
 
-                if (elemGroup === "scene" && (side === "left" || side === "right")
-                        && SCENE_CORNER_KEYS.indexOf(d.key) !== -1) {
-                    var opp = side === "left" ? "right" : "left";
-                    if (d.key === RATING_KEY) {
-                        /* The badge claims this corner; the sash and the logo
-                           move across, where they may sit together. */
-                        SCENE_CORNER_KEYS.forEach(function (k) {
-                            if (k !== RATING_KEY && cornerSideOf(k, m) === side) { m[k] = opp; }
-                        });
-                    } else if (cornerSideOf(RATING_KEY, m) === side) {
-                        /* Something took the badge's corner, so the badge moves
-                           across -- and whatever was over there comes back to
-                           join the element that displaced it, rather than
-                           landing on the badge again. */
-                        m[RATING_KEY] = opp;
-                        SCENE_CORNER_KEYS.forEach(function (k) {
-                            if (k === RATING_KEY || k === d.key) { return; }
-                            if (cornerSideOf(k, m) === opp) { m[k] = side; }
-                        });
-                    }
+                if (elemGroup === "scene" && SCENE_CORNER_KEYS.indexOf(d.key) !== -1) {
+                    m = refractResolveCorners(m, cornerSideOf, d.key);
                 }
 
                 Object.keys(m).forEach(function (k) {
@@ -1332,8 +1318,8 @@
 
                "Mirrored" was dropped: the defaults are rating left, ribbon
                right, studio right, and it set exactly the opposite of each,
-               which is precisely what one click of the "Swap top corners" chip
-               already does. It was a shortcut to a button, not a look.
+               which is precisely what placing each of them once already does.
+               It was a shortcut to three clicks, not a look.
 
                Three of these answer the same conflict, the sash crossing the
                logo, in three genuinely different ways: move the logo, reorder
@@ -1431,27 +1417,36 @@
 
             /* The tier ribbon IS a tier flourish, so it only exists in
                Extravagant — listing it under Minimal would be a dead row. */
-            function elemAvailable(d) {
-                if (d.noop) { return false; }
+            /* TWO answers, not five. Either the element does not exist in this
+               configuration at all -- a Classic-only element under Refract, a
+               plugin you have not installed, the dossier's panels on a gallery
+               back -- in which case nothing is drawn, because a control for a
+               card you are not looking at is noise. Or it exists and something
+               is BLOCKING it, in which case it keeps its place in the tray,
+               greyed, saying why in one line.
+
+               Everything that cannot act now renders that second way: the tier
+               sash under Minimal, the tray settings under Mirror, a stat
+               already on the strip, the Dossier look on a library with no
+               category ratings. Previously each of those invented its own
+               look, its own wording and, in one case, its own position. */
+            function elemState(d) {
+                if (d.noop) { return null; }
                 /* The name banner is a Refract-layout element; in Classic it is
                    display:none, so a chip for it would ring a corner and do
                    nothing -- the exact defect the no-op Rating banner had. */
-                if (d.key === "refract.pcHideName" && perfCardStyle !== "refract") { return false; }
-                if (d.classicOnly && cardStyle !== "classic") { return false; }
-                /* A chip for another plugin's element only exists where that
-                   plugin does. */
-                if (d.plugin === "ascension" && !document.body.classList.contains("refract-has-ascension")) { return false; }
-                /* The dossier's own panels: only offered on the dossier. */
-                if (d.dossier && !(editingBack && backStyle === "dossier")) { return false; }
-                return !d.tier || flourish === "extravagant";
+                if (d.key === "refract.pcHideName" && perfCardStyle !== "refract") { return null; }
+                if (d.classicOnly && cardStyle !== "classic") { return null; }
+                if (d.plugin === "ascension" && !document.body.classList.contains("refract-has-ascension")) { return null; }
+                if (d.dossier && !(editingBack && backStyle === "dossier")) { return null; }
+                if (d.tier && flourish !== "extravagant") {
+                    return { blocked: true, reason: "Needs the Extravagant rating flourish" };
+                }
+                return { blocked: false, reason: null };
             }
-            /* Available in principle but switched off by the FLOURISH: shown as
-               a disabled chip that says why, rather than vanishing -- two paths
-               hide the same element and one used to leave no trace. */
-            function elemDimmedByFlourish(d) {
-                if (d.noop) { return false; }
-                if (d.key === "refract.pcHideName" && perfCardStyle !== "refract") { return false; }
-                return !!d.tier && flourish !== "extravagant";
+            function elemAvailable(d) {
+                var st = elemState(d);
+                return !!st && !st.blocked;
             }
 
 
@@ -1477,32 +1472,14 @@
             }
             function elemsInZone(z) {
                 return CARD_ELEMS.filter(function (d) {
-                    return d.group === elemGroup && elemAvailable(d) && zoneOfElem(d) === z;
+                    return d.group === elemGroup && elemState(d) && zoneOfElem(d) === z;
                 });
             }
-            function topEdgeHasSides() {
-                return CARD_ELEMS.some(function (d) {
-                    return d.group === elemGroup && d.sideKey;
-                });
-            }
-            /* One write, not one per element. `setElemSide` reads the
-               `cardSides` closure and replaces the whole map, so calling it in
-               a loop would keep only the last element's move. */
-            function swapTopCorners() {
-                var m = {};
-                Object.keys(cardSides).forEach(function (k) { m[k] = cardSides[k]; });
-                CARD_ELEMS.forEach(function (d) {
-                    if (d.group !== elemGroup || !d.sideKey) { return; }
-                    /* Not on the top edge, so not part of the swap. */
-                    if (cardSides[d.key] === "bottom") { return; }
-                    var next = cardSides[d.key] === "left" ? "right" : "left";
-                    try { localStorage.setItem(d.sideKey, next); } catch (e) { /* ignore */ }
-                    m[d.key] = next;
-                });
-                scheduleServerSync();
-                setCardSides(m);
-                applyCardSideClasses();
-            }
+            /* `swapTopCorners` lived here. Deleted: placing one element already
+               moves whatever it displaces out of the way, so a single pick in
+               an element's own menu IS the swap -- and this chip was rendered
+               into BOTH top trays, so the same action appeared twice. A control
+               from before elements had menus of their own. */
             /* One element's own controls, opened by clicking the element on the
                card. Everything here acts on THAT element and says its name, so
                "Move to bottom corner" can no longer be a chip in a shared tray
@@ -1514,16 +1491,30 @@
                 }
                 return null;
             }
+            /* Has this element anything to say that its tray chip cannot?
+               Only a place to sit or a form to take. Hiding is the ROSTER's
+               job, and the roster is the load-bearing home because a tray chip
+               can act on an element that is not drawn -- Tag count on a scene
+               with no tags, Country on a performer with none. You cannot click
+               what is not there, so the menu is the duplicate that goes. */
+            function elemHasMenu(d) {
+                if (!d) { return false; }
+                if (d.key === "refract.scHideStudio") { return true; }
+                return !!d.sideKey;
+            }
             function elemActionMenu(d) {
                 var rows = [];
                 var isStudio = d.key === "refract.scHideStudio";
-                /* Where it sits. Until now the only way to move one of these
-                   was "Swap top corners", which moved ALL of them. */
+                /* Where it sits. This is the only place placement is asked,
+                   and it asks about ONE element -- the old shared chip moved
+                   every top-edge element at once and could not name what it
+                   was about to move. */
+                var placeRows = rows, formRows = [];
                 if (d.sideKey && !(isStudio && studioMode === "text")) {
                     var sides = d.sides || ["left", "right"];
                     var cur = cardSides[d.key] || d.sideDefault;
                     sides.forEach(function (sd) {
-                        rows.push(R.createElement("button", {
+                        placeRows.push(R.createElement("button", {
                             key: "side-" + sd,
                             type: "button",
                             className: "refract-cc-chip" + (cur === sd ? " is-on" : ""),
@@ -1544,8 +1535,8 @@
                 /* The studio is the one element with a FORM as well as a place:
                    a logo in a corner, or its name set before the title. */
                 if (isStudio) {
-                    [["logo", "As logo"], ["text", "As title text"]].forEach(function (o) {
-                        rows.push(R.createElement("button", {
+                    [["logo", "Logo"], ["text", "Title text"]].forEach(function (o) {
+                        formRows.push(R.createElement("button", {
                             key: "mode-" + o[0],
                             type: "button",
                             className: "refract-cc-chip" + (studioMode === o[0] ? " is-on" : ""),
@@ -1558,18 +1549,26 @@
                         }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]));
                     });
                 }
+                /* Two questions, asked as two. They were five identical
+                   squares with two ticks and no headings, and picking a form
+                   silently deleted the placement question. */
+                var groups = [];
+                var grp = function (k, head, rows) {
+                    if (!rows.length) { return; }
+                    groups.push(R.createElement("div", { key: k + "h", className: "refract-cc-menu-sub" }, head));
+                    /* `display: contents`, so the menu's grid still lays the
+                       buttons out itself while a screen reader hears one named
+                       group of radios rather than four loose ones. */
+                    groups.push(R.createElement("div", {
+                        key: k, className: "refract-cc-menu-grp", role: "radiogroup",
+                        "aria-label": elemLabel(d) + ": " + head.toLowerCase()
+                    }, rows));
+                };
+                grp("__where", "Where", placeRows);
+                grp("__as", "As", formRows);
                 return [R.createElement("div", { key: "__emenu", className: "refract-cc-slot-menu is-elem" },
                     R.createElement("div", { key: "__head", className: "refract-cc-slot-menu-head" }, elemLabel(d)),
-                    rows,
-                    R.createElement("div", { key: "__foot", className: "refract-cc-slot-menu-foot" },
-                        R.createElement("button", {
-                            key: "__hide",
-                            type: "button",
-                            className: "refract-cc-chip refract-cc-chip-swap refract-cc-slot-remove",
-                            title: "Take " + elemLabel(d).toLowerCase() + " off the card",
-                            onClick: function () { elemMenuState[1](null); toggleCardElem(d.key); }
-                        }, R.createElement("span", { className: "refract-cc-chip-box" }), "Hide it")
-                    )
+                    groups
                 )];
             }
             function zoneChips(z) {
@@ -1614,13 +1613,14 @@
                         return R.createElement("button", {
                             key: o[0],
                             type: "button",
-                            className: "refract-cc-chip" + (o[2] ? " is-on" : "") + (dead ? " is-dimmed" : ""),
-                            "aria-pressed": o[2] ? "true" : "false",
+                            className: "refract-cc-chip" + (dead ? " is-dimmed" : (o[2] ? " is-on" : "")),
+                            role: "switch",
+                            "aria-checked": (!dead && o[2]) ? "true" : "false",
+                            "aria-disabled": dead ? "true" : undefined,
                             disabled: dead,
                             title: dead ? "Needs the tray. Switch Tray on, or pick the Gallery look." : undefined,
                             onClick: function () { if (!dead) { o[3](); } }
-                        }, R.createElement("span", { className: "refract-cc-chip-box" }),
-                            o[1] + (dead ? " (no tray)" : ""));
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]);
                     });
                 }
                 /* Every pill is its own control. The chips sit in a centred
@@ -1630,31 +1630,38 @@
                    the same order, and framed the job as choosing what to hide. */
                 if (editingBack && z === "bottom") { return slotChips("back"); }
                 var chips = elemsInZone(z).map(function (d) {
+                    var st = elemState(d) || { blocked: false };
                     var shown = !cardElems[d.key];
+                    /* Blocked chips do NOT also read as on. One tick meant two
+                       things -- "this is showing" and "this is permitted" --
+                       and Mirror's tray showed a ticked, disabled, excused chip
+                       for a tray that was not there. */
                     return R.createElement("button", {
                         key: d.key,
                         type: "button",
-                        className: "refract-cc-chip" + (shown ? " is-on" : ""),
-                        "aria-pressed": shown ? "true" : "false",
+                        className: "refract-cc-chip"
+                            + (st.blocked ? " is-dimmed" : (shown ? " is-on" : ""))
+                            /* Hovering the thing on the card lights its chip,
+                               and hovering the chip lights the thing. The two
+                               halves of one control were never joined, so in a
+                               corner holding three elements you had to read
+                               labels to learn which chip was which. */
+                            + (elemHover === d.key ? " is-linked" : ""),
+                        role: "switch",
+                        disabled: st.blocked,
+                        "aria-checked": (!st.blocked && shown) ? "true" : "false",
+                        "aria-disabled": st.blocked ? "true" : undefined,
+                        title: st.blocked ? st.reason : undefined,
                         "aria-label": elemLabel(d) + ", " + (d.group === "scene" ? "scene card" : "performer card"),
-                        onClick: function () { toggleCardElem(d.key); }
+                        onMouseEnter: function () { if (!st.blocked) { elemHoverState[1](d.key); } },
+                        onMouseLeave: function () { elemHoverState[1](null); },
+                        onClick: function () { if (!st.blocked) { toggleCardElem(d.key); } }
                     }, R.createElement("span", { className: "refract-cc-chip-box" }), elemLabel(d));
                 });
-                /* Elements this corner WOULD hold if the flourish allowed: the
-                   tier sash under Minimal. Left in as a disabled chip that says
-                   so, because two paths hide the same element and this one used
-                   to leave no trace. */
-                CARD_ELEMS.forEach(function (d) {
-                    if (d.group !== elemGroup || !elemDimmedByFlourish(d) || zoneOfElem(d) !== z) { return; }
-                    chips.push(R.createElement("button", {
-                        key: d.key + "__dim",
-                        type: "button",
-                        className: "refract-cc-chip is-dimmed",
-                        disabled: true,
-                        "aria-disabled": "true",
-                        title: "Hidden by the Minimal flourish. Set Rating flourish to Extravagant to show it."
-                    }, R.createElement("span", { className: "refract-cc-chip-box" }), elemLabel(d) + " (Minimal)"));
-                });
+                /* The tier-under-Minimal chip used to be appended HERE, after
+                   every other chip, so a blocked element also changed position
+                   -- the tray silently reordered itself to encode a state. It
+                   is rendered in place above, like any other chip. */
                 /* The studio's "Move to bottom corner" and "Show as text" chips
                    used to sit HERE, in the corner's shared tray, next to the
                    Tier ribbon and Rating banner toggles -- so the tray offered
@@ -1668,18 +1675,6 @@
                         && perfCardStyle === "refract" && !cardElems["refract.pcHideStats"]) {
                     if (pillMenu !== null) { return slotChips("front"); }
                     chips = chips.concat(slotChips("front"));
-                }
-                /* Where the rating is DRAWN. A radio: it has one home at a
-                   time, and the sash is not one of them -- that carries the
-                   tier and only the tier, exactly as on the front. */
-                if ((z === "tl" || z === "tr") && topEdgeHasSides()) {
-                    chips.push(R.createElement("button", {
-                        key: "__swap",
-                        type: "button",
-                        className: "refract-cc-chip refract-cc-chip-swap",
-                        title: "Mirror every top-edge element to the opposite corner",
-                        onClick: swapTopCorners
-                    }, R.createElement("span", { className: "refract-cc-chip-box" }), "Swap top corners"));
                 }
                 return chips;
             }
@@ -1842,17 +1837,26 @@
                     elemHits.push(R.createElement("button", {
                         key: "__el" + k,
                         type: "button",
-                        className: "refract-cc-elem-hit" + (open ? " is-open" : ""),
+                        className: "refract-cc-elem-hit" + (open ? " is-open" : "")
+                            + (elemHasMenu(d) ? "" : " is-plain"),
                         style: { left: b.left + "px", top: b.top + "px", width: b.width + "px", height: b.height + "px" },
-                        title: open ? "Close" : elemLabel(d) + " - move, change or hide it",
-                        "aria-label": elemLabel(d) + ": move, change or hide it",
-                        "aria-expanded": open ? "true" : "false",
+                        title: elemHasMenu(d)
+                            ? (open ? "Close" : elemLabel(d) + " - where it sits, and how")
+                            : elemLabel(d),
+                        "aria-label": elemHasMenu(d)
+                            ? elemLabel(d) + ": choose where it sits"
+                            : elemLabel(d),
+                        "aria-expanded": elemHasMenu(d) ? (open ? "true" : "false") : undefined,
                         onMouseEnter: function () { holdZone(z0); elemHoverState[1](k); },
                         onMouseLeave: function () { elemHoverState[1](null); },
                         onFocus: function () { holdZone(z0); elemHoverState[1](k); },
                         onBlur: function () { elemHoverState[1](null); },
                         onClick: function (e) {
                             e.preventDefault(); e.stopPropagation();
+                            /* Hide-only elements have no menu now: the hit still
+                               lights the element so the tray chip has a face,
+                               but the switch lives in one place. */
+                            if (!elemHasMenu(d)) { return; }
                             setPillMenu(null);
                             elemMenuState[1](open ? null : k);
                         }
@@ -2550,24 +2554,14 @@
                             ),
                             R.createElement("div", { className: "refract-cc-rail-right" },
                                 R.createElement("span", { className: "refract-cc-hint" },
-                                    (zone && Object.keys(elemBoxes).length && !(zone === "bottom" && pillStripEditable()))
-                                        ? "Click an element to move, change or hide it"
-                                        : (zone === "bottom" && pillStripEditable() && pillBoxes.length)
-                                        /* The pills are the one control the
-                                           card cannot advertise: the tray says
-                                           "Add stat", nothing says the pills
-                                           already there can be CHANGED, so the
-                                           fair reading is that the strip is
-                                           add-and-remove only. Said here, in
-                                           the panel's own place for
-                                           instructions, only while the strip is
-                                           the thing being looked at. */
-                                        ? "Click a pill to change what it shows"
-                                        : editingBack
-                                            ? (backStyle === "dossier"
-                                                ? "The grid is fixed; hover the media strip or the footer to switch them off"
-                                                : "Hover a band of the back to change what sits there")
-                                            : "Hover a corner of the card to change what sits there"),
+                                    /* Two sentences, not five. Each new kind of
+                                       object used to add one, and one of them
+                                       lied: the performer strip's band said
+                                       "click a pill" while Country and the rank
+                                       badge were equally clickable beside it. */
+                                    zone
+                                        ? "Click anything on the card to change it"
+                                        : "Hover a region of the card to change what sits there"),
                                 R.createElement("button", {
                                     type: "button",
                                     className: "refract-cc-shuffle refract-cc-plain" + (plainOn ? " is-on" : ""),
@@ -3545,6 +3539,45 @@
             localStorage.removeItem("refract.scHideCounts");
         } catch (e) { /* ignore */ }
     }
+    /* THE badge-sits-alone rule, written once.
+
+       It was written twice, in two vocabularies: the customiser resolved it
+       over its own settings map, and the boot pass resolved it straight over
+       localStorage. They disagreed -- only the customiser knew that when
+       something takes the badge's corner, the badge's old corner-mate should
+       come BACK to join it rather than be left sitting alone opposite. Two
+       readings of one sentence is how a rule stops feeling like a rule.
+
+       `at(key, sides)` answers "which corner does this really occupy" and is
+       supplied by the caller, because the customiser knows its own live state
+       and the boot pass only has storage. `placed` keeps its corner; whatever
+       clashes gives way. Pure: it returns a new map and writes nothing. */
+    var REFRACT_CORNER_KEYS = ["refract.scHideRating", "refract.scHideTier", "refract.scHideStudio"];
+    var REFRACT_RATING_KEY = "refract.scHideRating";
+    function refractResolveCorners(sides, at, placed) {
+        var m = {};
+        Object.keys(sides).forEach(function (k) { m[k] = sides[k]; });
+        var side = at(placed, m);
+        if (side !== "left" && side !== "right") { return m; }
+        var opp = side === "left" ? "right" : "left";
+        if (placed === REFRACT_RATING_KEY) {
+            /* The badge claims this corner; the sash and the logo move across,
+               where they may sit together. */
+            REFRACT_CORNER_KEYS.forEach(function (k) {
+                if (k !== REFRACT_RATING_KEY && at(k, m) === side) { m[k] = opp; }
+            });
+        } else if (at(REFRACT_RATING_KEY, m) === side) {
+            /* Something took the badge's corner, so the badge moves across --
+               and whatever was over there comes back to join the element that
+               displaced it, rather than landing on the badge again. */
+            m[REFRACT_RATING_KEY] = opp;
+            REFRACT_CORNER_KEYS.forEach(function (k) {
+                if (k === REFRACT_RATING_KEY || k === placed) { return; }
+                if (at(k, m) === opp) { m[k] = side; }
+            });
+        }
+        return m;
+    }
     /* A saved layout from before the badge-sits-alone rule can still have the
        rating sharing a corner with the sash or the studio -- the rule only
        fires when you PLACE something, and nobody re-places what is already
@@ -3552,28 +3585,36 @@
        it was given, the others step across (where they may sit together).
        Silent, but the state it corrects is one the UI would no longer let you
        create, and it only ever moves things apart. */
+    var REFRACT_CORNER_SIDE_KEYS = {
+        "refract.scHideRating": ["refract.scRatingSide", "left"],
+        "refract.scHideTier": ["refract.scTierSide", "right"],
+        "refract.scHideStudio": ["refract.scStudioSide", "right"]
+    };
     function normaliseSceneCorners() {
         var moved = false;
         try {
-            if (localStorage.getItem("refract.scHideRating") === "1") { return false; }
-            var rs = localStorage.getItem("refract.scRatingSide") || "left";
-            if (rs !== "left" && rs !== "right") { return false; }
-            var opp = rs === "left" ? "right" : "left";
+            var sides = {};
+            REFRACT_CORNER_KEYS.forEach(function (k) {
+                var c = REFRACT_CORNER_SIDE_KEYS[k];
+                sides[k] = localStorage.getItem(c[0]) || c[1];
+            });
             var minimal = localStorage.getItem(FLOURISH_KEY) === "minimal";
-            var others = [
-                { hide: "refract.scHideTier", side: "refract.scTierSide", def: "right", tier: true },
-                { hide: "refract.scHideStudio", side: "refract.scStudioSide", def: "right", tier: false }
-            ];
-            others.forEach(function (o) {
-                if (localStorage.getItem(o.hide) === "1") { return; }
-                /* No sash under Minimal, and the studio set as title text is
-                   not in a corner at all. */
-                if (o.tier && minimal) { return; }
-                if (!o.tier && localStorage.getItem(STUDIO_MODE_KEY) === "text") { return; }
-                if ((localStorage.getItem(o.side) || o.def) === rs) {
-                    localStorage.setItem(o.side, opp);
-                    moved = true;
-                }
+            var studioText = localStorage.getItem(STUDIO_MODE_KEY) === "text";
+            /* The same question the customiser's `cornerSideOf` answers, asked
+               of storage: hidden, gated off by Minimal, or set as title text
+               all mean "not in a corner". */
+            var at = function (k, m) {
+                if (localStorage.getItem(k) === "1") { return null; }
+                if (k === "refract.scHideTier" && minimal) { return null; }
+                if (k === "refract.scHideStudio" && studioText) { return null; }
+                var sd = m[k];
+                return (sd === "left" || sd === "right") ? sd : null;
+            };
+            var out = refractResolveCorners(sides, at, REFRACT_RATING_KEY);
+            REFRACT_CORNER_KEYS.forEach(function (k) {
+                if (out[k] === sides[k]) { return; }
+                localStorage.setItem(REFRACT_CORNER_SIDE_KEYS[k][0], out[k]);
+                moved = true;
             });
         } catch (e) { /* ignore */ }
         return moved;
@@ -7507,6 +7548,96 @@
         } catch (e) { return false; }
     }
 
+    /* ── Rating: a trigger, not a 94px star row ───────────────────────
+       Stash's five-star widget was the widest control in a 338px column
+       and pushed everything else out of the toolbar. It is also NOT the
+       same value as the Advanced Rating plugin's chip beside it -- the
+       stars are Stash's own 0-5 rating, the chip is the plugin's
+       multi-criteria score -- so it could not simply be dropped.
+
+       Instead it collapses to one pill showing the current rating, and
+       the real widget opens beneath it on click. The stars are NEVER
+       moved in the DOM: they are React-managed, and relocating them
+       desyncs the fiber (the same trap documented for the date field).
+       CSS positions them into the popover while they stay exactly where
+       React put them; every click still lands on Stash's own button. */
+    function refractRatingValue(stars) {
+        var num = stars.querySelector(".star-rating-number");
+        if (num && num.textContent.trim()) { return num.textContent.trim(); }
+        /* No number rendered (stars mode) -- read it off the fill classes,
+           which carry a 0-100 fill per star. */
+        var btns = stars.querySelectorAll("button[class*='star-fill-']");
+        var total = 0;
+        Array.prototype.forEach.call(btns, function (b) {
+            var m = (b.className || "").toString().match(/star-fill-(\d+)/);
+            if (m) { total += parseInt(m[1], 10) / 100; }
+        });
+        if (!total) { return ""; }
+        return String(Math.round(total * 10) / 10);
+    }
+
+    function refractCloseRatingPopovers(except) {
+        var open = document.querySelectorAll(".refract-rating-open");
+        Array.prototype.forEach.call(open, function (h) {
+            if (h === except) { return; }
+            h.classList.remove("refract-rating-open");
+            var t = h.querySelector(".refract-rating-trigger");
+            if (t) { t.setAttribute("aria-expanded", "false"); }
+        });
+    }
+
+    var refractRatingGlobalsBound = false;
+    function refractBindRatingGlobals() {
+        if (refractRatingGlobalsBound) { return; }
+        refractRatingGlobalsBound = true;
+        document.addEventListener("click", function (e) {
+            if (e.target.closest && e.target.closest(".refract-rating-host")) { return; }
+            refractCloseRatingPopovers(null);
+        }, true);
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") { refractCloseRatingPopovers(null); }
+        });
+    }
+
+    function initSceneRatingPopover() {
+        var bars = document.querySelectorAll(".scene-toolbar, .image-toolbar");
+        Array.prototype.forEach.call(bars, function (bar) {
+            var stars = bar.querySelector(".rating-stars");
+            if (!stars) { return; }
+            var host = stars.parentElement;
+            if (!host) { return; }
+            host.classList.add("refract-rating-host");
+
+            var trig = host.querySelector(".refract-rating-trigger");
+            if (!trig) {
+                trig = document.createElement("button");
+                trig.type = "button";
+                trig.className = "refract-rating-trigger";
+                trig.setAttribute("aria-haspopup", "true");
+                trig.setAttribute("aria-expanded", "false");
+                trig.innerHTML = STAR_SVG + '<span class="refract-rating-trigger-val"></span>';
+                host.insertBefore(trig, stars);
+                trig.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var willOpen = !host.classList.contains("refract-rating-open");
+                    refractCloseRatingPopovers(host);
+                    host.classList.toggle("refract-rating-open", willOpen);
+                    trig.setAttribute("aria-expanded", willOpen ? "true" : "false");
+                });
+                refractBindRatingGlobals();
+            }
+
+            /* Refresh the read-out every pass: React rewrites the fill
+               classes in place when the rating changes. */
+            var val = refractRatingValue(stars);
+            var out = trig.querySelector(".refract-rating-trigger-val");
+            if (out && out.textContent !== val) { out.textContent = val; }
+            trig.classList.toggle("is-rated", !!val);
+            trig.title = val ? ("Rating " + val + " - click to change") : "Set a rating";
+        });
+    }
+
     function refractParseSourceLabel(text) {
         var t = String(text || "").replace(/,\s*selected\s*$/i, "").trim();
         if (!t) { return null; }
@@ -7677,6 +7808,7 @@
                 safeRun(stripRatingBannerToNumber);
                 safeRun(initCardTilts);
                 safeRun(initSceneCards);
+                safeRun(initSceneRatingPopover);
                 safeRun(initPerformerCards);
                 safeRun(syncPerformerCardHearts);
                 safeRun(integrateAscensionBadges);

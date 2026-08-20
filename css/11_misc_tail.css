@@ -2110,6 +2110,13 @@ body.stash-liquid-glass .refract-cc-elem-hit:hover {
     border-color: rgba(var(--accent-rgb), 0.75);
     background: rgba(var(--accent-rgb), 0.14);
 }
+/* Most elements have nothing to say that their tray chip cannot, so clicking
+   them opens nothing. The hit stays -- it lights the element and its chip
+   together, which is how you learn which chip is which -- but it does not
+   pretend to be a button. */
+body.stash-liquid-glass .refract-cc-elem-hit.is-plain {
+    cursor: default;
+}
 body.stash-liquid-glass .refract-cc-elem-hit:focus-visible {
     outline: 2px solid var(--accent-bright);
     outline-offset: 2px;
@@ -2125,6 +2132,27 @@ body.stash-liquid-glass .refract-cc-elem-hit.is-open {
    column, which made a six-row tower taller than a 253px scene card. */
 body.stash-liquid-glass .refract-cc-slot-menu.is-elem {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+/* An element's menu asks at most two questions -- where it sits, and what form
+   it takes -- so it says which is which. They were five identical squares with
+   two ticks between them and no way to tell that picking "Title text" was
+   answering a different question from picking "Left". */
+body.stash-liquid-glass .refract-cc-menu-sub {
+    grid-column: 1 / -1;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.42);
+    padding: 3px 2px 0;
+}
+body.stash-liquid-glass .refract-cc-menu-sub:first-of-type {
+    padding-top: 0;
+}
+/* The group is a name for a screen reader, not a box: the menu's own grid
+   still lays the buttons out. */
+body.stash-liquid-glass .refract-cc-menu-grp {
+    display: contents;
 }
 
 /* Each drawn pill, as its own control. Laid exactly over the real pill:
@@ -3467,11 +3495,30 @@ body.stash-liquid-glass .refract-cc-preset.is-unavailable[data-reason]::after {
     letter-spacing: 0.02em;
     color: var(--text-muted);
 }
-/* An element hidden by the flourish rather than by a toggle: present, grey,
-   unclickable, its label saying which. */
+/* THE one way to say "this cannot act right now" -- a stat already on the
+   strip, a tray setting under Mirror, the sash under Minimal. Present, in its
+   own place, dashed and grey, never also ticked, and hovering it gives the
+   reason. Four things used to say this four ways, and one of them said it by
+   moving to the end of the row. */
 body.stash-liquid-glass .refract-cc-chip.is-dimmed,
 body.stash-liquid-glass .refract-cc-chip.is-dimmed:hover {
-    opacity: 0.5;
+    opacity: 0.45;
     cursor: not-allowed;
     border-style: dashed;
+    background: rgba(10, 10, 13, 0.6);
+}
+/* The chip's box is the vocabulary for "this is on". A blocked chip is not
+   on, so it does not draw one -- ticked-and-disabled read as "showing, and you
+   may not turn it off", which was the opposite of the truth. */
+body.stash-liquid-glass .refract-cc-chip.is-dimmed .refract-cc-chip-box {
+    border-style: dashed;
+    background: none;
+}
+/* Hovering the thing on the card lights its chip in the tray, and hovering the
+   chip lights the thing on the card. One control, two halves, and until now
+   nothing joined them: in a corner holding a sash, a logo and a badge you had
+   to read three labels to find out which chip was which. */
+body.stash-liquid-glass .refract-cc-chip.is-linked {
+    border-color: rgba(var(--accent-rgb), 0.85);
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.3);
 }
