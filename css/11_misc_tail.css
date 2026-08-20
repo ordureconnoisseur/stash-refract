@@ -3325,16 +3325,58 @@ body.stash-liquid-glass:not(.refract-minimal-cards) .refract-preview-kind-scene 
     height: auto;
 }
 
-/* The dossier's two switchable panels: the media strip band and the
-   collector footer band, measured off the built card (header ~10%, hero to
-   ~28%, ratings to ~66%, media ~66-86%, foot ~86-100%). */
+/* The dossier's four switchable panels, measured off the built card at
+   264x395: title bar y12-35 (3-8.7%), portrait-and-score y42-106 (10.5-27%),
+   the ratings grid y113-267 (28.5-67%) which is the LOOK and stays fixed,
+   the media strip y273-329 (69-83%), the collector footer y336-383 (85-97%).
+   Each band runs from where the panel above it ends, so the whole card is
+   covered and no band claims a panel it cannot switch. */
+body.stash-liquid-glass .refract-cc-hit-dhead {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: auto;
+    width: auto;
+    height: 10%;
+    cursor: pointer;
+}
+body.stash-liquid-glass .refract-cc-ring-dhead {
+    left: 5px;
+    right: 5px;
+    top: 2%;
+    bottom: auto;
+    width: auto;
+    height: 7.5%;
+}
+body.stash-liquid-glass .refract-cc-chips-dhead { top: 13%; }
+body.stash-liquid-glass .refract-cc-hit-dhero {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 10%;
+    bottom: auto;
+    width: auto;
+    height: 18%;
+    cursor: pointer;
+}
+body.stash-liquid-glass .refract-cc-ring-dhero {
+    left: 5px;
+    right: 5px;
+    top: 9.6%;
+    bottom: auto;
+    width: auto;
+    height: 17.5%;
+}
+body.stash-liquid-glass .refract-cc-chips-dhero { top: 30%; }
 body.stash-liquid-glass .refract-cc-hit-dmedia {
     position: absolute;
     left: 0;
     right: 0;
-    top: 60%;
+    top: 67%;
+    bottom: auto;
     width: auto;
-    height: 26%;
+    height: 17%;
     cursor: pointer;
 }
 body.stash-liquid-glass .refract-cc-hit-dfoot {
@@ -3344,23 +3386,23 @@ body.stash-liquid-glass .refract-cc-hit-dfoot {
     bottom: 0;
     top: auto;
     width: auto;
-    height: 14%;
+    height: 16%;
     cursor: pointer;
 }
 body.stash-liquid-glass .refract-cc-ring-dmedia {
     left: 5px;
     right: 5px;
-    top: 64%;
+    top: 68%;
     width: auto;
     height: 20%;
 }
 body.stash-liquid-glass .refract-cc-ring-dfoot {
     left: 5px;
     right: 5px;
-    bottom: 4px;
+    bottom: 2.5%;
     top: auto;
     width: auto;
-    height: 11%;
+    height: 13.5%;
 }
 
 /* The stat strip is the bottom sixth now that the tray owns the middle. */

@@ -1214,6 +1214,16 @@
                 try { localStorage.setItem(key, nextHidden ? "1" : "0"); } catch (e) { /* ignore */ }
                 scheduleServerSync();
                 applyCardElemClasses();
+                /* The dossier's category rows are fitted to the room the panel
+                   actually has, and switching any other panel off hands it
+                   more. Without this the grid kept the row count it was built
+                   with and went on claiming "+N more" for rows it now had space
+                   to draw. */
+                if (key.indexOf("refract.cb") === 0) {
+                    Array.prototype.forEach.call(document.querySelectorAll(".refract-card-back"), function (b) {
+                        try { refractFitBackStats(b); } catch (e) { /* ignore */ }
+                    });
+                }
                 var m = {};
                 CARD_ELEMS.forEach(function (d) {
                     m[d.key] = (d.key === key) ? nextHidden : cardElems[d.key];
@@ -1581,25 +1591,35 @@
                 /* A focused element owns the tray while its menu is open. */
                 var fd = elemMenu ? elemDef(elemMenu) : null;
                 if (fd && zoneOfElem(fd) === z) { return elemActionMenu(fd); }
-                if (z === "img") {
-                    /* A radio, not toggles: exactly one source is in use, and
-                       the whole point of this zone is that the back can differ
-                       from the front. */
+                /* Which picture the back uses. A radio, not toggles: exactly
+                   one source is in use, and the whole point of it is that the
+                   back can differ from the front.
+
+                   Offered in TWO places because the picture is in two places.
+                   On the gallery it is the card, so it is that band. On the
+                   dossier it is the portrait in the hero row (the full-card
+                   wash behind the panels is the same photo, blurred), so it
+                   joins that band -- and until now it was offered on the
+                   dossier NOWHERE, which meant changing the picture of the
+                   default back meant switching looks twice to do it. */
+                function backSrcChips() {
                     return [
                         ["portrait", "Portrait"],
                         ["scene", "Top scene"],
                         ["photo", "Top photo"]
                     ].map(function (o) {
                         return R.createElement("button", {
-                            key: o[0],
+                            key: "src-" + o[0],
                             type: "button",
                             className: "refract-cc-chip" + (backSrc === o[0] ? " is-on" : ""),
                             role: "radio",
                             "aria-checked": backSrc === o[0] ? "true" : "false",
+                            title: "Use the " + o[1].toLowerCase() + " as the back's picture",
                             onClick: function () { pickBackSrc(o[0]); }
                         }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]);
                     });
                 }
+                if (z === "img") { return backSrcChips(); }
                 if (z === "tray") {
                     /* Mirror is the tray OFF. Its two settings survive so the
                        gallery you had comes back intact when you switch look,
@@ -1693,6 +1713,10 @@
                 if (editingBack && z === "bottom" && !cardElems["refract.mbHideStats"]) {
                     chips = chips.concat(slotChips("back"));
                 }
+                /* The dossier's hero row holds the visible copy of the back's
+                   picture, so the picture's source is asked here -- the panel's
+                   own switch first, then which photo it shows. */
+                if (z === "dhero") { chips = chips.concat(backSrcChips()); }
                 return chips;
             }
             /* Can a pill on the drawn strip be edited? The back's strip always
@@ -1734,7 +1758,7 @@
                        to avoid. The name band was the last piece missing: its
                        chip pointed at a band the back never offered, so the
                        switch existed and could not be reached. */
-                    ? (backStyle === "dossier" ? ["dmedia", "dfoot"] : ["img", "tl", "tr", "tray", "bottom"])
+                    ? (backStyle === "dossier" ? ["dhead", "dhero", "dmedia", "dfoot"] : ["img", "tl", "tr", "tray", "bottom"])
                     : (previewKind === "performer"
                         /* The performer front has exactly two places anything
                            can be moved: the sash in the top-right corner, and
@@ -3276,6 +3300,15 @@
            (that layout IS the look), but the media strip and the collector
            footer are additions a purist may not want -- and the dossier being
            the DEFAULT back with zero knobs was its own finding. */
+        /* The title bar and the portrait-and-score row. Two of the
+           dossier's five panels could be switched and three could not, and no
+           rule said which -- the ratings grid IS the look and stays fixed, but
+           a name you have already read on the front and a portrait you are
+           looking through are both things a reader may not want twice. */
+        { key: "refract.cbHideHead",       cls: "refract-cb-hide-head",       group: "back", label: "Title bar", dossier: true,
+          sel: ".refract-cb-head" },
+        { key: "refract.cbHideHero",       cls: "refract-cb-hide-hero",       group: "back", label: "Portrait & score", dossier: true,
+          sel: ".refract-cb-hero" },
         { key: "refract.cbHideMedia",      cls: "refract-cb-hide-media",      group: "back", label: "Media strip", dossier: true,
           sel: ".refract-cb-media" },
         { key: "refract.cbHideFoot",       cls: "refract-cb-hide-foot",       group: "back", label: "Collector footer", dossier: true,
@@ -3320,6 +3353,8 @@
            element you could not reach from it. Its own thin band, where it
            actually is. */
         "refract.pcHideBack":       "edge",
+        "refract.cbHideHead":       "dhead",
+        "refract.cbHideHero":       "dhero",
         "refract.cbHideMedia":      "dmedia",
         "refract.cbHideFoot":       "dfoot"
     };
@@ -6191,16 +6226,13 @@
         var face = "front";
         var busy = false;
 
-        /* The back photo, resolved exactly as the card resolves it: the
-           override if one is set, else the global rule -- top scene, top photo,
-           or the portrait itself. Same inputs, so what you see here is what
-           the card will use. */
+        /* The back photo, resolved by the SAME function the cards use, so
+           what the page shows is what a card will use. This asked the question
+           itself until now -- the fourth copy of one rule, and the copies had
+           already drifted: the dossier's portrait cell answered it differently
+           from the wash directly behind it. */
         function backPhotoUrl() {
-            if (over && over.path) { return over.path; }
-            var src = backSrcPref();
-            if (src === "scene" && scenes[0] && scenes[0].paths && scenes[0].paths.screenshot) { return scenes[0].paths.screenshot; }
-            if (src === "photo" && images[0] && images[0].paths && images[0].paths.thumbnail) { return images[0].paths.thumbnail; }
-            return img.getAttribute("src") || "";
+            return refractBackImageUrl(img.getAttribute("src") || "", d);
         }
         var backRatioKnown = null;
         function buildBack(done) {
@@ -6761,23 +6793,41 @@
 
     /* Painting is split out because it runs twice: once immediately with the
        portrait so the back is never blank, then again when the query lands. */
-    function refractPaintBack(back, portrait, d) {
+    /* WHICH PICTURE THE BACK USES. One answer, for both faces.
+
+       The gallery back asked it here; the dossier never asked at all and took
+       the portrait always, on the argument that the image source "describes
+       the gallery's anatomy". But the dossier is a back and it draws a picture
+       twice -- the portrait cell in its hero row, and the full-card wash behind
+       the frosted panels -- so a reader who set the back's picture to a top
+       scene got a silent override with nothing to say so, and no control on
+       that look to discover why. Same question, same answer, both faces. */
+    function refractBackImageUrl(portrait, d) {
         var p = d && d.findPerformer;
         var scenes = (d && d.findScenes && d.findScenes.scenes) || [];
         var images = (d && d.findImages && d.findImages.images) || [];
         /* An override beats the global rule; that is the whole point of it. */
         var over = refractBackOverride(p && p.custom_fields);
+        if (over) { return over.path; }
         var src = backSrcPref();
-        var url = portrait;
-        if (over) {
-            url = over.path;
-        } else if (src === "scene" && scenes[0] && scenes[0].paths && scenes[0].paths.screenshot) {
-            url = scenes[0].paths.screenshot;
-        } else if (src === "photo" && images[0] && images[0].paths && images[0].paths.thumbnail) {
-            url = images[0].paths.thumbnail;
+        if (src === "scene" && scenes[0] && scenes[0].paths && scenes[0].paths.screenshot) {
+            return scenes[0].paths.screenshot;
         }
+        if (src === "photo" && images[0] && images[0].paths && images[0].paths.thumbnail) {
+            return images[0].paths.thumbnail;
+        }
+        /* Asked for a scene by a performer with none, or a photo from an empty
+           library: the portrait, which is the one picture that always exists. */
+        return portrait;
+    }
+    function refractCssBgUrl(url) {
+        return "url('" + String(url).replace(/'/g, "%27") + "')";
+    }
+    function refractPaintBack(back, portrait, d) {
+        var p = d && d.findPerformer;
+        var url = refractBackImageUrl(portrait, d);
         var el = back.querySelector(".refract-mb-img");
-        if (el && url) { el.style.backgroundImage = "url('" + String(url).replace(/'/g, "%27") + "')"; }
+        if (el && url) { el.style.backgroundImage = refractCssBgUrl(url); }
         if (!p) { return; }
 
         var mode = effectiveRatingDisp();
@@ -6976,6 +7026,19 @@
             var p = d && d.findPerformer;
             var scenes = d && d.findScenes && d.findScenes.scenes;
             var images = d && d.findImages && d.findImages.images;
+            /* Both places the dossier draws the picture, from the one resolver
+               the gallery uses. Painted here rather than in the markup above
+               because a top scene or a top photo is only known once the query
+               lands; the portrait is already on screen until it does, so there
+               is no blank moment. */
+            var url = refractBackImageUrl(imgSrc, d);
+            if (url && url !== imgSrc) {
+                var bg = refractCssBgUrl(url);
+                var wash = back.querySelector(".refract-back-photo");
+                var cell = back.querySelector(".refract-cb-portrait");
+                if (wash) { wash.style.backgroundImage = bg; }
+                if (cell) { cell.style.backgroundImage = bg; }
+            }
             if (p) { refractFillPerformerBack(back, p, scenes, images); }
         }).catch(function () {
             var l = back.querySelector(".refract-cb-loading");
@@ -7024,28 +7087,12 @@
     }
 
     function refractFillPerformerBack(back, p, scenes, images) {
-        /* The backdrop follows the SAME back-image resolution as the gallery
-           and the performer page: per-performer override first, then the
-           global rule (top scene / top photo / portrait). It used to stay the
-           front image no matter what, so "Set image (back)" and the image
-           band did nothing on the default back while the performer-page flip
-           showed the choice -- the feature contradicting itself. The build
-           pass still paints the portrait first so the back is never blank;
-           this repaints once the data lands. */
-        var bp = back.querySelector(".refract-back-photo");
-        if (bp) {
-            var bOver = refractBackOverride(p && p.custom_fields);
-            var bSrc = backSrcPref();
-            var bUrl = null;
-            if (bOver && bOver.path) {
-                bUrl = bOver.path;
-            } else if (bSrc === "scene" && scenes && scenes[0] && scenes[0].paths && scenes[0].paths.screenshot) {
-                bUrl = scenes[0].paths.screenshot;
-            } else if (bSrc === "photo" && images && images[0] && images[0].paths && images[0].paths.thumbnail) {
-                bUrl = images[0].paths.thumbnail;
-            }
-            if (bUrl) { bp.style.backgroundImage = "url('" + String(bUrl).replace(/'/g, "%27") + "')"; }
-        }
+        /* The backdrop wash used to be repainted HERE, from its own copy of the
+           back-image rule -- which is how it came to disagree with the portrait
+           cell an inch in front of it, the wash following your choice of
+           picture while the cell stayed the portrait for ever. Both are painted
+           together now, by the one resolver, in the build pass that already had
+           the query in hand. */
         var explicit = isCardBackExplicit();
         var L = explicit ? {
             score: "Slut Score", assets: "Assets", scenes: "On-Cam Fucks", o: "Loads", topscene: "Best Fuck"
@@ -7717,6 +7764,30 @@
         });
     }
 
+    /* The playback-rate control is a sibling menu button on the control
+       bar. Its items are the source of truth for which rates this player
+       offers, so they are read rather than hard-coded. */
+    function refractSourceRates() {
+        var host = document.querySelector(".vjs-playback-rate");
+        if (!host) { return []; }
+        var items = host.querySelectorAll(".vjs-menu-item");
+        var out = [];
+        Array.prototype.forEach.call(items, function (li) {
+            var label = String(li.textContent || "").replace(/,\s*selected\s*$/i, "").trim();
+            if (label) { out.push({ label: label, li: li }); }
+        });
+        /* video.js lists fastest-first; slowest-first reads like a dial. */
+        return out.reverse();
+    }
+
+    function refractCurrentRate() {
+        var rates = refractSourceRates();
+        for (var i = 0; i < rates.length; i++) {
+            if (rates[i].li.classList.contains("vjs-selected")) { return rates[i].label; }
+        }
+        return null;
+    }
+
     function refractParseSourceLabel(text) {
         var t = String(text || "").replace(/,\s*selected\s*$/i, "").trim();
         if (!t) { return null; }
@@ -7791,6 +7862,18 @@
                     refractFlipEscHtml(short) + "</button>";
             });
             html += "</div></div>";
+            /* Speed. Same contract as Format and Resolution: Stash's own
+               menu items stay in the DOM and take the click, so video.js
+               keeps its state and refract reimplements nothing. */
+            var rates = refractSourceRates();
+            if (rates.length) {
+                html += '<div class="refract-src-group refract-src-group-rate"><div class="refract-src-head">Speed</div><div class="refract-src-row">';
+                rates.forEach(function (r) {
+                    html += '<button type="button" class="refract-src-opt" data-kind="rate" data-v="' +
+                        refractFlipEscHtml(r.label) + '">' + refractFlipEscHtml(r.label) + "</button>";
+                });
+                html += "</div></div>";
+            }
             if (refractVrPlugin()) {
                 html += '<div class="refract-src-group"><div class="refract-src-head">Projection</div><div class="refract-src-row">';
                 REFRACT_VR_MODES.forEach(function (m) {
@@ -7809,6 +7892,17 @@
                 e.stopPropagation();
                 var kind = b.getAttribute("data-kind");
                 var target = null;
+                if (kind === "rate") {
+                    var want = b.getAttribute("data-v");
+                    var rs = refractSourceRates();
+                    for (var ri = 0; ri < rs.length; ri++) {
+                        if (rs[ri].label === want) { rs[ri].li.click(); break; }
+                    }
+                    Array.prototype.forEach.call(panel.querySelectorAll('[data-kind="rate"]'), function (o) {
+                        o.classList.toggle("is-on", o.getAttribute("data-v") === want);
+                    });
+                    return;
+                }
                 if (kind === "vr") {
                     /* Projection is not a source, so it never forwards a click
                        into Stash's hidden <li> list. */
@@ -7844,6 +7938,7 @@
         };
         var d = panel.querySelector(".refract-src-direct");
         if (d) { d.classList.toggle("is-on", !!(cur && cur.direct)); }
+        mark('[data-kind="rate"]', refractCurrentRate());
         mark('[data-kind="vr"]', refractVrProjection);
         mark('[data-kind="format"]', cur && !cur.direct ? cur.format : null);
         mark('[data-kind="res"]', cur && !cur.direct ? cur.res : null);

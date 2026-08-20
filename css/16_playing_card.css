@@ -1895,6 +1895,12 @@ body.stash-liquid-glass.refract-mb-hide-stats.refract-mb-hide-stats .refract-car
 body.stash-liquid-glass.refract-pc-hide-back.refract-pc-hide-back.refract-pc-hide-back .performer-card .refract-card-flip-btn {
     display: none !important;
 }
+body.stash-liquid-glass.refract-cb-hide-head.refract-cb-hide-head .refract-card-back .refract-cb-head {
+    display: none !important;
+}
+body.stash-liquid-glass.refract-cb-hide-hero.refract-cb-hide-hero .refract-card-back .refract-cb-hero {
+    display: none !important;
+}
 body.stash-liquid-glass.refract-cb-hide-media.refract-cb-hide-media .refract-card-back .refract-cb-media {
     display: none !important;
 }
