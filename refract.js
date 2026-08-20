@@ -1221,31 +1221,80 @@
                 setCardElems(m);
             }
 
-            /* The rating badge and the tier sash both anchor to the very point
-               of a corner -- a solid badge sitting on a diagonal ribbon -- so
-               they may never share one. Moving either into the other's corner
-               MOVES the other across rather than hiding it: nothing is lost,
-               and it is what "put the rating over there" plainly means. The
-               sash and the studio logo are left alone: their crossing is
-               designed, has its own over/under control and its own look. */
-            var CORNER_RIVALS = { "refract.scHideRating": "refract.scHideTier",
-                                  "refract.scHideTier": "refract.scHideRating" };
+            /* THE RATING BADGE SITS ALONE. It is a solid disc pinned to the
+               very point of a corner, so anything else anchored there loses:
+               the tier sash puts a diagonal under it, and the studio logo --
+               which is often a wide wordmark, not a square mark -- ends up
+               shoulder to shoulder with it. The sash and the logo may still
+               share, because that crossing is designed and has its own
+               over/under control.
+
+               Two corners, three elements, and the rating wanting one to
+               itself resolves exactly: the rating in one, the sash and the
+               logo together in the other. Whatever you just placed keeps the
+               corner you put it in; everything else gives way. Nothing is
+               hidden and nothing is lost -- the user asked for "disable the
+               rating badge or something", and moving is the version of that
+               which you can undo by looking at it. */
+            var SCENE_CORNER_KEYS = ["refract.scHideRating", "refract.scHideTier", "refract.scHideStudio"];
+            var RATING_KEY = "refract.scHideRating";
+            /* Which corner an element really occupies: nothing if it is hidden,
+               gated off by the flourish, sent to the bottom, or -- for the
+               studio -- set as title text, which is not a corner at all. */
+            function cornerSideOf(key, sides) {
+                var d = elemDef(key);
+                if (!d || cardElems[key] || !elemAvailable(d)) { return null; }
+                if (key === "refract.scHideStudio" && studioMode === "text") { return null; }
+                var sd = sides[key] || d.sideDefault;
+                return (sd === "left" || sd === "right") ? sd : null;
+            }
+            /* Who this placement will shift, so the menu can say so first. */
+            function displacedBy(key, side) {
+                var out = [];
+                if (elemGroup !== "scene" || (side !== "left" && side !== "right")) { return out; }
+                if (SCENE_CORNER_KEYS.indexOf(key) === -1) { return out; }
+                if (key === RATING_KEY) {
+                    SCENE_CORNER_KEYS.forEach(function (k) {
+                        if (k !== RATING_KEY && cornerSideOf(k, cardSides) === side) { out.push(k); }
+                    });
+                } else if (cornerSideOf(RATING_KEY, cardSides) === side) {
+                    out.push(RATING_KEY);
+                }
+                return out;
+            }
             function setElemSide(d, side) {
                 if (!d.sideKey || cardSides[d.key] === side) { return; }
-                var writes = [[d, side]];
-                var rivalKey = CORNER_RIVALS[d.key];
-                if (rivalKey && (side === "left" || side === "right")) {
-                    var rival = elemDef(rivalKey);
-                    if (rival && !cardElems[rivalKey] && elemAvailable(rival)) {
-                        var rSide = cardSides[rivalKey] || rival.sideDefault;
-                        if (rSide === side) { writes.push([rival, side === "left" ? "right" : "left"]); }
-                    }
-                }
                 var m = {};
                 Object.keys(cardSides).forEach(function (k) { m[k] = cardSides[k]; });
-                writes.forEach(function (w) {
-                    try { localStorage.setItem(w[0].sideKey, w[1]); } catch (e) { /* ignore */ }
-                    m[w[0].key] = w[1];
+                m[d.key] = side;
+
+                if (elemGroup === "scene" && (side === "left" || side === "right")
+                        && SCENE_CORNER_KEYS.indexOf(d.key) !== -1) {
+                    var opp = side === "left" ? "right" : "left";
+                    if (d.key === RATING_KEY) {
+                        /* The badge claims this corner; the sash and the logo
+                           move across, where they may sit together. */
+                        SCENE_CORNER_KEYS.forEach(function (k) {
+                            if (k !== RATING_KEY && cornerSideOf(k, m) === side) { m[k] = opp; }
+                        });
+                    } else if (cornerSideOf(RATING_KEY, m) === side) {
+                        /* Something took the badge's corner, so the badge moves
+                           across -- and whatever was over there comes back to
+                           join the element that displaced it, rather than
+                           landing on the badge again. */
+                        m[RATING_KEY] = opp;
+                        SCENE_CORNER_KEYS.forEach(function (k) {
+                            if (k === RATING_KEY || k === d.key) { return; }
+                            if (cornerSideOf(k, m) === opp) { m[k] = side; }
+                        });
+                    }
+                }
+
+                Object.keys(m).forEach(function (k) {
+                    if (m[k] === cardSides[k]) { return; }
+                    var dd = elemDef(k);
+                    if (!dd || !dd.sideKey) { return; }
+                    try { localStorage.setItem(dd.sideKey, m[k]); } catch (e) { /* ignore */ }
                 });
                 scheduleServerSync();
                 setCardSides(m);
@@ -1482,10 +1531,10 @@
                             "aria-checked": cur === sd ? "true" : "false",
                             title: (function () {
                                 var t = "Put " + elemLabel(d).toLowerCase() + " in the " + SIDE_LABEL[sd].toLowerCase() + " corner";
-                                var rk = CORNER_RIVALS[d.key];
-                                if (rk && !cardElems[rk] && (cardSides[rk] || (elemDef(rk) || {}).sideDefault) === sd) {
-                                    t += ", moving " + elemLabel(elemDef(rk)).toLowerCase() + " across";
-                                }
+                                var moved = displacedBy(d.key, sd).map(function (k) {
+                                    return elemLabel(elemDef(k)).toLowerCase();
+                                });
+                                if (moved.length) { t += ", moving " + moved.join(" and ") + " across"; }
                                 return t;
                             })(),
                             onClick: function () { setElemSide(d, sd); elemMenuState[1](null); }
@@ -3496,6 +3545,44 @@
             localStorage.removeItem("refract.scHideCounts");
         } catch (e) { /* ignore */ }
     }
+    /* A saved layout from before the badge-sits-alone rule can still have the
+       rating sharing a corner with the sash or the studio -- the rule only
+       fires when you PLACE something, and nobody re-places what is already
+       where they left it. Normalised once at boot: the badge keeps the corner
+       it was given, the others step across (where they may sit together).
+       Silent, but the state it corrects is one the UI would no longer let you
+       create, and it only ever moves things apart. */
+    function normaliseSceneCorners() {
+        var moved = false;
+        try {
+            if (localStorage.getItem("refract.scHideRating") === "1") { return false; }
+            var rs = localStorage.getItem("refract.scRatingSide") || "left";
+            if (rs !== "left" && rs !== "right") { return false; }
+            var opp = rs === "left" ? "right" : "left";
+            var minimal = localStorage.getItem(FLOURISH_KEY) === "minimal";
+            var others = [
+                { hide: "refract.scHideTier", side: "refract.scTierSide", def: "right", tier: true },
+                { hide: "refract.scHideStudio", side: "refract.scStudioSide", def: "right", tier: false }
+            ];
+            others.forEach(function (o) {
+                if (localStorage.getItem(o.hide) === "1") { return; }
+                /* No sash under Minimal, and the studio set as title text is
+                   not in a corner at all. */
+                if (o.tier && minimal) { return; }
+                if (!o.tier && localStorage.getItem(STUDIO_MODE_KEY) === "text") { return; }
+                if ((localStorage.getItem(o.side) || o.def) === rs) {
+                    localStorage.setItem(o.side, opp);
+                    moved = true;
+                }
+            });
+        } catch (e) { /* ignore */ }
+        return moved;
+    }
+    /* Once at boot -- and again after the server copy lands, because that pull
+       overwrites localStorage and would otherwise reinstate the very clash
+       this just corrected. Whichever runs last wins, and both are idempotent. */
+    if (normaliseSceneCorners()) { scheduleServerSync(); }
+
     function applyCardElemClasses() {
         if (!document.body) { return; }
         migrateCountPills();
@@ -4007,6 +4094,10 @@
        sequence; rating-system is auto-detected separately so it's skipped. */
     function reapplyRefractSettings() {
         try {
+            /* The pull may have brought back a layout where the rating badge
+               shares a corner; correct it before the classes are written, and
+               push the correction so the server stops serving it. */
+            if (normaliseSceneCorners()) { scheduleServerSync(); }
             applyAccentClass(getStoredAccent());
             applyLiteModeClass(isLiteModeEnabled());
             applyLightModeClass(isLightModeEnabled());
