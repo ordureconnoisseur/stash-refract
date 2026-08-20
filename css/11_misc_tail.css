@@ -1978,6 +1978,17 @@ body.stash-liquid-glass .refract-cc-hit-tl { top: 0; left: 0; }
 body.stash-liquid-glass .refract-cc-hit-tr { top: 0; right: 0; }
 body.stash-liquid-glass .refract-cc-hit-bl { bottom: 0; left: 0; }
 body.stash-liquid-glass .refract-cc-hit-br { bottom: 0; right: 0; }
+/* The scene card's top edge, whole. Both corners and the run between them:
+   the rating badge, the tier sash and the studio all live along here and each
+   can sit at either end, so one band holds all three and moving one between
+   corners no longer moves its switch to a different band. */
+body.stash-liquid-glass .refract-cc-hit-top {
+    top: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 40%;
+}
 
 body.stash-liquid-glass .refract-cc-ring {
     position: absolute;
@@ -2012,6 +2023,13 @@ body.stash-liquid-glass .refract-cc-ring.is-intro {
 }
 body.stash-liquid-glass .refract-cc-ring-tl { top: 3px; left: 3px; }
 body.stash-liquid-glass .refract-cc-ring-tr { top: 3px; right: 3px; }
+body.stash-liquid-glass .refract-cc-ring-top {
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    width: auto;
+    height: 37%;
+}
 body.stash-liquid-glass .refract-cc-ring-bl { bottom: 3px; left: 3px; }
 body.stash-liquid-glass .refract-cc-ring-br { bottom: 3px; right: 3px; }/* ── The armed band: spotlight + one tray ─────────────────────────────────
    Arming a band does two things now. The REST of the card dims (the ring
@@ -2254,6 +2272,8 @@ body.stash-liquid-glass .refract-cc-chips .refract-cc-chip:not(.refract-cc-chip-
    ones, measured against each card's own ring geometry. */
 body.stash-liquid-glass .refract-cc-chips-tl,
 body.stash-liquid-glass .refract-cc-chips-tr { top: 46%; }
+/* Below the top band's ring, centred like every other tray. */
+body.stash-liquid-glass .refract-cc-chips-top { top: 46%; }
 body.stash-liquid-glass .refract-cc-chips-bl,
 body.stash-liquid-glass .refract-cc-chips-br { bottom: 46%; }
 body.stash-liquid-glass .refract-preview-kind-performer .refract-cc-chips-tl { top: 19%; }

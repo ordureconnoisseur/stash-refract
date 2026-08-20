@@ -1509,14 +1509,29 @@
                 if (d.key === "refract.scHideStudio" && studioMode === "text") { return "Studio name"; }
                 return d.label;
             }
+            /* THE TOP EDGE IS ONE BAND. Three elements live along it -- the
+               rating badge, the tier sash and the studio -- and each of them
+               can sit in either top corner, so splitting the edge into two
+               bands made the ROSTER move every time you moved an element. The
+               top-right corner would offer one lonely chip while the other two
+               hid in the top-left, and setting the studio to title text emptied
+               it out of the top altogether.
+
+               A band answers "what does the card show up here", which does not
+               change when something slides from one corner to the other. WHERE
+               a thing sits, and what form it takes, is the thing's own
+               business -- click it and its menu says so. Wide area toggles;
+               focused element places.
+
+               The one element that genuinely leaves the top edge is the studio
+               sent to the bottom-right corner: that is a different part of the
+               card, so its chip goes with it. As title text it stays here,
+               because the title row is where the top edge overflows to and
+               because otherwise there is no way back to a logo. */
             function zoneOfElem(d) {
                 if (ELEM_ZONE_FIXED[d.key]) { return ELEM_ZONE_FIXED[d.key]; }
-                /* As text the studio is no longer in a corner at all: it sits on
-                   the title line. Its control follows it, because the whole
-                   premise here is that a corner owns what sits there. */
-                if (d.key === "refract.scHideStudio" && studioMode === "text") { return "bl"; }
                 if (cardSides[d.key] === "bottom") { return "br"; }
-                return cardSides[d.key] === "left" ? "tl" : "tr";
+                return "top";
             }
             function elemsInZone(z) {
                 return CARD_ELEMS.filter(function (d) {
@@ -1821,7 +1836,7 @@
                            quadrants promised control in two corners that hold
                            nothing -- the top-left offered no chips at all. */
                         ? ["tl", "tr", "edge", "bottom"]
-                        : ["tl", "tr", "bl", "br"]);
+                        : ["top", "bl", "br"]);
                 /* Built ONCE per zone, then used twice: to drop bands that
                    have nothing to offer, and to render the armed one. A zone
                    whose chips all gate away (the performer card's top-left
