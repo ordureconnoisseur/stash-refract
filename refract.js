@@ -7984,9 +7984,16 @@
         if (d) { d.classList.toggle("is-on", !!(cur && cur.direct)); }
         mark('[data-kind="rate"]', refractCurrentRate());
         mark('[data-kind="vr"]', refractCurrentVr());
-        /* Stash's own VR button is redundant once the panel carries it. */
+        /* Stash's own controls are redundant once the panel carries them.
+           Hidden, not removed: their menu items are what the panel
+           forwards clicks to, and a display:none <li> still runs its
+           handler. */
         var vrBtn = refractVrMenuButton();
         if (vrBtn) { vrBtn.classList.add("refract-vr-folded"); }
+        if (panel.querySelector('[data-kind="rate"]')) {
+            var rateBtn = document.querySelector(".vjs-control-bar .vjs-playback-rate");
+            if (rateBtn) { rateBtn.classList.add("refract-rate-folded"); }
+        }
         mark('[data-kind="format"]', cur && !cur.direct ? cur.format : null);
         mark('[data-kind="res"]', cur && !cur.direct ? cur.res : null);
         /* An offer this file does not have is shown as unavailable rather than

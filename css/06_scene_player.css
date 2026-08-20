@@ -761,18 +761,53 @@ body.stash-liquid-glass .scrubber-heatmap {
     opacity: 0.92 !important;
 }
 
-/* Time label that appears on hovered thumbnail */
+/* Time label on a scrubber thumbnail.
+   The label is a RANGE ("0:00 - 0:06"), and on a short scene the
+   thumbnails are narrow -- a 2-minute scene gives ~57px items against
+   ~55px of text. With wrapping allowed the range broke across two lines
+   mid-range, which is the one place it must not break: "0:00 -" over
+   "0:06" reads as two separate times. It stays on one line now, and the
+   padding is trimmed so it fits a narrow thumbnail rather than relying
+   on the thumbnail being wide. */
 body.stash-liquid-glass .scrubber-item-time {
     background: rgba(12, 12, 14, 0.85) !important;
     color: var(--text) !important;
     font-size: var(--fs-xs) !important;
     font-weight: 500 !important;
-    padding: 0.2rem 0.5rem !important;
+    white-space: nowrap !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.2rem 0.4rem !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: 6px !important;
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
     font-variant-numeric: tabular-nums !important;
+}
+
+/* The label sizes to ITS OWN thumbnail, not to the viewport. Scrubber
+   item width is set by the scene's duration: a 52-minute scene gives
+   160px thumbnails and a 2-minute scene gives 50px, and at 50px a full
+   range needs ~55px of ink against ~42px of room, so it spilled out of
+   its own pill. A container query is the honest tool here -- the
+   constraint really is the thumbnail's width, and nothing else on the
+   page knows it. */
+body.stash-liquid-glass .scrubber-item {
+    container-type: inline-size;
+}
+@container (max-width: 120px) {
+    body.stash-liquid-glass .scrubber-item-time {
+        font-size: 9.1px !important;
+        padding: 0.18rem 0.25rem !important;
+        letter-spacing: -0.01em !important;
+    }
+}
+@container (max-width: 78px) {
+    body.stash-liquid-glass .scrubber-item-time {
+        font-size: 8.2px !important;
+        padding: 0.15rem 0.15rem !important;
+        letter-spacing: -0.02em !important;
+    }
 }
 
 /* ── Scene-tabs Video Filter panel ──────────────────────────────────
@@ -1094,8 +1129,11 @@ body.stash-liquid-glass .video-js .refract-src-row {
 body.stash-liquid-glass .video-js .refract-src-row > .refract-src-opt {
     flex: 0 0 auto;
 }
-/* Stash's own VR control, folded into this panel's Projection group. */
-body.stash-liquid-glass .video-js .vjs-control-bar .refract-vr-folded {
+/* Stash's own controls, folded into this panel. Hidden rather than
+   removed: the panel forwards its clicks to their menu items, and a
+   display:none <li> still runs its handler. */
+body.stash-liquid-glass .video-js .vjs-control-bar .refract-vr-folded,
+body.stash-liquid-glass .video-js .vjs-control-bar .refract-rate-folded {
     display: none !important;
 }
 body.stash-liquid-glass .video-js .refract-src-opt,
