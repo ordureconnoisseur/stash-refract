@@ -1987,30 +1987,46 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
    3.5 = 369.2 against 338. Every one of these is padding, not content:
    the count pills carry 7px each side on BOTH their icon and their
    value for an 11px glyph and a 6px digit. */
+/* The row fills its column by spreading the leftover into the gaps,
+   NOT by squashing the controls. The previous pass hard-set the
+   icon-only buttons to 24px while they are 26px tall, and they carry
+   `border-radius: 9999px` -- so a pill radius on a non-square box drew
+   them as vertical ovals. Nothing is given a width smaller than its
+   natural shape now; the controls sit at their true size and
+   `space-between` distributes the ~6px of slack across the seven joints
+   so the row still reaches both edges. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
-    gap: 0.15rem !important;
+    gap: 0.2rem !important;
+    justify-content: space-between !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) {
-    gap: 0.15rem !important;
+    gap: 0.2rem !important;
+    justify-content: space-between !important;
+    flex: 0 1 auto !important;
 }
+/* Icon-only controls stay perfectly round: square box, pill radius. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, #operation-menu, .mv-scene-page-btn, .mv-scene-btn, .adv-favourite-btn) {
+    width: 26px !important;
+    min-width: 26px !important;
+    height: 26px !important;
+    aspect-ratio: 1 / 1 !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    flex: 0 0 auto !important;
+}
+/* Pills keep enough padding to read as pills rather than as tubes. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button > .btn {
-    padding-left: 0.28rem !important;
-    padding-right: 0.28rem !important;
+    padding-left: 0.3rem !important;
+    padding-right: 0.3rem !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
-    padding-left: 0.4rem !important;
-    padding-right: 0.4rem !important;
-    gap: 0.2rem !important;
+    padding-left: 0.45rem !important;
+    padding-right: 0.45rem !important;
+    gap: 0.25rem !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn {
-    width: 26px !important;
-    padding-left: 0.2rem !important;
-    padding-right: 0.2rem !important;
-    margin-left: 0 !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, #operation-menu, .mv-scene-page-btn, .mv-scene-btn) {
-    width: 24px !important;
-    min-width: 24px !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+/* The star row is the one elastic thing here: it is the widest control
+   and the only one that can give width back without distorting. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
 }
