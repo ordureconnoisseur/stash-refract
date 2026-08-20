@@ -1940,7 +1940,15 @@ body.stash-liquid-glass .refract-cc-stage .performer-card {
 body.stash-liquid-glass .refract-cc-corners {
     position: absolute;
     inset: 0;
-    z-index: 60;
+    /* ABOVE the tier ladder. Tier cards carry z-index 20/30/40/50/60/70
+       (bronze..perfect, 03_cards.css) so that richer cards overlap plainer
+       ones in a grid -- and the cardbox is a stacking context, so those
+       numbers compete directly with this layer. At 60 the editing overlay
+       TIED with legendary and LOST to perfect: the card painted over the
+       ring, the tray and the spotlight. It stayed clickable the whole time
+       (the preview card is pointer-events:none), so the controls worked
+       while being invisible, which is the worst of both. */
+    z-index: 200;
     /* Clips the ring's spotlight shadow to the card's own silhouette. */
     overflow: hidden;
     border-radius: 14px;
@@ -2053,6 +2061,25 @@ body.stash-liquid-glass .refract-cc-chips > .refract-cc-chip {
     flex: 1 1 auto;
     justify-content: center;
 }
+/* The preview card HOLDS STILL. The top tiers animate `translate`, `scale`
+   and `rotate` (refractCardFloatPerfect / ...BreathePerfect), which on a
+   perfect card paints it 279x418 sitting 24px above its own 264x395 layout
+   box -- while the ring, the hit bands and the spotlight are pinned to that
+   box. The result was a ring floating off its sash with a dimmed sliver above
+   the card. On the grid that drift is the whole charm; on an editing surface
+   whose controls must land on the pixel, it is a bug.
+
+   Pinned with `!important`, which outranks animations in the cascade, and
+   only the GEOMETRY properties: the tier's colour, glow, holo and frame
+   keyframes keep running, so the card still looks like itself here. */
+body.stash-liquid-glass .refract-cc-cardbox .performer-card,
+body.stash-liquid-glass .refract-cc-cardbox .scene-card {
+    translate: none !important;
+    scale: none !important;
+    rotate: none !important;
+    transform: none !important;
+}
+
 /* Each drawn pill, as its own control. Laid exactly over the real pill:
    above the band it belongs to, below the tray. Resting state is invisible --
    the pills already look like the objects they are, and outlining four of them
