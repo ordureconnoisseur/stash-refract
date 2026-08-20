@@ -1204,15 +1204,35 @@
                 setCardElems(m);
             }
 
+            /* The rating badge and the tier sash both anchor to the very point
+               of a corner -- a solid badge sitting on a diagonal ribbon -- so
+               they may never share one. Moving either into the other's corner
+               MOVES the other across rather than hiding it: nothing is lost,
+               and it is what "put the rating over there" plainly means. The
+               sash and the studio logo are left alone: their crossing is
+               designed, has its own over/under control and its own look. */
+            var CORNER_RIVALS = { "refract.scHideRating": "refract.scHideTier",
+                                  "refract.scHideTier": "refract.scHideRating" };
             function setElemSide(d, side) {
                 if (!d.sideKey || cardSides[d.key] === side) { return; }
-                try { localStorage.setItem(d.sideKey, side); } catch (e) { /* ignore */ }
-                scheduleServerSync();
-                applyCardSideClasses();
+                var writes = [[d, side]];
+                var rivalKey = CORNER_RIVALS[d.key];
+                if (rivalKey && (side === "left" || side === "right")) {
+                    var rival = elemDef(rivalKey);
+                    if (rival && !cardElems[rivalKey] && elemAvailable(rival)) {
+                        var rSide = cardSides[rivalKey] || rival.sideDefault;
+                        if (rSide === side) { writes.push([rival, side === "left" ? "right" : "left"]); }
+                    }
+                }
                 var m = {};
                 Object.keys(cardSides).forEach(function (k) { m[k] = cardSides[k]; });
-                m[d.key] = side;
+                writes.forEach(function (w) {
+                    try { localStorage.setItem(w[0].sideKey, w[1]); } catch (e) { /* ignore */ }
+                    m[w[0].key] = w[1];
+                });
+                scheduleServerSync();
                 setCardSides(m);
+                applyCardSideClasses();
             }
 
             /* Presets APPLY, they do not latch: with this many rows most real
@@ -1443,7 +1463,14 @@
                             className: "refract-cc-chip" + (cur === sd ? " is-on" : ""),
                             role: "radio",
                             "aria-checked": cur === sd ? "true" : "false",
-                            title: "Put " + elemLabel(d).toLowerCase() + " in the " + SIDE_LABEL[sd].toLowerCase() + " corner",
+                            title: (function () {
+                                var t = "Put " + elemLabel(d).toLowerCase() + " in the " + SIDE_LABEL[sd].toLowerCase() + " corner";
+                                var rk = CORNER_RIVALS[d.key];
+                                if (rk && !cardElems[rk] && (cardSides[rk] || (elemDef(rk) || {}).sideDefault) === sd) {
+                                    t += ", moving " + elemLabel(elemDef(rk)).toLowerCase() + " across";
+                                }
+                                return t;
+                            })(),
                             onClick: function () { setElemSide(d, sd); elemMenuState[1](null); }
                         }, R.createElement("span", { className: "refract-cc-chip-box" }), SIDE_LABEL[sd]));
                     });
@@ -3064,7 +3091,9 @@
            bottom corner" could not say WHICH of the three it moved. */
         { key: "refract.scHideRating",     cls: "refract-sc-hide-rating",     group: "scene",     label: "Rating banner",
           sel: ":scope > .rating-banner",
-          sideKey: "refract.scRatingSide", sideDefault: "left",  sideCls: "refract-sc-rating-right" },
+          sideKey: "refract.scRatingSide", sideDefault: "left",  sideCls: "refract-sc-rating-right",
+          /* The one side class named for the RIGHT. */
+          sideClsSide: "right" },
         { key: "refract.scHideTier",       cls: "refract-sc-hide-tier",       group: "scene",     label: "Tier ribbon", tier: true,
           sel: ".refract-pc-tier-label",
           sideKey: "refract.scTierSide",   sideDefault: "right", sideCls: "refract-sc-tier-left" },
@@ -3472,9 +3501,15 @@
         CARD_ELEMS.forEach(function (d) {
             if (!d.sideKey) { return; }
             var side = cardElemSide(d);
-            /* The left class means LEFT, not merely "not the default": with a
-               third position in play, "bottom" must not light it. */
-            document.body.classList.toggle(d.sideCls, side === "left");
+            /* Apply the class for the side the CLASS ITSELF NAMES, not merely
+               "not the default" -- with a third position in play, "bottom" must
+               not light it. Nearly every sideCls is a `-left` class, but the
+               rating banner's is `refract-sc-rating-RIGHT`, so a blanket
+               `side === "left"` inverted it: the shipped preference (left) put
+               the class on and drew the badge on the RIGHT, straight into the
+               corner already holding the tier sash and the studio logo. That
+               is the "triple stacked top right by default". */
+            document.body.classList.toggle(d.sideCls, side === (d.sideClsSide || "left"));
             if (d.bottomCls) { document.body.classList.toggle(d.bottomCls, side === "bottom"); }
         });
         document.body.classList.toggle("refract-sc-tier-under", tierLayerPref() === "logo");
