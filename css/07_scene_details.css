@@ -858,7 +858,7 @@ body.stash-liquid-glass .nav-tabs .nav-link.active {
    the slim sidebar variants on scene/gallery pages. */
 body.stash-liquid-glass .performer-tabs .nav-tabs .nav-link {
     padding: 0.55rem 1rem !important;
-    font-size: 0.86rem !important;
+    font-size: var(--fs-base) !important;
     border-radius: var(--radius) !important;
     letter-spacing: 0.015em !important;
 }
@@ -977,8 +977,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > p.pre {
     font-family: inherit !important;
 }
 
-/* Tag pills — compact in scene-tabs context (full size elsewhere). */
-body.stash-liquid-glass .tag-item.tag-link.badge.badge-secondary {
+/* Tag pills — compact in scene-tabs context (full size elsewhere).
+   The selector used to be unscoped despite what this comment says, so the
+   compact treatment leaked onto every detail page. On the performer header
+   that rendered tag chips at 0.7rem (9.8px) beside 14px field values, with
+   the chip's own padding zeroed and moved onto the <a>. Scoped for real
+   now; elsewhere the pills fall back to the full-size rule in
+   04_filters.css (0.8rem, 0.22em/0.7em padding). */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.tag-link.badge.badge-secondary {
     display: inline-block !important;
     background: rgba(255, 255, 255, 0.04) !important;
     border: 1px solid var(--glass-border) !important;
@@ -990,17 +996,17 @@ body.stash-liquid-glass .tag-item.tag-link.badge.badge-secondary {
     color: var(--text) !important;
     transition: background 0.15s, border-color 0.15s, color 0.15s !important;
 }
-body.stash-liquid-glass .tag-item.tag-link.badge.badge-secondary:hover {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.tag-link.badge.badge-secondary:hover {
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
 }
-body.stash-liquid-glass .tag-item.tag-link.badge a {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.tag-link.badge a {
     display: inline-block !important;
     color: inherit !important;
     text-decoration: none !important;
     padding: 0.18rem 0.55rem !important;
 }
-body.stash-liquid-glass .tag-item.tag-link.badge:hover a {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.tag-link.badge:hover a {
     color: var(--accent-bright) !important;
 }
 

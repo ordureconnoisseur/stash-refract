@@ -92,6 +92,19 @@ body.stash-liquid-glass {
     --radius-sm: 12px;
     --radius-pill: 9999px;
 
+    /* Type scale. Root is 14px. Before this existed the performer header
+       alone rendered 12 distinct font sizes, three of which (0.9rem,
+       0.875rem, 0.86rem = 12.6 / 12.25 / 12.04px) sat inside half a
+       pixel of each other while claiming to be different steps. Six more
+       clustered between 9.2 and 10.8px. Anything picking a size should
+       reach for one of these six rather than inventing a seventh. */
+    --fs-xs:   0.72rem;   /* 10.08px  counters, overlay metadata      */
+    --fs-sm:   0.8rem;    /* 11.2px   pills, chips, badges            */
+    --fs-base: 0.875rem;  /* 12.25px  controls: buttons, tabs, inputs */
+    --fs-body: 1rem;      /* 14px     body copy, detail values        */
+    --fs-lg:   1.25rem;   /* 17.5px   sub-headings                    */
+    --fs-xl:   2rem;      /* 28px     page title                      */
+
     /* Accent palette — orange by default. Override the four `--accent`
        vars on `body.stash-liquid-glass.refract-<preset>` to retheme the
        entire UI; the preset classes at the bottom of this file ship

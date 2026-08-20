@@ -489,6 +489,8 @@
                slot list one for one. */
             var pillBoxesState = R.useState([]);
             var pillBoxes = pillBoxesState[0];
+            var pillHoverState = R.useState(null);
+            var pillHover = pillHoverState[0];
             R.useEffect(function () {
                 var live = true, timers = [], raf = null;
                 var measure = function () {
@@ -1563,7 +1565,8 @@
                    Classic performer layout the hits used to render over the
                    plain stat text -- tabbable, ringed on hover, and opening
                    nothing, because the menu is Refract-layout only. */
-                var pillHits = (zone === "bottom" && pillStripEditable() ? pillBoxes : []).map(function (b, i) {
+                var pillsLive = zone === "bottom" && pillStripEditable() ? pillBoxes : [];
+                var pillHits = pillsLive.map(function (b, i) {
                     var open = pillMenu === i;
                     return R.createElement("button", {
                         key: "__pill" + i,
@@ -1573,13 +1576,45 @@
                         title: open ? "Close" : "Change what this pill shows",
                         "aria-label": "Pill " + (i + 1) + " of " + pillBoxes.length + ": change what it shows",
                         "aria-expanded": open ? "true" : "false",
-                        onMouseEnter: function () { holdZone("bottom"); },
+                        onMouseEnter: function () { holdZone("bottom"); pillHoverState[1](i); },
+                        onMouseLeave: function () { pillHoverState[1](null); },
+                        onFocus: function () { holdZone("bottom"); pillHoverState[1](i); },
+                        onBlur: function () { pillHoverState[1](null); },
                         onClick: function (e) {
                             e.preventDefault(); e.stopPropagation();
                             setPillMenu(open ? null : i);
                         }
                     });
                 });
+                /* On the pills, the light contracts to the PILLS. The band's
+                   ring frames country + strip + the padding between them, which
+                   is the right subject while you are choosing a band -- but the
+                   moment the pointer is on a pill, that box is bigger than
+                   anything you can act on. Since the scrim IS this ring's
+                   box-shadow, moving the ring tightens the lit area with it.
+                   The whole ROW, not the single pill: sweeping across four
+                   pills would otherwise redraw the scrim four times, and the
+                   pill you are on already has its own ring. */
+                var ringStyle = null;
+                if (pillsLive.length && (pillHover !== null || pillMenu !== null)) {
+                    var x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+                    pillsLive.forEach(function (b) {
+                        if (b.left < x1) { x1 = b.left; }
+                        if (b.top < y1) { y1 = b.top; }
+                        if (b.left + b.width > x2) { x2 = b.left + b.width; }
+                        if (b.top + b.height > y2) { y2 = b.top + b.height; }
+                    });
+                    var pad = 4;
+                    ringStyle = {
+                        left: (x1 - pad) + "px",
+                        top: (y1 - pad) + "px",
+                        width: (x2 - x1 + pad * 2) + "px",
+                        height: (y2 - y1 + pad * 2) + "px",
+                        right: "auto",
+                        bottom: "auto",
+                        borderRadius: "999px"
+                    };
+                }
 
                 /* First open this session: every band's ring pulses once, in
                    sequence, so the card announces itself as the control
@@ -1593,12 +1628,16 @@
                 }) : null;
                 return R.createElement("div", {
                     className: "refract-cc-corners",
-                    onMouseLeave: function () { setZone(null); setPillMenu(null); }
+                    onMouseLeave: function () { setZone(null); setPillMenu(null); pillHoverState[1](null); }
                 },
                     hits,
                     pillHits,
                     introRings,
-                    chips.length ? R.createElement("div", { className: "refract-cc-ring refract-cc-ring-" + zone }) : null,
+                    chips.length ? R.createElement("div", {
+                        className: "refract-cc-ring refract-cc-ring-" + zone
+                            + (ringStyle ? " is-tight" : ""),
+                        style: ringStyle || undefined
+                    }) : null,
                     chips.length ? R.createElement("div", {
                         className: "refract-cc-chips refract-cc-chips-" + zone,
                         onMouseEnter: function () { holdZone(zone); },

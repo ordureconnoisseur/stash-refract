@@ -2015,6 +2015,16 @@ body.stash-liquid-glass .refract-cc-ring-br { bottom: 3px; right: 3px; }/* â”€â”
    tray docked beside the ring -- below a top band, above a bottom one --
    instead of raining individual pills across the artwork. The tray is an
    object; the old chips were confetti. */
+/* The contraction onto the pill row. Only the properties the tight state
+   actually sets are transitioned, so the band ring (which positions itself
+   with right/bottom) is not asked to interpolate to `auto`. */
+body.stash-liquid-glass .refract-cc-ring.is-tight {
+    transition: left 0.16s ease, top 0.16s ease, width 0.16s ease,
+                height 0.16s ease, border-radius 0.16s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass .refract-cc-ring.is-tight { transition: none; }
+}
 body.stash-liquid-glass .refract-cc-ring:not(.is-intro) {
     box-shadow: 0 0 0 640px rgba(7, 7, 11, 0.45);
     /* The ring element is created on arm, so without this the scrim hit full

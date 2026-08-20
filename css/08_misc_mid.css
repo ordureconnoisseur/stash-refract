@@ -1144,20 +1144,78 @@ body.stash-liquid-glass .detail-header .detail-header-image img.logo {
             mask-image: none !important;
 }
 
+/* Meta panel — two-column field grid.
+   Stash stacks every scalar field in one tall column. On a performer with
+   a full profile that made the panel 561px tall next to a 323px image, so
+   the left column carried 404px of dead space and each row ran 1109px wide
+   for values under 200px. Two columns halves the height, kills most of the
+   dead column, and stops the rules spanning empty space. Tags and stash IDs
+   keep the full width because they genuinely use it.
+   The negative side margins pull the panel's TEXT out to the same left edge
+   as the name and the action buttons (they were staggered by 12.9px, which
+   is too small to read as an indent and too large to read as aligned). */
 body.stash-liquid-glass .detail-header .detail-group {
     background: rgba(255, 255, 255, 0.035) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    padding: 0.65rem 0.85rem;
-    margin-top: 0.6rem !important;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.75rem;
+    padding: 0.2rem 0.85rem;
+    margin: 0.7rem calc(-0.85rem - 1px) 0 !important;
     -webkit-backdrop-filter: var(--glass-blur-md);
     backdrop-filter: var(--glass-blur-md);
 }
 
-body.stash-liquid-glass .detail-header .detail-item:not(:first-child) {
-    margin-top: 0.35rem;
-    padding-top: 0.35rem;
+/* One column once a half-width column can no longer hold a value like
+   "United States of America" on one line. */
+@media (max-width: 1200px) {
+    body.stash-liquid-glass .detail-header .detail-group {
+        grid-template-columns: minmax(0, 1fr);
+        column-gap: 0;
+    }
+}
+
+/* Rows. Stash ships these as `display: table` with a 130px table-cell
+   label; as grid items that would shrink-to-fit and the two columns would
+   not line up, so they become grids of their own.
+   Padding is symmetric top and bottom (it was 4.9px above / 7px below,
+   which combined with a 4.9px row margin put 11.9px above every divider
+   and 4.9px below it, so each rule hugged the label under it). The panel's
+   own vertical padding is cut to 0.2rem so the first and last rows keep
+   the same 9.1px inset from the panel edge as before. */
+body.stash-liquid-glass .detail-header .detail-item {
+    display: grid !important;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    column-gap: 0.5rem;
+    align-items: baseline;
+    padding: 0.45rem 0 !important;
+    margin: 0 !important;
+}
+body.stash-liquid-glass .detail-header .detail-item-title {
+    display: block !important;
+    width: auto !important;
+}
+
+/* Border on every row except the first VISUAL row. With two columns that
+   is the first two children, not just the first, and it holds however many
+   fields the record happens to have. */
+body.stash-liquid-glass .detail-header .detail-item:not(:nth-child(-n + 2)) {
     border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+@media (max-width: 1200px) {
+    body.stash-liquid-glass .detail-header .detail-item:nth-child(2) {
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+}
+
+body.stash-liquid-glass .detail-header .detail-item.tags,
+body.stash-liquid-glass .detail-header .detail-item.stash_ids,
+body.stash-liquid-glass .detail-header .detail-item.details,
+body.stash-liquid-glass .detail-header .detail-item.description,
+body.stash-liquid-glass .detail-header .detail-item.aliases,
+body.stash-liquid-glass .detail-header .detail-item.urls {
+    grid-column: 1 / -1;
 }
 
 /* Performer page: keep the header image at a comfortable size when
@@ -1175,6 +1233,7 @@ body.stash-liquid-glass #performer-page .detail-header.collapsed .detail-header-
 
 body.stash-liquid-glass .detail-header .detail-item-title {
     color: var(--text-muted) !important;
+    font-weight: 500 !important;
 }
 
 body.stash-liquid-glass .detail-header .detail-item-value,
@@ -1216,11 +1275,24 @@ body.stash-liquid-glass .details-edit {
     padding-top: 0.85rem !important;
 }
 
+/* The row's spacing comes from `gap` and nothing else. Stash also ships
+   `.details-edit > .btn { margin-right: .5rem }`, and React leaves an
+   empty zero-width <div> in the row, so the measured gaps ran
+   19.6 / 6.3 / 13.3 / 6.4 / 13.3 / 6.0px across seven buttons. */
+body.stash-liquid-glass .details-edit > .btn,
+body.stash-liquid-glass .details-edit .btn {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+}
+body.stash-liquid-glass .details-edit > :empty {
+    display: none !important;
+}
+
 /* All action buttons: uniform glass base */
 body.stash-liquid-glass .details-edit .btn {
     border-radius: var(--radius-sm) !important;
     box-shadow: none !important;
-    font-size: 0.875rem !important;
+    font-size: var(--fs-base) !important;
     padding: 0.35rem 0.85rem !important;
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
@@ -1255,17 +1327,88 @@ body.stash-liquid-glass .details-edit .btn.btn-primary:hover {
     color: #fff !important;
 }
 
-/* Danger (Delete) — orange accent, same treatment as Edit */
+/* Danger (Delete). This previously used the accent tint, identical to
+   Edit and Submit to Stash-Box down to the border colour, so the only
+   thing separating the destructive action from the two primary ones was
+   font-weight 400 vs 600. Given its own red it stays quiet in the row
+   but is no longer mistakable for a primary. Revert to `--accent-tint`
+   if the uniform accent row was the point. */
 body.stash-liquid-glass .details-edit .btn.btn-danger {
-    background: var(--accent-tint) !important;
-    border: 1px solid var(--accent-glow) !important;
-    color: var(--accent-bright) !important;
-    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.2) !important;
+    background: rgba(239, 68, 68, 0.12) !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+    color: #f87171 !important;
+    box-shadow: none !important;
 }
 body.stash-liquid-glass .details-edit .btn.btn-danger:hover {
-    background: rgba(var(--accent-rgb), 0.2) !important;
-    border-color: rgba(var(--accent-rgb), 0.5) !important;
+    background: rgba(239, 68, 68, 0.22) !important;
+    border-color: rgba(239, 68, 68, 0.55) !important;
     color: #fff !important;
+}
+
+/* ── Detail hero: the rest of the rhythm ──────────────────────────────
+
+   Measured on a fully populated performer before these rules existed:
+   the header card sat at x=12 while the tab bar directly under it sat at
+   x=27; the name and the alias line were 1.9px apart; the rank badge was
+   double-spaced because a flex `gap: 8px` and its own `margin-left: 10px`
+   both applied; the tab links had zero gap so the active pill's rounded
+   edge touched the next label; and the tag pills came out at 9.8px next
+   to 14px values.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* Align the header card with the tab bar beneath it. `.full-width`
+   escapes the row gutter that everything below the header sits inside. */
+body.stash-liquid-glass .detail-header.full-width {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+/* Header stack: name, aliases, rating row, panel. The gaps ran
+   1.9 / 5.5 / 8.4px, so the alias line was effectively sitting on the
+   name's descenders. */
+body.stash-liquid-glass .detail-header .alias-head {
+    display: block;
+    margin-top: 0.3rem !important;
+}
+body.stash-liquid-glass .detail-header .quality-group {
+    margin-top: 0.45rem !important;
+}
+
+/* Rank badge: the row already provides the gap. */
+body.stash-liquid-glass .detail-header .hon-battle-rank-badge {
+    margin-left: 0 !important;
+    font-size: var(--fs-base) !important;
+}
+
+/* Tab bar on detail pages: the links were edge to edge, so the active
+   pill's rounded corner butted straight into the next tab's label.
+   `!important` because 07_scene_details.css pins `gap: 0 !important` on
+   bare `.nav-tabs` for the compact sidebar strips. */
+body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs {
+    gap: 0.3rem !important;
+}
+
+/* Tag pills in the meta panel. The chips carried
+   `margin: 0 0.25rem 0.25rem 0`, which left a 3.5px gutter between
+   wrapped rows of 20.7px chips and a phantom 3.5px on the right edge.
+   A flex gap on the list handles both, and lets the chip rule stay
+   purely about the chip. */
+body.stash-liquid-glass .detail-header .detail-item-value.tags > ul,
+body.stash-liquid-glass .detail-header .detail-item-value.tags > ul.pl-0 {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.4rem !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+body.stash-liquid-glass .detail-header .detail-item-value.tags > ul > li {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+body.stash-liquid-glass .detail-header .detail-item-value.tags .tag-item {
+    margin: 0 !important;
 }
 
 /* ───────────────────────────────────────────────────────────────────
