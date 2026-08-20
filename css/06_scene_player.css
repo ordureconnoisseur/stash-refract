@@ -986,3 +986,92 @@ body.stash-liquid-glass .video-js.refract-video-idle .st-player-overlay {
 body.stash-liquid-glass .video-js.refract-video-idle {
     cursor: none !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   The source menu, as two questions
+   Stash flattens a format-by-resolution matrix into one thirteen-row list.
+   Its <li>s stay in the DOM (hidden below) and take every click; these two
+   rows are what you actually read.
+   ═══════════════════════════════════════════════════════════════════════ */
+body.stash-liquid-glass .video-js .vjs-menu-content.refract-src-hidden {
+    display: none !important;
+}
+/* video.js gives `.vjs-menu` height 0 and absolutely positions the <ul>
+   inside it at bottom:1.5em -- so an in-flow replacement drops out of the
+   bottom of the player instead of rising above the control bar. The panel
+   takes the same anchoring the list it replaces had, and the menu is freed
+   from its 10em fixed width and left offset so a two-column panel can sit
+   flush with the button that opened it. */
+body.stash-liquid-glass .video-js .vjs-source-selector .vjs-menu {
+    width: auto;
+    left: auto;
+    right: 0;
+}
+body.stash-liquid-glass .video-js .refract-src {
+    position: absolute;
+    bottom: 1.5em;
+    right: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    min-width: 15rem;
+    text-align: left;
+    border-radius: 0.6rem;
+    background: rgba(12, 12, 16, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+}
+body.stash-liquid-glass .video-js .refract-src-head {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: 0.3rem;
+}
+body.stash-liquid-glass .video-js .refract-src-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+body.stash-liquid-glass .video-js .refract-src-opt,
+body.stash-liquid-glass .video-js .refract-src-direct {
+    appearance: none;
+    flex: 1 1 auto;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    font: inherit;
+    font-size: 0.76rem;
+    line-height: 1.2;
+    text-transform: none;
+    cursor: pointer;
+    transition: background 0.14s ease, border-color 0.14s ease;
+}
+body.stash-liquid-glass .video-js .refract-src-direct {
+    width: 100%;
+    font-weight: 600;
+}
+body.stash-liquid-glass .video-js .refract-src-opt:hover:not([disabled]),
+body.stash-liquid-glass .video-js .refract-src-direct:hover {
+    background: rgba(var(--accent-rgb), 0.22);
+    border-color: rgba(var(--accent-rgb), 0.6);
+}
+body.stash-liquid-glass .video-js .refract-src-opt.is-on,
+body.stash-liquid-glass .video-js .refract-src-direct.is-on {
+    background: rgba(var(--accent-rgb), 0.28);
+    border-color: var(--accent-bright);
+    color: #fff;
+    font-weight: 600;
+}
+body.stash-liquid-glass .video-js .refract-src-opt[disabled] {
+    opacity: 0.35;
+    cursor: default;
+}

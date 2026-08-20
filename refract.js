@@ -7361,6 +7361,144 @@
         try { fn(); } catch (e) { /* swallow — Stash re-renders will trigger another cycle */ }
     }
 
+    /* ── The player's source menu, as two questions ──────────────────────
+       Stash lists every transcode as one flat menu: Direct stream, then MP4,
+       MP4 Standard (480p), MP4 Low (240p), WEBM, WEBM Standard (480p) ... a
+       format-by-resolution MATRIX flattened into thirteen rows, where picking
+       "720p" means scanning for the row that also happens to say the container
+       you are already on. They are two independent choices and they read as
+       two: pick a format, pick a resolution.
+
+       Stash's own <li>s stay in the DOM, untouched and merely hidden, and every
+       click is forwarded to one of them -- so video.js runs its own handler and
+       keeps its own state. Nothing here reimplements playback. */
+    function refractParseSourceLabel(text) {
+        var t = String(text || "").replace(/,\s*selected\s*$/i, "").trim();
+        if (!t) { return null; }
+        if (/^direct\s+stream$/i.test(t)) { return { direct: true, label: t }; }
+        var m = t.match(/^(\S+)\s*(.*)$/);
+        if (!m) { return null; }
+        return { direct: false, format: m[1], res: (m[2] || "").trim() || "Original", label: t };
+    }
+
+    function refractEnhanceSourceMenu() {
+        var host = document.querySelector(".vjs-source-selector");
+        if (!host) { return; }
+        var menu = host.querySelector(".vjs-menu");
+        var list = menu && menu.querySelector(".vjs-menu-content");
+        if (!list) { return; }
+        var items = Array.prototype.slice.call(list.querySelectorAll(".vjs-menu-item"));
+        if (items.length < 3) { return; }
+
+        var parsed = [];
+        items.forEach(function (li) {
+            var p = refractParseSourceLabel(li.textContent);
+            if (p) { p.li = li; p.on = li.classList.contains("vjs-selected"); parsed.push(p); }
+        });
+        var real = parsed.filter(function (p) { return !p.direct; });
+        if (!real.length) { return; }
+
+        /* A signature of the offer, so a re-render only happens when Stash's
+           own menu actually changes (transcode settings, a different file). */
+        var sig = parsed.map(function (p) { return p.label; }).join("|");
+        var panel = host.querySelector(".refract-src");
+        if (panel && panel.getAttribute("data-sig") !== sig) {
+            panel.parentNode.removeChild(panel);
+            panel = null;
+        }
+
+        var formats = [], resolutions = [];
+        real.forEach(function (p) {
+            if (formats.indexOf(p.format) === -1) { formats.push(p.format); }
+            if (resolutions.indexOf(p.res) === -1) { resolutions.push(p.res); }
+        });
+        var cur = parsed.filter(function (p) { return p.on; })[0] || null;
+        var find = function (fmt, res) {
+            for (var i = 0; i < real.length; i++) {
+                if (real[i].format === fmt && real[i].res === res) { return real[i]; }
+            }
+            return null;
+        };
+
+        if (!panel) {
+            panel = document.createElement("div");
+            panel.className = "refract-src";
+            panel.setAttribute("data-sig", sig);
+            var direct = parsed.filter(function (p) { return p.direct; })[0];
+            var html = "";
+            if (direct) {
+                html += '<button type="button" class="refract-src-direct" data-kind="direct">' +
+                    refractFlipEscHtml(direct.label) + "</button>";
+            }
+            html += '<div class="refract-src-group"><div class="refract-src-head">Format</div><div class="refract-src-row">';
+            formats.forEach(function (f) {
+                html += '<button type="button" class="refract-src-opt" data-kind="format" data-v="' +
+                    refractFlipEscHtml(f) + '">' + refractFlipEscHtml(f) + "</button>";
+            });
+            html += "</div></div>";
+            html += '<div class="refract-src-group"><div class="refract-src-head">Resolution</div><div class="refract-src-row">';
+            resolutions.forEach(function (r) {
+                /* "Standard (480p)" reads as its number here, because the
+                   column heading already says what the number is. */
+                var short = (r.match(/\((\d+p)\)/) || [])[1] || r;
+                html += '<button type="button" class="refract-src-opt" data-kind="res" data-v="' +
+                    refractFlipEscHtml(r) + '" title="' + refractFlipEscHtml(r) + '">' +
+                    refractFlipEscHtml(short) + "</button>";
+            });
+            html += "</div></div>";
+            panel.innerHTML = html;
+            menu.appendChild(panel);
+
+            panel.addEventListener("click", function (e) {
+                var b = e.target.closest ? e.target.closest("[data-kind]") : null;
+                if (!b) { return; }
+                e.preventDefault();
+                e.stopPropagation();
+                var kind = b.getAttribute("data-kind");
+                var target = null;
+                if (kind === "direct") {
+                    target = parsed.filter(function (p) { return p.direct; })[0];
+                } else {
+                    /* Hold the other axis. Coming from Direct stream there is
+                       no other axis to hold, so take the first offer -- the
+                       original resolution of the format you asked for. */
+                    var nowFmt = (cur && !cur.direct) ? cur.format : formats[0];
+                    var nowRes = (cur && !cur.direct) ? cur.res : resolutions[0];
+                    if (kind === "format") {
+                        target = find(b.getAttribute("data-v"), nowRes) || find(b.getAttribute("data-v"), resolutions[0]);
+                    } else {
+                        target = find(nowFmt, b.getAttribute("data-v")) || find(formats[0], b.getAttribute("data-v"));
+                    }
+                }
+                if (target && target.li) { target.li.click(); }
+            });
+        }
+
+        /* Marks, every pass: video.js moves `vjs-selected` itself. */
+        var mark = function (sel, val) {
+            Array.prototype.forEach.call(panel.querySelectorAll(sel), function (b) {
+                b.classList.toggle("is-on", b.getAttribute("data-v") === val);
+            });
+        };
+        var d = panel.querySelector(".refract-src-direct");
+        if (d) { d.classList.toggle("is-on", !!(cur && cur.direct)); }
+        mark('[data-kind="format"]', cur && !cur.direct ? cur.format : null);
+        mark('[data-kind="res"]', cur && !cur.direct ? cur.res : null);
+        /* An offer this file does not have is shown as unavailable rather than
+           silently doing nothing. */
+        var heldRes = (cur && !cur.direct) ? cur.res : resolutions[0];
+        var heldFmt = (cur && !cur.direct) ? cur.format : formats[0];
+        Array.prototype.forEach.call(panel.querySelectorAll('[data-kind="format"]'), function (b) {
+            var ok = !!(find(b.getAttribute("data-v"), heldRes) || find(b.getAttribute("data-v"), resolutions[0]));
+            b.disabled = !ok;
+        });
+        Array.prototype.forEach.call(panel.querySelectorAll('[data-kind="res"]'), function (b) {
+            var ok = !!(find(heldFmt, b.getAttribute("data-v")) || find(formats[0], b.getAttribute("data-v")));
+            b.disabled = !ok;
+        });
+        list.classList.add("refract-src-hidden");
+    }
+
     function watchForReinjection() {
         var observer = new MutationObserver(function () {
             /* Disconnect while mutating so our DOM updates do not synchronously re-trigger this observer
@@ -13861,6 +13999,7 @@
             try { relocateTaggerBatchButtons(); } catch (e) {}
             try { injectTaggerSearchClose(); } catch (e) {}
             try { applyScenePlayerFixes(); } catch (e) {}
+            try { refractEnhanceSourceMenu(); } catch (e) {}
             try { injectPluginToggles(); } catch (e) {}
             try { sortPluginList(); } catch (e) {}
             try { makePluginSettingsCollapsible(); } catch (e) {}
