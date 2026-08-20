@@ -1161,6 +1161,7 @@ body.stash-liquid-glass .detail-header .detail-group {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 1.75rem;
+    align-items: start;
     padding: 0.2rem 0.85rem;
     margin: 0.7rem calc(-0.85rem - 1px) 0 !important;
     -webkit-backdrop-filter: var(--glass-blur-md);
@@ -1168,11 +1169,17 @@ body.stash-liquid-glass .detail-header .detail-group {
 }
 
 /* One column once a half-width column can no longer hold a value like
-   "United States of America" on one line. */
+   "United States of America" on one line. The negative side margins go
+   with it: below this width the header is already tight, and the page
+   has a pre-existing horizontal overflow under ~750px that they make
+   25px worse for no benefit (the stagger they fix is barely visible in
+   a single-column panel). */
 @media (max-width: 1200px) {
     body.stash-liquid-glass .detail-header .detail-group {
         grid-template-columns: minmax(0, 1fr);
         column-gap: 0;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 }
 
@@ -1209,12 +1216,24 @@ body.stash-liquid-glass .detail-header .detail-item:not(:nth-child(-n + 2)) {
     }
 }
 
+/* Chip lists and prose set their own row height. Left in a half-width
+   column they make the row track tall and strand whatever short scalar
+   shares the row (measured on a tag page: a 36.6px value sitting in a
+   159.9px track). Matched structurally rather than by field name, because
+   the field set differs per entity type and custom fields are user-defined
+   — `sub_tags` was missed by a hand-written list on the first pass.
+   `:has()` is cheap here: one `.detail-header` per page, ~12 rows. Do not
+   copy this pattern into the card grid, where `:has()` churn is a known
+   scroll-perf problem. */
+body.stash-liquid-glass .detail-header .detail-item:has(ul),
+body.stash-liquid-glass .detail-header .detail-item:has(p),
+body.stash-liquid-glass .detail-header .detail-item:has(.tag-item),
+body.stash-liquid-glass .detail-header .detail-item:has(.stash-id-pill),
 body.stash-liquid-glass .detail-header .detail-item.tags,
 body.stash-liquid-glass .detail-header .detail-item.stash_ids,
 body.stash-liquid-glass .detail-header .detail-item.details,
 body.stash-liquid-glass .detail-header .detail-item.description,
-body.stash-liquid-glass .detail-header .detail-item.aliases,
-body.stash-liquid-glass .detail-header .detail-item.urls {
+body.stash-liquid-glass .detail-header .detail-item.synopsis {
     grid-column: 1 / -1;
 }
 
@@ -1374,9 +1393,15 @@ body.stash-liquid-glass .detail-header .quality-group {
     margin-top: 0.45rem !important;
 }
 
-/* Rank badge: the row already provides the gap. */
+/* Rating row chips. The row already provides the gap, so the rank badge's
+   own margin-left was doubling it (8px gap + 10px margin = 18px at that one
+   joint, 8px everywhere else). Both chips take the same size: header chips
+   sit at --fs-base, panel chips a step down at --fs-sm. */
 body.stash-liquid-glass .detail-header .hon-battle-rank-badge {
     margin-left: 0 !important;
+    font-size: var(--fs-base) !important;
+}
+body.stash-liquid-glass .detail-header .quality-group .adv-rating-btn {
     font-size: var(--fs-base) !important;
 }
 

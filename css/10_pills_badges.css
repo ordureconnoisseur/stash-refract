@@ -137,6 +137,27 @@ body.stash-liquid-glass .detail-item-value.stash-ids li.row {
     max-width: 100%;
 }
 
+/* The pill sets its own size; its two children were inheriting em-derived
+   sizes of 9.52px (the source label) and 9.24px (the uuid) — 0.28px apart,
+   which is noise, not a hierarchy. Both take the pill's size. */
+body.stash-liquid-glass .detail-item-value.stash-ids .stash-id-pill > span,
+body.stash-liquid-glass .detail-item-value.stash-ids .stash-id-pill > a {
+    font-size: 1em !important;
+}
+
+/* A stash ID is one unbreakable 36-character token, so at narrow widths
+   it was setting the width of the whole document: measured 821px of page
+   inside a 700px viewport, with the uuid the widest thing on the page.
+   It wraps now instead of pushing the layout. */
+body.stash-liquid-glass .detail-item-value.stash-ids .stash-id-pill {
+    max-width: 100% !important;
+    flex-wrap: wrap !important;
+}
+body.stash-liquid-glass .detail-item-value.stash-ids .stash-id-pill > a {
+    overflow-wrap: anywhere !important;
+    min-width: 0 !important;
+}
+
 /* ── Scene Tagger search results ─────────────────────────────────────── */
 body.stash-liquid-glass .search-result {
     background: var(--glass-bg);
