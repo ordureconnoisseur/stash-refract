@@ -4426,7 +4426,12 @@ body.stash-liquid-glass .slick-arrow.slick-disabled {
    in lite mode). Edit mode disables this so drag-reorder stays live. */
 body.stash-liquid-glass .recommendation-row {
     content-visibility: auto;
-    contain-intrinsic-size: auto 400px;
+    /* Was `auto 400px`, a single value applying to both axes and wrong
+       for every row: real settled heights are 276.67 / 509.80 / 510.80px,
+       so it under-reserved the performer rows by ~110px and over-reserved
+       the scene row by 123px. On a cold load .slick-list measured 409px
+       with zero cards, collapsing to 223.88px once painted. */
+    contain-intrinsic-size: auto none auto 500px;
 }
 body.stash-liquid-glass .recommendations-container-edit .recommendation-row {
     content-visibility: visible;

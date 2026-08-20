@@ -30,7 +30,16 @@ body.stash-liquid-glass .grid-card {
        off-screen. `contain-intrinsic-size: auto 320px` lets the browser
        remember the last-rendered size so scroll position stays stable. */
     content-visibility: auto;
-    contain-intrinsic-size: auto 320px;
+    /* Two values, not one. A single length applies to BOTH axes, so an
+       un-rendered card was a 320x320 SQUARE placeholder rather than its
+       real landscape shape. Measured on /scenes at t=2s against t=4s:
+       4 columns of 340x322 became 5 columns of 302x176, the outer page
+       margin went 97.5px -> 17.03px, and the document halved from 3533
+       to 1712px. Every page load laid the grid out wrong and then
+       reflowed it. The width is fluid (JS-computed per zoom level) so
+       `auto` keeps the remembered value; only the height needs a
+       sensible first guess. */
+    contain-intrinsic-size: auto none auto 200px;
     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.2s ease;
     position: relative;
 }
@@ -953,7 +962,14 @@ body.stash-liquid-glass .row:has(> .performer-card) {
    tint so it reads as "lit" instead of "black". */
 body.stash-liquid-glass.refract-flourish-tiers .performer-card[class*="refract-card-tier-"],
 body.stash-liquid-glass.refract-flourish-tiers .scene-card[class*="refract-card-tier-"] {
-    border: 0 !important;
+    /* Transparent, not removed. Dropping the 1px border outright changed
+       the card's inner box, so in a row mixing tiered and untiered cards
+       every element inside shifted by 1px -- thumbnail 250.16 against
+       248.16, the favourite heart at 15.39 against 16.39, the name
+       baseline at 26.25 against 27.25 -- and the heart, name and chip
+       row visibly zigzagged across the row. Keeping the border and
+       making it transparent preserves the box. */
+    border: 1px solid transparent !important;
     outline: 0 !important;
     contain: none !important;
     background:

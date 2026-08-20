@@ -108,6 +108,19 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .refract-pc-nam
     margin: 0 !important;
     flex-shrink: 0 !important;
 }
+/* Reserve the slot whether or not there is an icon to put in it. Five of
+   forty performers have no gender set and get no icon injected, so their
+   names started at 10.50px from the card edge while their neighbours
+   started at 35.98px -- a 25.48px stagger reading down a column, with
+   several names sitting hard against the card edge. The banner's own
+   flex gap cannot fix this: with no icon there is no second child for
+   the gap to sit between. */
+body.stash-liquid-glass.refract-perf-layout-card .performer-card .refract-pc-name-banner:not(:has(> .gender-icon))::before {
+    content: "";
+    display: block;
+    width: 1.35rem;
+    flex: 0 0 auto;
+}
 
 /* ── Favourite heart — large, anchored under the diagonal tier ribbon ─
    In playing-card mode, blow up the favourite heart so it acts as a

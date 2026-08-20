@@ -7372,6 +7372,50 @@
        Stash's own <li>s stay in the DOM, untouched and merely hidden, and every
        click is forwarded to one of them -- so video.js runs its own handler and
        keeps its own state. Nothing here reimplements playback. */
+    /* VR projection. Stash ships the machinery (videojs-vr, wired up in
+       vrmode.ts) but only ever shows its menu button when the scene carries
+       the tag named by the "VR Tag" setting under Settings > Interface >
+       Scene Player:
+
+           showButton = scene.tags.some(tag => vrTag === tag.name)
+
+       With that setting empty -- the default -- `showButton` is false for
+       every scene and Stash calls removeButton(), so the control simply is
+       not there. Nothing in refract was hiding it.
+
+       The plugin itself is imported unconditionally, so the projection API is
+       live on any scene whether or not the tag is set. These options drive it
+       directly, which puts VR back on every scene and puts it where the rest
+       of the playback choices already live rather than as a separate button.
+       Labels and projection strings match vrmode.ts exactly. */
+    var REFRACT_VR_MODES = [
+        { v: "NONE",   label: "Off" },
+        { v: "180_LR", label: "180 LR" },
+        { v: "360_TB", label: "360 TB" },
+        { v: "360",    label: "360 Mono" }
+    ];
+    var refractVrProjection = "NONE";
+
+    function refractVrPlugin() {
+        /* `window.videojs` is not exposed by Stash, but video.js leaves a
+           back-reference to the player on its own root element. */
+        var el = document.querySelector(".video-js");
+        if (!el || !el.player || typeof el.player.vr !== "function") { return null; }
+        try { return el.player.vr(); } catch (e) { return null; }
+    }
+
+    function refractApplyVr(projection) {
+        var vr = refractVrPlugin();
+        if (!vr || typeof vr.setProjection !== "function") { return false; }
+        try {
+            /* Same two calls, in the same order, as vrmode.ts loadVR(). */
+            vr.setProjection(projection);
+            if (typeof vr.init === "function") { vr.init(); }
+            refractVrProjection = projection;
+            return true;
+        } catch (e) { return false; }
+    }
+
     function refractParseSourceLabel(text) {
         var t = String(text || "").replace(/,\s*selected\s*$/i, "").trim();
         if (!t) { return null; }
@@ -7446,6 +7490,14 @@
                     refractFlipEscHtml(short) + "</button>";
             });
             html += "</div></div>";
+            if (refractVrPlugin()) {
+                html += '<div class="refract-src-group"><div class="refract-src-head">Projection</div><div class="refract-src-row">';
+                REFRACT_VR_MODES.forEach(function (m) {
+                    html += '<button type="button" class="refract-src-opt" data-kind="vr" data-v="' +
+                        refractFlipEscHtml(m.v) + '">' + refractFlipEscHtml(m.label) + "</button>";
+                });
+                html += "</div></div>";
+            }
             panel.innerHTML = html;
             menu.appendChild(panel);
 
@@ -7456,6 +7508,15 @@
                 e.stopPropagation();
                 var kind = b.getAttribute("data-kind");
                 var target = null;
+                if (kind === "vr") {
+                    /* Projection is not a source, so it never forwards a click
+                       into Stash's hidden <li> list. */
+                    refractApplyVr(b.getAttribute("data-v"));
+                    Array.prototype.forEach.call(panel.querySelectorAll('[data-kind="vr"]'), function (o) {
+                        o.classList.toggle("is-on", o.getAttribute("data-v") === refractVrProjection);
+                    });
+                    return;
+                }
                 if (kind === "direct") {
                     target = parsed.filter(function (p) { return p.direct; })[0];
                 } else {
@@ -7482,6 +7543,7 @@
         };
         var d = panel.querySelector(".refract-src-direct");
         if (d) { d.classList.toggle("is-on", !!(cur && cur.direct)); }
+        mark('[data-kind="vr"]', refractVrProjection);
         mark('[data-kind="format"]', cur && !cur.direct ? cur.format : null);
         mark('[data-kind="res"]', cur && !cur.direct ? cur.res : null);
         /* An offer this file does not have is shown as unavailable rather than

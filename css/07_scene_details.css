@@ -439,6 +439,15 @@ body.stash-liquid-glass:has(.main.container-fluid > .row > .gallery-container) .
    is critical — without it CSS Grid items default to intrinsic content
    height and break the parent's overflow:hidden clipping. width/max-width
    defeat Stash's Bootstrap col-style 50%-width rules on the container. */
+/* The container still fills its track; the details panel is sized by its
+   own content and capped, rather than forced to the full track height.
+   It was a fixed 890px slab whose content ended at 356.58 -- 619.67px,
+   69.6% of the panel, was empty glass. `max-height` keeps the internal
+   scroll for galleries whose details actually are long. */
+body.stash-liquid-glass .gallery-tabs {
+    height: auto !important;
+    max-height: 100% !important;
+}
 body.stash-liquid-glass .gallery-tabs,
 body.stash-liquid-glass .gallery-container {
     height: 100% !important;
@@ -454,6 +463,13 @@ body.stash-liquid-glass .gallery-container {
     overflow-x: hidden !important;
     scrollbar-width: thin !important;
     scrollbar-color: var(--glass-border) transparent !important;
+}
+
+/* Re-asserted after the shared rule above, which sets `height: 100%` for
+   both panels. */
+body.stash-liquid-glass .main.container-fluid > .row:has(> .gallery-container) > .gallery-tabs {
+    height: auto !important;
+    align-self: start !important;
 }
 body.stash-liquid-glass .gallery-tabs::-webkit-scrollbar,
 body.stash-liquid-glass .gallery-container::-webkit-scrollbar {

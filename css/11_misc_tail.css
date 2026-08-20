@@ -781,7 +781,12 @@ body.stash-liquid-glass .Lightbox-footer-center > .image-gallery-link {
     justify-self: start !important;
 }
 body.stash-liquid-glass .Lightbox-footer-center > .refract-lb-count {
-    grid-column: 1 / -1 !important;
+    /* Column 1, not the full width. Spanning both columns and centring
+       in the span put "3 / 40" at x 806.99 while the filename it
+       captions centred at 756.88 -- 50.11px adrift, reading as a stray
+       label rather than a caption. Column 1 holds the filename, so
+       centring within it lines the two up. */
+    grid-column: 1 !important;
     grid-row: 2 !important;
     justify-self: center !important;
 }

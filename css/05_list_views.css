@@ -48,8 +48,35 @@ body.stash-liquid-glass .table-list thead tr:first-child th:first-child {
 body.stash-liquid-glass .table-list thead tr:first-child th:last-child {
     border-top-right-radius: var(--radius) !important;
 }
+/* Sticky column headers. `thead th` was `position: static`, so on a
+   40-row table the column labels were gone after about two rows of
+   scrolling and there was no way to tell Duration from Rating without
+   scrolling back up. Offset clears the sticky filter toolbar above it
+   (which pins at 74.2px and stands ~41px tall).
+   The background moves onto the th because a sticky cell paints its own
+   background -- a transparent one would let rows scroll through it. */
+/* The `<table>` carries `overflow: hidden`, which makes IT the sticky
+   containing block for anything inside it. The scroller is the
+   `.table-list` wrapper one level up, so the header stuck to a box that
+   scrolls away with the rows and the column labels vanished after about
+   two rows. `thead` was already `position: sticky` -- the feature was
+   intended all along and silently defeated by this one property. */
+body.stash-liquid-glass .table-list > table {
+    overflow: visible !important;
+}
 body.stash-liquid-glass .table-list thead th {
-    background: transparent !important;
+    position: sticky !important;
+    /* `top: 0`, not an offset tracking the page toolbar: the list view
+       does not scroll the window at all. `.table-list` is its own
+       scrollport (measured scrollHeight 2948 against clientHeight 788),
+       so the header's containing scroller is the table itself. */
+    top: 0 !important;
+    z-index: 3 !important;
+}
+body.stash-liquid-glass .table-list thead th {
+    background: var(--glass-bg-strong) !important;
+    -webkit-backdrop-filter: var(--glass-blur-md);
+    backdrop-filter: var(--glass-blur-md);
     color: var(--text-muted) !important;
     font-size: var(--fs-xs);
     font-weight: 600;

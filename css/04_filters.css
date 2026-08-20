@@ -1371,7 +1371,13 @@ body.stash-liquid-glass span.paginationIndex.refract-scene-stats > .refract-stat
 body.stash-liquid-glass .pagination-index-container > .pagination {
     display: none !important;
 }
-@media (min-width: 768px) {
+/* 901, not 768. 12_mobile.css makes the toolbar full-bleed at <=900px,
+   but this top-right caption pin was gated at >=768px, so between 768 and
+   900 both applied and `.pagination-index-container`'s -0.85rem margin
+   pulled the caption up under the toolbar's sticky glass: 7.71px of a
+   12.36px caption covered, 62.4%, with elementFromPoint returning the
+   toolbar. */
+@media (min-width: 901px) {
     body.stash-liquid-glass.stash-route-scenes .sidebar-pane-content > .pagination-index-container {
         /* refract.js's floating-pager logic tags THIS container
            data-pager-row="hide" (rowOf() resolves the top pager's wrapper
