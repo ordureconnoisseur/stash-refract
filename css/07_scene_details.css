@@ -2254,28 +2254,46 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     font-weight: 600 !important;
 }
 
-/* ── Tags take the reclaimed space ────────────────────────────────── */
+/* ── Tags ─────────────────────────────────────────────────────────── */
+/* Outline chips: uncapped, and lighter than the state chips above so the
+   two read as different kinds of object. Still not right -- 3.8 to a row
+   over 9 rows -- and the next design pass owns it. A flowed keyword line
+   was tried and abandoned: the list's own flex/centring rules fight an
+   inline layout and every tag landed on its own centred line. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list {
     max-height: none !important;
     min-height: 0 !important;
-    gap: 5px !important;
-    margin: 0.55rem 0 0 0 !important;
+    gap: 4px !important;
+    margin: 0.4rem 0 0 0 !important;
+    padding: 0 !important;
     overflow-y: visible !important;
     -webkit-mask-image: none !important;
             mask-image: none !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.tag-link.badge.badge-secondary {
-    font-size: 12px !important;
+    font-size: 11px !important;
     font-weight: 500 !important;
+    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.62) !important;
+    transition: color 0.14s ease, border-color 0.14s ease, background 0.14s ease !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.tag-link.badge a {
-    padding: 4px 9px !important;
+    padding: 2px 7px !important;
+    color: inherit !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.tag-link.badge:hover,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.tag-link.badge:hover a {
+    background: var(--accent-tint) !important;
+    border-color: rgba(var(--accent-rgb), 0.4) !important;
+    color: var(--accent-light) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
     font-size: var(--sp-label) !important;
     font-weight: 700 !important;
     letter-spacing: 0.1em !important;
-    margin: 1rem 0 0 0 !important;
+    color: rgba(255, 255, 255, 0.38) !important;
+    margin: 1.25rem 0 0 0 !important;
 }
 
 /* ── Tab strip — same six destinations, one step larger ───────────── */
