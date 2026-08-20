@@ -1975,11 +1975,12 @@ body.stash-liquid-glass .refract-cc-ring {
     background: rgba(var(--accent-rgb), 0.1);
     pointer-events: none;
 }
-/* Focus on a band: the same dashed ring the hover draws, as an outline, so a
-   keyboard user sees which band is armed. */
+/* Focus on a band. SOLID, where the armed ring is dashed: focusing also arms
+   the band, so a dashed focus outline drew a second dashed accent rectangle
+   concentric with the first and the two read as one muddled intent. */
 body.stash-liquid-glass .refract-cc-hit:focus-visible {
-    outline: 1.5px dashed rgba(var(--accent-rgb), 0.85);
-    outline-offset: -3px;
+    outline: 2px solid var(--accent-bright);
+    outline-offset: -2px;
     border-radius: 9px;
 }
 /* The intro: one pulse per band, staggered from the JS, then gone. The
@@ -2475,7 +2476,7 @@ body.stash-liquid-glass .refract-cc-preset-grid.refract-cc-preset-back {
        dead air. One fixed width also guarantees the thing that matters most
        here: three back looks and four performer looks draw at the SAME
        scale, because they are the same component. */
-    grid-template-columns: repeat(auto-fit, 150px);
+    grid-template-columns: repeat(auto-fit, 162px);
     justify-content: start;
     max-width: 720px;
 }
@@ -2784,6 +2785,17 @@ body.stash-liquid-glass .refract-cc-cardbox {
     display: inline-flex;
 }
 
+/* The flip button belongs to the Refract performer layout: all of its
+   styling is scoped to `.refract-perf-layout-card`, so under Classic the
+   injected node survives with NO rules at all and lands in the card's flow as
+   a 262x252 near-white slab taller than the card itself. The real grid never
+   shows this (Classic cards get no flip button injected); only the preview,
+   whose card outlives the style switch. Hide it wherever the layout that owns
+   it is off. */
+body.stash-liquid-glass:not(.refract-perf-layout-card) .refract-cc-cardbox .refract-card-flip-btn {
+    display: none !important;
+}
+
 /* The preview's face control lives in the tab strip (.refract-cc-face) as a
    Front|Back segment nested after "Performer card". It was a button in the
    rail beside Shuffle, which read as an action or a third card; before that it
@@ -3081,6 +3093,28 @@ body.stash-liquid-glass .refract-cc-ring-tray {
     width: auto;
     height: 29.7%;
 }
+/* CLASSIC scene card only (Refract's short chin is tuned separately). Its
+   card is 440x416 and its bottom-right chips configure elements that sit in
+   two different places: the duration/resolution specs ride the IMAGE overlay,
+   while the o-count and tag pills sit in the chin. The ring reached only the
+   chin, so the spotlight dimmed two of the four things the tray was editing.
+
+   Anchored in PIXELS, not percent, and this is the whole point: a Classic
+   card's height follows its description, so the same percentage lands in a
+   different place on every scene. The image does not move -- it is 16:9 of
+   the stage's pinned 440px card, so its underside is always ~248px down.
+   Start just above that and run to the card's foot. */
+body.stash-liquid-glass:not(.refract-minimal-cards) .refract-preview-kind-scene .refract-cc-hit-br {
+    top: 210px;
+    bottom: 0;
+    height: auto;
+}
+body.stash-liquid-glass:not(.refract-minimal-cards) .refract-preview-kind-scene .refract-cc-ring-br {
+    top: 216px;
+    bottom: 4px;
+    height: auto;
+}
+
 /* The dossier's two switchable panels: the media strip band and the
    collector footer band, measured off the built card (header ~10%, hero to
    ~28%, ratings to ~66%, media ~66-86%, foot ~86-100%). */

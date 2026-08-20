@@ -1398,7 +1398,7 @@
                 /* A performer card's top-left holds nothing toggleable now that
                    the no-op rating is gone, and ringing an empty corner
                    promises a control that never appears. */
-                var chips = zone ? zoneChips(zone) : [];
+
                 /* One new zone the front never needed: the image itself. It is
                    the only element on the back that is a CHOICE rather than a
                    toggle, so its chips behave as a radio row. */
@@ -1424,6 +1424,16 @@
                            nothing -- the top-left offered no chips at all. */
                         ? ["tl", "tr", "bottom"]
                         : ["tl", "tr", "bl", "br"]);
+                /* Built ONCE per zone, then used twice: to drop bands that
+                   have nothing to offer, and to render the armed one. A zone
+                   whose chips all gate away (the performer card's top-left
+                   under the Classic layout) used to keep a tabbable hit that
+                   announced "show its controls" and then showed none -- the
+                   no-op Rating chip's defect, one level up. */
+                var zoneChipMap = {};
+                zones.forEach(function (z) { zoneChipMap[z] = zoneChips(z); });
+                zones = zones.filter(function (z) { return zoneChipMap[z].length > 0; });
+                var chips = (zone && zoneChipMap[zone]) ? zoneChipMap[zone] : [];
                 /* Hover is the fast path; focus, Enter/Space and a tap all
                    LATCH the band (holdZone, no grace period), so the editor
                    works without a pointer that hovers. */
