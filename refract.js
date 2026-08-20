@@ -1913,7 +1913,12 @@
                         className: "refract-cc-pill-hit" + (open ? " is-open" : ""),
                         style: { left: b.left + "px", top: b.top + "px", width: b.width + "px", height: b.height + "px" },
                         title: open ? "Close" : "Change what this shows",
-                        "aria-label": "Slot " + (i + 1) + " of " + pillsLive.length + ": change what it shows",
+                        /* "of" counts the SLOTS, not the ones that happen to
+                           be drawn: with a stat this performer lacks in the
+                           middle, five drawn cells announced themselves as
+                           "Slot 6 of 5". */
+                        "aria-label": "Slot " + (i + 1) + " of " + slotApi(pillFace).list.length
+                            + ": change what it shows",
                         "aria-expanded": open ? "true" : "false",
                         onMouseEnter: function () { holdZone(z0); pillHoverState[1](di); },
                         onMouseLeave: function () { pillHoverState[1](null); },

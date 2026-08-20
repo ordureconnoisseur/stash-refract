@@ -1867,6 +1867,10 @@ body.stash-liquid-glass .refract-cb-foot {
     border-top: 1px solid rgba(255, 255, 255, 0.10);
 }
 body.stash-liquid-glass .refract-cb-foot:empty { display: none; }
+/* A footer slot whose stat this performer does not have. Emitted and hidden
+   rather than skipped, exactly as an empty stat pill is, so that the slot
+   numbering the customiser reads off the card survives a gap in the middle. */
+body.stash-liquid-glass .refract-cb-foot-empty { display: none !important; }
 body.stash-liquid-glass .refract-cb-foot-item {
     display: inline-flex;
     align-items: baseline;
