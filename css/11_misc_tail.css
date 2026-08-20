@@ -3044,10 +3044,35 @@ body.stash-liquid-glass.refract-sc-studio-text .scene-card .studio-overlay {
 /* The title is an ANONYMOUS flex item once a span is put beside it inside the
    flex `h5`, and an anonymous item cannot be given a min-width, so the studio
    name starved it down to a single ellipsis ("GIRLCUM ...") on the preview
-   card. Blocking the heading lets the two flow as one line and the existing
-   ellipsis truncates the whole string, which is what "STUDIO - title" wants. */
+   card. Blocking the heading lets the two flow as one line and the heading's
+   own ellipsis truncates the whole string, which is what "STUDIO - title"
+   wants.
+
+   `!important` throughout, and this is the load-bearing part. The chin's
+   one-line clamp sets `display: -webkit-box !important` with
+   `-webkit-box-orient: vertical` on the same heading, so a plain
+   `display: block` lost to it -- and in a VERTICAL webkit-box the studio span
+   and the title are two children, which means two stacked rows. That is
+   exactly what it drew: the studio and its separator alone on one line, the
+   title dropped underneath. The clamp has to go with the box it belongs to,
+   and single-line truncation is done the ordinary way instead. */
 body.stash-liquid-glass.refract-sc-studio-text .scene-card h5.card-section-title {
-    display: block;
+    display: block !important;
+    -webkit-line-clamp: none !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-height: 0 !important;
+}
+/* Stash wraps the title text in a `.TruncatedText` div, which is a block (and
+   carries its own inline `-webkit-line-clamp`), so even on a blocked heading
+   it would start a new line of its own. Inline, it flows straight on from the
+   separator, and the heading above does the truncating for both. */
+body.stash-liquid-glass.refract-sc-studio-text .scene-card h5.card-section-title .TruncatedText {
+    display: inline !important;
+    -webkit-line-clamp: none !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
 }
 body.stash-liquid-glass .refract-sc-studio-name {
     font-weight: 700;
