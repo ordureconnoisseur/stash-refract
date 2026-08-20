@@ -506,22 +506,33 @@
                 var measure = function () {
                     if (!live) { return; }
                     var want = [], laidOut = false;
-                    if (zone === "bottom") {
+                    var mFace = stripFaceOf(zone);
+                    if (mFace) {
                         var box = document.querySelector("#plugin-refract-card-preview .refract-cc-cardbox");
                         /* Which strip is DRAWN, rather than which one the state
                            says should be: both faces are laid out at once (the
                            front strip keeps its box while the back is showing),
                            so the card's own class is the honest answer. */
                         var showBack = !!(box && box.querySelector(".performer-card.refract-show-back"));
-                        var strip = box && ((showBack && box.querySelector(".refract-card-back .refract-mb-stats"))
-                            || box.querySelector(".stash-perf-stats:not(.refract-mb-stats)"));
+                        var strip = box && (mFace === "foot"
+                            ? box.querySelector(".refract-card-back .refract-cb-foot")
+                            : ((showBack && box.querySelector(".refract-card-back .refract-mb-stats"))
+                                || box.querySelector(".stash-perf-stats:not(.refract-mb-stats)")));
                         if (strip && strip.children.length) {
                             var br = box.getBoundingClientRect();
-                            Array.prototype.forEach.call(strip.children, function (n) {
+                            Array.prototype.forEach.call(strip.children, function (n, di) {
                                 var r = n.getBoundingClientRect();
                                 if (!r.width || !r.height) { return; }
                                 laidOut = true;
+                                /* The SLOT this cell belongs to, off the cell.
+                                   An empty stat is drawn and hidden, so counting
+                                   the visible cells numbered a shorter list and
+                                   every slot after a gap was off by one -- on a
+                                   performer with no height, clicking the second
+                                   visible pill opened the third slot's menu. */
+                                var di2 = parseInt(n.getAttribute("data-i"), 10);
                                 want.push({
+                                    i: isNaN(di2) ? di : di2,
                                     left: Math.round(r.left - br.left),
                                     top: Math.round(r.top - br.top),
                                     width: Math.round(r.width),
@@ -815,6 +826,17 @@
                 dropBuiltBacks();
                 backPillsState[1](list);
             }
+            /* The dossier's footer, the third strip. Same storage shape, same
+               rebuild: the back is a template, so a changed list means a new
+               back rather than a patched one. */
+            var footPillsState = R.useState(footPillsPref);
+            var footPills = footPillsState[0];
+            function writeFootPills(list) {
+                try { localStorage.setItem(FOOT_PILLS_KEY, list.join(",")); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                dropBuiltBacks();
+                footPillsState[1](list);
+            }
             /* The FRONT's slot list, same shape. Cards are rebuilt by removing
                their marker so initPerformerCards runs again on them. */
             var frontPillsState = R.useState(frontPillsPref);
@@ -856,14 +878,24 @@
             /* One editor for both strips. `face` picks the list, the catalogue,
                the writer and the cap; everything else is identical, which is
                the point -- the two strips are the same component. */
+            /* Three strips, one machine. The dossier's footer joined last and
+               was the reason to stop writing `face === "back" ? a : b`. */
             function slotApi(face) {
-                var back = face === "back";
+                if (face === "foot") {
+                    return {
+                        list: footPills, cat: BACK_STATS, def: backStatDef,
+                        max: FOOT_PILLS_MAX, write: writeFootPills
+                    };
+                }
+                if (face === "back") {
+                    return {
+                        list: backPills, cat: BACK_STATS, def: backStatDef,
+                        max: BACK_PILLS_MAX, write: writeBackPills
+                    };
+                }
                 return {
-                    list: back ? backPills : frontPills,
-                    cat: back ? BACK_STATS : FRONT_STATS,
-                    def: back ? backStatDef : frontStatDef,
-                    max: back ? BACK_PILLS_MAX : FRONT_PILLS_MAX,
-                    write: back ? writeBackPills : writeFrontPills
+                    list: frontPills, cat: FRONT_STATS, def: frontStatDef,
+                    max: FRONT_PILLS_MAX, write: writeFrontPills
                 };
             }
             function setPillAt(face, i, key) {
@@ -1658,7 +1690,7 @@
                    the back's band used to return slot chips and NOTHING else,
                    so the one thing you could not do to the back's strip was
                    turn it off. */
-                if (editingBack && z === "bottom" && pillMenu !== null) { return slotChips("back"); }
+                if (editingBack && z === "bottom" && pillMenu !== null && stripFaceOf(z)) { return slotChips("back"); }
                 var chips = elemsInZone(z).map(function (d) {
                     var st = elemState(d) || { blocked: false };
                     var shown = !cardElems[d.key];
@@ -1710,24 +1742,47 @@
                    per slot -- and no slots offered once the strip is off,
                    because a list of what a hidden strip would carry is a
                    control that cannot be seen to work. */
-                if (editingBack && z === "bottom" && !cardElems["refract.mbHideStats"]) {
+                if (editingBack && z === "bottom" && stripFaceOf(z)) {
                     chips = chips.concat(slotChips("back"));
                 }
                 /* The dossier's hero row holds the visible copy of the back's
                    picture, so the picture's source is asked here -- the panel's
                    own switch first, then which photo it shows. */
                 if (z === "dhero") { chips = chips.concat(backSrcChips()); }
+                /* And its footer is a strip like the other two: the panel's own
+                   switch, then Add. Each item on the card is its own control,
+                   the same as every pill. */
+                if (z === "dfoot" && stripFaceOf(z)) {
+                    if (pillMenu !== null) { return slotChips("foot"); }
+                    chips = chips.concat(slotChips("foot"));
+                }
                 return chips;
             }
             /* Can a pill on the drawn strip be edited? The back's strip always
                can (its band only exists on the gallery/mirror looks); the
                front's needs the Refract layout and a shown strip. Both the hit
                targets and the rail's hint read this, so they cannot disagree. */
-            function pillStripEditable() {
-                if (editingBack) { return true; }
-                return previewKind === "performer" && perfCardStyle === "refract"
-                    && !cardElems["refract.pcHideStats"];
+            /* WHICH STRIP a band edits, or null. One question asked once,
+               because there are three strips now and every place that used to
+               test `zone === "bottom"` had its own idea of which one that was.
+               A strip that is switched off is not editable: a list of what a
+               hidden strip would carry is a control you cannot see work. */
+            function stripFaceOf(z) {
+                if (z === "bottom") {
+                    if (editingBack) {
+                        return (backStyle === "dossier" || cardElems["refract.mbHideStats"])
+                            ? null : "back";
+                    }
+                    return (previewKind === "performer" && perfCardStyle === "refract"
+                        && !cardElems["refract.pcHideStats"]) ? "front" : null;
+                }
+                if (z === "dfoot") {
+                    return (editingBack && backStyle === "dossier"
+                        && !cardElems["refract.cbHideFoot"]) ? "foot" : null;
+                }
+                return null;
             }
+            function pillStripEditable() { return !!stripFaceOf(zone); }
             function cornerLayer() {
                 /* A performer card's top-left holds nothing toggleable now that
                    the no-op rating is gone, and ringing an empty corner
@@ -1787,7 +1842,7 @@
                        filter has already dropped it -- the first attempt at
                        this fix deadlocked on exactly that. Editability is the
                        honest test and needs no measurement. */
-                    if (z === "bottom" && pillStripEditable()) { return true; }
+                    if (stripFaceOf(z)) { return true; }
                     return zoneChipMap[z].length > 0;
                 });
                 var chips = (zone && zoneChipMap[zone]) ? zoneChipMap[zone] : [];
@@ -1843,20 +1898,26 @@
                    plain stat text -- tabbable, ringed on hover, and opening
                    nothing, because the menu is Refract-layout only. */
                 var z0 = zone;
-                var pillsLive = zone === "bottom" && pillStripEditable() ? pillBoxes : [];
-                var pillHits = pillsLive.map(function (b, i) {
+                var pillFace = stripFaceOf(zone);
+                var pillsLive = pillFace ? pillBoxes : [];
+                var pillHits = pillsLive.map(function (b, di) {
+                    /* `b.i` is the SLOT; `di` is merely where it happens to be
+                       drawn. They differ whenever a stat this performer lacks
+                       leaves a gap in the middle of the strip. */
+                    var i = (b.i === undefined) ? di : b.i;
                     var open = pillMenu === i;
+                    var z0 = zone;
                     return R.createElement("button", {
                         key: "__pill" + i,
                         type: "button",
                         className: "refract-cc-pill-hit" + (open ? " is-open" : ""),
                         style: { left: b.left + "px", top: b.top + "px", width: b.width + "px", height: b.height + "px" },
-                        title: open ? "Close" : "Change what this pill shows",
-                        "aria-label": "Pill " + (i + 1) + " of " + pillBoxes.length + ": change what it shows",
+                        title: open ? "Close" : "Change what this shows",
+                        "aria-label": "Slot " + (i + 1) + " of " + pillsLive.length + ": change what it shows",
                         "aria-expanded": open ? "true" : "false",
-                        onMouseEnter: function () { holdZone("bottom"); pillHoverState[1](i); },
+                        onMouseEnter: function () { holdZone(z0); pillHoverState[1](di); },
                         onMouseLeave: function () { pillHoverState[1](null); },
-                        onFocus: function () { holdZone("bottom"); pillHoverState[1](i); },
+                        onFocus: function () { holdZone(z0); pillHoverState[1](di); },
                         onBlur: function () { pillHoverState[1](null); },
                         onClick: function (e) {
                             e.preventDefault(); e.stopPropagation();
@@ -3414,6 +3475,26 @@
     ];
     var BACK_PILLS_DEFAULT = ["rating", "height", "career", "scenes"];
 
+    /* The dossier's collector footer, which was a hardcoded list of six in a
+       hardcoded order -- built by a different hand from the two stat strips
+       and therefore a different KIND of thing to the reader, though it is a
+       row of stats like the others. Same catalogue, same slots, same machine.
+       The default is exactly what it drew before, so nobody's card moves. */
+    var FOOT_PILLS_KEY = "refract.cbFoot";
+    var FOOT_PILLS_MAX = 6;
+    var FOOT_PILLS_DEFAULT = ["scenes", "o", "measure", "height", "weight", "career"];
+    function footPillsPref() {
+        var raw;
+        try { raw = localStorage.getItem(FOOT_PILLS_KEY); } catch (e) { raw = null; }
+        if (raw == null) { return FOOT_PILLS_DEFAULT.slice(); }
+        var out = [];
+        String(raw).split(",").forEach(function (k) {
+            k = k.trim();
+            if (k && backStatDef(k) && out.indexOf(k) === -1) { out.push(k); }
+        });
+        return out.slice(0, FOOT_PILLS_MAX);
+    }
+
     /* The FRONT strip is a slot list too. It was a fixed four (rating, age,
        o-count, scenes) behind one on/off chip, while the back's was editable
        per pill -- the inconsistency was the complaint. Same catalogue as the
@@ -3529,7 +3610,7 @@
     var CARD_SIDE_KEYS = CARD_ELEMS.filter(function (d) { return d.sideKey; })
         .map(function (d) { return d.sideKey; })
         .concat([TIER_LAYER_KEY, STUDIO_MODE_KEY, BACK_SRC_KEY, BACK_PILLS_KEY, FRONT_PILLS_KEY,
-            BACK_STYLE_KEY, TRAY_KEY, TRAY_PHOTOS_KEY, TRAY_ROWS_KEY,
+            FOOT_PILLS_KEY, BACK_STYLE_KEY, TRAY_KEY, TRAY_PHOTOS_KEY, TRAY_ROWS_KEY,
             RATING_DISP_KEY, CARD_BACK_EXPLICIT_KEY]);
     /* What "Reset card customiser" clears: every element, side and back key.
        Not the flourish, the card styles, the popover or the rating system --
@@ -6781,11 +6862,17 @@
        then value. The icon is not decoration -- the pill is a two-column grid
        and the icon holds column 1, so a pill without one leaves that column
        empty and pushes the number off its centre. */
-    function refractMirrorPill(key) {
+    /* `data-i` is the SLOT this pill belongs to, and it is load-bearing. A
+       pill with no value is hidden outright (`.refract-mb-empty`), so the
+       customiser measuring the DRAWN pills and numbering them 0,1,2 was
+       numbering a shorter list: on a performer with no height, clicking the
+       second visible pill opened the menu for the third slot. The index comes
+       off the pill itself now, so a gap in the middle costs nothing. */
+    function refractMirrorPill(key, i) {
         var d = backStatDef(key);
         if (!d) { return ""; }
         return '<span class="stash-perf-' + key + ' refract-mb-p refract-mb-p-' + key +
-            ' refract-mb-empty">' +
+            ' refract-mb-empty" data-i="' + i + '">' +
             backStatIcon(d.icon) +
             '<span class="stash-perf-label">' + refractFlipEscHtml(d.label) + '</span>' +
             '<span class="refract-mb-v"></span></span>';
@@ -7189,22 +7276,42 @@
             assets.innerHTML = h;
         }
 
-        /* Collector footer: library counts beside physical/career vitals,
-           each shown only if set. */
+        /* Collector footer: the stats you chose, in the order you put them,
+           each drawn only if this performer has it. An item with no value is
+           still EMITTED, hidden, carrying its index -- see refractMirrorPill
+           for why the customiser needs that. */
         var foot = back.querySelector(".refract-cb-foot");
         if (foot) {
-            var fi = [];
-            if (p.scene_count != null) { fi.push([L.scenes, p.scene_count]); }
-            if (p.o_counter != null && p.o_counter > 0) { fi.push([L.o, p.o_counter]); }
-            if (p.measurements) { fi.push(["Meas", p.measurements]); }
-            if (p.height_cm) { fi.push(["Height", p.height_cm + "cm"]); }
-            if (p.weight) { fi.push(["Weight", p.weight + "kg"]); }
-            var cy = refractCareerYears(p.career_length);
-            if (cy) { fi.push(["Career", cy]); }
-            foot.innerHTML = fi.map(function (it) {
-                return '<span class="refract-cb-foot-item"><b>' + refractFlipEscHtml(String(it[1])) +
-                    '</b>' + refractFlipEscHtml(String(it[0])) + '</span>';
+            foot.innerHTML = footPillsPref().map(function (key, i) {
+                var v = refractFootValue(p, key);
+                return '<span class="refract-cb-foot-item' + (v ? "" : " refract-cb-foot-empty") +
+                    '" data-i="' + i + '"><b>' + refractFlipEscHtml(v || "") +
+                    '</b>' + refractFlipEscHtml(refractFootLabel(key, L)) + '</span>';
             }).join("");
+        }
+    }
+    /* The footer's own wording. Its cells are narrower than a pill and read as
+       a caption, so three of the catalogue's labels are shortened here rather
+       than in the catalogue, which two other strips share. */
+    function refractFootLabel(key, L) {
+        if (key === "scenes") { return L.scenes; }
+        if (key === "o") { return L.o; }
+        if (key === "measure") { return "Meas"; }
+        var d = backStatDef(key);
+        return d ? d.label : key;
+    }
+    function refractFootValue(p, key) {
+        if (!p) { return ""; }
+        switch (key) {
+        case "scenes": return p.scene_count != null ? String(p.scene_count) : "";
+        case "o": return (p.o_counter != null && p.o_counter > 0) ? String(p.o_counter) : "";
+        case "measure": return p.measurements || "";
+        case "height": return p.height_cm ? (p.height_cm + "cm") : "";
+        case "weight": return p.weight ? (p.weight + "kg") : "";
+        case "career": return refractCareerYears(p.career_length) || "";
+        case "age": return refractAgeFrom(p.birthdate) || "";
+        case "rating": return p.rating100 != null ? refractFlipRating(p.rating100 / 10) : "";
+        default: return "";
         }
     }
 

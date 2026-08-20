@@ -1034,9 +1034,9 @@ body.stash-liquid-glass .video-js .refract-src {
     z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.6rem;
-    min-width: 15rem;
+    gap: 0.42rem;
+    padding: 0.55rem 0.6rem;
+    min-width: 19rem;
     text-align: left;
     border-radius: 0.6rem;
     background: rgba(12, 12, 16, 0.94);
@@ -1045,24 +1045,56 @@ body.stash-liquid-glass .video-js .refract-src {
     -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
 }
-body.stash-liquid-glass .video-js .refract-src-head {
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
-    margin-bottom: 0.3rem;
+/* Label beside its options, not stacked above them. Four stacked
+   headings cost ~60px of a 356px panel for four words; on the side they
+   cost nothing and the panel reads as a settings sheet. */
+body.stash-liquid-glass .video-js .refract-src-group {
+    display: grid;
+    /* 5.4rem fits the longest heading. At 4.4rem "Resolution" (71.4px of
+       ink) and "Projection" (72.2px) overflowed a 61.6px column and ran
+       into their own first option -- measured gap to the options row was
+       -2.8px and -3.6px, i.e. touching. */
+    grid-template-columns: 5.4rem minmax(0, 1fr);
+    align-items: start;
+    column-gap: 0.5rem;
 }
+body.stash-liquid-glass .video-js .refract-src-head {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: right;
+    margin: 0;
+    /* Pinned to the first row of options. Without an explicit line box
+       the heading centred itself across the whole group, so on a
+       two-row group it floated between the rows instead of labelling
+       them. */
+    align-self: start;
+    line-height: 1;
+    padding-top: 0.55rem;
+}
+/* Options size to their own label and do not grow. The bug was
+   `flex: 1 1 auto`: a lone trailing option absorbed the whole line, so
+   MP4 came out 58.7px wide while DASH, alone on the second line, came
+   out 191.2px. Fixed grid tracks fixed that but truncated the labels
+   instead ("Origi...", "0....", "360 ..."), which is worse -- a control
+   you cannot read is not a control. Content width, no grow. */
 body.stash-liquid-glass .video-js .refract-src-row {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
 }
+body.stash-liquid-glass .video-js .refract-src-row > .refract-src-opt {
+    flex: 0 0 auto;
+}
 body.stash-liquid-glass .video-js .refract-src-opt,
 body.stash-liquid-glass .video-js .refract-src-direct {
     appearance: none;
-    flex: 1 1 auto;
-    padding: 5px 10px;
+    /* No flex-grow: the grid track sets the width now. */
+    padding: 4px 9px;
+    text-align: center;
+    white-space: nowrap;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.16);
     background: rgba(255, 255, 255, 0.06);
