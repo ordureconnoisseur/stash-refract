@@ -674,7 +674,7 @@ body.stash-liquid-glass.refract-rating-system-stars .scene-card .rating-banner {
     min-height: 3.1rem !important;
     max-width: 3.1rem !important;
     max-height: 3.1rem !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1385,7 +1385,7 @@ body.stash-liquid-glass.refract-rating-system-stars.refract-flourish-tiers .refr
    fills the same fraction of the star regardless of tier. */
 body.stash-liquid-glass.refract-rating-system-stars.refract-flourish-tiers .refract-card-tier-gold .rating-banner,
 body.stash-liquid-glass.refract-rating-system-stars.refract-flourish-tiers .refract-card-tier-diamond .rating-banner {
-    font-size: 1.05rem !important;
+    font-size: var(--fs-body) !important;
 }
 body.stash-liquid-glass.refract-rating-system-stars.refract-flourish-tiers .refract-card-tier-legendary .rating-banner {
     font-size: 1.12rem !important;
@@ -1573,7 +1573,7 @@ body.stash-liquid-glass .rating-number {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     line-height: 1 !important;
     font-variant-numeric: tabular-nums;
@@ -1622,7 +1622,7 @@ body.stash-liquid-glass .rating-number > span {
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-number {
     height: 26px !important;
     padding: 0 0.55rem !important;
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     gap: 0.25rem !important;
     box-shadow: none !important;
     background: rgba(255, 255, 255, 0.05) !important;
@@ -1998,7 +1998,7 @@ body.stash-liquid-glass .stash-perf-stats {
     border-top: 1px solid var(--glass-border);
 }
 body.stash-liquid-glass .stash-perf-age {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     font-weight: 500;
     line-height: 1;
@@ -2008,7 +2008,7 @@ body.stash-liquid-glass .stash-perf-scenes {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--text-muted);
     text-decoration: none !important;
@@ -2030,7 +2030,7 @@ body.stash-liquid-glass .stash-perf-ocount {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--text-muted);
     line-height: 1;

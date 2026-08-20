@@ -412,7 +412,7 @@ body.stash-liquid-glass .st-op-menu-item {
     color: var(--text);
     text-align: left;
     padding: 0.6rem 0.85rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-base);
     font-weight: 500;
     cursor: pointer;
     transition: background 0.12s, border-color 0.12s, color 0.12s;
@@ -521,7 +521,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .studio-logo img {
 body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1.studio-logo {
     margin: 0 0 0.15rem 0 !important;
     padding: 0 !important;
-    font-size: 0.85rem !important;
+    font-size: var(--fs-base) !important;
     line-height: 1.2 !important;
     text-align: left !important;
     background: transparent !important;
@@ -532,7 +532,7 @@ body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1
     text-decoration: none !important;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 700;
     transition: color 0.15s ease;
 }
@@ -565,7 +565,7 @@ body.stash-liquid-glass.refract-studio-banner :is(.scene-header-container, .imag
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-studio,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-studio-name {
     flex: 0 0 auto !important;
-    font-size: 0.85rem !important;
+    font-size: var(--fs-base) !important;
     color: var(--text-muted) !important;
     text-decoration: none !important;
     margin: 0 !important;
@@ -610,7 +610,7 @@ body.stash-liquid-glass :is(.scene-header, .image-header) > div {
 }
 body.stash-liquid-glass :is(.scene-header, .image-header) h5,
 body.stash-liquid-glass :is(.scene-header, .image-header) .text-muted {
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-muted) !important;
     font-weight: 400 !important;
 }
@@ -622,7 +622,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     align-items: center !important;
     gap: 0.6rem !important;
     margin: 0 0 0.85rem 0 !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-muted) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .date {
@@ -634,15 +634,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
 }
 
 /* ── Toolbar — strict single row of small glass-pill buttons ──────── */
+/* Wraps rather than scrolls. As a strict single row this needed 409px of
+   width inside a column that caps at 358px, with `overflow-x: auto` and
+   `scrollbar-width: none` hiding the fact: the scene actions menu and the
+   multiview button were 100% off the end, and the organised button was
+   sliced at 74%, at EVERY supported width (still 51px over at 2560).
+   A second row in a 385px sidebar costs 30px and reaches everything. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
     display: flex !important;
-    flex-wrap: nowrap !important;
+    flex-wrap: wrap !important;
     align-items: center !important;
     gap: 0.35rem !important;
+    row-gap: 0.35rem !important;
     margin: 0 0 0.65rem 0 !important;
-    overflow-x: auto !important;
-    -ms-overflow-style: none !important;
-    scrollbar-width: none !important;
+    overflow-x: visible !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar)::-webkit-scrollbar {
     display: none !important;
@@ -652,6 +657,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, 
     align-items: center !important;
     gap: 0.3rem !important;
     flex-wrap: nowrap !important;
+}
+/* The group's `gap` is the only spacing. It was being added to the
+   Advanced Rating plugin's own `margin-left: 8px` and to refract's
+   `margin-left: 6px` on the favourite button, so three items produced
+   two gaps of 12.19px and 10.19px, neither equal to the declared 4.2px
+   nor to each other. And an empty 0x0 <span> led group two, spending a
+   whole 4.19px slot on nothing. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) > * {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > :empty,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) > :empty {
+    display: none !important;
 }
 /* Star rating styling lives in the global block in 08_misc_mid.css.
    Scene-tabs only needs to size the button frame to align with adjacent
@@ -668,7 +687,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     line-height: 1 !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -689,7 +708,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     background: transparent !important;
     border: none !important;
     color: var(--text) !important;
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     line-height: 1 !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -811,8 +830,11 @@ body.stash-liquid-glass .nav-tabs .nav-link {
     border: 1px solid transparent !important;
     border-radius: var(--radius-sm) !important;
     margin-bottom: 0 !important;
-    padding: 0.22rem 0.42rem !important;
-    font-size: 0.66rem !important;
+    padding: 0.3rem 0.55rem !important;
+    /* Was 0.66rem = 9.24px: primary navigation rendered smaller than the
+       tag chips next to it, and 2.65x smaller than the least important
+       text on the gallery panel. */
+    font-size: var(--fs-sm) !important;
     letter-spacing: 0 !important;
     white-space: nowrap !important;
     text-align: center !important;
@@ -867,7 +889,7 @@ body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tab
     letter-spacing: 0.015em !important;
 }
 body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link .badge {
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     padding: 0.18em 0.5em !important;
 }
 
@@ -881,7 +903,7 @@ body.stash-liquid-glass .gallery-tabs .card .card-header {
     background: transparent !important;
     border-bottom: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     padding: 0.6rem 1rem !important;
 }
@@ -905,7 +927,7 @@ body.stash-liquid-glass .scene-history table,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table {
     background: transparent !important;
     color: var(--text) !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table thead th {
     background: rgba(255, 255, 255, 0.04) !important;
@@ -952,7 +974,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row > .col-12:has(> p.pre
 /* Section labels (h6 "Details:", "Tags") */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
     margin: 0.6rem 0 0.35rem 0 !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.08em !important;
@@ -974,7 +996,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6:last-child {
 /* Description text */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > p.pre {
     color: var(--text) !important;
-    font-size: 0.85rem !important;
+    font-size: var(--fs-base) !important;
     line-height: 1.5 !important;
     margin: 0 0 0.6rem 0 !important;
     white-space: pre-wrap !important;
@@ -995,7 +1017,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.t
     border-radius: var(--radius-pill) !important;
     margin: 0 0.25rem 0.25rem 0 !important;
     padding: 0 !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 500 !important;
     color: var(--text) !important;
     transition: background 0.15s, border-color 0.15s, color 0.15s !important;
@@ -1048,7 +1070,12 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list::-webkit-scro
     background: var(--glass-border) !important;
     border-radius: 3px !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item {
+/* Doubled class to outrank the compact pill rule earlier in this file.
+   That rule is (0,5,1) and carries `margin: 0 0.25rem 0.25rem 0`; this
+   reset was (0,4,1) and silently lost, so the declared `gap: 4px 6px`
+   rendered as 9.50px horizontally and ~7.5px vertically, and the last
+   chip in every row kept a phantom 3.5px that ate into the wrap width. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list.st-tag-list .tag-item.tag-item {
     margin: 0 !important;
     flex-shrink: 0 !important;
 }
@@ -1372,7 +1399,13 @@ body.stash-liquid-glass dl.details-list {
     padding: 0 !important;
     margin: 0 0 0.85rem 0 !important;
     display: grid !important;
-    grid-template-columns: minmax(140px, max-content) 1fr !important;
+    /* Was `minmax(140px, max-content)`. The max-content was set by a
+       single outlier, "File Modification Time:" at 136.1px, while the
+       other 13 labels measure 29.8-79.4px -- so the URLs and Path rows
+       carried 124px of blank space beside values that were themselves
+       being truncated (Stash IDs: scrollWidth 206 vs clientWidth 130).
+       A hard cap lets the long label wrap and gives the width back. */
+    grid-template-columns: minmax(0, 5.5rem) minmax(0, 1fr) !important;
     column-gap: 1rem !important;
     row-gap: 0.5rem !important;
     align-items: baseline !important;
@@ -1380,7 +1413,7 @@ body.stash-liquid-glass dl.details-list {
 body.stash-liquid-glass .scene-file-info dt,
 body.stash-liquid-glass dl.details-list dt {
     color: var(--text-muted) !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.06em !important;
@@ -1389,7 +1422,7 @@ body.stash-liquid-glass dl.details-list dt {
 body.stash-liquid-glass .scene-file-info dd,
 body.stash-liquid-glass dl.details-list dd {
     color: var(--text) !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     margin: 0 !important;
     word-break: break-all !important;
 }
@@ -1435,7 +1468,7 @@ body.stash-liquid-glass .history-header .badge.badge-pill.badge-secondary {
     color: var(--accent-bright) !important;
     border: 1px solid var(--accent-glow) !important;
     padding: 0.15rem 0.5rem !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
 }
 body.stash-liquid-glass .scene-history ul {
@@ -1455,7 +1488,7 @@ body.stash-liquid-glass .scene-history li {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     color: var(--text) !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
 }
 body.stash-liquid-glass .scene-history .remove-date-button {
     background: transparent !important;
@@ -1523,7 +1556,7 @@ body.stash-liquid-glass .queue-scene-details {
 }
 body.stash-liquid-glass .queue-scene-title {
     font-weight: 600 !important;
-    font-size: 0.85rem !important;
+    font-size: var(--fs-base) !important;
     color: #fff !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -1532,7 +1565,7 @@ body.stash-liquid-glass .queue-scene-title {
 body.stash-liquid-glass .queue-scene-studio,
 body.stash-liquid-glass .queue-scene-performers,
 body.stash-liquid-glass .queue-scene-date {
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     color: var(--text-muted) !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -1622,7 +1655,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-tag.row {
 body.stash-liquid-glass .scene-markers-panel .primary-tag::before {
     content: "Categories";
     grid-column: 1 / -1;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -1691,7 +1724,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-card-body .d-flex {
 }
 body.stash-liquid-glass .scene-markers-panel .primary-card-body .d-flex > div:first-child {
     font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 700;
     letter-spacing: 0.01em;
     white-space: nowrap;
@@ -1783,7 +1816,7 @@ body.stash-liquid-glass .scene-markers-panel .wall {
 body.stash-liquid-glass .scene-markers-panel .wall:has(.wall-item)::before {
     content: "Previews";
     grid-column: 1 / -1;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -1840,7 +1873,7 @@ body.stash-liquid-glass .scene-markers-panel .wall-item-text {
     line-height: 1.25 !important;
 }
 body.stash-liquid-glass .scene-markers-panel .wall-item-text > div {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
     overflow: hidden;

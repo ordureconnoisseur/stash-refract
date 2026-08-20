@@ -425,7 +425,7 @@ body.stash-liquid-glass .video-js .vjs-time-divider {
     visibility: visible !important;
     color: var(--text) !important;
     font-family: inherit !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     line-height: 38px !important;
     padding: 0 0.35rem !important;
     min-width: auto !important;
@@ -573,7 +573,7 @@ body.stash-liquid-glass .video-js .vjs-playback-rate .vjs-playback-rate-value {
     position: absolute !important;
     inset: 0 !important;
     line-height: 38px !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
     text-align: center !important;
     color: var(--text) !important;
@@ -602,7 +602,7 @@ body.stash-liquid-glass .video-js .vjs-menu-item {
     color: var(--text) !important;
     background: transparent !important;
     font-family: inherit !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     padding: 0.35rem 0.65rem !important;
     border-radius: 6px !important;
     text-transform: none !important;
@@ -746,7 +746,7 @@ body.stash-liquid-glass .scrubber-heatmap {
 body.stash-liquid-glass .scrubber-item-time {
     background: rgba(12, 12, 14, 0.85) !important;
     color: var(--text) !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 500 !important;
     padding: 0.2rem 0.5rem !important;
     border: 1px solid var(--glass-border) !important;
@@ -766,7 +766,7 @@ body.stash-liquid-glass .scrubber-item-time {
 /* Section headers (Filters / Transforms / Actions) */
 body.stash-liquid-glass .scene-video-filter h5 {
     color: var(--text-muted) !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.08em !important;
@@ -794,7 +794,7 @@ body.stash-liquid-glass .scene-video-filter .row.form-group > .col-sm-3 {
     flex: 0 0 5.5rem !important;
     max-width: 5.5rem !important;
     color: var(--text) !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     white-space: nowrap !important;
     overflow: visible !important;

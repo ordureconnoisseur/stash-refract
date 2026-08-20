@@ -51,7 +51,7 @@ body.stash-liquid-glass .table-list thead tr:first-child th:last-child {
 body.stash-liquid-glass .table-list thead th {
     background: transparent !important;
     color: var(--text-muted) !important;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     letter-spacing: 0.05em;
     text-transform: uppercase;
@@ -225,7 +225,7 @@ body.stash-liquid-glass .table-list .comma-list a {
     display: inline-flex !important;
     align-items: center;
     padding: 0.12rem 0.5rem;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     border-radius: var(--radius-pill);
     background: rgba(var(--accent-rgb), 0.09) !important;
     border: 1px solid rgba(var(--accent-rgb), 0.22) !important;
@@ -245,7 +245,7 @@ body.stash-liquid-glass .table-list .comma-list a:hover {
 body.stash-liquid-glass .table-list .date-data,
 body.stash-liquid-glass .table-list .duration-data {
     color: var(--text-muted) !important;
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
@@ -679,7 +679,7 @@ body.stash-liquid-glass #stash-table > .row.d-none.d-md-flex > h6 {
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     border-bottom: none !important;
     padding-bottom: 0 !important;
     margin-bottom: 0 !important;
@@ -848,7 +848,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     color: inherit;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) button.collapse-button .badge {
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     padding: 0.2em 0.55em !important;
     border-radius: var(--radius-pill) !important;
@@ -1267,7 +1267,7 @@ body.stash-liquid-glass .st-plugin-reload-btn .fa-icon svg {
 }
 
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) table.scraper-table thead th {
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -1305,7 +1305,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) table.scraper-table li {
     margin: 0;
     padding: 0.18rem 0.6rem;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     line-height: 1.4;
     color: var(--text-muted) !important;
     background: rgba(255, 255, 255, 0.05);
@@ -1548,7 +1548,7 @@ body.stash-liquid-glass .tagger-container-header select.form-control {
     border-radius: var(--radius-sm) !important;
     color: var(--text) !important;
     font-family: inherit !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     padding: 0.3rem 2rem 0.3rem 0.65rem !important;
     cursor: pointer;
     box-shadow: none !important;
@@ -1569,7 +1569,7 @@ body.stash-liquid-glass .tagger-container-header .form-group {
     margin-bottom: 0.4rem !important;
 }
 body.stash-liquid-glass .tagger-container-header .form-group .form-label {
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 500 !important;
     color: var(--text-muted) !important;
     margin-bottom: 0.25rem !important;
@@ -1649,7 +1649,7 @@ body.stash-liquid-glass .tagger-container-header > .collapsing.card {
     will-change: height;
 }
 body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card h4 {
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--text-muted) !important;
@@ -1675,7 +1675,7 @@ body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).car
 }
 body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card .form-text {
     color: var(--text-muted) !important;
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     display: block;
     margin-top: 0.55rem !important;
     line-height: 1.45;
@@ -1799,7 +1799,7 @@ body.stash-liquid-glass .PerformerTagger-header:hover h2 {
     color: var(--accent-bright);
 }
 body.stash-liquid-glass .PerformerTagger-details .performer-disambiguation {
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     font-weight: 500;
     color: var(--text-muted);
     margin-left: 0.35rem;
@@ -1831,7 +1831,7 @@ body.stash-liquid-glass .PerformerTagger-details .text-left > h5.text-bold {
 }
 body.stash-liquid-glass .PerformerTagger-details .text-left > h5.text-bold::before {
     content: "✓ TAGGED";
-    font-size: 0.68rem;
+    font-size: var(--fs-xs);
     text-transform: uppercase;
 }
 
@@ -1847,7 +1847,7 @@ body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTa
     color: #fbbf24;
     border-radius: var(--radius-pill);
     padding: 0.12rem 0.48rem;       /* match TAGGED rem-based padding exactly */
-    font-size: 0.68rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     line-height: 1;
     margin-bottom: 0.5rem;          /* identical to tagged badge wrapper */
@@ -1908,7 +1908,7 @@ body.stash-liquid-glass .PerformerTagger-box-link .input-group-text a {
 }
 body.stash-liquid-glass .PerformerTagger-box-link .input-group-text a::before {
     content: "↗ View on StashDB";
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--accent-bright);
     letter-spacing: 0.02em;
@@ -1930,7 +1930,7 @@ body.stash-liquid-glass .PerformerTagger-box-link .btn-primary.btn {
     background: transparent !important;
     color: var(--accent-bright) !important;
     padding: 0 0.95rem !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
     font-weight: 600 !important;
@@ -1994,7 +1994,7 @@ body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTa
     border-radius: 0 !important;
     color: var(--text) !important;
     padding: 0 0.95rem !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     line-height: 1 !important;
     min-height: 1.85rem;
     z-index: 1;
@@ -2032,7 +2032,7 @@ body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTa
     background: transparent !important;
     color: var(--accent-bright) !important;
     padding: 0 0.95rem !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
     font-weight: 600 !important;
@@ -2177,7 +2177,7 @@ body.stash-liquid-glass .PerformerTagger-performer-search-item:hover > .Performe
 body.stash-liquid-glass .PerformerTagger-performer-search-item > span {
     color: var(--text) !important;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: var(--fs-base);
     line-height: 1.3;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2333,7 +2333,7 @@ body.stash-liquid-glass .TagTagger-details-text .text-left > h5.text-bold {
 }
 body.stash-liquid-glass .TagTagger-details-text .text-left > h5.text-bold::before {
     content: "✓ TAGGED";
-    font-size: 0.68rem;
+    font-size: var(--fs-xs);
     text-transform: uppercase;
 }
 
@@ -2347,7 +2347,7 @@ body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-bo
     color: #fbbf24;
     border-radius: var(--radius-pill);
     padding: 0.12rem 0.48rem;
-    font-size: 0.68rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     line-height: 1;
     margin-bottom: 0.5rem;
@@ -2396,7 +2396,7 @@ body.stash-liquid-glass .TagTagger-box-link .input-group-text a {
 }
 body.stash-liquid-glass .TagTagger-box-link .input-group-text a::before {
     content: "↗ View on StashDB";
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--accent-bright);
     letter-spacing: 0.02em;
@@ -2418,7 +2418,7 @@ body.stash-liquid-glass .TagTagger-box-link .btn-primary.btn {
     background: transparent !important;
     color: var(--accent-bright) !important;
     padding: 0 0.95rem !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
     font-weight: 600 !important;
@@ -2470,7 +2470,7 @@ body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-bo
     border-radius: 0 !important;
     color: var(--text) !important;
     padding: 0 0.95rem !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     line-height: 1 !important;
     min-height: 1.85rem;
     z-index: 1;
@@ -2506,7 +2506,7 @@ body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-bo
     background: transparent !important;
     color: var(--accent-bright) !important;
     padding: 0 0.95rem !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
     font-weight: 600 !important;
@@ -2618,7 +2618,7 @@ body.stash-liquid-glass .refract-tag-editor__discard {
     border: none;
     color: var(--text-muted);
     padding: 0.35rem 0.6rem;
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     cursor: pointer;
     transition: color 0.15s;
 }
@@ -2631,7 +2631,7 @@ body.stash-liquid-glass .refract-tag-editor__discard:disabled {
 }
 body.stash-liquid-glass .refract-tag-editor__save {
     padding: 0.4rem 1rem;
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     letter-spacing: 0.02em;
     border-radius: var(--radius-pill);
@@ -2821,7 +2821,7 @@ body.stash-liquid-glass .refract-tag-editor__subgroup-header-main {
 }
 body.stash-liquid-glass .refract-tag-editor__subgroup-title {
     color: var(--text);
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2832,7 +2832,7 @@ body.stash-liquid-glass .refract-tag-editor__subgroup-meta {
     align-items: center;
     gap: 0.4rem;
     color: var(--text-muted);
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     font-variant-numeric: tabular-nums;
     flex: 0 0 auto;
 }
@@ -2994,7 +2994,7 @@ body.stash-liquid-glass .refract-tag-tooltip-portal .refract-tag-tooltip__body {
     text-align: left;
 }
 body.stash-liquid-glass .refract-tag-tooltip-portal .refract-tag-tooltip__name {
-    font-size: 0.85rem;
+    font-size: var(--fs-base);
     font-weight: 600;
     color: var(--text);
     line-height: 1.25;
@@ -3029,7 +3029,7 @@ body.stash-liquid-glass .refract-performer-name-tooltip-portal {
     border: 1px solid var(--glass-border);
     border-radius: 6px;
     padding: 0.22rem 0.5rem;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     font-weight: 500;
     line-height: 1.2;
     white-space: nowrap;
@@ -3072,7 +3072,7 @@ body.stash-liquid-glass .refract-perf-tip-img {
 body.stash-liquid-glass .refract-perf-tip-name {
     display: block;
     padding: 0.4rem 0.55rem;
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     font-weight: 700;
     line-height: 1.25;
     text-align: center;

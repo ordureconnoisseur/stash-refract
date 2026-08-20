@@ -677,7 +677,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-current-time {
         margin-right: auto !important;
         padding: 0 0.35rem !important;
-        font-size: 0.85rem !important;
+        font-size: var(--fs-base) !important;
         height: 32px !important;
         line-height: 1 !important;
         display: inline-flex !important;
@@ -810,7 +810,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         max-width: 2.5rem !important;
         height: 2.2rem !important;
         padding: 0 0.35rem !important;
-        font-size: 0.78rem !important;
+        font-size: var(--fs-sm) !important;
     }
 
     /* View-mode picker: refract replaces Stash's native grid/list/wall
@@ -1133,5 +1133,96 @@ body.stash-liquid-glass .refract-mobile-drawer {
         min-width: 0 !important;
         flex: initial !important;
         margin: 0 !important;
+    }
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   B2 — the 769-1199.98px band: give the metadata back, stacked.
+
+   07_scene_details.css hides .scene-tabs / .image-tabs / .gallery-tabs
+   below 1200px, for a stated and correct reason: below that width the
+   side-by-side grid squeezes the player to nothing. The block above
+   (max-width: 768px) then restacks the panel under the player for
+   phones, because -- in that block's own words -- otherwise "the user
+   has no way to access scene details".
+
+   That is exactly as true at 1024 and 1152 as it is at 767, and those
+   are an iPad in landscape and a half-screen laptop window. Measured in
+   the dead band: .scene-tabs is display:none at 0x0 AND
+   document.scrollHeight === window.innerHeight, so there is not even
+   anything to scroll to. Title, studio, date, rating, o-counter, tabs,
+   tags, performers, file info, markers and Edit are all unreachable.
+
+   So this restacks in the band, using the same treatment phones get. It
+   deliberately does NOT widen the 768 block, which also carries
+   phone-only work (two-row player control bar, chevron removal).
+   Galleries get the full range, because .gallery-tabs was never in the
+   768 restore list at all and is unreachable at EVERY width under 1200.
+   ─────────────────────────────────────────────────────────────────── */
+@media (min-width: 768.02px) and (max-width: 1199.98px) {
+    body.stash-liquid-glass .main.container-fluid > .row:has(> :is(.scene-tabs, .image-tabs)) {
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: auto auto !important;
+        gap: 14px !important;
+        overflow: visible !important;
+    }
+    body.stash-liquid-glass .scene-player-container,
+    body.stash-liquid-glass .scene-player-container .VideoPlayer {
+        height: auto !important;
+        max-height: none !important;
+    }
+    body.stash-liquid-glass .video-wrapper,
+    body.stash-liquid-glass div.video-wrapper {
+        flex: 0 0 auto !important;
+        aspect-ratio: 16 / 9 !important;
+        max-height: none !important;
+        height: auto !important;
+    }
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
+        display: block !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+    }
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content,
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane.active.show {
+        display: block !important;
+        min-height: 0 !important;
+        flex: initial !important;
+    }
+}
+
+/* Galleries: the whole range below 1200px, since there is no phone
+   fallback for .gallery-tabs anywhere. */
+@media (max-width: 1199.98px) {
+    body.stash-liquid-glass .main.container-fluid > .row:has(> .gallery-container) {
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: auto auto !important;
+        gap: 14px !important;
+        overflow: visible !important;
+    }
+    body.stash-liquid-glass .gallery-tabs {
+        display: block !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        order: 2 !important;
+    }
+    body.stash-liquid-glass .gallery-container {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+        order: 1 !important;
+    }
+    body.stash-liquid-glass:has(.main.container-fluid > .row > .gallery-container) .main.container-fluid {
+        padding-bottom: 6rem !important;
     }
 }

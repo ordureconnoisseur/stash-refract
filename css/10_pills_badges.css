@@ -25,7 +25,7 @@ body.stash-liquid-glass .count-button.increment-only .count-value {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     padding: 0.35rem 0.65rem !important;
     color: var(--text) !important;
@@ -56,7 +56,7 @@ body.stash-liquid-glass .stash-id-pill {
     border: 1px solid var(--glass-border) !important;
     background: var(--glass-bg) !important;
     overflow: hidden;
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     line-height: 1.1 !important;
     vertical-align: middle;
     -webkit-backdrop-filter: var(--glass-blur-sm);
@@ -70,7 +70,7 @@ body.stash-liquid-glass .stash-id-pill > span:first-child {
     border-right: 1px solid var(--accent-glow) !important;
     color: var(--accent-bright) !important;
     font-weight: 700 !important;
-    font-size: 0.68rem !important;
+    font-size: var(--fs-xs) !important;
     line-height: 1 !important;
     letter-spacing: 0.04em !important;
     white-space: nowrap;

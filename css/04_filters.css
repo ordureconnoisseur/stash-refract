@@ -76,14 +76,20 @@ body.stash-liquid-glass .modal-dialog {
 body.stash-liquid-glass .modal-header {
     display: flex !important;
     align-items: center;
-    justify-content: space-between;
+    /* Was `space-between`, which on a two-child header put 399.41px
+       between the gear icon and the word "Export" in a 498px bar. It
+       also contradicted refract's own close-button rule below, which
+       pushes `.close` right with `margin-left: auto` -- that only works
+       from flex-start. Headers with a close button are unchanged;
+       headers without one no longer fling their title to the far edge. */
+    justify-content: flex-start;
     gap: 0.75rem;
     flex-wrap: wrap;
     padding: 0.85rem 1.05rem !important;
     background: rgba(255, 255, 255, 0.035) !important;
     border-bottom: 1px solid var(--glass-border) !important;
     border-color: var(--glass-border) !important;
-    font-size: 1.05rem;
+    font-size: var(--fs-body);
     font-weight: 600;
     color: var(--text) !important;
     line-height: 1.35;
@@ -157,7 +163,7 @@ body.stash-liquid-glass .modal-body .sub-heading,
 body.stash-liquid-glass .modal-content .sub-heading {
     margin-top: 0.65rem !important;
     margin-bottom: 0 !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     line-height: 1.45;
     color: var(--text-muted) !important;
     font-weight: 400;
@@ -179,6 +185,20 @@ body.stash-liquid-glass .modal-footer {
     border-color: var(--glass-border) !important;
 }
 body.stash-liquid-glass .modal-footer > * {
+    margin: 0 !important;
+}
+/* React wraps the buttons in a plain <div>, so the footer's `gap` and
+   `justify-content` never reached them -- the measured 7px between
+   Cancel and Export came from per-button margins, and an empty 0x0 div
+   sat one whole gap slot to their left. Make the wrapper transparent to
+   layout and drop the empty one. */
+body.stash-liquid-glass .modal-footer > div:not([class]) {
+    display: contents !important;
+}
+body.stash-liquid-glass .modal-footer > :empty {
+    display: none !important;
+}
+body.stash-liquid-glass .modal-footer .btn {
     margin: 0 !important;
 }
 
@@ -285,7 +305,7 @@ body.stash-liquid-glass .modal-header {
 }
 body.stash-liquid-glass .modal-header > div:first-child {
     flex-shrink: 0;
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
     font-weight: 600;
     color: var(--text);
 }
@@ -294,7 +314,7 @@ body.stash-liquid-glass .modal-header .search-input {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     height: 1.85rem !important;
     padding: 0 12px !important;
     min-width: 0 !important;
@@ -316,7 +336,7 @@ body.stash-liquid-glass .search-term-row {
     margin-bottom: 0.25rem !important;
 }
 body.stash-liquid-glass .search-term-row > span {
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-muted) !important;
     white-space: nowrap !important;
     flex-shrink: 0;
@@ -369,7 +389,7 @@ body.stash-liquid-glass .search-term-row .clearable-text-field {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     height: 1.85rem !important;
     padding: 0 12px !important;
     width: 100% !important;
@@ -523,7 +543,7 @@ body.stash-liquid-glass .criterion-editor select.form-control {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     color: var(--text) !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     height: 2rem !important;
     padding: 0 10px !important;
     box-shadow: none !important;
@@ -584,7 +604,7 @@ body.stash-liquid-glass .popover-body a {
     align-items: center;
     margin: 0.1rem 0.15rem 0.1rem 0;
     padding: 0.15rem 0.55rem;
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     border-radius: var(--radius-pill);
     background: rgba(var(--accent-rgb), 0.09) !important;
     border: 1px solid rgba(var(--accent-rgb), 0.22) !important;
@@ -598,6 +618,31 @@ body.stash-liquid-glass .popover-body a:hover {
     border-color: var(--accent-glow) !important;
     color: var(--accent-bright) !important;
 }
+/* Contextual toasts. `.toast` sets a flat glass background with
+   `!important`, which beat Bootstrap's `.bg-success` / `.bg-danger`, so
+   a failed task and a successful one computed identical background,
+   border, radius and text colour. An error carried no signal at all. */
+body.stash-liquid-glass .toast.bg-success,
+body.stash-liquid-glass .toast.bg-success .toast-header {
+    background: rgba(46, 125, 91, 0.22) !important;
+    border-color: rgba(46, 125, 91, 0.45) !important;
+}
+body.stash-liquid-glass .toast.bg-danger,
+body.stash-liquid-glass .toast.bg-danger .toast-header {
+    background: rgba(217, 45, 32, 0.22) !important;
+    border-color: rgba(217, 45, 32, 0.5) !important;
+}
+body.stash-liquid-glass .toast.bg-warning,
+body.stash-liquid-glass .toast.bg-warning .toast-header {
+    background: rgba(232, 121, 43, 0.2) !important;
+    border-color: rgba(232, 121, 43, 0.45) !important;
+}
+/* The stack rendered at an effective 0.765 alpha (0.9 container opacity
+   over an 0.85 background) with its text dimmed to match. */
+body.stash-liquid-glass .toast-container {
+    opacity: 1 !important;
+}
+
 body.stash-liquid-glass .popover-body .comma-list li {
     display: inline-block;
     list-style: none;
@@ -1100,7 +1145,7 @@ body.stash-liquid-glass .filter-tags .tag-item {
     color: var(--text) !important;
     border-radius: var(--radius-pill) !important;
     padding: 0.3em 0.9em !important;
-    font-size: 0.85rem;
+    font-size: var(--fs-base);
     line-height: 1.2;
 }
 body.stash-liquid-glass .filter-tags .tag-item .btn,
@@ -1143,7 +1188,7 @@ body.stash-liquid-glass .tag-item.badge-secondary {
     color: var(--text) !important;
     border-radius: var(--radius-pill) !important;
     padding: 0.22em 0.7em !important;
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     line-height: 1.4 !important;
     text-decoration: none !important;
@@ -1294,7 +1339,7 @@ body.stash-liquid-glass span.paginationIndex.refract-scene-stats > .scenes-stats
     display: none !important;
 }
 body.stash-liquid-glass span.paginationIndex.refract-scene-stats > .refract-stats-overlay {
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
@@ -1402,7 +1447,7 @@ body.stash-liquid-glass .pagination-index-container > .pagination {
         line-height: 1.3 !important;
     }
     body.stash-liquid-glass.stash-route-scenes .sidebar-pane-content > .pagination-index-container span.paginationIndex.refract-scene-stats > .refract-stats-overlay {
-        font-size: 0.68rem;
+        font-size: var(--fs-xs);
     }
 }
 
@@ -1547,3 +1592,35 @@ body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.se
     border-color: rgba(255, 255, 255, 0.14) !important;
 }
 
+
+/* ───────────────────────────────────────────────────────────────────
+   A-01 / R5 — page-level horizontal overflow and gutter alignment.
+
+   Every list route scrolled sideways by exactly 3px: measured
+   documentElement.scrollWidth 1588 against clientWidth 1585 on scenes,
+   tags, studios, galleries, images and performers, 1603/1600 on groups,
+   with `scrollTo(500,0)` genuinely moving the page. Home was the only
+   clean route. The offender is Bootstrap's `.row { margin: 0 -15px }`
+   on `.row.justify-content-center`, which sits at x = -3 inside a
+   `.main` that is inset 12px. refract already zeroes this for rows that
+   are DIRECT children of `.main`, but the list grids are nested inside
+   `.sidebar-pane-content` and never matched that rule.
+
+   Clipped rather than un-margined on purpose: the cards are centred in
+   that row, so the 15px overhang is empty, and zeroing the margins
+   would narrow the row by 30px and could drop a column at some widths.
+   `clip` does not create a scroll container, so the sticky toolbar
+   inside keeps working. */
+body.stash-liquid-glass .main.container-fluid {
+    overflow-x: clip;
+}
+
+/* Home's card grid sat 19.97px right of every list page's, because
+   Stash puts `padding: 0 20px` on `.recommendations-container` and
+   nothing zeroed it. 01_tokens.css:201 states the 12px `.main` inset is
+   chosen so content lines up with the floating navbar; this restores
+   that intent on the one page that broke it. */
+body.stash-liquid-glass .recommendations-container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}

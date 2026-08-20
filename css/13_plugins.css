@@ -172,7 +172,7 @@ body.stash-liquid-glass .mv-launcher-count {
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
     border-radius: var(--radius-sm) !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
     font-variant-numeric: tabular-nums !important;
 }
@@ -444,7 +444,7 @@ body.stash-liquid-glass .performer-card .hon-battle-rank-badge.hon-battle-rank-b
        Matched to the caption's own scale instead. It stays heavier and
        warmer than the nationality beside it, which is enough to separate
        them without a second type size on one line. */
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 700 !important;
     line-height: 1 !important;
     color: rgba(255, 255, 255, 0.92) !important;
@@ -516,7 +516,7 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-total
 body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-text {
     font-weight: 800 !important;
     /* Follows the container down; see the note on the badge's font-size. */
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     letter-spacing: 0.01em !important;
     background: linear-gradient(180deg, #ffd24a 0%, #ff7a18 48%, #e11d2a 100%) !important;
     -webkit-background-clip: text !important;
@@ -574,7 +574,7 @@ body.stash-liquid-glass .react-datepicker__header {
 body.stash-liquid-glass .react-datepicker__current-month {
     color: var(--text) !important;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
     letter-spacing: 0.01em;
     margin-bottom: 0.4rem;
 }
@@ -591,7 +591,7 @@ body.stash-liquid-glass .react-datepicker__year-read-view {
     border-radius: var(--radius-pill) !important;
     padding: 0.18rem 0.6rem !important;
     color: var(--text) !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -626,7 +626,7 @@ body.stash-liquid-glass .react-datepicker__day-names {
 }
 body.stash-liquid-glass .react-datepicker__day-name {
     color: var(--text-muted) !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -654,7 +654,7 @@ body.stash-liquid-glass .react-datepicker__day {
     margin: 1px !important;
     border-radius: 50% !important;
     color: var(--text) !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
@@ -797,7 +797,7 @@ body.stash-liquid-glass .gs-input-row > input {
     padding: 0.35rem 0 !important;
     margin: 0 !important;
     color: var(--text) !important;
-    font-size: 1.05rem !important;
+    font-size: var(--fs-body) !important;
     line-height: 1.6 !important;
     min-height: 2rem !important;
     height: auto !important;
@@ -873,7 +873,7 @@ body.stash-liquid-glass .adv-rating-btn {
     justify-content: center !important;
     gap: 8px;
     line-height: 1 !important;
-    font-size: 0.9rem !important;
+    font-size: var(--fs-base) !important;
     transition: background 0.18s ease, border-color 0.18s ease,
                 color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
 }
@@ -928,7 +928,7 @@ body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge {
     height: auto !important;
     padding: 0 !important;
     margin: 0 !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 700 !important;
     font-variant-numeric: tabular-nums;
 }
@@ -1311,7 +1311,7 @@ body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn {
     border: 1px solid var(--accent-glow) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--accent-bright) !important;
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 700 !important;
     letter-spacing: 0.06em !important;
     text-transform: uppercase !important;
@@ -1350,7 +1350,7 @@ body.stash-liquid-glass .stash-scribe-secondary.is-ready {
    .stash-scribe-review-section. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-section .stash-scribe-review-heading {
     margin: 0.6rem 0 0.35rem 0 !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.08em !important;
@@ -1361,7 +1361,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-secti
    for our p.pre. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-section p.pre {
     color: var(--text) !important;
-    font-size: 0.85rem !important;
+    font-size: var(--fs-base) !important;
     line-height: 1.5 !important;
     margin: 0 0 0.6rem 0 !important;
     white-space: pre-wrap !important;
@@ -1391,7 +1391,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-headi
 body.stash-liquid-glass .stash-scribe-review-edit {
     margin-left: auto !important;
     color: var(--text-muted) !important;
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 500 !important;
     padding: 0 0.4rem !important;
     text-transform: none !important;
@@ -1465,7 +1465,7 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-header-info {
     min-width: 0;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-title {
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--text-muted) !important;
@@ -1474,7 +1474,7 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-title {
     font-family: var(--theme-font-stack) !important;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-summary {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     opacity: 0.75;
 }
@@ -1489,7 +1489,7 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-btn {
     color: var(--text-muted);
     border-radius: var(--radius-pill);
     padding: 0.22rem 0.7rem;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     font-weight: 600;
@@ -1519,7 +1519,7 @@ body.stash-liquid-glass .edit-tags-overhaul__search-input {
     color: var(--text);
     border-radius: var(--radius-pill);
     padding: 0.42rem 0.95rem;
-    font-size: 0.82rem;
+    font-size: var(--fs-sm);
     line-height: 1.2;
     outline: none;
     box-shadow: none;
@@ -1638,7 +1638,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-header-main {
     flex: 1 1 auto;
 }
 body.stash-liquid-glass .edit-tags-overhaul__title {
-    font-size: 0.85rem;
+    font-size: var(--fs-base);
     font-weight: 700;
     color: var(--text);
     margin: 0;
@@ -1658,7 +1658,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-meta {
     display: inline-flex;
     align-items: baseline;
     gap: 0.25rem;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
 }
@@ -1694,7 +1694,7 @@ body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn {
     width: 1.5rem;
     height: 1.5rem;
     line-height: 1;
-    font-size: 0.85rem;
+    font-size: var(--fs-base);
     font-weight: 700;
     display: inline-flex;
     align-items: center;
@@ -1950,7 +1950,7 @@ body.stash-liquid-glass .details-tags-overhaul__panel-header {
     flex-wrap: wrap;
 }
 body.stash-liquid-glass .details-tags-overhaul__panel-title {
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--text-muted) !important;
@@ -1959,7 +1959,7 @@ body.stash-liquid-glass .details-tags-overhaul__panel-title {
     font-family: var(--theme-font-stack) !important;
 }
 body.stash-liquid-glass .details-tags-overhaul__panel-summary {
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     opacity: 0.75;
     flex: 1 1 auto;
@@ -2060,7 +2060,7 @@ body.stash-liquid-glass .details-tags-overhaul__title {
     line-height: 1.2;
 }
 body.stash-liquid-glass .details-tags-overhaul__subgroup-title {
-    font-size: 0.78rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     color: var(--text);
     line-height: 1.2;
@@ -2070,7 +2070,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup-meta {
     display: inline-flex;
     align-items: baseline;
     gap: 0.25rem;
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
 }
@@ -2177,7 +2177,7 @@ body.stash-liquid-glass .details-tags-overhaul__tag {
     border-radius: var(--radius);
     padding: 0.4rem 0.4rem 0.5rem;
     width: calc(var(--dto-image-size, 100px) + 0.8rem);
-    font-size: 0.72rem;
+    font-size: var(--fs-xs);
     line-height: 1.25;
     text-decoration: none !important;
     text-align: center;
@@ -2327,7 +2327,7 @@ body.stash-liquid-glass .tag-sidebar__clear {
     border: 1px solid var(--glass-border) !important;
     color: var(--text-muted) !important;
     border-radius: var(--radius-pill) !important;
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     padding: 0.2rem 0.7rem !important;
     transition: background 0.15s, border-color 0.15s, color 0.15s !important;
@@ -2350,7 +2350,7 @@ body.stash-liquid-glass .tag-sidebar__segmented {
     margin-bottom: 0.7rem !important;
 }
 body.stash-liquid-glass .tag-sidebar__segmented-label {
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.06em !important;
     color: var(--text-muted) !important;
@@ -2369,7 +2369,7 @@ body.stash-liquid-glass .tag-sidebar__segmented-button {
     border: none !important;
     color: var(--text-muted) !important;
     border-radius: var(--radius-pill) !important;
-    font-size: 0.7rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 700 !important;
     letter-spacing: 0.04em !important;
     padding: 0.2rem 0.7rem !important;
@@ -2388,7 +2388,7 @@ body.stash-liquid-glass .tag-sidebar__search-input {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     padding: 0.4rem 0.85rem !important;
     margin-bottom: 0.8rem !important;
     transition: border-color 0.15s, box-shadow 0.15s !important;
@@ -2408,7 +2408,7 @@ body.stash-liquid-glass .tag-sidebar__section {
     margin-top: 0.9rem !important;
 }
 body.stash-liquid-glass .tag-sidebar__section-label {
-    font-size: 0.68rem !important;
+    font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.08em !important;
     font-weight: 700 !important;
@@ -2416,7 +2416,7 @@ body.stash-liquid-glass .tag-sidebar__section-label {
     margin: 0 0 0.5rem !important;
 }
 body.stash-liquid-glass .tag-sidebar__empty {
-    font-size: 0.8rem !important;
+    font-size: var(--fs-sm) !important;
     color: var(--text-muted) !important;
     padding: 0.1rem 0 0.5rem !important;
 }
@@ -2481,7 +2481,7 @@ body.stash-liquid-glass .tag-sidebar__action {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     line-height: 1 !important;
     transition: background 0.13s, border-color 0.13s, color 0.13s !important;
 }
@@ -2517,7 +2517,7 @@ body.stash-liquid-glass .tag-sidebar__label {
     background: transparent !important;
     border: none !important;
     color: var(--text) !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     text-align: left !important;
     padding: 0.18rem 0.25rem !important;
@@ -2536,7 +2536,7 @@ body.stash-liquid-glass .tag-sidebar__label:hover {
 
 /* Count pill — soft accent, right-aligned, tabular */
 body.stash-liquid-glass .tag-sidebar__count {
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     color: var(--accent-light) !important;
     font-variant-numeric: tabular-nums !important;

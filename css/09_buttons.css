@@ -64,7 +64,7 @@ body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"] {
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
     height: 30px !important;
-    font-size: 0.82rem !important;
+    font-size: var(--fs-sm) !important;
     padding: 0 14px !important;
     min-width: 140px !important;
     flex: 1 1 auto !important;
@@ -88,7 +88,7 @@ body.stash-liquid-glass [data-stash-filter] .btn-secondary {
     height: 30px !important;
     min-width: 30px !important;
     padding: 0 8px !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     transition: background 0.15s, border-color 0.15s, color 0.15s !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -153,7 +153,7 @@ body.stash-liquid-glass [data-stash-filter] select {
     color: var(--text-muted) !important;
     border-radius: var(--radius-sm) !important;
     height: 30px !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     padding: 0 8px !important;
 }
 
@@ -249,7 +249,7 @@ body.stash-liquid-glass .page-link {
     border: none !important;
     color: var(--text-muted) !important;
     border-radius: var(--radius-pill) !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     min-width: 26px !important;
     height: 26px !important;
     padding: 0 6px !important;
@@ -277,7 +277,7 @@ body.stash-liquid-glass .pagination-index,
 body.stash-liquid-glass .filter-container + * .text-muted,
 body.stash-liquid-glass [class*="list-count"],
 body.stash-liquid-glass [class*="total-count"] {
-    font-size: 0.68rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     letter-spacing: 0.07em !important;
     text-transform: uppercase !important;
@@ -291,7 +291,7 @@ body.stash-liquid-glass .pagination-container select {
     background: transparent !important;
     border: none !important;
     color: var(--text-muted) !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     height: 24px !important;
     padding: 0 4px !important;
     cursor: pointer !important;
@@ -393,7 +393,7 @@ body.stash-liquid-glass .page-size-selector select {
     width: 64px !important;
     min-width: 64px !important;
     max-width: 64px !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     padding: 0 1.1rem 0 1.1rem !important;
     cursor: pointer !important;
@@ -443,9 +443,25 @@ body.stash-liquid-glass [data-pager-row="float"] {
     align-items: center !important;
     gap: 6px !important;
     pointer-events: auto !important;
+    /* Shrink-wrap. When the float row is a WRAPPER it is `.pagination-footer`,
+       which carries `width: 100%` from 04_filters.css. Combined with
+       `position: fixed`, that resolved against the VIEWPORT, so the wrapper
+       became a 1585x56 transparent slab pinned across the bottom of the
+       screen with `pointer-events: auto` on it. Measured with
+       elementFromPoint: it swallowed hover and click for 5 cards on /scenes,
+       6 on /performers and 10 on a performer's scenes tab, while the only
+       thing visible inside it was a ~210px pill. */
+    width: auto !important;
+    max-width: calc(100vw - 2rem) !important;
 }
 body.stash-liquid-glass [data-pager-row="float"]:not(.pagination):not(.btn-group) {
     flex-direction: column !important;
+    /* Belt and braces on top of `width: auto`: even if some future wrapper
+       stretches again, only its real children may take a click. */
+    pointer-events: none !important;
+}
+body.stash-liquid-glass [data-pager-row="float"]:not(.pagination):not(.btn-group) > * {
+    pointer-events: auto !important;
 }
 body.stash-liquid-glass [data-pager-row="float"].pagination,
 body.stash-liquid-glass [data-pager-row="float"].btn-group {
@@ -560,7 +576,7 @@ body.stash-liquid-glass #perf-rating-trigger {
     background: var(--glass-bg-strong);
     border: 1px solid var(--glass-border);
     color: var(--text) !important;
-    font-size: 0.8rem;
+    font-size: var(--fs-sm);
     font-weight: 600;
     line-height: 1 !important;
     cursor: pointer;
@@ -619,7 +635,7 @@ body.stash-liquid-glass .adv-rating-header {
 }
 body.stash-liquid-glass .adv-rating-header h3 {
     margin: 0 !important;
-    font-size: 0.78rem !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 700 !important;
     letter-spacing: 0.1em !important;
     text-transform: uppercase !important;
@@ -691,7 +707,7 @@ body.stash-liquid-glass .rating-label {
     display: flex !important;
     align-items: center;
     gap: 0.4rem;
-    font-size: 0.85rem;
+    font-size: var(--fs-base);
     font-weight: 500;
     color: var(--text) !important;
     flex: 1;
@@ -704,7 +720,7 @@ body.stash-liquid-glass .rating-info-icon {
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
-    font-size: 0.85rem;
+    font-size: var(--fs-base);
     color: var(--text-muted) !important;
     cursor: help;
     flex-shrink: 0;
@@ -769,7 +785,7 @@ body.stash-liquid-glass .rating-star:hover {
 
 /* Clear × */
 body.stash-liquid-glass .rating-clear {
-    font-size: 0.9rem;
+    font-size: var(--fs-base);
     color: rgba(255, 255, 255, 0.2) !important;
     cursor: pointer;
     padding: 0.1rem 0.3rem;
@@ -841,7 +857,7 @@ body.stash-liquid-glass .adv-rating-inline-head {
     border-bottom: 1px solid var(--glass-border) !important;
 }
 body.stash-liquid-glass .adv-rating-inline-title {
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 700 !important;
     letter-spacing: 0.1em !important;
     text-transform: uppercase !important;
@@ -857,7 +873,7 @@ body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown-caret {
     color: var(--accent-bright) !important;
 }
 body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-subhead {
-    font-size: 0.72rem !important;
+    font-size: var(--fs-xs) !important;
     color: var(--text-muted) !important;
     opacity: 0.85;
 }
