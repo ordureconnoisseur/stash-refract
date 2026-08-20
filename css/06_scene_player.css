@@ -1129,6 +1129,100 @@ body.stash-liquid-glass .video-js .refract-src-row {
 body.stash-liquid-glass .video-js .refract-src-row > .refract-src-opt {
     flex: 0 0 auto;
 }
+
+/* ── Speed: a slider, not eight more pills ───────────────────────────
+   Speed is an ordered scale with a natural resting point at 1x, which
+   is what a slider is for, and the eight pills were the largest block
+   in the panel. It snaps to Stash's own rates, so the readout is always
+   a real option rather than an invented number. */
+body.stash-liquid-glass .video-js .refract-src-rate {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 26px;
+}
+body.stash-liquid-glass .video-js .refract-src-slider {
+    appearance: none;
+    -webkit-appearance: none;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 4px;
+    margin: 0;
+    border-radius: 999px;
+    background: transparent;
+    accent-color: var(--accent);
+    cursor: pointer;
+    outline: none;
+}
+body.stash-liquid-glass .video-js .refract-src-slider:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 4px;
+}
+/* Chrome draws its OWN track from `::-webkit-slider-runnable-track`;
+   the background set on the input is not it. Without this the track
+   rendered in the browser's default blue -- which the styled thumb hid
+   just well enough to miss in the numbers. */
+body.stash-liquid-glass .video-js .refract-src-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    border: none;
+}
+body.stash-liquid-glass .video-js .refract-src-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    /* Centre a 13px thumb on a 4px track. */
+    margin-top: -4.5px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--accent-bright);
+    border: 2px solid rgba(10, 10, 12, 0.9);
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.55);
+    transition: transform 0.12s ease;
+}
+body.stash-liquid-glass .video-js .refract-src-slider:hover::-webkit-slider-thumb,
+body.stash-liquid-glass .video-js .refract-src-slider:active::-webkit-slider-thumb {
+    transform: scale(1.15);
+}
+body.stash-liquid-glass .video-js .refract-src-slider::-moz-range-thumb {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--accent-bright);
+    border: 2px solid rgba(10, 10, 12, 0.9);
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.55);
+}
+body.stash-liquid-glass .video-js .refract-src-slider::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+}
+/* The readout is the only number here, so it gets a fixed box: without
+   one the slider's length changed as the label went 1x -> 1.25x. */
+body.stash-liquid-glass .video-js .refract-src-rate-val {
+    flex: 0 0 auto;
+    width: 3.1rem;
+    text-align: right;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--accent-bright);
+    font-variant-numeric: tabular-nums;
+}
+
+/* The volume panel reserves 4em for a slider that is positioned
+   off-canvas in the vertical variant, so it sat 56px wide around a 36px
+   button -- 20px of dead bar, which read as a hole once the playback
+   rate button next to it was folded into the panel. */
+body.stash-liquid-glass .video-js .vjs-control-bar .vjs-volume-panel.vjs-volume-panel-vertical {
+    /* An explicit width, not `auto`: auto let the off-canvas slider
+       contribute and made the panel WIDER (78px against the original
+       56px). The vertical slider is positioned out of flow, so the panel
+       only ever needs to be its mute button. */
+    width: 36px !important;
+    min-width: 36px !important;
+    flex: 0 0 36px !important;
+    overflow: visible !important;
+}
 /* Stash's own controls, folded into this panel. Hidden rather than
    removed: the panel forwards its clicks to their menu items, and a
    display:none <li> still runs its handler. */

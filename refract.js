@@ -7829,6 +7829,96 @@
         return null;
     }
 
+    /* ── Rating: a trigger, not a 94px star row ───────────────────────
+       Stash's five-star widget was the widest control in a 338px column
+       and pushed everything else out of the toolbar. It is also NOT the
+       same value as the Advanced Rating plugin's chip beside it -- the
+       stars are Stash's own 0-5 rating, the chip is the plugin's
+       multi-criteria score -- so it could not simply be dropped.
+
+       Instead it collapses to one pill showing the current rating, and
+       the real widget opens beneath it on click. The stars are NEVER
+       moved in the DOM: they are React-managed, and relocating them
+       desyncs the fiber (the same trap documented for the date field).
+       CSS positions them into the popover while they stay exactly where
+       React put them; every click still lands on Stash's own button. */
+    function refractRatingValue(stars) {
+        var num = stars.querySelector(".star-rating-number");
+        if (num && num.textContent.trim()) { return num.textContent.trim(); }
+        /* No number rendered (stars mode) -- read it off the fill classes,
+           which carry a 0-100 fill per star. */
+        var btns = stars.querySelectorAll("button[class*='star-fill-']");
+        var total = 0;
+        Array.prototype.forEach.call(btns, function (b) {
+            var m = (b.className || "").toString().match(/star-fill-(\d+)/);
+            if (m) { total += parseInt(m[1], 10) / 100; }
+        });
+        if (!total) { return ""; }
+        return String(Math.round(total * 10) / 10);
+    }
+
+    function refractCloseRatingPopovers(except) {
+        var open = document.querySelectorAll(".refract-rating-open");
+        Array.prototype.forEach.call(open, function (h) {
+            if (h === except) { return; }
+            h.classList.remove("refract-rating-open");
+            var t = h.querySelector(".refract-rating-trigger");
+            if (t) { t.setAttribute("aria-expanded", "false"); }
+        });
+    }
+
+    var refractRatingGlobalsBound = false;
+    function refractBindRatingGlobals() {
+        if (refractRatingGlobalsBound) { return; }
+        refractRatingGlobalsBound = true;
+        document.addEventListener("click", function (e) {
+            if (e.target.closest && e.target.closest(".refract-rating-host")) { return; }
+            refractCloseRatingPopovers(null);
+        }, true);
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") { refractCloseRatingPopovers(null); }
+        });
+    }
+
+    function initSceneRatingPopover() {
+        var bars = document.querySelectorAll(".scene-toolbar, .image-toolbar");
+        Array.prototype.forEach.call(bars, function (bar) {
+            var stars = bar.querySelector(".rating-stars");
+            if (!stars) { return; }
+            var host = stars.parentElement;
+            if (!host) { return; }
+            host.classList.add("refract-rating-host");
+
+            var trig = host.querySelector(".refract-rating-trigger");
+            if (!trig) {
+                trig = document.createElement("button");
+                trig.type = "button";
+                trig.className = "refract-rating-trigger";
+                trig.setAttribute("aria-haspopup", "true");
+                trig.setAttribute("aria-expanded", "false");
+                trig.innerHTML = STAR_SVG + '<span class="refract-rating-trigger-val"></span>';
+                host.insertBefore(trig, stars);
+                trig.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var willOpen = !host.classList.contains("refract-rating-open");
+                    refractCloseRatingPopovers(host);
+                    host.classList.toggle("refract-rating-open", willOpen);
+                    trig.setAttribute("aria-expanded", willOpen ? "true" : "false");
+                });
+                refractBindRatingGlobals();
+            }
+
+            /* Refresh the read-out every pass: React rewrites the fill
+               classes in place when the rating changes. */
+            var val = refractRatingValue(stars);
+            var out = trig.querySelector(".refract-rating-trigger-val");
+            if (out && out.textContent !== val) { out.textContent = val; }
+            trig.classList.toggle("is-rated", !!val);
+            trig.title = val ? ("Rating " + val + " - click to change") : "Set a rating";
+        });
+    }
+
     function refractParseSourceLabel(text) {
         var t = String(text || "").replace(/,\s*selected\s*$/i, "").trim();
         if (!t) { return null; }
@@ -7908,12 +7998,25 @@
                keeps its state and refract reimplements nothing. */
             var rates = refractSourceRates();
             if (rates.length) {
-                html += '<div class="refract-src-group refract-src-group-rate"><div class="refract-src-head">Speed</div><div class="refract-src-row">';
-                rates.forEach(function (r) {
-                    html += '<button type="button" class="refract-src-opt" data-kind="rate" data-v="' +
-                        refractFlipEscHtml(r.label) + '">' + refractFlipEscHtml(r.label) + "</button>";
-                });
-                html += "</div></div>";
+                /* A slider, not eight more pills. Speed is an ordered scale
+                   with a natural resting point, which is what a slider is
+                   for -- and eight pills was the single biggest block in
+                   the panel. It still snaps to Stash's own rates rather
+                   than inventing continuous values, so the click can be
+                   forwarded to Stash's menu item like everything else. */
+                var curRate = refractCurrentRate();
+                var curIdx = 0;
+                for (var qi = 0; qi < rates.length; qi++) {
+                    if (rates[qi].label === curRate) { curIdx = qi; }
+                }
+                html += '<div class="refract-src-group refract-src-group-rate">' +
+                    '<div class="refract-src-head">Speed</div>' +
+                    '<div class="refract-src-rate">' +
+                    '<input type="range" class="refract-src-slider" data-kind="rate"' +
+                    ' min="0" max="' + (rates.length - 1) + '" step="1" value="' + curIdx + '"' +
+                    ' aria-label="Playback speed">' +
+                    '<span class="refract-src-rate-val">' + refractFlipEscHtml(curRate || "1x") + "</span>" +
+                    "</div></div>";
             }
             var vrModes = refractVrModes();
             if (vrModes.length) {
@@ -7927,6 +8030,23 @@
             panel.innerHTML = html;
             menu.appendChild(panel);
 
+            var slider = panel.querySelector(".refract-src-slider");
+            if (slider) {
+                var applyRate = function () {
+                    var rs = refractSourceRates();
+                    var pick = rs[parseInt(slider.value, 10)];
+                    if (!pick) { return; }
+                    var out = panel.querySelector(".refract-src-rate-val");
+                    if (out) { out.textContent = pick.label; }
+                    pick.li.click();
+                };
+                slider.addEventListener("input", applyRate);
+                /* The slider lives inside the menu; without this a drag or
+                   a click on it closes the menu via the panel handler. */
+                slider.addEventListener("click", function (e) { e.stopPropagation(); });
+                slider.addEventListener("mousedown", function (e) { e.stopPropagation(); });
+            }
+
             panel.addEventListener("click", function (e) {
                 var b = e.target.closest ? e.target.closest("[data-kind]") : null;
                 if (!b) { return; }
@@ -7934,17 +8054,6 @@
                 e.stopPropagation();
                 var kind = b.getAttribute("data-kind");
                 var target = null;
-                if (kind === "rate") {
-                    var want = b.getAttribute("data-v");
-                    var rs = refractSourceRates();
-                    for (var ri = 0; ri < rs.length; ri++) {
-                        if (rs[ri].label === want) { rs[ri].li.click(); break; }
-                    }
-                    Array.prototype.forEach.call(panel.querySelectorAll('[data-kind="rate"]'), function (o) {
-                        o.classList.toggle("is-on", o.getAttribute("data-v") === want);
-                    });
-                    return;
-                }
                 if (kind === "vr") {
                     var wantVr = b.getAttribute("data-v");
                     var ms = refractVrModes();
@@ -7982,7 +8091,16 @@
         };
         var d = panel.querySelector(".refract-src-direct");
         if (d) { d.classList.toggle("is-on", !!(cur && cur.direct)); }
-        mark('[data-kind="rate"]', refractCurrentRate());
+        var nowRate = refractCurrentRate();
+        var sl = panel.querySelector(".refract-src-slider");
+        if (sl && nowRate) {
+            var all = refractSourceRates();
+            for (var si = 0; si < all.length; si++) {
+                if (all[si].label === nowRate && String(si) !== sl.value) { sl.value = String(si); }
+            }
+            var rv = panel.querySelector(".refract-src-rate-val");
+            if (rv && rv.textContent !== nowRate) { rv.textContent = nowRate; }
+        }
         mark('[data-kind="vr"]', refractCurrentVr());
         /* Stash's own controls are redundant once the panel carries them.
            Hidden, not removed: their menu items are what the panel
@@ -8036,6 +8154,7 @@
                 safeRun(stripRatingBannerToNumber);
                 safeRun(initCardTilts);
                 safeRun(initSceneCards);
+                safeRun(initSceneRatingPopover);
                 safeRun(initPerformerCards);
                 safeRun(syncPerformerCardHearts);
                 safeRun(integrateAscensionBadges);
