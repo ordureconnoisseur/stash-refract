@@ -660,16 +660,19 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     display: flex !important;
     flex-wrap: wrap !important;
     align-items: center !important;
-    /* Packed left, NOT space-between. space-between reads fine on a
-       single row, but once the toolbar wraps it justifies each line
-       independently -- the second line holds the counters group and the
-       multiview button, so it shoved them to opposite ends of the panel
-       and left a 150.8px hole between them. */
     justify-content: flex-start !important;
-    gap: 0.35rem !important;
-    row-gap: 0.35rem !important;
+    /* ONE row, as the heading above says. The overflow fix that started
+       this let the toolbar wrap, which reached every control but cost a
+       second row -- and the strict single row is the design. Everything
+       fits now because the star rating was the thing making it not fit:
+       eight controls needed 333.7px of a 338px column with seven gaps to
+       find, and the stars alone were 109px of that. Smaller stars and a
+       tighter gap bring the row to ~310px, so nothing wraps and nothing
+       is hidden. */
+    flex-wrap: nowrap !important;
+    gap: 0.25rem !important;
     margin: 0 0 0.65rem 0 !important;
-    overflow-x: visible !important;
+    overflow: visible !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar)::-webkit-scrollbar {
     display: none !important;
@@ -688,14 +691,9 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, 
     flex: 0 0 auto !important;
 }
 
-/* Two deliberate rows: the rating cluster, then the counters and the
-   multiview button together. The three items total ~360px against a
-   column that only ever offers 338-358px, so a second row is always
-   needed -- forcing the break here keeps it the SAME two rows at every
-   panel width, instead of letting a few pixels of viewport decide
-   whether the multiview button rides along or hangs alone. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > :is(.scene-toolbar-group, .image-toolbar-group):first-child {
-    flex-basis: 100% !important;
+/* Groups shrink rather than force a wrap. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > :is(.scene-toolbar-group, .image-toolbar-group) {
+    min-width: 0 !important;
 }
 /* The group's `gap` is the only spacing. It was being added to the
    Advanced Rating plugin's own `margin-left: 8px` and to refract's
@@ -714,10 +712,18 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, 
 /* Star rating styling lives in the global block in 08_misc_mid.css.
    Scene-tabs only needs to size the button frame to align with adjacent
    pill controls; the icon styling is inherited. */
+/* 15px, not 18. Five stars at 18px plus their margins came to 109px --
+   nearly a third of the whole toolbar's width budget, and the single
+   reason the other seven controls could not share the row. At 15px the
+   rating still reads clearly and the row fits. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars button {
-    width: 18px !important;
-    height: 18px !important;
-    min-width: 18px !important;
+    width: 15px !important;
+    height: 15px !important;
+    min-width: 15px !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars button svg {
+    width: 15px !important;
+    height: 15px !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
     height: 26px !important;
@@ -1973,3 +1979,38 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
 }
 
 /* ── Wall / masonry view ────────────────────────────────────────────── */
+
+/* ── Toolbar fits one row ─────────────────────────────────────────────
+   Eight controls in a 338px column. Measured budget before this block:
+   stars 94 + rating chip 50.2 + heart 30 + play-count 46 + o-count 46.5
+   + organised 26 + kebab 26 + multiview 26 = 344.7, plus seven gaps at
+   3.5 = 369.2 against 338. Every one of these is padding, not content:
+   the count pills carry 7px each side on BOTH their icon and their
+   value for an 11px glyph and a 6px digit. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
+    gap: 0.15rem !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) {
+    gap: 0.15rem !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button > .btn {
+    padding-left: 0.28rem !important;
+    padding-right: 0.28rem !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
+    padding-left: 0.4rem !important;
+    padding-right: 0.4rem !important;
+    gap: 0.2rem !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn {
+    width: 26px !important;
+    padding-left: 0.2rem !important;
+    padding-right: 0.2rem !important;
+    margin-left: 0 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, #operation-menu, .mv-scene-page-btn, .mv-scene-btn) {
+    width: 24px !important;
+    min-width: 24px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
