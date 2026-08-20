@@ -501,20 +501,6 @@
             var elemHover = elemHoverState[0];
             var elemBoxesState = R.useState({});
             var elemBoxes = elemBoxesState[0];
-            /* Escape closes whichever menu is open. Every other layer in the
-               panel already does (the back-photo picker, the toolbar popover);
-               these two trapped you. */
-            R.useEffect(function () {
-                if (pillMenu === null && elemMenu === null) { return undefined; }
-                var onKey = function (e) {
-                    if (e.key !== "Escape") { return; }
-                    e.stopPropagation();
-                    setPillMenu(null);
-                    elemMenuState[1](null);
-                };
-                document.addEventListener("keydown", onKey);
-                return function () { document.removeEventListener("keydown", onKey); };
-            }, [pillMenu, elemMenu]);
             R.useEffect(function () {
                 var live = true, timers = [], raf = null;
                 var measure = function () {
@@ -580,11 +566,23 @@
                                    editable; two overlapping targets over one
                                    object is worse than none. */
                                 if (d.key === "refract.pcHideStats" && pillStripEditable()) { return; }
-                                var n;
-                                try { n = root.querySelector(d.sel); } catch (e) { n = null; }
-                                if (!n) { return; }
-                                var r = n.getBoundingClientRect();
-                                if (!r.width || !r.height) { return; }
+                                /* The first VISIBLE match, not the first match.
+                                   `sel` lists alternates ("the duration pill OR
+                                   the specs-overlay duration"), and querySelector
+                                   returns whichever comes first in DOM ORDER --
+                                   which for Duration is the hidden overlay span,
+                                   0x0, so the element was silently skipped and
+                                   its chip had no target. Same trap waits for the
+                                   studio in "As title text" mode. */
+                                var ns;
+                                try { ns = root.querySelectorAll(d.sel); } catch (e) { ns = null; }
+                                if (!ns || !ns.length) { return; }
+                                var r = null;
+                                for (var qi = 0; qi < ns.length; qi++) {
+                                    var rr = ns[qi].getBoundingClientRect();
+                                    if (rr.width && rr.height) { r = rr; break; }
+                                }
+                                if (!r) { return; }
                                 eb[d.key] = {
                                     left: Math.round(r.left - rb.left),
                                     top: Math.round(r.top - rb.top),
@@ -791,6 +789,25 @@
             var backPills = backPillsState[0];
             var pillMenuState = R.useState(null);
             var pillMenu = pillMenuState[0];
+            /* Escape closes whichever menu is open. MUST sit below
+               `var pillMenu`: declared above it, the dependency array read the
+               hoisted-but-unassigned `undefined` every render, so it never
+               changed, the effect never re-ran when a pill menu opened, and no
+               listener was ever attached. The element menu worked only because
+               its variable happens to be declared earlier -- which is exactly
+               why the bug looked fixed. */
+            R.useEffect(function () {
+                if (pillMenu === null && elemMenu === null) { return undefined; }
+                var onKey = function (e) {
+                    if (e.key !== "Escape") { return; }
+                    e.stopPropagation();
+                    setPillMenu(null);
+                    elemMenuState[1](null);
+                };
+                document.addEventListener("keydown", onKey);
+                return function () { document.removeEventListener("keydown", onKey); };
+            }, [pillMenu, elemMenu]);
+
             var setPillMenu = pillMenuState[1];
             function writeBackPills(list) {
                 try { localStorage.setItem(BACK_PILLS_KEY, list.join(",")); } catch (e) { /* ignore */ }
