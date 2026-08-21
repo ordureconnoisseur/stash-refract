@@ -418,7 +418,10 @@ body.stash-liquid-glass .performer-card .hon-battle-rank-badge.hon-battle-rank-b
     display: inline-flex !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
-    gap: 0.34rem !important;
+    /* Measured 1.75px of daylight between the flame and the number -- the
+       nominal gap is eaten by the glyph's own box. Widened until the two read
+       as an icon and a number rather than as one smudge. */
+    gap: 0.5rem !important;
     flex: 0 0 auto !important;
     width: auto !important;
     max-width: 100% !important;

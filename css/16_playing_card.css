@@ -437,7 +437,11 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .stash-perf-sta
     grid-template-columns: auto auto !important;
     grid-template-rows: auto auto !important;
     column-gap: calc(0.3rem * var(--pc-badge-scale, 1)) !important;
-    row-gap: calc(0.05rem * var(--pc-badge-scale, 1)) !important;
+    /* The label sat ON the icon: 0.05rem is 0.8px, which is not a gap, it is
+       a rounding error. Measured live at 0.59px between the label's box and
+       the icon's. Enough air that the two rows read as two rows, and small
+       enough that the pill keeps its height. */
+    row-gap: calc(0.16rem * var(--pc-badge-scale, 1)) !important;
     align-items: center !important;
     justify-items: center !important;
     padding:
