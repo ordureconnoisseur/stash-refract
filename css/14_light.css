@@ -230,10 +230,28 @@ body.stash-liquid-glass.refract-light .filter-dialog .modal-content {
 
 /* ═══════ 7. Scene player chrome (background overrides; shadows from
               tokens or kept-inline composites) ═══════════════════ */
+/* The player chrome stays dark in light mode -- it sits under video, not
+   on the page ground -- but 06_scene_player.css colours it with
+   var(--text) / var(--text-muted), which light mode redefines to
+   near-black. The whole control bar was painting dark-on-black: play,
+   the skip buttons, both time displays and the loaded percentage all
+   measured under 2.5:1 against the bar, and the bar read as empty.
+   Restoring the dark theme's tokens on the bar itself fixes every
+   var(--text) consumer inside it at once. */
+body.stash-liquid-glass.refract-light .video-js .vjs-control-bar {
+    --text: rgba(255, 255, 255, 0.92);
+    --text-muted: rgba(255, 255, 255, 0.55);
+}
+/* ...except the light islands that sit inside the bar. These get a
+   near-white panel on purpose, so they take the tokens back the other
+   way -- which also carries to their descendants (.vjs-menu-item) that
+   the old rule could not reach. */
 body.stash-liquid-glass.refract-light .video-js .vjs-menu .vjs-menu-content,
 body.stash-liquid-glass.refract-light .video-js .vjs-mouse-display .vjs-time-tooltip,
 body.stash-liquid-glass.refract-light .video-js .vjs-volume-panel-vertical .vjs-volume-control,
 body.stash-liquid-glass.refract-light .scrubber-item-time {
+    --text: rgba(0, 0, 0, 0.88);
+    --text-muted: rgba(0, 0, 0, 0.65);
     background: rgba(255, 255, 255, 0.88) !important;
     color: var(--text) !important;
 }
