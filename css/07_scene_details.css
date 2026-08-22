@@ -2056,6 +2056,15 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     font-weight: 600 !important;
     font-variant-numeric: tabular-nums !important;
 }
+/* Stash renders the spec spans whether or not it has a value for them,
+   so a scene with no date got an empty .date -- which the pill styling
+   above turned into a visible 20x8 grey stub sitting where the studio
+   eyebrow should be. Scenes without a date are common, so this showed
+   up constantly. Drawing a pill is conditional on having something to
+   put in it. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) :is(.date, .frame-rate, .resolution):empty {
+    display: none !important;
+}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .divider {
     display: none !important;
 }
