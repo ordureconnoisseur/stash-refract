@@ -883,3 +883,16 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .nav-tabs {
     background: rgba(0, 0, 0, 0.03) !important;
     border: 1px solid var(--glass-border) !important;
 }
+
+/* ═══════ 28. Card customiser segmented controls ═══════════════════
+   `.is-active` paints accent-bright text on a 20% accent tint. On the
+   dark base that is light-on-dark and fine; on the light base it is the
+   lighter accent on a pale accent wash, which measured 2.38:1 and
+   2.53:1 -- the selected tab was the hardest label in the panel to
+   read. Light mode already defines --accent as the darker variant of
+   the pair for exactly this reason, so use it. Takes the two controls
+   to roughly 3.6:1. */
+body.stash-liquid-glass.refract-light .refract-cc-kind-btn.is-active,
+body.stash-liquid-glass.refract-light .refract-cc-seg-btn.is-active {
+    color: var(--accent);
+}
