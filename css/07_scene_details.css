@@ -705,8 +705,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, 
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > :empty,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) > :empty {
+/* :not(button):not(a) because `:empty` is not "looks empty" -- an element
+   whose only child is a comment node counts as empty, and that is exactly
+   what React renders for a falsy child or a portal placeholder. A plugin
+   button built that way was being hidden outright and never came back,
+   because nothing ever filled it. The classless wrapper span this rule
+   exists for is still caught; a control never is. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > :empty:not(button):not(a),
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) > :empty:not(button):not(a) {
     display: none !important;
 }
 /* Star rating styling lives in the global block in 08_misc_mid.css.
@@ -2083,6 +2089,16 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) span:empty {
     display: none !important;
+}
+
+/* Every control below is given an explicit `order`, which means anything
+   NOT listed keeps the initial `order: 0` and sorts ahead of all of them --
+   so a third-party plugin button landed at the head of the row, in front of
+   the rating stars. This catch-all puts unrecognised controls after the
+   known ones instead. Deliberately not `!important`, so all the specific
+   rules below continue to win. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(button, a, div.dropdown, div.btn-group) {
+    order: 10;
 }
 
 /* Anchor: Stash's own five stars, back at readable size. This is what
