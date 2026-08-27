@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;800;900&display=swap">
+  <style>
+    body { margin: 0; font-family: "Albert Sans", system-ui, sans-serif; }
+    a { color: #fb923c; } a:hover { color: #ffd4b0; }
+    .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 900px; min-height: 1400px; box-sizing: border-box; padding: 60px 56px 64px; background: radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.045) 0%, transparent 55%), radial-gradient(100% 60% at 100% 30%, rgba(249,115,22,0.05) 0%, transparent 50%), linear-gradient(180deg, #111 0%, #0a0a0a 100%); color: rgba(255,255,255,0.92); letter-spacing: 0.005em;">
+
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 34px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f97316;">Section 6</div>
+    <div style="font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;">Component law</div>
+    <div style="font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.55; max-width: 66ch; text-wrap: pretty;">The recipes as shipped, each carrying the rule it encodes. Blur is for the few large surfaces, never for the many small ones.</div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">Buttons</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+    <div style="font-size: 10.08px; color: rgba(255,255,255,0.4);">no blur: 30 to 50 per page, each would be a GPU layer</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 14px; align-items: stretch;">
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(249,115,22,0.12); border: 1px solid rgba(249,115,22,0.28); border-radius: 12px; color: #fb923c; font-size: 12.25px; font-weight: 600;">Save changes</div>
+      <div style="font-size: 10.08px; color: rgba(255,255,255,0.5); text-align: center;">primary, rest</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(249,115,22,0.22); border: 1px solid #fb923c; border-radius: 12px; color: rgba(255,255,255,0.92); font-size: 12.25px; font-weight: 600; box-shadow: 0 0 14px rgba(249,115,22,0.38);">Save changes</div>
+      <div style="font-size: 10.08px; color: rgba(255,255,255,0.5); text-align: center;">hover and focus</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; color: rgba(255,255,255,0.8); font-size: 12.25px; font-weight: 500;">Cancel</div>
+      <div style="font-size: 10.08px; color: rgba(255,255,255,0.5); text-align: center;">secondary glass</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="height: 40px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.75);">
+        <svg viewBox="0 0 512 512" style="width: 18px; height: 18px; fill: #fb923c;"><path d="M225.8 468.2l-2.5-2.3L48.1 303.2C17.4 274.7 0 234.7 0 192.8l0-3.3c0-70.4 50-130.8 119.2-144 39.1-7.4 79.4 .9 109.4 22.8c12.2 8.9 19.4 18.2 27.4 28.5 8-10.3 15.3-19.6 27.4-28.5 30-21.9 70.3-30.2 109.4-22.8C462 53.5 512 113.9 512 184.3l0 3.5c0 41.9-17.4 81.9-48.1 110.4L289.6 466c-.8 .8-1.7 1.5-2.5 2.3-9.5 8.8-22 13.7-35 13.7s-25.5-4.9-35-13.7z"/></svg>
+      </div>
+      <div style="font-size: 10.08px; color: rgba(255,255,255,0.5); text-align: center;">minimal: the glyph is the button</div>
+    </div>
+  </div>
+  <div style="font-size: 11.2px; color: rgba(255,255,255,0.55); line-height: 1.55; margin-bottom: 34px; text-wrap: pretty;">Fill accent-tint 0.12, rim accent-glow 0.28, ink accent-bright, weight 600, radius-sm. Hover fills to 0.22 and glows. Destructive actions live in a menu, not in a row of peers.</div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; margin-bottom: 34px;">
+    <div>
+      <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 14px;">Inputs</div>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="height: 38px; display: flex; align-items: center; padding: 0 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; color: rgba(255,255,255,0.45); font-size: 12.25px;">Search scenes</div>
+        <div style="height: 38px; display: flex; align-items: center; padding: 0 14px; background: rgba(255,255,255,0.09); border: 1px solid rgba(249,115,22,0.28); border-radius: 12px; color: rgba(255,255,255,0.92); font-size: 12.25px; box-shadow: 0 0 0 2px rgba(249,115,22,0.15);">Search scenes<span style="display: inline-block; width: 1.5px; height: 16px; background: #fb923c; margin-left: 2px;"></span></div>
+      </div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.55); line-height: 1.55; margin-top: 12px; text-wrap: pretty;">Focus is an accent event, never a browser default and never nothing: accent-glow rim, a 2px accent ring at 0.15, fill one step up to 0.09. This is the house focus ring, everywhere.</div>
+    </div>
+    <div>
+      <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 14px;">Toasts: state survives the glass</div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 9px 14px; background: rgba(46,125,91,0.22); border: 1px solid rgba(46,125,91,0.45); border-radius: 12px; font-size: 11.9px; font-weight: 600;">Scan finished</div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 9px 14px; background: rgba(217,45,32,0.22); border: 1px solid rgba(217,45,32,0.5); border-radius: 12px; font-size: 11.9px; font-weight: 600;">Generate failed: disk full on Z:</div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 9px 14px; background: rgba(232,121,43,0.2); border: 1px solid rgba(232,121,43,0.45); border-radius: 12px; font-size: 11.9px; font-weight: 600;">Library path unreachable</div>
+      </div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.55); line-height: 1.55; margin-top: 12px; text-wrap: pretty;">The flat glass toast once beat the semantic classes, so a failure and a success rendered identically. Status tints layer ONTO the glass; they never lose to it.</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; margin-bottom: 34px;">
+    <div>
+      <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 14px;">The eyebrow</div>
+      <div style="border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 18px; background: rgba(255,255,255,0.03);">
+        <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.55); padding-bottom: 7px; border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 10px;">File info</div>
+        <div style="display: flex; justify-content: space-between; font-size: 12.25px; padding: 3px 0;"><span style="color: rgba(255,255,255,0.55);">Resolution</span><span>2160p</span></div>
+        <div style="display: flex; justify-content: space-between; font-size: 12.25px; padding: 3px 0;"><span style="color: rgba(255,255,255,0.55);">Codec</span><span>HEVC</span></div>
+      </div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.55); line-height: 1.55; margin-top: 12px; text-wrap: pretty;">fs-xs, weight 600 to 700, uppercase. Tracking ladder: 0.04em tight, 0.06 to 0.08em standard, 0.1 to 0.14em wide. Always muted or accent, never brighter than the content it introduces.</div>
+    </div>
+    <div>
+      <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 14px;">Scrollbars</div>
+      <div style="border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 18px; background: rgba(255,255,255,0.03); display: grid; grid-template-columns: minmax(0, 1fr) 20px; gap: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 7px;">
+          <div style="height: 9px; border-radius: 4px; background: rgba(255,255,255,0.07); width: 92%;"></div>
+          <div style="height: 9px; border-radius: 4px; background: rgba(255,255,255,0.07); width: 78%;"></div>
+          <div style="height: 9px; border-radius: 4px; background: rgba(255,255,255,0.07); width: 86%;"></div>
+          <div style="height: 9px; border-radius: 4px; background: rgba(255,255,255,0.07); width: 64%;"></div>
+          <div style="height: 9px; border-radius: 4px; background: rgba(255,255,255,0.07); width: 88%;"></div>
+        </div>
+        <div style="display: flex; justify-content: center;">
+          <div style="width: 8px; height: 100%; position: relative;">
+            <div style="position: absolute; top: 8%; width: 8px; height: 44%; border-radius: 9999px; background: rgba(249,115,22,0.35);"></div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.55); line-height: 1.55; margin-top: 12px; text-wrap: pretty;">8px on panes, 4px in popups. Accent thumb at 0.35, hover 0.6, pill radius, transparent track, always. Quiet contexts may use the glass border colour instead.</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">Mobile chrome: the dock</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+    <div style="font-size: 10.08px; color: rgba(255,255,255,0.4);">the one settled break from the floating-glass language</div>
+  </div>
+
+  <div style="display: flex; justify-content: center; margin-bottom: 14px;">
+    <div style="width: 320px; border: 1px solid rgba(255,255,255,0.14); border-radius: 22px; overflow: hidden; background: #0d0d10;">
+      <div style="height: 96px; padding: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);"></div>
+        <div style="border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);"></div>
+      </div>
+      <div style="height: 49px; background: rgba(10,10,12,0.96); border-top: 1px solid rgba(255,255,255,0.10); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; justify-items: center;">
+        <div style="width: 20px; height: 20px; border-radius: 6px; background: rgba(249,115,22,0.8);"></div>
+        <div style="width: 20px; height: 20px; border-radius: 6px; background: rgba(255,255,255,0.22);"></div>
+        <div style="width: 20px; height: 20px; border-radius: 6px; background: rgba(255,255,255,0.22);"></div>
+        <div style="width: 20px; height: 20px; border-radius: 6px; background: rgba(255,255,255,0.22);"></div>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="width: 16px; height: 2px; background: rgba(255,255,255,0.5); border-radius: 1px;"></div>
+          <div style="width: 16px; height: 2px; background: rgba(255,255,255,0.5); border-radius: 1px;"></div>
+          <div style="width: 16px; height: 2px; background: rgba(255,255,255,0.5); border-radius: 1px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="font-size: 11.2px; color: rgba(255,255,255,0.55); line-height: 1.55; margin-bottom: 34px; max-width: 70ch; text-wrap: pretty;">Below phone widths the desktop navbar is replaced, not shrunk: an edge-to-edge tab bar, 3.5rem content height, near-black, hairline top border, 12px blur, safe-area folded inside so it reads as device chrome. Burger tile opens the drawer; the dock (z 110) sits above the scrim (z 99) so the burger doubles as the close control. Width-driven, not touch-gated.</div>
+
+  <div style="display: flex; flex-direction: column; gap: 14px;">
+    <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 16px;">
+      <div style="background: #f97316; border-radius: 2px;"></div>
+      <div>
+        <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 6px;">Icons: inline SVG, currentColor, never emoji.</div>
+        <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">Icons inherit their text colour and theme for free across eight accents and light mode. On Windows an emoji renders as a colour bitmap that ignores currentColor entirely, which is why the heart is drawn as bezier paths.</div>
+      </div>
+    </div>
+    <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 16px;">
+      <div style="background: #f97316; border-radius: 2px;"></div>
+      <div>
+        <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 6px;">Voice: British English, sentence case, plain verbs.</div>
+        <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">Colour, customiser, organised. Labels name what the user controls, in their vocabulary: "Lite mode", never "disable backdrop-filter". A control says what it does. Errors say what happened and what to do. No emoji, no em dashes, anywhere.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

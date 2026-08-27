@@ -10,7 +10,9 @@
 
     { "file": "Tiers.dc.html", "x": 0, "y": 2940, "w": 900, "h": 1320, "title": "Rating tiers" },
     { "file": "Modes.dc.html", "x": 1000, "y": 2940, "w": 900, "h": 1180, "title": "Modes" },
-    { "file": "Drift.dc.html", "x": 2000, "y": 2940, "w": 900, "h": 1180, "title": "Drift and checklist" }
+    { "file": "Components.dc.html", "x": 2000, "y": 2940, "w": 900, "h": 1400, "title": "Component law" },
+
+    { "file": "Drift.dc.html", "x": 1000, "y": 4480, "w": 900, "h": 1240, "title": "Drift and checklist" }
   ],
   "annotations": [
     {
@@ -21,7 +23,8 @@
       "text": "The visual half of the Refract design system.\nThe governing text is DESIGN_SYSTEM.md in the repo root; where the two disagree, the file wins.\nEvery number on these sheets was read out of the shipped CSS or JS."
     },
     { "id": "row-foundations", "x": 0, "y": 1480, "w": 340, "text": "Foundations: the tokens everything else resolves through." },
-    { "id": "row-systems", "x": 0, "y": 2820, "w": 340, "text": "Systems and process: what the tokens are for, and how a change gets shipped." }
+    { "id": "row-systems", "x": 0, "y": 2820, "w": 340, "text": "Systems: what the tokens are for, and the recipes that consume them." },
+    { "id": "row-process", "x": 1000, "y": 4370, "w": 340, "text": "Process: the honest ledger, and the bar a change has to clear." }
   ],
   "launch": { "view": "canvas" }
 }

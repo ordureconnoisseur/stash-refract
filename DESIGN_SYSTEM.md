@@ -312,7 +312,7 @@ glare alpha, `cubic-bezier(.03,.98,.52,.99)`.
 Hover lift is `translateY(-2px)`. It is small on purpose. Cards in a grid that
 jump are cards that make a grid feel unstable.
 
-**Rules**
+**Rules (motion)**
 
 1. **Never toggle a document-wide effect on scroll.** `scroll-perf` toggled a
    body class to strip `backdrop-filter` while scrolling; on Chromium D3D11
@@ -325,6 +325,28 @@ jump are cards that make a grid feel unstable.
    that never stops.
 3. `prefers-reduced-motion: reduce` strips animation and keeps colour. It is
    handled in 13 places today; a new animated element adds a 14th.
+
+### 3.8 Elevation (proposed scale)
+
+There is no z-index system today; the drift ledger (section 9) documents the
+mess. This is the proposed band map, drawn from what the shipped values
+actually mean. New code picks from a band; existing values migrate
+opportunistically, file by file, never in a sweep.
+
+| Band | Range | What lives here |
+|---|---|---|
+| Content | 0 to 9 | in-flow layering inside a component |
+| Card tiers | 20 to 70 | the tier rank ladder (section 4), fixed |
+| Floating chrome | 90 to 120 | mobile scrim 99, mobile dock 110, sticky bars |
+| Page overlays | 400 | floating pagination |
+| Bootstrap layer | 1050 to 1100 | modals, dropdowns, popovers (Bootstrap's own values) |
+| Topmost | 9999 to 10000 | lightbox chrome, drag ghosts, absolute-last-resort |
+
+Two standing rules already earned by bugs: the tier ladder must stay isolated
+inside its grid row (its 20 to 70 would otherwise fight the pagination's 400
+through a transformed ancestor), and tier cards get no `isolation` or
+`will-change`, because promoting each card to its own compositor layer makes
+Chrome sometimes paint them out of z-order.
 
 ---
 
@@ -430,36 +452,210 @@ trade-off.
 
 ## 6. Component law
 
-**Cards.** The image is the card. Text overlays it or sits in a chin below it,
-never beside it. Metadata is glass pills, not rows. Hover does three things and
-only three: lift 2px, warm the rim, tilt if enabled. The rating banner is a
-five-point star in STARS mode and a squircle pill in DECIMAL, auto-detected,
-no setting. A card in a grid never scrolls internally.
+### 6.1 Cards
 
-**Navbar.** Fixed and floating, inset 12px on three sides, `--radius`, the full
-glass recipe, `--shadow-navbar`. Clips horizontally (`overflow-x: clip`) and
-stays visible vertically so active-state halos are not cut off. Icons are
+The image is the card. Text overlays it or sits in a chin below it, never
+beside it. Metadata is glass pills, not rows. Hover does three things and only
+three: lift 2px, warm the rim, tilt if enabled. The rating banner is a
+five-point star in STARS mode and a squircle pill in DECIMAL, auto-detected, no
+setting. A card in a grid never scrolls internally.
+
+Per-element visibility comes from the `CARD_ELEMS` table: every hideable part
+of a card has a `refract-sc-*` / `refract-pc-*` body class, and the keys, the
+classes and the settings chips all derive from that one table. A new card
+element that should be hideable joins the table; it does not get a bespoke
+toggle.
+
+### 6.2 The playing card
+
+The signature element. When `refract-perf-layout-card` is set, a performer card
+becomes a trading card:
+
+- **Name banner** on top (`.refract-pc-name-banner`), tier-glow behind the
+  name, the gender glyph sitting to its left like a type symbol.
+- **Neon stat strip** over the bottom of the image: rating, age, scene count,
+  o-count, country flag, each a compact icon-plus-value unit.
+- **Tier label ribbon** (`.refract-pc-tier-label`) when tiered.
+- **A back**: the flip button two-phase-rotates to a dossier face built lazily
+  on first flip, GraphQL fired only then. The flip is faked (section 8) because
+  `overflow: hidden` forces `transform-style: flat`.
+
+The name and tier chip are never toggleable; a card must always be
+identifiable. Scene cards keep the Refract chin in this mode; the trading-card
+layout is performers only.
+
+### 6.3 Navbar
+
+Fixed and floating, inset 12px on three sides, `--radius`, the full glass
+recipe, `--shadow-navbar`. Clips horizontally (`overflow-x: clip`) and stays
+visible vertically so active-state halos are not cut off. Icons are
 drag-reorderable and the order persists. It scrolls horizontally rather than
 wrapping at narrow widths.
 
-**Panels.** `--glass-bg-strong` plus a blur rung. Content sets its own rhythm;
-the panel supplies the rim and the floor and nothing else. Remember section
-3.2: a child of a glass panel cannot paint its own glass without reading as a
-lighter band.
+### 6.4 Panels
 
-**Pills and chips.** `--radius-pill`, `--fs-sm`, glass fill, hairline rim. They
-are readouts first and controls second. A pill that mutates something must look
-different from a pill that reports something. Eleven identical 26px circles in
-one row communicates nothing, and that is exactly what the scene panel action
-bar shipped.
+`--glass-bg-strong` plus a blur rung. Content sets its own rhythm; the panel
+supplies the rim and the floor and nothing else. Remember section 3.2: a child
+of a glass panel cannot paint its own glass without reading as a lighter band.
 
-**Popovers.** Bootstrap's variables are re-pegged at body level so they cascade
-everywhere: `rgba(20,20,24,0.97)` in dark, `rgba(255,255,255,0.97)` in light,
-12px radius. Do not restyle a popover locally; fix the variable.
+### 6.5 Buttons
 
-**Buttons.** `--fs-base`, `--radius-sm` or pill, glass fill, accent on hover
-through `--bs-link-hover-color`. Destructive actions live in a menu, not in a
-row of peers.
+The primary recipe, from `09_buttons.css`:
+
+```css
+background: var(--accent-tint);          /* 0.12 accent */
+border: 1px solid var(--accent-glow);    /* 0.28 accent */
+color: var(--accent-bright);
+border-radius: var(--radius-sm);
+font-weight: 600;
+/* hover and focus: fill to 0.22, glow shadow, text to --text */
+```
+
+**Deliberately no backdrop-filter.** The rule hits every primary button on the
+page, which can be 30 to 50 on heavy pages, and each blurred button is its own
+GPU compositor layer. Accent tint plus accent-glow border is readable without
+blur. This is the template for any repeated control: blur is for the few large
+surfaces, never for the many small ones.
+
+The **minimal** variant (`.btn.minimal`) is the icon-only button: transparent
+fill, transparent border, no shadow, no blur. The glyph is the button. Used for
+the favourite heart and its peers.
+
+Destructive actions live in a menu, not in a row of peers. A counter that
+happens to be clickable is a readout, not a button, and must not dress like
+one.
+
+### 6.6 Inputs and forms
+
+Glass inputs: `rgba(255,255,255,0.04)` fill, `--glass-border` rim, `--text`
+ink, `--fs-sm` in dense contexts and `--fs-base` elsewhere. Focus is an accent
+event, not a browser default:
+
+```css
+border-color: var(--accent-glow);
+box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.15);   /* 3px on selects */
+outline: none;
+background: rgba(255, 255, 255, 0.09);                  /* one step up */
+```
+
+Focus must always be visible; the rule above is the house focus ring. Input
+groups (prepend button plus field) merge into one pill: the seam edge of each
+half flattens its radius. Do not force `border-radius` with `!important` on a
+high-specificity input selector; it blocks the downstream pill-merging rules,
+which is a bug that already shipped once.
+
+### 6.7 Pills and chips
+
+`--radius-pill`, `--fs-sm`, glass fill, hairline rim. They are readouts first
+and controls second. A pill that mutates something must look different from a
+pill that reports something. Eleven identical 26px circles in one row
+communicates nothing, and that is exactly what the scene panel action bar
+shipped.
+
+### 6.8 Popovers and hover cards
+
+Bootstrap's variables are re-pegged at body level so they cascade everywhere:
+`rgba(20,20,24,0.97)` in dark, `rgba(255,255,255,0.97)` in light, 12px radius.
+Do not restyle a popover locally; fix the variable.
+
+Refract also injects its own hover cards (performer circles on scene cards, tag
+popups). Two rules earned there:
+
+1. **The popup stays open while the mouse travels to it.** Show on hover of the
+   badge OR the popup itself, so the cursor can cross the gap without
+   dismissal.
+2. Injected popovers portal to body level and get the thin scrollbar (6.10),
+   never an inner scroll trap inside a card.
+
+### 6.9 Toasts and status colour
+
+Status tints layer ONTO the glass; they do not replace it:
+
+| State | Fill | Border |
+|---|---|---|
+| success | `rgba(46,125,91,0.22)` | `rgba(46,125,91,0.45)` |
+| danger | `rgba(217,45,32,0.22)` | `rgba(217,45,32,0.5)` |
+| warning | `rgba(232,121,43,0.2)` | `rgba(232,121,43,0.45)` |
+
+The rule this encodes: **state must survive the glass.** The original flat
+glass toast beat Bootstrap's `.bg-success` / `.bg-danger` with `!important`, so
+a failed task and a successful one rendered identically and an error carried no
+signal at all. Whenever a themed surface can carry semantic state, check that
+the state still reads after theming.
+
+### 6.10 Scrollbars
+
+Thin, track-less, accent-thumbed:
+
+- Width 8px on content panes, 4px inside popups.
+- Thumb `rgba(var(--accent-rgb), 0.35)`, hover `0.6`, pill radius. Quiet
+  contexts (tag popups) may use `--glass-border` instead of accent.
+- Track transparent, always.
+
+A scrollbar is chrome; it gets accent only because it is interactive.
+
+### 6.11 Mobile chrome
+
+Below phone widths Refract does not shrink the desktop navbar; it replaces it,
+ground-up, width-driven (any narrow viewport, not touch-gated):
+
+- **Bottom dock**: an edge-to-edge native-feeling tab bar. 3.5rem content
+  height, near-black fill, hairline top border, 12px blur, safe-area inset
+  folded INSIDE the bar so it reads as device chrome rather than a floating
+  element. Essential routes one tap away, burger tile at the end.
+- **Drawer**: a body-level overlay of route tiles, opened by the burger, closed
+  by it too (dock 110 sits above the scrim 99 so the burger stays reachable).
+- **Scrim**: dims the page under the drawer.
+
+Breakpoints in use: 600, 768, 900, 991, 1200 max-width, with 12_mobile loaded
+after the desktop sheets so its rules win. The scene page stacks player over
+panel below 1200 (section 3.6); the card grid drops to two columns on phones.
+
+The dock deliberately breaks the floating-glass language: at phone size the
+theme imitates the platform's own chrome instead of its desktop self. That
+trade is settled.
+
+### 6.12 Iconography
+
+- Inline SVG only, sized by the text box, coloured by `currentColor`. Two
+  families in use: filled Font Awesome-style paths (matching Stash's own icon
+  set) and stroke-based glyphs; keep to those, matching whichever the
+  surrounding Stash context uses.
+- **Never emoji.** Beyond the house style rule, there is a technical one: on
+  Windows, emoji glyphs render as colour bitmaps that ignore `fillStyle` and
+  `currentColor` entirely. The heart is drawn as bezier paths for exactly this
+  reason.
+- Icons inherit their text colour and therefore theme for free. An icon with a
+  hard-coded fill is wrong in seven accents and light mode.
+
+### 6.13 The eyebrow, and micro-type
+
+The house label pattern for section headers, column labels and stat captions:
+`--fs-xs`, weight 600 to 700, uppercase, tracked. Tracking has a de-facto
+ladder: `0.04em` for tight labels, `0.06` to `0.08em` for standard eyebrows,
+`0.1` to `0.14em` for wide display labels; body text sits at the global
+`0.005em` and never gets tracked wider. 64 uppercase uses follow this pattern
+today.
+
+An eyebrow labels; it is always `--text-muted` or accent, never brighter than
+the content it introduces (P1).
+
+### 6.14 Voice
+
+The words are part of the theme and follow the same discipline:
+
+- **British English**: colour, customiser, organised, favourite. Refract's UI
+  copy, settings labels and README already are; stay consistent.
+- **Sentence case everywhere**: "Accent colour", "Card rating style", "Show
+  performer names". Uppercase belongs to the eyebrow treatment (6.13), not to
+  the words themselves.
+- Labels name what the user controls, in their vocabulary, not the
+  implementation's: "Lite mode", never "disable backdrop-filter".
+- A control says what it does: the plain verb, no cleverness. Counters are
+  nouns. Toggles are states.
+- No emoji, no em dashes, anywhere, ever.
+- Errors say what happened and what to do, specifically. A toast that cannot
+  say which of success or failure occurred is the 6.9 bug in words.
 
 ---
 
@@ -533,7 +729,7 @@ that file.
 | Motion | Not tokenized at all. 0.15s appears 373 times as a literal. There is no `--dur-*` or `--ease-*`. | 3.7 |
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px, 9px and 10px literals. | 3.4 |
 | Surfaces | Four `backdrop-filter` expressions still bypass the ladder, including `blur(16px) saturate(1.1)`. | 3.2 |
-| Z-index | No scale at all. Values run 0, 1 through 12, then 20, 30, 50, 90, 99, 100, 400, 1050, 1060, 1100, 9999, 10000, each chosen ad hoc. | none yet, which is the problem |
+| Z-index | Values run 0, 1 through 12, then 20, 30, 50, 90, 99, 100, 400, 1050, 1060, 1100, 9999, 10000, each chosen ad hoc. A band map now exists (3.8); nothing has migrated to it yet. | 3.8 |
 | Specificity | 8,268 `!important` declarations. Largely unavoidable against Bootstrap, but it means load order and class doubling are the only remaining levers. | 5.2 |
 
 If a sub-`--fs-xs` step is genuinely needed, add it to the scale once rather
@@ -597,7 +793,10 @@ Before a design ships:
 - [ ] Readable in lite mode, with no low-alpha surface left unpinned.
 - [ ] Defined behaviour under `prefers-reduced-motion` and
       `prefers-reduced-transparency`.
-- [ ] Survives at the stacked or narrow width, not just the design width.
+- [ ] Survives at the stacked or narrow width, not just the design width, and
+      on phones coexists with the bottom dock rather than fighting it.
+- [ ] Focus is visible on every interactive element, using the house ring
+      (6.6), not the browser default and not nothing.
 - [ ] Survives every third-party plugin element being absent.
 - [ ] No React node relocated; every click still lands on Stash's element.
 - [ ] Every size comes from the type scale, and the surface has six or seven
