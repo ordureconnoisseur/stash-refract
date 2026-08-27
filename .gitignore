@@ -21,3 +21,6 @@ design-scrape-modal/
 
 # Local measuring harness (dev tooling, not part of the plugin)
 tools/
+
+# Seeded design-canvas output (2.5 MB editor payload, rebuilt from the .dc.html sources)
+design-system/refract-design-system.html

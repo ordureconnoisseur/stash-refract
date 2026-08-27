@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;800;900&display=swap">
+  <style>
+    body { margin: 0; font-family: "Albert Sans", system-ui, sans-serif; }
+    a { color: #fb923c; } a:hover { color: #ffd4b0; }
+    .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 900px; min-height: 1180px; box-sizing: border-box; padding: 60px 56px 64px; background: radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.045) 0%, transparent 55%), radial-gradient(100% 60% at 100% 30%, rgba(249,115,22,0.05) 0%, transparent 50%), linear-gradient(180deg, #111 0%, #0a0a0a 100%); color: rgba(255,255,255,0.92); letter-spacing: 0.005em;">
+
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f97316;">Foundation 3.2 and 3.4</div>
+    <div style="font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;">Surfaces</div>
+    <div style="font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.55; max-width: 66ch; text-wrap: pretty;">Five properties, in this order, every time. Two fills, two rims, and a fixed ladder of eleven blurs that exists for a reason that has nothing to do with looks.</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; margin-bottom: 36px; align-items: stretch;">
+    <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; box-shadow: 0 8px 26px rgba(0,0,0,0.32); padding: 20px 22px;">
+      <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 12px;">The canonical recipe</div>
+      <div class="mono" style="font-size: 12.25px; line-height: 1.85; color: rgba(255,255,255,0.85);">
+        <div>background: <span style="color: #fb923c;">var(--glass-bg)</span>;</div>
+        <div>border: 1px solid <span style="color: #fb923c;">var(--glass-border)</span>;</div>
+        <div>border-radius: <span style="color: #fb923c;">var(--radius)</span>;</div>
+        <div>box-shadow: <span style="color: #fb923c;">var(--shadow-lg)</span>;</div>
+        <div>backdrop-filter: <span style="color: #fb923c;">var(--glass-blur)</span>;</div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px 14px;">
+        <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;"></div>
+        <div>
+          <div class="mono" style="font-size: 10.08px; font-weight: 600;">--glass-bg</div>
+          <div style="font-size: 10.08px; color: rgba(255,255,255,0.5);">0.06, floating chrome</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px 14px;">
+        <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;"></div>
+        <div>
+          <div class="mono" style="font-size: 10.08px; font-weight: 600;">--glass-bg-strong</div>
+          <div style="font-size: 10.08px; color: rgba(255,255,255,0.5);">0.10, reading panels</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px 14px;">
+        <div style="width: 30px; height: 30px; border-radius: 8px; background: transparent; border: 1px solid rgba(255,255,255,0.22); flex-shrink: 0;"></div>
+        <div>
+          <div class="mono" style="font-size: 10.08px; font-weight: 600;">--glass-border-bright</div>
+          <div style="font-size: 10.08px; color: rgba(255,255,255,0.5);">0.22, hover and focus</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">The blur ladder</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+    <div style="font-size: 10.08px; color: rgba(255,255,255,0.4);">six rungs, plus five saturating variants</div>
+  </div>
+
+  <div style="position: relative; height: 200px; border-radius: 16px; overflow: hidden; margin-bottom: 14px; background: radial-gradient(60% 90% at 12% 25%, #f97316 0%, transparent 62%), radial-gradient(52% 85% at 62% 78%, #3b82f6 0%, transparent 62%), radial-gradient(48% 75% at 92% 12%, #ec4899 0%, transparent 62%), radial-gradient(40% 70% at 38% 95%, #22c55e 0%, transparent 60%), #14141a;">
+    <div style="position: absolute; inset: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; padding: 22px;">
+      <div style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
+        <div class="mono" style="font-size: 10.08px; font-weight: 700;">xs</div>
+        <div class="mono" style="font-size: 9px; color: rgba(255,255,255,0.7);">6px</div>
+      </div>
+      <div style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
+        <div class="mono" style="font-size: 10.08px; font-weight: 700;">sm</div>
+        <div class="mono" style="font-size: 9px; color: rgba(255,255,255,0.7);">10px</div>
+      </div>
+      <div style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
+        <div class="mono" style="font-size: 10.08px; font-weight: 700;">md</div>
+        <div class="mono" style="font-size: 9px; color: rgba(255,255,255,0.7);">14px</div>
+      </div>
+      <div style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
+        <div class="mono" style="font-size: 10.08px; font-weight: 700;">lg</div>
+        <div class="mono" style="font-size: 9px; color: rgba(255,255,255,0.7);">20px</div>
+      </div>
+      <div style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
+        <div class="mono" style="font-size: 10.08px; font-weight: 700;">xl</div>
+        <div class="mono" style="font-size: 9px; color: rgba(255,255,255,0.7);">24px</div>
+      </div>
+      <div style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); backdrop-filter: blur(32px); -webkit-backdrop-filter: blur(32px); display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
+        <div class="mono" style="font-size: 10.08px; font-weight: 700;">2xl</div>
+        <div class="mono" style="font-size: 9px; color: rgba(255,255,255,0.7);">32px</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; margin-bottom: 34px; display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 16px;">
+    <div style="background: #f97316; border-radius: 2px;"></div>
+    <div>
+      <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 6px;">Never invent a new backdrop-filter expression.</div>
+      <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">On Windows Chromium every distinct expression compiles its own HLSL shader. Consolidating from 22 expressions down to 11 tokens capped the shader count and stopped recompile churn on home-page navigation. Pick a rung. If none fits, the ladder gains one rung, once, in the token file.</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 32px; align-items: start;">
+
+    <div>
+      <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 16px;">Radius, the whole vocabulary</div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 62px; height: 44px; border-radius: 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16); flex-shrink: 0;"></div>
+          <div>
+            <div class="mono" style="font-size: 11.2px; font-weight: 600;">--radius</div>
+            <div style="font-size: 10.08px; color: rgba(255,255,255,0.5);">16px, surfaces and cards</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 62px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16); flex-shrink: 0;"></div>
+          <div>
+            <div class="mono" style="font-size: 11.2px; font-weight: 600;">--radius-sm</div>
+            <div style="font-size: 10.08px; color: rgba(255,255,255,0.5);">12px, controls and chips</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 62px; height: 44px; border-radius: 9999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16); flex-shrink: 0;"></div>
+          <div>
+            <div class="mono" style="font-size: 11.2px; font-weight: 600;">--radius-pill</div>
+            <div style="font-size: 10.08px; color: rgba(255,255,255,0.5);">9999px, pills and counters</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 16px;">Glass surfaces stack, and it is not intuitive</div>
+      <div style="position: relative; border-radius: 14px; overflow: hidden; background: radial-gradient(70% 100% at 20% 30%, #f97316 0%, transparent 65%), radial-gradient(60% 90% at 80% 70%, #3b82f6 0%, transparent 65%), #14141a; padding: 16px;">
+        <div style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.10); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 14px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-size: 10.08px; color: rgba(255,255,255,0.7); font-weight: 600;">a glass panel</div>
+          <div style="border-radius: 8px; padding: 10px 12px; background: rgba(255,255,255,0.10); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.10);">
+            <div style="font-size: 10.08px; font-weight: 700; color: #fca5a5;">glass on glass reads as a lighter band</div>
+          </div>
+          <div style="border-radius: 8px; padding: 10px 12px; background: linear-gradient(rgba(255,255,255,0.10), rgba(255,255,255,0.10)), #111; border: 1px solid rgba(255,255,255,0.10);">
+            <div style="font-size: 10.08px; font-weight: 700; color: #86efac;">opaque composite of the same formula, no seam</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.62); margin-top: 12px; text-wrap: pretty;">To occlude something inside a glass panel, use an opaque composite (<span class="mono" style="color: rgba(255,255,255,0.85);">--bg-1</span> plus one <span class="mono" style="color: rgba(255,255,255,0.85);">--glass-bg-strong</span>), or go fully transparent with <span class="mono" style="color: rgba(255,255,255,0.85);">position: static</span>.</div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

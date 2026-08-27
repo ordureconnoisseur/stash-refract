@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;800;900&display=swap">
+  <style>
+    body { margin: 0; font-family: "Albert Sans", system-ui, sans-serif; }
+    a { color: #fb923c; } a:hover { color: #ffd4b0; }
+    .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 900px; min-height: 1180px; box-sizing: border-box; padding: 60px 56px 64px; background: radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.045) 0%, transparent 55%), radial-gradient(100% 60% at 100% 30%, rgba(249,115,22,0.05) 0%, transparent 50%), linear-gradient(180deg, #111 0%, #0a0a0a 100%); color: rgba(255,255,255,0.92); letter-spacing: 0.005em;">
+
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 34px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f97316;">Sections 9 and 10.3</div>
+    <div style="font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;">Drift, and the checklist</div>
+    <div style="font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.55; max-width: 66ch; text-wrap: pretty;">An honest ledger of where the system is not being followed. None of it is an emergency. All of it is a cheap win for whoever is already in that file.</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.12); font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.4);">
+    <div>Area</div><div>State</div><div style="text-align: right;">Rule</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: start;">
+    <div style="font-size: 12.25px; font-weight: 700;">Type</div>
+    <div style="font-size: 11.9px; color: rgba(255,255,255,0.68); line-height: 1.55;">301 uses of the scale tokens against 99 literal sizes, so 75 percent adoption. The literals cluster at 0.74, 0.66, 0.62, 0.6 and 0.58rem, which is a sub-xs tier the scale does not have.</div>
+    <div class="mono" style="font-size: 10.08px; color: #fb923c; text-align: right;">3.5</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: start;">
+    <div style="font-size: 12.25px; font-weight: 700;">Motion</div>
+    <div style="font-size: 11.9px; color: rgba(255,255,255,0.68); line-height: 1.55;">Not tokenized at all. 0.15s appears 373 times as a literal. There is no duration or easing variable anywhere in the theme.</div>
+    <div class="mono" style="font-size: 10.08px; color: #fb923c; text-align: right;">3.7</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: start;">
+    <div style="font-size: 12.25px; font-weight: 700;">Radius</div>
+    <div style="font-size: 11.9px; color: rgba(255,255,255,0.68); line-height: 1.55;">17 hand-written 999px, plus 2px, 3px, 6px, 8px, 9px and 10px literals, against three tokens that cover every real case.</div>
+    <div class="mono" style="font-size: 10.08px; color: #fb923c; text-align: right;">3.4</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: start;">
+    <div style="font-size: 12.25px; font-weight: 700;">Surfaces</div>
+    <div style="font-size: 11.9px; color: rgba(255,255,255,0.68); line-height: 1.55;">Four backdrop-filter expressions still bypass the ladder, including blur(16px) saturate(1.1). Each one is a shader the ladder was built to avoid.</div>
+    <div class="mono" style="font-size: 10.08px; color: #fb923c; text-align: right;">3.2</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: start;">
+    <div style="font-size: 12.25px; font-weight: 700;">Z-index</div>
+    <div style="font-size: 11.9px; color: rgba(255,255,255,0.68); line-height: 1.55;">No scale at all. Values run 0, 1 through 12, then 20, 30, 50, 90, 99, 100, 400, 1050, 1060, 1100, 9999, 10000, each chosen ad hoc.</div>
+    <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.35); text-align: right;">none</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: start;">
+    <div style="font-size: 12.25px; font-weight: 700;">Specificity</div>
+    <div style="font-size: 11.9px; color: rgba(255,255,255,0.68); line-height: 1.55;">8,268 important declarations. Largely unavoidable against Bootstrap, but it means load order and class doubling are the only remaining levers.</div>
+    <div class="mono" style="font-size: 10.08px; color: #fb923c; text-align: right;">5.2</div>
+  </div>
+
+  <div style="margin-top: 26px; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 18px 20px; background: rgba(255,255,255,0.03);">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+      <div style="font-size: 11.2px; font-weight: 700;">Type scale adoption</div>
+      <div class="mono" style="font-size: 11.2px; color: #fb923c; font-weight: 700;">75%</div>
+    </div>
+    <div style="display: flex; height: 16px; border-radius: 9999px; overflow: hidden; background: rgba(255,255,255,0.06);">
+      <div style="width: 75.25%; background: #f97316;"></div>
+      <div style="width: 24.75%; background: rgba(255,255,255,0.14);"></div>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 10.08px; color: rgba(255,255,255,0.5);">
+      <div>301 uses of var(--fs-*)</div>
+      <div>99 literal sizes</div>
+    </div>
+    <div style="font-size: 11.2px; color: rgba(255,255,255,0.6); margin-top: 12px; line-height: 1.55;">If a sub-xs step is genuinely needed, add it to the scale once rather than writing 0.62rem a sixth time.</div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">Before a design ships</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+    <div style="font-size: 10.08px; color: rgba(255,255,255,0.4);">thirteen</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 28px;">
+
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">Reads correctly in all eight accents, and depends on none of them.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">Reads correctly in light mode.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">Readable in lite mode, with no low-alpha surface left unpinned.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">Defined behaviour under reduced motion and reduced transparency.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">Survives at the stacked or narrow width, not just the design width.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">Survives every third-party plugin element being absent.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">No React node relocated; every click still lands on Stash's element.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">Every size from the scale; six or seven pairs on the surface, not twenty.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">Every blur from the ladder; no new backdrop-filter expression.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">Every shadow from a token, so light mode flips for free.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">No drop-shadow filter on a repeated element.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.28); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.75);">Rows centred on cap height, checked in rendered pixels.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 12px; align-items: start; padding: 6px 0;">
+      <div style="width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid rgba(249,115,22,0.6); background: rgba(249,115,22,0.14); margin-top: 1px;"></div>
+      <div style="font-size: 11.9px; line-height: 1.5; color: rgba(255,255,255,0.92); font-weight: 600;">Before and after measured on the live instance with tools/measure, with screenshots.</div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;800;900&display=swap">
+  <style>
+    body { margin: 0; font-family: "Albert Sans", system-ui, sans-serif; }
+    a { color: #fb923c; } a:hover { color: #ffd4b0; }
+    .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 900px; min-height: 1240px; box-sizing: border-box; padding: 60px 56px 64px; background: radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.045) 0%, transparent 55%), radial-gradient(100% 60% at 100% 30%, rgba(249,115,22,0.05) 0%, transparent 50%), linear-gradient(180deg, #111 0%, #0a0a0a 100%); color: rgba(255,255,255,0.92); letter-spacing: 0.005em;">
+
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f97316;">Foundation 3.5</div>
+    <div style="font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;">Type</div>
+    <div style="font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.55; max-width: 66ch; text-wrap: pretty;">Albert Sans Variable, self-hosted, one file for weights 100 to 900. Seven steps on a 14px root. The scale exists because the performer header once rendered twelve sizes, three of them within half a pixel of each other.</div>
+  </div>
+
+  <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; margin-bottom: 34px; display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 16px; align-items: stretch;">
+    <div style="background: #f97316; border-radius: 2px;"></div>
+    <div>
+      <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 6px;">The font path fails silently.</div>
+      <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">It must be <span class="mono" style="color: rgba(255,255,255,0.92);">/plugin/refract/assets/fonts/...</span>, absolute, with the <span class="mono" style="color: rgba(255,255,255,0.92);">/assets/</span> segment Stash adds. Get it wrong and the theme falls back to system-ui, which looks close enough that v1.10.2 shipped broken. Verify in DevTools Network: 200, not 404.</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">The scale</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+    <div style="font-size: 10.08px; color: rgba(255,255,255,0.4);">root 14px</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column;">
+
+    <div style="display: grid; grid-template-columns: 96px 78px minmax(0, 1fr); gap: 18px; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600; color: #fb923c;">--fs-xl</div>
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.42);">2rem / 28</div>
+      <div style="font-size: 28px; font-weight: 700; letter-spacing: -0.01em;">Page title</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 96px 78px minmax(0, 1fr); gap: 18px; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600; color: #fb923c;">--fs-lg</div>
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.42);">1.25rem / 17.5</div>
+      <div style="font-size: 17.5px; font-weight: 700;">Sub-headings, the scene title</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 96px 78px minmax(0, 1fr); gap: 18px; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600; color: #fb923c;">--fs-body</div>
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.42);">1rem / 14</div>
+      <div style="font-size: 14px; font-weight: 400;">Body copy and detail values, the reading size</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 96px 78px minmax(0, 1fr); gap: 18px; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600; color: #fb923c;">--fs-md</div>
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.42);">0.92rem / 12.88</div>
+      <div style="font-size: 12.88px; font-weight: 600;">Card titles and dense headings</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 96px 78px minmax(0, 1fr); gap: 18px; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600; color: #fb923c;">--fs-base</div>
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.42);">0.875rem / 12.25</div>
+      <div style="font-size: 12.25px; font-weight: 500;">Controls: buttons, tabs, inputs</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 96px 78px minmax(0, 1fr); gap: 18px; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600; color: #fb923c;">--fs-sm</div>
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.42);">0.8rem / 11.2</div>
+      <div style="font-size: 11.2px; font-weight: 500;">Pills, chips and badges</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 96px 78px minmax(0, 1fr); gap: 18px; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600; color: #fb923c;">--fs-xs</div>
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.42);">0.72rem / 10.08</div>
+      <div style="font-size: 10.08px; font-weight: 600;">Counters and overlay metadata</div>
+    </div>
+
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 30px; margin-bottom: 34px;">
+    <div style="border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 18px 20px; background: rgba(255,255,255,0.03);">
+      <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 8px; color: #fb923c;">Six or seven pairs, not twenty.</div>
+      <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">The scene detail panel measured 20 size and weight pairs in a 338px column. 10.08px alone carried 119 elements across three weights. When one size does six jobs it has stopped being a level and become the default.</div>
+    </div>
+    <div style="border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 18px 20px; background: rgba(255,255,255,0.03);">
+      <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 8px; color: #fb923c;">Hierarchy is three things at once.</div>
+      <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">Size and weight and colour together. Muted text at the same size is a level. Three weights at the same size is not. Current adoption of the scale is 301 token uses against 99 literals.</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">Centre on cap height</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; align-items: start;">
+
+    <div style="position: relative; height: 114px; background: rgba(255,255,255,0.035); border-radius: 8px;">
+      <div style="position: absolute; left: 16px; top: 0; font-size: 96px; line-height: 113.5px; font-weight: 700; color: rgba(255,255,255,0.22);">Refracting</div>
+      <div style="position: absolute; left: 0; right: 0; top: 0; height: 1px; background: rgba(255,255,255,0.28);"></div>
+      <div style="position: absolute; left: 0; right: 0; top: 113px; height: 1px; background: rgba(255,255,255,0.28);"></div>
+      <div style="position: absolute; left: 0; right: 0; top: 17px; height: 1px; background: rgba(255,255,255,0.5);"></div>
+      <div style="position: absolute; left: 0; right: 0; top: 87px; height: 1px; background: rgba(255,255,255,0.5);"></div>
+      <div style="position: absolute; left: 0; right: 0; top: 56px; height: 0; border-top: 1px dashed rgba(255,255,255,0.45);"></div>
+      <div style="position: absolute; left: 0; right: 0; top: 52px; height: 0; border-top: 1px dashed #f97316;"></div>
+      <div style="position: absolute; right: 8px; top: 2px; font-size: 9px; color: rgba(255,255,255,0.4);">line box</div>
+      <div style="position: absolute; right: 8px; top: 19px; font-size: 9px; color: rgba(255,255,255,0.55);">cap</div>
+      <div style="position: absolute; right: 8px; top: 89px; font-size: 9px; color: rgba(255,255,255,0.55);">baseline</div>
+      <div style="position: absolute; right: 8px; top: 41px; font-size: 9px; font-weight: 700; color: #f97316;">cap centre</div>
+      <div style="position: absolute; right: 8px; top: 58px; font-size: 9px; color: rgba(255,255,255,0.5);">box centre</div>
+    </div>
+
+    <div style="font-size: 12.25px; line-height: 1.6; color: rgba(255,255,255,0.65); text-wrap: pretty;">
+      <span style="color: rgba(255,255,255,0.92); font-weight: 600;">getBoundingClientRect returns the line box</span>, which reserves descender space whether or not the string has a descender. A box-centred label without one reads high.
+      <div style="margin-top: 12px;">Albert Sans at 11px: ascent 10, descent 3, cap 8. That asymmetry is the whole cause. Tab labels that measured 0.5px off by the box model were 1.5px high in rendered pixels.</div>
+      <div style="margin-top: 12px; color: rgba(255,255,255,0.92); font-weight: 600;">Centre on cap height and let descenders hang.</div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

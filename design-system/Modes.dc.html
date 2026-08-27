@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;800;900&display=swap">
+  <style>
+    body { margin: 0; font-family: "Albert Sans", system-ui, sans-serif; }
+    a { color: #fb923c; } a:hover { color: #ffd4b0; }
+    .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 900px; min-height: 1180px; box-sizing: border-box; padding: 60px 56px 64px; background: radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.045) 0%, transparent 55%), radial-gradient(100% 60% at 100% 30%, rgba(249,115,22,0.05) 0%, transparent 50%), linear-gradient(180deg, #111 0%, #0a0a0a 100%); color: rgba(255,255,255,0.92); letter-spacing: 0.005em;">
+
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 34px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f97316;">Section 5</div>
+    <div style="font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;">Modes</div>
+    <div style="font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.55; max-width: 66ch; text-wrap: pretty;">Everything Refract does is gated by a class on the body element. There is no other switch. Eight accents times two colour schemes is sixteen combinations, and lite doubles it again.</div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">The body-class contract</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+  </div>
+
+  <div style="margin-bottom: 38px;">
+    <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: baseline;">
+      <div class="mono" style="font-size: 11.2px; font-weight: 700; color: #fb923c;">stash-liquid-glass</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.68);">The theme is on. Every selector in every sheet starts here.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: baseline;">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">refract-&lt;hue&gt;</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.68);">Accent preset: blue, pink, red, yellow, purple, green, teal. Orange is the unclassed default.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: baseline;">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">refract-light</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.68);">Light mode. Redefines the colour and shadow tokens in one scope.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: baseline;">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">refract-lite</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.68);">Performance mode. Loaded last, wins everything.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: baseline;">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">refract-flourish-tiers</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.68);">Extravagant rating style. The tier frames only apply here.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: baseline;">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">refract-minimal-cards</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.68);">Minimal rating style. An accent halo scaled by score, nothing more.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: baseline;">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">refract-perf-layout-card</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.68);">Playing-card performer layout.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: baseline;">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">refract-rating-system-stars</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.68);">Stash is set to STARS, not DECIMAL. Auto-detected, no setting.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: baseline;">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">refract-sc-* / refract-pc-*</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.68);">Per-element card visibility, derived from the CARD_ELEMS table.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 20px; padding: 11px 0; align-items: baseline;">
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">stash-route-&lt;path&gt;</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.68);">The current route. Added by JS at boot, so it does not exist on first paint.</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">Load order is the arbitration mechanism</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+    <div class="mono" style="font-size: 10.08px; font-weight: 700; padding: 6px 12px; border-radius: 9999px; background: rgba(249,115,22,0.18); border: 1px solid rgba(249,115,22,0.45); color: #fb923c;">01_tokens</div>
+    <div style="color: rgba(255,255,255,0.3); font-size: 12px;">&rsaquo;</div>
+    <div class="mono" style="font-size: 10.08px; padding: 6px 12px; border-radius: 9999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6);">02 to 13</div>
+    <div style="color: rgba(255,255,255,0.3); font-size: 12px;">&rsaquo;</div>
+    <div class="mono" style="font-size: 10.08px; font-weight: 700; padding: 6px 12px; border-radius: 9999px; background: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.9); color: #111;">14_light</div>
+    <div style="color: rgba(255,255,255,0.3); font-size: 12px;">&rsaquo;</div>
+    <div class="mono" style="font-size: 10.08px; padding: 6px 12px; border-radius: 9999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6);">16_playing_card</div>
+    <div style="color: rgba(255,255,255,0.3); font-size: 12px;">&rsaquo;</div>
+    <div class="mono" style="font-size: 10.08px; padding: 6px 12px; border-radius: 9999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.6);">17_scroll_perf</div>
+    <div style="color: rgba(255,255,255,0.3); font-size: 12px;">&rsaquo;</div>
+    <div class="mono" style="font-size: 10.08px; font-weight: 700; padding: 6px 12px; border-radius: 9999px; background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.5); color: #93c5fd;">15_lite</div>
+  </div>
+  <div style="font-size: 11.2px; color: rgba(255,255,255,0.55); line-height: 1.55; margin-bottom: 36px; text-wrap: pretty;">The numbering no longer matches the order. Read refract.yml, not the filenames. 17_scroll_perf is a legacy name: the document-wide mechanism it was named for is gone, and all that survives in it is the scoped carousel mid-slide strip.</div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-bottom: 26px;">
+    <div style="border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 18px 20px; background: rgba(239,68,68,0.06);">
+      <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #fca5a5; margin-bottom: 12px;">Lite kills</div>
+      <div style="font-size: 11.9px; line-height: 1.75; color: rgba(255,255,255,0.72);">
+        backdrop-filter, everywhere<br>
+        hover glow halos on cards, navbar, toolbar<br>
+        the active-route icon glow<br>
+        the focused chip and list-item glow<br>
+        3D card tilt and its glare overlay
+      </div>
+    </div>
+    <div style="border: 1px solid rgba(34,197,94,0.3); border-radius: 12px; padding: 18px 20px; background: rgba(34,197,94,0.06);">
+      <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #86efac; margin-bottom: 12px;">Lite keeps</div>
+      <div style="font-size: 11.9px; line-height: 1.75; color: rgba(255,255,255,0.72);">
+        animations and transitions<br>
+        base shadows<br>
+        performer carousel loop clones<br>
+        cheap state indicators: border and colour<br>
+        every formerly translucent surface, pinned opaque
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 14px;">
+    <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 16px;">
+      <div style="background: #f97316; border-radius: 2px;"></div>
+      <div>
+        <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 6px;">Lite is not the theme with the fun removed.</div>
+        <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">It is the theme on a machine that cannot composite. Anything that becomes unreadable in lite is a bug, not a trade-off. Note that 0.06 alpha without blur reads as a film over scrolling content, which is why the floating surfaces go opaque rather than staying faint.</div>
+      </div>
+    </div>
+    <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 16px;">
+      <div style="background: #f97316; border-radius: 2px;"></div>
+      <div>
+        <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 6px;">Route classes flash.</div>
+        <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">They are added by JS at boot, so anything gated on one is unstyled on first paint. If an element is flash-prone, hide it with an unscoped rule as well. Visibility toggles double their gate class for specificity; the country gate triples it, because playing-card's country-with-rank rule ties a double.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

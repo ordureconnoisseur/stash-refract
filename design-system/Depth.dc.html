@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;800;900&display=swap">
+  <style>
+    body { margin: 0; font-family: "Albert Sans", system-ui, sans-serif; }
+    a { color: #fb923c; } a:hover { color: #ffd4b0; }
+    .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 900px; min-height: 1060px; box-sizing: border-box; padding: 60px 56px 64px; background: radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.045) 0%, transparent 55%), radial-gradient(100% 60% at 100% 30%, rgba(249,115,22,0.05) 0%, transparent 50%), linear-gradient(180deg, #111 0%, #0a0a0a 100%); color: rgba(255,255,255,0.92); letter-spacing: 0.005em;">
+
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 34px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f97316;">Foundation 3.3</div>
+    <div style="font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;">Depth</div>
+    <div style="font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.55; max-width: 66ch; text-wrap: pretty;">Six graduated shadows and two composites. They are tokens for one reason: light mode redefines all eight in a single scope, and every consumer flips for free.</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; margin-bottom: 44px;">
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+      <div style="width: 100%; height: 76px; border-radius: 12px; background: #1a1a1e; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 1px 4px rgba(0,0,0,0.35);"></div>
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">--shadow-xs</div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">0 1px 4px / 0.35</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+      <div style="width: 100%; height: 76px; border-radius: 12px; background: #1a1a1e; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 2px 10px rgba(0,0,0,0.25);"></div>
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">--shadow-sm</div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">0 2px 10px / 0.25</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+      <div style="width: 100%; height: 76px; border-radius: 12px; background: #1a1a1e; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 4px 24px rgba(0,0,0,0.25);"></div>
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">--shadow-md</div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">0 4px 24px / 0.25</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+      <div style="width: 100%; height: 76px; border-radius: 12px; background: #1a1a1e; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 26px rgba(0,0,0,0.32);"></div>
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">--shadow-lg</div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">0 8px 26px / 0.32</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+      <div style="width: 100%; height: 76px; border-radius: 12px; background: #1a1a1e; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 12px 40px rgba(0,0,0,0.55);"></div>
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">--shadow-xl</div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">0 12px 40px / 0.55</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+      <div style="width: 100%; height: 76px; border-radius: 12px; background: #1a1a1e; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 24px 60px rgba(0,0,0,0.55);"></div>
+      <div class="mono" style="font-size: 11.2px; font-weight: 600;">--shadow-2xl</div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">0 24px 60px / 0.55</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">The same six, redefined once for light</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+  </div>
+
+  <div style="background: #fafafa; border-radius: 16px; padding: 26px; margin-bottom: 40px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px;">
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: #ffffff; box-shadow: 0 1px 4px rgba(0,0,0,0.06);"></div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(0,0,0,0.55);">xs / 0.06</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);"></div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(0,0,0,0.55);">sm / 0.05</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: #ffffff; box-shadow: 0 4px 24px rgba(0,0,0,0.06);"></div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(0,0,0,0.55);">md / 0.06</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: #ffffff; box-shadow: 0 8px 26px rgba(0,0,0,0.08);"></div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(0,0,0,0.55);">lg / 0.08</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: #ffffff; box-shadow: 0 12px 40px rgba(0,0,0,0.10);"></div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(0,0,0,0.55);">xl / 0.10</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 56px; border-radius: 10px; background: #ffffff; box-shadow: 0 24px 60px rgba(0,0,0,0.12);"></div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(0,0,0,0.55);">2xl / 0.12</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">The two composites</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 36px;">
+    <div>
+      <div style="height: 76px; border-radius: 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(24px); box-shadow: 0 12px 36px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06), 0 0 18px rgba(249,115,22,0.28), 0 0 40px rgba(249,115,22,0.16); display: flex; align-items: center; padding: 0 20px; gap: 10px;">
+        <div style="width: 26px; height: 26px; border-radius: 8px; background: rgba(255,255,255,0.1);"></div>
+        <div style="width: 26px; height: 26px; border-radius: 8px; background: rgba(249,115,22,0.35);"></div>
+        <div style="width: 26px; height: 26px; border-radius: 8px; background: rgba(255,255,255,0.1);"></div>
+      </div>
+      <div class="mono" style="font-size: 11.2px; font-weight: 600; margin-top: 12px;">--shadow-navbar</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.55); margin-top: 4px; line-height: 1.5;">Depth drop, hairline, inner highlight, two accent halos. The halo is deliberately tight (18 and 40) because a wide layer got asymmetrically clipped by the wrapper's overflow.</div>
+    </div>
+    <div>
+      <div style="height: 76px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; padding: 0 20px;">
+        <div style="width: 100%; height: 8px; border-radius: 9999px; background: rgba(0,0,0,0.4); box-shadow: inset 0 1px 2px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.05); position: relative;">
+          <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 38%; border-radius: 9999px; background: #f97316;"></div>
+        </div>
+      </div>
+      <div class="mono" style="font-size: 11.2px; font-weight: 600; margin-top: 12px;">--shadow-inset-track</div>
+      <div style="font-size: 11.2px; color: rgba(255,255,255,0.55); margin-top: 4px; line-height: 1.5;">A dark dent plus a bright top rim. Used on player and scrubber grooves where the track should read as carved into the surface rather than laid on it.</div>
+    </div>
+  </div>
+
+  <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 16px;">
+    <div style="background: #f97316; border-radius: 2px;"></div>
+    <div>
+      <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 6px;">No per-element filter: drop-shadow.</div>
+      <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">Stacked drop-shadows were measured as the largest per-frame paint cost in the scene panel and were removed. Use box-shadow. And a hand-written box-shadow is a shadow that will look wrong in light mode, with no way to find it except by looking.</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

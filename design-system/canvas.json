@@ -1,0 +1,27 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 900, "h": 1440, "title": "Thesis and principles" },
+    { "file": "Colour.dc.html", "x": 1000, "y": 0, "w": 900, "h": 1240, "title": "Colour" },
+    { "file": "Type.dc.html", "x": 2000, "y": 0, "w": 900, "h": 1240, "title": "Type" },
+
+    { "file": "Surfaces.dc.html", "x": 0, "y": 1600, "w": 900, "h": 1180, "title": "Surfaces and radius" },
+    { "file": "Depth.dc.html", "x": 1000, "y": 1600, "w": 900, "h": 1060, "title": "Depth" },
+    { "file": "Motion.dc.html", "x": 2000, "y": 1600, "w": 900, "h": 1120, "title": "Motion" },
+
+    { "file": "Tiers.dc.html", "x": 0, "y": 2940, "w": 900, "h": 1320, "title": "Rating tiers" },
+    { "file": "Modes.dc.html", "x": 1000, "y": 2940, "w": 900, "h": 1180, "title": "Modes" },
+    { "file": "Drift.dc.html", "x": 2000, "y": 2940, "w": 900, "h": 1180, "title": "Drift and checklist" }
+  ],
+  "annotations": [
+    {
+      "id": "orientation",
+      "x": 0,
+      "y": -150,
+      "w": 560,
+      "text": "The visual half of the Refract design system.\nThe governing text is DESIGN_SYSTEM.md in the repo root; where the two disagree, the file wins.\nEvery number on these sheets was read out of the shipped CSS or JS."
+    },
+    { "id": "row-foundations", "x": 0, "y": 1480, "w": 340, "text": "Foundations: the tokens everything else resolves through." },
+    { "id": "row-systems", "x": 0, "y": 2820, "w": 340, "text": "Systems and process: what the tokens are for, and how a change gets shipped." }
+  ],
+  "launch": { "view": "canvas" }
+}

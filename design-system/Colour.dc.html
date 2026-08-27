@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;800;900&display=swap">
+  <style>
+    body { margin: 0; font-family: "Albert Sans", system-ui, sans-serif; }
+    a { color: #fb923c; } a:hover { color: #ffd4b0; }
+    .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 900px; min-height: 1240px; box-sizing: border-box; padding: 60px 56px 64px; background: radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.045) 0%, transparent 55%), radial-gradient(100% 60% at 100% 30%, rgba({{accentRgb}},0.05) 0%, transparent 50%), linear-gradient(180deg, #111 0%, #0a0a0a 100%); color: rgba(255,255,255,0.92); letter-spacing: 0.005em;">
+
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 36px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: {{accent}};">Foundation 3.1</div>
+    <div style="font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;">Colour</div>
+    <div style="font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.55; max-width: 66ch; text-wrap: pretty;">Four authored accent tokens, two derived. Everything else in the theme resolves through them, which is what makes eight presets and a light mode cost nothing.</div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">Neutrals</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 38px;">
+    <div style="border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; overflow: hidden;">
+      <div style="height: 62px; background: #0a0a0a;"></div>
+      <div style="padding: 10px 12px; background: rgba(255,255,255,0.04);">
+        <div class="mono" style="font-size: 11.2px; font-weight: 600;">--bg-0</div>
+        <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.5); margin-top: 3px;">#0a0a0a</div>
+      </div>
+    </div>
+    <div style="border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; overflow: hidden;">
+      <div style="height: 62px; background: #111;"></div>
+      <div style="padding: 10px 12px; background: rgba(255,255,255,0.04);">
+        <div class="mono" style="font-size: 11.2px; font-weight: 600;">--bg-1</div>
+        <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.5); margin-top: 3px;">#111</div>
+      </div>
+    </div>
+    <div style="border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; overflow: hidden;">
+      <div style="height: 62px; background: #0a0a0a; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: rgba(255,255,255,0.92);">Aa</div>
+      <div style="padding: 10px 12px; background: rgba(255,255,255,0.04);">
+        <div class="mono" style="font-size: 11.2px; font-weight: 600;">--text</div>
+        <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.5); margin-top: 3px;">white 0.92</div>
+      </div>
+    </div>
+    <div style="border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; overflow: hidden;">
+      <div style="height: 62px; background: #0a0a0a; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: rgba(255,255,255,0.55);">Aa</div>
+      <div style="padding: 10px 12px; background: rgba(255,255,255,0.04);">
+        <div class="mono" style="font-size: 11.2px; font-weight: 600;">--text-muted</div>
+        <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.5); margin-top: 3px;">white 0.55</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">The accent, live</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+    <div style="font-size: 10.08px; color: rgba(255,255,255,0.4);">use the tweak above to reprove P2</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px;">
+    <div style="border-radius: 12px; padding: 16px; background: {{accent}}; color: rgba(0,0,0,0.82);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 700;">--accent</div>
+      <div class="mono" style="font-size: 10.08px; opacity: 0.7; margin-top: 4px;">{{accent}}</div>
+      <div style="font-size: 10.08px; margin-top: 12px; font-weight: 600;">solid fills, borders</div>
+    </div>
+    <div style="border-radius: 12px; padding: 16px; background: {{accentBright}}; color: rgba(0,0,0,0.82);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 700;">--accent-bright</div>
+      <div class="mono" style="font-size: 10.08px; opacity: 0.7; margin-top: 4px;">{{accentBright}}</div>
+      <div style="font-size: 10.08px; margin-top: 12px; font-weight: 600;">hover, brighter rim</div>
+    </div>
+    <div style="border-radius: 12px; padding: 16px; background: {{accentLight}}; color: rgba(0,0,0,0.82);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 700;">--accent-light</div>
+      <div class="mono" style="font-size: 10.08px; opacity: 0.7; margin-top: 4px;">{{accentLight}}</div>
+      <div style="font-size: 10.08px; margin-top: 12px; font-weight: 600;">text on accent</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 38px;">
+    <div style="border-radius: 12px; padding: 16px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 700; color: {{accent}};">--accent-rgb</div>
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.55); margin-top: 4px;">{{accentRgb}}</div>
+      <div style="font-size: 10.08px; margin-top: 12px; color: rgba(255,255,255,0.62); font-weight: 600;">the one that matters</div>
+    </div>
+    <div style="border-radius: 12px; padding: 16px; border: 1px solid rgba(255,255,255,0.12); background: rgba({{accentRgb}}, 0.28);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 700;">--accent-glow</div>
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.6); margin-top: 4px;">rgb 0.28</div>
+      <div style="font-size: 10.08px; margin-top: 12px; color: rgba(255,255,255,0.7); font-weight: 600;">derived</div>
+    </div>
+    <div style="border-radius: 12px; padding: 16px; border: 1px solid rgba(255,255,255,0.12); background: rgba({{accentRgb}}, 0.12);">
+      <div class="mono" style="font-size: 11.2px; font-weight: 700;">--accent-tint</div>
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.6); margin-top: 4px;">rgb 0.12</div>
+      <div style="font-size: 10.08px; margin-top: 12px; color: rgba(255,255,255,0.7); font-weight: 600;">derived</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 16px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">The eight presets</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 10px; margin-bottom: 38px;">
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 74px; border-radius: 12px; background: #f97316; box-shadow: 0 0 18px rgba(249,115,22,0.4);"></div>
+      <div style="font-size: 10.08px; font-weight: 600; color: rgba(255,255,255,0.75);">orange</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 74px; border-radius: 12px; background: #3b82f6; box-shadow: 0 0 18px rgba(59,130,246,0.4);"></div>
+      <div style="font-size: 10.08px; font-weight: 600; color: rgba(255,255,255,0.75);">blue</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 74px; border-radius: 12px; background: #ec4899; box-shadow: 0 0 18px rgba(236,72,153,0.4);"></div>
+      <div style="font-size: 10.08px; font-weight: 600; color: rgba(255,255,255,0.75);">pink</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 74px; border-radius: 12px; background: #ef4444; box-shadow: 0 0 18px rgba(239,68,68,0.4);"></div>
+      <div style="font-size: 10.08px; font-weight: 600; color: rgba(255,255,255,0.75);">red</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 74px; border-radius: 12px; background: #eab308; box-shadow: 0 0 18px rgba(234,179,8,0.4);"></div>
+      <div style="font-size: 10.08px; font-weight: 600; color: rgba(255,255,255,0.75);">yellow</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 74px; border-radius: 12px; background: #a855f7; box-shadow: 0 0 18px rgba(168,85,247,0.4);"></div>
+      <div style="font-size: 10.08px; font-weight: 600; color: rgba(255,255,255,0.75);">purple</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 74px; border-radius: 12px; background: #22c55e; box-shadow: 0 0 18px rgba(34,197,94,0.4);"></div>
+      <div style="font-size: 10.08px; font-weight: 600; color: rgba(255,255,255,0.75);">green</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div style="width: 100%; height: 74px; border-radius: 12px; background: #14b8a6; box-shadow: 0 0 18px rgba(20,184,166,0.4);"></div>
+      <div style="font-size: 10.08px; font-weight: 600; color: rgba(255,255,255,0.75);">teal</div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <div style="display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 14px; align-items: start;">
+      <div style="font-size: 12.25px; font-weight: 800; color: {{accent}};">1</div>
+      <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.7); text-wrap: pretty;">Never write a raw accent hex outside the preset block. Use <span class="mono" style="color: rgba(255,255,255,0.92);">rgba(var(--accent-rgb), N)</span> so custom CSS and light mode both keep working.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 14px; align-items: start;">
+      <div style="font-size: 12.25px; font-weight: 800; color: {{accent}};">2</div>
+      <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.7); text-wrap: pretty;">The tier palette is the only second colour system permitted. It may override the accent, because it is encoding data.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 14px; align-items: start;">
+      <div style="font-size: 12.25px; font-weight: 800; color: {{accent}};">3</div>
+      <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.7); text-wrap: pretty;">Semantic colour (error red, success green) is Bootstrap's and stays Bootstrap's. Do not add a third palette.</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{"preset":{"editor":"enum","options":["orange","blue","pink","red","yellow","purple","green","teal"],"default":"orange"},"$preview":{"width":900,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var presets = {
+      orange: ['#f97316', '#fb923c', '#ffd4b0', '249, 115, 22'],
+      blue:   ['#3b82f6', '#60a5fa', '#bfdbfe', '59, 130, 246'],
+      pink:   ['#ec4899', '#f472b6', '#fbcfe8', '236, 72, 153'],
+      red:    ['#ef4444', '#f87171', '#fecaca', '239, 68, 68'],
+      yellow: ['#eab308', '#facc15', '#fef08a', '234, 179, 8'],
+      purple: ['#a855f7', '#c084fc', '#e9d5ff', '168, 85, 247'],
+      green:  ['#22c55e', '#4ade80', '#bbf7d0', '34, 197, 94'],
+      teal:   ['#14b8a6', '#2dd4bf', '#99f6e4', '20, 184, 166']
+    };
+    var p = presets[this.props.preset] || presets.orange;
+    return { accent: p[0], accentBright: p[1], accentLight: p[2], accentRgb: p[3] };
+  }
+}
+</script>
+</body>
+</html>

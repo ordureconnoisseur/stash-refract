@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;800;900&display=swap">
+  <style>
+    body { margin: 0; font-family: "Albert Sans", system-ui, sans-serif; }
+    a { color: #fb923c; } a:hover { color: #ffd4b0; }
+  </style>
+</helmet>
+
+<div style="width: 900px; min-height: 1440px; box-sizing: border-box; padding: 60px 56px 64px; background: radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.045) 0%, transparent 55%), radial-gradient(100% 60% at 100% 30%, rgba(249,115,22,0.05) 0%, transparent 50%), linear-gradient(180deg, #111 0%, #0a0a0a 100%); color: rgba(255,255,255,0.92); letter-spacing: 0.005em;">
+
+  <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f97316;">Refract design system</div>
+    <div style="font-size: 44px; font-weight: 800; line-height: 1.02; letter-spacing: -0.02em;">A dark room with<br>lit glass in it.</div>
+  </div>
+
+  <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; box-shadow: 0 8px 26px rgba(0,0,0,0.32); backdrop-filter: blur(24px); padding: 26px 28px; margin-bottom: 44px;">
+    <div style="font-size: 17.5px; line-height: 1.5; font-weight: 400; color: rgba(255,255,255,0.92); text-wrap: pretty;">
+      The library is the only saturated thing on screen. Chrome is transparent, borrowing colour from whatever is behind it. One accent hue lights the edges. The theme raises its voice in exactly one circumstance: a rating high enough to have earned it.
+    </div>
+    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.10); font-size: 12.25px; color: rgba(255,255,255,0.55); line-height: 1.5;">
+      Everything that follows is that sentence, made specific enough to argue with. Full text: <span style="color: rgba(255,255,255,0.78);">DESIGN_SYSTEM.md</span> in the repo root.
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f97316;">The principles</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.12);"></div>
+    <div style="font-size: 10.08px; color: rgba(255,255,255,0.4); letter-spacing: 0.08em;">NINE</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 2px;">
+
+    <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div style="font-size: 12.88px; font-weight: 800; color: #f97316; letter-spacing: 0.02em; padding-top: 1px;">P1</div>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 5px;">The image is the subject.</div>
+        <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.62); text-wrap: pretty;">Chrome never out-saturates content. If a control is more colourful than the thumbnail next to it, the control is wrong.</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div style="font-size: 12.88px; font-weight: 800; color: #f97316; letter-spacing: 0.02em; padding-top: 1px;">P2</div>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 5px;">One accent, one hue, never assumed.</div>
+        <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.62); text-wrap: pretty;">Eight presets ship, plus light mode, plus a custom override. A design that reads correctly only in orange is broken in seven other places.</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div style="font-size: 12.88px; font-weight: 800; color: #f97316; letter-spacing: 0.02em; padding-top: 1px;">P3</div>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 5px;">Emphasis is earned, not applied.</div>
+        <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.62); text-wrap: pretty;">Visual intensity is a function of data. A card glows because it is rated 9.8, not because glowing looks good.</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div style="font-size: 12.88px; font-weight: 800; color: #f97316; letter-spacing: 0.02em; padding-top: 1px;">P4</div>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 5px;">Restyle, never reimplement.</div>
+        <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.62); text-wrap: pretty;">Stash owns behaviour and state. Refract owns presentation. The moment Refract owns a piece of state, it owns every bug in it forever.</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div style="font-size: 12.88px; font-weight: 800; color: #f97316; letter-spacing: 0.02em; padding-top: 1px;">P5</div>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 5px;">Degrade in tiers, not cliffs.</div>
+        <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.62); text-wrap: pretty;">Every effect has a defined behaviour in dark, light, lite, reduced motion and reduced transparency. "It disappears" is valid. "Nobody checked" is not.</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div style="font-size: 12.88px; font-weight: 800; color: #f97316; letter-spacing: 0.02em; padding-top: 1px;">P6</div>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 5px;">Reachable beats visible.</div>
+        <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.62); text-wrap: pretty;">Moving a control behind a disclosure is a design decision. Losing it is not. Nothing Stash could do before may become impossible after.</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div style="font-size: 12.88px; font-weight: 800; color: #f97316; letter-spacing: 0.02em; padding-top: 1px;">P7</div>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 5px;">Space goes to density.</div>
+        <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.62); text-wrap: pretty;">Nothing dense may hide behind an inner scrollbar while whitespace goes unused in the same column. 34 tag chips crushed into 98px above 46.5px of dead space is the canonical failure.</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.07);">
+      <div style="font-size: 12.88px; font-weight: 800; color: #f97316; letter-spacing: 0.02em; padding-top: 1px;">P8</div>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 5px;">Give people the means. Never claim knowledge the theme does not have.</div>
+        <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.62); text-wrap: pretty;">Refract cannot tell which image is safe for work. So it does not guess. It makes the parts configurable and lets the user express the intent.</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 18px; padding: 16px 0;">
+      <div style="font-size: 12.88px; font-weight: 800; color: #f97316; letter-spacing: 0.02em; padding-top: 1px;">P9</div>
+      <div>
+        <div style="font-size: 15px; font-weight: 700; margin-bottom: 5px;">Measure the live page. Reading the CSS does not tell you what it does.</div>
+        <div style="font-size: 12.88px; line-height: 1.55; color: rgba(255,255,255,0.62); text-wrap: pretty;">A change can be correct in the source and do nothing on screen. Four "obvious" causes of the scroll problem were each ruled out by A/B before the real one was found.</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

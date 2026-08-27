@@ -1,0 +1,187 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700;800;900&display=swap">
+  <style>
+    body { margin: 0; font-family: "Albert Sans", system-ui, sans-serif; }
+    a { color: #fb923c; } a:hover { color: #ffd4b0; }
+    .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+    @keyframes rf-breathe { 0%, 100% { opacity: 0.82; } 50% { opacity: 1; } }
+    @keyframes rf-spin { to { transform: rotate(360deg); } }
+    @keyframes rf-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+    .rf-card {
+      position: relative; z-index: 1; border-radius: 14px; overflow: hidden;
+      background: #16161a; border: 1px solid rgba(255,255,255,0.10);
+      aspect-ratio: 2 / 3; display: flex; flex-direction: column;
+    }
+    .rf-shot { flex-grow: 1; }
+    .rf-name {
+      font-size: 10.08px; font-weight: 700; letter-spacing: 0.04em;
+      padding: 7px 8px; text-align: center; background: rgba(0,0,0,0.55);
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .rf-score {
+      position: absolute; top: 7px; right: 7px; font-size: 10.08px; font-weight: 800;
+      padding: 2px 7px; border-radius: 9999px; background: rgba(0,0,0,0.62);
+      backdrop-filter: blur(6px);
+    }
+
+    .t-bronze { box-shadow: 0 0 0 1.5px rgba(245,197,145,0.5), 0 0 10px rgba(215,148,92,0.38), 0 0 26px rgba(215,148,92,0.16); animation: rf-breathe 5.5s ease-in-out infinite; }
+    .t-silver { box-shadow: 0 0 0 1.75px rgba(232,236,244,0.6), 0 0 12px rgba(192,196,204,0.46), 0 0 32px rgba(192,196,204,0.2); animation: rf-breathe 4.5s ease-in-out infinite; }
+    .t-gold { box-shadow: 0 0 0 2px rgba(255,215,120,0.72), 0 0 14px rgba(230,185,78,0.6), 0 0 38px rgba(230,185,78,0.28), inset 0 0 14px rgba(255,215,120,0.18); animation: rf-breathe 3.4s ease-in-out infinite; }
+    .t-diamond { box-shadow: 0 0 0 2px rgba(224,247,244,0.78), 0 0 16px rgba(165,223,219,0.7), 0 0 44px rgba(165,223,219,0.34), inset 0 0 12px rgba(224,247,244,0.22); animation: rf-breathe 3.4s ease-in-out infinite; }
+    .t-legendary { box-shadow: 0 0 0 2.5px rgba(251,207,232,0.85), 0 0 12px rgba(244,114,182,0.9), 0 0 30px rgba(96,165,250,0.6), 0 0 62px rgba(192,132,252,0.4), inset 0 0 14px rgba(251,207,232,0.3); animation: rf-float 4s ease-in-out infinite; }
+    .t-perfect { box-shadow: 0 0 0 2.5px rgba(255,255,255,0.95), 0 0 14px rgba(255,255,255,0.9), 0 0 28px rgba(244,114,182,0.6), 0 0 48px rgba(96,165,250,0.5), 0 0 78px rgba(192,132,252,0.45), 0 0 110px rgba(34,197,94,0.22), inset 0 0 16px rgba(255,255,255,0.35); animation: rf-float 3.6s ease-in-out infinite; }
+
+    /* No negative z-index here: the wrapper makes no stacking context, so
+       z-index:-1 would drop the halo behind the sheet background and vanish.
+       DOM order does the job instead, with the card lifted one step. */
+    .rf-halo {
+      position: absolute; inset: -14px; border-radius: 26px;
+      background: conic-gradient(#f472b6, #60a5fa, #c084fc, #4ade80, #facc15, #f472b6);
+      filter: blur(9px); opacity: 0.55; animation: rf-spin 7s linear infinite;
+    }
+  </style>
+</helmet>
+
+<div style="width: 900px; min-height: 1320px; box-sizing: border-box; padding: 60px 56px 64px; background: radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.045) 0%, transparent 55%), radial-gradient(100% 60% at 100% 30%, rgba(249,115,22,0.05) 0%, transparent 50%), linear-gradient(180deg, #111 0%, #0a0a0a 100%); color: rgba(255,255,255,0.92); letter-spacing: 0.005em;">
+
+  <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f97316;">Section 4</div>
+    <div style="font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;">The rating tiers</div>
+    <div style="font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.55; max-width: 66ch; text-wrap: pretty;">Refract's one loud idea, and the reason P3 exists. Intensity is a function of the score, and nothing else in the theme is allowed to shout like this.</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 22px; margin-bottom: 46px; padding: 14px 0 22px;">
+
+    <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+      <div class="rf-card t-bronze" style="width: 100%;">
+        <div class="rf-shot" style="background: linear-gradient(160deg, rgba(215,148,92,0.24), rgba(0,0,0,0.5));"></div>
+        <div class="rf-score" style="color: rgb(245,197,145);">5.8</div>
+        <div class="rf-name" style="color: rgb(245,197,145);">BRONZE</div>
+      </div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">5.0 to 6.4</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+      <div class="rf-card t-silver" style="width: 100%;">
+        <div class="rf-shot" style="background: linear-gradient(160deg, rgba(192,196,204,0.24), rgba(0,0,0,0.5));"></div>
+        <div class="rf-score" style="color: rgb(232,236,244);">7.0</div>
+        <div class="rf-name" style="color: rgb(232,236,244);">SILVER</div>
+      </div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">6.5 to 7.4</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+      <div class="rf-card t-gold" style="width: 100%;">
+        <div class="rf-shot" style="background: linear-gradient(160deg, rgba(230,185,78,0.26), rgba(0,0,0,0.5));"></div>
+        <div class="rf-score" style="color: rgb(255,215,120);">8.0</div>
+        <div class="rf-name" style="color: rgb(255,215,120);">GOLD</div>
+      </div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">7.5 to 8.4</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+      <div class="rf-card t-diamond" style="width: 100%;">
+        <div class="rf-shot" style="background: linear-gradient(160deg, rgba(165,223,219,0.26), rgba(0,0,0,0.5));"></div>
+        <div class="rf-score" style="color: rgb(224,247,244);">9.0</div>
+        <div class="rf-name" style="color: rgb(224,247,244);">DIAMOND</div>
+      </div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">8.5 to 9.4</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+      <div class="rf-card t-legendary" style="width: 100%;">
+        <div class="rf-shot" style="background: linear-gradient(160deg, rgba(244,114,182,0.3), rgba(96,165,250,0.22), rgba(0,0,0,0.5));"></div>
+        <div class="rf-score" style="color: rgb(251,207,232);">9.7</div>
+        <div class="rf-name" style="color: rgb(251,207,232);">LEGENDARY</div>
+      </div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">9.5 to 9.9</div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+      <div style="position: relative; width: 100%;">
+        <div class="rf-halo"></div>
+        <div class="rf-card t-perfect" style="width: 100%;">
+          <div class="rf-shot" style="background: linear-gradient(160deg, rgba(255,255,255,0.22), rgba(192,132,252,0.2), rgba(0,0,0,0.5));"></div>
+          <div class="rf-score" style="color: #ffffff;">10</div>
+          <div class="rf-name" style="color: #ffffff;">PERFECT</div>
+        </div>
+      </div>
+      <div class="mono" style="font-size: 9.5px; color: rgba(255,255,255,0.45);">10.0</div>
+    </div>
+
+  </div>
+
+  <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;">
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">Tokens and treatment</div>
+    <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
+  </div>
+
+  <div style="margin-bottom: 40px;">
+    <div style="display: grid; grid-template-columns: 96px 84px 120px minmax(0, 1fr); gap: 16px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.12); font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.4);">
+      <div>Tier</div><div>Rating</div><div>--tier-color</div><div>Treatment</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 96px 84px 120px minmax(0, 1fr); gap: 16px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 11.2px; align-items: center;">
+      <div style="font-weight: 700; color: rgb(245,197,145);">Bronze</div><div class="mono" style="color: rgba(255,255,255,0.6);">5.0 to 6.4</div><div class="mono" style="color: rgba(255,255,255,0.6);">215, 148, 92</div><div style="color: rgba(255,255,255,0.7);">quiet breathing glow</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 96px 84px 120px minmax(0, 1fr); gap: 16px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 11.2px; align-items: center;">
+      <div style="font-weight: 700; color: rgb(232,236,244);">Silver</div><div class="mono" style="color: rgba(255,255,255,0.6);">6.5 to 7.4</div><div class="mono" style="color: rgba(255,255,255,0.6);">192, 196, 204</div><div style="color: rgba(255,255,255,0.7);">breathing plus slow sheen sweep</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 96px 84px 120px minmax(0, 1fr); gap: 16px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 11.2px; align-items: center;">
+      <div style="font-weight: 700; color: rgb(255,215,120);">Gold</div><div class="mono" style="color: rgba(255,255,255,0.6);">7.5 to 8.4</div><div class="mono" style="color: rgba(255,255,255,0.6);">230, 185, 78</div><div style="color: rgba(255,255,255,0.7);">faster breathing, sheen, warm inset</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 96px 84px 120px minmax(0, 1fr); gap: 16px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 11.2px; align-items: center;">
+      <div style="font-weight: 700; color: rgb(224,247,244);">Diamond</div><div class="mono" style="color: rgba(255,255,255,0.6);">8.5 to 9.4</div><div class="mono" style="color: rgba(255,255,255,0.6);">165, 223, 219</div><div style="color: rgba(255,255,255,0.7);">breathing plus sparkle particles</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 96px 84px 120px minmax(0, 1fr); gap: 16px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 11.2px; align-items: center;">
+      <div style="font-weight: 700; color: rgb(251,207,232);">Legendary</div><div class="mono" style="color: rgba(255,255,255,0.6);">9.5 to 9.9</div><div class="mono" style="color: rgba(255,255,255,0.6);">244, 114, 182<br>plus blue, purple</div><div style="color: rgba(255,255,255,0.7);">dual-colour neon tube, subtle float</div>
+    </div>
+    <div style="display: grid; grid-template-columns: 96px 84px 120px minmax(0, 1fr); gap: 16px; padding: 11px 0; font-size: 11.2px; align-items: center;">
+      <div style="font-weight: 700; color: #ffffff;">Perfect</div><div class="mono" style="color: rgba(255,255,255,0.6);">10.0</div><div class="mono" style="color: rgba(255,255,255,0.6);">255, 255, 255</div><div style="color: rgba(255,255,255,0.7);">white-hot core, rotating rainbow halo, hue-cycling text, ribbon, float</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px;">
+    <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 16px;">
+      <div style="background: #f97316; border-radius: 2px;"></div>
+      <div>
+        <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 6px;">The floor is 5.0 and it is deliberate.</div>
+        <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">Below 5, a card is default glass. Do not "fix" this. If everything is a collectible, nothing is.</div>
+      </div>
+    </div>
+    <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 16px;">
+      <div style="background: #f97316; border-radius: 2px;"></div>
+      <div>
+        <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 6px;">Escalation is monotonic.</div>
+        <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">Each tier adds to the one below rather than swapping to a different idea, so a user can rank two cards by looking at them.</div>
+      </div>
+    </div>
+    <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 16px;">
+      <div style="background: #a5dfdb; border-radius: 2px;"></div>
+      <div>
+        <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 6px;">The top three are accent-independent.</div>
+        <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">Diamond reads as cold crystal, Legendary as mythic, Perfect as full spectrum, regardless of which accent the user has set. The chromatic shift away from their accent is what signals rarity.</div>
+      </div>
+    </div>
+    <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 20px; display: grid; grid-template-columns: 4px minmax(0, 1fr); gap: 16px;">
+      <div style="background: #f97316; border-radius: 2px;"></div>
+      <div>
+        <div style="font-size: 12.25px; font-weight: 700; margin-bottom: 6px;">Rank sets z-order.</div>
+        <div style="font-size: 12.25px; line-height: 1.55; color: rgba(255,255,255,0.65); text-wrap: pretty;">Bronze 20 through Perfect 70, so a higher tier's halo is never clipped by a lower-ranked neighbour. No isolation and no will-change: those promote each card to its own layer, which Chrome sometimes paints out of z-order.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

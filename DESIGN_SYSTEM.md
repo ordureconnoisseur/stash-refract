@@ -11,6 +11,12 @@ newer, measured evidence wins over both.
 
 Every number here was read out of the shipped CSS or JS, not invented.
 
+There is a visual companion: nine artboards covering the thesis, colour, type,
+surfaces, depth, motion, the rating tiers, the modes and the drift ledger.
+Sources are in `design-system/` as `.dc.html` files plus `canvas.json`; re-seed
+with the design canvas helper after editing them. It is a view of this file, not
+a second source of truth.
+
 ---
 
 ## 1. The thesis
@@ -390,10 +396,17 @@ switch.
 1. **Light and lite are orthogonal to accent and to each other.** Eight accents
    times two colour schemes is sixteen combinations, and lite doubles it again.
    Nothing may assume a combination.
-2. **Load order is the arbitration mechanism.** `01_tokens` first, then
-   `14_light`, then `15_lite` last. Light redefines tokens in its own scope so
-   every consumer flips for free. Lite is the final word on performance and
-   strips effects with `!important` regardless of colour scheme.
+2. **Load order is the arbitration mechanism.** `refract.yml` lists
+   `01_tokens` first, then `02` through `14_light`, then `16_playing_card` and
+   `17_scroll_perf`, and `15_lite` LAST. The numbering no longer matches the
+   order, so read the manifest, not the filenames. Light redefines tokens in
+   its own scope so every consumer flips for free. Lite is the final word on
+   performance and strips effects with `!important` regardless of colour
+   scheme.
+
+   `17_scroll_perf.css` is a legacy filename. The document-wide mechanism it
+   was named for is gone; all that remains in it is the scoped carousel
+   mid-slide strip.
 3. **Route classes are added by JS at boot, so they do not exist on first
    paint.** Anything gated on one will flash. If an element is flash-prone,
    hide it with an unscoped rule as well.
