@@ -7846,6 +7846,132 @@
     /* Run an init in isolation so one throw doesn't skip the rest of the
        cycle (e.g. a stale-reference NotFoundError from one init breaking
        sibling initializers running in the same MutationObserver callback). */
+
+    /* ── Scrape results: the line-up ──────────────────────────────────
+       05_list_views.css turns the performer scrape list into a contact
+       sheet. Two things it cannot know from CSS alone: which names in
+       the result set collide with each other, and whether a card has a
+       photograph worth showing. Both decide what the card says, so they
+       are settled here and expressed as classes and one injected node. */
+    var SCRAPE_LIST_SEL = ".PerformerScrapeModal-list";
+
+    function scrapeResultName(item) {
+        var h = item.querySelector(".performer-name");
+        if (!h) { return ""; }
+        var first = h.querySelector("span");
+        var txt = first ? first.textContent : h.textContent;
+        return String(txt || "").trim();
+    }
+
+    /* A result has no usable picture in two different ways, and they are
+       not the same news: the source has none (permanent), or it named
+       one and fetching it failed (not). An <img> that has finished
+       loading with no intrinsic width is the second case -- worth
+       distinguishing, since every StashDB image failed to load on a
+       cold cache while this was being built. */
+    function scrapeResultPlate(item) {
+        var row = item.querySelector(".performer-result > .row");
+        if (!row) { return; }
+        var holder = row.querySelector(".scene-image-container");
+        var img = holder ? holder.querySelector("img") : null;
+        var state = "";
+        if (!holder || !img) {
+            state = "NO PHOTO";
+        } else if (img.complete && !img.naturalWidth) {
+            state = "WOULD NOT LOAD";
+        } else if (!img.complete && !img.getAttribute("data-refract-sr-watch")) {
+            /* Still in flight. Re-run once it settles rather than guess. */
+            img.setAttribute("data-refract-sr-watch", "1");
+            var again = function () { safeRun(initScrapeResults); };
+            img.addEventListener("load", again);
+            img.addEventListener("error", again);
+        }
+        var plate = row.querySelector(".refract-sr-plate");
+        if (!state) {
+            if (plate) { plate.parentNode.removeChild(plate); }
+            if (holder) { holder.style.removeProperty("display"); }
+            return;
+        }
+        if (holder) { holder.style.display = "none"; }
+        if (!plate) {
+            plate = document.createElement("div");
+            plate.className = "refract-sr-plate";
+            plate.appendChild(document.createElement("span"))
+                .className = "refract-sr-plate__label";
+            plate.appendChild(document.createElement("span"))
+                .className = "refract-sr-plate__key";
+            row.insertBefore(plate, row.firstChild);
+        }
+        var label = plate.querySelector(".refract-sr-plate__label");
+        var key = plate.querySelector(".refract-sr-plate__key");
+        if (label && label.textContent !== state) { label.textContent = state; }
+        /* The slot carries the field that decides. Empty is handled in
+           CSS, so a performer with no disambiguation still reads. */
+        var dis = item.querySelector(".performer-disambiguation");
+        var want = dis ? String(dis.textContent || "").replace(/^\s*\(|\)\s*$/g, "").trim() : "";
+        if (key && key.textContent !== want) { key.textContent = want; }
+    }
+
+    function scrapeCollisionNote(list, name, count, groups) {
+        var host = list.parentElement;
+        if (!host) { return; }
+        var note = host.querySelector(".refract-sr-collide-note");
+        if (!count) {
+            if (note) { note.parentNode.removeChild(note); }
+            return;
+        }
+        if (!note) {
+            note = document.createElement("div");
+            note.className = "refract-sr-collide-note";
+            host.insertBefore(note, list);
+        }
+        /* One group can be named; several cannot without listing them,
+           and a real search throws up several -- "Julia James" returns
+           four bare Julias, two Jameses and two Julia Jameses, in three
+           separate groups. Naming only the largest would report a third
+           of the problem and imply the rest were unique. */
+        var txt = (groups === 1)
+            ? count + " of these are called " + name + ". The studio and the age are what tell them apart."
+            : count + " of these share a name with another result. The studio and the age are what tell them apart.";
+        if (note.textContent !== txt) { note.textContent = txt; }
+    }
+
+    function initScrapeResults() {
+        var lists = document.querySelectorAll(SCRAPE_LIST_SEL);
+        for (var i = 0; i < lists.length; i++) {
+            var list = lists[i];
+            var items = list.querySelectorAll(".search-item");
+            if (!items.length) { scrapeCollisionNote(list, "", 0, 0); continue; }
+            var names = [];
+            var counts = {};
+            var j;
+            for (j = 0; j < items.length; j++) {
+                var n = scrapeResultName(items[j]);
+                names.push(n);
+                var k = n.toLowerCase();
+                counts[k] = (counts[k] || 0) + 1;
+            }
+            var biggest = "";
+            var biggestN = 0;
+            var colliding = 0;
+            var groups = 0;
+            var seen = {};
+            for (j = 0; j < items.length; j++) {
+                var key = names[j].toLowerCase();
+                var dup = counts[key] > 1;
+                if (dup) { items[j].classList.add("refract-sr-collide"); }
+                else { items[j].classList.remove("refract-sr-collide"); }
+                if (dup) {
+                    colliding += 1;
+                    if (!seen[key]) { seen[key] = 1; groups += 1; }
+                    if (counts[key] > biggestN) { biggestN = counts[key]; biggest = names[j]; }
+                }
+                scrapeResultPlate(items[j]);
+            }
+            scrapeCollisionNote(list, biggest, colliding, groups);
+        }
+    }
+
     function safeRun(fn) {
         try { fn(); } catch (e) { /* swallow — Stash re-renders will trigger another cycle */ }
     }
@@ -8183,6 +8309,7 @@
                 safeRun(enhanceDuplicateChecker);
                 safeRun(initPerformerNameTooltip);
                 safeRun(initTagCountPopover);
+                safeRun(initScrapeResults);
             } finally {
                 observer.observe(document.body, { childList: true, subtree: true });
             }

@@ -3106,3 +3106,231 @@ body.stash-liquid-glass .refract-perf-tip-name {
     white-space: normal;
 }
 
+/* ───────────────────────────────────────────────────────────────────
+   Scrape results: the line-up
+   ───────────────────────────────────────────────────────────────────
+   Both performer scrape modals (StashDB, and the by-ID search) render
+   the same list: one result per row, a small portrait on the left and
+   everything else beside it. The job on that screen is almost never
+   "read the results" -- it is "tell apart three people with the SAME
+   name", which is what a search for a common name returns. A row list
+   is the wrong instrument for that: it puts one candidate on screen per
+   170px, so comparing the third against the first means scrolling
+   between them, and it sets the disambiguation -- the only field that
+   actually decides -- quieter than the name it modifies.
+
+   So the list becomes a contact sheet. Faces are the fastest identifier
+   anyone has, ten of them fit at once, and comparison stops needing
+   memory. Nothing here changes what a click does; this is the same list
+   in a shape you can scan. */
+
+body.stash-liquid-glass .modal-dialog:has(.PerformerScrapeModal) {
+    /* A 5-up sheet needs the width. 500px (Stash default) fits one card
+       and a lot of nothing. */
+    max-width: 940px !important;
+}
+
+body.stash-liquid-glass .PerformerScrapeModal-list {
+    display: grid;
+    /* auto-fill rather than a fixed 5, so the sheet reflows on a narrow
+       window instead of overflowing it. */
+    grid-template-columns: repeat(auto-fill, minmax(152px, 1fr));
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+body.stash-liquid-glass .PerformerScrapeModal-list > li {
+    display: flex;
+    margin: 0;
+    min-width: 0;
+}
+/* Not every record carries a disambiguation or an age, so captions run
+   to two lines or three and the cards would end at different heights.
+   In a row list that is invisible; across a sheet it reads as damage.
+   Stretch each card to its grid row so the bottom edge is one line. */
+body.stash-liquid-glass .PerformerScrapeModal .search-item,
+body.stash-liquid-glass .PerformerScrapeModal .performer-result {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+body.stash-liquid-glass .PerformerScrapeModal .performer-result > .row:first-child {
+    flex: 1 1 auto;
+}
+
+/* The card. .search-item carries Bootstrap's mt-3, which is a row
+   rhythm and has no business in a grid with its own gap. */
+body.stash-liquid-glass .PerformerScrapeModal .search-item {
+    margin: 0 !important;
+    padding: 7px !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    background: rgba(255, 255, 255, 0.035) !important;
+    box-shadow: none;
+    cursor: pointer;
+    transition: border-color 0.14s ease, background-color 0.14s ease, transform 0.14s ease;
+}
+body.stash-liquid-glass .PerformerScrapeModal .search-item:hover {
+    border-color: rgba(var(--accent-rgb), 0.55) !important;
+    background: rgba(var(--accent-rgb), 0.10) !important;
+    transform: translateY(-2px);
+}
+
+/* Image over caption, not image beside caption. The inner .row is
+   Bootstrap's, so its negative gutters go too. */
+body.stash-liquid-glass .PerformerScrapeModal .performer-result > .row {
+    flex-direction: column;
+    gap: 9px;
+    margin: 0;
+}
+body.stash-liquid-glass .PerformerScrapeModal .performer-result > .row > .col,
+body.stash-liquid-glass .PerformerScrapeModal .performer-result > .row > .scene-image-container {
+    width: 100%;
+    max-width: 100%;
+    flex: 0 0 auto;
+    padding: 0;
+}
+
+/* The well. Fixed 3:4 and filled, so ten cards line up on a shared
+   baseline whatever the source images do -- which also retires the
+   letterbox problem the old bordered-frame rule was fighting. Faces sit
+   high in a portrait, hence the object-position. */
+body.stash-liquid-glass .PerformerScrapeModal .scene-image-container img {
+    display: block;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 3 / 4;
+    min-width: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover;
+    object-position: 50% 22%;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 9px !important;
+}
+
+/* Caption. */
+body.stash-liquid-glass .PerformerScrapeModal .performer-result .col.flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 3px 3px;
+    min-width: 0;
+}
+body.stash-liquid-glass .PerformerScrapeModal .performer-name {
+    display: block;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* The disambiguation is its own line here, not a tail on the name: on a
+   152px card the two together always truncate, and it is the half worth
+   keeping. */
+body.stash-liquid-glass .PerformerScrapeModal .performer-disambiguation {
+    display: block;
+    font-size: 11px;
+    line-height: 1.3;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* ...and when several results share a name it is the whole decision, so
+   it stops being an aside. Marked by initScrapeResults. */
+body.stash-liquid-glass .PerformerScrapeModal .search-item.refract-sr-collide .performer-disambiguation {
+    color: var(--accent-bright);
+    font-weight: 600;
+}
+body.stash-liquid-glass .PerformerScrapeModal .performer-details {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.3;
+    color: rgba(255, 255, 255, 0.5);
+}
+body.stash-liquid-glass .PerformerScrapeModal .performer-details .gender-icon {
+    width: 11px;
+    height: 11px;
+}
+body.stash-liquid-glass .PerformerScrapeModal .performer-result__country-flag {
+    width: 15px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+/* The bio and the tag list are three lines of prose and a chip run.
+   Neither survives a 152px card, and neither disambiguates. */
+body.stash-liquid-glass .PerformerScrapeModal .performer-result > .row:nth-of-type(2),
+body.stash-liquid-glass .PerformerScrapeModal .performer-result > .row:nth-of-type(3) {
+    display: none;
+}
+
+/* Said once, above the sheet, instead of implied ten times inside it. */
+body.stash-liquid-glass .refract-sr-collide-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+}
+body.stash-liquid-glass .refract-sr-collide-note::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    flex: none;
+    border-radius: var(--radius-pill);
+    background: var(--accent-bright);
+}
+
+/* No photograph, or a photograph that would not load. A silhouette
+   repeated ten times would defeat the sheet, so the slot carries what
+   does disambiguate instead. Flat and hatched where a photo is soft, so
+   the two are told apart before either is read. */
+body.stash-liquid-glass .refract-sr-plate {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    padding: 10px;
+    border-radius: 9px;
+    background:
+        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.045) 0 6px, rgba(255, 255, 255, 0) 6px 12px),
+        #141419;
+}
+body.stash-liquid-glass .refract-sr-plate__label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.35);
+}
+body.stash-liquid-glass .refract-sr-plate__key {
+    /* Studio names run long ("Lustery - James & Lola"), and the well has
+       a fixed aspect it must not grow past. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--accent-bright);
+    overflow: hidden;
+}
+body.stash-liquid-glass .refract-sr-plate__key:empty::before {
+    content: "no studio listed";
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+}
