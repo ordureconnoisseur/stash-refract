@@ -186,3 +186,36 @@ body.stash-liquid-glass .scene-image-container img {
     max-width: 100%;
 }
 
+/* ...and in the performer scrape results, make that frame fit.
+
+   The rule above is written for the scene tagger, whose thumbnails are
+   landscape and fill the box Stash gives them. Stash sizes all of these
+   with `.scene-image { min-width: 168px; max-width: 14rem; max-height:
+   10rem; object-fit: contain }`, plus `padding-left: 1rem` in the search
+   list. A portrait performer photo in that box paints about 94px wide
+   inside a 168px element, 14px right of centre, so the border framed the
+   ELEMENT and the picture floated inside it: a second empty box around
+   the photo, inside the row's own box. A border-radius could not help,
+   because it rounds a box the picture does not reach.
+
+   So give the element the picture's own shape and let the existing frame
+   land on it. A fixed height with width:auto derives the width from the
+   aspect, and max-width has to be restated as an absolute: the base
+   rule's `max-width: 100%` resolves against .scene-image-container,
+   which is a content-sized flex item, and with Stash's min-width floor
+   removed the two go circular and the image collapses to nothing
+   (measured: 2x2). Result is 96x140 around a 94x138 picture -- zero dead
+   space on either axis.
+
+   Portraits are the case here. A landscape image would letterbox
+   vertically instead and the frame would stand off it top and bottom;
+   worth revisiting if performer photos in the wild turn out wider than
+   they are tall. */
+body.stash-liquid-glass .PerformerScrapeModal .scene-image-container img {
+    min-width: 0;
+    max-width: 14rem;
+    width: auto;
+    height: 10rem;
+    padding: 0;
+}
+
