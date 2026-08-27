@@ -7898,12 +7898,28 @@
             plate.className = "refract-sr-plate";
             plate.appendChild(document.createElement("span"))
                 .className = "refract-sr-plate__label";
-            plate.appendChild(document.createElement("span"))
+            /* Label at the top, everything else in one foot, so the studio
+               sits on the same line whether or not there is a bio under
+               it. Three loose children would move it. */
+            var foot = document.createElement("div");
+            foot.className = "refract-sr-plate__foot";
+            foot.appendChild(document.createElement("span"))
                 .className = "refract-sr-plate__key";
+            foot.appendChild(document.createElement("span"))
+                .className = "refract-sr-plate__note";
+            plate.appendChild(foot);
             row.insertBefore(plate, row.firstChild);
         }
         var label = plate.querySelector(".refract-sr-plate__label");
         var key = plate.querySelector(".refract-sr-plate__key");
+        /* The mockup put a scene count here. ScrapedPerformer has no such
+           field -- that number was invented for the drawing -- so the slot
+           takes the bio instead, which is real, is already in the DOM, and
+           is hidden everywhere else on the card. */
+        var note = plate.querySelector(".refract-sr-plate__note");
+        var bio = item.querySelector(".performer-result > .row:nth-of-type(2)");
+        var bioTxt = bio ? String(bio.textContent || "").trim() : "";
+        if (note && note.textContent !== bioTxt) { note.textContent = bioTxt; }
         if (label && label.textContent !== state) { label.textContent = state; }
         /* The slot carries the field that decides. Empty is handled in
            CSS, so a performer with no disambiguation still reads. */

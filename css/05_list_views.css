@@ -3328,6 +3328,24 @@ body.stash-liquid-glass .refract-sr-plate__label {
     letter-spacing: 0.12em;
     color: rgba(255, 255, 255, 0.35);
 }
+body.stash-liquid-glass .refract-sr-plate__foot {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 0;
+}
+body.stash-liquid-glass .refract-sr-plate__note {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    font-size: 10.5px;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.42);
+    overflow: hidden;
+}
+body.stash-liquid-glass .refract-sr-plate__note:empty {
+    display: none;
+}
 body.stash-liquid-glass .refract-sr-plate__key {
     /* Studio names run long ("Lustery - James & Lola"), and the well has
        a fixed aspect it must not grow past. */
@@ -3350,8 +3368,33 @@ body.stash-liquid-glass .refract-sr-plate__key:empty::before {
    made a designed grid look like it had wandered into someone else s
    dialog. None of this changes what anything does. */
 body.stash-liquid-glass .modal-dialog:has(.PerformerScrapeModal) .modal-header {
-    padding: 20px 24px 15px;
+    padding: 20px 24px 15px !important;
     border-bottom: 1px solid var(--glass-border);
+}
+/* The mockup put an accent eyebrow above the title naming the source.
+   The title already names it ("Scrape performer from StashDB"), and that
+   string is Stash's, localised, and different for every scraper -- so
+   repeating it in CSS would be both duplication and a lie in any other
+   language. What the eyebrow was really doing compositionally was giving
+   the title something above it in the accent. A rule does that without
+   inventing a word. */
+/* 04_filters.css sets display, align-items and gap on every modal header
+   with !important, centred, for headers that are one row. Stacking the
+   rule above the title makes this one a column, where align-items is the
+   HORIZONTAL axis -- inheriting `center` there silently centred a header
+   that had been left-aligned all along. */
+body.stash-liquid-glass .modal-dialog:has(.PerformerScrapeModal) .modal-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 11px !important;
+}
+body.stash-liquid-glass .modal-dialog:has(.PerformerScrapeModal) .modal-header::before {
+    content: "";
+    display: block;
+    width: 24px;
+    height: 2px;
+    border-radius: var(--radius-pill);
+    background: var(--accent-bright);
 }
 body.stash-liquid-glass .modal-dialog:has(.PerformerScrapeModal) .modal-header span {
     font-size: 1.5rem;
@@ -3391,19 +3434,38 @@ body.stash-liquid-glass .modal-body .PerformerScrapeModal .text-input {
     color: var(--text);
     margin-bottom: 18px !important;
 }
+/* Room for the chip, so a long query never runs under it. */
+body.stash-liquid-glass .modal-body .PerformerScrapeModal .text-input {
+    padding-right: 190px;
+}
 body.stash-liquid-glass .modal-body .PerformerScrapeModal .text-input:focus {
     border-color: rgba(var(--accent-rgb), 0.55);
     box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.18);
     background-color: rgba(255, 255, 255, 0.07) !important;
 }
 
-/* "10 performers found" is a count, not a heading: it sets up the sheet
-   and then gets out of the way. */
+/* The count belongs to the field, not to the sheet. Sitting under it as
+   its own line, the bar is an input with a caption; sitting inside it,
+   the bar is one unit that states its own result -- query in, count out.
+   It cannot be moved in the markup (Stash renders it inside the list
+   container, a sibling), so it is lifted over the field instead. The
+   string stays Stash's, localised and plural-aware, which is why the
+   chip is sized for a sentence rather than for "10 FOUND". */
+body.stash-liquid-glass .PerformerScrapeModal {
+    position: relative;
+}
 body.stash-liquid-glass .PerformerScrapeModal-list-container > .mt-1 {
-    margin: 0 0 5px !important;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    margin: 0 !important;
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.08);
     font-size: var(--fs-sm);
     font-weight: 600;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.42);
+    color: var(--text-muted);
+    pointer-events: none;
 }
