@@ -1369,6 +1369,9 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
+    /* Portrait headshots in a 34px circle: a centred crop takes the
+       middle of the body and cuts the face off. */
+    object-position: top center !important;
     /* Default center-center crop — matches vanilla Stash behaviour. */
     object-position: center center !important;
 }
@@ -2040,6 +2043,12 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     gap: 5px !important;
     margin: 0.7rem 0 0 0 !important;
     flex-wrap: wrap !important;
+    /* Measured 119.81px of dead air between the date pill and the
+       fps/resolution group: justify-content resolves to space-between
+       from outside both refract blocks, so the two ends were pushed
+       apart across the full 338px. The pills are a group, not a
+       distributed row. */
+    justify-content: flex-start !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) > span > span {
     display: inline-flex !important;
@@ -2490,13 +2499,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link {
 /* Performers: the credit row.
 
    Collapsed, each card is a 34px circle in an overlapping stack with the
-   names as text beneath, which turns a 419px block into about 60px. The
-   cards are the avatars -- nothing is cloned and nothing is moved, the
-   card box is just resized and everything inside it except the image is
-   hidden. Opening restores every rule by dropping .st-perf-open's
-   negation, so the expanded state is the untouched card layout. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) {
+   names as text beneath, which turns a 419px block into about 60px.
+   Nothing is cloned and nothing is moved: the card box is resized and
+   everything inside it except the image is hidden.
+
+   The selectors carry [data-perf-count] because the count-adaptive rules
+   above lay the row out as a GRID and size the cards from the track
+   (`width: 100% !important` under
+   .scene-performers-row[data-perf-count="2"]). Without the attribute in
+   the selector those rules win and the cards stay 169px wide with a 34px
+   height -- measured exactly that way before this fix. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers {
     display: flex !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
     justify-content: flex-start !important;
@@ -2509,21 +2525,22 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-
     scroll-snap-type: none !important;
 }
 
-/* The carousel scaffolding is for the expanded layout only. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) > .performer-card.refract-clone,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) > .performer-card.st-perf-beyond,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row:not(.st-perf-is-open) .stash-perf-dots,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row:not(.st-perf-is-open) .stash-carousel-bar {
+/* Carousel scaffolding belongs to the expanded layout only. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card.refract-clone,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card.st-perf-beyond,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) .stash-perf-nav,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) .stash-perf-dots,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) .stash-carousel-bar {
     display: none !important;
 }
 
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) > .performer-card {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card {
     flex: 0 0 auto !important;
     width: 34px !important;
-    min-width: 0 !important;
+    min-width: 34px !important;
     max-width: 34px !important;
     height: 34px !important;
-    min-height: 0 !important;
+    min-height: 34px !important;
     max-height: 34px !important;
     margin: 0 0 0 -9px !important;
     padding: 0 !important;
@@ -2537,22 +2554,18 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-
     filter: none !important;
     scroll-snap-align: none !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) > .performer-card:first-child {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card.st-perf-first {
     margin-left: 0 !important;
 }
-/* Tier rings and sheens are drawn on the pseudo-elements; at 34px they
-   are noise, and the conic ring would paint over the whole avatar. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) > .performer-card::before,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) > .performer-card::after {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card::before,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card::after {
     display: none !important;
     content: none !important;
 }
-/* Everything in the card except the image: the name banner, the chin,
-   the favourite button, the rating badge and the country flag. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) > .performer-card > * {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card > * {
     display: none !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) > .performer-card > .thumbnail-section {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card > .thumbnail-section {
     display: block !important;
     width: 100% !important;
     height: 100% !important;
@@ -2562,17 +2575,17 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-
     border-radius: 0 !important;
     aspect-ratio: auto !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) .thumbnail-section > * {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers .thumbnail-section > * {
     display: none !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) .thumbnail-section > a:first-child {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers .thumbnail-section > a:first-child {
     display: block !important;
     width: 100% !important;
     height: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) .performer-card-image {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers .performer-card-image {
     width: 100% !important;
     height: 100% !important;
     min-height: 0 !important;
@@ -2599,10 +2612,8 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-extra {
     color: rgba(255, 255, 255, 0.6);
     font-variant-numeric: tabular-nums;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-extra[hidden] {
-    display: none;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers.st-perf-open .st-perf-extra {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-extra[hidden],
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-perf-is-open .st-perf-extra {
     display: none;
 }
 
@@ -2625,19 +2636,17 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-toggle {
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-toggle:hover {
     color: var(--accent-light);
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers.st-perf-open .st-perf-toggle {
-    transform: rotate(180deg);
-}
 /* Expanded, the row is the original grid or carousel again, so the
-   chevron cannot ride in it -- park it on the row's top-right corner. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers.st-perf-open {
+   chevron cannot ride in the flow -- park it on the corner. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-perf-is-open .scene-performers {
     position: relative !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers.st-perf-open .st-perf-toggle {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-perf-is-open .st-perf-toggle {
     position: absolute;
     top: 0;
     right: 0;
     z-index: 3;
+    transform: rotate(180deg);
 }
 
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-names {
@@ -2648,5 +2657,50 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-names {
     text-wrap: pretty;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-perf-is-open > .st-perf-names {
+    display: none;
+}
+
+/* Description: four lines, then a button.
+
+   Stash renders the scene details as <p class="pre">. Measured at
+   1,838px on scene 135947, which put the tag list at y=2246 inside an
+   890px panel -- the whole redesign below it was off the panel and the
+   description WAS the panel. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden !important;
+    margin-bottom: 0 !important;
+    font-size: var(--sp-body) !important;
+    line-height: 1.5 !important;
+    color: rgba(255, 255, 255, 0.62) !important;
+    text-wrap: pretty;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc.st-desc-open {
+    display: block !important;
+    -webkit-line-clamp: none;
+    overflow: visible !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more {
+    display: block;
+    /* The details column is centre-aligned, which the button inherits and
+       which reads as a stray link floating mid-column. */
+    text-align: left;
+    margin: 0.5rem 0 0 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-size: var(--sp-tab);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    cursor: pointer;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more:hover {
+    color: var(--accent-bright);
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more[hidden] {
     display: none;
 }

@@ -12490,7 +12490,9 @@
                 t.setAttribute("data-sth-tag-origin", "1");
                 t.style.setProperty("display", "none", "important");
                 var name = stTagName(t);
-                var m = ST_CRIT_RE.exec(name);
+                var label = (t.textContent || "").trim();
+                var m = ST_CRIT_RE.exec(label) ||
+                        ST_CRIT_SORT_RE.exec(t.getAttribute("data-sort-name") || "");
                 if (m) {
                     crits.push({ label: m[1], value: m[2], node: clone });
                     return;
@@ -12543,6 +12545,41 @@
             stFetchTagCounts(chips.map(function (c) { return c.__stId; }), function () {
                 if (wrapper.parentNode) { stApplyTagOrder(wrapper); }
             });
+        });
+    }
+
+    /* Scene-panel description: clamp it.
+
+       Stash renders the scene's details as a <p class="pre"> in the
+       Details pane. Measured on scene 135947 it is 1,838px tall, which
+       pushed the tag list down to y=2246 in a panel that is 890px tall --
+       so every piece of the redesign below it was off the panel entirely
+       and the description WAS the panel. Four lines, with the rest one
+       button away, on the same pattern as the tags. */
+    function stClampDescription() {
+        document.querySelectorAll(":is(.scene-tabs, .image-tabs) .tab-pane p.pre").forEach(function (p) {
+            if (!p.classList.contains("st-desc")) { p.classList.add("st-desc"); }
+            var btn = p.nextElementSibling;
+            if (!btn || !btn.classList || !btn.classList.contains("st-desc-more")) {
+                btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "st-desc-more";
+                btn.addEventListener("click", function (ev) {
+                    ev.preventDefault();
+                    var open = p.classList.toggle("st-desc-open");
+                    btn.textContent = open ? "Show less" : "Read more";
+                    btn.setAttribute("aria-expanded", open ? "true" : "false");
+                });
+                btn.textContent = "Read more";
+                btn.setAttribute("aria-expanded", "false");
+                p.insertAdjacentElement("afterend", btn);
+            }
+            /* Only offer the control when there is something folded away.
+               scrollHeight beats clientHeight by more than a rounding
+               error only when the clamp actually bit. */
+            var clipped = p.scrollHeight > p.clientHeight + 2 ||
+                          p.classList.contains("st-desc-open");
+            btn.hidden = !clipped;
         });
     }
 
@@ -12628,6 +12665,11 @@
             cards.forEach(function (c, i) {
                 c.classList.toggle("st-perf-stacked", i < ST_PERF_STACK);
                 c.classList.toggle("st-perf-beyond", i >= ST_PERF_STACK);
+                /* :first-child is no good here: in the 5+ carousel the row's
+                   first child is a hidden .refract-clone, so the first VISIBLE
+                   avatar kept the -9px stack offset and hung 9px outside the
+                   column. Mark the first real card instead. */
+                c.classList.toggle("st-perf-first", i === 0);
             });
             extra.textContent = over > 0 ? ("+" + over) : "";
             extra.hidden = over <= 0;
@@ -12672,7 +12714,12 @@
        not seen. Until it answers the list renders alphabetically, so the
        panel is never empty waiting on a fetch. */
     var ST_TAG_LEAD = 8;
+    /* Two spellings. The visible label is "Aesthetics ★: 5", but
+       data-sort-name is "#Aesthetics: 5" -- no star, a leading hash, and
+       it is what the first version matched against, so the split silently
+       never fired and all five criterion tags kept their lead slots. */
     var ST_CRIT_RE = /^(.+?)\s*★\s*:\s*(\d+)\s*$/;
+    var ST_CRIT_SORT_RE = /^#\s*(.+?)\s*:\s*(\d+)\s*$/;
     var stTagCountCache = Object.create(null);
     var stTagCountPending = Object.create(null);
 
@@ -13318,6 +13365,7 @@
         setupSceneTabsPerformers();
         wrapSceneTagList();
         stPerformerCredit();
+        stClampDescription();
         initImageCardLightbox();
         initRatingInputSelectAll();
         tagFilledRatings();

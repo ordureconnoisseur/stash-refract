@@ -950,3 +950,7 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-perf-tog
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-perf-names {
     color: var(--text-muted);
 }
+
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc {
+    color: var(--text) !important;
+}
