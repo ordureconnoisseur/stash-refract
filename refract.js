@@ -6771,7 +6771,20 @@
             var t = e.target.closest ? e.target.closest("[data-act]") : null;
             if (!t) { return; }
             var act = t.getAttribute("data-act");
-            if (act === "filebtn" || act === "file") { return; }   /* the label opens the input */
+            if (act === "file") { return; }   /* the input's own change handler has it */
+            if (act === "filebtn") {
+                /* The button sits inside the <label> that owns the file input,
+                   on the assumption that the label would forward the click.
+                   It does not: a label runs its activation behaviour only when
+                   the click did NOT land on an interactive descendant, and a
+                   <button> is exactly that. So the picker never opened and the
+                   entry did nothing at all (reported against 1.22.0). Open the
+                   input directly. */
+                e.preventDefault();
+                var inp = pop.querySelector('input[data-act="file"]');
+                if (inp) { inp.click(); }
+                return;
+            }
             e.preventDefault();
             if (act === "media") { close(); rfx.openPicker(report); return; }
             if (act === "default") { close(); report(rfx.chooseBack(null)); return; }
