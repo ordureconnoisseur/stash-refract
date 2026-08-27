@@ -12612,14 +12612,14 @@
             var cards = Array.prototype.slice.call(
                 row.querySelectorAll(":scope > .performer-card:not(.refract-clone)"));
             if (!cards.length) {
-                var deadNames = wrap.querySelector(":scope > .st-perf-names");
+                var deadNames = wrap.querySelector(".st-perf-names");
                 if (deadNames) { deadNames.remove(); }
                 return;
             }
 
             var extra = row.querySelector(":scope > .st-perf-extra");
             var toggle = row.querySelector(":scope > .st-perf-toggle");
-            var names = wrap.querySelector(":scope > .st-perf-names");
+            var names = wrap.querySelector(".st-perf-names");
 
             if (!extra) {
                 extra = document.createElement("span");
@@ -12648,14 +12648,19 @@
             /* Re-append every cycle: cheap, and it restores the order and
                the nodes themselves if React rebuilt the row underneath us.
                appendChild on an element already last is a no-op move. */
-            if (extra.parentNode !== row || extra.nextSibling !== toggle) {
+            /* All three ride INSIDE the row, in this order, so the credit
+               reads as one line: avatars, +N, names, chevron. Measured on
+               scene 189289 the previous shape put the avatar at x=38.5,
+               the chevron at x=354.5 behind a 282px auto margin, and the
+               name on its own line below -- three fragments that looked
+               scattered rather than composed. Re-appended only when the
+               sequence is actually wrong, so this is a no-op most cycles. */
+            if (extra.nextElementSibling !== names ||
+                names.nextElementSibling !== toggle ||
+                toggle.nextElementSibling) {
                 row.appendChild(extra);
-            }
-            if (toggle.parentNode !== row || toggle.nextSibling) {
+                row.appendChild(names);
                 row.appendChild(toggle);
-            }
-            if (names.parentNode !== wrap || row.nextSibling !== names) {
-                row.insertAdjacentElement("afterend", names);
             }
 
             var joined = cards.map(stPerformerName).filter(Boolean).join(", ");

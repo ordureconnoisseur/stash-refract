@@ -2050,7 +2050,16 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
        distributed row. */
     justify-content: flex-start !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) > span > span {
+/* One real star, defined once. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
+    --st-star-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 2l2.9 6.2 6.6.9-4.8 4.7 1.2 6.7L12 17.3 6.1 20.5l1.2-6.7L2.5 9.1l6.6-.9z'/%3E%3C/svg%3E");
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) > span {
+    /* The flex was on the CHILDREN, not the container: the unclassed
+       wrapper span holding frame-rate + resolution stayed display:block
+       with gap:normal, so those two pills sat at 0px while the date sat
+       at the row's declared 5px. Measured 5px / 0px before, 5px / 5px
+       after. One gap value, one container. */
     display: inline-flex !important;
     align-items: center !important;
     gap: 5px !important;
@@ -2148,34 +2157,92 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 /* Advanced Ratings value beside the stars. Absent -> the stars alone are
    the anchor and nothing reflows. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
+    /* What this control actually is, measured in both states: complete
+       renders a star and a plus and NO number; incomplete renders a
+       star, a plus and a badge carrying a count. So it is a TRIGGER that
+       opens the per-criterion editor, not a score readout -- drawing it
+       as a bare number (or a score pill) shows a value that half the
+       time does not exist. The score itself has a home already: the
+       Scored row below.
+
+       As a 26px glass circle it matches the operations and multiview
+       buttons exactly -- three controls, one shape -- and stays beside
+       the stars because it is about rating. */
     order: 2 !important;
+    position: relative !important;
     display: inline-flex !important;
-    align-items: baseline !important;
-    width: auto !important;
-    height: auto !important;
-    min-width: 0 !important;
-    padding: 0 0 0 5px !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    margin: 0 0 0 9px !important;
+    padding: 0 !important;
+    /* Measured against the operations and multiview buttons: they fill
+       at rgba(255,255,255,0.04), not --glass-bg's 0.06. Three controls,
+       one shape, one fill. */
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
     box-shadow: none !important;
-    font-size: var(--sp-value) !important;
-    font-weight: 700 !important;
-    font-variant-numeric: tabular-nums !important;
     color: var(--accent-light) !important;
+    overflow: visible !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn .adv-rating-btn-star,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn:hover {
+    background: var(--accent-tint) !important;
+    border-color: rgba(var(--accent-rgb), 0.4) !important;
+}
+/* The plugin draws its star as a UNICODE glyph with color:#ffc107
+   hard-coded inline. A text glyph renders differently on every platform
+   and cannot be recoloured reliably, so it is hidden and replaced with a
+   real SVG carried as a mask -- masked rather than a background image so
+   it takes currentColor and follows the hover state for free. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn .adv-rating-btn-star {
+    display: none !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn::before {
+    content: "";
+    display: block;
+    width: 12px;
+    height: 12px;
+    background-color: currentColor;
+    -webkit-mask: var(--st-star-svg) center / contain no-repeat;
+            mask: var(--st-star-svg) center / contain no-repeat;
+}
+/* The plus is the "edit me" affordance; the star already says that. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn .adv-rating-btn-plus {
     display: none !important;
 }
+/* The count, rendered only while criteria are outstanding, as a corner
+   badge rather than a word sitting in the row. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn .adv-rating-btn-badge {
+    /* The plugin's count badge measured 22.6px wide for a single digit
+       and sat across most of a 26px button. At this size a number cannot
+       be read anyway, so the state is carried by a dot instead and the
+       exact count stays one click away in the editor. */
+    display: none !important;
+}
+/* Outstanding criteria: a plain accent dot, no glyph. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn.adv-rating-btn--incomplete::after {
+    /* Class doubled: the caption-removal rule above is also four classes
+       deep, so an equal-specificity tie let `content: none` win on source
+       order and the dot never drew. */
+    content: "" !important;
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 7px;
+    height: 7px;
+    border-radius: var(--radius-pill);
+    background: var(--accent);
+    border: 1.5px solid var(--bg-0);
+}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn::after {
-    content: "Rating";
-    margin-left: 6px;
-    font-size: var(--sp-label);
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.38);
+    /* Was a "RATING" caption. Five stars beside a control do not need a
+       word telling you they are a rating, and it was the third unrelated
+       object in a row that should hold two. */
+    content: none !important;
 }
 
 /* Actions: right of the anchor, behind a hairline, read as a different
@@ -2624,7 +2691,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-toggle {
     justify-content: center;
     width: 22px;
     height: 22px;
-    margin-left: auto;
+    margin-left: 4px;
     padding: 0;
     border: 0;
     border-radius: var(--radius-pill);
@@ -2649,14 +2716,25 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-p
     transform: rotate(180deg);
 }
 
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-names {
-    margin-top: 0.5rem;
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .st-perf-names {
+    /* Inline between the stack and the chevron, so the credit reads as
+       one composed line. Measured before: avatar at x=38.5, chevron at
+       x=354.5 behind a 282px auto margin, name stranded on its own line
+       underneath -- three fragments. Two lines maximum, or a ten-name
+       list would push the panel around. */
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0 0 0 11px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
     font-size: var(--sp-chip);
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.72);
     text-wrap: pretty;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-perf-is-open > .st-perf-names {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-perf-is-open .st-perf-names {
     display: none;
 }
 

@@ -954,3 +954,12 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-perf-nam
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc {
     color: var(--text) !important;
 }
+
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
+    background: var(--accent-tint) !important;
+    border-color: rgba(var(--accent-rgb), 0.45) !important;
+    color: var(--accent) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .scene-performers .st-perf-names {
+    color: var(--text);
+}
