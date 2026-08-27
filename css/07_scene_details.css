@@ -2551,16 +2551,54 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
 }
 
 /* ── Tab strip — same six destinations, one step larger ───────────── */
+/* The tab strip, as a segmented control rather than a row of touching
+   pills. Three measured faults: the links sat at a 0px gap so adjacent
+   12px pills abutted with no daylight between them; the link radius
+   equalled the container's with only 2.8px of padding between, so the
+   nested corners fought each other; and the strip's bottom edge landed
+   on exactly the same pixel as the pane below it (both 327.4), giving
+   the content no air at all.
+
+   The radius is concentric now: 12px outside, 3px of padding, 9px
+   inside, so the corners are parallel. Items keep min-width: max-content
+   so six tabs share the row evenly while seven (a play queue adds a
+   Queue tab) scroll instead of squeezing the labels to breaking point. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs {
-    margin: 0.9rem 0 0 0 !important;
+    /* Deliberately asymmetric: the strip selects the pane beneath it, so
+       it sits closer to what it controls than to the state row above.
+       Measured 11.9 above and 10.5 below beforehand, which is near enough
+       to equal that the strip read as floating between two things
+       instead of belonging to one. */
+    margin: 1rem 0 0.6rem 0 !important;
+    padding: 3px !important;
+    gap: 3px !important;
     border-radius: var(--radius-sm) !important;
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs::-webkit-scrollbar {
+    display: none !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-item {
+    flex: 1 1 auto !important;
+    min-width: max-content !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link {
+    display: block !important;
     font-size: var(--sp-tab) !important;
     font-weight: 600 !important;
-    padding: 0.375rem 0.35rem !important;
+    /* 4px horizontal is a MINIMUM, not the look: the items grow to fill
+       the row, so with six tabs the boxes stretch and the padding never
+       shows. It only bites in the seven-tab play-queue case, where 7px
+       overflowed the strip by 38px and clipped Edit behind a scroll. */
+    padding: 5px 4px !important;
+    /* 12px container minus 3px padding: concentric with the outer edge. */
+    border-radius: 9px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
 }
 
 /* Performers: the credit row.
