@@ -2961,6 +2961,12 @@
         };
     }
 
+    /* The settings panel component and where it ended up mounted.
+       Published at module scope so the Interface-section injector can
+       mount it directly if the navbar portal host never arrives. */
+    var refractSettingsPanelComponent = null;
+    var refractSettingsMountMode = "none";
+
     function registerAccentPatch() {
         if (typeof PluginApi === "undefined" || !PluginApi.patch || !PluginApi.React) {
             setTimeout(registerAccentPatch, 100);
@@ -2999,6 +3005,7 @@
            whenever that exists. */
         var R3 = PluginApi.React;
         var RefractSettingsPanel = buildAccentSwatchPicker();
+        refractSettingsPanelComponent = RefractSettingsPanel;
         function RefractInterfacePortalHost() {
             var st = R3.useState(null);
             var container = st[0], setContainer = st[1];
@@ -3037,6 +3044,14 @@
                     var now = Date.now();
                     if (!claim || claim.token === tokenRef.current || (now - claim.at) > 2000) {
                         c._refractHostClaim = { token: tokenRef.current, at: now };
+                        /* The watcher may have written its "could not attach"
+                           notice into this card. A host turning up later means
+                           it was wrong, so clear it before portalling in. */
+                        if (c._refractNoticeShown) {
+                            c.textContent = "";
+                            c._refractNoticeShown = false;
+                        }
+                        refractSettingsMountMode = "portal";
                         if (c !== container) { setContainer(c); }
                     } else if (container) {
                         setContainer(null);
@@ -3048,12 +3063,22 @@
             return PluginApi.ReactDOM.createPortal(
                 R3.createElement(RefractSettingsPanel, { key: "sync-" + epochSt[0] }), container);
         }
-        PluginApi.patch.instead("MainNavBar.UtilityItems", function () {
-            var args = Array.prototype.slice.call(arguments);
-            var next = args.pop();
-            var orig = next.apply(null, args);
-            return R3.createElement(R3.Fragment, null, orig,
-                R3.createElement(RefractInterfacePortalHost, { key: "refract-settings-host" }));
+        /* Registered on two independent patch points. Only one host ever
+           renders the panel -- the claim-with-heartbeat above settles that --
+           but if a plugin replaces one of these components with `instead` and
+           never chains to next, ours goes with it, and the settings become
+           unreachable with no error anywhere. Three points, one survivor --
+           and BooleanSetting is deliberately not in the navbar at all, since
+           it is Stash's own settings row and so renders on the very page the
+           panel belongs to, with the app's providers around it. */
+        ["MainNavBar.UtilityItems", "MainNavBar.MenuItems", "BooleanSetting"].forEach(function (point) {
+            PluginApi.patch.instead(point, function () {
+                var args = Array.prototype.slice.call(arguments);
+                var next = args.pop();
+                var orig = next.apply(null, args);
+                return R3.createElement(R3.Fragment, null, orig,
+                    R3.createElement(RefractInterfacePortalHost, { key: "refract-settings-host" }));
+            });
         });
     }
     registerAccentPatch();
@@ -14058,6 +14083,80 @@
        pointer note instead (see the PluginSettings patch). The settings
        component is built once and mounted with PluginApi.ReactDOM.render;
        if the SPA rebuilds the pane, the consolidated watcher re-injects. */
+    /* Fallback mount for the settings panel.
+
+       The panel normally arrives by portal from the host patched onto
+       MainNavBar.UtilityItems. On some installs that host never renders
+       -- another plugin replacing the same component with `instead`
+       without chaining to next, or a build that does not apply the
+       patch -- and the symptom is brutal and silent: the Interface tab
+       shows the "Refract" heading with an empty box under it, so every
+       theme setting is unreachable while the theme itself looks fine
+       (reported against 1.22.0, where the card customiser lives behind
+       exactly that box).
+
+       This has to be a poller rather than a one-shot check. Stash
+       re-renders the Interface pane, which discards our injected section
+       (React does not know about it), and the watcher then injects a
+       fresh empty one -- so each card needs its own grace period.
+
+       What it does NOT do is render the panel itself. That was tried and
+       does not work: a root outside Stash's tree has no
+       ConfigurationProvider and no Router, and the panel's own children
+       throw for want of them on a later pass, which takes the whole root
+       down again and leaves the same empty box. Rather than fake a fix,
+       say what happened, so an empty box is at worst a legible one. */
+    var REFRACT_SETTINGS_GRACE_MS = 2500;
+    var refractSettingsWatch = null;
+    function refractMountSettingsFallback() {
+        if (refractSettingsWatch) { return; }
+        var misses = 0;
+        refractSettingsWatch = setInterval(function () {
+            var card = document.querySelector("#refract-settings-section > .card");
+            if (!card) {
+                /* Off the settings page. Stand down rather than poll for
+                   ever; the injector re-arms this when the tab comes back. */
+                misses += 1;
+                if (misses > 20) { clearInterval(refractSettingsWatch); refractSettingsWatch = null; }
+                return;
+            }
+            misses = 0;
+            if (card.firstChild) { card._refractEmptySince = 0; return; }
+            if (!card._refractEmptySince) { card._refractEmptySince = Date.now(); return; }
+            if (Date.now() - card._refractEmptySince < REFRACT_SETTINGS_GRACE_MS) { return; }
+            if (card._refractNoticeShown) { return; }
+            card._refractNoticeShown = true;
+            refractSettingsMountMode = "notice";
+            var note = document.createElement("div");
+            note.className = "refract-settings-unreachable sub-heading";
+            note.textContent = "Refract's settings could not be attached to this page. "
+                + "This normally means another plugin has replaced one of Stash's navbar "
+                + "or settings components without passing the original through, which "
+                + "removes Refract's panel along with it. Disabling other UI plugins one "
+                + "at a time will find it. Running __refractSettingsDiag() in the browser "
+                + "console reports what Refract could and could not reach.";
+            card.appendChild(note);
+        }, 600);
+    }
+
+    /* Why the settings panel is or is not on screen, in one call, so a
+       report of an empty box can be answered without guesswork. */
+    window.__refractSettingsDiag = function () {
+        var section = document.querySelector("#refract-settings-section");
+        var card = section ? section.querySelector(".card") : null;
+        return {
+            interfacePane: !!document.querySelector("[id$='-tabpane-interface']"),
+            section: !!section,
+            card: !!card,
+            cardChildren: card ? card.childNodes.length : 0,
+            mount: refractSettingsMountMode,
+            panelBuilt: !!refractSettingsPanelComponent,
+            pluginApi: typeof PluginApi !== "undefined",
+            canPatch: typeof PluginApi !== "undefined" && !!(PluginApi.patch && PluginApi.patch.instead),
+            canRender: typeof PluginApi !== "undefined" && !!(PluginApi.ReactDOM && PluginApi.ReactDOM.render)
+        };
+    };
+
     function injectInterfaceRefractSection() {
         if (typeof PluginApi === "undefined" || !PluginApi.React || !PluginApi.ReactDOM) { return; }
         var pane = document.querySelector("[id$='-tabpane-interface']");
@@ -14079,6 +14178,7 @@
         /* TOP of the Interface tab (user request 2026-07-26): theme
            settings are the most-touched thing on this page. */
         pane.insertBefore(section, pane.firstChild);
+        refractMountSettingsFallback();
 
         /* The panel itself is mounted into this .card by the portal host
            registered in registerAccentPatch — NOT a standalone
