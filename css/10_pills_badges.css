@@ -216,6 +216,24 @@ body.stash-liquid-glass .PerformerScrapeModal .scene-image-container img {
     max-width: 14rem;
     width: auto;
     height: 10rem;
+    /* The padding has to go -- inside the border, it pushes the picture off
+       centre within the frame, which is the whole bug. But it was carrying
+       the row's left gutter: .search-item pads 14px and the Bootstrap .row
+       inside it margins -15px straight back off, so without something the
+       photo sits flat against the card edge. A margin does the same job from
+       outside the border, where it cannot disturb the fit. 15px because that
+       is what the row's other three gaps measure. */
     padding: 0;
+    margin-left: 15px;
+}
+
+/* The text column is `col flex-column`, but Bootstrap's flex-column only sets
+   a direction -- the column is still display:block, so it stacked from the
+   top while the photo beside it stood 140px tall. Two lines of text against a
+   full-height image left a void under them. Make it the flex column it is
+   already named for and centre it against the picture. */
+body.stash-liquid-glass .PerformerScrapeModal .performer-result .col.flex-column {
+    display: flex;
+    justify-content: center;
 }
 
