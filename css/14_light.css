@@ -834,3 +834,14 @@ body.stash-liquid-glass.refract-light .refract-cc-kind-btn.is-active,
 body.stash-liquid-glass.refract-light .refract-cc-seg-btn.is-active {
     color: var(--accent);
 }
+
+/* ═══════ 29. Settings-unreachable notice: the code chip ═══════════════
+   The base rule paints the chip with --glass-bg-strong and
+   --accent-bright, which reads on the dark base. On the light one
+   --accent-bright is the LIGHTER half of the accent pair, so a purple at
+   4.1:1 on a near-white chip. Light mode defines --accent as the darker
+   half for exactly this, the same swap the customiser's segmented
+   controls take above. */
+body.stash-liquid-glass.refract-light .refract-su-code {
+    color: var(--accent) !important;
+}

@@ -14141,13 +14141,19 @@
             card._refractNoticeShown = true;
             refractSettingsMountMode = "notice";
             var note = document.createElement("div");
-            note.className = "refract-settings-unreachable sub-heading";
-            note.textContent = "Refract's settings could not be attached to this page. "
-                + "This normally means another plugin has replaced one of Stash's navbar "
-                + "or settings components without passing the original through, which "
-                + "removes Refract's panel along with it. Disabling other UI plugins one "
-                + "at a time will find it. Running __refractSettingsDiag() in the browser "
-                + "console reports what Refract could and could not reach.";
+            note.className = "refract-settings-unreachable";
+            note.innerHTML =
+                '<div class="refract-su-head">' +
+                '  <span class="refract-su-mark" aria-hidden="true"></span>' +
+                '  <span class="refract-su-title">Refract could not attach its settings to this page</span>' +
+                '</div>' +
+                '<p class="refract-su-body">Another plugin has most likely replaced one of Stash&rsquo;s ' +
+                'navbar or settings components without passing the original through, which takes ' +
+                'Refract&rsquo;s panel down with it. Turning other UI plugins off one at a time will ' +
+                'find which one.</p>' +
+                '<p class="refract-su-body">For the specifics, run <code class="refract-su-code">' +
+                '__refractSettingsDiag()</code> in the browser console. It reports what Refract ' +
+                'could and could not reach.</p>';
             card.appendChild(note);
         }, 600);
     }
