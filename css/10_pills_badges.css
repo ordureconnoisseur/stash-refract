@@ -186,3 +186,26 @@ body.stash-liquid-glass .scene-image-container img {
     max-width: 100%;
 }
 
+/* ...except in the performer scrape results, where that frame lies.
+
+   The rule above is written for the scene tagger, whose thumbnails are
+   landscape and fill the box Stash gives them. Stash sizes every one of
+   these with `.scene-image { min-width: 168px; max-width: 14rem;
+   max-height: 10rem; object-fit: contain }`, and adds `padding-left:
+   1rem` in the search list. A portrait performer photo in that box paints
+   about 94px wide inside a 168px element, sitting 14px right of centre,
+   so the border framed the ELEMENT rather than the picture: a second
+   empty box around the photo, inside the row's own box.
+
+   Removing min-width is not the way out. Our `max-width: 100%` resolves
+   against `.scene-image-container`, which is a content-sized flex item,
+   so dropping the floor makes the two circular and the image collapses
+   to nothing (measured: 2x2). The frame is what is wrong here, not
+   Stash's sizing, so the frame goes and the row's own box is the only
+   one left. */
+body.stash-liquid-glass .PerformerScrapeModal .scene-image-container img {
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+}
+
