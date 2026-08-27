@@ -186,54 +186,12 @@ body.stash-liquid-glass .scene-image-container img {
     max-width: 100%;
 }
 
-/* ...and in the performer scrape results, make that frame fit.
-
-   The rule above is written for the scene tagger, whose thumbnails are
-   landscape and fill the box Stash gives them. Stash sizes all of these
-   with `.scene-image { min-width: 168px; max-width: 14rem; max-height:
-   10rem; object-fit: contain }`, plus `padding-left: 1rem` in the search
-   list. A portrait performer photo in that box paints about 94px wide
-   inside a 168px element, 14px right of centre, so the border framed the
-   ELEMENT and the picture floated inside it: a second empty box around
-   the photo, inside the row's own box. A border-radius could not help,
-   because it rounds a box the picture does not reach.
-
-   So give the element the picture's own shape and let the existing frame
-   land on it. A fixed height with width:auto derives the width from the
-   aspect, and max-width has to be restated as an absolute: the base
-   rule's `max-width: 100%` resolves against .scene-image-container,
-   which is a content-sized flex item, and with Stash's min-width floor
-   removed the two go circular and the image collapses to nothing
-   (measured: 2x2). Result is 96x140 around a 94x138 picture -- zero dead
-   space on either axis.
-
-   Portraits are the case here. A landscape image would letterbox
-   vertically instead and the frame would stand off it top and bottom;
-   worth revisiting if performer photos in the wild turn out wider than
-   they are tall. */
-body.stash-liquid-glass .PerformerScrapeModal .scene-image-container img {
-    min-width: 0;
-    max-width: 14rem;
-    width: auto;
-    height: 10rem;
-    /* The padding has to go -- inside the border, it pushes the picture off
-       centre within the frame, which is the whole bug. But it was carrying
-       the row's left gutter: .search-item pads 14px and the Bootstrap .row
-       inside it margins -15px straight back off, so without something the
-       photo sits flat against the card edge. A margin does the same job from
-       outside the border, where it cannot disturb the fit. 15px because that
-       is what the row's other three gaps measure. */
-    padding: 0;
-    margin-left: 15px;
-}
-
-/* The text column is `col flex-column`, but Bootstrap's flex-column only sets
-   a direction -- the column is still display:block, so it stacked from the
-   top while the photo beside it stood 140px tall. Two lines of text against a
-   full-height image left a void under them. Make it the flex column it is
-   already named for and centre it against the picture. */
-body.stash-liquid-glass .PerformerScrapeModal .performer-result .col.flex-column {
-    display: flex;
-    justify-content: center;
-}
+/* The performer scrape modal used to be styled from here: the image
+   frame was made to hug its picture, and the text column was centred
+   against it. Both were answers to a ROW layout. 05_list_views.css turns
+   that list into a contact sheet, where the caption sits under the photo
+   and the well is a fixed 3:4 filled by object-fit, so neither applies
+   any more -- and the centring one actively fought the new caption from
+   a later file. The sheet owns that modal now; the rule above stays for
+   the tagger, which is still rows. */
 
