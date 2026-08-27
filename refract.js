@@ -12546,6 +12546,106 @@
         });
     }
 
+    /* Scene-panel performers: a credit row that opens into the cards.
+
+       One performer card in this panel measures 280x419, which is 47% of
+       the panel's height spent on the least dense thing in it. Collapsed,
+       each card becomes a 34px circle in an overlapping stack, the names
+       run underneath as text, and a chevron restores the cards exactly as
+       they were. That is what frees the room the tag work spends.
+
+       Nothing is moved. The cards stay where React put them and are
+       resized by CSS; the only new nodes are the chevron and the names
+       line, both injected as siblings and both rebuilt if React drops
+       them. Open state lives on the wrapper as a JS property rather than
+       a class, because a re-render would take a class with it. */
+    var ST_PERF_STACK = 5;
+
+    function stPerformerName(card) {
+        var el = card.querySelector(".performer-name") ||
+                 card.querySelector(".refract-pc-name-text") ||
+                 card.querySelector(".card-section-title .TruncatedText");
+        return (el && el.textContent || "").trim();
+    }
+
+    function stPerformerCredit() {
+        document.querySelectorAll(":is(.scene-tabs, .image-tabs) .col-12.scene-performers-row").forEach(function (wrap) {
+            var row = wrap.querySelector(":scope > .scene-performers");
+            if (!row) { return; }
+            var cards = Array.prototype.slice.call(
+                row.querySelectorAll(":scope > .performer-card:not(.refract-clone)"));
+            if (!cards.length) {
+                var deadNames = wrap.querySelector(":scope > .st-perf-names");
+                if (deadNames) { deadNames.remove(); }
+                return;
+            }
+
+            var extra = row.querySelector(":scope > .st-perf-extra");
+            var toggle = row.querySelector(":scope > .st-perf-toggle");
+            var names = wrap.querySelector(":scope > .st-perf-names");
+
+            if (!extra) {
+                extra = document.createElement("span");
+                extra.className = "st-perf-extra";
+            }
+            if (!toggle) {
+                toggle = document.createElement("button");
+                toggle.type = "button";
+                toggle.className = "st-perf-toggle";
+                toggle.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" ' +
+                    'fill="none" stroke="currentColor" stroke-width="2.2" ' +
+                    'stroke-linecap="round" stroke-linejoin="round">' +
+                    '<path d="M6 9l6 6 6-6"></path></svg>';
+                toggle.addEventListener("click", function (ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    wrap.__stPerfOpen = !wrap.__stPerfOpen;
+                    stSyncPerfOpen(wrap, row, toggle);
+                });
+            }
+            if (!names) {
+                names = document.createElement("div");
+                names.className = "st-perf-names";
+            }
+
+            /* Re-append every cycle: cheap, and it restores the order and
+               the nodes themselves if React rebuilt the row underneath us.
+               appendChild on an element already last is a no-op move. */
+            if (extra.parentNode !== row || extra.nextSibling !== toggle) {
+                row.appendChild(extra);
+            }
+            if (toggle.parentNode !== row || toggle.nextSibling) {
+                row.appendChild(toggle);
+            }
+            if (names.parentNode !== wrap || row.nextSibling !== names) {
+                row.insertAdjacentElement("afterend", names);
+            }
+
+            var joined = cards.map(stPerformerName).filter(Boolean).join(", ");
+            if (names.textContent !== joined) { names.textContent = joined; }
+
+            var over = cards.length - ST_PERF_STACK;
+            cards.forEach(function (c, i) {
+                c.classList.toggle("st-perf-stacked", i < ST_PERF_STACK);
+                c.classList.toggle("st-perf-beyond", i >= ST_PERF_STACK);
+            });
+            extra.textContent = over > 0 ? ("+" + over) : "";
+            extra.hidden = over <= 0;
+
+            stSyncPerfOpen(wrap, row, toggle);
+        });
+    }
+
+    function stSyncPerfOpen(wrap, row, toggle) {
+        var open = !!wrap.__stPerfOpen;
+        row.classList.toggle("st-perf-open", open);
+        wrap.classList.toggle("st-perf-is-open", open);
+        if (toggle) {
+            toggle.setAttribute("aria-expanded", open ? "true" : "false");
+            toggle.setAttribute("aria-label", open ? "Collapse performers" : "Expand performers");
+        }
+    }
+
     /* Scene-panel tags: split, rank, fold.
        Three things happen to the flat alphabetical run Stash renders.
 
@@ -13217,6 +13317,7 @@
         injectScenePlayerOverlay();
         setupSceneTabsPerformers();
         wrapSceneTagList();
+        stPerformerCredit();
         initImageCardLightbox();
         initRatingInputSelectAll();
         tagFilledRatings();

@@ -930,3 +930,23 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-rest
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-rest-run .tag-item.st-tag-is-rest.tag-link.badge:hover a {
     color: var(--accent) !important;
 }
+
+/* Performer credit row: light counterparts. */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) > .performer-card {
+    border-color: var(--glass-border) !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-perf-extra {
+    border-color: var(--glass-border);
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-muted);
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-perf-toggle {
+    color: var(--text-muted);
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-perf-toggle:hover {
+    color: var(--accent);
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-perf-names {
+    color: var(--text-muted);
+}
