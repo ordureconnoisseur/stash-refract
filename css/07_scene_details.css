@@ -2594,7 +2594,16 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link {
        the row, so with six tabs the boxes stretch and the padding never
        shows. It only bites in the seven-tab play-queue case, where 7px
        overflowed the strip by 38px and clipped Edit behind a scroll. */
-    padding: 5px 4px !important;
+    /* Asymmetric ON PURPOSE, and it is optical centring, not a fudge.
+       Centring the line box is not the same as centring the text: the
+       line box reserves descender space, and every tab label but History
+       is descender-free, so that reserved space sat empty below the ink
+       and the whole strip read high. Measured off the rendered pixels,
+       Markers' ink had 13px above it and 16px below inside the bar. The
+       vertical padding still sums to 10px, so the strip height is
+       unchanged; the 1px is moved from below the text to above it, which
+       centres the CAP HEIGHT and lets descenders hang as they should. */
+    padding: 6px 4px 4px !important;
     /* 12px container minus 3px padding: concentric with the outer edge. */
     border-radius: 9px !important;
     text-align: center !important;
@@ -2819,4 +2828,33 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more:hover {
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more[hidden] {
     display: none;
+}
+
+/* One vertical rhythm for the state chips.
+
+   Measured with a descender-independent metric (cap-height centre against
+   box centre) the row was 5.1px out of true with itself: "0 plays" sat
+   2.00px high because its line-height (11.5px) was SHORTER than the font
+   box Albert Sans reports at that size (ascent 11 + descent 3 = 14), so
+   the half-leading went negative and dragged the baseline up; while
+   "Not favourite" and "Not organised" sat 3.13px low because their line
+   box was never centred in the chip at all.
+
+   Centring the line box is the whole fix. A centred line box lands the
+   cap-height block within half a pixel of the box centre at these sizes,
+   which is where the tab strip and the tag chips already were -- the
+   residual is the font's own 10/3 asymmetry and it is below the
+   threshold of sight. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-value,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-icon,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    /* Comfortably above the 14px font box, so the leading stays positive
+       and splits evenly above and below the baseline. */
+    line-height: 1.35 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
