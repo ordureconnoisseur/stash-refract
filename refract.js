@@ -12483,13 +12483,257 @@
                IMPORTANT: clone BEFORE modifying the original — cloneNode(true)
                copies inline styles and dataset, so cloning after hiding would
                give us invisible clones too. */
+            var chips = [];
+            var crits = [];
             tagNodes.forEach(function (t) {
                 var clone = t.cloneNode(true);
                 t.setAttribute("data-sth-tag-origin", "1");
                 t.style.setProperty("display", "none", "important");
-                wrapper.appendChild(clone);
+                var name = stTagName(t);
+                var m = ST_CRIT_RE.exec(name);
+                if (m) {
+                    crits.push({ label: m[1], value: m[2], node: clone });
+                    return;
+                }
+                clone.classList.add("st-tag-chip");
+                clone.__stId = stTagIdFromNode(clone);
+                clone.__stName = name;
+                chips.push(clone);
+            });
+
+            stRenderScored(col, tagsHeading, crits);
+
+            if (!chips.length) {
+                /* Every tag on this scene was a rating criterion. Drop the
+                   empty list rather than drawing a bare "Tags" label over
+                   nothing (CSS hides the heading off .st-tags-empty). */
+                wrapper.remove();
+                tagsHeading.classList.add("st-tags-empty");
+                return;
+            }
+            tagsHeading.classList.remove("st-tags-empty");
+
+            var caption = document.createElement("div");
+            caption.className = "st-tag-caption";
+            var leadRow = document.createElement("div");
+            leadRow.className = "st-tag-lead-row";
+            /* The remainder gets its OWN block container. Putting inline
+               children into the flex list is what defeated the earlier
+               keyword-line attempt: the list's flex and centring rules
+               fight an inline layout and every tag landed centred on a
+               line of its own. A separate block parent has no such rules. */
+            var restRun = document.createElement("div");
+            restRun.className = "st-tag-rest-run";
+            var more = document.createElement("button");
+            more.type = "button";
+            more.className = "st-tag-more";
+            more.hidden = true;
+            more.addEventListener("click", function (ev) {
+                ev.preventDefault();
+                wrapper.classList.toggle("st-tags-expanded");
+                stSyncMoreLabel(wrapper);
+            });
+            wrapper.appendChild(caption);
+            wrapper.appendChild(leadRow);
+            wrapper.appendChild(restRun);
+            wrapper.appendChild(more);
+            wrapper.__stChips = chips;
+
+            stApplyTagOrder(wrapper);
+            stFetchTagCounts(chips.map(function (c) { return c.__stId; }), function () {
+                if (wrapper.parentNode) { stApplyTagOrder(wrapper); }
             });
         });
+    }
+
+    /* Scene-panel tags: split, rank, fold.
+       Three things happen to the flat alphabetical run Stash renders.
+
+       1. Advanced Rating criterion tags ("Creativity <BLACKSTAR>: 4") are
+          scores, not descriptors, so they lift into their own Scored row
+          above the list. This matters more than it sounds: the ranking
+          below is rarest-first, and a criterion tag sits on a handful of
+          scenes by construction, so left in place they take EVERY lead
+          slot. Measured on scene 135947 - its five criterion tags carry
+          library counts of 8/9/14/21/27 against a median in the hundreds,
+          so all five sorted ahead of every real descriptor. They stay real
+          tag links, so filtering by one is still possible.
+       2. The rest sort by how many scenes in the library carry them,
+          rarest first, so the tags that distinguish THIS scene lead.
+          Checked against the densest scene in the library (61948, 107
+          tags): the lead becomes Fivesome (BBBBG) at 2 scenes, Blowjob
+          (DVP) at 3, Spooning Blowjob at 15.
+       3. Only the first ST_TAG_LEAD draw as chips; the remainder is a
+          comma run behind one button. A hundred chips behind a click is
+          still a hundred chips.
+
+       scene_count comes from one aliased GraphQL call, cached for the life
+       of the page, so the second scene you open only asks about ids it has
+       not seen. Until it answers the list renders alphabetically, so the
+       panel is never empty waiting on a fetch. */
+    var ST_TAG_LEAD = 8;
+    var ST_CRIT_RE = /^(.+?)\s*★\s*:\s*(\d+)\s*$/;
+    var stTagCountCache = Object.create(null);
+    var stTagCountPending = Object.create(null);
+
+    function stTagName(node) {
+        return (node.getAttribute("data-sort-name") || node.textContent || "").trim();
+    }
+
+    /* Stash encodes the tag id in the chip's own filter href, as a URL-
+       encoded criterion object: ...("id":"67","label":"Anal")... */
+    function stTagIdFromNode(node) {
+        var a = node.querySelector("a[href]");
+        if (!a) { return null; }
+        var href = a.getAttribute("href") || "";
+        var decoded;
+        try { decoded = decodeURIComponent(href); } catch (e) { decoded = href; }
+        var m = /"id"\s*:\s*"?(\d+)"?/.exec(decoded);
+        return m ? m[1] : null;
+    }
+
+    function stGroupDigits(n) {
+        return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function stFetchTagCounts(ids, done) {
+        var want = [];
+        ids.forEach(function (id) {
+            if (id && !(id in stTagCountCache) && !stTagCountPending[id] &&
+                want.indexOf(id) === -1) {
+                want.push(id);
+            }
+        });
+        if (!want.length) { done(); return; }
+        want.forEach(function (id) { stTagCountPending[id] = 1; });
+        var parts = want.map(function (id) {
+            return "t" + id + ": findTag(id: " + id + ") { scene_count }";
+        }).join(" ");
+        gql("query { " + parts + " }").then(function (res) {
+            var d = (res && res.data) || {};
+            want.forEach(function (id) {
+                var row = d["t" + id];
+                stTagCountCache[id] =
+                    (row && typeof row.scene_count === "number") ? row.scene_count : null;
+                delete stTagCountPending[id];
+            });
+            done();
+        })["catch"](function () {
+            /* Leave the cache alone so a later scene can retry. The list
+               stays alphabetical, which is what it was before. */
+            want.forEach(function (id) { delete stTagCountPending[id]; });
+            done();
+        });
+    }
+
+    function stSyncMoreLabel(wrapper) {
+        var more = wrapper.querySelector(":scope > .st-tag-more");
+        if (!more) { return; }
+        var expanded = wrapper.classList.contains("st-tags-expanded");
+        more.textContent = expanded ? "Show fewer" : ("+" + more.__stHidden + " more");
+        more.setAttribute("aria-expanded", expanded ? "true" : "false");
+    }
+
+    function stApplyTagOrder(wrapper) {
+        var chips = wrapper.__stChips || [];
+        var leadRow = wrapper.querySelector(":scope > .st-tag-lead-row");
+        var restRun = wrapper.querySelector(":scope > .st-tag-rest-run");
+        var caption = wrapper.querySelector(":scope > .st-tag-caption");
+        var more = wrapper.querySelector(":scope > .st-tag-more");
+        if (!chips.length || !leadRow || !restRun) { return; }
+
+        var counted = 0;
+        chips.forEach(function (c) {
+            var v = stTagCountCache[c.__stId];
+            if (v !== undefined && v !== null) { counted++; }
+        });
+        var sorted = chips.slice().sort(function (a, b) {
+            var ca = stTagCountCache[a.__stId];
+            var cb = stTagCountCache[b.__stId];
+            var na = (ca === undefined || ca === null);
+            var nb = (cb === undefined || cb === null);
+            /* Unknown counts sort LAST, so a partial answer still puts the
+               tags we do know about in front rather than burying them
+               behind the ones we do not. */
+            if (na && nb) { return a.__stName.localeCompare(b.__stName); }
+            if (na) { return 1; }
+            if (nb) { return -1; }
+            if (ca !== cb) { return ca - cb; }
+            return a.__stName.localeCompare(b.__stName);
+        });
+
+        leadRow.textContent = "";
+        restRun.textContent = "";
+        var lead = Math.min(ST_TAG_LEAD, sorted.length);
+        sorted.forEach(function (chip, i) {
+            var badge = chip.querySelector(":scope > .st-tag-n");
+            var count = stTagCountCache[chip.__stId];
+            if (i < lead) {
+                chip.classList.add("st-tag-is-lead");
+                chip.classList.remove("st-tag-is-rest");
+                if (count !== undefined && count !== null) {
+                    if (!badge) {
+                        badge = document.createElement("span");
+                        badge.className = "st-tag-n";
+                        chip.appendChild(badge);
+                    }
+                    badge.textContent = stGroupDigits(count);
+                } else if (badge) {
+                    badge.remove();
+                }
+                leadRow.appendChild(chip);
+            } else {
+                chip.classList.remove("st-tag-is-lead");
+                chip.classList.add("st-tag-is-rest");
+                if (badge) { badge.remove(); }
+                if (restRun.childNodes.length) {
+                    restRun.appendChild(document.createTextNode(", "));
+                }
+                restRun.appendChild(chip);
+            }
+        });
+
+        if (caption) {
+            caption.textContent = (counted === sorted.length)
+                ? (sorted.length + ", rarest first")
+                : String(sorted.length);
+        }
+        var hidden = sorted.length - lead;
+        if (more) {
+            more.__stHidden = hidden;
+            more.hidden = (hidden <= 0);
+            if (hidden <= 0) { wrapper.classList.remove("st-tags-expanded"); }
+            stSyncMoreLabel(wrapper);
+        }
+    }
+
+    /* The criterion tags, lifted above the Tags heading as a compact
+       readout. Each stays the cloned tag link it always was. */
+    function stRenderScored(col, tagsHeading, crits) {
+        ["st-scored", "st-scored-head"].forEach(function (cls) {
+            var old = col.querySelector(":scope > ." + cls);
+            if (old) { old.remove(); }
+        });
+        if (!crits.length) { return; }
+        crits.sort(function (a, b) { return a.label.localeCompare(b.label); });
+        var head = document.createElement("div");
+        head.className = "st-scored-head";
+        head.textContent = "Scored";
+        var box = document.createElement("div");
+        box.className = "st-scored";
+        crits.forEach(function (c) {
+            var node = c.node;
+            node.classList.add("st-scored-item");
+            var inner = node.querySelector("a > div") || node.querySelector("a") || node;
+            inner.textContent = c.label;
+            var val = document.createElement("span");
+            val.className = "st-scored-value";
+            val.textContent = c.value;
+            node.appendChild(val);
+            box.appendChild(node);
+        });
+        tagsHeading.insertAdjacentElement("beforebegin", head);
+        head.insertAdjacentElement("afterend", box);
     }
 
     /* ── Gallery image card: click image → open lightbox ─────────────

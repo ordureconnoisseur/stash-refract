@@ -822,6 +822,68 @@ body.stash-liquid-glass.refract-light .refract-cc-slot-menu {
     border-color: rgba(20, 22, 34, 0.18);
     box-shadow: 0 10px 26px rgba(20, 22, 34, 0.25);
 }
+
+/* ═══════ 27. Scene panel v3 — marquee, state row, tabs ════════════
+   The v3 composition hardcodes white tints and white text with
+   !important, which is correct on the dark base and unreadable on the
+   light one. Without these overrides light mode showed empty white
+   capsules where the spec pills should be, an invisible RATING label,
+   invisible "plays" / "O" words, and a "Not favourite" chip that had
+   white text on a white background and so read as nothing at all. Each
+   rule below is the light counterpart of one v3 rule in
+   07_scene_details.css, in the same order. */
+
+/* Spec pills: white-tint fill + near-white text -> dark tint + body text */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) :is(.date, .frame-rate, .resolution) {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: var(--glass-border) !important;
+    color: var(--text) !important;
+}
+
+/* The "RATING" caption after the rating value */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn::after {
+    color: rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Hairline between the stars and the operations pair */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) div.dropdown {
+    box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Count chips, and the "plays" / "O" word each one carries */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button {
+    background: rgba(0, 0, 0, 0.04) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) .count-value::after,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) .count-value::after {
+    color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Off-state chips. These say "Not favourite" / "Not organised" in the
+   chip itself, so losing the text loses the whole control. */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn) {
+    background: rgba(0, 0, 0, 0.02) !important;
+    border: 1px dashed rgba(0, 0, 0, 0.18) !important;
+    color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Tag chips */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.tag-link.badge.badge-secondary {
+    border: 1px solid rgba(0, 0, 0, 0.14) !important;
+    color: var(--text-muted) !important;
+}
+
+/* Section captions (TAGS, DETAILS) */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .col-12 > h6 {
+    color: rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Tab strip trough */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .nav-tabs {
+    background: rgba(0, 0, 0, 0.03) !important;
+    border: 1px solid var(--glass-border) !important;
+}
+
 /* ═══════ 28. Card customiser segmented controls ═══════════════════
    `.is-active` paints accent-bright text on a 20% accent tint. On the
    dark base that is light-on-dark and fine; on the light base it is the
@@ -835,13 +897,36 @@ body.stash-liquid-glass.refract-light .refract-cc-seg-btn.is-active {
     color: var(--accent);
 }
 
-/* ═══════ 29. Settings-unreachable notice: the code chip ═══════════════
-   The base rule paints the chip with --glass-bg-strong and
-   --accent-bright, which reads on the dark base. On the light one
-   --accent-bright is the LIGHTER half of the accent pair, so a purple at
-   4.1:1 on a near-white chip. Light mode defines --accent as the darker
-   half for exactly this, the same swap the customiser's segmented
-   controls take above. */
-body.stash-liquid-glass.refract-light .refract-su-code {
+/* ── Scene panel: ranked tags + scored row (direction D) ───────────────
+   The dark rules hardcode white tints and near-white text with
+   !important, which is right on #0a0a0a and unreadable on the light
+   ground. Same order, same conventions as the rest of this file. */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-caption {
+    color: var(--text-muted);
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge.badge-secondary {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead .st-tag-n {
+    color: var(--text-muted);
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-rest-run {
+    color: var(--text-muted);
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-scored-head {
+    color: var(--text-muted);
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-scored .tag-item.st-scored-item.tag-link.badge.badge-secondary {
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-scored .st-scored-value {
+    color: var(--accent);
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge:hover,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge:hover a,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-rest-run .tag-item.st-tag-is-rest.tag-link.badge:hover,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-rest-run .tag-item.st-tag-is-rest.tag-link.badge:hover a {
     color: var(--accent) !important;
 }
