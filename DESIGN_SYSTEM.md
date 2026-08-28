@@ -949,7 +949,26 @@ bug.
     written for the old axis (a modal header's `align-items: center`) starts
     doing something else entirely. When you change an axis, re-declare both
     alignment properties explicitly.
-11. **Replaced-element physics.** A border or radius on an element whose
+11. **Collapsing something Stash sized from a grid track means zeroing the
+    MINIMUMS, not just the dimensions.** Stash sizes cards and their images
+    off the track they were laid out in, and those minimums outrank a
+    `width: 100%` set later. Twice now: collapsed performer cards stuck at
+    169px wide because `[data-perf-count="2"]` won, and then the images
+    inside the fixed 34px circles carried `min-width: 157.5px`, so
+    `object-fit: cover` scaled each photo to cover 157px and the card
+    clipped all but the leftmost 34px. Every avatar was an edge sliver of a
+    hugely zoomed picture and it looked like a bad crop rather than a
+    layout fault. Set `min-width` and `min-height` to 0 on every box down
+    to the replaced element.
+12. **Below 1200px the panel is not a column, and anything tuned to 338px
+    has to say what it does at 1060px.** Three separate things stretched
+    when the page stacked: the tab strip's `flex: 1 1 auto` turned six tabs
+    into 166 to 181px slabs around 46px of ink; the description ran the
+    full pane at about 157 characters a line; and Stash's own header
+    ordering flips at exactly 1200px, sending the studio eyebrow below the
+    title it labels. A row composed for the column needs a cap, a measure,
+    or an explicit order, and the check is to measure at 1600 AND at 1100.
+13. **Replaced-element physics.** A border or radius on an element whose
     content does not fill its box frames the box, not the picture:
     `object-fit: contain` plus a border produced a 168px frame around a 94px
     portrait with 29px of dead space each side. And `max-width: 100%` on a
