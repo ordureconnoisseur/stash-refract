@@ -2676,25 +2676,74 @@ body.stash-liquid-glass .rating-stars button:hover {
 body.stash-liquid-glass .rating-stars svg {
     filter: none !important;
 }
-/* The star artwork, everywhere the rating control appears. Stash builds
-   each star as an .unfilled-star div with an absolutely positioned,
-   width-clipped .filled-star over it -- that clip is how a 4.4 renders a
-   40 percent star, so it has to survive.
+/* The star artwork, everywhere the rating control appears.
 
-   Painting the mask on the DIVS keeps it: mask-size `auto 100%` draws
-   the star at full height whatever the div's width, left-anchored, so
-   the filled div's own overflow: hidden does the clipping exactly as
-   before. Sizing off the div also means this works at every size the
-   control appears in without naming one. The native <svg> stays in the
-   flow, invisible, because the div takes its box from it. */
-body.stash-liquid-glass .rating-stars :is(.filled-star, .unfilled-star) {
-    background-color: currentColor !important;
-    -webkit-mask: var(--st-star-svg) left center / auto 100% no-repeat !important;
-            mask: var(--st-star-svg) left center / auto 100% no-repeat !important;
+   Masking Stash's own two divs did not work, and the reason is worth
+   recording: .filled-star is not a left-anchored clip. On a 40 percent
+   star Stash sets it to left: 4.20px, width: 5.59px -- a WINDOW onto a
+   region of the star, not the first 40 percent of it. A mask painted on
+   that div starts at the div's own left edge, so it drew the star's left
+   tip inside a window meant to show its middle, and every partial star
+   came out as a wedge in the wrong place.
+
+   So the two layers are drawn on the BUTTON instead, where the
+   coordinate system is the whole star: ::before is the empty star at
+   full size, ::after is the filled one clipped by its own width from
+   the button's left edge. The fill percentage comes off the
+   star-fill-N class Stash already sets, enumerated below in fives,
+   which covers the tenth-precision control and anything coarser. Both
+   layers size off the button, so this works wherever the control
+   appears without naming a size. */
+body.stash-liquid-glass .rating-stars button {
+    position: relative !important;
 }
-body.stash-liquid-glass .rating-stars :is(.filled-star, .unfilled-star) > svg {
+body.stash-liquid-glass .rating-stars button :is(.filled-star, .unfilled-star) {
     visibility: hidden !important;
 }
+body.stash-liquid-glass .rating-stars button::before,
+body.stash-liquid-glass .rating-stars button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    pointer-events: none;
+}
+body.stash-liquid-glass .rating-stars button::before {
+    width: 100%;
+    background-color: var(--star-empty);
+    -webkit-mask: var(--st-star-svg) center / contain no-repeat;
+            mask: var(--st-star-svg) center / contain no-repeat;
+}
+body.stash-liquid-glass .rating-stars button::after {
+    width: 0;
+    background-color: var(--star);
+    /* auto 100% keeps the star at full width whatever this element's own
+       width is, so the width below clips it rather than squashing it. */
+    -webkit-mask: var(--st-star-svg) left center / auto 100% no-repeat;
+            mask: var(--st-star-svg) left center / auto 100% no-repeat;
+}
+body.stash-liquid-glass .rating-stars button.star-fill-5::after { width: 5%; }
+body.stash-liquid-glass .rating-stars button.star-fill-10::after { width: 10%; }
+body.stash-liquid-glass .rating-stars button.star-fill-15::after { width: 15%; }
+body.stash-liquid-glass .rating-stars button.star-fill-20::after { width: 20%; }
+body.stash-liquid-glass .rating-stars button.star-fill-25::after { width: 25%; }
+body.stash-liquid-glass .rating-stars button.star-fill-30::after { width: 30%; }
+body.stash-liquid-glass .rating-stars button.star-fill-35::after { width: 35%; }
+body.stash-liquid-glass .rating-stars button.star-fill-40::after { width: 40%; }
+body.stash-liquid-glass .rating-stars button.star-fill-45::after { width: 45%; }
+body.stash-liquid-glass .rating-stars button.star-fill-50::after { width: 50%; }
+body.stash-liquid-glass .rating-stars button.star-fill-55::after { width: 55%; }
+body.stash-liquid-glass .rating-stars button.star-fill-60::after { width: 60%; }
+body.stash-liquid-glass .rating-stars button.star-fill-65::after { width: 65%; }
+body.stash-liquid-glass .rating-stars button.star-fill-70::after { width: 70%; }
+body.stash-liquid-glass .rating-stars button.star-fill-75::after { width: 75%; }
+body.stash-liquid-glass .rating-stars button.star-fill-80::after { width: 80%; }
+body.stash-liquid-glass .rating-stars button.star-fill-85::after { width: 85%; }
+body.stash-liquid-glass .rating-stars button.star-fill-90::after { width: 90%; }
+body.stash-liquid-glass .rating-stars button.star-fill-95::after { width: 95%; }
+body.stash-liquid-glass .rating-stars button.star-fill-100::after { width: 100%; }
+body.stash-liquid-glass .rating-stars button.star-fill-100::after { width: 100%; }
 body.stash-liquid-glass .rating-stars .filled-star {
     color: var(--star) !important;
     fill: var(--star) !important;
