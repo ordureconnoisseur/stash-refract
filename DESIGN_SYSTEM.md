@@ -208,9 +208,15 @@ Three tokens: `--radius` 16px (surfaces, cards, navbar), `--radius-sm` 12px
 (controls, chips, inner elements), `--radius-pill` 9999px (pills, counters,
 round buttons). Circles use `50%`.
 
-That is the whole vocabulary. `2px`, `3px`, `6px`, `8px`, `9px`, `10px` and a
-hand-written `999px` all appear in the shipped CSS, and all of them are drift
-(section 9).
+That is the whole vocabulary, with one computed exception: **nested radii are
+concentric.** Inner radius = outer radius minus the gap between the two edges.
+A 12px container with 3px padding needs 9px inside; equal nested radii read as
+untidy. A concentric radius is computed, not chosen, must carry a comment
+stating its derivation (`/* 12px container minus 3px padding */`), and is
+exempt from the three-token vocabulary.
+
+Everything else literal (`2px`, `3px`, `6px`, `8px`, `10px`, hand-written
+`999px`) is drift (section 9).
 
 ### 3.5 Type
 
@@ -568,6 +574,14 @@ pill that reports something. Eleven identical 26px circles in one row
 communicates nothing, and that is exactly what the scene panel action bar
 shipped.
 
+**Line-height must clear the font box (ascent plus descent), or the line box
+must be centred explicitly.** A pill set `line-height: 11.5px` against Albert
+Sans's 14px font box at that size sent the half-leading negative, silently
+dragging its baseline 2px up while its neighbours sat 3.13px low: 5.1px of
+spread across one row of pills, invisible in the source and unmeasurable by
+eye. Negative leading never announces itself; when a row of chips will not
+align, check the line-height against the font box before touching padding.
+
 ### 6.8 Popovers and hover cards
 
 Bootstrap's variables are re-pegged at body level so they cascade everywhere:
@@ -643,6 +657,11 @@ trade is settled.
   reason.
 - Icons inherit their text colour and therefore theme for free. An icon with a
   hard-coded fill is wrong in seven accents and light mode.
+- **For a glyph you do not own** (a plugin's unicode star with an inline
+  hard-coded colour): hide the native glyph and draw a data-URI SVG as a CSS
+  mask with `background-color: currentColor`. The element's DOM and handlers
+  are untouched (P4), and theming plus hover states come free on a control you
+  cannot edit.
 
 ### 6.13 The eyebrow, and micro-type
 
@@ -760,6 +779,9 @@ The law for adding one:
 4. Minimal-compat is a valid tier: some plugins (stashGlobalSearch) get one
    tweak, not a re-skin. Match effort to how visible the plugin's UI is
    inside the theme.
+5. **A plugin control with a hard-coded look gets the mask treatment**
+   (6.12): hide its glyph, repaint with a currentColor mask, never edit its
+   element.
 
 ### 6.21 Voice
 
@@ -797,10 +819,15 @@ bug.
    under the cursor across a 19,000-element page. Style recalculation, not
    paint, is the cost: 117ms per pass, measured. `:has()` also sets the browser
    floor (Chrome and Edge 105, Safari 15.4, Firefox 121).
-3. **Third-party plugin elements may or may not exist.** Advanced Ratings,
-   multiview and the better-image picker all inject into Refract's surfaces. A
-   design may use them when present, must not look broken when absent, and must
-   not reserve space for something that is not there.
+3. **Third-party plugin elements may be absent, and may change shape per
+   state.** Advanced Ratings, multiview and the better-image picker all
+   inject into Refract's surfaces. A design may use them when present, must
+   not look broken when absent, and must not reserve space for something that
+   is not there. The sharper trap is state: Advanced Rating renders a star, a
+   plus and a badge when incomplete, and a star and a plus with NO number at
+   all when complete. A design measured against the one state it happened to
+   open in is wrong in the others. Measure every state of a third-party
+   control before styling it.
 4. **Self-hosted assets resolve under `/plugin/refract/assets/<path>` only.**
    The plain `/plugin/refract/<path>` route serves manifest-listed CSS and JS
    and silently 404s everything else.
@@ -847,8 +874,9 @@ that file.
 | Area | State | Rule |
 |---|---|---|
 | Type | 301 uses of `var(--fs-*)` against 99 literal sizes, so 75% adoption. The literals cluster at 0.74, 0.66, 0.62, 0.6 and 0.58rem, which is a sub-`--fs-xs` tier the scale does not have. | 3.5 |
+| Type, second ladder | `07_scene_details.css` declares a six-step panel-local scale (`--sp-title` 21, `--sp-value` 15, `--sp-body` 13, `--sp-chip` 11.5, `--sp-tab` 11, `--sp-label` 10) used 15+ times alongside `var(--fs-*)` in the same file. Ruling: four of its steps are sub-third-of-a-pixel restatements of global tokens (13 vs 12.88, 11.5 vs 11.2, 11 vs 11.2, 10 vs 10.08), and two of its own steps sit 0.5px apart, the exact 3.5 rule 1 failure. Those four alias to `--fs-md`, `--fs-sm`, `--fs-sm`, `--fs-xs` when the panel work lands. The other two are real: 21px exposes a genuine hole between `--fs-lg` (17.5) and `--fs-xl` (28), and 15px a plausible emphasis step above body. If the panel design holds, promote those two to the global scale rather than keeping a parallel ladder. | 3.5 |
 | Motion | Not tokenized at all. 0.15s appears 373 times as a literal. There is no `--dur-*` or `--ease-*`. | 3.7 |
-| Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px, 9px and 10px literals. | 3.4 |
+| Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px and 10px literals. 9px is removed from this row: where commented as concentric (inner = outer minus padding) it is computed, correct, and exempt per 3.4; uncommented 9px uses still need their derivation stated or a token. | 3.4 |
 | Surfaces | Four `backdrop-filter` expressions still bypass the ladder, including `blur(16px) saturate(1.1)`. | 3.2 |
 | Z-index | Values run 0, 1 through 12, then 20, 30, 50, 90, 99, 100, 400, 1050, 1060, 1100, 9999, 10000, each chosen ad hoc. A band map now exists (3.8); nothing has migrated to it yet. | 3.8 |
 | Spacing | No scale. Gaps cluster at 0.3, 0.35, 0.4, 0.5, 0.55, 0.75, 0.85 and 1rem, chosen by eye per cluster. | 3.6 |
@@ -942,5 +970,10 @@ Before a design ships:
 - [ ] Nothing Stash could do before has become impossible.
 - [ ] Rows centred on cap height, checked in rendered pixels rather than by
       `getBoundingClientRect` alone.
+- [ ] **The computed style matches the intent, not just that the rule
+      shipped.** A correct rule that lost the cascade (specificity, source
+      order, an attribute selector outranking it) is indistinguishable from no
+      rule, and three of four failures in one measured session were exactly
+      this. Check `getComputedStyle` or the harness, per property changed.
 - [ ] Before and after measured on the live instance with the harness, with
       screenshots.

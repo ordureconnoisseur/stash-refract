@@ -12,7 +12,7 @@
     { "file": "Modes.dc.html", "x": 1000, "y": 2940, "w": 900, "h": 1180, "title": "Modes" },
     { "file": "Components.dc.html", "x": 2000, "y": 2940, "w": 900, "h": 1400, "title": "Component law" },
 
-    { "file": "Drift.dc.html", "x": 1000, "y": 4480, "w": 900, "h": 1330, "title": "Drift and checklist" }
+    { "file": "Drift.dc.html", "x": 1000, "y": 4480, "w": 900, "h": 1480, "title": "Drift and checklist" }
   ],
   "annotations": [
     {
