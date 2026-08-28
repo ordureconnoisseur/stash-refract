@@ -939,10 +939,19 @@ body.stash-liquid-glass .scene-video-filter .row.form-group > .col-6 {
     padding: 0 !important;
 }
 
-/* Numeric read-outs are removed entirely (filters show a live-preview
-   swatch instead; transforms show nothing). Hide every value cell's text
-   node - the exact value is still available as the swatch's hover title. */
-body.stash-liquid-glass .scene-video-filter .filter-slider-value .TruncatedText {
+/* The numeric read-out is hidden ONLY where the swatch that replaces it
+   actually exists. It used to be hidden unconditionally, on the promise
+   of a live-preview chip -- and that chip has been switched off since
+   2026-07-28 (REFRACT_FILTER_SWATCHES_ENABLED = false, held back as
+   unfinished). The flag turned the swatch off; nothing turned the hiding
+   off with it, so all thirteen sliders in the Filters tab have had no
+   read-out of any kind since: no number, no chip, an empty 0px column.
+
+   Keyed on .refract-has-swatch, which the injection adds, the number
+   comes back while the feature is off and disappears again by itself the
+   day the flag flips. A rule that depends on a feature should name the
+   feature. */
+body.stash-liquid-glass .scene-video-filter .filter-slider-value.refract-has-swatch .TruncatedText {
     display: none !important;
 }
 

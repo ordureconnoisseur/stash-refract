@@ -1541,9 +1541,15 @@ body.stash-liquid-glass .o-history {
 body.stash-liquid-glass .history-header {
     margin-bottom: 0.5rem !important;
 }
+/* The same eyebrow the Details pane uses for Details, Scored and Tags.
+   Four section labels across the panel had four treatments; this was the
+   one that read as a heading instead of a label. */
 body.stash-liquid-glass .history-header h5 {
-    font-size: var(--fs-md) !important;
-    color: var(--text) !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: var(--track-eyebrow) !important;
+    color: rgba(255, 255, 255, 0.38) !important;
     margin: 0 !important;
     display: flex !important;
     align-items: center !important;
@@ -1555,32 +1561,44 @@ body.stash-liquid-glass .history-header h5 > span:first-child {
     align-items: center !important;
     gap: var(--gap-sm) !important;
 }
+/* A count beside its label, the way the tag count sits beside TAGS on
+   the Details pane. It was an accent-tinted pill, which made the number
+   of times a scene had been played the most emphatic thing on the tab. */
 body.stash-liquid-glass .history-header .badge.badge-pill.badge-secondary {
-    background: var(--accent-tint) !important;
-    color: var(--accent-bright) !important;
-    border: 1px solid var(--accent-glow) !important;
-    padding: 0.15rem 0.5rem !important;
+    background: none !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+    border: 0 !important;
+    padding: 0 !important;
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
 }
+/* A list, not a stack of cards. Each entry shipped as its own filled,
+   rimmed, rounded box, so seven timestamps read as seven separate
+   objects and repeated the panel's own fill inside the panel. Hairline
+   rows read as one list and cost no fill at all. */
 body.stash-liquid-glass .scene-history ul {
     list-style: none !important;
     padding: 0 !important;
     margin: 0 0 0.5rem 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: var(--gap-xs) !important;
+    gap: 0 !important;
 }
 body.stash-liquid-glass .scene-history li {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 0.4rem 0.7rem !important;
-    background: var(--fill-1) !important;
-    border: 1px solid var(--glass-border) !important;
-    border-radius: var(--radius-sm) !important;
-    color: var(--text) !important;
+    padding: 0.42rem 0 !important;
+    background: none !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-radius: 0 !important;
+    color: rgba(255, 255, 255, 0.72) !important;
     font-size: var(--fs-sm) !important;
+    font-weight: 500 !important;
+}
+body.stash-liquid-glass .scene-history li:last-child {
+    border-bottom: 0 !important;
 }
 body.stash-liquid-glass .scene-history .remove-date-button {
     background: transparent !important;
@@ -1593,6 +1611,58 @@ body.stash-liquid-glass .scene-history .remove-date-button {
 body.stash-liquid-glass .scene-history .remove-date-button:hover {
     color: #ff6b6b !important;
     background: rgba(255, 107, 107, 0.1) !important;
+}
+
+/* ── Filters tab ──────────────────────────────────────────────────
+   Section labels take the panel's one eyebrow, and the four actions take
+   one treatment instead of three accent-tinted buttons beside one glass
+   one. None of the four is the primary action of the pane -- two rotate,
+   two reset -- so accent on three of them was emphasis applied rather
+   than earned (P3). */
+body.stash-liquid-glass .scene-video-filter h5 {
+    font-size: var(--fs-xs) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: var(--track-eyebrow) !important;
+    color: rgba(255, 255, 255, 0.38) !important;
+    margin: 0.4rem 0 0.2rem 0 !important;
+}
+body.stash-liquid-glass .scene-video-filter .btn.btn-primary,
+body.stash-liquid-glass .scene-video-filter .btn.btn-secondary {
+    background: var(--fill-3) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: rgba(255, 255, 255, 0.72) !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass .scene-video-filter .btn.btn-primary:hover,
+body.stash-liquid-glass .scene-video-filter .btn.btn-secondary:hover {
+    background: var(--fill-4) !important;
+    border-color: var(--glass-border-bright) !important;
+    color: var(--text) !important;
+}
+/* While the swatch feature is off (see 06_scene_player.css), the value
+   cell holds a number again, and 1.6rem does not fit "100%". The wider
+   column applies only in that case, so nothing moves when the swatch
+   comes back. */
+/* Matching 06's own selector shape, not a shorter one. That rule is a
+   GROUP whose first selector is (0,6,1); a tidier
+   `.scene-video-filter .filter-slider-value:not(...)` is (0,4,1) and
+   loses, which is exactly how the number came back truncated to "10..."
+   on the first attempt. Second time this session that counting only the
+   readable selector in a group has cost a round. */
+body.stash-liquid-glass .scene-video-filter .row.form-group > .col-sm-2.filter-slider-value:not(.refract-has-swatch),
+body.stash-liquid-glass .scene-video-filter .filter-slider-value:not(.refract-has-swatch) {
+    flex: 0 0 2.9rem !important;
+    max-width: 2.9rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 600 !important;
+    font-variant-numeric: tabular-nums !important;
+    color: rgba(255, 255, 255, 0.45) !important;
 }
 
 /* ── Queue tab ────────────────────────────────────────────────────── */
@@ -1728,6 +1798,29 @@ body.stash-liquid-glass .scene-markers-panel > .btn.refract-marker-see-all svg {
 body.stash-liquid-glass .scene-markers-panel > .container {
     max-width: 100%;
     padding: 0;
+}
+
+/* The empty state. Measured, this pane is 73px of content in a 569px
+   pane: 87 percent empty, two buttons of different weights, and nothing
+   saying what a marker is or why you would make one. 6.22 rule 3 says an
+   empty screen is an invitation to act, and 9 admits empty states are
+   not designed anywhere yet -- this is where that costs most, because
+   the tab is empty on most scenes.
+
+   Gated on the card wall having no children rather than on :empty, which
+   is true of an element whose only child is a comment node and therefore
+   true of a React placeholder. One :has() on one element, which 7.2
+   permits in a detail panel. */
+body.stash-liquid-glass .scene-markers-panel:not(:has(.wall > *))::after {
+    content: "No markers on this scene. A marker tags a moment, so you can jump straight back to it or find every scene that has one.";
+    display: block;
+    max-width: 30ch;
+    margin: 2.5rem auto 0 auto;
+    text-align: center;
+    text-wrap: pretty;
+    font-size: var(--fs-sm);
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.4);
 }
 
 /* Card grid: drop the row's negative margins, add a real gutter. */
