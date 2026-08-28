@@ -521,6 +521,20 @@ body.stash-liquid-glass :is(.scene-header-container, .image-header-container) {
     border: none !important;
     box-shadow: none !important;
 }
+/* Stash orders these two itself, and it changes its mind at 1200px:
+   above it the studio comes first, below it the title does, so the
+   eyebrow jumped from above the title to below it the moment the page
+   stacked. Refract composes this header (it injects the studio name and
+   makes the container a column), so the order is Refract's to state.
+   An eyebrow that labels the thing under it has to be above the thing
+   under it at every width. */
+body.stash-liquid-glass :is(.scene-header-container, .image-header-container) > h1.studio-logo {
+    order: 0 !important;
+}
+body.stash-liquid-glass :is(.scene-header-container, .image-header-container) > :is(.scene-header, .image-header) {
+    order: 1 !important;
+}
+
 /* Hide the studio LOGO IMAGE only. The studio NAME is injected as a
    <span class="st-studio-name"> child of the <a> by refract.js (the
    name lives only in the image's alt attribute on this Stash version). */
@@ -2102,6 +2116,23 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     overflow: visible !important;
     position: relative !important;
 }
+/* Below 1200px the panel stops being a 338px column and becomes the
+   full page width, and the tab strip went with it: the nav items are
+   flex: 1 1 auto, which is exactly what makes six tabs read as a
+   segmented control at the design width and exactly what breaks them
+   at 1060px, where each tab measured 166 to 181px around 46px of ink.
+   The label became 28 percent of its own tab and the control read as
+   six empty slabs.
+
+   Capped, the strip keeps the proportions it has at the narrow width
+   (tabs of 72 to 101px, measured at a 600px viewport) and sits at the
+   left of the wider column instead of being stretched across it. The
+   cap is above any width the strip reaches as a column, so the design
+   width is untouched. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs {
+    max-width: 620px !important;
+}
+
 /* The row breaks into two lines, and the split is by what a control IS,
    not by how many fit: everything that REPORTS on the scene above
    (rating, score, play count, O count), everything that ACTS on it
@@ -2759,11 +2790,35 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data
     padding: 0 !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers .performer-card-image {
+    /* min-width is the load-bearing one and it was the one missing.
+       Stash sizes this image from the uncollapsed grid track, so it
+       carried min-width: 157.5px, which BEATS width: 100% and left a
+       157.5x32 image inside a 32px circle: object-fit: cover then
+       scaled the picture to cover 157px of width, and the card's
+       overflow: hidden clipped all but the leftmost 34px of it. Every
+       collapsed avatar was a sliver from the edge of a hugely zoomed
+       photo, which is why the credit row read as coloured smudges
+       rather than faces.
+
+       Exactly the failure already on record for the card box itself
+       (height applied, width did not, from the same block), one level
+       further in. When collapsing something Stash sized from a track,
+       zero the MINIMUMS on every box down to the replaced element,
+       not just the dimensions. */
     width: 100% !important;
     height: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     min-height: 0 !important;
     max-height: none !important;
     object-fit: cover !important;
+    /* Biased up rather than centred. A performer image is a photo of a
+       person, and in the ones that are taller than they are wide the
+       head is in the top third; centring puts the torso in the circle
+       and the face off the top. On the near-square images that most of
+       them are this moves the crop by a couple of pixels and costs
+       nothing. */
+    object-position: 50% 30% !important;
     border-radius: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -2850,7 +2905,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-p
    1,838px on scene 135947, which put the tag list at y=2246 inside an
    890px panel -- the whole redesign below it was off the panel and the
    description WAS the panel. */
+/* Measure, not width. In the 338px column the description runs about
+   52 characters a line; stacked, the same paragraph ran the full
+   1023px pane at about 157 characters, roughly double any readable
+   line. The clamp in 6.4 bounds the height of user text; this bounds
+   its width, and the two together are what stop a description from
+   deciding what the panel looks like. Below the cap nothing changes,
+   so the design width is untouched.
+
+   64ch, not 64 characters: ch is the advance of "0", which is wider
+   than average lowercase, so this measures out at about 80 real
+   characters a line. Set it by measuring the rendered line, not by
+   reading the number. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc {
+    max-width: 64ch !important;
     display: -webkit-box !important;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
