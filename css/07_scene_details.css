@@ -2319,7 +2319,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
    inner button's title, because both carry the same class. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button {
     height: 24px !important;
-    padding: 0 !important;
+    /* The pill carried padding: 0, so its two halves insetted it very
+       differently: the icon button has no padding of its own and sat
+       1px from the outer edge (the border, and nothing else), while
+       the value's 10px right padding held the number 11px off the
+       other end. Measured 1px left against 11px right, which is why
+       the icon read as jammed. The 10px here restores the pill's own
+       inset on the side the icon is on, so both ends are 11px. */
+    padding: 0 0 0 10px !important;
     border-radius: var(--radius-pill) !important;
     border: 1px solid var(--glass-border) !important;
     background: var(--fill-3) !important;
@@ -2342,11 +2349,24 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     font-weight: 600 !important;
     font-variant-numeric: tabular-nums !important;
 }
+/* This rule used to be `display: none`, and it had been dead since the
+   tab-centring pass: that block lists .count-icon among the elements it
+   sets to display: inline-flex !important, at identical specificity and
+   further down the file, so it won on source order and the icons came
+   back unpadded without anything in the source saying so. Stating the
+   intent where it actually holds instead of leaving a rule that loses. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-icon {
-    display: none !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: rgba(255, 255, 255, 0.5) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-value {
-    padding: 0 10px !important;
+    /* 6px between the icon and its number, 10px to the pill's edge. The
+       icon and the count are one object, so the gap that binds them has
+       to be smaller than the gap that separates the pair from the pill,
+       or the icon reads as a third item in a row of two. */
+    padding: 0 10px 0 6px !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) .count-value::after {
     content: " plays";
