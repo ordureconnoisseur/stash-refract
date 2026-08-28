@@ -40,7 +40,7 @@ body.stash-liquid-glass .grid-card {
        `auto` keeps the remembered value; only the height needs a
        sensible first guess. */
     contain-intrinsic-size: auto none auto 200px;
-    transition: transform var(--dur-enter) ease, box-shadow var(--dur-enter) ease, border-color 0.2s ease;
+    transition: transform var(--dur-enter) ease, box-shadow var(--dur-enter) ease, border-color var(--dur-move) ease;
     position: relative;
 }
 /* Slick-carousel exception: the home-page Slick carousels render every

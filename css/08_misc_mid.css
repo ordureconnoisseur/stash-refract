@@ -44,7 +44,7 @@ body.stash-liquid-glass .wall-item .lineargradient {
         transparent 65%
     ) !important;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--dur-move) ease;
     pointer-events: none;
 }
 body.stash-liquid-glass .wall-item:hover .lineargradient {
@@ -106,7 +106,7 @@ body.stash-liquid-glass .wall-item .wall-item-check {
     box-shadow: none !important;
     opacity: 0;
     cursor: pointer;
-    transition: opacity 0.16s ease, background var(--dur-fast), border-color var(--dur-fast), box-shadow var(--dur-fast);
+    transition: opacity var(--dur-fast) ease, background var(--dur-fast), border-color var(--dur-fast), box-shadow var(--dur-fast);
 }
 body.stash-liquid-glass .wall-item:hover .wall-item-check,
 body.stash-liquid-glass .wall-item .wall-item-check:checked {
@@ -1117,8 +1117,8 @@ body.stash-liquid-glass .detail-header {
     box-shadow:
         var(--shadow-md),
         0 0 0 1px rgba(0, 0, 0, 0.15) inset;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     padding: 1rem 1.25rem;
     margin-bottom: 0.85rem;
     overflow: visible;
@@ -2547,8 +2547,8 @@ body.stash-liquid-glass #select_page_popover {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     box-shadow: var(--shadow-lg) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
-    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur-xl) !important;
+    backdrop-filter: var(--glass-blur-xl) !important;
     padding: 4px !important;
     color: var(--text) !important;
     max-width: max-content !important;
@@ -2813,8 +2813,8 @@ body.stash-liquid-glass .package-manager-table-container {
     background: rgba(10, 10, 12, 0.78) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
     overflow: auto !important;
     max-height: 56vh;
@@ -2850,8 +2850,8 @@ body.stash-liquid-glass .package-manager-table-container .table thead {
 }
 body.stash-liquid-glass .package-manager-table-container .table thead tr:first-child th {
     background: rgba(20, 20, 22, 0.92) !important;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     color: var(--accent-bright) !important;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -3514,8 +3514,8 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup
     border: 1px solid var(--glass-border);
     border-radius: 10px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-    -webkit-backdrop-filter: var(--glass-blur-lg-sat);
-            backdrop-filter: var(--glass-blur-lg-sat);
+    -webkit-backdrop-filter: var(--glass-blur-xl-sat);
+            backdrop-filter: var(--glass-blur-xl-sat);
     scrollbar-width: thin;
     scrollbar-color: var(--glass-border) transparent;
     opacity: 0;
@@ -3941,7 +3941,7 @@ body.stash-liquid-glass .refract-tag-popup-portal {
     visibility: hidden;
     transform: translateY(4px) scale(0.98);
     transform-origin: bottom right;
-    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0s linear 0.14s;
+    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease, visibility 0s linear var(--dur-fast);
     pointer-events: none;
 }
 body.stash-liquid-glass .refract-tag-popup-portal::-webkit-scrollbar {
@@ -3955,7 +3955,7 @@ body.stash-liquid-glass .refract-tag-popup-portal--show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
-    transition: opacity 0.14s ease, transform 0.14s ease, visibility 0s linear 0s;
+    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease, visibility 0s linear 0s;
     pointer-events: auto;
 }
 /* Let the popups escape the card's overflow:hidden when hovered,
@@ -4111,8 +4111,8 @@ body.stash-liquid-glass .stash-performer-popup::before {
     font-size: var(--fs-base);
     height: 2.4rem;
     cursor: pointer;
-    -webkit-backdrop-filter: var(--glass-blur-lg);
-    backdrop-filter: var(--glass-blur-lg);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     transition: background var(--dur-move), border-color var(--dur-move);
 }
 #stash-category-browser .stash-cat-close {
@@ -4157,8 +4157,8 @@ body.stash-liquid-glass .stash-performer-popup::before {
     overflow: hidden;
     border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
     background: var(--glass-bg, rgba(255, 255, 255, 0.06));
-    -webkit-backdrop-filter: var(--glass-blur-lg);
-    backdrop-filter: var(--glass-blur-lg);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     cursor: pointer;
     text-align: left;
@@ -4166,7 +4166,7 @@ body.stash-liquid-glass .stash-performer-popup::before {
     color: #fff;
     display: flex;
     flex-direction: column;
-    transition: transform 0.2s ease, box-shadow 0.2s, border-color 0.2s;
+    transition: transform var(--dur-move) ease, box-shadow var(--dur-move), border-color var(--dur-move);
 }
 #stash-category-browser .stash-cat-tile:hover {
     transform: scale(1.02);
@@ -4473,7 +4473,7 @@ body.stash-liquid-glass .recommendation-row-head a {
     border-radius: var(--radius-pill) !important;
     background: var(--accent-tint) !important;
     letter-spacing: 0.04em !important;
-    transition: background 0.2s, box-shadow 0.2s !important;
+    transition: background var(--dur-move), box-shadow var(--dur-move) !important;
 }
 body.stash-liquid-glass .recommendation-row-head a:hover {
     background: rgba(var(--accent-rgb), 0.2) !important;
@@ -4756,8 +4756,8 @@ body.stash-liquid-glass .stats-element {
         var(--shadow-sm),
         inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
     padding: 1.75rem 1.3rem 1.4rem !important;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     transition: border-color var(--dur-enter), box-shadow var(--dur-enter), transform var(--dur-enter);
     flex: none !important;
     width: auto !important;
@@ -4856,8 +4856,8 @@ body.stash-liquid-glass .custom-stats-row > div[style*="max-width"] {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     box-shadow: var(--shadow-sm);
 }
 
@@ -4933,8 +4933,8 @@ body.stash-liquid-glass #on-this-day-section {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
 }
 body.stash-liquid-glass #on-this-day-section h4,
 body.stash-liquid-glass #on-this-day-section h5 {
@@ -4980,8 +4980,8 @@ body.stash-liquid-glass #timeline-stats-container {
     border-radius: var(--radius) !important;
     padding: 1.2rem !important;
     margin-top: 1rem;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
 }
 body.stash-liquid-glass .stats-chart-title {
     color: var(--text) !important;
@@ -5132,8 +5132,8 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur-xl);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
     box-shadow: var(--shadow-md);
     /* Lift the entire filter form (and any dropdown opened from it) above
        sibling panels. Panels have backdrop-filter which creates their own
@@ -5263,8 +5263,8 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
     background: rgba(20, 22, 28, 0.92) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur-xl);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
     box-shadow: var(--shadow-xl);
     padding: 0.35rem !important;
     z-index: 1060 !important;
@@ -5345,8 +5345,8 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="b
     border: 1px solid var(--glass-border-bright) !important;
     border-radius: var(--radius-pill) !important;
     box-shadow: var(--glass-shadow) !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
+    backdrop-filter: var(--glass-blur-xl) !important;
+    -webkit-backdrop-filter: var(--glass-blur-xl) !important;
 }
 /* Strip nested-glass on the inner pagination pill — it's already inside
    the outer glass bar; double-layering looks heavy. */
@@ -5479,8 +5479,8 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary {
         var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur-xl);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
     box-shadow: var(--shadow-md);
     position: relative;
     overflow: hidden;
@@ -5576,8 +5576,8 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur-xl);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
     box-shadow: var(--shadow-md);
     overflow: hidden;
     transition: border-color var(--dur-move), box-shadow var(--dur-move);
@@ -5673,7 +5673,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__spr
     height: 100%;
     object-fit: cover;
     object-position: center;
-    transition: filter 0.2s, transform 0.3s;
+    transition: filter var(--dur-move), transform 0.3s;
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__sprite:hover > img {
     filter: saturate(1.15) brightness(1.05);
@@ -5938,8 +5938,8 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-empty {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur-xl);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
     box-shadow: var(--shadow-md);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-empty__icon {

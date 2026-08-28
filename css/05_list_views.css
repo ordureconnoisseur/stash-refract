@@ -8,8 +8,8 @@ body.stash-liquid-glass .table-list {
     box-shadow: var(--shadow-lg);
     overflow-x: auto;
     overflow-y: visible;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
 }
 
 /* Reset Bootstrap 5's element-scoped table variables, then apply theme */
@@ -297,8 +297,8 @@ body.stash-liquid-glass .nav.nav-pills.flex-column {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     padding: 0.5rem;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     box-shadow: var(--shadow-lg);
 }
 
@@ -521,7 +521,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button 
     background-color: transparent !important;
     border-color: transparent !important;
     color: var(--text) !important;
-    /* The global .btn-primary rule sets backdrop-filter: var(--glass-blur)
+    /* The global .btn-primary rule sets backdrop-filter: var(--glass-blur-xl)
        which still paints a visible blurred patch even with transparent bg.
        Reset it. */
     -webkit-backdrop-filter: none !important;
@@ -859,7 +859,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     height: 0.85rem !important;
     flex-shrink: 0;
     opacity: 0.85;
-    transition: transform 0.2s ease;
+    transition: transform var(--dur-move) ease;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) button.collapse-button.btn.btn-primary[aria-expanded="true"] svg {
     transform: rotate(90deg);
@@ -1743,8 +1743,8 @@ body.stash-liquid-glass .PerformerTagger-performer {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-md);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     overflow: hidden;
     transition: border-color var(--dur-move), box-shadow var(--dur-move), transform var(--dur-move);
 }
@@ -2248,8 +2248,8 @@ body.stash-liquid-glass .TagTagger-tag {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-md);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     overflow: hidden;
     transition: border-color var(--dur-move), box-shadow var(--dur-move), transform var(--dur-move);
 }
@@ -2597,8 +2597,8 @@ body.stash-liquid-glass .refract-tag-editor {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     padding: 1.1rem 1.25rem 1.25rem;
     margin-bottom: 1.25rem;
 }
@@ -2903,7 +2903,7 @@ body.stash-liquid-glass .refract-tag-editor__tag {
     cursor: pointer;
     text-align: center;
     position: relative !important; /* anchor for hover tooltip */
-    transition: background 0.14s, border-color 0.14s, color 0.14s, transform var(--dur-instant), box-shadow 0.14s;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast), transform var(--dur-instant), box-shadow var(--dur-fast);
 }
 body.stash-liquid-glass .refract-tag-editor__tag-label {
     overflow: hidden;
@@ -2992,17 +2992,17 @@ body.stash-liquid-glass .refract-tag-tooltip-portal {
     visibility: hidden;
     transform: translateY(4px);
     transition:
-        opacity 0.16s ease,
-        transform 0.16s ease,
-        visibility 0s linear 0.16s;
+        opacity var(--dur-fast) ease,
+        transform var(--dur-fast) ease,
+        visibility 0s linear var(--dur-fast);
 }
 body.stash-liquid-glass .refract-tag-tooltip-portal.refract-tag-tooltip-portal--show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
     transition:
-        opacity 0.16s ease,
-        transform 0.16s ease,
+        opacity var(--dur-fast) ease,
+        transform var(--dur-fast) ease,
         visibility 0s linear 0s;
 }
 body.stash-liquid-glass .refract-tag-tooltip-portal .refract-tag-tooltip__img {
@@ -3085,8 +3085,8 @@ body.stash-liquid-glass .refract-performer-name-tooltip-portal--card {
     overflow: hidden;
     border-radius: var(--radius);
     background: var(--glass-bg-strong);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
 }
 body.stash-liquid-glass .refract-perf-tip-img {
     width: 140px;
@@ -3170,7 +3170,7 @@ body.stash-liquid-glass .PerformerScrapeModal .search-item {
     background: rgba(255, 255, 255, 0.035) !important;
     box-shadow: none;
     cursor: pointer;
-    transition: border-color 0.14s ease, background-color 0.14s ease, transform 0.14s ease;
+    transition: border-color var(--dur-fast) ease, background-color var(--dur-fast) ease, transform var(--dur-fast) ease;
 }
 body.stash-liquid-glass .PerformerScrapeModal .search-item:hover {
     border-color: rgba(var(--accent-rgb), 0.55) !important;

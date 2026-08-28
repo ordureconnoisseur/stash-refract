@@ -42,19 +42,24 @@ body.stash-liquid-glass {
 
     /* Backdrop blur tiers. Each unique backdrop-filter expression compiles
        to its own HLSL shader on Windows Chromium / D3D11; consolidating
-       to a fixed token set caps the shader count (was 22, now 11) and
-       stops the HLSLCompiler recompile churn on home-page navigation. */
+       to a fixed token set caps the shader count (22 originally, 11 at
+       the first consolidation, 9 since 2026-08-28: the lg rung was folded
+       into xl because a 4px delta at 20-24px is imperceptible behind
+       glass). --glass-blur-lg/-lg-sat stay DEFINED as aliases of the xl
+       values so users' custom CSS keeps working, but internal code uses
+       the xl names; identical values compile to one shader either way. */
     --glass-blur-xs:      blur(6px);
     --glass-blur-sm:      blur(10px);
     --glass-blur-md:      blur(14px);
-    --glass-blur-lg:      blur(20px);
     --glass-blur-xl:      blur(24px);
     --glass-blur-2xl:     blur(32px);
     --glass-blur-sm-sat:  blur(10px) saturate(140%);
     --glass-blur-md-sat:  blur(14px) saturate(140%);
-    --glass-blur-lg-sat:  blur(20px) saturate(140%);
     --glass-blur-xl-sat:  blur(24px) saturate(140%);
     --glass-blur-2xl-sat: blur(32px) saturate(140%);
+    /* Deprecated aliases — do not use in new code. */
+    --glass-blur-lg:      blur(24px);
+    --glass-blur-lg-sat:  blur(24px) saturate(140%);
 
     --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
 

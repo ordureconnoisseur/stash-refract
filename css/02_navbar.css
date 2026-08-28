@@ -22,8 +22,8 @@ body.stash-liquid-glass nav.top-nav.navbar {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     box-shadow: var(--shadow-navbar) !important;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     padding: 0.4rem 0.85rem;
     display: flex !important;
     flex-direction: row !important;
@@ -603,7 +603,7 @@ html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button {
     align-items: center !important;
     justify-content: center !important;
     transition:
-        transform 0.2s var(--ease-spring),
+        transform var(--dur-move) var(--ease-spring),
         box-shadow var(--dur-enter) ease,
         border-color var(--dur-enter) ease,
         filter var(--dur-enter) ease;

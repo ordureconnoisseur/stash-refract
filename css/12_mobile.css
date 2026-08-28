@@ -272,7 +272,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         text-decoration: none;
         position: relative;
         isolation: isolate;
-        transition: color 0.16s ease, transform 0.14s var(--ease-spring);
+        transition: color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-spring);
     }
     /* Active/open highlight lives on a fixed-size CIRCLE centred behind
        the icon — the item box itself is flex-stretched wide, so painting
@@ -288,7 +288,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         border-radius: 50%;
         z-index: -1;
         background: transparent;
-        transition: background 0.16s ease, box-shadow 0.16s ease;
+        transition: background var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
     }
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item svg {
         width: 1.3rem;
@@ -390,7 +390,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
             background var(--dur-move) ease,
             border-color var(--dur-move) ease,
             color var(--dur-move) ease,
-            transform 0.16s var(--ease-spring);
+            transform var(--dur-fast) var(--ease-spring);
     }
     body.stash-liquid-glass nav.top-nav .refract-mobile-new + .refract-burger {
         /* When New button is present it owns margin-left:auto, so reset
@@ -474,8 +474,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
             background var(--dur-move) ease,
             border-color var(--dur-move) ease,
             color var(--dur-move) ease,
-            transform 0.16s var(--ease-spring),
-            box-shadow 0.2s ease;
+            transform var(--dur-fast) var(--ease-spring),
+            box-shadow var(--dur-move) ease;
     }
     /* Count badge on drawer tiles (currently the multiview tile's
        combined picks+filters number). Accent dot, top-right corner. */

@@ -552,8 +552,8 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     box-shadow: var(--shadow-xl) !important;
     color: var(--text) !important;
 }
@@ -1441,7 +1441,7 @@ body.stash-liquid-glass .refract-toggle-thumb {
     border-radius: 50% !important;
     background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(220,224,232,0.78) 100%) !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35) !important;
-    transition: left 0.2s ease, background 0.2s ease, box-shadow 0.2s ease !important;
+    transition: left var(--dur-move) ease, background var(--dur-move) ease, box-shadow var(--dur-move) ease !important;
 }
 body.stash-liquid-glass .refract-toggle.is-on .refract-toggle-track {
     background: rgba(var(--accent-rgb), 0.32) !important;
@@ -2104,8 +2104,8 @@ body.stash-liquid-glass .refract-cc-ring-br { bottom: 3px; right: 3px; }/* â”€â”
    actually sets are transitioned, so the band ring (which positions itself
    with right/bottom) is not asked to interpolate to `auto`. */
 body.stash-liquid-glass .refract-cc-ring.is-tight {
-    transition: left 0.16s ease, top 0.16s ease, width 0.16s ease,
-                height 0.16s ease, border-radius 0.16s ease;
+    transition: left var(--dur-fast) ease, top var(--dur-fast) ease, width var(--dur-fast) ease,
+                height var(--dur-fast) ease, border-radius var(--dur-fast) ease;
 }
 @media (prefers-reduced-motion: reduce) {
     body.stash-liquid-glass .refract-cc-ring.is-tight { transition: none; }
@@ -2186,7 +2186,7 @@ body.stash-liquid-glass .refract-cc-elem-hit {
     border-radius: 8px;
     background: none;
     cursor: pointer;
-    transition: border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
+    transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
 body.stash-liquid-glass .refract-cc-elem-hit:hover {
     border-color: rgba(var(--accent-rgb), 0.75);
@@ -2251,7 +2251,7 @@ body.stash-liquid-glass .refract-cc-pill-hit {
     border-radius: 999px;
     background: none;
     cursor: pointer;
-    transition: border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
+    transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
 body.stash-liquid-glass .refract-cc-pill-hit:hover {
     border-color: rgba(var(--accent-rgb), 0.75);
@@ -2440,7 +2440,7 @@ body.stash-liquid-glass .refract-cc-chip {
     color: var(--text-muted);
     cursor: pointer;
     white-space: nowrap;
-    transition: border-color 0.14s, color 0.14s, background 0.14s;
+    transition: border-color var(--dur-fast), color var(--dur-fast), background var(--dur-fast);
 }
 body.stash-liquid-glass .refract-cc-chip.is-on {
     border-color: rgba(var(--accent-rgb), 0.5);

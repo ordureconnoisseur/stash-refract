@@ -929,7 +929,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .refract-card-f
     cursor: pointer;
     opacity: 0;
     transform: translate(100%, -50%);
-    transition: opacity var(--dur-move) ease, transform 0.2s ease, background var(--dur-move) ease, color var(--dur-move) ease, border-color var(--dur-move) ease;
+    transition: opacity var(--dur-move) ease, transform var(--dur-move) ease, background var(--dur-move) ease, color var(--dur-move) ease, border-color var(--dur-move) ease;
 }
 body.stash-liquid-glass.refract-perf-layout-card .performer-card:hover .refract-card-flip-btn {
     opacity: 1;

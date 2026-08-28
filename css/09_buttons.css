@@ -9,7 +9,7 @@ body.stash-liquid-glass .btn-primary {
     color: var(--accent-bright) !important;
     border-radius: var(--radius-sm) !important;
     font-weight: 600 !important;
-    transition: background 0.2s, box-shadow 0.2s, color 0.2s !important;
+    transition: background var(--dur-move), box-shadow var(--dur-move), color var(--dur-move) !important;
 }
 body.stash-liquid-glass .btn-primary:hover,
 body.stash-liquid-glass .btn-primary:focus {
@@ -68,7 +68,7 @@ body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"] {
     padding: 0 14px !important;
     min-width: 140px !important;
     flex: 1 1 auto !important;
-    transition: border-color 0.2s, box-shadow 0.2s !important;
+    transition: border-color var(--dur-move), box-shadow var(--dur-move) !important;
 }
 body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"]:focus {
     border-color: var(--accent-glow) !important;
@@ -238,8 +238,8 @@ body.stash-liquid-glass .pagination {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     padding: 3px 6px !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
+    backdrop-filter: var(--glass-blur-xl) !important;
+    -webkit-backdrop-filter: var(--glass-blur-xl) !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 2px !important;
@@ -477,8 +477,8 @@ body.stash-liquid-glass [data-pager-row="float"].pagination {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     padding: 3px 8px !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
+    backdrop-filter: var(--glass-blur-xl) !important;
+    -webkit-backdrop-filter: var(--glass-blur-xl) !important;
     box-shadow: var(--glass-shadow) !important;
 }
 
@@ -500,7 +500,7 @@ body.stash-liquid-glass .stash-view-panel {
     opacity: 0 !important;
     transition:
         max-width 0.28s var(--ease-glide),
-        opacity 0.2s ease !important;
+        opacity var(--dur-move) ease !important;
 }
 body.stash-liquid-glass .stash-view-panel.open {
     max-width: 220px !important;
@@ -771,7 +771,7 @@ body.stash-liquid-glass .rating-star {
     cursor: pointer;
     line-height: 1;
     user-select: none;
-    transition: color 0.1s, filter 0.1s, transform 0.1s;
+    transition: color var(--dur-instant), filter var(--dur-instant), transform var(--dur-instant);
 }
 /* .filled is added by JS (plugin uses no class, just swaps ☆→★) */
 body.stash-liquid-glass .rating-star.filled,
@@ -834,8 +834,8 @@ body.stash-liquid-glass .adv-rating-inline-panel {
     padding: 0 !important;
     overflow: hidden;
     color: var(--text) !important;
-    -webkit-backdrop-filter: var(--glass-blur-lg-sat);
-    backdrop-filter: var(--glass-blur-lg-sat);
+    -webkit-backdrop-filter: var(--glass-blur-xl-sat);
+    backdrop-filter: var(--glass-blur-xl-sat);
     /* Soft dark drop for lift + a short-radius accent halo behind the panel
        for depth. The accent glow (not a fill) gives presence without the
        bright-band problem the white surface had. */

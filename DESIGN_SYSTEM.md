@@ -152,12 +152,16 @@ Two fills: `--glass-bg` at 0.06 alpha for floating chrome, `--glass-bg-strong`
 at 0.10 for panels that hold reading content. Two rims: `--glass-border` at
 0.12, `--glass-border-bright` at 0.22 for hover and focus.
 
-**Blur is a fixed ladder, not a free parameter.** Eleven tokens: six plain
-(`xs` 6px, `sm` 10px, `md` 14px, `lg` 20px, `xl` 24px, `2xl` 32px) and five
+**Blur is a fixed ladder, not a free parameter.** Nine live expressions: five
+plain rungs (`xs` 6px, `sm` 10px, `md` 14px, `xl` 24px, `2xl` 32px) and four
 saturating variants at `saturate(140%)`. On Windows Chromium every distinct
-`backdrop-filter` expression compiles its own HLSL shader; consolidating from
-22 expressions down to 11 tokens capped the shader count and stopped recompile
-churn on home-page navigation.
+`backdrop-filter` expression compiles its own HLSL shader; the ladder has been
+consolidated twice for exactly that reason (22 expressions originally, 11 at
+the first pass, 9 since 2026-08-28, when the `lg` 20px rung folded into `xl`
+because a 4px delta at that magnitude is imperceptible behind glass).
+`--glass-blur-lg`, `--glass-blur-lg-sat` and the legacy `--glass-blur` stay
+defined as aliases of the xl values so users' custom CSS keeps working; new
+code uses the xl names.
 
 Rule: **never invent a new `backdrop-filter` expression.** Pick a rung. If none
 fits, the design is asking for something the ladder should have, and the ladder
@@ -920,9 +924,9 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 |---|---|---|
 | Type | 301 uses of `var(--fs-*)` against 99 literal sizes, so 75% adoption. The literals cluster at 0.74, 0.66, 0.62, 0.6 and 0.58rem, which is a sub-`--fs-xs` tier the scale does not have. | 3.5 |
 | Type, second ladder | `07_scene_details.css` declares a six-step panel-local scale (`--sp-title` 21 down to `--sp-label` 10) used 15+ times alongside `var(--fs-*)` in the same file. Ruling, sharpened 2026-08-28: the second scale was four rounding errors and one missing step. Four steps restate global tokens within a third of a pixel and alias to `--fs-md`, `--fs-sm`, `--fs-sm`, `--fs-xs`; 15 is 1px off `--fs-body` and folds into it; only 21px is a genuine hole (between 17.5 and 28) and is promoted to the global scale when the panel lands. Logged 2026-08-27; revisit at the panel merge. | 3.5 |
-| Motion | Tokenized 2026-08-28: five `--dur-*` and three `--ease-*` tokens; 647 canonical declarations migrated by script, values unchanged. Residue: the straggler durations (0.13, 0.14, 0.16, 0.2, 0.25 to 0.35s, roughly 90 uses) fold onto the tokens in a phase 2 measured pass. Revisit after the panel work lands. | 3.7 |
+| Motion | Tokenized 2026-08-28: five `--dur-*` and three `--ease-*` tokens; 647 canonical declarations migrated, then 83 near-duplicates (0.1, 0.13, 0.14, 0.16, 0.2s, all deltas 0.02s or less, imperceptible) folded onto them the same day. Residue: 0.08s and the 0.25 to 0.35s band, roughly 46 uses, where folding would be a perceptible change; those need a looked-at pass, not a scripted one. | 3.7 |
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px and 10px literals. 9px is removed from this row: where commented as concentric (inner = outer minus padding) it is computed, correct, and exempt per 3.4; uncommented 9px uses still need their derivation stated or a token. | 3.4 |
-| Surfaces | Four `backdrop-filter` expressions still bypass the ladder, including `blur(16px) saturate(1.1)`. | 3.2 |
+| Surfaces | Four `backdrop-filter` expressions still bypass the ladder, including `blur(16px) saturate(1.1)`. Each is a shader the ladder was built to avoid. Revisit at the next blur pass. | 3.2 |
 | Z-index | Values run 0, 1 through 12, then 20, 30, 50, 90, 99, 100, 400, 1050, 1060, 1100, 9999, 10000, each chosen ad hoc. A band map now exists (3.8); nothing has migrated to it yet. | 3.8 |
 | Spacing | No scale. Gaps cluster at 0.3, 0.35, 0.4, 0.5, 0.55, 0.75, 0.85 and 1rem, chosen by eye per cluster. | 3.6 |
 | Specificity | 8,268 `!important` declarations. Largely unavoidable against Bootstrap, but it means load order and class doubling are the only remaining levers. | 5.2 |

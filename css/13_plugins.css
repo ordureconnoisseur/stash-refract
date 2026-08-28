@@ -143,8 +143,8 @@ body.stash-liquid-glass #mv-launcher {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     box-shadow: var(--shadow-lg) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
-    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur-xl) !important;
+    backdrop-filter: var(--glass-blur-xl) !important;
     padding: 5px 6px !important;
     gap: 5px !important;
 }
@@ -551,8 +551,8 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-match-stat
    without being clipped. */
 body.stash-liquid-glass .react-datepicker {
     background: rgba(18, 18, 22, 0.88) !important;
-    -webkit-backdrop-filter: var(--glass-blur-lg-sat) !important;
-    backdrop-filter: var(--glass-blur-lg-sat) !important;
+    -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
+    backdrop-filter: var(--glass-blur-xl-sat) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     box-shadow:
@@ -733,8 +733,8 @@ body.stash-liquid-glass .react-datepicker__navigation:hover .react-datepicker__n
 body.stash-liquid-glass .react-datepicker__month-dropdown,
 body.stash-liquid-glass .react-datepicker__year-dropdown {
     background: rgba(14, 14, 18, 0.98) !important;
-    -webkit-backdrop-filter: var(--glass-blur-lg-sat) !important;
-    backdrop-filter: var(--glass-blur-lg-sat) !important;
+    -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
+    backdrop-filter: var(--glass-blur-xl-sat) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: var(--shadow-xl) !important;
@@ -1444,8 +1444,8 @@ body.stash-liquid-glass #kmv-edit-tags-overhaul.edit-tags-overhaul {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     padding: 0.9rem 1rem 1rem;
     margin: 0.5rem 0 1rem;
     color: var(--text);
@@ -1937,8 +1937,8 @@ body.stash-liquid-glass #kmv-details-tags-overhaul.details-tags-overhaul {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur-xl);
+    backdrop-filter: var(--glass-blur-xl);
     padding: 0.6rem 0.9rem;
     margin: 0.5rem 0 1rem;
     color: var(--text);
@@ -2264,8 +2264,8 @@ body.stash-liquid-glass .tag-sidebar__panel {
     height: calc(100vh - var(--nav-btn-size) - 2.6rem - 12px) !important;
     max-height: calc(100vh - var(--nav-btn-size) - 2.6rem - 12px) !important;
     background: rgba(16, 16, 20, 0.92) !important;
-    -webkit-backdrop-filter: var(--glass-blur-lg-sat) !important;
-            backdrop-filter: var(--glass-blur-lg-sat) !important;
+    -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
+            backdrop-filter: var(--glass-blur-xl-sat) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     box-shadow: var(--shadow-lg) !important;
@@ -2486,7 +2486,7 @@ body.stash-liquid-glass .tag-sidebar__action {
     justify-content: center !important;
     font-size: var(--fs-sm) !important;
     line-height: 1 !important;
-    transition: background 0.13s, border-color 0.13s, color 0.13s !important;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .tag-sidebar__action--expand:hover {
     background: rgba(255, 255, 255, 0.08) !important;
@@ -2531,7 +2531,7 @@ body.stash-liquid-glass .tag-sidebar__label {
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     cursor: pointer !important;
-    transition: color 0.13s !important;
+    transition: color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .tag-sidebar__label:hover {
     color: var(--accent-bright) !important;
@@ -2571,8 +2571,8 @@ body.stash-liquid-glass .tag-sidebar__toggle {
     border-left: none !important;
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
     color: var(--text-muted) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
-            backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur-xl) !important;
+            backdrop-filter: var(--glass-blur-xl) !important;
     box-shadow: 4px 0 16px rgba(0, 0, 0, 0.35) !important;
     /* The plugin slides the toggle via `transition: left 180ms ease`. Our
        override MUST keep `left` (and the same 180ms) or the toggle teleports
