@@ -62,7 +62,7 @@ body.stash-liquid-glass .stash-id-pill {
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
 }
-/* Source label chip — orange-tinted left half */
+/* Source label chip - orange-tinted left half */
 body.stash-liquid-glass .stash-id-pill > span:first-child {
     padding: 0.3rem 0.6rem !important;
     margin: 0 !important;
@@ -82,7 +82,7 @@ body.stash-liquid-glass .stash-id-pill > span:first-child {
     box-sizing: border-box !important;
     min-height: 0 !important;
 }
-/* UUID link — neutral glass right half (force-clear of any
+/* UUID link - neutral glass right half (force-clear of any
    default/blue background bleeding from Stash native rules). */
 body.stash-liquid-glass .stash-id-pill a,
 body.stash-liquid-glass .stash-id-pill a:link,
@@ -115,7 +115,7 @@ body.stash-liquid-glass .stash-id-pill a:hover {
     background: rgba(255, 255, 255, 0.06) !important;
     color: #fff !important;
 }
-/* Stash IDs <ul> reset — kill the no-gutters bullet/spacing artefacts.
+/* Stash IDs <ul> reset - kill the no-gutters bullet/spacing artefacts.
    <li class="row"> would otherwise stretch the pill via Bootstrap's
    `.row { display: flex }`; force the <li> back to inline-block so the
    pill sizes to its content. */
@@ -138,7 +138,7 @@ body.stash-liquid-glass .detail-item-value.stash-ids li.row {
 }
 
 /* The pill sets its own size; its two children were inheriting em-derived
-   sizes of 9.52px (the source label) and 9.24px (the uuid) — 0.28px apart,
+   sizes of 9.52px (the source label) and 9.24px (the uuid) - 0.28px apart,
    which is noise, not a hierarchy. Both take the pill's size. */
 body.stash-liquid-glass .detail-item-value.stash-ids .stash-id-pill > span,
 body.stash-liquid-glass .detail-item-value.stash-ids .stash-id-pill > a {

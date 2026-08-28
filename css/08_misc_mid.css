@@ -25,7 +25,7 @@ body.stash-liquid-glass .wall-item video {
     border-radius: 0;
 }
 
-/* Gradient overlay — must override Stash's partial height so it covers the full card */
+/* Gradient overlay - must override Stash's partial height so it covers the full card */
 body.stash-liquid-glass .wall-item .lineargradient {
     position: absolute !important;
     top: 0 !important;
@@ -89,7 +89,7 @@ body.stash-liquid-glass .wall-item:hover .wall-item-title {
     color: var(--accent-bright) !important;
 }
 
-/* Checkbox — circular glass/orange, top-left, fades in on hover */
+/* Checkbox - circular glass/orange, top-left, fades in on hover */
 body.stash-liquid-glass .wall-item .wall-item-check {
     appearance: none;
     -webkit-appearance: none;
@@ -138,7 +138,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
 }
 
 /* The form-container row has px-3 / pt-3 utilities and Stash's native
-   dark form background (~rgb(32,43,51)) — neutralise both. */
+   dark form background (~rgb(32,43,51)) - neutralise both. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .form-container {
     padding: 0 !important;
     margin: 0 !important;
@@ -176,8 +176,8 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
     padding: 0 !important;
 }
 
-/* Form inputs — slightly smaller in the sidebar context. NOTE: don't
-   set `border-radius` here — the global form-control rule already
+/* Form inputs - slightly smaller in the sidebar context. NOTE: don't
+   set `border-radius` here - the global form-control rule already
    does, and forcing it !important on this high-specificity selector
    prevents downstream pill-merging selectors (string-list-input,
    date-input-group) from flattening the right corners. */
@@ -205,7 +205,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
    Fix: fade the fields out under the bar. The bar is toned with the
    PANEL's own glass recipe (`--glass-bg-strong` + a saturated blur,
    matching `.scene-tabs` in 07_scene_details.css) so it reads as part
-   of the panel rather than a foreign band — earlier attempts looked like
+   of the panel rather than a foreign band - earlier attempts looked like
    a band because they matched the BODY tone, not the lighter glass panel
    the toolbar actually sits on. The backdrop-filter frosts any field
    scrolling behind the buttons so it blurs away instead of overlapping
@@ -216,7 +216,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
    Selector sits later than the `.form-container` rule at equal
    specificity, so its background wins. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .edit-buttons-container {
-    /* Keep Stash's `position: sticky; top: 0` (do NOT override position) —
+    /* Keep Stash's `position: sticky; top: 0` (do NOT override position) -
        the Save/Scrape bar stays pinned while the form scrolls. To occlude
        fields scrolling up behind it WITHOUT reading as a band, replicate
        the panel's exact composited tone with an OPAQUE fill:
@@ -255,7 +255,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
     padding: 0.35rem 0.7rem !important;
     border-radius: var(--radius-sm) !important;
 }
-/* The magnifying-glass dropdown is a btn-secondary — Bootstrap default
+/* The magnifying-glass dropdown is a btn-secondary - Bootstrap default
    gives it ~rgb(57,75,89), a desaturated blue. Convert to glass. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .scraper-group .btn.btn-secondary {
     background: var(--fill-2) !important;
@@ -288,7 +288,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
     font-size: var(--fs-sm) !important;
 }
 
-/* Multi-value pills (selected performers / tags) — match tag-pill look.
+/* Multi-value pills (selected performers / tags) - match tag-pill look.
    Unscoped so it applies to every react-select multi-select wherever
    it appears (scene edit, performer edit, studio edit, etc). */
 body.stash-liquid-glass .react-select__multi-value {
@@ -315,7 +315,7 @@ body.stash-liquid-glass .react-select__multi-value__remove:hover {
     background: rgba(244, 60, 60, 0.18) !important;
     color: #fca5a5 !important;
 }
-/* Performer disambiguation — Stash renders the parenthetical "(Disambiguation)"
+/* Performer disambiguation - Stash renders the parenthetical "(Disambiguation)"
    with a dark muted colour that's near-invisible on Refract's dark pills /
    options. Pin it to a readable muted tone wherever it appears in a select. */
 body.stash-liquid-glass .react-select__multi-value .performer-disambiguation,
@@ -330,7 +330,7 @@ body.stash-liquid-glass .react-select__option .performer-select-disambiguation {
    The MultiSet mode buttons (.button-group-above, in every "Edit N <items>"
    dialog) are all .btn-primary inside .modal-body, where a broad settings/
    dialog rule (05_list_views) already gives every .btn-primary the modal
-   "Apply" look (accent-tint glass) — so all three looked identical and you
+   "Apply" look (accent-tint glass) - so all three looked identical and you
    couldn't tell which was selected. The ACTIVE one keeping that Apply look is
    exactly right; we only need to make the INACTIVE ones read as "off". So mirror
    the footer's Cancel button (btn-secondary glass) on :not(.active). That
@@ -360,14 +360,14 @@ body.stash-liquid-glass :is(#configuration-tabs #settings-container, .modal-body
    structure as the inline .date-input-group (input + .input-group-append with a
    nested react-datepicker button), but a different wrapper class, so it missed
    all the merge handling below. refract.js stamps `date-input-group` onto it
-   (tagBulkDateInputGroups) so it reuses that proven treatment verbatim — no
+   (tagBulkDateInputGroups) so it reuses that proven treatment verbatim - no
    duplicate CSS. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .react-select__indicator {
     padding: 0 0.35rem !important;
 }
 
 /* React Select injects two sibling spans with class `css-XXX-a11yText`
-   immediately before `.react-select__control` — these are aria-live regions
+   immediately before `.react-select__control` - these are aria-live regions
    for screen readers and should be visually hidden. Some browser/cascade
    combinations let them render as small dots/ovals below each select. Force
    the standard sr-only pattern so they stay off-screen no matter what. */
@@ -419,14 +419,14 @@ body.stash-liquid-glass .input-group-prepend.bg-secondary > .btn.btn-secondary {
     box-shadow: none !important;
     transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast) !important;
 }
-/* 3. Flat right side — these buttons are always connected to an input */
+/* 3. Flat right side - these buttons are always connected to an input */
 body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary,
 body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary {
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
     border-right: none !important;
 }
-/* 4. Accept (check icon) — green tint */
+/* 4. Accept (check icon) - green tint */
 body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary:has(svg.fa-check),
 body.stash-liquid-glass .input-group-prepend.bg-secondary > .btn.btn-secondary:has(svg.fa-check),
 body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary:has(svg.fa-check) {
@@ -441,7 +441,7 @@ body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary:has(svg.f
     border-color: rgba(34, 197, 94, 0.55) !important;
     color: #bbf7d0 !important;
 }
-/* 5. Reject/clear (xmark icon) — subtle red tint */
+/* 5. Reject/clear (xmark icon) - subtle red tint */
 body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark),
 body.stash-liquid-glass .input-group-prepend.bg-secondary > .btn.btn-secondary:has(svg.fa-xmark),
 body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark) {
@@ -582,7 +582,7 @@ html body.stash-liquid-glass .scraper-filter-container > button.reload-button.bt
     border: 1px solid var(--accent-glow) !important;
     color: var(--accent-bright) !important;
     box-shadow: none !important;
-    /* Use shorthand — beats any per-corner longhands set by a less
+    /* Use shorthand - beats any per-corner longhands set by a less
        specific !important rule (e.g. .btn-primary { border-radius })
        and any same-specificity longhand declared earlier. */
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
@@ -648,7 +648,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
     height: 0.9rem !important;
 }
 
-/* Date picker rows in any edit form — merge the date input and the
+/* Date picker rows in any edit form - merge the date input and the
    trailing calendar button into a single pill, same as .string-list-input.
    flex-wrap: wrap so Bootstrap's `.invalid-feedback` (with width:100%
    below) can take a row of its own when the input is .is-invalid,
@@ -665,7 +665,7 @@ body.stash-liquid-glass form .date-input-group {
    `.is-invalid` toggling, just forces full-width when shown. */
 body.stash-liquid-glass .date-input-group > .invalid-feedback,
 body.stash-liquid-glass form .date-input-group > .invalid-feedback {
-    /* Take row 2 with the Fix pill — feedback grows to fill, pill is
+    /* Take row 2 with the Fix pill - feedback grows to fill, pill is
        fixed-width on the right. flex-basis is calc(100% - pill) so the
        two share the row. Order ensures predictable layout regardless
        of DOM order after refract.js relocates the Fix link. */
@@ -676,7 +676,7 @@ body.stash-liquid-glass form .date-input-group > .invalid-feedback {
     order: 99 !important;
     position: static !important;
     min-width: 0 !important;
-    /* Single-line — smaller font + nowrap + ellipsis if row is narrow. */
+    /* Single-line - smaller font + nowrap + ellipsis if row is narrow. */
     font-size: var(--fs-xs) !important;
     line-height: 1.3 !important;
     letter-spacing: 0.01em !important;
@@ -709,7 +709,7 @@ body.stash-liquid-glass form .date-input-group:not(:has(.invalid-feedback)):not(
 body.stash-liquid-glass .refract-date-fix-native {
     display: none !important;
 }
-/* Fix pill — small accent-on-danger button to the right of the error
+/* Fix pill - small accent-on-danger button to the right of the error
    message. Refract.js injects this as a proxy that forwards the click to
    the hidden native "Attempt to fix?" anchor. */
 body.stash-liquid-glass .date-input-group > .refract-date-fix-btn,
@@ -793,7 +793,7 @@ body.stash-liquid-glass .date-input-group > .input-group-append .btn svg {
    button row. Merge the clearable-input-group with the reload button
    as a single pill. The Stash native rule
    `.scraper-menu .dropdown-menu .scraper-filter-container { background-color: #394b59 }`
-   leaks a dark-blue wrapper bg in the dropdown context — strip it so
+   leaks a dark-blue wrapper bg in the dropdown context - strip it so
    the themed input + button read cleanly against the dropdown panel. */
 body.stash-liquid-glass .scraper-filter-container,
 body.stash-liquid-glass .scraper-menu .dropdown-menu .scraper-filter-container,
@@ -816,7 +816,7 @@ body.stash-liquid-glass .scraper-filter-container > .reload-button svg {
     height: 0.9rem !important;
 }
 
-/* Hide native number-input spinner buttons in every edit form — they
+/* Hide native number-input spinner buttons in every edit form - they
    look chunky and clash with the themed pill inputs. Users can still
    type or use the keyboard ↑/↓ arrows. */
 body.stash-liquid-glass form input[type="number"].form-control,
@@ -834,7 +834,7 @@ body.stash-liquid-glass form input[type="number"].text-input::-webkit-inner-spin
     display: none !important;
 }
 
-/* Cover image preview — compact and rounded */
+/* Cover image preview - compact and rounded */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .scene-cover {
     width: 100% !important;
     max-height: 160px !important;
@@ -845,7 +845,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
     display: block !important;
 }
 
-/* Stash IDs list — compact spacing */
+/* Stash IDs list - compact spacing */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) ul.pl-0 {
     padding: 0 !important;
     margin: 0 0 0.5rem 0 !important;
@@ -862,7 +862,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
     flex: 0 0 auto !important;
 }
 
-/* Custom Fields collapse panel — tighter */
+/* Custom Fields collapse panel - tighter */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .custom-fields-input {
     margin-top: 0.5rem !important;
 }
@@ -878,7 +878,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
     color: var(--text-muted) !important;
 }
 
-/* Group-row (no-groups state) — make the placeholder dropdown line up
+/* Group-row (no-groups state) - make the placeholder dropdown line up
    with the Performers / Tags selects above and below. Stash wraps the
    Groups select in an extra .group-table > .group-row > .col-12 chain
    that carries Bootstrap's 15px column gutters, which would otherwise
@@ -893,7 +893,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
     padding-right: 0 !important;
 }
 
-/* Detail header name-icons row — flex layout with breathing room */
+/* Detail header name-icons row - flex layout with breathing room */
 body.stash-liquid-glass .name-icons {
     display: inline-flex !important;
     align-items: center !important;
@@ -912,7 +912,7 @@ body.stash-liquid-glass .name-icons .external-links-button.dropdown {
     line-height: 0 !important;
 }
 
-/* Favourite heart in the detail header — white when not favorited
+/* Favourite heart in the detail header - white when not favorited
    (overrides the generic .favorite-button colour which leaks orange via
    the .btn-primary cascade in the detail-header context). */
 body.stash-liquid-glass .name-icons .favorite-button:not(.favorite) {
@@ -963,7 +963,7 @@ body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary svg 
     height: 1.05rem !important;
     transition: filter var(--dur-move) ease;
 }
-/* Brand-glow per icon — subtle at rest, stronger on hover */
+/* Brand-glow per icon - subtle at rest, stronger on hover */
 body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.link svg {
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.18));
 }
@@ -1026,7 +1026,7 @@ body.stash-liquid-glass .name-icons .favorite-button.favorite:hover svg {
     filter: drop-shadow(0 0 12px rgba(244, 114, 182, 0.85));
 }
 
-/* Generic link (no brand) — neutral muted */
+/* Generic link (no brand) - neutral muted */
 body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.link {
     color: var(--text-muted) !important;
 }
@@ -1035,7 +1035,7 @@ body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.link
     color: #fff !important;
 }
 
-/* Twitter / X — light blue */
+/* Twitter / X - light blue */
 body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.twitter {
     color: #1DA1F2 !important;
 }
@@ -1044,7 +1044,7 @@ body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.twit
     color: #5fb6f5 !important;
 }
 
-/* Instagram — magenta/pink */
+/* Instagram - magenta/pink */
 body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.instagram {
     color: #E4405F !important;
 }
@@ -1053,7 +1053,7 @@ body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.inst
     color: #f06b85 !important;
 }
 
-/* Facebook — Meta blue */
+/* Facebook - Meta blue */
 body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.facebook {
     color: #1877F2 !important;
 }
@@ -1062,7 +1062,7 @@ body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.face
     color: #5396f5 !important;
 }
 
-/* YouTube — red */
+/* YouTube - red */
 body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.youtube {
     color: #FF0000 !important;
 }
@@ -1071,7 +1071,7 @@ body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.yout
     color: #ff5252 !important;
 }
 
-/* TikTok — cyan / magenta — use cyan as primary */
+/* TikTok - cyan / magenta - use cyan as primary */
 body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.tiktok {
     color: #25F4EE !important;
 }
@@ -1080,7 +1080,7 @@ body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.tikt
     color: #6df7f3 !important;
 }
 
-/* Reddit — orange-red */
+/* Reddit - orange-red */
 body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.reddit {
     color: #FF4500 !important;
 }
@@ -1089,7 +1089,7 @@ body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.redd
     color: #ff7f4e !important;
 }
 
-/* OnlyFans — cyan */
+/* OnlyFans - cyan */
 body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.onlyfans {
     color: #00AFF0 !important;
 }
@@ -1099,12 +1099,12 @@ body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.only
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Detail hero (tags / studios / galleries — .detail-header.full-width)
+   Detail hero (tags / studios / galleries - .detail-header.full-width)
    Frosted shell + nested meta panel + glass controls (matches cards / scene-header).
    ─────────────────────────────────────────────────────────────────── */
 
 /* Hide the sticky compact header (name / gender / age / country strip)
-   that appears once the user scrolls past the main detail hero — the
+   that appears once the user scrolls past the main detail hero - the
    primary header above already conveys this info. */
 body.stash-liquid-glass .sticky.detail-header {
     display: none !important;
@@ -1129,7 +1129,7 @@ body.stash-liquid-glass .detail-header .detail-container {
 }
 
 /* Studio logo in the detail header. Logos often have design elements
-   (letters, marks) right up against the edge — clipping the corners
+   (letters, marks) right up against the edge - clipping the corners
    directly on the img cuts those off. Padding inside the bordered img
    gives the logo breathing room from the rounded outline, so we can
    keep the soft corners without losing content. */
@@ -1144,7 +1144,7 @@ body.stash-liquid-glass .detail-header .detail-header-image img.logo {
             mask-image: none !important;
 }
 
-/* Meta panel — two-column field grid.
+/* Meta panel - two-column field grid.
    Stash stacks every scalar field in one tall column. On a performer with
    a full profile that made the panel 561px tall next to a 323px image, so
    the left column carried 404px of dead space and each row ran 1109px wide
@@ -1221,7 +1221,7 @@ body.stash-liquid-glass .detail-header .detail-item:not(:nth-child(-n + 2)) {
    shares the row (measured on a tag page: a 36.6px value sitting in a
    159.9px track). Matched structurally rather than by field name, because
    the field set differs per entity type and custom fields are user-defined
-   — `sub_tags` was missed by a hand-written list on the first pass.
+   - `sub_tags` was missed by a hand-written list on the first pass.
    `:has()` is cheap here: one `.detail-header` per page, ~12 rows. Do not
    copy this pattern into the card grid, where `:has()` churn is a known
    scroll-perf problem. */
@@ -1333,7 +1333,7 @@ body.stash-liquid-glass .details-edit .btn.btn-secondary:disabled {
     opacity: 0.38 !important;
 }
 
-/* Primary (Edit) — orange accent */
+/* Primary (Edit) - orange accent */
 body.stash-liquid-glass .details-edit .btn.btn-primary {
     background: var(--accent-tint) !important;
     border: 1px solid var(--accent-glow) !important;
@@ -1437,7 +1437,7 @@ body.stash-liquid-glass .detail-header .detail-item-value.tags .tag-item {
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Favourite button — pink glow when active
+   Favourite button - pink glow when active
    ─────────────────────────────────────────────────────────────────── */
 
 body.stash-liquid-glass .favorite-button {
@@ -1490,7 +1490,7 @@ body.stash-liquid-glass .tag-card .thumbnail-section {
      max-width the card filled the slide, rendering one giant tile per
      page.
    - On any layout, .tag-card-header used `aspect-ratio: 4/3 + width: 100%`,
-     which means image height tracked container width — a wide container
+     which means image height tracked container width - a wide container
      produced a tall image, and the cards in the same row inherited the
      tallest one's height. Fixed height + object-fit:cover gives every
      image the same height regardless of natural dimensions or column
@@ -1508,13 +1508,13 @@ body.stash-liquid-glass .tag-card .thumbnail-section {
 body.stash-liquid-glass .slick-slider .tag-card {
     /* In slick contexts, .tag-card behaves as `display: inline-block` so
        its width follows the image's intrinsic ratio at the fixed 165px
-       header height — landscape images give wider cards, portrait images
+       header height - landscape images give wider cards, portrait images
        narrower. Force an explicit width so every card lines up uniformly
        and the image fills the header at 220×165 (with object-fit:cover
        cropping any aspect-ratio mismatch).
 
        Stash's tag recommendation row uses react-slick's variableWidth
-       mode — each slide takes its content's width with NO inter-slide
+       mode - each slide takes its content's width with NO inter-slide
        padding from slick. So horizontal margin lives on the card itself
        to give adjacent cards breathing room (image-card / studio-card
        rows get this for free from Stash's natural card-margin which we
@@ -1526,7 +1526,7 @@ body.stash-liquid-glass .tag-card .tag-card-header {
     display: block;
     width: 100%;
     /* 124px on a 204px-wide header (220 card minus 16px thumbnail-section
-       padding) gives ~5:3 landscape — clearly rectangular, not square. */
+       padding) gives ~5:3 landscape - clearly rectangular, not square. */
     /* aspect-ratio (not a fixed px height) so the image scales with the
        zoomed card width instead of staying a 124px letterbox on wide
        cards. 5:3 matches the old 124px-on-204px look at slick size. */
@@ -1615,7 +1615,7 @@ body.stash-liquid-glass .tag-card .tag-description {
     -webkit-line-clamp: 2 !important;
 }
 
-/* Sub-tags / parent-tags caption — small strip under the description */
+/* Sub-tags / parent-tags caption - small strip under the description */
 body.stash-liquid-glass .tag-card .tag-sub-tags,
 body.stash-liquid-glass .tag-card .tag-parent-tags {
     font-size: var(--fs-xs);
@@ -1659,7 +1659,7 @@ body.stash-liquid-glass .tag-card hr:has(+ .card-popovers:empty) {
    scale, tight body padding, accent-on-hover title, hide empty rows.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Borderless shell — override the global .card / .grid-card border so
+/* Borderless shell - override the global .card / .grid-card border so
    only the inset image (and the card body's hr) provide structure. */
 body.stash-liquid-glass .gallery-card,
 body.stash-liquid-glass .image-card,
@@ -2022,7 +2022,7 @@ body.stash-liquid-glass .movie-card .favorite-button.favorite svg {
    corner (thumbnail-section starts at card 0,0 with no margin/border);
    the inset comes from a small `inset: 0.5rem` instead. */
 /* Defeat .thumbnail-section's position: relative so the favorite-button
-   positions relative to .studio-card directly — same containing block
+   positions relative to .studio-card directly - same containing block
    as the rating banner uses. Otherwise the heart inherits thumbnail-
    section's coord system which is the same coords numerically but
    doesn't actually escape past its bounds for the visual placement we
@@ -2035,7 +2035,7 @@ body.stash-liquid-glass .movie-card .thumbnail-section {
 body.stash-liquid-glass .studio-card button.favorite-button.btn,
 body.stash-liquid-glass .group-card button.favorite-button.btn,
 body.stash-liquid-glass .movie-card button.favorite-button.btn {
-    /* Mirror the rating banner exactly — same approach: position
+    /* Mirror the rating banner exactly - same approach: position
        absolute, same offsets (just right instead of left), positions
        relative to .studio-card (same containing block as the rating
        banner now that .thumbnail-section is position: static). */
@@ -2071,7 +2071,7 @@ body.stash-liquid-glass .movie-card button.favorite-button.btn.favorite {
    .btn.minimal.btn-primary (transparent background + accent-bright
    colour, defined in 09_buttons.css). .count-button.increment-only
    (O count) by default gets the glass-pill treatment from
-   10_pills_badges.css — which is right in the scene toolbar but
+   10_pills_badges.css - which is right in the scene toolbar but
    wrong here, where it sits next to two transparent siblings.
 
    In the card-popovers context, strip the glass pill so the O count
@@ -2099,7 +2099,7 @@ body.stash-liquid-glass .performer-card .card-popovers > .count-button.increment
 body.stash-liquid-glass .scene-card .card-popovers > .count-button.increment-only .count-icon,
 body.stash-liquid-glass .scene-card .card-popovers > .count-button.increment-only .count-value {
     color: var(--accent-bright) !important;
-    /* Match sibling .btn.minimal.btn-primary — same font-size, weight,
+    /* Match sibling .btn.minimal.btn-primary - same font-size, weight,
        padding as scene-count / performer-count buttons in the row. */
     font-size: 1rem !important;
     font-weight: 600 !important;
@@ -2165,7 +2165,7 @@ body.stash-liquid-glass .progress {
     overflow: hidden;
 }
 /* Bootstrap progress: <div.progress><div.progress-bar style=width:N%>
-   Scope this rule to that pattern only — otherwise it leaks onto Stash
+   Scope this rule to that pattern only - otherwise it leaks onto Stash
    scene-card progress where .progress-bar is the TRACK, not the fill. */
 body.stash-liquid-glass .progress > .progress-bar {
     background: linear-gradient(90deg, var(--accent) 0%, var(--accent-bright) 100%) !important;
@@ -2174,7 +2174,7 @@ body.stash-liquid-glass .progress > .progress-bar {
 /* Stash scene-card / grid-card progress:
    <div.progress-bar>            ← outer = TRACK (un-played remainder)
      <div.progress-indicator>    ← inner = FILL (played portion)
-   Flat, translucent, rounded — quiet rather than dimensional. */
+   Flat, translucent, rounded - quiet rather than dimensional. */
 body.stash-liquid-glass .grid-card .progress-bar,
 body.stash-liquid-glass .scene-card .progress-bar {
     background: rgba(255, 255, 255, 0.10) !important;
@@ -2276,12 +2276,12 @@ body.stash-liquid-glass .react-select__option--is-selected {
     color: var(--accent-bright) !important;
 }
 
-/* ── Native <select> dropdown options — readable in every modal ───────
+/* ── Native <select> dropdown options - readable in every modal ───────
    The open option list of a NATIVE <select> (e.g. the home-page Customize
    "Add" dialog's Type / Premade Filter pickers) is painted by the browser,
    outside the React tree, so it never inherits the theme's glass surfaces.
    Refract styles the closed select box, and form-control text is light, but
-   the OPTION rows had no background set — on Windows Chromium that renders
+   the OPTION rows had no background set - on Windows Chromium that renders
    light-text-on-default-white, so the list looks blank and only the
    OS-highlighted row is legible (this is why macOS, which draws its own
    native menu and ignores the colour, was never affected). Give every
@@ -2298,7 +2298,7 @@ body.stash-liquid-glass select optgroup {
     font-weight: 600 !important;
 }
 
-/* Universal custom checkbox — round glass dot, orange fill + white SVG
+/* Universal custom checkbox - round glass dot, orange fill + white SVG
    check on :checked, accent glow. Matches the table-list select column
    and the Lightbox popover idiom. Excludes switches (which inherit a
    completely different track-and-thumb look) and the table-list select
@@ -2321,7 +2321,7 @@ body.stash-liquid-glass .form-check input[type="checkbox"]:not(.form-switch inpu
     transition: border-color var(--dur-fast), background var(--dur-fast), box-shadow var(--dur-fast);
     flex-shrink: 0;
 }
-/* Checked state — matches the base rule's :not chain so specificity is
+/* Checked state - matches the base rule's :not chain so specificity is
    equal, then source-order wins for the checked override. The base
    rule's `background:` shorthand (with !important) would otherwise
    beat a less-specific :checked rule even with !important. */
@@ -2336,7 +2336,7 @@ body.stash-liquid-glass .form-check input[type="checkbox"]:not(.form-switch inpu
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.45) !important;
 }
 
-/* Liquid-glass toggles — larger, more tactile (Bootstrap custom-switch + form-switch). */
+/* Liquid-glass toggles - larger, more tactile (Bootstrap custom-switch + form-switch). */
 body.stash-liquid-glass .custom-switch,
 body.stash-liquid-glass .form-switch {
     min-height: 2.45rem;
@@ -2431,7 +2431,7 @@ body.stash-liquid-glass .btn.btn-danger {
 
 /* Neutral glass for secondary / cancel buttons.
    `:where()` wraps the :not() chain so its specificity contribution is
-   zero — keeps this rule low-specificity (0,3,1) so per-context overrides
+   zero - keeps this rule low-specificity (0,3,1) so per-context overrides
    like `.filtered-list-toolbar .filter-button.btn.btn-secondary` (0,5,1)
    can win without specificity gymnastics.
    Excludes:
@@ -2454,7 +2454,7 @@ body.stash-liquid-glass .btn.btn-secondary:where(:not(.minimal):not(.page-link):
     color: #fff !important;
 }
 /* .dropdown-toggle was excluded above so per-context rules can override it.
-   Without a fallback it gets Bootstrap's default grey — wrong in a dark
+   Without a fallback it gets Bootstrap's default grey - wrong in a dark
    glass theme. Apply the same glass look here at the same low specificity
    so per-context overrides (filter toolbar, scene toolbar) still win. */
 body.stash-liquid-glass .btn.btn-secondary.dropdown-toggle:where(:not(.minimal):not(.page-link)) {
@@ -2485,7 +2485,7 @@ body.stash-liquid-glass .btn-group:has(.dropdown-toggle-split) > .btn:not(:first
     border-bottom-left-radius: 0 !important;
 }
 
-/* Pagination cluster (« ‹ 1 2 3 › » buttons) — must beat the global glass
+/* Pagination cluster (« ‹ 1 2 3 › » buttons) - must beat the global glass
    rule above; pagination is a single capsule pill, not individual buttons.
    Also explicitly covers the page-count-dropdown chevron toggle, which my
    global :not() chain excludes (so it'd otherwise default to Bootstrap chrome). */
@@ -2528,19 +2528,19 @@ body.stash-liquid-glass .pagination > :last-child.btn.btn-secondary {
 }
 
 /* Hide the page-count-dropdown chevron entirely (and its wrapping
-   .dropdown) — the popover-form for jumping to a specific page is rarely
+   .dropdown) - the popover-form for jumping to a specific page is rarely
    needed and the chevron clutters the pill. */
 body.stash-liquid-glass button.page-count-dropdown,
 body.stash-liquid-glass .pagination .dropdown:has(> button.page-count-dropdown),
 body.stash-liquid-glass [data-pager-row="float"] .pagination .dropdown:has(> button.page-count-dropdown) {
     display: none !important;
 }
-/* Page-jump popover (#select_page_popover) — glass-styled. The native
+/* Page-jump popover (#select_page_popover) - glass-styled. The native
    number-input spinner arrows are hidden, the input + button join into
    one clean pill, and the popover arrow-pip is removed. */
 body.stash-liquid-glass #select_page_popover {
     /* Match the floating pagination capsule exactly (same glass fill + blur)
-       — it's the control this popover springs from and it reads cleanly. Light
+       - it's the control this popover springs from and it reads cleanly. Light
        mode gets an opaque fill via the 14_light popover list; lite mode (no
        backdrop-filter) gets a solid fill via 15_lite. */
     background: var(--glass-bg) !important;
@@ -2648,7 +2648,7 @@ body.stash-liquid-glass #select_page_popover .btn.btn-primary:hover {
    Stash renders each star as a <button> containing two SVGs (filled +
    unfilled) overlaid via position: absolute, with the filled-star clipped
    to show partial fills. ONLY style fill/colour and strip button chrome
-   — DO NOT override display/padding/positioning of the button or SVGs,
+   - DO NOT override display/padding/positioning of the button or SVGs,
    or the overlay layering misaligns and the stars look "doubled". */
 body.stash-liquid-glass .rating-stars .btn,
 body.stash-liquid-glass .rating-stars .btn.btn-secondary,
@@ -2789,7 +2789,7 @@ body.stash-liquid-glass #tasks-panel .tasks-panel-queue:hover {
         0 0 90px 18px rgba(var(--accent-rgb), 0.09) !important;
 }
 /* The inner .job-table.card has the .card class so it inherits .card:hover's
-   orange glow — suppress it; only the outer .tasks-panel-queue should glow. */
+   orange glow - suppress it; only the outer .tasks-panel-queue should glow. */
 body.stash-liquid-glass #tasks-panel .tasks-panel-queue .job-table.card:hover,
 body.stash-liquid-glass .job-table.card:hover {
     border-color: var(--glass-border) !important;
@@ -2807,7 +2807,7 @@ body.stash-liquid-glass .table th {
     border-bottom-color: var(--glass-border) !important;
     color: var(--text-muted) !important;
 }
-/* Outer container — glass shell, vertically scrollable when the list
+/* Outer container - glass shell, vertically scrollable when the list
    gets long. Sticky header keeps the column labels visible during scroll. */
 body.stash-liquid-glass .package-manager-table-container {
     background: rgba(10, 10, 12, 0.78) !important;
@@ -2842,7 +2842,7 @@ body.stash-liquid-glass .package-manager-table-container .table {
     border-collapse: separate !important;
     border-spacing: 0 !important;
 }
-/* Sticky header — stays pinned during scroll */
+/* Sticky header - stays pinned during scroll */
 body.stash-liquid-glass .package-manager-table-container .table thead {
     position: sticky;
     top: 0;
@@ -2932,7 +2932,7 @@ body.stash-liquid-glass .package-manager-table-container td:first-child {
     padding-right: 0.4rem !important;
 }
 
-/* Custom checkboxes — same idiom as the table-list select column
+/* Custom checkboxes - same idiom as the table-list select column
    (round glass dot, orange fill + check on :checked). */
 body.stash-liquid-glass .package-manager-table-container input[type="checkbox"].form-check-input,
 body.stash-liquid-glass .package-manager-table-container .form-check input[type="checkbox"] {
@@ -3018,7 +3018,7 @@ body.stash-liquid-glass .package-manager-table-container .source-collapse .btn s
     width: 0.75rem !important;
     height: 0.75rem !important;
 }
-/* Rotate chevron when source is expanded (Stash adds a class — common
+/* Rotate chevron when source is expanded (Stash adds a class - common
    patterns are `expanded` / `open` or aria-expanded="true"). */
 body.stash-liquid-glass .package-manager-table-container .source-collapse .btn[aria-expanded="true"] svg,
 body.stash-liquid-glass .package-manager-table-container .source-collapse .btn.expanded svg,
@@ -3042,12 +3042,12 @@ body.stash-liquid-glass .package-manager-table-container .source-controls .btn {
     line-height: 1.1 !important;
 }
 
-/* "Add source" footer row — escape the table-row colspan layout so the
+/* "Add source" footer row - escape the table-row colspan layout so the
    button centers against the full row width. Set the row + tds to
    block-level, hide the empty first td, and let the surviving td
    stretch the full width with text-align: center. */
 /* When refract.js relocates the Add source button up next to Install,
-   the original host row is left empty — collapse it. */
+   the original host row is left empty - collapse it. */
 body.stash-liquid-glass .package-manager-table-container .table tbody tr.add-package-source:not(:has(button)) {
     display: none !important;
 }
@@ -3124,12 +3124,12 @@ body.stash-liquid-glass .scene-card .scene-card__details:empty,
 body.stash-liquid-glass .scene-card .scene-card__details:not(:has(:not(:empty))) {
     display: none !important;
 }
-/* Hide native card popovers — performers shown as circles, tags shown in our badge */
+/* Hide native card popovers - performers shown as circles, tags shown in our badge */
 body.stash-liquid-glass .scene-card .card-popovers {
     display: none !important;
 }
 /* Also hide the divider hr that Stash renders alongside .card-popovers
-   — orphaned once we hide the popovers, otherwise reads as a stray
+   - orphaned once we hide the popovers, otherwise reads as a stray
    grey line at the bottom of every scene card. */
 body.stash-liquid-glass .scene-card hr,
 body.stash-liquid-glass .grid-card.scene-card hr {
@@ -3144,7 +3144,7 @@ body.stash-liquid-glass .scene-card .card-section {
     gap: 0;
 }
 /* Title: largest element. Wrap to a max of 2 lines (line-clamp), with
-   ellipsis on overflow — long filenames stay readable without dominating
+   ellipsis on overflow - long filenames stay readable without dominating
    the card vertically. `min-height` reserves 2 lines of space ALWAYS,
    so single-line titles leave a blank second line and everything below
    (date / performer circles) lines up across cards in the grid. */
@@ -3195,7 +3195,7 @@ body.stash-liquid-glass .stash-performer-circles {
     min-height: 34px;
 }
 
-/* Minimal scene cards — minimise the metadata "chin" so more of the
+/* Minimal scene cards - minimise the metadata "chin" so more of the
    card is dedicated to the thumbnail.
 
    - hide the description (was already)
@@ -3207,7 +3207,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-card__details,
 body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-card__date {
     display: none !important;
 }
-/* No chin — title floats directly over the bottom of the thumbnail.
+/* No chin - title floats directly over the bottom of the thumbnail.
    .card-section is taken out of flow (position: absolute, bottom: 0)
    so card height equals the thumbnail height. Softer bottom gradient
    blends rather than banding; the title's drop-shadow handles
@@ -3232,7 +3232,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section > * {
 }
 body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section-title,
 body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section-title .TruncatedText {
-    /* Guarantee single-line truncation — the title's text actually lives
+    /* Guarantee single-line truncation - the title's text actually lives
        inside an inner .TruncatedText div, so both layers need the clamp
        or the inner block wraps to multiple lines. */
     display: -webkit-box !important;
@@ -3251,10 +3251,10 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section-title {
     line-height: 1.25 !important;
     letter-spacing: 0.012em !important;
     /* Two-stop gradient skewed so the accent kicks in across more of the
-       title — gives the text a noticeable colour shift rather than just
+       title - gives the text a noticeable colour shift rather than just
        tinting the last word. */
     /* Two-stop gradient skewed so the accent kicks in across more of the
-       title — gives the text a noticeable colour shift rather than just
+       title - gives the text a noticeable colour shift rather than just
        tinting the last word. */
     background: linear-gradient(
         110deg,
@@ -3283,11 +3283,11 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-circl
     right: 0 !important;
     z-index: 5 !important;
     /* Avatar circles on the left, pill cluster (duration / O / tag) on
-       the right — `space-between` pushes them to opposite edges of the
+       the right - `space-between` pushes them to opposite edges of the
        row. Tag-popup still anchors right: 0 of its pill, so popups
        stay inside the card. */
     justify-content: space-between !important;
-    /* Bottom-align both clusters — without this, the 26px avatars make
+    /* Bottom-align both clusters - without this, the 26px avatars make
        the row taller and `align-items: center` then floats the shorter
        pills above the row bottom, opening a 2–3px gap to the title.
        `flex-end` keeps the pill bottoms flush with the chin top whether
@@ -3297,7 +3297,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-circl
     margin: 0 !important;
     min-height: 0 !important;
     border-top: none !important;
-    /* No row backdrop — each pill (duration / O / tag) carries its
+    /* No row backdrop - each pill (duration / O / tag) carries its
        own glass background, so a band here would show as a black line
        behind the hover-scrubber. */
     background: transparent !important;
@@ -3341,13 +3341,13 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-specs-overlay {
 /* EXCEPT on the tagger (.search-item .scene-card): those cards are plain
    thumbnail links that injectPerformerCircles never processes, so they get
    no .stash-duration-pill to mirror specs into. Hiding the native overlay
-   there would drop resolution/size/duration entirely — keep it visible. */
+   there would drop resolution/size/duration entirely - keep it visible. */
 body.stash-liquid-glass.refract-minimal-cards .search-item .scene-card .scene-specs-overlay {
     display: block !important;
 }
 
 /* Hide the divider + popovers slot below .card-section. Without these
-   hidden the chin stays tall because of their height — even when the
+   hidden the chin stays tall because of their height - even when the
    .card-section itself shrinks to just the title. */
 body.stash-liquid-glass.refract-minimal-cards .scene-card > hr,
 body.stash-liquid-glass.refract-minimal-cards .scene-card > .card-popovers {
@@ -3369,7 +3369,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-card-preview {
 
 /* Move the card's overflow:hidden clip down to the thumbnail container.
    Keeping it on the outer .scene-card was clipping the tag/performer
-   popups (the popups extend up out of the card on hover) — and even
+   popups (the popups extend up out of the card on hover) - and even
    with a :has() carve-out, the brief moment between badge-unhover and
    popup-hover caused the card to re-clip and the popup to vanish
    mid-travel. Inner clip = rounded thumbnail + escapable popups, no
@@ -3389,7 +3389,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .scene-card-preview .p
     object-fit: cover !important;
     object-position: center !important;
 }
-/* Portrait scenes (refract.js tags the card via tagOrientation()) —
+/* Portrait scenes (refract.js tags the card via tagOrientation()) -
    contain instead of cover so vertical thumbnails aren't aggressively
    cropped. Letterboxes on the sides; the title overlay still anchors
    to the card's bottom edge. */
@@ -3400,11 +3400,11 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card.refract-portrait .scen
 }
 
 /* The previous block of .scene-specs-overlay positioning / per-span /
-   resolution-accent rules has been removed — the overlay is now hidden
+   resolution-accent rules has been removed - the overlay is now hidden
    in minimal mode (duration lives in .stash-duration-pill instead) and
    keeping the rules around just risked overriding the hide. */
 
-/* Studio overlay — let the logo sit directly on the thumbnail without
+/* Studio overlay - let the logo sit directly on the thumbnail without
    a background tile. The user wants the logo "naked" over the image. */
 body.stash-liquid-glass.refract-minimal-cards .scene-card .studio-overlay {
     background: transparent !important;
@@ -3413,7 +3413,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .studio-overlay {
     box-shadow: none !important;
 }
 
-/* Performer pill — alternative compact representation in minimal mode.
+/* Performer pill - alternative compact representation in minimal mode.
    In default mode the pill stays hidden and the avatar row shows;
    minimal mode flips this so a single glass pill (icon + count + hover
    popover) takes the row's place. Visual language mirrors .stash-tag-
@@ -3422,7 +3422,7 @@ body.stash-liquid-glass .stash-performer-pill {
     display: none;
 }
 /* Minimal mode now shows the performer avatar circles (on the left of
-   the row) and HIDES the performer pill — duration takes its slot in
+   the row) and HIDES the performer pill - duration takes its slot in
    the right-side cluster. Circles are sized down to match the row's
    compact height. */
 body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill {
@@ -3440,7 +3440,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-avata
     min-height: 26px !important;
 }
 
-/* Duration pill — mirrors the dark glass styling used by Stash's
+/* Duration pill - mirrors the dark glass styling used by Stash's
    .scene-specs-overlay span; tabular numerals for stable digit width. */
 body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-duration-pill {
     /* Pin duration as the rightmost pill in the cluster regardless of
@@ -3450,7 +3450,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-duration-pill {
     display: inline-flex;
     align-items: center;
     padding: 0.18em 0.55em;
-    /* Lighter than the rest of the pills — translucent dark fill with
+    /* Lighter than the rest of the pills - translucent dark fill with
        a blur backdrop reads as glassy rather than solid. backdrop-blur
        is acceptable here because it's at most one pill per card (not
        per-element-per-card like the previous palette). */
@@ -3472,7 +3472,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-duration-pill {
     flex-shrink: 0;
     white-space: nowrap;
 }
-/* Hide the duration-pill in non-minimal modes — the native
+/* Hide the duration-pill in non-minimal modes - the native
    .scene-specs-overlay shows duration there instead. The minimal-mode
    rule above is more specific so the pill stays visible there. */
 body.stash-liquid-glass .stash-duration-pill {
@@ -3492,7 +3492,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill 
     flex-shrink: 0;
 }
 
-/* Performer popup — glass card anchored to the pill, mirroring the tag
+/* Performer popup - glass card anchored to the pill, mirroring the tag
    popup pattern (scrollable, fades on hover with margin-bridge so
    mouse can travel pill -> popup -> chip). */
 body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup {
@@ -3508,7 +3508,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup
     flex-direction: column;
     gap: 4px;
     padding: 0.5rem;
-    /* Flush against the pill — see .stash-tag-popup for rationale. */
+    /* Flush against the pill - see .stash-tag-popup for rationale. */
     margin-bottom: 0;
     background: rgba(12, 12, 14, 0.94);
     border: 1px solid var(--glass-border);
@@ -3573,7 +3573,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup
    (.performer-tag > .image-thumbnail) plus a separate name badge
    (.tag-item.badge), defaulting to a sprawled inline layout. For now: drop
    the images entirely and show a clean vertical list of name text. (Avatars
-   here are a TODO pending a decision on gallery cards — see CLAUDE.md.) */
+   here are a TODO pending a decision on gallery cards - see CLAUDE.md.) */
 body.stash-liquid-glass .hover-popover-content:has(.performer-tag-container) {
     width: max-content;
     max-width: 280px;
@@ -3586,7 +3586,7 @@ body.stash-liquid-glass .hover-popover-content .performer-tag-container {
     gap: 0.15rem;
     margin: 0;
 }
-/* Hide the avatar image link — text names only for now. */
+/* Hide the avatar image link - text names only for now. */
 body.stash-liquid-glass .hover-popover-content .performer-tag {
     display: none !important;
 }
@@ -3694,7 +3694,7 @@ body.stash-liquid-glass .stash-performer-link:hover {
     transform: scale(1.18) translateY(-2px);
     z-index: 20;
 }
-/* Performer-name tooltip — implemented as a body-portaled element by
+/* Performer-name tooltip - implemented as a body-portaled element by
    refract.js (.refract-performer-name-tooltip-portal). The earlier
    ::after-on-link approach got clipped at the card / grid edge for
    any avatar near the side of the card; portaling means no ancestor
@@ -3713,7 +3713,7 @@ body.stash-liquid-glass .stash-performer-avatar {
     border-radius: 50% !important;
     object-fit: cover !important;
     /* Bias crop toward the top of the performer image so faces/heads
-       stay visible — default center-center often clipped them off. */
+       stay visible - default center-center often clipped them off. */
     object-position: center 25% !important;
     border: 1.5px solid rgba(var(--accent-rgb), 0.45);
     background: var(--glass-bg-strong);
@@ -3743,7 +3743,7 @@ body.stash-liquid-glass .stash-performer-more {
     letter-spacing: -0.02em;
 }
 
-/* Tag count badge — orange accent; rendered as <a> so strip link chrome */
+/* Tag count badge - orange accent; rendered as <a> so strip link chrome */
 body.stash-liquid-glass .stash-tag-count {
     display: inline-flex;
     align-items: center;
@@ -3774,7 +3774,7 @@ body.stash-liquid-glass .stash-tag-count .stash-tag-icon {
     flex-shrink: 0;
 }
 
-/* Right-side count cluster — wraps .stash-o-count + .stash-tag-count
+/* Right-side count cluster - wraps .stash-o-count + .stash-tag-count
    inside .stash-performer-circles so they share consistent spacing. */
 body.stash-liquid-glass .stash-card-counts {
     display: inline-flex;
@@ -3827,7 +3827,7 @@ body.stash-liquid-glass .stash-o-count svg {
     flex-shrink: 0;
 }
 
-/* Tag list popup — anchored to .stash-tag-count, appears above on hover
+/* Tag list popup - anchored to .stash-tag-count, appears above on hover
    with a fade. Each tag rendered as a small muted chip; popup wraps
    to multiple lines if many tags. */
 body.stash-liquid-glass .stash-tag-count {
@@ -3850,7 +3850,7 @@ body.stash-liquid-glass .stash-tag-popup {
     flex-wrap: wrap;
     gap: 4px;
     padding: 0.5rem 0.55rem;
-    /* No margin-bottom — popup sits flush against the badge so the
+    /* No margin-bottom - popup sits flush against the badge so the
        mouse never crosses a dead zone. Visual separation comes from
        the popup's own padding + border. */
     margin-bottom: 0;
@@ -3911,7 +3911,7 @@ body.stash-liquid-glass .stash-tag-popup-chip:hover {
    The inline `.stash-tag-popup` (built into the card) is clipped by the
    card's overflow:hidden no matter how short we cap it. So refract.js
    (initTagCountPopover) clones its chips into this body-level element on
-   hover, positioned via getBoundingClientRect — exactly like the
+   hover, positioned via getBoundingClientRect - exactly like the
    performer-name tooltip. Hide the inline one; it's now just a data source. */
 body.stash-liquid-glass .stash-tag-count .stash-tag-popup {
     display: none !important;
@@ -3921,7 +3921,7 @@ body.stash-liquid-glass .refract-tag-popup-portal {
     z-index: var(--z-top);
     min-width: 160px;
     max-width: 280px;
-    /* Body-level, so it's free to be tall — capped to viewport, never the
+    /* Body-level, so it's free to be tall - capped to viewport, never the
        card. Flip-below logic in JS keeps it on-screen. */
     max-height: min(360px, 62vh);
     overflow-y: auto;
@@ -3960,7 +3960,7 @@ body.stash-liquid-glass .refract-tag-popup-portal--show {
 }
 /* Let the popups escape the card's overflow:hidden when hovered,
    mirroring the existing carve-out for performer-link tooltips. Also
-   triggers on `.stash-tag-popup:hover` directly — once the mouse is
+   triggers on `.stash-tag-popup:hover` directly - once the mouse is
    on the popup, `:hover` on the pill may transiently fail (e.g.
    crossing the 6px margin gap), and without this fallback the card
    re-clips and the popup vanishes mid-hover. */
@@ -4005,7 +4005,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .progress-bar {
     border-radius: 0 !important;
 }
 body.stash-liquid-glass.refract-minimal-cards .scene-card .progress-bar > .progress-indicator {
-    /* Watched portion — muted white so the active accent scrub marker
+    /* Watched portion - muted white so the active accent scrub marker
        reads as a distinct, brighter layer on top. */
     background: rgba(255, 255, 255, 0.55) !important;
     border-radius: 0 !important;
@@ -4014,7 +4014,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .hover-scrubber {
     z-index: 7 !important;
 }
 body.stash-liquid-glass.refract-minimal-cards .scene-card .hover-scrubber .hover-scrubber-indicator {
-    /* Transparent track — the watched-progress bar underneath provides
+    /* Transparent track - the watched-progress bar underneath provides
        the visible base, and the marker paints in accent on top. */
     background-color: transparent !important;
     height: 4px !important;
@@ -4035,7 +4035,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card:has(.hover-scrubber:ho
     opacity: 0;
 }
 
-/* Hover bridge — the badge gets a ::after pseudo that extends upward
+/* Hover bridge - the badge gets a ::after pseudo that extends upward
    into the gap. While the mouse is anywhere in the gap, it's still
    inside the badge's hit area, so .stash-tag-count:hover stays true
    and the popup stays visible. The popup also gets a ::before that
@@ -4323,9 +4323,9 @@ body.stash-liquid-glass .stash-carousel-fill {
 /* ── Slick carousel: minimal SVG arrow buttons ───────────────────────────
    Use mask-image (not background-image) so the chevron color is driven
    by background-color, which can reference --accent-bright. The SVG
-   stroke value inside the data URI is irrelevant — mask-mode: alpha (the
+   stroke value inside the data URI is irrelevant - mask-mode: alpha (the
    default) only reads the rendered alpha channel. */
-/* Native slick-carousel arrows — invisible circle, orange chevron only.
+/* Native slick-carousel arrows - invisible circle, orange chevron only.
    Same convention as the performer-row chevrons. */
 body.stash-liquid-glass .slick-slider {
     position: relative;
@@ -4334,7 +4334,7 @@ body.stash-liquid-glass .slick-slider {
    (gives the icon something to sit on when it overlaps card imagery),
    and a ::before pseudo-element holds the actual chevron drawn via
    mask + accent-bright background. The old single-element design
-   masked the button itself, so there was no visible circle — only the
+   masked the button itself, so there was no visible circle - only the
    thin chevron line floating against whatever was behind. */
 body.stash-liquid-glass .slick-arrow,
 body.stash-liquid-glass .slick-prev,
@@ -4348,7 +4348,7 @@ body.stash-liquid-glass .slick-next {
     /* Chevrons sit INSIDE the slider's content area (left/right: 4px)
        rather than in the page gutter. The .recommendation-row's
        `content-visibility: auto` adds `contain: paint` which creates
-       a stacking context — chevrons positioned in the gutter would
+       a stacking context - chevrons positioned in the gutter would
        compete with the gutter's z-index from OUTSIDE that context and
        lose regardless of how high their z-index is. Inside-the-slider
        positioning sidesteps that entirely.
@@ -4418,7 +4418,7 @@ body.stash-liquid-glass .slick-arrow.slick-disabled {
 /* ── Recommendation rows: off-screen render skip ─────────────────
    Each row contains heading + slick carousel of ~20 cards. On a home
    page with 4-5 rows that's 80-100 backdrop-filtered card surfaces in
-   the DOM, all painted on every frame even when below the fold —
+   the DOM, all painted on every frame even when below the fold -
    biggest remaining compositor cost on Chromium / D3D11 after the
    shader-consolidation pass.
 
@@ -4430,7 +4430,7 @@ body.stash-liquid-glass .slick-arrow.slick-disabled {
 
    Safe to apply at the row level: slick lives INSIDE .recommendation-row,
    so when the section is skipped the whole carousel subtree is hidden
-   atomically — slick never sees its track at width 0 (which was the
+   atomically - slick never sees its track at width 0 (which was the
    bug from applying content-visibility directly to .slick-slider .card
    in lite mode). Edit mode disables this so drag-reorder stays live. */
 body.stash-liquid-glass .recommendation-row {
@@ -4489,7 +4489,7 @@ body.stash-liquid-glass .recommendations-container-edit {
     padding: 0.5rem 0;
 }
 
-/* Strip Stash's default `.recommendation-row` chrome inside edit mode —
+/* Strip Stash's default `.recommendation-row` chrome inside edit mode -
    the draggable wrapper is now the visible card, the inner row should be flat. */
 body.stash-liquid-glass .recommendations-container-edit .recommendation-row {
     background: transparent !important;
@@ -4563,7 +4563,7 @@ body.stash-liquid-glass .recommendations-container-edit .recommendation-row-head
     line-height: 1.25 !important;
 }
 
-/* Delete: compact destructive affordance — small, sized to match the row's
+/* Delete: compact destructive affordance - small, sized to match the row's
    visual weight without dominating it. */
 body.stash-liquid-glass .recommendations-container-edit .btn.btn-danger {
     font-size: var(--fs-sm) !important;
@@ -4641,7 +4641,7 @@ body.stash-liquid-glass .recommendations-footer {
 /* Gallery/image card hover-overlay magnifying-glass button.
    .preview-button is a position:absolute wrapper that fills the card
    image. Strip the button's .btn-primary chrome (which would otherwise
-   paint a frosted-glass orange box over the card) — let the icon itself
+   paint a frosted-glass orange box over the card) - let the icon itself
    be the affordance, with a drop-shadow for legibility. */
 body.stash-liquid-glass .preview-button > button.btn.btn-primary,
 body.stash-liquid-glass .preview-button button.btn.btn-primary,
@@ -4681,7 +4681,7 @@ body.stash-liquid-glass .preview-button .svg-inline--fa {
     transition: opacity var(--dur-enter) ease, transform var(--dur-move) ease !important;
 }
 /* Reveal on card hover (covers both .image-card-preview and .grid-card
-   wrappers — Stash uses different parents in different list contexts). */
+   wrappers - Stash uses different parents in different list contexts). */
 body.stash-liquid-glass .image-card-preview:hover .preview-button .fa-icon,
 body.stash-liquid-glass .image-card-preview:hover .preview-button .svg-inline--fa,
 body.stash-liquid-glass .grid-card:hover .preview-button .fa-icon,
@@ -4719,7 +4719,7 @@ body.stash-liquid-glass .grid-card .preview-button {
    theme glass + accent throughout.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Stats row container — force fully transparent so only the inner
+/* Stats row container - force fully transparent so only the inner
    tiles render. Use CSS grid for auto-fitting layout. */
 body.stash-liquid-glass .stats,
 body.stash-liquid-glass .row.stats,
@@ -4742,7 +4742,7 @@ body.stash-liquid-glass .main.container-fluid .mt-5 > .stats:first-of-type {
     margin-top: 1.5rem !important;
 }
 
-/* Stat tile — gradient bg with accent corner glow, larger gradient-
+/* Stat tile - gradient bg with accent corner glow, larger gradient-
    filled numbers, more breathing room. */
 body.stash-liquid-glass .stats-element {
     position: relative;
@@ -4788,7 +4788,7 @@ body.stash-liquid-glass .stats-element:hover::after {
     background: linear-gradient(90deg, transparent 0%, rgba(var(--accent-rgb), 0.7) 50%, transparent 100%);
 }
 
-/* Number — gradient text, larger, tighter spacing */
+/* Number - gradient text, larger, tighter spacing */
 body.stash-liquid-glass .stats-element .title {
     font-size: 2.2rem !important;
     font-weight: 700;
@@ -4803,7 +4803,7 @@ body.stash-liquid-glass .stats-element .title {
     font-variant-numeric: tabular-nums;
 }
 
-/* Label — small uppercase, accent-tinted muted on hover */
+/* Label - small uppercase, accent-tinted muted on hover */
 body.stash-liquid-glass .stats-element .heading {
     font-size: 0.64rem !important;
     color: var(--text-muted) !important;
@@ -4817,7 +4817,7 @@ body.stash-liquid-glass .stats-element:hover .heading {
     color: var(--accent-bright) !important;
 }
 
-/* Stats page HR — refined section divider with a centered ornament.
+/* Stats page HR - refined section divider with a centered ornament.
    The inline `border-color: rgba(255,255,255,0.2)` reads as a stray
    white bar; replaced with a faded accent hairline and a small diamond
    centered on top to mark the section break clearly. */
@@ -4847,7 +4847,7 @@ body.stash-liquid-glass .main.container-fluid .mt-5 hr::before {
     letter-spacing: 0.3em;
 }
 
-/* Custom stats rows (community plugins) — wrap children in glass */
+/* Custom stats rows (community plugins) - wrap children in glass */
 body.stash-liquid-glass .custom-stats-row {
     margin-top: 1.5rem !important;
     padding: 0 !important;
@@ -4890,7 +4890,7 @@ body.stash-liquid-glass .custom-stats-row .stats-element .heading {
     margin-top: 0.2rem !important;
 }
 
-/* Chart header buttons (This Week / This Month / This Year) — were
+/* Chart header buttons (This Week / This Month / This Year) - were
    hardcoded blue/green. Theme them as accent segmented controls. */
 body.stash-liquid-glass .custom-stats-row button[style*="rgb(0, 123, 255)"],
 body.stash-liquid-glass .custom-stats-row button[style*="rgb(40, 167, 69)"] {
@@ -4916,7 +4916,7 @@ body.stash-liquid-glass .custom-stats-row button[style*="rgb(85, 85, 85)"]:hover
     background: rgba(var(--accent-rgb), 0.06) !important;
 }
 
-/* Chart bars — blue (O's) and green (Watch time) get accent + secondary */
+/* Chart bars - blue (O's) and green (Watch time) get accent + secondary */
 body.stash-liquid-glass .custom-stats-row div[style*="background-color: rgb(0, 123, 255)"] {
     background-color: var(--accent) !important;
     background: linear-gradient(180deg, var(--accent-bright) 0%, var(--accent) 100%) !important;
@@ -4956,7 +4956,7 @@ body.stash-liquid-glass #on-this-day-section span[style*="rgb(153, 153, 153)"] {
     background-color: rgba(0, 0, 0, 0.55) !important;
 }
 
-/* On-This-Day total badges (blue, green, yellow) — use accent + tints */
+/* On-This-Day total badges (blue, green, yellow) - use accent + tints */
 body.stash-liquid-glass #on-this-day-section div[style*="color: rgb(0, 123, 255)"] {
     color: var(--accent-bright) !important;
 }
@@ -5036,7 +5036,7 @@ body.stash-liquid-glass .refresh-btn:hover {
     background: rgba(var(--accent-rgb), 0.22) !important;
 }
 
-/* Timeline chart bars — keep their hsl coloring but constrain the panel */
+/* Timeline chart bars - keep their hsl coloring but constrain the panel */
 body.stash-liquid-glass .timeline-container {
     padding: 0.5rem;
     background: rgba(0, 0, 0, 0.18);
@@ -5072,7 +5072,7 @@ body.stash-liquid-glass div[title*="Average minutes"] {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   Scene Duplicate Checker — comparison-card layout
+   Scene Duplicate Checker - comparison-card layout
    Stash's native page renders a 10-column Bootstrap table that forces
    vertical scanning to compare two copies of the same scene. We hide
    the table and inject per-group glass panels with side-by-side cards
@@ -5088,7 +5088,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker #scene-duplicate-check
     box-shadow: none !important;
     padding: 1rem 0.5rem 4rem !important;
     max-width: 100% !important;
-    /* Strip the .card containment — `contain: layout` AND the
+    /* Strip the .card containment - `contain: layout` AND the
        `content-visibility: auto` (which implies contain: size layout style
        paint) both create a containing block for position:fixed descendants,
        trapping the floating pager inside this card so it sticks to the
@@ -5161,7 +5161,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
     gap: var(--gap-md);
     display: flex;
 }
-/* Neutralize Bootstrap's column widths inside our compact toolbar — the
+/* Neutralize Bootstrap's column widths inside our compact toolbar - the
    `.col-12` wrapping the Select-Options dropdown otherwise stretches to
    100% and breaks the row. The .col-12 also needs to flex its own
    children (dropdown + our injected select button) so they sit side-by-
@@ -5182,7 +5182,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .ml-4 {
     margin-left: 0 !important;
 }
-/* Hide the helper text — doesn't fit the compact horizontal toolbar */
+/* Hide the helper text - doesn't fit the compact horizontal toolbar */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .form-text {
     display: none !important;
 }
@@ -5212,7 +5212,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
     appearance: none;
     -webkit-appearance: none;
     /* The theme's standard select chevron (stroke SVG), matching the
-       tagger-header selects — not a custom gradient triangle. */
+       tagger-header selects - not a custom gradient triangle. */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
     background-position: right 0.7rem center !important;
     background-size: 0.85rem !important;
@@ -5239,7 +5239,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
     position: relative;
 }
 /* Replace Bootstrap's tiny triangle caret with the theme's stroke chevron
-   (currentColor mask, so it inherits the accent text colour) — makes it
+   (currentColor mask, so it inherits the accent text colour) - makes it
    read as a dropdown, not a plain button. */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown .dropdown-toggle::after {
     content: "" !important;
@@ -5307,7 +5307,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
 }
 
 /* ── Pagination strip ───────────────────────────────────────────────
-   Stash renders the pager twice — above + below the table. We hide
+   Stash renders the pager twice - above + below the table. We hide
    the top copy (redundant) and pin the bottom copy to the viewport
    so the count / edit-delete / page controls are always reachable
    regardless of how far the user has scrolled. The bottom of the
@@ -5348,7 +5348,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="b
     backdrop-filter: var(--glass-blur-xl) !important;
     -webkit-backdrop-filter: var(--glass-blur-xl) !important;
 }
-/* Strip nested-glass on the inner pagination pill — it's already inside
+/* Strip nested-glass on the inner pagination pill - it's already inside
    the outer glass bar; double-layering looks heavy. */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .pagination,
 body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .pagination.btn-group {
@@ -5387,7 +5387,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="b
 
 /* Edit / Delete bulk-action ButtonGroup (appears in pager when items
    are checked). Bootstrap btn-group uses negative margins to collapse
-   borders — break that out into spaced individual pills. */
+   borders - break that out into spaced individual pills. */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .btn-group:not(.pagination) {
     display: inline-flex !important;
     gap: var(--gap-sm) !important;
@@ -5431,7 +5431,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="b
 }
 
 /* The floating pill is JUST the page navigation (plus bulk Edit/Delete when
-   items are checked) — the duplicates count and page-size select live in
+   items are checked) - the duplicates count and page-size select live in
    the top row instead, so hide them in the floated bottom row. */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > h6,
 body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > select,
@@ -5439,7 +5439,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="b
     display: none !important;
 }
 
-/* ── Missing-phash warning — float to top-right, vertically centered
+/* ── Missing-phash warning - float to top-right, vertically centered
    with the h4's text via fixed-height matching the title's line. ── */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > p.lead {
     position: absolute;
@@ -5528,7 +5528,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-summary__
     font-weight: 700;
 }
 
-/* ── Toolbar action pill: "Select N" — paired with the relabeled
+/* ── Toolbar action pill: "Select N" - paired with the relabeled
    dropdown to its left so the two read as filter + action. Uses
    accent to mirror the suggested-card halo. ──────────────────────── */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-toolbar-select {
@@ -5809,10 +5809,10 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec--war
     color: #fbbf24;
 }
 
-/* Suggested state — accent-tinted halo on cards flagged by the active
+/* Suggested state - accent-tinted halo on cards flagged by the active
    strategy. Distinct from --checked (which is the "marked for delete"
    destructive red state). Suggested is a soft recommendation that the
-   user hasn't committed yet — clicking Select promotes it to checked. */
+   user hasn't committed yet - clicking Select promotes it to checked. */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--suggested {
     border-color: rgba(var(--accent-rgb), 0.6);
     box-shadow:
@@ -5828,7 +5828,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--sug
         0 0 36px 6px rgba(var(--accent-rgb), 0.28);
 }
 
-/* Checked-for-delete state — red danger ring + strike title */
+/* Checked-for-delete state - red danger ring + strike title */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--checked {
     border-color: rgba(239, 68, 68, 0.5);
     box-shadow:
@@ -5996,7 +5996,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker[dat
    Scrape Results Modal
    Performer / Scene / Studio / Movie / Gallery "Scrape Results"
    dialog. Anchored on .modal-content:has(> .modal-body >
-   .dialog-container) — the structural fingerprint unique to
+   .dialog-container) - the structural fingerprint unique to
    scrape-result modals. Most accept/reject button glass + flat-corner
    merging is already handled by the `.scraper-edit` / `form
    .input-group-prepend` rules earlier in this file; this section adds
@@ -6005,7 +6005,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker[dat
    picker, scrollable body.
    ────────────────────────────────────────────────────────────────── */
 
-/* 1. Column headers — "Existing" / "Scraped" chip strip */
+/* 1. Column headers - "Existing" / "Scraped" chip strip */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .column-label {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
@@ -6038,7 +6038,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .d
     padding-top: 0.55rem !important;
 }
 
-/* 4. Existing column desaturation — first .col-lg-6 in each row.
+/* 4. Existing column desaturation - first .col-lg-6 in each row.
       Marks "what you have now" as quieter than the scraped candidate. */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field] > .col-lg-9 > .row > .col-lg-6:first-of-type .form-control,
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field] > .col-lg-9 > .row > .col-lg-6:first-of-type input.text-input {
@@ -6048,7 +6048,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [d
 }
 
 /* 5. Scraped column inherits glass form-control + accent focus glow
-      from 04_filters.css — no override needed. */
+      from 04_filters.css - no override needed. */
 
 /* 6. Accept (✓) / Reject (✕) buttons inherit their green/red glass
       from the `form .input-group-prepend > .btn.btn-secondary` rules
@@ -6093,7 +6093,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     width: 0.85rem !important;
     height: 0.85rem !important;
 }
-/* Disabled trailing chips on the empty "add new" row — fade out */
+/* Disabled trailing chips on the empty "add new" row - fade out */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button[disabled] {
     opacity: 0.35 !important;
     background: transparent !important;
@@ -6101,7 +6101,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     color: var(--text-muted) !important;
 }
 
-/* 8. String-list row spacing — keep stacked URL rows from jamming */
+/* 8. String-list row spacing - keep stacked URL rows from jamming */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .form-group .input-group + .input-group {
     margin-top: 0.4rem !important;
 }
@@ -6109,7 +6109,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     margin-bottom: 0 !important;
 }
 
-/* 9. Image row — Grid layout. Row sizes to image's actual rendered
+/* 9. Image row - Grid layout. Row sizes to image's actual rendered
       height (auto); image constrained by both max-height: 380px AND
       max-width: 100% so it scales within column bounds without
       overflowing. Rail stretches via grid align-items + inner flex
@@ -6129,7 +6129,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [d
     margin: 0 !important;
 }
 
-/* Rail in column 1 — stretched by grid, button stretched by inner flex */
+/* Rail in column 1 - stretched by grid, button stretched by inner flex */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .col-lg-6 > .input-group > .input-group-prepend,
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .col-lg-6 > .input-group > .input-group-prepend.bg-secondary {
     grid-column: 1 !important;
@@ -6159,7 +6159,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [d
 }
 
 /* Existing-side img: max-bound by 380px tall AND 100% column wide,
-   border wraps tightly around the visible image. NOTE: no opacity dim —
+   border wraps tightly around the visible image. NOTE: no opacity dim -
    dimming the image reads as a brightness/quality difference (it isn't;
    the pixels match the scraped side). Which side is which is already clear
    from the red-X / green-check rail, labels, and position. */
@@ -6200,7 +6200,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [d
     display: none !important;
 }
 
-/* The visible scraped <img> — grid cell 2,1 (flush with rail) */
+/* The visible scraped <img> - grid cell 2,1 (flush with rail) */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection > .performer-image > img.performer-image:not(.d-none) {
     grid-column: 2 !important;
     grid-row: 1 !important;
@@ -6222,7 +6222,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [d
     display: block !important;
 }
 
-/* Nav strip — grid cell 2,2 (below image, not inside the image card).
+/* Nav strip - grid cell 2,2 (below image, not inside the image card).
    Centered under the image. Only present when multiple scraped images
    exist; otherwise row 2 collapses to 0. */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) [data-field="image"] .image-selection > .select-buttons {
@@ -6337,7 +6337,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .c
     display: block !important;
 }
 
-/* 10. Modal header — accent the pencil icon */
+/* 10. Modal header - accent the pencil icon */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .modal-header > .svg-inline--fa.fa-pencil,
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .modal-header > svg.fa-pencil {
     width: 0.9rem !important;
@@ -6347,7 +6347,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .m
     opacity: 0.95;
 }
 
-/* 11. Modal body scroll — keep tall scrape lists inside the viewport */
+/* 11. Modal body scroll - keep tall scrape lists inside the viewport */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .modal-body {
     max-height: 75vh !important;
     overflow-y: auto !important;
@@ -6374,7 +6374,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .m
 /* 13. String-list column as ONE unified container.
        The full-height ✕ / ✓ pillar is a column-wide action; keep it
        tall and flush. Inside, the .string-list-input is styled as a
-       single glass block — each URL row is borderless/transparent
+       single glass block - each URL row is borderless/transparent
        with a hairline divider, instead of being its own pill. */
 
 /* Tall column-action button (rail): full height, flat-right, accent border */
@@ -6399,7 +6399,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     border-right: none !important;
 }
 
-/* Unified container — one glass block, flat-left where it meets the rail */
+/* Unified container - one glass block, flat-left where it meets the rail */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .col-lg-6 > .input-group > .string-list-input {
     flex: 1 !important;
     min-width: 0;
@@ -6425,7 +6425,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     border-bottom: none;
 }
 
-/* The input itself: transparent, borderless, no radius — inherits container surface */
+/* The input itself: transparent, borderless, no radius - inherits container surface */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > input.form-control,
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > input.text-input.form-control {
     background: transparent !important;
@@ -6472,7 +6472,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     opacity: 0.3 !important;
     border-left-color: var(--glass-border) !important;
 }
-/* Hide drag-to-reorder handles — only the remove (minus) action stays */
+/* Hide drag-to-reorder handles - only the remove (minus) action stays */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button.drag-handle {
     display: none !important;
 }
@@ -6481,7 +6481,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     height: 0.85rem !important;
 }
 
-/* Existing column (left) — desaturate the whole unified container */
+/* Existing column (left) - desaturate the whole unified container */
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .col-lg-6:first-of-type > .input-group > .string-list-input {
     background: rgba(255, 255, 255, 0.022) !important;
 }
@@ -6491,13 +6491,13 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
 }
 
 /* ──────────────────────────────────────────────────────────────────
-   Select Folders modal — folder picker list cleanup
+   Select Folders modal - folder picker list cleanup
    Stash native draws a fake tree (L-shaped corner brackets via
    pseudo-elements) and old PNG folder icons that clash with the glass
    theme. With a flat list of root paths there's no tree to indicate,
    so we kill the brackets + icons and render each path as a clean
    full-width tile with monospace text and accent hover.
-   Unique fingerprint: .dialog-container > ul.folder-list — only the
+   Unique fingerprint: .dialog-container > ul.folder-list - only the
    folder picker has that direct child structure.
    ────────────────────────────────────────────────────────────────── */
 
@@ -6514,7 +6514,7 @@ body.stash-liquid-glass .dialog-container > ul.folder-list .folder-list-item > b
     border: none !important;
 }
 
-/* List container — reset defaults, breathing room below file-path input */
+/* List container - reset defaults, breathing room below file-path input */
 body.stash-liquid-glass .dialog-container > ul.folder-list {
     list-style: none !important;
     padding: 0.5rem 0 0 0 !important;
@@ -6524,7 +6524,7 @@ body.stash-liquid-glass .dialog-container > ul.folder-list {
     gap: var(--gap-2xs) !important;
 }
 
-/* Row wrapper — let the inner button own the visible area */
+/* Row wrapper - let the inner button own the visible area */
 body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item {
     margin: 0 !important;
     padding: 0 !important;
@@ -6533,7 +6533,7 @@ body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item
     list-style: none !important;
 }
 
-/* Path button — flat full-width tile, monospace text, accent on hover */
+/* Path button - flat full-width tile, monospace text, accent on hover */
 body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item > button.btn.btn-link {
     display: flex !important;
     align-items: center !important;
@@ -6568,7 +6568,7 @@ body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item
 }
 
 /* ──────────────────────────────────────────────────────────────────
-   Settings → Tasks — Task Queue card
+   Settings → Tasks - Task Queue card
    The outer .tasks-panel-queue + inner .job-table.card glass-shell
    styling lives earlier in this file (L2227+). This section adds the
    detail polish: section heading, job row layout, stop-button as red
@@ -6589,7 +6589,7 @@ body.stash-liquid-glass #tasks-panel .tasks-panel-queue > h1 {
     border: none !important;
 }
 
-/* Inner card — flush padding so job rows own their gutters. Force
+/* Inner card - flush padding so job rows own their gutters. Force
    `height: auto` because something (Stash native CSS or React inline
    style for the collapse-animation state) was pinning the card to
    ~140px (one job's height), clipping every job past the first via
@@ -6609,7 +6609,7 @@ body.stash-liquid-glass .job-table.card > ul {
     padding: 0 !important;
 }
 
-/* Individual job row — every job gets the SAME fixed height so the
+/* Individual job row - every job gets the SAME fixed height so the
    queue card grows with job COUNT, not with the running job's
    per-tick subtask churn (Generate / Scan jobs can list 10+ subtask
    file paths, which was making the card height bounce around as
@@ -6631,7 +6631,7 @@ body.stash-liquid-glass .job-table.card > ul > li.job {
     overflow: hidden !important;
     box-sizing: border-box;
 }
-/* Expanded — a FIXED-height scroll panel, not content-sized. With
+/* Expanded - a FIXED-height scroll panel, not content-sized. With
    `height: auto` the row tracked its subtask list, which churns every
    tick during a scan (files scroll in/out, line count wobbles), so the
    row and the whole queue card bounced up and down. Pinning the height
@@ -6650,7 +6650,7 @@ body.stash-liquid-glass .job-table.card > ul > li.job:hover {
     background: var(--fill-1) !important;
 }
 
-/* Chevron toggle — vertically centred on the row's right edge, only
+/* Chevron toggle - vertically centred on the row's right edge, only
    shown on jobs with subtasks to expand. Same accent-tinted chip
    styling as the X stop button on the row's left edge (mirrored
    visually), and the same chevron SVG + rotate-on-expand convention
@@ -6700,7 +6700,7 @@ body.stash-liquid-glass .job-table.card > ul > li.job > div {
     gap: var(--gap-lg) !important;
 }
 
-/* Stop button — red-tint icon chip (override btn-primary) */
+/* Stop button - red-tint icon chip (override btn-primary) */
 body.stash-liquid-glass .job-table.card .job button.btn.btn-primary.stop,
 body.stash-liquid-glass .job-table.card .job button.minimal.stop.btn,
 body.stash-liquid-glass .job-table.card .job button.minimal.stop.btn.btn-primary,
@@ -6735,7 +6735,7 @@ body.stash-liquid-glass .job-table.card .job button.stop .svg-inline--fa {
     height: 0.85rem !important;
 }
 
-/* Status block — flex column: description, progress, subtask */
+/* Status block - flex column: description, progress, subtask */
 body.stash-liquid-glass .job-table.card .job .job-status {
     flex: 1 1 auto !important;
     display: flex !important;
@@ -6744,7 +6744,7 @@ body.stash-liquid-glass .job-table.card .job .job-status {
     min-width: 0 !important;
 }
 
-/* Job description row — spinning gear + task name */
+/* Job description row - spinning gear + task name */
 body.stash-liquid-glass .job-table.card .job .job-description {
     margin: 0 !important;
     padding: 0 !important;
@@ -6766,7 +6766,7 @@ body.stash-liquid-glass .job-table.card .job .job-description .svg-inline--fa {
     flex: 0 0 auto !important;
 }
 
-/* Subtask — secondary description, muted */
+/* Subtask - secondary description, muted */
 body.stash-liquid-glass .job-table.card .job .job-subtask {
     font-size: var(--fs-sm) !important;
     font-weight: 400 !important;
@@ -6777,7 +6777,7 @@ body.stash-liquid-glass .job-table.card .job .job-subtask {
     padding: 0 !important;
 }
 
-/* Progress bar inside a job — slim, full-width */
+/* Progress bar inside a job - slim, full-width */
 body.stash-liquid-glass .job-table.card .job .progress {
     height: 4px !important;
     margin: 0 !important;
@@ -6811,7 +6811,7 @@ body.stash-liquid-glass .job-table.card .job .job-description > div > .st-task-p
     letter-spacing: 0.02em;
 }
 
-/* Empty state — centered, muted */
+/* Empty state - centered, muted */
 body.stash-liquid-glass .job-table.card > ul .empty-queue-message {
     display: block !important;
     text-align: center !important;
@@ -6838,13 +6838,13 @@ body.stash-liquid-glass .job-table.card .job.fade-in {
 }
 
 /* ──────────────────────────────────────────────────────────────────
-   Settings Pages — Comprehensive Restyle (Stage 1: Foundation)
+   Settings Pages - Comprehensive Restyle (Stage 1: Foundation)
    Section headings (h1/h2), subsection headings (h3/h4), .setting-group
    container cards, and internal .setting row separators. Applies across
    every settings tab via the standard settings scope alias.
    ────────────────────────────────────────────────────────────────── */
 
-/* ── 1a. Section headings (h1/h2) — e.g. "Library", "System", "Interface" ── */
+/* ── 1a. Section headings (h1/h2) - e.g. "Library", "System", "Interface" ── */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) > h1,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) > h2,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) > div > h1,
@@ -6861,7 +6861,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     border-bottom: 1px solid var(--glass-border) !important;
 }
 
-/* First heading at the very top of a tab pane — no extra top margin */
+/* First heading at the very top of a tab pane - no extra top margin */
 body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] > h1:first-child,
 body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] > h2:first-child,
 body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] > div:first-child > h1:first-child,
@@ -6869,7 +6869,7 @@ body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] > div:first-child > 
     margin-top: 0.4rem !important;
 }
 
-/* ── 1b. Subsection headings (h3/h4) — e.g. "Scan", "Auto Tag", "Generate" ── */
+/* ── 1b. Subsection headings (h3/h4) - e.g. "Scan", "Auto Tag", "Generate" ── */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > h3,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > h4,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > .collapse-button > h3,
@@ -6884,7 +6884,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     letter-spacing: 0.005em !important;
 }
 
-/* ── 1c. .setting-group containers — transparent (no nested-box look),
+/* ── 1c. .setting-group containers - transparent (no nested-box look),
         compact padding so plugin/task list rows don't get spaced out. ── */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group {
     background: transparent !important;
@@ -6902,8 +6902,8 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     box-shadow: none !important;
 }
 
-/* Groups that have a subsection heading (h3/h4) — the "real" content
-   sections like "Scan", "Auto Tag" — get a bit more breathing room. */
+/* Groups that have a subsection heading (h3/h4) - the "real" content
+   sections like "Scan", "Auto Tag" - get a bit more breathing room. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:has(> h3),
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:has(> h4),
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:has(> .collapse-button > h3) {
@@ -6911,7 +6911,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     margin: 0 0 1rem 0 !important;
 }
 
-/* Force rows to align flush-left with their group's padding — Stash's
+/* Force rows to align flush-left with their group's padding - Stash's
    native .setting has a left padding/indent that misaligns it. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > .setting {
     padding-left: 0 !important;
@@ -6933,7 +6933,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 }
 
 /* Section-level description text (the line under each h3 like "Scan for
-   new content and add it to the database.") — muted, smaller, breathing
+   new content and add it to the database.") - muted, smaller, breathing
    room above the divider strip */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > .description,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group > p.description,
@@ -6945,7 +6945,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 }
 
 /* ──────────────────────────────────────────────────────────────────
-   Settings Pages — Stage 2: Form rows + accent toggles
+   Settings Pages - Stage 2: Form rows + accent toggles
    Soften the noisy underlines on help-trigger labels, override
    Bootstrap's purple custom-switch / form-switch toggle to use
    refract's accent, and tidy the row layout so label+description
@@ -6980,11 +6980,11 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     text-decoration-color: var(--accent-bright) !important;
 }
 
-/* ── 2b. Custom-switch / form-switch toggles — INTENTIONALLY LEFT
+/* ── 2b. Custom-switch / form-switch toggles - INTENTIONALLY LEFT
    UNSTYLED here. Refract has bespoke JS-injected toggle styling in
    05_list_views.css / refract.js that should not be overridden. ── */
 
-/* ── 2c. Form controls in settings — consistent height + accent focus ──
+/* ── 2c. Form controls in settings - consistent height + accent focus ──
    Extends 05_list_views.css L622–633 with refined sizing/focus matching
    the modal input pattern. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting .form-control,
@@ -7012,7 +7012,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     color: #fff !important;
 }
 
-/* Textarea — taller min-height, same accent-focus treatment */
+/* Textarea - taller min-height, same accent-focus treatment */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting textarea.form-control {
     min-height: 5rem !important;
     line-height: 1.5 !important;
@@ -7032,14 +7032,14 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 }
 
 /* ──────────────────────────────────────────────────────────────────
-   Settings Pages — Stage 3: Help-tip icons + button refinements + polish
+   Settings Pages - Stage 3: Help-tip icons + button refinements + polish
    The `?` circle next to subsection titles, action button placement
    inside the heading row, and final vertical-rhythm tweaks.
    ────────────────────────────────────────────────────────────────── */
 
 /* ── 3a. Help-tip "?" icons next to subsection titles ──
    Stash renders these as small circle buttons inheriting Bootstrap
-   secondary styling. Strip the chrome — render as a subtle muted
+   secondary styling. Strip the chrome - render as a subtle muted
    icon that lifts to accent on hover. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 .help-button,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 button.btn:has(svg.fa-question-circle),
@@ -7095,7 +7095,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     margin-left: 0 !important;
 }
 
-/* ── 3c. Vertical rhythm — calm spacing between .setting-sections ── */
+/* ── 3c. Vertical rhythm - calm spacing between .setting-sections ── */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section {
     margin-bottom: 1.4rem !important;
 }
@@ -7103,7 +7103,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     margin-bottom: 0 !important;
 }
 
-/* ── 3d. Tab pane outer padding — small breathing room from viewport edge ── */
+/* ── 3d. Tab pane outer padding - small breathing room from viewport edge ── */
 body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] {
     padding: 0.4rem 0.4rem 1.5rem 0.4rem !important;
 }
@@ -7113,14 +7113,14 @@ body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] {
    Covers both representations: the avatar circles row and minimal
    mode's compact pill. Doubled class outranks per-mode styling. (The
    old show-resolution toggle is retired: the res chip now simply
-   follows the Scene card style — Classic shows it, tidy hides it.) */
+   follows the Scene card style - Classic shows it, tidy hides it.) */
 body.stash-liquid-glass.refract-sc-hide-performers.refract-sc-hide-performers .scene-card .stash-performer-circles,
 body.stash-liquid-glass.refract-sc-hide-performers.refract-sc-hide-performers .scene-card .stash-performer-pill {
     display: none !important;
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   B7 — Settings residue found by the global-chrome audit.
+   B7 - Settings residue found by the global-chrome audit.
    ─────────────────────────────────────────────────────────────────── */
 
 /* Stash draws `.setting` row separators as a PURE BLACK hairline. On a

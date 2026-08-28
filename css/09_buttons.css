@@ -1,5 +1,5 @@
 /* ── .btn-primary: glass orange button ─────────────────────────────
-   No backdrop-filter — this rule hits every primary button on the page,
+   No backdrop-filter - this rule hits every primary button on the page,
    which can be 30-50+ on heavy pages. Each blurred button is a GPU
    compositor layer. Accent-tint background + accent-glow border is
    readable without blur. */
@@ -18,7 +18,7 @@ body.stash-liquid-glass .btn-primary:focus {
     color: var(--text) !important;
     border-color: var(--accent-bright) !important;
 }
-/* Minimal icon-only buttons (e.g. favorite heart) — no square background */
+/* Minimal icon-only buttons (e.g. favorite heart) - no square background */
 body.stash-liquid-glass .btn.minimal.btn-primary,
 body.stash-liquid-glass button.minimal.btn-primary {
     background: transparent !important;
@@ -41,7 +41,7 @@ body.stash-liquid-glass button.minimal.btn-primary:focus {
    work regardless of Stash's internal component class names.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Container — no background; buttons float on the page like the navbar */
+/* Container - no background; buttons float on the page like the navbar */
 body.stash-liquid-glass [data-stash-filter] {
     background: transparent !important;
     border: none !important;
@@ -77,7 +77,7 @@ body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"]:focus {
     background: var(--fill-4) !important;
 }
 
-/* Secondary buttons — same base style as navbar buttons.
+/* Secondary buttons - same base style as navbar buttons.
    Excludes .sort-by-select children (sort dropdown + direction + shuffle)
    which need full glass styling, not the navbar-style transparent treatment. */
 body.stash-liquid-glass [data-stash-filter] .btn-secondary {
@@ -100,7 +100,7 @@ body.stash-liquid-glass [data-stash-filter] .btn-secondary:hover {
     border-color: var(--glass-border) !important;
     color: var(--text) !important;
 }
-/* Sort dropdown override — needs full glass styling like the page-size
+/* Sort dropdown override - needs full glass styling like the page-size
    selector, not the transparent navbar style applied to view-mode buttons. */
 body.stash-liquid-glass [data-stash-filter] .sort-by-select .btn.btn-secondary,
 body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .btn.btn-secondary {
@@ -120,7 +120,7 @@ body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .btn.btn-secondar
     color: #fff !important;
 }
 
-/* Active view-mode button — exact navbar glow pattern */
+/* Active view-mode button - exact navbar glow pattern */
 body.stash-liquid-glass [data-stash-filter] .btn-primary {
     background: var(--accent-tint) !important;
     border: 1px solid var(--accent-glow) !important;
@@ -157,7 +157,7 @@ body.stash-liquid-glass [data-stash-filter] select {
     padding: 0 8px !important;
 }
 
-/* ── Active filter chips — hidden by default (filter button badge shows
+/* ── Active filter chips - hidden by default (filter button badge shows
    the count); the refract-show-filter-tags body class (Suggestion Box
    toggle, forum request) re-shows them so filters can be dismissed
    without opening the menu. ── */
@@ -199,7 +199,7 @@ body.stash-liquid-glass [data-stash-filter] button[data-filter-active] svg {
         drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.45)) !important;
 }
 
-/* Badge inside filter button — small pill, no box */
+/* Badge inside filter button - small pill, no box */
 body.stash-liquid-glass [data-stash-filter] button .badge,
 body.stash-liquid-glass [data-stash-filter] button .badge-secondary {
     background: var(--accent) !important;
@@ -225,7 +225,7 @@ body.stash-liquid-glass .filter-tag button:hover {
 
 /* ── Pagination: minimal, clean ──────────────────────────────────── */
 
-/* Hide double-jump arrows (first/last page) — rarely useful */
+/* Hide double-jump arrows (first/last page) - rarely useful */
 body.stash-liquid-glass .pagination .page-item:first-child,
 body.stash-liquid-glass .pagination .page-item:last-child {
     display: none !important;
@@ -272,7 +272,7 @@ body.stash-liquid-glass .page-item.disabled .page-link {
     pointer-events: none !important;
 }
 
-/* "1-40 of N" count — tiny muted label, no pill */
+/* "1-40 of N" count - tiny muted label, no pill */
 body.stash-liquid-glass .pagination-index,
 body.stash-liquid-glass .filter-container + * .text-muted,
 body.stash-liquid-glass [class*="list-count"],
@@ -305,7 +305,7 @@ body.stash-liquid-glass .stash-view-wrap {
     position: static !important;
 }
 
-/* Chevron trigger — always visible at the right edge */
+/* Chevron trigger - always visible at the right edge */
 body.stash-liquid-glass .stash-view-trigger {
     background: transparent !important;
     border: 1px solid transparent !important;
@@ -334,7 +334,7 @@ body.stash-liquid-glass .stash-view-trigger:hover {
     color: var(--text) !important;
 }
 
-/* Always-visible current view indicator — orange glow, same as active nav */
+/* Always-visible current view indicator - orange glow, same as active nav */
 body.stash-liquid-glass .stash-view-active-ind {
     background: var(--accent-tint) !important;
     border: 1px solid var(--accent-glow) !important;
@@ -424,13 +424,13 @@ body.stash-liquid-glass .pagination[data-pager-role="hide"] {
     display: none !important;
 }
 
-/* Float the bottom pager row — fixed to viewport bottom center.
+/* Float the bottom pager row - fixed to viewport bottom center.
    `flex-direction: column` only applies when the float row is a WRAPPER
-   (e.g. .pagination-footer on /scenes — wraps the pill plus other items
+   (e.g. .pagination-footer on /scenes - wraps the pill plus other items
    stacked vertically). When the float row IS the .pagination/.btn-group
    itself (e.g. on /performers, /studios, /tags, /groups, where rowOf()
    returned the pagination directly), column-direction stacks the
-   individual page buttons vertically instead of horizontally — that's
+   individual page buttons vertically instead of horizontally - that's
    what produced the "pagination vertical on non-scene pages" report. */
 body.stash-liquid-glass [data-pager-row="float"] {
     position: fixed !important;
@@ -468,7 +468,7 @@ body.stash-liquid-glass [data-pager-row="float"].btn-group {
     flex-direction: row !important;
 }
 
-/* Glass pill around the floated pagination — covers both the wrapper-row
+/* Glass pill around the floated pagination - covers both the wrapper-row
    case and the case where the pager itself is the floated element
    (happens when rowOf() declines to tag a toolbar-containing wrapper). */
 body.stash-liquid-glass [data-pager-row="float"] .pagination,
@@ -490,7 +490,7 @@ body.stash-liquid-glass:has([data-pager-row="float"]) .main.container-fluid {
     padding-bottom: 6rem !important;
 }
 
-/* Panel — slides out horizontally to the left of the chevron */
+/* Panel - slides out horizontally to the left of the chevron */
 body.stash-liquid-glass .stash-view-panel {
     display: inline-flex !important;
     align-items: center !important;
@@ -562,7 +562,7 @@ body.stash-liquid-glass [data-stash-filter] .badge {
 
 /* ── Performer Advanced Rating plugin ───────────────────────────────
    Styles the trigger button and modal injected by the plugin.
-   Safe to include without the plugin — selectors simply don't match.
+   Safe to include without the plugin - selectors simply don't match.
    ─────────────────────────────────────────────────────────────────── */
 
 body.stash-liquid-glass .adv-rating-btn,
@@ -624,7 +624,7 @@ body.stash-liquid-glass .adv-rating-modal-content {
     color: var(--text);
 }
 
-/* Header — same bg as card so it doesn't look like a separate box */
+/* Header - same bg as card so it doesn't look like a separate box */
 body.stash-liquid-glass .adv-rating-header {
     display: flex !important;
     align-items: center;
@@ -641,7 +641,7 @@ body.stash-liquid-glass .adv-rating-header h3 {
     text-transform: uppercase !important;
     color: var(--text-muted) !important;
 }
-/* Close button — SVG × via pseudo-element, orange on hover */
+/* Close button - SVG × via pseudo-element, orange on hover */
 body.stash-liquid-glass .perf-rating-close {
     width: 1.75rem;
     height: 1.75rem;
@@ -658,7 +658,7 @@ body.stash-liquid-glass .perf-rating-close {
 }
 /* Use mask-image so the × glyph color comes from background-color and
    tracks --accent-bright on hover. Stroke value inside the data URI is
-   ignored — only the rendered alpha matters. */
+   ignored - only the rendered alpha matters. */
 body.stash-liquid-glass .perf-rating-close::before {
     content: '';
     display: block;
@@ -714,7 +714,7 @@ body.stash-liquid-glass .rating-label {
     min-width: 0;
 }
 
-/* Info icon ⓘ — character already has circle built in, so no extra border */
+/* Info icon ⓘ - character already has circle built in, so no extra border */
 body.stash-liquid-glass .rating-info-icon {
     position: relative;
     display: inline-flex !important;
@@ -731,7 +731,7 @@ body.stash-liquid-glass .rating-info-icon:hover {
     color: var(--accent-bright) !important;
 }
 
-/* Tooltip — shown on hover */
+/* Tooltip - shown on hover */
 body.stash-liquid-glass .rating-tooltip {
     display: none;
     position: absolute;
@@ -764,7 +764,7 @@ body.stash-liquid-glass .rating-stars-modal {
     flex-shrink: 0;
 }
 
-/* Star glyphs — empty state */
+/* Star glyphs - empty state */
 body.stash-liquid-glass .rating-star {
     font-size: 1.35rem;
     color: rgba(255, 255, 255, 0.2) !important;
@@ -820,7 +820,7 @@ body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb:hover {
    sidebar (instead of the overlay) so the video keeps playing while you
    rate. It reuses the same .rating-row / .rating-stars-modal / .rating-
    star / .rating-clear / .rating-tooltip / .adv-rating-* classes as the
-   modal, which are already themed above — here we only style the new
+   modal, which are already themed above - here we only style the new
    panel container + header and tighten horizontal padding to fit the
    narrow sidebar column. */
 body.stash-liquid-glass .adv-rating-inline-panel {
@@ -845,7 +845,7 @@ body.stash-liquid-glass .adv-rating-inline-panel {
         inset 0 0 0 1px rgba(var(--accent-rgb), 0.10),
         inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
-/* Header — uppercase muted label (like the modal's .adv-rating-header h3)
+/* Header - uppercase muted label (like the modal's .adv-rating-header h3)
    with the "N criteria · M rated" summary aligned right. */
 body.stash-liquid-glass .adv-rating-inline-head {
     display: flex !important;
@@ -896,7 +896,7 @@ body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown {
     margin-top: 0 !important;
     border-top: 1px solid var(--glass-border) !important;
 }
-/* Trigger pressed state while the panel is open — accent ring instead of
+/* Trigger pressed state while the panel is open - accent ring instead of
    the plugin's default yellow inset. */
 body.stash-liquid-glass .adv-rating-btn--active {
     background: rgba(var(--accent-rgb), 0.22) !important;

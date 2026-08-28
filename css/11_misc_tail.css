@@ -1,5 +1,5 @@
 /* ── optional-field: strip Stash's grey bubble, keep button left-pinned ── */
-/* Use display:flex (block-level) NOT inline-flex — inline-flex shrinks the   */
+/* Use display:flex (block-level) NOT inline-flex - inline-flex shrinks the   */
 /* element so a parent justify-content:center can shift it to the middle.     */
 body.stash-liquid-glass .search-result .optional-field {
     background: transparent !important;
@@ -19,7 +19,7 @@ body.stash-liquid-glass .search-result .optional-field-content {
     flex: 1 1 auto;
 }
 
-/* scene-metadata — Stash gives this its own card background; clear it */
+/* scene-metadata - Stash gives this its own card background; clear it */
 body.stash-liquid-glass .scene-metadata {
     background: transparent !important;
     border: none !important;
@@ -27,7 +27,7 @@ body.stash-liquid-glass .scene-metadata {
     padding: 0 !important;
 }
 
-/* scene-details rows inside scene tagger — cancel the global glass card rule
+/* scene-details rows inside scene tagger - cancel the global glass card rule
    (body.stash-liquid-glass .scene-details → glass-bg) and left-align content */
 body.stash-liquid-glass .search-result .scene-details {
     background: transparent !important;
@@ -50,7 +50,7 @@ body.stash-liquid-glass .search-result .scene-details .include-exclude-button {
     left: auto !important;
 }
 
-/* Include / exclude toggle — small inline checkmark, no circle chrome */
+/* Include / exclude toggle - small inline checkmark, no circle chrome */
 body.stash-liquid-glass .include-exclude-button {
     background: transparent !important;
     border: none !important;
@@ -219,7 +219,7 @@ body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn):not
     box-shadow: 0 2px 18px rgba(var(--accent-rgb), 0.4) !important;
 }
 
-/* Create / Link icon buttons inside an unmatched tag pill — small inline glyphs
+/* Create / Link icon buttons inside an unmatched tag pill - small inline glyphs
    that match the surrounding badge instead of the big Save button. */
 body.stash-liquid-glass .search-result .tag-item.badge .btn.btn-primary {
     background: transparent !important;
@@ -290,7 +290,7 @@ body.stash-liquid-glass .search-result .form-group .react-select__control {
     border-radius: var(--radius-sm) !important;
     min-height: 36px !important;
 }
-/* Studio / performer select in entity row — single-value value container */
+/* Studio / performer select in entity row - single-value value container */
 body.stash-liquid-glass .search-result .studio-select .react-select__control,
 body.stash-liquid-glass .search-result .performer-select .react-select__control {
     font-size: var(--fs-sm) !important;
@@ -298,7 +298,7 @@ body.stash-liquid-glass .search-result .performer-select .react-select__control 
     border-radius: 0 !important;
 }
 
-/* Sprite (image preview) button — no useful action in tagger context */
+/* Sprite (image preview) button - no useful action in tagger context */
 body.stash-liquid-glass .sprite-button.btn-link {
     display: none !important;
 }
@@ -363,7 +363,7 @@ body.stash-liquid-glass:has(.Lightbox) .grid-card {
     animation: none !important;
 }
 
-/* Outer container — full-viewport dark backdrop. backdrop-filter is
+/* Outer container - full-viewport dark backdrop. backdrop-filter is
    intentionally omitted: Stash's Ctrl+Wheel image zoom applies
    transform:scale() to the lightbox image, and Chromium has a known
    issue where transformed children inside a backdrop-filter ancestor
@@ -386,7 +386,7 @@ body.stash-liquid-glass .Lightbox {
    slot as the footer with a transparent background. Its children
    (page indicator on the left, control buttons on the right) visually
    appear INSIDE the footer's glass slab while the footer keeps the
-   filename/link in the center. No DOM is moved — Stash's React
+   filename/link in the center. No DOM is moved - Stash's React
    lightbox stays intact, so scroll-wheel zoom doesn't blank the page. */
 body.stash-liquid-glass .Lightbox-header {
     position: fixed !important;
@@ -405,7 +405,7 @@ body.stash-liquid-glass .Lightbox-header {
     pointer-events: none !important;
     z-index: 1102 !important;
     /* Match the footer's 3-column grid so the header-right cluster
-       lands at the same right edge as the footer-right cluster — both
+       lands at the same right edge as the footer-right cluster - both
        column sets align identically over the same bar. */
     display: grid !important;
     grid-template-columns: 1fr auto 1fr !important;
@@ -413,7 +413,7 @@ body.stash-liquid-glass .Lightbox-header {
     gap: var(--gap-lg) !important;
     margin: 0 !important;
     /* Same min-height as the footer so the header occupies the SAME
-       slab area — without this the header is shorter than the footer
+       slab area - without this the header is shorter than the footer
        and its children visually drop to the bottom edge of the bar. */
     min-height: 60px !important;
 }
@@ -423,12 +423,12 @@ body.stash-liquid-glass .Lightbox-header > * {
     align-items: center !important;
     align-self: center !important;
 }
-/* Empty Lightbox-header-left slot (Stash renders a 3-cell layout) —
+/* Empty Lightbox-header-left slot (Stash renders a 3-cell layout) -
    collapse it so the indicator becomes the leftmost visible element. */
 body.stash-liquid-glass .Lightbox-header > .Lightbox-header-left {
     display: none !important;
 }
-/* Hide the native indicator entirely — refract.js mirrors its image
+/* Hide the native indicator entirely - refract.js mirrors its image
    count text into a `.refract-lb-count` element under the filename in
    the footer center. */
 body.stash-liquid-glass .Lightbox-header > .Lightbox-header-indicator {
@@ -441,7 +441,7 @@ body.stash-liquid-glass .Lightbox-header > .Lightbox-header-right {
     justify-self: end !important;
     grid-column: 3 !important;
 }
-/* Buttons inside header-right — explicit vertical centering on every
+/* Buttons inside header-right - explicit vertical centering on every
    button regardless of native button defaults / line-height. */
 body.stash-liquid-glass .Lightbox-header-right > .btn,
 body.stash-liquid-glass .Lightbox-header-right > * > .btn {
@@ -464,9 +464,9 @@ body.stash-liquid-glass .Lightbox-header-indicator b {
     color: var(--accent-bright) !important;
 }
 
-/* Header buttons (gear, slideshow, fullscreen, close) — bare icon buttons */
+/* Header buttons (gear, slideshow, fullscreen, close) - bare icon buttons */
 /* Theme ANY button inside the header / navbuttons. Stash uses .btn,
-   .btn-link, .btn-secondary, .minimal in different combos — catch them
+   .btn-link, .btn-secondary, .minimal in different combos - catch them
    all so the gear/play/fullscreen/close icons consistently match. */
 body.stash-liquid-glass .Lightbox-header button,
 body.stash-liquid-glass .Lightbox-header .btn,
@@ -495,7 +495,7 @@ body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link svg {
     height: 1rem !important;
 }
 
-/* Nav buttons (chevron-left / chevron-right) — floating glass orbs, vertically
+/* Nav buttons (chevron-left / chevron-right) - floating glass orbs, vertically
    centered along the side gutters */
 body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
     position: fixed !important;
@@ -506,7 +506,7 @@ body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
     background: rgba(var(--surface-rgb), 0.78) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: 50% !important;
-    /* backdrop-filter intentionally omitted — combination of position:fixed
+    /* backdrop-filter intentionally omitted - combination of position:fixed
        + transform + backdrop-filter on a sibling-of-a-zoom-transformed-img
        causes Chromium on Windows to crash/blank the page on Ctrl+Wheel. */
     -webkit-backdrop-filter: none !important;
@@ -557,7 +557,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show {
     box-shadow: var(--shadow-xl) !important;
     color: var(--text) !important;
 }
-/* Hide popper's default arrow — we're not anchored to the trigger any more */
+/* Hide popper's default arrow - we're not anchored to the trigger any more */
 body.stash-liquid-glass:has(.Lightbox) .popover.show .arrow,
 body.stash-liquid-glass:has(.Lightbox) .popover.show::before,
 body.stash-liquid-glass:has(.Lightbox) .popover.show::after {
@@ -601,7 +601,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control {
     box-sizing: border-box !important;
     vertical-align: middle;
 }
-/* Native select dropdown arrow — replace with themed chevron */
+/* Native select dropdown arrow - replace with themed chevron */
 body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control {
     appearance: none !important;
     -webkit-appearance: none !important;
@@ -618,7 +618,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control:focus {
     box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.18) !important;
     outline: none !important;
 }
-/* Custom checkbox — round glass dot, matching the table-list select-col
+/* Custom checkbox - round glass dot, matching the table-list select-col
    idiom (05_list_views.css). Default = neutral glass; checked = orange
    fill with embedded SVG check + accent glow. */
 body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-input[type="checkbox"] {
@@ -649,7 +649,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-label {
     cursor: pointer;
 }
 
-/* Number input — hide chunky native spinner; keep clean text input */
+/* Number input - hide chunky native spinner; keep clean text input */
 body.stash-liquid-glass:has(.Lightbox) .popover.show input[type="number"].form-control {
     -moz-appearance: textfield;
     appearance: textfield;
@@ -663,14 +663,14 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show input[type="number"].form-c
     display: none !important;
 }
 
-/* Display area — transparent so the dark backdrop shows through. The
+/* Display area - transparent so the dark backdrop shows through. The
    parent .Lightbox owns the bottom-padding reservation; flex sizing
    here naturally honours it. */
 body.stash-liquid-glass .Lightbox-display {
     background: transparent !important;
 }
 
-/* Footer — floating glass slab, inset from bottom edge.
+/* Footer - floating glass slab, inset from bottom edge.
    Explicit horizontal flex so left/center/right groups don't stack. */
 body.stash-liquid-glass .Lightbox-footer {
     position: fixed !important;
@@ -680,7 +680,7 @@ body.stash-liquid-glass .Lightbox-footer {
     background: rgba(var(--surface-rgb), 0.92) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
-    /* backdrop-filter intentionally omitted — same Chromium/Windows zoom
+    /* backdrop-filter intentionally omitted - same Chromium/Windows zoom
        crash as .Lightbox-navbutton. Solid background compensates. */
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
@@ -790,7 +790,7 @@ body.stash-liquid-glass .Lightbox-footer-center > .refract-lb-count {
     grid-row: 2 !important;
     justify-self: center !important;
 }
-/* Mirrored image count from the (hidden) header indicator — small,
+/* Mirrored image count from the (hidden) header indicator - small,
    muted, sits directly under the filename / gallery link. */
 body.stash-liquid-glass .refract-lb-count {
     font-size: var(--fs-xs) !important;
@@ -806,7 +806,7 @@ body.stash-liquid-glass .Lightbox-footer-center > *,
 body.stash-liquid-glass .Lightbox-footer-right > * {
     flex-shrink: 0;
 }
-/* O-counter on the lightbox footer — slim glass pill matching the
+/* O-counter on the lightbox footer - slim glass pill matching the
    adjacent .rating-number sizing. The native Stash markup wraps the
    icon + value in inner Bootstrap btn-group with their own paddings;
    zero those out so total height matches a single-line pill. */
@@ -898,7 +898,7 @@ body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link svg {
     height: 0.9rem !important;
 }
 
-/* Refract Theme — accent swatch picker (replaces Stash's native input on
+/* Refract Theme - accent swatch picker (replaces Stash's native input on
    #plugin-refract-accent in Settings → Plugins → Refract Theme).
    Stash's `.setting > div:last-child` cell is sized to its content, so
    we explicitly let the swatch row expand and lock each swatch to its
@@ -937,7 +937,7 @@ body.stash-liquid-glass .refract-accent-swatch.is-active {
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5), 0 0 14px rgba(var(--accent-rgb), 0.6) !important;
 }
 
-/* Light/dark mode toggle — sun (light on) / moon (light off) icon
+/* Light/dark mode toggle - sun (light on) / moon (light off) icon
    sitting alongside the 8 accent swatches. Distinct visual: glass
    background with icon inside, warm sun-gradient when active so
    users can tell at a glance which mode is on. */
@@ -965,7 +965,7 @@ body.stash-liquid-glass .refract-light-toggle.is-active {
         0 0 14px rgba(251, 191, 36, 0.6) !important;
 }
 
-/* Navbar light-mode toggle — same sun/moon glyph as the accent-row
+/* Navbar light-mode toggle - same sun/moon glyph as the accent-row
    swatch button, sized to match the other utility buttons in the
    navbar cluster. Gated by `body.refract-show-light-nav` so users can
    hide it via the Interface settings (default: shown). */
@@ -1003,7 +1003,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav:hover
 }
 
 /* Right-align Refract's per-setting controls within their .setting
-   rows — matches the accent-swatches alignment so each control sits
+   rows - matches the accent-swatches alignment so each control sits
    next to its heading instead of dropping to a new line. */
 body.stash-liquid-glass .setting#plugin-refract-view-minimiser > .refract-setting-control,
 body.stash-liquid-glass .setting#plugin-refract-custom-logo > .refract-setting-control,
@@ -1018,7 +1018,7 @@ body.stash-liquid-glass .setting#plugin-refract-flourish > .refract-setting-cont
     margin-left: auto !important;
 }
 
-/* Refract segmented control — used by the card-style toggles (scene and
+/* Refract segmented control - used by the card-style toggles (scene and
    performer) and the rating-flourish toggle. Glass-pill buttons; the
    active one fills with accent tint. */
 body.stash-liquid-glass .refract-flourish-toggle,
@@ -1060,7 +1060,7 @@ body.stash-liquid-glass .refract-segmented-btn.is-active {
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.25);
 }
 
-/* Custom-logo URL input — glass styling matching Refract's other text
+/* Custom-logo URL input - glass styling matching Refract's other text
    inputs. Wider min-width so URLs are readable. */
 body.stash-liquid-glass .refract-logo-input {
     min-width: 18rem !important;
@@ -1079,7 +1079,7 @@ body.stash-liquid-glass .refract-logo-input:focus {
     box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.18) !important;
 }
 
-/* ── "The Suggestion Box" — collapsible drawer of opt-in extras in the
+/* ── "The Suggestion Box" - collapsible drawer of opt-in extras in the
    Refract plugin-settings panel (native <details>). Styled as a bordered
    card with a clickable summary header + a chevron that rotates on open. */
 body.stash-liquid-glass .refract-suggestion-box {
@@ -1119,7 +1119,7 @@ body.stash-liquid-glass .refract-suggestion-summary h3 {
     font-weight: 600;
     color: var(--text);
 }
-/* Disclosure chevron on the RIGHT edge — the same FontAwesome chevron-right
+/* Disclosure chevron on the RIGHT edge - the same FontAwesome chevron-right
    SVG (via mask) used by refract's other collapsible settings, rotating 90°
    and tinting accent when the drawer opens. */
 body.stash-liquid-glass .refract-suggestion-summary::after {
@@ -1186,7 +1186,7 @@ body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards {
    shape of the cards it is previewing. Measured at zoom-1: scene 305px,
    performer 253px, i.e. the performer is ~83% of the scene's width. At 190px
    the performer card read as elongated next to a 300px scene card even though
-   its image was a correct 2:3 — it was squeezed horizontally, not stretched. */
+   its image was a correct 2:3 - it was squeezed horizontally, not stretched. */
 /* Sized to a REAL zoom level, not to whatever fits. Measured off the scenes
    page zoom slider: 236 / 285 / 359 / 482px. The preview used to sit at 292,
    effectively level 1 (second smallest), where the card's own furniture reads
@@ -1332,7 +1332,7 @@ body.stash-liquid-glass .refract-su-code {
    normal card CSS paints, so every visibility toggle below shows its
    effect live. The .setting row is stacked (not the usual label/control
    split) so the cards get the full width; pointer-events:none keeps
-   links, hovers, and popovers dead — it's a picture, not a card. */
+   links, hovers, and popovers dead - it's a picture, not a card. */
 body.stash-liquid-glass .refract-card-preview-setting,
 body.stash-liquid-glass .refract-dock-config-setting {
     display: block !important;
@@ -1406,7 +1406,7 @@ body.stash-liquid-glass .refract-card-preview .refract-preview-card .performer-c
     display: block;
 }
 
-/* Refract plugin-settings toggle — used for the view-mode minimiser
+/* Refract plugin-settings toggle - used for the view-mode minimiser
    feature. Glass track + accent-tinted thumb when enabled. */
 body.stash-liquid-glass .refract-toggle {
     display: inline-block !important;
@@ -1454,7 +1454,7 @@ body.stash-liquid-glass .refract-toggle.is-on .refract-toggle-thumb {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 8px rgba(var(--accent-rgb), 0.5) !important;
 }
 
-/* Help modal — markdown content (blockquotes, code blocks). Scoped to
+/* Help modal - markdown content (blockquotes, code blocks). Scoped to
    .modal-dialog.manual so performer bios / scene descriptions aren't
    affected. */
 body.stash-liquid-glass .modal-dialog.manual .markdown blockquote {
@@ -1572,7 +1572,7 @@ body.stash-liquid-glass .refract-seg .refract-segmented-btn {
 }
 
 /* Keyboard focus. The segmented buttons are the panel's most-used control
-   and had NO focus style anywhere — tabbing through Card style, Rating
+   and had NO focus style anywhere - tabbing through Card style, Rating
    flourish, Left/Right, the layering row and the rating-system mirror gave
    no visible position. Offset inward so the ring sits inside the pill's
    track rather than colliding with the neighbouring button. */
@@ -1596,13 +1596,13 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CARD PREVIEW — STYLE BOUNDARY
+   CARD PREVIEW - STYLE BOUNDARY
    The preview renders REAL Stash cards inside the settings panel, so the
    panel's own styling reaches them by two separate routes:
 
-     1. INHERITANCE — text-align, colour, font and friends flow down from
+     1. INHERITANCE - text-align, colour, font and friends flow down from
         the panel's control column into the cards.
-     2. SPECIFICITY — 136 panel selectors are scoped with an ID
+     2. SPECIFICITY - 136 panel selectors are scoped with an ID
         (`:is(#settings-container, ...)`), which outranks EVERY card rule
         regardless of !important. 51 of those target buttons.
 
@@ -1645,7 +1645,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
       the overspill; the preview has open space under the card, so it shows
       as a stray bar sitting under the card's own grey progress bar.
       The preview is inert by design (pointer-events none, clicks captured),
-      so a scrub control cannot be used here at all — hide it outright. */
+      so a scrub control cannot be used here at all - hide it outright. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview .hover-scrubber {
     display: none !important;
 }
@@ -1655,7 +1655,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
       specificity. This is the ONE place to add a button when a plugin
       grows a new one on a card; values mirror the rules named beside each. */
 
-/* Stash's native heart is chrome-less — the only one with no box. */
+/* Stash's native heart is chrome-less - the only one with no box. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .favorite-button {
     background: transparent !important;
     background-color: transparent !important;
@@ -1671,7 +1671,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
    (.adv-favourite-btn, light glass) and the CARD overlay
    (.adv-favourite-card-btn, DARK glass + white heart, 13_plugins:994).
    A card carries BOTH classes, so matching on .adv-favourite-btn alone
-   painted the card overlay in the toolbar's light colours — that is the
+   painted the card overlay in the toolbar's light colours - that is the
    odd pale heart that showed up top-right on preview cards. Only the card
    variant can appear in the preview, so only it is restated here. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .adv-favourite-card-btn {
@@ -1687,7 +1687,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     color: #f472b6 !important;
     box-shadow: 0 0 12px rgba(236, 72, 153, 0.3) !important;
 }
-/* multiview's add button — dark glass box (13_plugins: .mv-add-btn) */
+/* multiview's add button - dark glass box (13_plugins: .mv-add-btn) */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .mv-add-btn {
     background: rgba(0, 0, 0, 0.55) !important;
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
@@ -1746,7 +1746,7 @@ body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards > * {
 }
 
 /* The cards row is shrink-to-fit, so `justify-content: center` only centred
-   the card within the row's own width — with two cards that filled the
+   the card within the row's own width - with two cards that filled the
    setting and looked centred; with one it left the card hugging the left.
    Give the row the full width so the card centres in the panel. */
 body.stash-liquid-glass .refract-card-preview-real,
@@ -1755,7 +1755,7 @@ body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CARD CUSTOMISER — corner touch
+   CARD CUSTOMISER - corner touch
    The panel is a card and the things that change it, not a stack of settings
    rows. Three bands: a rail, a stage (card plus the four global settings
    riding its right edge), and the presets as pictures.
@@ -2676,7 +2676,7 @@ body.stash-liquid-glass .refract-cc-group-head > span {
     color: var(--text-muted);
 }
 /* ═══════════════════════════════════════════════════════════════════════
-   LOOKS — six miniatures, drawn from each look's own flags
+   LOOKS - six miniatures, drawn from each look's own flags
    Three columns rather than four, so each picture is ~215px and its
    silhouette is legible: the whole point is that Mirrored is visibly the
    other hand and Poster is visibly empty. The miniature takes the SHAPE of

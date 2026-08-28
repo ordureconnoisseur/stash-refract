@@ -1,4 +1,4 @@
-/* Stash Theme — small JS layer.
+/* Stash Theme - small JS layer.
    - Adds body class for theme scope
    - Sweeps v1 DOM artifacts (orphaned label spans, fallback i tags, old Categories link)
    - Replaces the iconless "New" button text with a + SVG
@@ -21,7 +21,7 @@
 
     /* ── Early nav-order injection ───────────────────────────────────────
        Writes saved order as CSS rules into <head> immediately on script
-       execution — before React paints the nav — so items never appear in
+       execution - before React paints the nav - so items never appear in
        the wrong order on page load. setupNavbarReorder() later manages
        the same <style> tag for live drag updates. */
     (function earlyNavOrder() {
@@ -78,7 +78,7 @@
 
     function applyAccentClass(accent) {
         if (!document.body) { return; }
-        /* Only strip the 7 accent classes — not refract-light or
+        /* Only strip the 7 accent classes - not refract-light or
            refract-lite, which are orthogonal axes that the accent
            picker must not clobber. */
         REFRACT_PRESETS.forEach(function (p) {
@@ -108,7 +108,7 @@
                 var r = cs.getPropertyValue("--accent-rgb").trim();
                 /* On a cold load the bundled CSS may not have applied yet,
                    so the accent vars read empty. Retry a few frames before
-                   giving up — otherwise the multiview handoff keeps a stale
+                   giving up - otherwise the multiview handoff keeps a stale
                    accent with no recovery. */
                 if (!a && attempts < 10) {
                     attempts++;
@@ -197,7 +197,7 @@
         };
 
         /* Live preview: one real scene + one real performer rendered with
-           Stash's own card components — pixel-identical to the grid, and
+           Stash's own card components - pixel-identical to the grid, and
            every refract processor treats them as real cards. Falls back
            to the static mocks when the library is empty, the fetch
            fails, the components are unavailable, or a card crashes.
@@ -1124,7 +1124,7 @@
             var setCardSides = cardSidesState[1];
 
             /* Mirror of Stash's OWN rating system setting. Not a refract
-               setting and deliberately not in REFRACT_SYNC_KEYS — it is
+               setting and deliberately not in REFRACT_SYNC_KEYS - it is
                surfaced here only so you don't have to go and find it. */
             var ratingSysState = R.useState(function () {
                 return document.body.classList.contains("refract-rating-system-stars") ? "stars" : "decimal";
@@ -1154,7 +1154,7 @@
                         );
                     })
                     .then(function () { refractFetchRatingSystem(); })
-                    .catch(function () { /* no perms / offline — Stash keeps what it had */ });
+                    .catch(function () { /* no perms / offline - Stash keeps what it had */ });
             }
 
             /* Custom CSS Source state: { loaded, url } where url is
@@ -1481,7 +1481,7 @@
 
 
             /* The tier ribbon IS a tier flourish, so it only exists in
-               Extravagant — listing it under Minimal would be a dead row. */
+               Extravagant - listing it under Minimal would be a dead row. */
             /* TWO answers, not five. Either the element does not exist in this
                configuration at all -- a Classic-only element under Refract, a
                plugin you have not installed, the dossier's panels on a gallery
@@ -2495,7 +2495,7 @@
             function toggleLight() {
                 var next = !lightOn;
                 /* Use View Transitions when supported (Chromium 111+,
-                   Safari 18+, Firefox 137+) — browser snapshots the
+                   Safari 18+, Firefox 137+) - browser snapshots the
                    current state, runs the DOM change, then crossfades.
                    Handles all the visual deltas (bg gradient, shadows,
                    accent glow, text colors) in one smooth fade rather
@@ -2564,7 +2564,7 @@
                     onClick: function () { pick(preset); }
                 });
             });
-            /* Light/dark mode toggle — sun (light on) / moon (light off)
+            /* Light/dark mode toggle - sun (light on) / moon (light off)
                glyph sitting alongside the accent swatches. Sun-gradient
                active state in 11_misc_tail.css makes the current mode
                obvious at a glance. View Transitions crossfade the flip
@@ -2918,7 +2918,7 @@
                         )
                     )
                 ),
-                /* Custom CSS Source setting — disabled for this release.
+                /* Custom CSS Source setting - disabled for this release.
                    Flip the flag to re-enable. Supporting code (cssSrc
                    state, getUiConfig/setCustomCssUrl helpers) stays in
                    place so the underlying flow is intact. */
@@ -2929,9 +2929,7 @@
                         R.createElement("div", null,
                             R.createElement("h3", null, "Theme on login + early load"),
                             R.createElement("div", { className: "sub-heading" },
-                                "Writes the plugin's CSS endpoint URL into Stash's Custom CSS Source so the theme loads BEFORE plugins ",
-                                R.createElement("—", null),
-                                " on the login page and the first-paint flash of every cold load. Toggle off to remove. ",
+                                "Writes the plugin's CSS endpoint URL into Stash's Custom CSS Source so the theme loads BEFORE plugins - on the login page and the first-paint flash of every cold load. Toggle off to remove. ",
                                 cssSrcState.loaded && cssSrcState.url
                                     ? R.createElement("div", { style: { marginTop: "0.4rem", opacity: 0.7, fontSize: "0.75rem", wordBreak: "break-all" } },
                                         "Current: ", cssSrcState.url)
@@ -3000,7 +2998,7 @@
            own SceneCard/PerformerCard, which need the app's
            ConfigurationProvider / IntlProvider / Router contexts.
            MainNavBar.UtilityItems is patchable and mounted on every
-           route; the host itself renders nothing in the navbar — it
+           route; the host itself renders nothing in the navbar - it
            only portals into the injected Interface section container
            whenever that exists. */
         var R3 = PluginApi.React;
@@ -3034,7 +3032,7 @@
                     }
                     /* Stash renders MainNavBar.UtilityItems TWICE (desktop
                        navbar + the collapsed-menu slot), so two hosts
-                       exist and both would portal the panel — duplicating
+                       exist and both would portal the panel - duplicating
                        every settings row. Claim-with-heartbeat on the
                        container: the first host to claim renders and
                        refreshes its claim each tick; the other idles. A
@@ -3122,7 +3120,7 @@
     var HIDE_CENTER_CONTROLS_KEY = "refract.hideCenterControls";
     var SHOW_FILTER_TAGS_KEY = "refract.showFilterTags";
 
-    /* Gender glyph for the mock name banner — the real banner CLONES the
+    /* Gender glyph for the mock name banner - the real banner CLONES the
        native .gender-icon svg from the card title, which the mocks don't
        have, so carry a static venus copy with the same class. */
     var REFRACT_PREVIEW_GENDER_SVG =
@@ -3135,7 +3133,7 @@
     /* Built LAZILY (function, not a var) because it concatenates the shared
        pill icon constants (STAR_SVG, CAKE_SVG, O_ICON_SVG, PLAY_SVG,
        PEOPLE_ICON_SVG, TAG_ICON_SVG) which are declared further down the
-       file — by settings render time they're all assigned. Markup mirrors a
+       file - by settings render time they're all assigned. Markup mirrors a
        REAL processed card (dumped live 2026-07-26): name banner first child,
        circles/counts INSIDE .card-section after the title, icons inside
        every pill. --pc-badge-scale is JS-fitted on real cards; the mock
@@ -3153,7 +3151,7 @@
             '</div>' +
             /* DIRECT card child on purpose: 03_cards.css hides any banner
                nested deeper (`.scene-card .rating-banner`) and re-shows
-               only `.scene-card > .rating-banner` — refract.js's injected
+               only `.scene-card > .rating-banner` - refract.js's injected
                source-of-truth banner. The mock mirrors the injected one,
                not Stash's hidden native nested banner. */
             '<div class="rating-banner">8.6</div>' +
@@ -4009,7 +4007,7 @@
 
     var GRAPHQL_URL = "/graphql";
 
-    /* Custom CSS Source (Stash interface config) — lets the theme load
+    /* Custom CSS Source (Stash interface config) - lets the theme load
        on login / pre-plugin screens. We expose an "Apply / Remove"
        button in the plugin settings panel that writes the plugin's
        CSS endpoint URL into Stash's `cSSURL` (a.k.a. Custom CSS Source
@@ -4045,7 +4043,7 @@
         });
     }
 
-    /* Lite mode — strips backdrop-blur (the heaviest GPU cost on
+    /* Lite mode - strips backdrop-blur (the heaviest GPU cost on
        Windows Chromium / D3D11), hover glow halos, and the 3D card
        tilt-glare. Animations, base shadows, transitions, and the
        performer carousel loop clones all stay on. CSS rules in
@@ -4063,7 +4061,7 @@
     }
     applyLiteModeClass(isLiteModeEnabled());
 
-    /* Engine flag — true for Blink/Chromium (Chrome/Edge/Opera/Brave), false
+    /* Engine flag - true for Blink/Chromium (Chrome/Edge/Opera/Brave), false
        for Gecko (Firefox) and WebKit (Safari). backdrop-filter raster behaves
        very differently across these, so a couple of perf mitigations branch on
        it. Detect by the "Chrome/" UA token (absent in Firefox and Safari). */
@@ -4075,11 +4073,11 @@
        mass-rebuilt hundreds of GPU compositing layers, FREEZING the home page
        for seconds on scroll. It was already gated off for Gecko/WebKit (only
        caused a pop-in flash there, no raster win) and its Chromium benefit was
-       marginal at best — net-negative. Static blur scrolls acceptably; the
+       marginal at best - net-negative. Static blur scrolls acceptably; the
        toggle cost far more than it saved. (The body.refract-scrolling CSS rules
        were removed from 17_scroll_perf.css in the same change.) */
 
-    /* Light mode — orthogonal to accents. Toggles a white/paper base
+    /* Light mode - orthogonal to accents. Toggles a white/paper base
        via the `refract-light` body class; CSS rules in css/14_light.css
        override tokens + hardcoded shadows. Pairs with any accent.
        Loads BEFORE 15_lite.css so lite's !important shadow-strip wins
@@ -4089,8 +4087,8 @@
             return localStorage.getItem(LIGHT_MODE_STORAGE_KEY) === "1";
         } catch (e) { return false; }
     }
-    /* Safari on iOS (and Chrome on Android) tint the browser chrome —
-       the status-bar strip above the page — from the theme-color meta,
+    /* Safari on iOS (and Chrome on Android) tint the browser chrome -
+       the status-bar strip above the page - from the theme-color meta,
        which Stash never sets, so it renders WHITE against the dark
        theme on phones. Maintain one matching the page's top-edge
        colour (the --bg-1 end of the body gradient), tracking light
@@ -4211,12 +4209,12 @@
     }
     applyFilterTagsShownClass(isFilterTagsShown());
 
-    /* Scene card style. "refract" (default) = tidier minimal layout —
+    /* Scene card style. "refract" (default) = tidier minimal layout -
        description block hidden so the grid stays consistent across
        scenes with and without descriptions. "classic" = Stash's
        original layout with description, file path, and details
        visible. Body class `refract-minimal-cards` is on the "refract"
-       branch — every selector in 08_misc_mid.css + 15_lite.css that
+       branch - every selector in 08_misc_mid.css + 15_lite.css that
        hides/restyles native card details is scoped to that class, so
        "classic" mode = absence of the class. Legacy boolean values
        ("1" / "0") mapped transparently for backwards-compat. */
@@ -4302,7 +4300,7 @@
     })();
     applyCardModeClasses();
 
-    /* View-mode minimiser feature toggle. Default enabled — Refract
+    /* View-mode minimiser feature toggle. Default enabled - Refract
        collapses Stash's row of view-mode buttons into a single icon +
        expand chevron to reduce toolbar clutter. Users who prefer the
        original Stash btn-group can disable this in plugin settings. */
@@ -4352,7 +4350,7 @@
        OStats) monkey-patch window.fetch to inject their own per-response
        hooks. Those hooks assume a specific data shape (e.g. data.data.findScene)
        and throw synchronously inside their patched .then when refract's
-       responses don't match — which rejects refract's promise chain and
+       responses don't match - which rejects refract's promise chain and
        silently breaks scene-card badge injection (initSceneCards's catch
        swallows the error). XHR isn't typically intercepted, so this
        sidesteps the whole class of conflict. */
@@ -4373,7 +4371,7 @@
                    failures hit onerror). Without this guard an auth error
                    (401/403/422) with a parseable JSON body resolves with
                    res.data === undefined, which callers can't distinguish
-                   from a legitimately empty result — so enrichment silently
+                   from a legitimately empty result - so enrichment silently
                    no-ops with no retry signal. */
                 if (xhr.status < 200 || xhr.status >= 300) {
                     var httpMsg = (res && res.errors && res.errors.length &&
@@ -4383,7 +4381,7 @@
                 }
                 /* GraphQL total failure: errors present AND no data at all.
                    Partial success (some aliased findScene calls resolved,
-                   others errored — see initSceneCards) still carries `data`,
+                   others errored - see initSceneCards) still carries `data`,
                    so we resolve and let the caller use what it got. */
                 if (res && res.errors && res.errors.length && res.data == null) {
                     reject(new Error(res.errors[0].message || "GraphQL error"));
@@ -4406,7 +4404,7 @@
 
     /* ── Server-side settings sync ──────────────────────────────────────
        refract settings live in localStorage for an instant, flash-free
-       boot, but localStorage is per-origin and per-browser — so settings
+       boot, but localStorage is per-origin and per-browser - so settings
        "reset" when Stash is reached via a different URL/session/relaunch.
        Mirror them into Stash's server-side UI config
        (configuration.ui.refract) so they persist per-server everywhere.
@@ -4431,7 +4429,7 @@
             gqlWithVars(
                 'mutation($v: Any){ configureUISetting(key: "refract", value: $v) }',
                 { v: snapshotRefractSettings() }
-            ).catch(function () { /* offline / no perms — localStorage still holds it */ });
+            ).catch(function () { /* offline / no perms - localStorage still holds it */ });
         }, 400);
     }
 
@@ -4460,7 +4458,7 @@
         } catch (e) { /* ignore */ }
     }
 
-    /* Boot reconcile: pull the server copy. If present, it wins — write it
+    /* Boot reconcile: pull the server copy. If present, it wins - write it
        into localStorage and re-apply. If absent (first run after upgrade),
        migrate the current localStorage settings up to the server. */
     /* Server keys that were split or renamed live on in old server copies
@@ -4529,11 +4527,11 @@
                    converges instead of staying one change behind. */
                 if (editedInFlight) { scheduleServerSync(); }
             } else if (Object.keys(snapshotRefractSettings()).length) {
-                /* No server copy yet — migrate current localStorage up. */
+                /* No server copy yet - migrate current localStorage up. */
                 scheduleServerSync();
             }
             refractSettleSync();
-        }).catch(function () { refractSettleSync(); /* no server / no auth — stay on localStorage */ });
+        }).catch(function () { refractSettleSync(); /* no server / no auth - stay on localStorage */ });
     }
     initSettingsSync();
 
@@ -4555,19 +4553,19 @@
             var cached = localStorage.getItem(RATING_SYSTEM_STORAGE_KEY);
             if (cached) { applyRatingSystemClass(cached); }
         } catch (e) { /* ignore */ }
-        /* `configuration.ui` is a Map! scalar in Stash's GraphQL schema —
+        /* `configuration.ui` is a Map! scalar in Stash's GraphQL schema -
            you can't subselect fields on it. Query the whole blob and
            read ratingSystemOptions.type from the deserialised object.
 
            If `ratingSystemOptions.type` is missing (Stash's default,
            decimal mode, doesn't always serialise the field), treat as
-           non-stars and clear the cached value — otherwise a previous
+           non-stars and clear the cached value - otherwise a previous
            "stars" cache would stick across a switch to decimal. */
         gql("query { configuration { ui } }")
             .then(function (res) {
                 var ui = res && res.data && res.data.configuration
                     && res.data.configuration.ui;
-                /* No usable config blob in a *successful* response — don't
+                /* No usable config blob in a *successful* response - don't
                    clobber the cached value with "". (An errored/auth-failed
                    response now rejects in gqlXhr and lands in .catch below,
                    so it never reaches here and the cache is preserved.)
@@ -4577,7 +4575,7 @@
                 var t = (ui.ratingSystemOptions && ui.ratingSystemOptions.type) || "";
                 try { localStorage.setItem(RATING_SYSTEM_STORAGE_KEY, t); } catch (e) { /* ignore */ }
                 applyRatingSystemClass(t);
-            }).catch(function () { /* ignore — keep cached value */ });
+            }).catch(function () { /* ignore - keep cached value */ });
     }
 
     function escapeHtml(s) {
@@ -4600,7 +4598,7 @@
     }
 
     /* Insert newNode into parent before referenceNode. Falls back to
-       appendChild if referenceNode isn't actually a child of parent —
+       appendChild if referenceNode isn't actually a child of parent -
        React re-renders can detach references between query and call,
        causing "Child to insert before is not a child of this node"
        errors that break unrelated DOM work in the same cycle. */
@@ -4635,7 +4633,7 @@
             var num = m[1];
             if (starsMode) {
                 var parsed = parseFloat(num);
-                /* Only divide if the value is in the 0–10 range — if
+                /* Only divide if the value is in the 0–10 range - if
                    Stash is already showing a 0–5 number we leave it. */
                 if (isFinite(parsed) && parsed > 5) {
                     num = String(Math.round((parsed / 2) * 100) / 100);
@@ -4698,7 +4696,7 @@
         var logoUrl = getStoredLogoUrl();
         var existingLogo = btn.querySelector(".refract-custom-logo");
         if (logoUrl) {
-            /* Custom logo set — render a masked <span> tinted to the same
+            /* Custom logo set - render a masked <span> tinted to the same
                --text white as the rest of the navbar icons. The image is
                used as a CSS mask, not a foreground bitmap, so any
                opaque pixel paints in the accent-aware text colour. Skip
@@ -4718,7 +4716,7 @@
                 btn.appendChild(logo);
             }
         } else {
-            /* Default orb — strip any text/svg/img so Refract's CSS
+            /* Default orb - strip any text/svg/img so Refract's CSS
                renders the empty styled circle. */
             if (btn.tagName === "A") {
                 var aText = (btn.textContent || "").replace(/\s+/g, " ").trim();
@@ -4793,7 +4791,7 @@
         if (!fullLabel) {
             fullLabel = "Add directory";
         }
-        /* Avoid touching the DOM when already normalized — prevents MutationObserver feedback loops. */
+        /* Avoid touching the DOM when already normalized - prevents MutationObserver feedback loops. */
         if (
             btn.classList.contains("btn-primary") &&
             !btn.querySelector("svg.stash-injected-icon") &&
@@ -4812,7 +4810,7 @@
 
     /* Available Plugins page: Stash renders the "Add source" button at the
        bottom of the package-sources table, far from the disabled "Install"
-       button at the top — move it next to Install so they form one cluster. */
+       button at the top - move it next to Install so they form one cluster. */
     function relocateAddSourceButton() {
         if (!/^\/settings(\/|$)/.test(refractPathFromLocation())) return;
         var addBtn = null;
@@ -4841,7 +4839,7 @@
         return true;
     }
 
-    /* Custom mobile burger button — injected into the navbar via JS. CSS
+    /* Custom mobile burger button - injected into the navbar via JS. CSS
        (12_mobile.css) gates visibility on (pointer: coarse) so it only
        shows on touch devices. Toggles `refract-burger-open` on <body>;
        CSS re-styles `.navbar-collapse` as a dropdown panel in that state.
@@ -4958,7 +4956,7 @@
         return true;
     }
 
-    /* Body-level backdrop scrim — fades in/out with the drawer.
+    /* Body-level backdrop scrim - fades in/out with the drawer.
        Click closes. Injected once, idempotent. */
     function injectBurgerScrim() {
         if (document.querySelector(".refract-burger-scrim")) { return true; }
@@ -5008,7 +5006,7 @@
         return true;
     }
 
-    /* Open / close — toggles body class which animates the drawer. Both
+    /* Open / close - toggles body class which animates the drawer. Both
        burger instances (legacy top-nav one and the bottom dock's) get
        the is-open X morph so whichever is visible reads correctly. */
     function refractSetBurgerState(open) {
@@ -5029,7 +5027,7 @@
         document.body.classList.remove("refract-burger-open");
     }
 
-    /* Mobile drawer — body-level overlay built from a hardcoded item
+    /* Mobile drawer - body-level overlay built from a hardcoded item
        list. Independent of Stash's navbar DOM (which we hide entirely
        on mobile). Each tile is an <a> whose click triggers SPA nav via
        pushState + popstate (Stash's React Router responds to popstate). */
@@ -5059,7 +5057,7 @@
         settings:   '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>'
     };
 
-    /* Mobile bottom dock — iOS-style fixed pill bar with the essential
+    /* Mobile bottom dock - iOS-style fixed pill bar with the essential
        routes one tap away (Scenes, Performers, Studios, Tags, Settings)
        and a burger tile at the end that opens the full drawer for
        everything else (secondary pages + plugin tiles). Replaces the
@@ -5086,7 +5084,7 @@
         return MOBILE_DOCK_DEFAULT.slice();
     }
 
-    /* Every dock candidate, harvested from the DRAWER's tiles — the
+    /* Every dock candidate, harvested from the DRAWER's tiles - the
        drawer is already the canonical registry of everything mirrorable
        (hardcoded routes, plugin route tiles, plugin ACTION tiles like
        DiceR / SFWSwitch / Ascension). Keys: the route href, or
@@ -5299,7 +5297,7 @@
             /* target="_blank" tiles (plugin launcher buttons like binge/
                desire/forage/Stash TV, which open a standalone app in a new
                tab rather than an in-app route) get the native anchor click
-               behaviour — no preventDefault, no fake SPA nav. Faking a
+               behaviour - no preventDefault, no fake SPA nav. Faking a
                pushState+popstate to a static plugin-asset path that no
                React Router route matches would just rewrite the URL bar
                and do nothing, silently breaking the tile. */
@@ -5392,13 +5390,13 @@
        (performer / scene / tag / gallery / studio) for refract's own
        navbar SVGs, so card footers match the nav. The FA <Icon> renders
        <svg data-icon="user|tag|play-circle|...">; we keep that element
-       (don't replaceWith — that detaches React's fiber) and rewrite its
+       (don't replaceWith - that detaches React's fiber) and rewrite its
        viewBox + inner paths + stroke styling in place. Re-keying data-icon
        to "<name>-refract" makes the next watcher pass skip it; a React
        re-render restores the FA glyph + original data-icon, which the
        watcher re-catches. */
     /* Keyed by the popover button's stable class (.performer-count etc.),
-       NOT FA's data-icon — FA7 renamed those (only "user" still matched,
+       NOT FA's data-icon - FA7 renamed those (only "user" still matched,
        which is why just the performer icon swapped first time round). */
     var CARD_POPOVER_BTN_ICON = {
         "performer-count": "performers",
@@ -5443,11 +5441,11 @@
 
     /* Normalize an arbitrary (plugin-authored) icon's color to currentColor
        so it always reads against refract's dark glass tiles. Plugins inject
-       icons in all sorts of ways — some inherit color via a CSS class (fine,
+       icons in all sorts of ways - some inherit color via a CSS class (fine,
        survives as currentColor already), but others bake a literal color
        into a fill/stroke attribute or inline style (e.g. a legacy FA4-style
        glyph, or an icon lib that hardcodes "#212529"). That literal color
-       clones verbatim and, if dark, is invisible on our dark background —
+       clones verbatim and, if dark, is invisible on our dark background -
        reads to the user as "the icon is missing" when the tile/link are
        actually fine. Root gets fill/stroke forced to currentColor so any
        child with NO explicit color inherits it normally; a child WITH an
@@ -5472,10 +5470,10 @@
        hardcoded MOBILE_NAV_ITEMS, then builds a tile in our style
        using the plugin's own SVG. Idempotent (skips tiles that exist),
        runs every watcher tick so plugins that mount late get caught.
-       Skips /new contextual buttons — those get mirrored next to the
+       Skips /new contextual buttons - those get mirrored next to the
        burger via injectMobileNewButton instead. */
     var NATIVE_NAV_SKIP = {
-        "/": true,        // home — brand orb already covers it
+        "/": true,        // home - brand orb already covers it
         "/setup": true,
         "/migrate": true
     };
@@ -5508,7 +5506,7 @@
             if (!href) { continue; }
             if (known[href]) { knownPresent[href] = true; continue; }
             if (NATIVE_NAV_SKIP[href]) { continue; }
-            // /new contextual button — mirrored separately next to burger.
+            // /new contextual button - mirrored separately next to burger.
             if (/\/new$/.test(href)) { continue; }
             // External / system links we never want in the drawer.
             if (href.indexOf("logout") !== -1) { continue; }
@@ -5521,7 +5519,7 @@
                mirror, and the drawer's target="_blank" branch launches them
                correctly. */
             if (/^https?:/i.test(href) && href.indexOf(window.location.origin) !== 0) { continue; }
-            /* Not a real route — a "javascript:"/"#" href means the link is
+            /* Not a real route - a "javascript:"/"#" href means the link is
                actually a click-handler-driven action (e.g. a plugin's modal
                trigger styled as a nav pill, like Ascension's ranking button)
                rather than a page to navigate to. Faking SPA navigation to it
@@ -5531,7 +5529,7 @@
                get a proxy-click entry in PLUGIN_ACTION_TILES instead (as
                Ascension now does). */
             if (/^(javascript:|#)/i.test(href.replace(/^\s+/, ""))) { continue; }
-            // Already rendered — still mark present so reconcile keeps it.
+            // Already rendered - still mark present so reconcile keeps it.
             if (drawer.querySelector('.refract-drawer-tile[data-href="' + refractAttrEscape(href) + '"]')) { present[href] = true; continue; }
 
             var srcSvg = link.querySelector("svg");
@@ -5548,7 +5546,7 @@
             tile.setAttribute("aria-label", label);
             tile.setAttribute("data-plugin-tile", "1");
             // Carry target/rel so standalone-app launcher buttons (binge,
-            // desire, forage, Stash TV — real routes that open in a new
+            // desire, forage, Stash TV - real routes that open in a new
             // tab rather than an in-app page) keep that behaviour when
             // mirrored here; see the drawer's click handler above.
             var linkTarget = link.getAttribute("target");
@@ -5606,7 +5604,7 @@
         if (navReady) {
             /* Exclude action tiles (data-action-tile): they mirror plugin
                controls, not routes, so they have no data-href to match a live
-               navbar route — without this exclusion the "disabled route" pass
+               navbar route - without this exclusion the "disabled route" pass
                would stamp them refract-drawer-tile-off on every tick and hide
                them. */
             var htiles = drawer.querySelectorAll(".refract-drawer-tile:not([data-plugin-tile]):not([data-action-tile])");
@@ -5635,7 +5633,7 @@
        the drawer. The route-mirror above can't reach these: DiceR's roll
        button has href="javascript:void(0)" and no <svg> (its icon is a CSS
        mask), and SFWSwitch's toggle is a <button> whose wrapping <a> has no
-       href — so neither is a real route with a clonable icon on an a[href].
+       href - so neither is a real route with a clonable icon on an a[href].
        For each registered control we find the live source button, build a
        tile with a matching icon (cloned from the source's own svg when it
        has one, else the spec's inline markup), and forward the tile's click
@@ -5662,7 +5660,7 @@
             label: "Ascension",
             /* Ascension's ranking button: href="javascript:void(0);" with a
                click handler (openRankingModal) bound to the anchor itself, so
-               the proxy-click pattern fires the modal. No spec icon — the
+               the proxy-click pattern fires the modal. No spec icon - the
                source button carries a clean currentColor flame svg that the
                clone fallback below mirrors faithfully. */
             selector: "#plugin_hon"
@@ -5673,7 +5671,7 @@
             /* multiView's floating picking launcher is BODY-level (not a
                navbar control) and hidden on mobile by 12_mobile.css; this
                tile mirrors its open button so launches work from the
-               drawer. Exists only while picking mode is on — the tile
+               drawer. Exists only while picking mode is on - the tile
                appears/disappears with it. Its two counters (scene picks +
                filter slots) collapse into ONE combined badge, painted by
                the badge pass below. */
@@ -5769,7 +5767,7 @@
         var tiles = drawer.querySelectorAll(".refract-drawer-tile");
         /* Hash-aware path (bare pathname is always "/" under hash routing);
            honour each tile's data-aliases; and light up the LONGEST matching
-           prefix so /scenes/markers lights Markers, not Scenes — mirrors
+           prefix so /scenes/markers lights Markers, not Scenes - mirrors
            markActiveUtilityButtons(). */
         var path = refractPathFromLocation();
         var best = null, bestLen = -1;
@@ -5856,7 +5854,7 @@
     }
 
     /* Stash renders <div class="troubleshooting-mode-button"> as a direct child of .nav, not inside
-       <div class="nav-item"> like tab links — wrap it so layout matches Tools / About, etc. */
+       <div class="nav-item"> like tab links - wrap it so layout matches Tools / About, etc. */
     function normalizeSettingsSidebarNavItems() {
         if (!/^\/settings(\/|$)/.test(refractPathFromLocation())) return false;
         var allTb = document.querySelectorAll(".troubleshooting-mode-button");
@@ -7586,7 +7584,7 @@
     function markActiveUtilityButtons() {
         var currentPath = refractPathFromLocation();
         /* Right-side utility links (exact match) + left-side route links (prefix match).
-           Left nav items have no .nav-link class — select all <a href> inside .navbar-nav,
+           Left nav items have no .nav-link class - select all <a href> inside .navbar-nav,
            excluding javascript: pseudo-links. */
         var links = document.querySelectorAll(
             "nav.top-nav .navbar-buttons a.nav-utility[href], nav.top-nav .navbar-nav a[href]:not([href^='javascript'])"
@@ -7621,7 +7619,7 @@
                 if (currentPath === hrefPath) {
                     isActive = true;
                 } else if (currentPath.indexOf(hrefPath + "/") === 0) {
-                    /* Prefix match — but only if no longer-prefix nav item
+                    /* Prefix match - but only if no longer-prefix nav item
                        also matches. Prevents /scenes lighting up on
                        /scenes/markers (Markers owns the longer prefix). */
                     isActive = !leftNavHrefs.some(function (other) {
@@ -7989,7 +7987,7 @@
     }
 
     function safeRun(fn) {
-        try { fn(); } catch (e) { /* swallow — Stash re-renders will trigger another cycle */ }
+        try { fn(); } catch (e) { /* swallow - Stash re-renders will trigger another cycle */ }
     }
 
     /* ── The player's source menu, as two questions ──────────────────────
@@ -8351,12 +8349,12 @@
            glow-shadow re-raster every frame against a blur-dense home page,
            dropping hover to ~2fps on Chrome. CSS in 03_cards.css also
            flattens their :hover (no scale/glow). The effect stays on the
-           real list/grid views. Not marked _stashTilt — the closest() check
+           real list/grid views. Not marked _stashTilt - the closest() check
            is cheap and keeps SPA re-binds correct. */
         if (card.closest && card.closest(".slick-slider")) { return; }
         card._stashTilt = true;
 
-        /* Skip the glare overlay on image-cards — it paints above Stash's
+        /* Skip the glare overlay on image-cards - it paints above Stash's
            native hover lightbox-trigger icon and hides it from view. */
         var withGlare = !card.classList.contains("image-card");
         var glareInner = null;
@@ -8451,7 +8449,7 @@
            v1.13.13 lazy-bound these via IntersectionObserver (bind only when a
            card neared the viewport) to shave boot cost ~80→~20 cards, but that
            appended the .stash-tilt-glare overlay div mid-scroll as cards came
-           into view — a DOM mutation during scroll that flashed a visible
+           into view - a DOM mutation during scroll that flashed a visible
            pop-in (worst on Firefox during fast scroll). Binding all present
            cards directly costs only a few listeners + one tiny div each, and
            the _stashTilt idempotence guard in cardTiltBind keeps repeat
@@ -8475,7 +8473,7 @@
         '<path fill="currentColor" d="M32.5 96l0 149.5c0 17 6.7 33.3 18.7 45.3l192 192c25 25 65.5 25 90.5 0L483.2 333.3c25-25 25-65.5 0-90.5l-192-192C279.2 38.7 263 32 246 32L96.5 32c-35.3 0-64 28.7-64 64zm112 16a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>' +
         '</svg>';
 
-    /* O count icon — stylized rotated O glyph matching Stash native.
+    /* O count icon - stylized rotated O glyph matching Stash native.
        Fill attribute lives on the <svg> root (not the inner <path>) to
        match STAR/CAKE/PLAY structure. Path-level fill would shadow the
        CSS `fill: --badge-color-bright` override used by playing-card
@@ -8486,7 +8484,7 @@
         '<path d="M22.855.758L7.875 7.024l12.537 9.733c2.633 2.224 6.377 2.937 9.77 1.518c4.826-2.018 7.096-7.576 5.072-12.413C33.232 1.024 27.68-1.261 22.855.758zm-9.962 17.924L2.05 10.284L.137 23.529a7.993 7.993 0 0 0 2.958 7.803a8.001 8.001 0 0 0 9.798-12.65zm15.339 7.015l-8.156-4.69l-.033 9.223c-.088 2 .904 3.98 2.75 5.041a5.462 5.462 0 0 0 7.479-2.051c1.499-2.644.589-6.013-2.04-7.523z"/>' +
         '</svg>';
 
-    /* Light-mode toggle glyphs — sun (light on) / moon (light off). User-
+    /* Light-mode toggle glyphs - sun (light on) / moon (light off). User-
        supplied svgrepo icons, normalised to currentColor so they inherit the
        toggle button's color (incl. the warm-gradient active state). Sun is
        stroke-based, moon is fill-based. */
@@ -8499,7 +8497,7 @@
         '<path d="M21.0672 11.8568L20.4253 11.469L21.0672 11.8568ZM12.1432 2.93276L11.7553 2.29085V2.29085L12.1432 2.93276ZM21.25 12C21.25 17.1086 17.1086 21.25 12 21.25V22.75C17.9371 22.75 22.75 17.9371 22.75 12H21.25ZM12 21.25C6.89137 21.25 2.75 17.1086 2.75 12H1.25C1.25 17.9371 6.06294 22.75 12 22.75V21.25ZM2.75 12C2.75 6.89137 6.89137 2.75 12 2.75V1.25C6.06294 1.25 1.25 6.06294 1.25 12H2.75ZM15.5 14.25C12.3244 14.25 9.75 11.6756 9.75 8.5H8.25C8.25 12.5041 11.4959 15.75 15.5 15.75V14.25ZM20.4253 11.469C19.4172 13.1373 17.5882 14.25 15.5 14.25V15.75C18.1349 15.75 20.4407 14.3439 21.7092 12.2447L20.4253 11.469ZM9.75 8.5C9.75 6.41182 10.8627 4.5828 12.531 3.57467L11.7553 2.29085C9.65609 3.5593 8.25 5.86509 8.25 8.5H9.75ZM12 2.75C11.9115 2.75 11.8077 2.71008 11.7324 2.63168C11.6686 2.56527 11.6538 2.50244 11.6503 2.47703C11.6461 2.44587 11.6482 2.35557 11.7553 2.29085L12.531 3.57467C13.0342 3.27065 13.196 2.71398 13.1368 2.27627C13.0754 1.82126 12.7166 1.25 12 1.25V2.75ZM21.7092 12.2447C21.6444 12.3518 21.5541 12.3539 21.523 12.3497C21.4976 12.3462 21.4347 12.3314 21.3683 12.2676C21.2899 12.1923 21.25 12.0885 21.25 12H22.75C22.75 11.2834 22.1787 10.9246 21.7237 10.8632C21.286 10.804 20.7293 10.9658 20.4253 11.469L21.7092 12.2447Z" fill="currentColor"/>' +
         '</svg>';
 
-    /* People / group icon — used on the minimal-mode performer pill that
+    /* People / group icon - used on the minimal-mode performer pill that
        replaces the avatar circle row. */
     var PEOPLE_ICON_SVG =
         '<svg class="stash-performer-icon" viewBox="0 0 640 512" aria-hidden="true">' +
@@ -8562,12 +8560,12 @@
 
         row.appendChild(avatarWrap);
 
-        /* Right-side count cluster — holds duration / O count / tag count
+        /* Right-side count cluster - holds duration / O count / tag count
            badges so they share consistent spacing when present. */
         var counts = document.createElement("div");
         counts.className = "stash-card-counts";
 
-        /* Duration pill — mirrors Stash's native .overlay-duration text
+        /* Duration pill - mirrors Stash's native .overlay-duration text
            into the counts cluster. In minimal mode this is the leftmost
            pill in the right cluster (replacing the performer pill); the
            original .overlay-duration on the thumbnail is hidden via CSS.
@@ -8582,7 +8580,7 @@
             counts.appendChild(dPill);
         }
 
-        /* Performer pill — alternative compact representation that lives
+        /* Performer pill - alternative compact representation that lives
            ALONGSIDE the avatar circles. CSS gates which one is visible:
            default mode shows circles, minimal mode shows the pill.
            Pill markup mirrors .stash-tag-count: clickable anchor to the
@@ -8635,7 +8633,7 @@
             badge.href = sceneId ? "/scenes/" + sceneId : "/tags";
             badge.addEventListener("click", stopProp);
             badge.innerHTML = TAG_ICON_SVG + "<span>" + tagCount + "</span>";
-            /* Hover popup — clickable tag chips, each linking to /tags/:id.
+            /* Hover popup - clickable tag chips, each linking to /tags/:id.
                Built as a sibling-anchored sibling node (not via attr()) so
                we can attach event handlers and per-chip hover states. */
             if (tagInfo && tagInfo.length) {
@@ -8677,12 +8675,12 @@
         }
 
         /* Tag portrait thumbnails so the minimal-mode cover-fill CSS can
-           opt them out — for vertical scenes the cover behaviour would
+           opt them out - for vertical scenes the cover behaviour would
            crop heavily. The image often isn't loaded yet, so check
            complete + naturalWidth, else listen for load once. */
         tagOrientation(card);
 
-        /* Heart-halo effect for "Favourite" scenes — driven by the
+        /* Heart-halo effect for "Favourite" scenes - driven by the
            "Favourite ★" tag injected by the Advanced Rating plugin. We
            detect via the tagInfo array (case-insensitive match on
            "favourite" / "favorite" so it works for either spelling and
@@ -8706,7 +8704,7 @@
     /* Add .refract-portrait to a scene-card whose preview image is taller
        than wide. CSS uses this to swap object-fit: cover (landscape) for
        object-fit: contain (portrait) so vertical scenes letterbox instead
-       of cropping. Idempotent — early-exits once tagged. */
+       of cropping. Idempotent - early-exits once tagged. */
     function tagOrientation(card) {
         if (card.classList.contains("refract-portrait") ||
             card.classList.contains("refract-landscape-checked")) { return; }
@@ -8724,7 +8722,7 @@
     }
 
     /* Strip trailing file extensions from scene-card titles for a tidier
-       grid. NO dataset marker — that previously caused a stick where my
+       grid. NO dataset marker - that previously caused a stick where my
        "already stripped" flag survived a React re-render that restored
        the extension, so the strip never re-fired. The regex test is
        cheap and idempotent (already-clean text doesn't match), so
@@ -8750,7 +8748,7 @@
             var id = extractSceneId(card);
             if (id !== null) {
                 card.setAttribute("data-stash-sc", "1");
-                /* Tier label placeholder — empty <div> always present;
+                /* Tier label placeholder - empty <div> always present;
                    CSS reads the card's `refract-card-tier-*` class (set
                    by tagFilledRatings) and fills the visible text via
                    `::after { content: "BRONZE"/...PERFECT }`. Hidden in
@@ -8763,7 +8761,7 @@
                 }
                 ids.push(id);
                 cardMap[id] = card;         /* int key */
-                cardMap[String(id)] = card; /* string key — GQL returns id as string */
+                cardMap[String(id)] = card; /* string key - GQL returns id as string */
             }
         });
 
@@ -8771,7 +8769,7 @@
 
         /* Use aliased findScene (singular) calls instead of findScenes
            (plural) with scene_ids. Stash's findScenes(scene_ids:) errors
-           the entire batch if ANY id in the list doesn't exist — and on
+           the entire batch if ANY id in the list doesn't exist - and on
            a home page with stale/deleted recommendations that's common
            enough to silently break every card in the page. findScene(id:)
            returns null for missing ids, so other aliases in the same
@@ -8795,7 +8793,7 @@
                     /* Re-query the live DOM by scene-id href instead of
                        trusting cardMap. On the home page, React + slick
                        reshuffle/clone scene-card nodes between when we
-                       fire the query and when it resolves — cardMap
+                       fire the query and when it resolves - cardMap
                        refs point to detached originals while the visible
                        cards (including slick clones) are new nodes that
                        cardMap doesn't know about. Querying by href
@@ -8825,7 +8823,7 @@
             .catch(function () {
                 /* Query failed (expired ApiKey, network blip, Stash
                    restart). Un-mark the cards we claimed so the next
-                   MutationObserver pass retries them — otherwise
+                   MutationObserver pass retries them - otherwise
                    :not([data-stash-sc]) excludes them forever and they show
                    no badges until a full reload. Re-query live by href since
                    React may have swapped the nodes while in flight; a
@@ -8845,7 +8843,7 @@
     }
 
     /* Inject a .rating-banner inside a scene card (mirrors the badge
-       Stash renders on performer cards). Idempotent — if a banner is
+       Stash renders on performer cards). Idempotent - if a banner is
        already there we just refresh its text (so a user switching
        between stars and decimal rating systems sees the new value on
        the next initSceneCards pass). Rating is 0-100 in Stash;
@@ -8879,7 +8877,7 @@
         's16.8 4.1 24.3-.5l144-88c7.1-4.4 11.5-12.1 11.5-20.5s-4.4-16.1-11.5-20.5l-144-88' +
         'c-7.4-4.5-16.7-4.7-24.3-.5z"/></svg>';
 
-    /* Solid five-point star — used by the playing-card stats strip rating
+    /* Solid five-point star - used by the playing-card stats strip rating
        badge. Matches Stash's general star iconography. */
     var STAR_SVG =
         '<svg viewBox="0 0 576 512" width="10" height="10" fill="currentColor" aria-hidden="true">' +
@@ -8889,7 +8887,7 @@
         's14.9-19.3 12.9-31.3L438.6 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7' +
         's-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg>';
 
-    /* Cake-with-candles — used by the playing-card stats strip age
+    /* Cake-with-candles - used by the playing-card stats strip age
        badge. Disambiguates the age number (e.g. "27") from any other
        stat. Simplified FontAwesome cake-candles path. */
     var CAKE_SVG =
@@ -8965,7 +8963,7 @@
     /* Apply the Bronze→Perfect card-frame tier class (drives the playing-
        card name-banner glow + tiers-mode card frame) directly from a
        0–10 rating. tagFilledRatings normally does this, but it reads the
-       native `.rating-banner` from the debounced runAll pass — and on
+       native `.rating-banner` from the debounced runAll pass - and on
        performer cards Ascension deletes that banner (ratingBanner.replace
        With) on a 300ms timer, which beats the debounce on navigation and
        leaves the card untiered. initPerformerCards already parses the
@@ -9089,7 +9087,7 @@
                an unrated/blank performer doesn't get a row of empty pills. */
             var anyStat = false;
 
-            /* Rating badge — gated to playing-card mode via CSS. The number
+            /* Rating badge - gated to playing-card mode via CSS. The number
                comes from the same parse path as tagFilledRatings (className
                > textContent). Real value only when v > 0; otherwise "-". */
             var ratingValue = null;
@@ -9111,7 +9109,7 @@
                     }
                 }
                 if (ratingNum && ratingNum > 0) {
-                    /* Tier the card now, from the banner we just read —
+                    /* Tier the card now, from the banner we just read -
                        before Ascension can delete it (see applyCardTier).
                        Keep the value: this is the ONLY moment the rating is
                        readable, and the tier has to be recomputable later
@@ -9145,7 +9143,7 @@
             row.appendChild(rEl);
             if (ratingValue != null) { anyStat = true; }
 
-            /* Age — adds a cake icon + "Age" label so the bare number
+            /* Age - adds a cake icon + "Age" label so the bare number
                (e.g. "27") isn't ambiguous in the playing-card stats
                strip. The icon and label are CSS-hidden in Minimal /
                Extravagant modes so those modes keep the compact
@@ -9178,7 +9176,7 @@
             row.appendChild(ageSpan);
             if (ageValue != null) { anyStat = true; }
 
-            /* O count — Stash renders it as a two-button group:
+            /* O count - Stash renders it as a two-button group:
                  .count-button > [button title="O Count"] + [button.count-value > span]
                Find the title="O Count" button, walk to its parent group,
                read the .count-value span. Real value only when non-zero. */
@@ -9199,7 +9197,7 @@
             row.appendChild(oEl);
             if (oValue != null) { anyStat = true; }
 
-            /* Scene count — wrap the number in an inner <span> for the
+            /* Scene count - wrap the number in an inner <span> for the
                same reason as age (lets playing-card mode target an inner
                element for gradient text-clip without clipping the chip).
                Real value only when non-zero; the pill is a live link only
@@ -9224,13 +9222,13 @@
             row.appendChild(scenesA);
             if (sceneValue != null) { anyStat = true; }
 
-            /* Country flag — kept around; clone is injected INSIDE the
+            /* Country flag - kept around; clone is injected INSIDE the
                name banner (alongside the gender icon) in playing-card
                mode. This frees the top-right corner for the diagonal
                tier banner. The flag clone is added below when we
                build the name banner. */
 
-            /* Tier label placeholder — empty in DOM. In playing-card
+            /* Tier label placeholder - empty in DOM. In playing-card
                mode, CSS reads the card's `refract-card-tier-*` class
                (applied later by tagFilledRatings) and fills this
                element via `::after { content: ... }`. Always injected
@@ -9289,10 +9287,10 @@
 
             /* Combined shrink-to-fit for the stat strip + name banner.
                Both passes need to re-run on card resize (window zoom,
-               grid reflow, etc.) — the one-shot rAF that fired only on
+               grid reflow, etc.) - the one-shot rAF that fired only on
                first inject left the badges cut off after `cmd+`/`cmd-`.
                `var bannerInner` is hoisted to the forEach scope and is
-               assigned later in the if(titleEl) block — by the time
+               assigned later in the if(titleEl) block - by the time
                refit() actually runs (rAF / ResizeObserver callback),
                that assignment has happened or `bannerInner` is
                undefined and we skip the name pass. */
@@ -9305,7 +9303,7 @@
                 requestAnimationFrame(function () {
                     refitPending = false;
                     if (!document.body.classList.contains("refract-perf-layout-card")) { return; }
-                    /* Stat strip — high scene counts (3 digits) push chips
+                    /* Stat strip - high scene counts (3 digits) push chips
                        off the right edge, so shrink to fit.
 
                        DISCRETE steps, matching refractFitBackStats and the
@@ -9336,7 +9334,7 @@
                             if (row.scrollWidth <= pcAvail + 1) { break; }
                         }
                     }
-                    /* Name banner — Concert One is moderately wide;
+                    /* Name banner - Concert One is moderately wide;
                        step font-size down through the ladder until the
                        text fits the left 3/4 of the banner. */
                     if (bannerInner) {
@@ -9349,13 +9347,13 @@
                 });
             }
 
-            /* Playing-card mode name banner — Pokemon-style header:
+            /* Playing-card mode name banner - Pokemon-style header:
                  [gender icon (type)]  Name        ← left-aligned
                Inject a copy of the gender icon (cloned from native
                .gender-icon under the title) PLUS just the performer name
                text (from .TruncatedText so we exclude the hidden country
                string). Display is CSS-gated to playing-card mode. */
-            /* Country indicator — extract the ISO-2 code from the
+            /* Country indicator - extract the ISO-2 code from the
                flag-icons class (`fi fi-XX`) and convert it to the
                full localized country name via `Intl.DisplayNames`
                (built-in browser API). Inserted into the chin above
@@ -9389,12 +9387,12 @@
             if (titleEl) {
                 var banner = document.createElement("div");
                 banner.className = "refract-pc-name-banner";
-                /* Gender — corner "type" slot before the name */
+                /* Gender - corner "type" slot before the name */
                 var genderEl = titleEl.querySelector(".gender-icon");
                 if (genderEl) {
                     banner.appendChild(genderEl.cloneNode(true));
                 }
-                /* Name — prefer .TruncatedText child; falls back to title
+                /* Name - prefer .TruncatedText child; falls back to title
                    textContent. Avoid grabbing titleEl.textContent directly
                    since Stash also renders .performer-card__country-string
                    inside the title (display:none but textContent-visible).
@@ -9443,10 +9441,10 @@
        particles layer holding TWO sub-layers; CSS shows whichever fits
        the current mode (so toggling lite at runtime switches instantly
        with no rebuild):
-         • .refract-heart-float-layer — an animated vignette ring of live
+         • .refract-heart-float-layer - an animated vignette ring of live
            hearts that twinkle (staggered opacity + scale pulse), full
            mode. Transform + opacity animation only.
-         • .refract-heart-halo-layer — a static photographic-vignette ring
+         • .refract-heart-halo-layer - a static photographic-vignette ring
            of hearts (lite mode + reduced motion): one of five baked SVGs
            (crowding the corners, thinning inward, centre clear) applied as
            a background-image. One node + one cached blit per card. Zero
@@ -9458,7 +9456,7 @@
         particles.className = "refract-heart-particles";
         particles.setAttribute("aria-hidden", "true");
 
-        /* ── Full-mode layer — an ANIMATED vignette ring. Same edge-
+        /* ── Full-mode layer - an ANIMATED vignette ring. Same edge-
            crowding distribution as the lite halo, but built as live spans
            so each heart can twinkle (a staggered opacity + scale pulse)
            for a shimmering halo. Full mode only; lite swaps to the static
@@ -9508,7 +9506,7 @@
         }
         particles.appendChild(floatLayer);
 
-        /* ── Halo layer (lite mode / reduced motion) — static vignette. ──
+        /* ── Halo layer (lite mode / reduced motion) - static vignette. ──
            The ring of hearts is a baked SVG (img/heart-halo-N.svg) applied
            as a background-image in CSS, NOT ~36 live spans. One node per
            card instead of 36 keeps style-recalc cheap on big favourite
@@ -9525,7 +9523,7 @@
         return particles;
     }
 
-    /* Heart-halo sync for favourited PERFORMER cards — only in playing-
+    /* Heart-halo sync for favourited PERFORMER cards - only in playing-
        card rating-style mode. The source of "is this favourited?" is the
        native Stash `.favorite-button.favorite` class rather than a tag
        lookup, so we re-sync on every mutation cycle (Stash toggles the
@@ -9680,7 +9678,7 @@
                 if (!el || el === document.body) { break; }
                 var tag = el.tagName;
                 if (tag !== "NAV" && tag !== "UL" && tag !== "LI") {
-                    /* Don't tag a wrapper that also contains the filter toolbar —
+                    /* Don't tag a wrapper that also contains the filter toolbar -
                        otherwise the whole toolbar gets position:fixed'd to the
                        viewport bottom on pages where the pager is embedded in
                        the toolbar row. Float just the pager itself in that case. */
@@ -9696,7 +9694,7 @@
 
         /* Scene Duplicate Checker has its own dedicated pager treatment
            (data-refract-pager rows tagged by enhanceDuplicateChecker +
-           styling in 08_misc_mid.css) — skip it here so the two systems
+           styling in 08_misc_mid.css) - skip it here so the two systems
            don't fight over the same elements. */
         if (document.querySelector("#scene-duplicate-checker")) {
             return;
@@ -9720,7 +9718,7 @@
        Popper recomputes the popover's document coords a frame late, so the
        pill visibly stutters as it chases the bar. It's a transient type-a-page
        input, so the clean fix is to just close it on scroll (clicking the
-       trigger toggles it shut) — nothing left to stutter. Bound once. */
+       trigger toggles it shut) - nothing left to stutter. Bound once. */
     var refractPageJumpDismissBound = false;
     function bindPageJumpScrollDismiss() {
         if (refractPageJumpDismissBound) { return; }
@@ -9768,7 +9766,7 @@
        The kmv details-tags-overhaul plugin renders its panel with
        `.is-open` already on the section root, so the tag groups are
        visible by default. Refract paired CSS hides everything below
-       the panel header when `.is-open` is absent — here we strip it
+       the panel header when `.is-open` is absent - here we strip it
        once on first render so the panel starts collapsed. A marker on
        the section keeps us from re-stripping after the user opens it
        manually (the plugin's own JS owns toggle behavior). */
@@ -9788,9 +9786,9 @@
 
        Targets two wrapper variants Stash uses:
          .count-button (scene detail toolbar + scene-card popovers)
-           — two buttons inside: .count-icon[title="O Count"] + .count-value
+           - two buttons inside: .count-icon[title="O Count"] + .count-value
          .o-counter (image detail toolbar + Lightbox-footer + image-card popovers)
-           — single button title="O Count" with count as last inner span
+           - single button title="O Count" with count as last inner span
 
        Entity ID is resolved from context:
          • scene/image detail toolbar → URL match
@@ -9843,7 +9841,7 @@
 
             wrapper.addEventListener("pointerdown", function (e) {
                 if (e.button !== 0) { return; }
-                /* Only react to pointerdowns on an actual button — clicking
+                /* Only react to pointerdowns on an actual button - clicking
                    the wrapper border/padding shouldn't fire. */
                 if (!e.target.closest("button")) { return; }
                 longPressed = false;
@@ -9863,7 +9861,7 @@
             wrapper.addEventListener("pointerleave", cancelTimer);
             wrapper.addEventListener("pointercancel", cancelTimer);
 
-            /* Capture-phase click suppression — fires before Stash's own
+            /* Capture-phase click suppression - fires before Stash's own
                click handler. Reset the flag after suppressing so the next
                normal click still increments. */
             wrapper.addEventListener("click", function (e) {
@@ -9890,7 +9888,7 @@
             if (im) { return { type: "image", id: im[1] }; }
         }
 
-        /* 2. Lightbox — pull the ID out of the currently-visible image src. */
+        /* 2. Lightbox - pull the ID out of the currently-visible image src. */
         var lb = el.closest(".Lightbox") || (el.closest(".Lightbox-footer") && document.querySelector(".Lightbox"));
         if (lb) {
             var imgEl = lb.querySelector('img[src*="/image/"]');
@@ -9900,7 +9898,7 @@
             }
         }
 
-        /* 3. Card popovers — find the card type and pull the ID from its link.
+        /* 3. Card popovers - find the card type and pull the ID from its link.
               Skip performer cards entirely: the O count there is an aggregate
               across all the performer's scenes, not a single entity. */
         var performerCard = el.closest(".performer-card");
@@ -9941,7 +9939,7 @@
            and inherit all the filter-bar styling). */
         if (search.closest && search.closest('.modal, .modal-dialog, .modal-content, .sidebar, form, .edit-tags-overhaul, #tag-manager-host, .tag-manager')) { return; }
 
-        /* Walk up until we find a div containing ≥ 4 buttons — that is the
+        /* Walk up until we find a div containing ≥ 4 buttons - that is the
            filter toolbar wrapper, whatever Stash names the class. */
         var el = search.parentElement;
         for (var i = 0; i < 7; i++) {
@@ -9959,7 +9957,7 @@
     /* ── Filter button: orange glow when filters are active ─────────── */
 
     function initFilterButtonBadge() {
-        /* Find buttons inside [data-stash-filter] that contain a .badge child —
+        /* Find buttons inside [data-stash-filter] that contain a .badge child -
            those are the Stash filter/sort buttons with an active-count overlay. */
         document.querySelectorAll("[data-stash-filter] button").forEach(function (btn) {
             var badge = btn.querySelector(".badge");
@@ -10000,7 +9998,7 @@
                 if (n >= 2 && n >= maxBtns) { group = g; maxBtns = n; }
             });
             if (!group) { return; }
-            /* Exclude multiview plugin's picking toggle — it lives in this group
+            /* Exclude multiview plugin's picking toggle - it lives in this group
                but is not a view mode and must stay as a standalone button. */
             var btns = Array.from(group.querySelectorAll(".btn")).filter(function (b) {
                 return !b.classList.contains("mv-picking-toggle-btn");
@@ -10068,7 +10066,7 @@
                 var current = liveBtns();
                 var activeBtn = getActiveBtn(current);
 
-                /* Update active indicator — show current view's icon */
+                /* Update active indicator - show current view's icon */
                 if (activeBtn) {
                     var svg = activeBtn.querySelector("svg");
                     activeInd.innerHTML = svg ? svg.outerHTML : "";
@@ -10088,7 +10086,7 @@
                 var current = liveBtns();
                 var activeBtn = getActiveBtn(current);
                 current.forEach(function (btn) {
-                    /* Skip the currently active view — it's shown in the indicator */
+                    /* Skip the currently active view - it's shown in the indicator */
                     if (btn === activeBtn) { return; }
                     var label = btn.getAttribute("aria-label") || btn.getAttribute("title") || "";
                     var svg   = btn.querySelector("svg");
@@ -10319,7 +10317,7 @@
                     });
                     document.body.classList.toggle("refract-tasks-running", active);
                 })
-                .catch(function () { /* Stash restarting or offline — leave class as-is */ });
+                .catch(function () { /* Stash restarting or offline - leave class as-is */ });
         }
         check();
         setInterval(check, 4000);
@@ -10454,7 +10452,7 @@
             el.style.setProperty("min-width", "0", "important");
         });
 
-        /* optional-field: flex row, left-aligned — must set display too or
+        /* optional-field: flex row, left-aligned - must set display too or
            justify-content has no effect if Stash overrides display to block   */
         r.querySelectorAll(".search-result .optional-field").forEach(function(el) {
             el.style.setProperty("background", "transparent", "important");
@@ -10493,7 +10491,7 @@
         });
     }
 
-    /* Initial fixSceneTaggerDetails pass — subsequent passes run via the
+    /* Initial fixSceneTaggerDetails pass - subsequent passes run via the
        consolidated mutation watcher at the end of this file. */
     fixSceneTaggerDetails();
 
@@ -10527,7 +10525,7 @@
     }
     relocateTaggerBatchButtons();
 
-    /* PerformerTagger search results — inject a close X button so the
+    /* PerformerTagger search results - inject a close X button so the
        user can dismiss the result overlay without picking a match.
        The close handler HIDES via class rather than removing the
        element, because removing a React-managed element corrupts
@@ -10584,7 +10582,7 @@
        the attribute) so neither a `change` event nor a MutationObserver
        picks up state changes coming from Stash's bulk-select dropdown.
        A 250ms poll syncs our card's visual checked state to the
-       underlying input — cheap, robust, scoped to the route. */
+       underlying input - cheap, robust, scoped to the route. */
 
     var refractDupSync = [];
     /* null = pre-action default (largest-file heuristic); otherwise one of
@@ -10595,7 +10593,7 @@
 
     function refractParseBytes(text) {
         /* Unit prefix is optional so a plain-bytes value like "512 B" parses
-           as 512 rather than 0 — a 0 would corrupt group totals, the
+           as 512 rather than 0 - a 0 would corrupt group totals, the
            "largest" winner pick, and the reclaim estimate. */
         var m = (text || "").match(/([\d.]+)\s*([KMGT]?)i?B/i);
         if (!m) { return 0; }
@@ -10626,8 +10624,8 @@
         var actionButtons = cells[9].querySelectorAll(".edit-button");
         /* Identify Delete vs Merge by their label (title / aria-label /
            text), NOT by column position. A positional [0]=delete/[1]=merge
-           mapping silently fires the WRONG action — merging scenes the user
-           meant to delete — if Stash ever reorders the action column or adds
+           mapping silently fires the WRONG action - merging scenes the user
+           meant to delete - if Stash ever reorders the action column or adds
            another .edit-button. Fall back to positional only when no label
            disambiguates (preserves behavior on unlabelled buttons). */
         function dupBtnLabel(b) {
@@ -10694,7 +10692,7 @@
             (isWarn ? " refract-dup-spec--warn" : "");
         pill.innerHTML =
             '<span class="refract-dup-spec__icon" aria-hidden="true">' + iconChar + '</span>' +
-            '<span class="refract-dup-spec__text">' + escapeHtml(text || "—") + '</span>';
+            '<span class="refract-dup-spec__text">' + escapeHtml(text || "-") + '</span>';
         return pill;
     }
 
@@ -10720,7 +10718,7 @@
         img.alt = "";
         img.loading = "lazy";
         spriteLink.appendChild(img);
-        /* Pure-CSS hover preview — sibling <span> with a 2x sprite that
+        /* Pure-CSS hover preview - sibling <span> with a 2x sprite that
            fades in on :hover. Avoids touching Stash's React HoverPopover
            (moving React-managed nodes corrupts virtual DOM tracking). */
         var pop = document.createElement("span");
@@ -10898,7 +10896,7 @@
                     chipText = "Suggested · lower res";
                     break;
                 case "oldest":
-                    /* mod_time isn't rendered in the table — we can't compute
+                    /* mod_time isn't rendered in the table - we can't compute
                        it ourselves. Mirror whatever Stash just checked. */
                     suggested = isChecked;
                     chipText = "Suggested · oldest";
@@ -10908,7 +10906,7 @@
                     chipText = "Suggested · youngest";
                     break;
                 case "largestFile":
-                default: /* null — pre-action default heuristic */
+                default: /* null - pre-action default heuristic */
                     suggested = !isLargest;
                     chipText = "Suggested · smaller file";
                     break;
@@ -10964,7 +10962,7 @@
        boxes. "Select None" is allowed through (it still clears checked
        state natively, which is what users expect). For the four positive
        strategies we stopImmediatePropagation so React's onClick handler
-       never sees the event — the boxes don't auto-check. A separate
+       never sees the event - the boxes don't auto-check. A separate
        "Select N suggested" button in the summary lets the user commit
        the recommendation when they're ready. */
     document.addEventListener("click", function (e) {
@@ -10993,7 +10991,7 @@
            strategy. For largestFile/largestRes we can compute ourselves,
            so block native and just update chips. */
         if (refractDupStrategy === "oldest" || refractDupStrategy === "youngest") {
-            /* Let native fire — sync poll will reflect checked state and
+            /* Let native fire - sync poll will reflect checked state and
                trigger refractApplyDupSuggestions to flag the right cards. */
             setTimeout(refractApplyDupSuggestions, 50);
             return;
@@ -11058,7 +11056,7 @@
         }
         var card = document.querySelector("#scene-duplicate-checker");
         if (!card) { return; }
-        /* Operate on the inner <div class="duplicate-checker"> — the outer
+        /* Operate on the inner <div class="duplicate-checker"> - the outer
            Card's className is rewritten by React on every re-render, which
            would strip a class flag here. The inner div's className is set
            statically once by the React component, so we can stash our
@@ -11072,7 +11070,7 @@
 
         /* Label both pagination rows so CSS can hide the top one and
            pin the bottom one to the viewport. Data attribute survives
-           React re-renders. Idempotent — safe to call on every cycle. */
+           React re-renders. Idempotent - safe to call on every cycle. */
         var pagers = dc.querySelectorAll(":scope > .d-flex.mt-2.mb-2");
         pagers.forEach(function (p, i) {
             p.setAttribute("data-refract-pager", i === pagers.length - 1 ? "bottom" : "top");
@@ -11194,7 +11192,7 @@
             var summary = document.createElement("div");
             summary.className = "refract-dup-summary";
             /* Total-duplicates count: read from the (already trimmed) React
-               pager h6 — it's the page-independent total, which refract's
+               pager h6 - it's the page-independent total, which refract's
                per-page group math can't reproduce. */
             var topH6 = dc.querySelector('[data-refract-pager] > h6');
             var countMatch = topH6 ? (topH6.textContent || "").match(/[\d,]+/) : null;
@@ -11229,7 +11227,7 @@
         refractStartDupSyncTimer();
     }
 
-    /* ── Performer Edit Tags Tab — native hierarchical taxonomy editor ────
+    /* ── Performer Edit Tags Tab - native hierarchical taxonomy editor ────
        Injects an "Edit Tags" tab into #performer-tabs. When clicked, hides
        the native .tab-content via a body class and renders our own pane:
          • GraphQL fetch of the full tag taxonomy + this performer's tags
@@ -11241,7 +11239,7 @@
            children fall under an "Ungrouped" trailing section.
          • Click a leaf to toggle on/off. aria-pressed drives the
            selected style. Group/subgroup chevrons collapse sections.
-         • Search filter — auto-expands groups containing matches.
+         • Search filter - auto-expands groups containing matches.
          • Save → performerUpdate mutation; Discard reverts to
            original. No plugin dependency. */
 
@@ -11389,10 +11387,10 @@
     var refractTagPopupTimer = null;
 
     /* ────────────────────────────────────────────────────────────────
-       Performer-name tooltip — portaled to document.body so it can
+       Performer-name tooltip - portaled to document.body so it can
        render outside the scene card's bounding box. The earlier
        ::after-on-link approach was always at risk of being clipped by
-       ancestor overflow / the grid edge — the leftmost avatar's
+       ancestor overflow / the grid edge - the leftmost avatar's
        centered tooltip pushed past the card's left edge and got cut
        off. Portaling sidesteps the whole class of clipping problems
        since the tooltip's only ancestor is body.
@@ -11473,7 +11471,7 @@
             if (e.relatedTarget && link.contains(e.relatedTarget)) { return; }
             refractHidePerfTip();
         });
-        /* Hide on scroll — tooltip is fixed-positioned so it would
+        /* Hide on scroll - tooltip is fixed-positioned so it would
            drift away from its anchor as the page scrolls. */
         window.addEventListener("scroll", function () {
             if (refractPerfTipEl && refractPerfTipEl.classList.contains("refract-performer-name-tooltip-portal--show")) {
@@ -11561,7 +11559,7 @@
             var badge = e.target.closest && e.target.closest(".stash-tag-count");
             if (!badge) { return; }
             /* Don't hide if the cursor is moving into the badge or onto the
-               portal — the portal's own mouseleave will close it. */
+               portal - the portal's own mouseleave will close it. */
             if (e.relatedTarget && (badge.contains(e.relatedTarget) ||
                 (refractTagPopupEl && refractTagPopupEl.contains(e.relatedTarget)))) {
                 return;
@@ -11570,7 +11568,7 @@
         });
         window.addEventListener("scroll", function (e) {
             /* Scrolling INSIDE the popup (it's overflow-y:auto) also fires
-               here via capture — don't dismiss in that case. Only page/
+               here via capture - don't dismiss in that case. Only page/
                ancestor scroll (which would drift the fixed popup off its
                anchor) should close it. */
             if (e.target === refractTagPopupEl) { return; }
@@ -11681,7 +11679,7 @@
             if (related && btn.contains(related)) { return; }
             refractHideTagTip();
         });
-        /* Hide on scroll too — otherwise the tooltip would float in place
+        /* Hide on scroll too - otherwise the tooltip would float in place
            while the button moves under it. */
         window.addEventListener("scroll", refractHideTagTip, { passive: true, capture: true });
 
@@ -11705,7 +11703,7 @@
                 }
                 return;
             }
-            /* Subgroup header click — anywhere on the header toggles
+            /* Subgroup header click - anywhere on the header toggles
                the section (excluding the static "General"/"Tags"
                root pseudo-headers). */
             var sgHeader = e.target.closest(".refract-tag-editor__subgroup-header");
@@ -11719,7 +11717,7 @@
                 }
                 return;
             }
-            /* Group header click — anywhere on the header toggles. */
+            /* Group header click - anywhere on the header toggles. */
             var gHeader = e.target.closest(".refract-tag-editor__group-header");
             if (gHeader) {
                 var gSection = gHeader.closest(".refract-tag-editor__group");
@@ -12089,7 +12087,7 @@
        which yanks the tab strip itself off the top of the viewport.
        We snapshot the scroll position synchronously on click and
        restore it for two frames afterwards (one frame is often too
-       early — the focus-induced scroll fires on the next layout). */
+       early - the focus-induced scroll fires on the next layout). */
     document.addEventListener("click", function (e) {
         if (!e.target.closest) return;
         var tab = e.target.closest(".performer-tabs .nav-tabs .nav-link");
@@ -12150,7 +12148,7 @@
             /* Sync the overlay play/pause icon with VideoJS state.
                Use the affirmative `.vjs-playing` class so the default
                (no class set yet, e.g. before the player initialises)
-               shows the play icon — checking `.vjs-paused` instead made
+               shows the play icon - checking `.vjs-paused` instead made
                the icon flip to pause on initial load before the paused
                class had been applied. */
             function syncPlayIcon() {
@@ -12178,13 +12176,13 @@
                complaint; worst on short clips). But running our own
                stillness TIMER (the first fix) made the overlay hide on a
                different clock than the control bar, which hides on vjs's
-               inactivity timer — the two faded out at visibly different
+               inactivity timer - the two faded out at visibly different
                moments. So `refract-pointer-active` now only answers "was
                the latest activity pointer-born, over the player?": set on
                mouse/touch activity, cleared on mouseleave or keydown, NO
                timer of its own. The CSS show gate requires it AND
                `.vjs-user-active`, so the hide moment (and the 1s fade,
-               matched in 06_scene_player.css) is vjs's own — overlay and
+               matched in 06_scene_player.css) is vjs's own - overlay and
                control bar leave together. Keyboard input still never
                shows the overlay: it clears the flag before vjs marks
                activity. Listeners live on the videojs node and die with
@@ -12200,7 +12198,7 @@
             videojs.addEventListener("touchstart", pointerShow, { passive: true });
             /* mouseleave doesn't bubble, and it's bound directly on the
                videojs node (not capture), so it only fires when the
-               cursor leaves the player as a whole — no flicker when
+               cursor leaves the player as a whole - no flicker when
                moving between child controls. */
             videojs.addEventListener("mouseleave", pointerClear);
             videojs.addEventListener("keydown", pointerClear, true);
@@ -12216,7 +12214,7 @@
         if (!/^\/scenes\/[^/]/.test(refractPathFromLocation())) return;
         document.querySelectorAll(".scene-performers-row:not([data-stash-perf-arrows])").forEach(function (wrap) {
             /* Sidebar wrappers use the adaptive setupSceneTabsPerformers()
-               instead — no chevrons there, dots + keyboard nav. */
+               instead - no chevrons there, dots + keyboard nav. */
             if (wrap.closest(".scene-tabs")) return;
             var row = wrap.querySelector(".scene-performers");
             if (!row) { return; }
@@ -12263,16 +12261,16 @@
             } else {
                 window.addEventListener("resize", syncChevronVisibility, { passive: true });
             }
-            /* React may still be inserting cards — re-sync once after a beat. */
+            /* React may still be inserting cards - re-sync once after a beat. */
             syncChevronVisibility();
             setTimeout(syncChevronVisibility, 200);
             setTimeout(syncChevronVisibility, 800);
         });
     }
 
-    /* Sidebar performer carousel — count-adaptive layout.
+    /* Sidebar performer carousel - count-adaptive layout.
        (1) Marks the .col-12 that directly contains .scene-performers with the
-           class scene-performers-row so CSS can target it. No node is moved —
+           class scene-performers-row so CSS can target it. No node is moved -
            moving a React-managed child out of its tracked parent causes a
            NotFoundError on removeChild when React reconciles after a scene save.
        (2) Counts cards, tags wrapper with data-perf-count="1|2|3|4|many".
@@ -12280,7 +12278,7 @@
        (3) For count >= 5: appends pagination dots, IntersectionObserver tracks
            which card is in view, scoped MutationObserver watches for card
            count changes, single delegated keydown listener for arrow keys.
-       Fully idempotent — guards via class presence and wrap.__refractPerf state. */
+       Fully idempotent - guards via class presence and wrap.__refractPerf state. */
     function setupSceneTabsPerformers() {
         /* Galleries render performers in `.gallery-performers` instead of
            scenes' `.scene-performers` (identical card layout + structure,
@@ -12292,7 +12290,7 @@
             el.classList.add("scene-performers");
         });
 
-        /* Step 1 — mark the col-12 that contains .scene-performers as our wrapper.
+        /* Step 1 - mark the col-12 that contains .scene-performers as our wrapper.
            classList.add is a non-childList mutation so it does not retrigger the
            MutationObserver (which watches childList only). */
         document.querySelectorAll(":is(.scene-tabs, .image-tabs, .gallery-tabs) .tab-pane .col-12 > .scene-performers").forEach(function (el) {
@@ -12303,7 +12301,7 @@
             }
         });
 
-        /* Step 2-6 — apply adaptive layout per wrapper. */
+        /* Step 2-6 - apply adaptive layout per wrapper. */
         document.querySelectorAll(":is(.scene-tabs, .image-tabs, .gallery-tabs) .col-12.scene-performers-row").forEach(function (wrap) {
             applyAdaptiveLayout(wrap);
         });
@@ -12432,7 +12430,7 @@
             state.dots = dotsEl;
         }
 
-        /* (Re)wire IntersectionObserver — observes REAL cards only and
+        /* (Re)wire IntersectionObserver - observes REAL cards only and
            uses their stored realIdx for dot mapping (so the active dot
            reflects the underlying performer, not a clone). */
         if (state.io) state.io.disconnect();
@@ -12469,7 +12467,7 @@
             state.initialized = true;
         }
 
-        /* Scroll handler — silent jump when user lands on a clone.
+        /* Scroll handler - silent jump when user lands on a clone.
            Hysteresis: only jump when scrollLeft is essentially AT the
            clone center (within 1px to avoid mid-scroll false positives). */
         if (state.onScroll) row.removeEventListener("scroll", state.onScroll);
@@ -12509,7 +12507,7 @@
             state.dots.children[0].classList.add("active");
         }
 
-        /* Keyboard arrows — wrap around at boundaries. */
+        /* Keyboard arrows - wrap around at boundaries. */
         if (state.onKey) document.removeEventListener("keydown", state.onKey);
         state.onKey = function (e) {
             if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
@@ -12588,7 +12586,7 @@
        can constrain it to a 5-row column-wrap strip with horizontal
        overflow scroll (mirrors the performer-card strip below it).
        Tag items are CLONED into the wrapper (originals hidden in-place) rather
-       than moved — moving React-managed nodes causes a NotFoundError on
+       than moved - moving React-managed nodes causes a NotFoundError on
        removeChild when React reconciles after a scene save. Rebuild is
        triggered whenever any tag-item in the col lacks data-sth-tag-origin,
        meaning React has re-rendered fresh nodes. */
@@ -12623,7 +12621,7 @@
             tagsHeading.insertAdjacentElement("afterend", wrapper);
             /* Mark originals and hide them in-place so React can removeChild
                them normally (parent unchanged). Clone into wrapper for display.
-               IMPORTANT: clone BEFORE modifying the original — cloneNode(true)
+               IMPORTANT: clone BEFORE modifying the original - cloneNode(true)
                copies inline styles and dataset, so cloning after hiding would
                give us invisible clones too. */
             var chips = [];
@@ -13036,7 +13034,7 @@
        theme card styling on these builds. Route the image click to
        whichever underlying trigger Stash renders for that card. */
     function findImageLightboxTrigger(card) {
-        /* querySelector matches by document order, not selector order — so we
+        /* querySelector matches by document order, not selector order - so we
            query for the most specific actual <button> first, then fall back
            to wrapper elements. Otherwise the wrapping DIV.preview-button is
            returned instead of the BUTTON inside (the latter has the React
@@ -13049,13 +13047,13 @@
                card.querySelector("a[title*='preview' i]");
     }
 
-    /* Delegated handler — one body-level click listener catches every
+    /* Delegated handler - one body-level click listener catches every
        .image-card image click regardless of when React re-renders the
        cards. Replaces the previous per-card binding which relied on the
        MutationObserver scheduler firing in time after every re-render. */
     /* Pause-idle controls hide.
        Stash's video.js keeps controls visible whenever the video is
-       paused — annoying when you want to screenshot a frame. After 2.5s
+       paused - annoying when you want to screenshot a frame. After 2.5s
        of cursor inactivity (or mouse leaving the player), fade the
        control bar + big play button + cursor away. Any mouse motion or
        resume brings them back. */
@@ -13096,14 +13094,14 @@
             var v = c.querySelector("video");
             if (v && v.paused) { schedule(c); }
         }, { passive: true });
-        /* Cursor leaving the player while paused — go idle immediately.
+        /* Cursor leaving the player while paused - go idle immediately.
            IMPORTANT: capture-phase `mouseleave` fires for every
            descendant's mouseleave (it doesn't bubble, but the capture
            phase still hits ancestor listeners). So a mouse moving
            BETWEEN control-bar buttons or seek-bar segments would
            previously trigger this handler and immediately re-add
            `.refract-video-idle`, while the next micro-mousemove would
-           clear it — rapid flicker, especially noticeable around the
+           clear it - rapid flicker, especially noticeable around the
            seekbar. Only treat it as a real player-leave when
            e.target IS the .video-js itself AND relatedTarget (where
            the cursor went next) is outside it. */
@@ -13139,7 +13137,7 @@
        Stash's <input type="number" min="0" step="0.1" max="10"> is wired
        to a React controlled-value handler that re-parses every keystroke
        through the step engine, making it impossible to type multi-char
-       values like "5.5" or "10" — React rewrites the value back to a
+       values like "5.5" or "10" - React rewrites the value back to a
        clamped/rounded snapshot on every keypress. The shim detaches React
        while the user is typing and commits the parsed final value on
        blur / Enter / Tab:
@@ -13151,7 +13149,7 @@
             0.1, write back via the native value setter, and dispatch
             input + change so React picks up the FINAL value (just once). */
     /* Toggle .refract-overflow on .st-tag-list whenever it has more
-       content than fits in its max-height — CSS gates the bottom fade
+       content than fits in its max-height - CSS gates the bottom fade
        mask on this class, so lists that fit cleanly don't get the
        half-faded last row. */
     function syncTagListFade() {
@@ -13163,7 +13161,7 @@
 
     /* Tag .rating-number pills with `.refract-rated` when the numeric
        value in their span isn't 0/empty. We can't rely on Stash's own
-       `.disabled` class to indicate "no rating" — it sometimes stays on
+       `.disabled` class to indicate "no rating" - it sometimes stays on
        the element even after a value is set. Re-runs via the body-wide
        mutation watcher so React re-renders are caught.
        Also tags `.rating-banner` (the small badge on performer cards)
@@ -13179,7 +13177,7 @@
             el.classList.toggle("refract-rated", rated);
         });
         /* Some plugins (e.g. stash-multiview, alternate-scale displays)
-           inject a SECOND `.rating-banner` element on the same card —
+           inject a SECOND `.rating-banner` element on the same card -
            often with a different value scale (5/5 stars rendered as a
            "10/10 decimal" equivalent). Iterating all banners would let
            the second banner overwrite the first's tier classes,
@@ -13193,7 +13191,7 @@
             var dupeCard = el.closest(".performer-card, .scene-card");
             if (dupeCard && tieredCards.has(dupeCard)) { return; }
             if (dupeCard) { tieredCards.add(dupeCard); }
-            /* Read rating100 from the banner's className, not text — Stash's
+            /* Read rating100 from the banner's className, not text - Stash's
                RatingBanner.tsx writes one of:
                  • `rating-100-N`   (N = trunc(rating100 / 5), 0–20)
                    used for decimal mode + 5-star half/quarter precision
@@ -13206,7 +13204,7 @@
                 /* Stash has shipped multiple `rating-100-N` formats:
                      • Old: N = floor(rating100/5), range 0-20
                      • New: N IS rating100 directly, range 0-100
-                   Detect by magnitude — anything > 20 has to be the
+                   Detect by magnitude - anything > 20 has to be the
                    new format (since the old format maxes at 20). */
                 var n = parseInt(mCls[1], 10);
                 rating100 = n > 20 ? Math.min(100, n) : n * 5;
@@ -13218,7 +13216,7 @@
                changes or a 3rd-party plugin injects a banner without
                the `rating-100-N` / `rating-N` class. Use the configured
                rating system (`body.refract-rating-system-stars`, set
-               by refractFetchRatingSystem) to pick the scale —
+               by refractFetchRatingSystem) to pick the scale -
                otherwise a decimal-mode 5/10 would be parsed as 5/5
                (Perfect) and 4.9/10 as 4.9/5 (Legendary), since the
                old `rawV <= 5 ? * 20 : * 10` heuristic always assumed
@@ -13242,7 +13240,7 @@
                     }
                 }
             }
-            /* Diagnostic logging — temporary. Enable by running
+            /* Diagnostic logging - temporary. Enable by running
                `window._refractTierDebug = true` in DevTools, then
                reload. Logs one line per scene-card rating banner so
                we can see what classes + text it has + how the parser
@@ -13338,7 +13336,7 @@
                         return;
                     }
                 }
-                /* Reject — restore caret to end of last valid value. */
+                /* Reject - restore caret to end of last valid value. */
                 t.value = lastValid;
             }
             t.addEventListener("input", validate, true);
@@ -13390,7 +13388,7 @@
     }
 
     /* Clear leftover inline style overrides from older versions of the
-       theme — back when image-list toolbars were force-pinned to
+       theme - back when image-list toolbars were force-pinned to
        position:static and sidebars were mistakenly tagged data-stash-filter.
        Image lists now use the same sticky pill design as everywhere else. */
     function unstickyGalleryToolbar() {
@@ -13405,14 +13403,14 @@
                 el.style.removeProperty(p);
             });
         });
-        /* Strip data-stash-filter off form columns — older builds (or any
+        /* Strip data-stash-filter off form columns - older builds (or any
            run where a third-party plugin's "Search…" input snuck into the
            scene edit form) would tag the column as a filter toolbar and
            inherit the wrong styling. Forms aren't toolbars. */
         document.querySelectorAll("form [data-stash-filter], form[data-stash-filter]").forEach(function (el) {
             el.removeAttribute("data-stash-filter");
         });
-        /* Same problem with CustomTagsManager — its sidebar holds a search
+        /* Same problem with CustomTagsManager - its sidebar holds a search
            input + many buttons, which made older builds tag the whole
            layout as a filter toolbar. The plugin owns its own styling. */
         document.querySelectorAll("#tag-manager-host [data-stash-filter], .tag-manager [data-stash-filter]").forEach(function (el) {
@@ -13420,7 +13418,7 @@
         });
     }
 
-    /* Operation-menu modal — when the 3-dots #operation-menu button is
+    /* Operation-menu modal - when the 3-dots #operation-menu button is
        clicked, we intercept BEFORE Bootstrap opens its dropdown and
        instead render a custom overlay panel centered in the details
        panel. The native dropdown's items are cloned (preserving their
@@ -13475,7 +13473,7 @@
         document.body.addEventListener("click", function (e) {
             var btn = e.target.closest && e.target.closest("#operation-menu");
             if (!btn) { return; }
-            /* Don't intercept — let Bootstrap open the dropdown first so the
+            /* Don't intercept - let Bootstrap open the dropdown first so the
                .dropdown-menu element actually renders. Then capture it. */
             var panel = document.querySelector(".scene-tabs, .image-tabs, .gallery-tabs");
             if (!panel) { return; }
@@ -13491,7 +13489,7 @@
                 if (!nativeMenu) { return; }
                 var items = Array.from(nativeMenu.querySelectorAll(".dropdown-item, a, button"));
                 if (!items.length) { return; }
-                /* Hide the native menu — our overlay is the visible UI now. */
+                /* Hide the native menu - our overlay is the visible UI now. */
                 nativeMenu.style.setProperty("display", "none", "important");
                 var overlay = buildOperationMenuOverlay(items);
                 /* Override the default close handler so dismissing the
@@ -13554,7 +13552,7 @@
     // footer so the lightbox shows ONE floating glass bar instead of two.
     // CSS hides the now-empty .Lightbox-header.
     function consolidateLightbox() {
-        /* DOM-MOVING consolidation is DISABLED — moving header content
+        /* DOM-MOVING consolidation is DISABLED - moving header content
            into footer breaks Stash's React lightbox during scroll-wheel
            zoom on Chromium/Windows (page goes blank, requires reload).
            Instead this function only sets up a one-way text bridge: read
@@ -13594,7 +13592,7 @@
             indicator.__refractCountObs = obs;
         }
     }
-    consolidateLightbox(); /* initial pass — bridge runs idempotently */
+    consolidateLightbox(); /* initial pass - bridge runs idempotently */
 
     // Scene header studio name: Stash renders only the studio logo as an
     // <img> inside <h1.studio-logo><a><img alt="…"></a></h1>; the visible
@@ -13604,7 +13602,7 @@
     // text, so it becomes visible (CSS styles it like a label).
     /* Remove orphan .gs-trigger buttons left over from an earlier
        JS-relocation experiment that competed with React reconciliation.
-       Idempotent — only deletes buttons that were detached from the
+       Idempotent - only deletes buttons that were detached from the
        React tree (no React fiber, no parent navbar-nav).
        After the JS approach was abandoned, leftover DOM may stick
        around once on the user's open tab; this cleans it up.
@@ -13695,12 +13693,12 @@
        "1-40 of 1234" with a `<br>` and a `.scenes-stats` span holding
        "(duration - total size)". Refract repositions this span to the
        top-right of the grid (CSS) and reformats the text to a single line:
-       "<total> scenes · <duration> · <size>" — dropping the per-page
+       "<total> scenes · <duration> · <size>" - dropping the per-page
        "1-40 of" range and flattening the two lines into one.
 
        IMPORTANT: PaginationIndex is a React function component that
        re-renders `{indexText}<br/>{metadataByline}` IN PLACE whenever the
-       filtered total changes. So we must NOT destroy its children — doing
+       filtered total changes. So we must NOT destroy its children - doing
        that desyncs React's fiber (it keeps updating now-detached text nodes
        while our replacement stays frozen at the first value, which is why
        the count used to be stuck at the unfiltered library total). Instead
@@ -13709,17 +13707,17 @@
        overlay` child holding the reformatted line. We re-read Stash's live,
        localized count/duration/size each pass and refresh the overlay from a
        signature, so a filter re-render flows straight through. We only read
-       Stash's "X of N" text to recover N (the one coupling — that format is
+       Stash's "X of N" text to recover N (the one coupling - that format is
        hardcoded, not localized, in PaginationIndex). */
     function reformatSceneStats() {
         document.querySelectorAll(".pagination-index-container span.paginationIndex").forEach(function (idx) {
             var statsSpan = idx.querySelector(".scenes-stats");
-            if (!statsSpan) { return; } /* scenes view only — gallery/perf lists have no .scenes-stats */
+            if (!statsSpan) { return; } /* scenes view only - gallery/perf lists have no .scenes-stats */
             var dur = statsSpan.querySelector(".scenes-duration");
             var size = statsSpan.querySelector(".scenes-size");
             /* Recover the total count from the leading "first-last of N"
                text. The count text is the first text node of the span,
-               before the <br> — our overlay is appended AFTER the <br>, so
+               before the <br> - our overlay is appended AFTER the <br>, so
                this loop never sees it. */
             var head = "";
             for (var i = 0; i < idx.childNodes.length; i++) {
@@ -13733,7 +13731,7 @@
                 : (m ? m[1].trim() : "");
             var durTxt = dur ? dur.textContent.trim() : "";
             var sizeTxt = size ? size.textContent.trim() : "";
-            if (!total) { return; } /* totals unknown — leave Stash's text */
+            if (!total) { return; } /* totals unknown - leave Stash's text */
 
             /* Build "<N> scenes · <dur> · <size>" from the parts present. */
             var parts = [total + (total === "1" ? " scene" : " scenes")];
@@ -13788,7 +13786,7 @@
     // [Enable]/[Disable] btn-sm with a Bootstrap custom-switch toggle so
     // every row's action column reads the same. The original button stays
     // in the DOM (CSS hides it) and our toggle dispatches a click on it
-    // when flipped — Stash's own handler runs unchanged. Also relocates
+    // when flipped - Stash's own handler runs unchanged. Also relocates
     // the project-link icon out of the action column into the title row
     // so the right column stays compact and consistent.
     function injectPluginToggles() {
@@ -13810,7 +13808,7 @@
             }
 
             // The Enable/Disable btn is the btn-sm one. Skip rows w/o it.
-            /* Exclude our own injected chevron IN the selector — matching it
+            /* Exclude our own injected chevron IN the selector - matching it
                then `continue`-ing skipped the whole row, so the plugin got
                no toggle at all when the chevron sorted first. */
             var nativeBtn = rightSide.querySelector("button.btn.btn-primary.btn-sm:not(.st-plugin-chevron)");
@@ -13869,7 +13867,7 @@
     // Stash renders the plugins as one .setting-group per plugin inside a
     // bare <div>; we flag that <div> as a flex column (refract-plugin-list,
     // styled in css/13_plugins.css) and assign each row a CSS `order`. Nothing
-    // is moved in the DOM — relocating a React-managed node desyncs its fiber
+    // is moved in the DOM - relocating a React-managed node desyncs its fiber
     // (NotFoundError on the next reconcile), so order-only is the safe play.
     // Re-runs via the consolidated watcher, so it re-sorts after a plugin is
     // toggled (which re-renders the list and resets our inline order).
@@ -13935,7 +13933,7 @@
                 return 0;
             });
 
-            /* FIRST — each row's prior layout position (from the cache; empty
+            /* FIRST - each row's prior layout position (from the cache; empty
                on the very first pass, so first render never animates). */
             var firsts = {};
             var fr;
@@ -13945,7 +13943,7 @@
                 }
             }
 
-            /* Apply the new order (CSS `order` only — never move the nodes). */
+            /* Apply the new order (CSS `order` only - never move the nodes). */
             var changed = false;
             var r;
             for (r = 0; r < rows.length; r++) {
@@ -13953,7 +13951,7 @@
                 if (rows[r].el.style.order !== ord) { rows[r].el.style.order = ord; changed = true; }
             }
 
-            /* LAST — read each row's new layout position (one reflow) and
+            /* LAST - read each row's new layout position (one reflow) and
                refresh the cache for next time. Skip hidden rows (offsetParent
                null, e.g. filtered out by search) so they don't poison the FLIP. */
             var lasts = {};
@@ -13968,7 +13966,7 @@
 
             if (!animate || !changed) { continue; }
 
-            /* PLAY — invert each moved row back to where it visually was, then
+            /* PLAY - invert each moved row back to where it visually was, then
                transition the transform away so the reorder glides into place. */
             var moved = [];
             var p;
@@ -14064,7 +14062,7 @@
     makePluginSettingsCollapsible(); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Plugins page: take over the "Reload plugins" .setting
-    // row — replace its h3 title with a live search input, and strip
+    // row - replace its h3 title with a live search input, and strip
     // the reload button down to an icon-only affordance. That row is
     // wasted vertical space otherwise (one button + redundant text),
     // and putting the search there keeps the page's vertical rhythm.
@@ -14086,14 +14084,14 @@
         // glass-bg + accent-focus look used by the package-manager filter
         // and search-term rows) apply automatically. Adds a "clear" (×)
         // button alongside since the rest of those clearable rows have
-        // one — keeps the family consistent.
+        // one - keeps the family consistent.
         var wrap = document.createElement("div");
         wrap.className = "clearable-input-group st-plugin-search";
         wrap.innerHTML =
             "<input type='text' class='clearable-text-field form-control st-plugin-search-input' " +
                 "placeholder='Filter…' aria-label='Search plugins' " +
                 "autocomplete='off' spellcheck='false'>" +
-            /* Intentionally NOT applying `btn btn-secondary` here —
+            /* Intentionally NOT applying `btn btn-secondary` here -
                those classes would pull in the settings-scoped
                `.btn.btn-secondary` rule (a glass border + bg) that
                competes with the bare-icon `.clearable-text-field-clear`
@@ -14113,14 +14111,14 @@
         function applyFilter() {
             var q = input.value.trim().toLowerCase();
             clearBtn.style.display = q ? "" : "none";
-            // Use descendant combinator — plugin groups aren't always
+            // Use descendant combinator - plugin groups aren't always
             // direct children of .setting-section depending on Stash
             // version. Mirror what makePluginSettingsCollapsible uses.
             var groups = document.querySelectorAll(".setting-section .setting-group");
             for (var i = 0; i < groups.length; i++) {
                 var g = groups[i];
                 // Find the title h3 anywhere in the header row, not at
-                // a strict 2-level depth — guards against React render
+                // a strict 2-level depth - guards against React render
                 // changes.
                 var header = g.querySelector(":scope > .setting");
                 var titleH3 = header ? header.querySelector("h3") : null;
@@ -14142,7 +14140,7 @@
             titleDiv.appendChild(wrap);
         }
 
-        // Reduce the reload button to icon-only — drop the inner text
+        // Reduce the reload button to icon-only - drop the inner text
         // span, keep the .fa-icon span (which holds the rotate SVG).
         var reloadBtn = reloadRow.querySelector(":scope > div:last-child button");
         if (reloadBtn) {
@@ -14184,7 +14182,7 @@
             pluginCard.classList.add("st-task-plugin-card");
         }
 
-        // Inject search bar once — wrapped in a .setting row so the
+        // Inject search bar once - wrapped in a .setting row so the
         // clearable-input-group layout matches the Plugins page search.
         if (!pluginCard.dataset.stTaskSearchDone) {
             var searchRow = document.createElement("div");
@@ -14231,7 +14229,7 @@
         }
 
         // Inject identical st-plugin-chevron into each group header and default
-        // to collapsed — exactly as makePluginSettingsCollapsible does it so all
+        // to collapsed - exactly as makePluginSettingsCollapsible does it so all
         // existing chevron CSS (.st-plugin-chevron, .st-plugin-collapsed) applies.
         var groups = pluginCard.querySelectorAll(".setting-group.collapsible");
         for (var i = 0; i < groups.length; i++) {
@@ -14302,7 +14300,7 @@
             var section = group.querySelector(":scope > .collapsible-section");
             if (!section) continue; // no body to collapse
 
-            // Skip plugin task groups — those have .btn.btn-secondary.btn-sm
+            // Skip plugin task groups - those have .btn.btn-secondary.btn-sm
             // triggers in their collapsible-section. Native task groups (Scan,
             // Generate…) have checkbox toggles instead.
             if (section.querySelector(".btn.btn-secondary.btn-sm")) continue;
@@ -14343,7 +14341,7 @@
     }
     setupNativeTaskGroups(); /* initial pass; re-runs via consolidated watcher */
 
-    /* Task Queue progress — inline percentage next to the title.
+    /* Task Queue progress - inline percentage next to the title.
        Bootstrap renders the percentage as text INSIDE .progress-bar; the
        bar is 4 px tall in our theme (08_misc_mid.css L5846) so the text
        overflows vertically as a faded blur. CSS hides the inner text;
@@ -14394,7 +14392,7 @@
        were wrong: when a job completes and drops out, every later job
        shifts down one index, so the next job at that index would
        inherit the expanded state. Description text is stable across
-       that shift. (Two jobs with identical descriptions share state —
+       that shift. (Two jobs with identical descriptions share state -
        a rare, harmless edge vs. the index-bleed it replaces.) */
     /* Use the same chevron path as st-plugin-chevron (refract.js:5969)
        for visual consistency. CSS rotates it 90° to point down in the
@@ -14469,14 +14467,14 @@
     setupTaskJobChevrons();
 
     /* Inject a sun/moon light-mode toggle into the navbar utility cluster
-       (right side, next to the burger / settings cog). Idempotent —
+       (right side, next to the burger / settings cog). Idempotent -
        skip if already injected. Visibility is gated by CSS via the
        refract-show-light-nav body class (see applyLightToggleNavbarClass). */
     function injectNavLightToggle() {
         var buttons = document.querySelector("nav.top-nav .navbar-buttons");
         if (!buttons) return;
         if (buttons.querySelector(":scope > .st-light-toggle-nav")) {
-            /* Already injected — keep the glyph in sync with current state */
+            /* Already injected - keep the glyph in sync with current state */
             var existing = buttons.querySelector(":scope > .st-light-toggle-nav");
             var nowLight = isLightModeEnabled();
             /* Only mutate when the state actually changed. The global
@@ -14741,12 +14739,12 @@
         refractMountSettingsFallback();
 
         /* The panel itself is mounted into this .card by the portal host
-           registered in registerAccentPatch — NOT a standalone
+           registered in registerAccentPatch - NOT a standalone
            ReactDOM.render root. The portal keeps the panel inside
            Stash's React tree so the real-card preview can render the
            app's SceneCard/PerformerCard (they need ConfigurationProvider
            / IntlProvider / Router context, which a standalone root
-           lacks — verified by crash 2026-07-26). */
+           lacks - verified by crash 2026-07-26). */
 
         /* Deep link from the old plugin-panel note. */
         if (location.hash === "#refract") {
@@ -14816,7 +14814,7 @@
             var navSel = "body.stash-liquid-glass nav.top-nav .navbar-nav";
             var css = "";
             saved.forEach(function (key, i) {
-                /* Skip non-string entries — a legacy/corrupted numeric entry
+                /* Skip non-string entries - a legacy/corrupted numeric entry
                    would throw on .slice and, caught by the outer try, drop
                    the entire saved nav order. */
                 if (typeof key !== "string") { return; }
@@ -14868,7 +14866,7 @@
             var sorted   = getVisualOrder();
             var dragRect = el.getBoundingClientRect();
 
-            /* Capture inner-element metrics NOW — before display:none makes
+            /* Capture inner-element metrics NOW - before display:none makes
                getBoundingClientRect() return zeros on all descendants. */
             var innerSvgs    = Array.from(el.querySelectorAll("svg"));
             var svgRects     = innerSvgs.map(function (s) { return s.getBoundingClientRect(); });
@@ -14923,7 +14921,7 @@
                 x.style.transform  = "translateX(0)";
             });
 
-            /* 6. Floating clone — the "lifted" icon following the cursor.
+            /* 6. Floating clone - the "lifted" icon following the cursor.
                Lives in <body>, so nav-scoped CSS doesn't apply; we fix each
                inner element using metrics captured before display:none.
                Initial left uses currentX (where cursor is NOW) not dragRect.left
@@ -14946,7 +14944,7 @@
                 "border-radius:var(--radius-sm);" +
                 "box-shadow:0 8px 28px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.1);";
 
-            /* Inner <a>: add only the centering/sizing props we need — don't
+            /* Inner <a>: add only the centering/sizing props we need - don't
                wipe cssText so React-managed inline styles are preserved. */
             var cloneA = clone.querySelector("a");
             if (cloneA) {
@@ -15027,7 +15025,7 @@
                 return x.getBoundingClientRect().left;
             });
 
-            /* 2. Snap transforms off instantly — no transition. */
+            /* 2. Snap transforms off instantly - no transition. */
             otherItems.forEach(function (x) {
                 x.style.transition = "none";
                 x.style.transform  = "";
@@ -15072,7 +15070,7 @@
             /* 8. Cleanup. Guard the removeChild: if the floating clone was
                already detached (a pointercancel/pointerup race, or React
                reconciled <body>), an unguarded removeChild throws and skips
-               the listener teardown + `drag = null` below — permanently
+               the listener teardown + `drag = null` below - permanently
                jamming drag-reorder (the next pointerdown is rejected by
                `|| drag`). */
             if (drag.clone && drag.clone.parentNode) {
@@ -15129,7 +15127,7 @@
 
         Array.from(navRow.children).forEach(attachDrag);
 
-        /* One observer per navRow lifetime — catches late-injected plugin items. */
+        /* One observer per navRow lifetime - catches late-injected plugin items. */
         if (!navRow.dataset.stNavReorderInit) {
             navRow.dataset.stNavReorderInit = "1";
             new MutationObserver(function () {
@@ -15144,7 +15142,7 @@
        Replace the numeric read-out at the end of each colour/tonal filter
        slider (Brightness/Contrast/Gamma/Saturation/Hue/Warmth/R/G/B/Blur)
        with a round chip whose colour is that slider's OWN spectrum sampled
-       at the current value — the same gradients Stash paints on the vanilla
+       at the current value - the same gradients Stash paints on the vanilla
        slider tracks (see stash-fork Scenes/styles.scss). So the Hue chip
        shows the current hue, Saturation goes grey→red, Brightness dark→light,
        Warmth cool→warm, R/G/B dark→channel, etc. Pure colour maths, updated
@@ -15195,7 +15193,7 @@
         }
         return "rgb(128,128,128)";
     }
-    /* WIP — held back from public release (user call 2026-07-28): the
+    /* WIP - held back from public release (user call 2026-07-28): the
        swatch treatment isn't finished. Flip to true to resume; all the
        code below and the .refract-has-swatch CSS stay in place. */
     var REFRACT_FILTER_SWATCHES_ENABLED = false;
@@ -15241,7 +15239,7 @@
 
     /* ── Consolidated mutation watcher ──────────────────────────────────
        Single global MutationObserver feeding all body-wide DOM watchers.
-       Replaces 7 separate body-subtree observers — each used to fire on
+       Replaces 7 separate body-subtree observers - each used to fire on
        every DOM mutation, triggering 7 separate setTimeouts and 7 separate
        full-document scans. Now one observer, one debounce, one pass. */
     (function consolidatedMutationWatcher() {
@@ -15301,7 +15299,7 @@
 
     // Bootstrap's Collapse uses the same `.collapsing` class for opening AND closing,
     // so CSS can't tell direction. On click we tag the header:
-    //   - `.st-collapse-opening`: about to open — CSS pre-applies the orange/flat state
+    //   - `.st-collapse-opening`: about to open - CSS pre-applies the orange/flat state
     //     immediately so the button transition syncs with the panel slide.
     //   - `.st-collapse-transitioning`: present during BOTH directions for ~400ms so
     //     CSS can keep the bottom border transparent during the animation, avoiding
@@ -15325,14 +15323,14 @@
 
     // ── Card-control hover markers (":has(:hover)" perf replacement) ──
     // Chrome re-evaluates `:has(...:hover)` rule subjects across the whole
-    // grid as elements pass under the cursor during scroll — profiled as the
+    // grid as elements pass under the cursor during scroll - profiled as the
     // playing-card home-page jank (style recalc, not paint; see CLAUDE.md).
     // Instead, delegated pointer events toggle plain marker classes on the
     // owning card: `.refract-check-hover` while its .card-check select
     // circle is hovered, `.refract-fav-hover` while its favourite heart is.
     // CSS consumers: 03_cards.css (rating-banner fade), 16_playing_card.css
     // (name-banner + tier-ribbon fades). The `:has(...:checked)` variants
-    // stay in CSS — they only invalidate on click, not on scroll.
+    // stay in CSS - they only invalidate on click, not on scroll.
     (function () {
         var HOVER_SEL = ".card-check, .favorite-button";
         function classFor(hit) {

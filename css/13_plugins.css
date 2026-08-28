@@ -4,7 +4,7 @@
    These rules style DOM created by other Stash plugins (stash-multiview,
    url-switcher, Ascension/Desire, etc.). On a vanilla Stash install with
    none of these plugins active, every selector below matches no DOM and
-   the file is inert — Refract works without them.
+   the file is inert - Refract works without them.
 
    Loaded last in the cascade (after 12_mobile.css) so plugin-specific
    overrides win over generic theme rules.
@@ -32,7 +32,7 @@ body.stash-liquid-glass #mv-filter-add-btn.mv-filter-has-slots {
         0 0 0 1px rgba(var(--accent-rgb), 0.22) inset !important;
 }
 /* Position the badge so the slot count sits as an orange pill on the
-   button corner — match `.filter-button .badge` exactly. */
+   button corner - match `.filter-button .badge` exactly. */
 body.stash-liquid-glass .mv-filter-add-btn {
     position: relative !important;
 }
@@ -63,7 +63,7 @@ body.stash-liquid-glass .mv-filter-badge {
     box-shadow: none !important;
 }
 
-/* Picking toggle button — active glow matched to .stash-view-active-ind.
+/* Picking toggle button - active glow matched to .stash-view-active-ind.
    Class doubled (`.mv-picking-toggle-btn.mv-picking-toggle-btn`) to bump
    specificity above my new toolbar `:has(> svg:only-child)` rule at
    (0,5,2), which would otherwise strip the active state. */
@@ -82,7 +82,7 @@ body.stash-liquid-glass .btn.btn-secondary.mv-picking-toggle-btn.mv-picking-togg
         drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.45)) !important;
 }
 
-/* Scene card add buttons — only shown when multiview picking mode is active */
+/* Scene card add buttons - only shown when multiview picking mode is active */
 body.stash-liquid-glass:not(.mv-picking-mode) .mv-add-btn {
     display: none !important;
 }
@@ -114,7 +114,7 @@ body.stash-liquid-glass .mv-add-btn.mv-queued {
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.38) !important;
 }
 
-/* Scene-page queue toggle button — when the current scene is in the
+/* Scene-page queue toggle button - when the current scene is in the
    multiview queue. The scene-toolbar has `overflow-x: auto` so any
    outer box-shadow extending past the button gets clipped at the
    toolbar bounds. We rely on a strong inset glow + bright accent
@@ -137,7 +137,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
         drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.5)) !important;
 }
 
-/* Floating launcher widget — themed pill shell */
+/* Floating launcher widget - themed pill shell */
 body.stash-liquid-glass #mv-launcher {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
@@ -165,7 +165,7 @@ body.stash-liquid-glass #mv-open-btn:hover {
     box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.46) !important;
 }
 
-/* Count badges — neutral glass with optional accent text for filter count.
+/* Count badges - neutral glass with optional accent text for filter count.
    Reserves the orange visual weight for the primary action (open button). */
 body.stash-liquid-glass .mv-launcher-count {
     background: rgba(255, 255, 255, 0.06) !important;
@@ -182,7 +182,7 @@ body.stash-liquid-glass .mv-launcher-filter-count {
     color: var(--accent-bright) !important;
 }
 
-/* Clear queue × button — replace the × text with a pseudo so we can
+/* Clear queue × button - replace the × text with a pseudo so we can
    position the glyph optically (the U+00D7 character sits below the line-box
    midline in most fonts, which is why the original looked bottom-aligned). */
 body.stash-liquid-glass #mv-clear-queue {
@@ -215,11 +215,11 @@ body.stash-liquid-glass #mv-clear-queue:hover {
    url-switcher
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Navbar order — slot the URL switcher into the right-side cluster. */
+/* Navbar order - slot the URL switcher into the right-side cluster. */
 body.stash-liquid-glass nav.top-nav .navbar-buttons > #url-switcher-btn,
 body.stash-liquid-glass nav.top-nav .navbar-buttons > .url-switcher-link      { order: 80; }
 
-/* URL switcher: always a full nav icon square (don’t rely on h-100 / % sizing — breaks when “off”). */
+/* URL switcher: always a full nav icon square (don’t rely on h-100 / % sizing - breaks when “off”). */
 body.stash-liquid-glass nav.top-nav a#url-switcher-btn,
 body.stash-liquid-glass nav.top-nav #url-switcher-btn.url-switcher-link {
     display: inline-flex !important;
@@ -278,11 +278,11 @@ body.stash-liquid-glass nav.top-nav button#url-switcher-btn.mode-tunnel svg {
    Other plugin navbar slot ordering
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Ascension/Desire plugin nav item — sits at the end of the library row. */
+/* Ascension/Desire plugin nav item - sits at the end of the library row. */
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #desire-nav-container                 { order: 90; }
-/* Generic plugin nav element (#plugin_hon) — slotted just after Desire. */
+/* Generic plugin nav element (#plugin_hon) - slotted just after Desire. */
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plugin_hon)                   { order: 91; }
-/* StashGifs launcher — same DOM shape as binge/desire/forage (an icon
+/* StashGifs launcher - same DOM shape as binge/desire/forage (an icon
    nav-link that opens its own app). Slot it into the launcher cluster at
    the end of the library row; with no explicit order it defaults to 0 and
    jumps in front of Scenes. */
@@ -295,12 +295,12 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(#plugin_sfw)         
 body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(.random-btn)                                   { order: 11 !important; }
 
 /* ═══════════════════════════════════════════════════════════════════
-   DiceR — random-entity navbar button icon
+   DiceR - random-entity navbar button icon
    The plugin injects:
      <div class="mr-2"><a href="javascript:void(0)">
        <button class="btn btn-primary random-btn">[die]Roll</button></a></div>
    The master nav rule sizes button.btn to an icon square, and the navbar's
-   font-size:0 zeroes the emoji+label — so out of the box it renders as a
+   font-size:0 zeroes the emoji+label - so out of the box it renders as a
    BLANK square. Draw a proper dice glyph via a masked SVG (so it inherits
    the nav's currentColor like every other icon) and keep the text off.
    NOTE: the master button rule (02_navbar.css) already owns this button's
@@ -327,7 +327,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons .random-btn::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   SFWSwitch — navbar toggle icon
+   SFWSwitch - navbar toggle icon
    The plugin injects <button id="plugin_sfw" class="btn btn-primary">
    holding an odd FontAwesome "screen" glyph. Hide it and draw the same
    clean eye-off used by the mobile drawer tile, via a ::after mask (the
@@ -348,7 +348,7 @@ body.stash-liquid-glass nav.top-nav #plugin_sfw::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   ThumbPreviews plugin (CommunityScripts) — keep the card box stable
+   ThumbPreviews plugin (CommunityScripts) - keep the card box stable
    On hover the plugin appends a scene-preview <video> into a performer
    card's image link and crossfades the still image and the video via
    inline opacity. The video is in-flow, and scene previews are landscape
@@ -389,7 +389,7 @@ body.stash-liquid-glass .performer-card .thumbnail-section > a:has(> video) > im
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Ascension (Sakoto's HotorNot fork) — performer-card battle-rank badge
+   Ascension (Sakoto's HotorNot fork) - performer-card battle-rank badge
    Ascension swaps a performer card's native .rating-banner for its
    `.hon-battle-rank-badge.hon-battle-rank-badge-compact`. Left to the
    plugin it lands wherever the banner sat and overlaps Refract's
@@ -462,7 +462,7 @@ body.stash-liquid-glass .performer-card .hon-battle-rank-badge.hon-battle-rank-b
 /* Fallback case (performer with no country caption, or a non-playing-
    card rating mode): refract.js drops the badge straight into the chin
    (a stretch flex-column). Right-align it so the rank stays pinned to the
-   card's right edge — the same side it sits on when a country caption IS
+   card's right edge - the same side it sits on when a country caption IS
    present (pushed right in a space-between row). Direct-child selector so
    it only targets the fallback, never the country-nested case.
 
@@ -539,10 +539,10 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-match-stat
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   flexibleDateInput plugin — react-datepicker theming
+   flexibleDateInput plugin - react-datepicker theming
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Outer calendar pop — opaque dark glass card. Originally used
+/* Outer calendar pop - opaque dark glass card. Originally used
    var(--glass-bg-strong) (rgba 255,255,255,0.10) which was too see-
    through over content. Switched to a near-opaque dark base plus a
    heavy backdrop blur so it reads cleanly against any background.
@@ -563,7 +563,7 @@ body.stash-liquid-glass .react-datepicker {
     overflow: visible !important;
     padding: 0.25rem;
 }
-/* Pointer triangle — hide; the floating card stands on its own. */
+/* Pointer triangle - hide; the floating card stands on its own. */
 body.stash-liquid-glass .react-datepicker__triangle {
     display: none !important;
 }
@@ -779,7 +779,7 @@ body.stash-liquid-glass .react-datepicker__year-option--selected {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   stashGlobalSearch plugin — minimal compat tweak only
+   stashGlobalSearch plugin - minimal compat tweak only
    ═══════════════════════════════════════════════════════════════════ */
 
 /* The plugin's `.gs-input.form-control` is intentionally borderless so
@@ -810,7 +810,7 @@ body.stash-liquid-glass .gs-input-row > input {
     vertical-align: middle !important;
 }
 
-/* Subtle accent glow behind the modal panel — ties the search modal
+/* Subtle accent glow behind the modal panel - ties the search modal
    into Refract's accent system without overriding the plugin's dark
    background. */
 body.stash-liquid-glass .gs-modal .modal-content {
@@ -848,12 +848,12 @@ body.stash-liquid-glass .gs-see-all:hover {
    stash-advanced-rating
    Sister plugin that injects two buttons next to the scene toolbar
    rating control (and the analogous controls on the performer toolbar):
-     • `.adv-rating-btn` — the ★+ trigger that opens the per-criterion
+     • `.adv-rating-btn` - the ★+ trigger that opens the per-criterion
        rating modal. Ships with a yellow palette by default; we re-skin
        it in accent-glass to match Refract's toolbar language.
-     • `.adv-favourite-btn` — the heart toggle that adds/removes the
+     • `.adv-favourite-btn` - the heart toggle that adds/removes the
        "Favourite ★" tag. Keeps the red identity (favourites are
-       universally red — Stash's own performer-favourite uses red too)
+       universally red - Stash's own performer-favourite uses red too)
        but adopts Refract's glass surface + halo style.
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -866,7 +866,7 @@ body.stash-liquid-glass .adv-rating-btn {
     height: 26px !important;
     padding: 0 10px !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
-    /* Force explicit flex centering — the ★ glyph in most fonts sits
+    /* Force explicit flex centering - the ★ glyph in most fonts sits
        below the visual line center because the star's bottom points
        hang at the baseline while the top point pokes up. Flex centering
        + line-height:1 + a tiny -1px nudge on the star puts it on the
@@ -916,7 +916,7 @@ body.stash-liquid-glass .adv-rating-btn:hover > span[style*="color"] {
     background-color: #fff !important;
 }
 /* Unrated-count: instead of a detached chunky pill, render it inline after
-   the ★ behind a hairline divider — "★ | 4" — so the button reads as one
+   the ★ behind a hairline divider - "★ | 4" - so the button reads as one
    cohesive unit, matching the toolbar's other icon+number controls. */
 body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge {
     background: transparent !important;
@@ -936,7 +936,7 @@ body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge {
     font-variant-numeric: tabular-nums;
 }
 /* The divider as its own centred element (not a border-left), so the gap
-   before and after it is symmetric — the container gap (star -> divider)
+   before and after it is symmetric - the container gap (star -> divider)
    equals the badge gap (divider -> number). */
 body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge::before {
     content: "" !important;
@@ -945,7 +945,7 @@ body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge::before {
     height: 14px !important;
     background: rgba(var(--accent-rgb), 0.6) !important;
 }
-/* No state-based fill — the count is always the inline accent number. */
+/* No state-based fill - the count is always the inline accent number. */
 body.stash-liquid-glass .adv-rating-btn--partial .adv-rating-btn-badge {
     background: transparent !important;
     color: var(--accent-bright) !important;
@@ -960,10 +960,10 @@ body.stash-liquid-glass .adv-rating-btn:hover .adv-rating-btn-badge::before {
 
 /* ── Favourite heart toggle ─────────────────────────────────────── */
 /* Empty state: same muted-glass language as every other Refract
-   toolbar button — neutral grey heart on the standard glass surface.
+   toolbar button - neutral grey heart on the standard glass surface.
    Hover gives a subtle pink "preview" (just a colour shift on the
    heart + a hairline pink border tint), no bg change. The activated
-   state is the glass-pink look — pink-tinted glass surface with a
+   state is the glass-pink look - pink-tinted glass surface with a
    solid pink heart, no heavy gradient fill. */
 body.stash-liquid-glass .adv-favourite-btn {
     background: var(--glass-bg) !important;
@@ -978,7 +978,7 @@ body.stash-liquid-glass .adv-favourite-btn {
                 color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
 }
 /* Empty + hover: just a subtle pink preview on the heart and a barely
-   visible pink in the border. No background fill, no lift — keeps it
+   visible pink in the border. No background fill, no lift - keeps it
    quiet so it doesn't pre-empt the activated state visually. */
 body.stash-liquid-glass .adv-favourite-btn:hover {
     color: rgba(244, 114, 182, 0.85) !important;
@@ -986,7 +986,7 @@ body.stash-liquid-glass .adv-favourite-btn:hover {
 }
 /* Activated: pink-tinted glass surface, solid pink heart inside.
    The button itself stays "glassy" (translucent pink bg, pink-tinted
-   border, soft pink glow) — only the heart glyph reads as solid pink.
+   border, soft pink glow) - only the heart glyph reads as solid pink.
    Heart is `currentColor` so the button text colour drives the fill;
    we set it to a strong pink while keeping the surface translucent. */
 body.stash-liquid-glass .adv-favourite-btn.adv-favourite-btn--on {
@@ -1045,7 +1045,7 @@ body.stash-liquid-glass .adv-favourite-card-btn svg {
     height: 14px !important;
 }
 body.stash-liquid-glass .adv-favourite-card-btn:hover {
-    /* Clearer glass on hover instead of darker — translucent white
+    /* Clearer glass on hover instead of darker - translucent white
        tint reads as the surface "lighting up" rather than dimming. */
     background: rgba(255, 255, 255, 0.1) !important;
     color: #f472b6 !important;
@@ -1069,7 +1069,7 @@ body.stash-liquid-glass .adv-favourite-card-btn.adv-favourite-btn--on:hover {
 }
 /* Refract-only: hide the favourite button even when the scene is
    already favourited unless the card is hovered. Keeps the grid
-   visually clean — favourited state is still discoverable by hovering
+   visually clean - favourited state is still discoverable by hovering
    the card. Overrides the plugin's default `--on` opacity rule on
    higher specificity (body.stash-liquid-glass adds one class to the
    selector). */
@@ -1090,7 +1090,7 @@ body.stash-liquid-glass .scene-card:hover .adv-favourite-card-btn {
       visible }`, so the menu gets cut at the card's rounded bottom
       corner. Override unconditionally.
    2. When FastTagger renders inside Stash's `.scrape-dialog` modal,
-      `.modal-content` ALSO has overflow:hidden — which clips the
+      `.modal-content` ALSO has overflow:hidden - which clips the
       menu again at the modal boundary if it extends past the card.
       Only flip that one when a FastTagger dropdown is actually open
       so we don't change modal layout when it's not needed.
@@ -1103,7 +1103,7 @@ body.stash-liquid-glass .card.fast-tagger-card {
        adds implicit `contain: layout paint style` even when the
        card IS in the viewport, and the paint containment clips the
        absolutely-positioned "Move to" dropdown menu at the card's
-       rounded-corner boundary. Defeat both for FastTagger cards —
+       rounded-corner boundary. Defeat both for FastTagger cards -
        the perf saving doesn't matter here (no images, ~70px rows). */
     content-visibility: visible !important;
     contain: none !important;
@@ -1113,7 +1113,7 @@ body.stash-liquid-glass .modal-content:has(.fast-tagger-card .dropdown.show) {
     overflow: visible !important;
 }
 
-/* Menu surface — glass language to match other Refract dropdowns,
+/* Menu surface - glass language to match other Refract dropdowns,
    instead of Bootstrap's flat white default. */
 body.stash-liquid-glass .fast-tagger-card .dropdown-menu.show {
     background: rgba(var(--surface-rgb), 0.97) !important;
@@ -1145,7 +1145,7 @@ body.stash-liquid-glass .adv-favourite-btn svg {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   stash-scribe — LLM-driven scene-review assistant
+   stash-scribe - LLM-driven scene-review assistant
    Sibling plugin that ships its own `--scribe-*` token system (mirrors
    stash-multiview's pattern). The accent family already auto-retints
    because the plugin defaults to `var(--accent, …)`. Refract only
@@ -1203,7 +1203,7 @@ body.stash-liquid-glass .stash-scribe-modal-overlay {
 }
 body.stash-liquid-glass .stash-scribe-modal {
     /* Match the ASR/APR modal opacity recipe (.adv-rating-modal-content
-       at 09_buttons.css:559) — near-opaque dark base + heavy blur so the
+       at 09_buttons.css:559) - near-opaque dark base + heavy blur so the
        card reads as solid glass, not see-through. */
     background: rgba(28, 28, 28, 0.97) !important;
     border: 1px solid rgba(255, 255, 255, 0.10) !important;
@@ -1218,7 +1218,7 @@ body.stash-liquid-glass .stash-scribe-modal {
         0 0 100px 24px rgba(var(--accent-rgb), 0.08) !important;
 }
 
-/* Header + context + result divider — let Refract's glass border show
+/* Header + context + result divider - let Refract's glass border show
    through instead of Scribe's hard #333 line. */
 body.stash-liquid-glass .stash-scribe-header,
 body.stash-liquid-glass .stash-scribe-context,
@@ -1228,7 +1228,7 @@ body.stash-liquid-glass .stash-scribe-result {
 }
 
 /* ── Inputs / textareas ─────────────────────────────────────────────
-   Standard Refract glass field language — translucent surface, glass
+   Standard Refract glass field language - translucent surface, glass
    border, accent focus glow. */
 body.stash-liquid-glass .stash-scribe-input,
 body.stash-liquid-glass .stash-scribe-review {
@@ -1246,7 +1246,7 @@ body.stash-liquid-glass .stash-scribe-review:focus {
 
 /* ── Buttons ────────────────────────────────────────────────────────
    Primary action (Send / Save review+scores / active mode tab) uses
-   accent-glass — same recipe as #mv-open-btn / .adv-rating-btn so the
+   accent-glass - same recipe as #mv-open-btn / .adv-rating-btn so the
    three plugins read as siblings. Secondary buttons are neutral
    glass. */
 body.stash-liquid-glass .stash-scribe-send,
@@ -1284,7 +1284,7 @@ body.stash-liquid-glass .stash-scribe-restart:hover {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Binge (Stash TV) plugin — navbar button
+   Binge (Stash TV) plugin - navbar button
    The plugin patches MainNavBar.MenuItems and creates div#BingeNavButton
    containing only <span>BINGE</span> (no SVG). Refract hides all
    nav.top-nav spans globally, so we un-hide just this one and re-skin
@@ -1294,7 +1294,7 @@ body.stash-liquid-glass .stash-scribe-restart:hover {
 /* Slot after the native library items (order 1-8) but before Desire (90). */
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #BingeNavButton { order: 89; }
 
-/* Un-hide the text label — it's the only content in this button. */
+/* Un-hide the text label - it's the only content in this button. */
 body.stash-liquid-glass nav.top-nav #BingeNavButton span {
     display: inline !important;
 }
@@ -1331,7 +1331,7 @@ body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn:hover {
 }
 
 
-/* "Ready to generate" hint — keep the green accent (success colour
+/* "Ready to generate" hint - keep the green accent (success colour
    convention) but soften the border so it's a hint, not a primary. */
 body.stash-liquid-glass .stash-scribe-secondary.is-ready {
     border-color: rgba(74, 222, 128, 0.55) !important;
@@ -1347,7 +1347,7 @@ body.stash-liquid-glass .stash-scribe-secondary.is-ready {
    declarations for the nested case so the heading + body look
    indistinguishable from native Details/Tags. */
 
-/* Scene page — re-apply 07_scene_details.css:761 (uppercase muted
+/* Scene page - re-apply 07_scene_details.css:761 (uppercase muted
    label) for our heading. The section now wraps in its own row/col
    for React-safety, so we target the heading inside .col-12 inside
    .stash-scribe-review-section. */
@@ -1360,7 +1360,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-secti
     color: var(--text-muted) !important;
 }
 
-/* Scene page — re-apply 07_scene_details.css:783 (description prose)
+/* Scene page - re-apply 07_scene_details.css:783 (description prose)
    for our p.pre. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-section p.pre {
     color: var(--text) !important;
@@ -1371,7 +1371,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-secti
     font-family: inherit !important;
 }
 
-/* Performer-page review section — inherits `.detail-header .detail-item`
+/* Performer-page review section - inherits `.detail-header .detail-item`
    layout (narrow title column / wide value column) from native Stash.
    No flex override on the title; the Edit button lives at the end of
    the value column instead via .stash-scribe-review-edit-row. */
@@ -1381,7 +1381,7 @@ body.stash-liquid-glass .stash-scribe-review-edit-row {
     justify-content: flex-end !important;
 }
 
-/* Scene-page heading row — h6 spans full width, so flex the title
+/* Scene-page heading row - h6 spans full width, so flex the title
    + Edit button onto a single line with Edit pushed right. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-heading {
     display: flex !important;
@@ -1389,7 +1389,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-headi
     gap: var(--gap-md) !important;
 }
 
-/* Edit affordance — small, muted, accent on hover so it stays
+/* Edit affordance - small, muted, accent on hover so it stays
    discoverable without competing with the native section labels. */
 body.stash-liquid-glass .stash-scribe-review-edit {
     margin-left: auto !important;
@@ -1429,14 +1429,14 @@ body.stash-liquid-glass .stash-scribe-msg-assistant .stash-scribe-msg-body.stash
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Edit Tags Overhaul (kmv plugin) — grouped/searchable tag picker
+   Edit Tags Overhaul (kmv plugin) - grouped/searchable tag picker
    ═══════════════════════════════════════════════════════════════════
 
    Third-party plugin that injects a `<section id="kmv-edit-tags-overhaul">`
    into the scene edit form (replaces the multi-select tag picker). It
    uses its own BEM classes (`.edit-tags-overhaul__*`) and its own JS
    to toggle group expand/collapse via an `is-open` class. We only
-   re-skin its visible elements — never override `display` for
+   re-skin its visible elements - never override `display` for
    collapsible bodies, since the plugin's JS owns that state. */
 
 body.stash-liquid-glass #kmv-edit-tags-overhaul.edit-tags-overhaul {
@@ -1543,7 +1543,7 @@ body.stash-liquid-glass .edit-tags-overhaul__search-empty {
     opacity: 0.75;
 }
 
-/* Groups list — vertical stack of glass cards */
+/* Groups list - vertical stack of glass cards */
 body.stash-liquid-glass .edit-tags-overhaul__groups {
     display: flex;
     flex-direction: column;
@@ -1594,7 +1594,7 @@ body.stash-liquid-glass .edit-tags-overhaul__header-actions {
     flex-shrink: 0;
 }
 
-/* Collapse chevron — matches refract's native `.collapse-icon`:
+/* Collapse chevron - matches refract's native `.collapse-icon`:
    FontAwesome chevron-right SVG, small (0.55rem), low opacity, rotates
    90° when the section opens. Implemented as a mask so colour flows
    through `background-color` (currentColor doesn't work on backgrounds). */
@@ -1717,7 +1717,7 @@ body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn[aria-pressed="tru
     color: var(--accent-bright);
 }
 
-/* Collapsible bodies — hidden by default, shown when the parent group /
+/* Collapsible bodies - hidden by default, shown when the parent group /
    subgroup has `.is-open` (toggled by plugin JS). Without this, the
    plugin renders everything expanded since its own CSS only flips a
    class, not `display`.
@@ -1766,7 +1766,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup.is-open > .edit-tags-overh
     display: flex;
 }
 
-/* Tag button — refract pill, accent glow when pressed. Explicit
+/* Tag button - refract pill, accent glow when pressed. Explicit
    left-align + flex-start so the label sits flush-left even if a
    parent flex stretches the pill. */
 body.stash-liquid-glass .edit-tags-overhaul__tag {
@@ -1820,7 +1820,7 @@ body.stash-liquid-glass .edit-tags-overhaul__tag-label {
    overflow: visible`, so the FLEX intrinsic size of the name column
    equals the full text width. The flex algorithm shrinks row-left to
    fit, but because the inner span has overflow:visible, its rendered
-   content overflows visually past its allocated box — and on some
+   content overflows visually past its allocated box - and on some
    viewport widths the row's own grid track is narrower than the
    row's computed width, pushing row-actions out.
 
@@ -1871,7 +1871,7 @@ body.stash-liquid-glass #tag-manager-host .tag-manager__tree-panel-scroll {
 /* Pin the row itself to 100% of its parent's box. Without this the
    flex layout uses the row's intrinsic min-content (which includes
    the full nowrap text + drag handle), making the row wider than the
-   sidebar — pushing the drag handle past the right edge. */
+   sidebar - pushing the drag handle past the right edge. */
 body.stash-liquid-glass #tag-manager-host .tag-manager__group-header,
 body.stash-liquid-glass #tag-manager-host .tag-manager__subgroup-header,
 body.stash-liquid-glass #tag-manager-host .tag-manager__tree-item {
@@ -1897,7 +1897,7 @@ body.stash-liquid-glass #tag-manager-host .tag-manager__subgroup-header {
    popup width and switch image fit to cover so the preview reads as a
    tight card.
 
-   Multi-image previews still work — the inner grid uses auto-fit with
+   Multi-image previews still work - the inner grid uses auto-fit with
    minmax(8rem, 1fr) (ETO) or minmax(6.9rem, 1fr) (CTM), so 1-3 images
    flow naturally within the narrower width. */
 body.stash-liquid-glass #edit-tags-overhaul-hover-preview.edit-tags-overhaul-hover-preview,
@@ -1920,10 +1920,10 @@ body.stash-liquid-glass #custom-tags-manager-hover-preview .tag-manager-hover-pr
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Details Tags Overhaul (kmv plugin) — grouped read-only tag display
+   Details Tags Overhaul (kmv plugin) - grouped read-only tag display
    ═══════════════════════════════════════════════════════════════════
 
-   Sister plugin to edit-tags-overhaul, but read-only — appears on the
+   Sister plugin to edit-tags-overhaul, but read-only - appears on the
    scene detail page to show applied tags grouped by parent. Each tag
    is an `<a>` with an image + label, not a button. The plugin toggles
    `.is-open` on the section root (panel), each `__group`, and each
@@ -1945,7 +1945,7 @@ body.stash-liquid-glass #kmv-details-tags-overhaul.details-tags-overhaul {
     font-family: var(--theme-font-stack);
 }
 
-/* Panel header (title + summary + ▾ toggle) — full row is clickable */
+/* Panel header (title + summary + ▾ toggle) - full row is clickable */
 body.stash-liquid-glass .details-tags-overhaul__panel-header {
     display: flex;
     align-items: center;
@@ -1967,7 +1967,7 @@ body.stash-liquid-glass .details-tags-overhaul__panel-summary {
     opacity: 0.75;
     flex: 1 1 auto;
 }
-/* Panel toggle — hide the plugin's `▾` text and overlay the refract
+/* Panel toggle - hide the plugin's `▾` text and overlay the refract
    chevron SVG via mask. Rotates 90° when panel is open. */
 body.stash-liquid-glass .details-tags-overhaul__panel-toggle {
     background: transparent;
@@ -2007,7 +2007,7 @@ body.stash-liquid-glass .details-tags-overhaul.is-open .details-tags-overhaul__p
     background-color: var(--accent-bright);
 }
 
-/* Panel body — show only when .is-open on the section root */
+/* Panel body - show only when .is-open on the section root */
 body.stash-liquid-glass .details-tags-overhaul__groups {
     display: none;
 }
@@ -2082,7 +2082,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup-total-count {
     opacity: 0.75;
 }
 
-/* Group / subgroup toggle chevrons — same SVG mask treatment.
+/* Group / subgroup toggle chevrons - same SVG mask treatment.
    The plugin renders these as `<button>▾</button>`; we hide the text
    and overlay the refract chevron-right via mask. Rotates 90° on open. */
 body.stash-liquid-glass .details-tags-overhaul__toggle,
@@ -2165,7 +2165,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup.is-open > .details-tags
     display: flex;
 }
 
-/* Tag link — card with thumbnail above label. The plugin sets
+/* Tag link - card with thumbnail above label. The plugin sets
    `--dto-image-size` (default 100px from its inline style on the section),
    so we use that so user-configured sizes flow through. */
 body.stash-liquid-glass .details-tags-overhaul__tag {
@@ -2216,7 +2216,7 @@ body.stash-liquid-glass .details-tags-overhaul__tag-label {
     white-space: nowrap;
 }
 
-/* Image-only variant (no label) — bigger square */
+/* Image-only variant (no label) - bigger square */
 body.stash-liquid-glass .details-tags-overhaul__tag--image-only {
     width: calc(var(--dto-image-only-size, 120px) + 0.8rem);
     padding: 0.4rem;
@@ -2245,20 +2245,20 @@ body.stash-liquid-glass .refract-plugin-list {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Tag Sidebar (tag-sidebar plugin) — docked tag-tree filter panel
+   Tag Sidebar (tag-sidebar plugin) - docked tag-tree filter panel
    BEM `tag-sidebar__*`. Root `.tag-sidebar__panel` is position:absolute
    top:0 left:0 (360px, full height), so it slid UNDER refract's floating
    navbar (fixed, top:12px, height ~nav-btn-size + padding). Push the panel
    down to clear the nav and re-skin the whole thing in glass.
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Panel shell — clear the navbar (~its top:12px + height + padding + gap,
+/* Panel shell - clear the navbar (~its top:12px + height + padding + gap,
    which the existing scene-page calc treats as nav-btn-size + 1.6rem) and
    shrink the height to match so the bottom doesn't overflow the viewport. */
 body.stash-liquid-glass .tag-sidebar__panel {
     top: calc(var(--nav-btn-size) + 2.6rem) !important;
     /* Float it off the left edge. margin-left (not left) so we don't fight
-       the plugin's open/close which animates `left`/transform — margin just
+       the plugin's open/close which animates `left`/transform - margin just
        shifts the resting position; the closed state still tucks off-screen. */
     margin-left: 12px !important;
     height: calc(100vh - var(--nav-btn-size) - 2.6rem - 12px) !important;
@@ -2275,7 +2275,7 @@ body.stash-liquid-glass .tag-sidebar__panel {
 
 /* Inner = scroll host (panel itself is overflow:hidden). The plugin makes
    this a flex container, and its content was measured at 472px wide inside a
-   359px panel — the children weren't stretching to the panel width on the
+   359px panel - the children weren't stretching to the panel width on the
    flex cross-axis. Force a proper vertical column with stretched, full-width,
    shrinkable children so nothing can exceed the sidebar. */
 body.stash-liquid-glass .tag-sidebar__inner {
@@ -2294,7 +2294,7 @@ body.stash-liquid-glass .tag-sidebar__inner {
     align-items: stretch !important;
     flex-wrap: nowrap !important;
 }
-/* Every descendant container stretches to full width and may shrink — kills
+/* Every descendant container stretches to full width and may shrink - kills
    the content-sized overflow at whatever nested flex level it occurs (the
    inner [data-stash-filter] wrapper, sections, tree, branches, children). */
 body.stash-liquid-glass .tag-sidebar__inner > *,
@@ -2384,7 +2384,7 @@ body.stash-liquid-glass .tag-sidebar__segmented-button.is-active {
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.4) !important;
 }
 
-/* Search field — glass pill */
+/* Search field - glass pill */
 body.stash-liquid-glass .tag-sidebar__search-input {
     width: 100% !important;
     background: var(--glass-bg) !important;
@@ -2441,14 +2441,14 @@ body.stash-liquid-glass .tag-sidebar__children {
     box-sizing: border-box !important;
 }
 /* Clip stray horizontal overflow only at the tree root (the inner scroll
-   host already does its own overflow-x:hidden). Not on every nested level —
+   host already does its own overflow-x:hidden). Not on every nested level -
    overflow-x:hidden + overflow-y:visible would force nested y-scrollers. */
 body.stash-liquid-glass .tag-sidebar__tree {
     overflow-x: hidden !important;
 }
 
 /* Tree rows. NOTE: indentation is the plugin's own `padding-left`, computed
-   from the row's `--tag-sidebar-depth` custom property — so DON'T set the
+   from the row's `--tag-sidebar-depth` custom property - so DON'T set the
    `padding` shorthand (it would wipe padding-left and flatten the tree) and
    DON'T force `width:100%` (it fights any margin indent). width:auto fills
    the parent content box; max-width:100% + min-width:0 keep it inside the
@@ -2470,7 +2470,7 @@ body.stash-liquid-glass .tag-sidebar__row:hover {
     background: var(--fill-2) !important;
 }
 
-/* Action buttons — small square; expand ▸ neutral, include + accent,
+/* Action buttons - small square; expand ▸ neutral, include + accent,
    exclude − red. Active states fill solid. */
 body.stash-liquid-glass .tag-sidebar__action {
     background: transparent !important;
@@ -2537,7 +2537,7 @@ body.stash-liquid-glass .tag-sidebar__label:hover {
     color: var(--accent-bright) !important;
 }
 
-/* Count pill — soft accent, right-aligned, tabular */
+/* Count pill - soft accent, right-aligned, tabular */
 body.stash-liquid-glass .tag-sidebar__count {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
@@ -2548,7 +2548,7 @@ body.stash-liquid-glass .tag-sidebar__count {
     padding-left: 0.4rem !important;
 }
 
-/* Toggle tab — rotate the "TAGS" label to vertical text so the tab is a thin
+/* Toggle tab - rotate the "TAGS" label to vertical text so the tab is a thin
    strip on the screen edge instead of a wide horizontal box. Glass styling to
    match the panel + navbar. Position is left to the plugin (don't fight its
    open/close), we only change the content orientation + skin. */
@@ -2566,7 +2566,7 @@ body.stash-liquid-glass .tag-sidebar__toggle {
     line-height: 1 !important;
     background: rgba(var(--surface-rgb), 0.92) !important;
     border: 1px solid var(--glass-border) !important;
-    /* Attach flush to the panel's flat right edge — no left border, round
+    /* Attach flush to the panel's flat right edge - no left border, round
        only the right corners, drop the shadow on the right side. */
     border-left: none !important;
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
@@ -2588,7 +2588,7 @@ body.stash-liquid-glass .tag-sidebar__toggle:hover {
 /* Open: the plugin slides the toggle to left:var(--tag-sidebar-panel-width)
    (the un-floated panel edge). We floated the panel +12px, so target +12px
    more. Driving it through `left` lets the plugin's native 180ms left-slide
-   animate it in sync with the panel — no separate margin to desync. Closed
+   animate it in sync with the panel - no separate margin to desync. Closed
    state (left:0, screen edge) is untouched. */
 body.stash-liquid-glass .tag-sidebar--open .tag-sidebar__toggle {
     left: calc(var(--tag-sidebar-panel-width, 360px) + 12px) !important;
@@ -2596,7 +2596,7 @@ body.stash-liquid-glass .tag-sidebar--open .tag-sidebar__toggle {
 }
 
 /* ── Ascension rank on the chin (non playing-card modes) ─────────────
-   Sits on the NAME's line, pinned to the right edge — the same side and
+   Sits on the NAME's line, pinned to the right edge - the same side and
    relationship it has in playing-card mode, where it rides the country
    caption.
 
@@ -2629,7 +2629,7 @@ body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank > .
    In the Refract playing-card layout the name is the banner at the TOP of
    the card and this chin holds the STAT STRIP instead, so `top: 0.48rem`
    pinned the rank onto the pills. Measured on a performer with no country:
-   badge 324-336, strip 329-371 — 7px into the pills, straight through their
+   badge 324-336, strip 329-371 - 7px into the pills, straight through their
    labels. It only shows on performers with no country, which is why it
    looked like it broke "in some places".
 
@@ -2661,7 +2661,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .card-section.r
     font-size: var(--fs-sm) !important;
     filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.62)) !important;
 }
-/* Match the country-nested variant's ember halo too — this case had a
+/* Match the country-nested variant's ember halo too - this case had a
    wider 1.5px/5px glow against 1.2px/3.5px, so the same badge glowed
    differently depending only on whether a country was set. */
 body.stash-liquid-glass.refract-perf-layout-card .performer-card .card-section.refract-chin-with-rank > .refract-ascension-badge .refract-ascension-icon {
@@ -2672,7 +2672,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .card-section.r
 }
 /* The chin's first child is Stash's title link, whose h5 is display:none
    in this layout. It is a 0px-tall flex item that still consumes one
-   2.8px column gap — and because the badge takes `order: -1`, that dead
+   2.8px column gap - and because the badge takes `order: -1`, that dead
    gap lands ABOVE the content on a card with a country and BELOW it on a
    card without one. Nothing is lost by removing it: the h5 inside is
    already hidden, so the link has no height and no hit area, and the
@@ -2688,7 +2688,7 @@ body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank > .
 /* Keep a long name clear of the rank instead of running under it. The
    margin goes on the TITLE, not on the link that wraps it: the title is
    `overflow: hidden` + `nowrap`, and overflow clips at the padding edge,
-   so padding on the wrapper would not actually reserve the space —
+   so padding on the wrapper would not actually reserve the space -
    shrinking the title's own box does. */
 body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank h5.card-section-title {
     margin-right: 3.4rem !important;

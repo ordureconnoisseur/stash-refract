@@ -158,7 +158,7 @@ body.stash-liquid-glass .table-list th.select-col input[type="checkbox"]:checked
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.45) !important;
 }
 
-/* Thumbnail — fixed 16:10 crop so all rows are the same height */
+/* Thumbnail - fixed 16:10 crop so all rows are the same height */
 body.stash-liquid-glass .table-list .cover_image-data {
     width: 106px;
     min-width: 106px;
@@ -240,7 +240,7 @@ body.stash-liquid-glass .table-list .comma-list {
     -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
 }
 body.stash-liquid-glass .table-list .comma-list li {
-    /* keep Stash's inline display — don't override it */
+    /* keep Stash's inline display - don't override it */
     list-style: none !important;
     margin: 0.1rem 0.15rem 0.1rem 0 !important;
 }
@@ -302,7 +302,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column {
     box-shadow: var(--shadow-lg);
 }
 
-/* Settings menu column only: single column, no wrap — avoids Troubleshooting sitting on Advanced. */
+/* Settings menu column only: single column, no wrap - avoids Troubleshooting sitting on Advanced. */
 body.stash-liquid-glass #settings-menu-container .nav.nav-pills.flex-column {
     display: flex;
     flex-direction: column !important;
@@ -351,7 +351,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-link.active {
 }
 
 /* "Support Stash" link injected by refract.js at the bottom of the
-   settings sidebar — replaces the navbar donate button (which we hide
+   settings sidebar - replaces the navbar donate button (which we hide
    because it's off-theme). Subtle, matches sidebar nav-pills aesthetic. */
 body.stash-liquid-glass .nav.nav-pills.flex-column .refract-support-stash-item {
     margin-top: 0.15rem !important;
@@ -395,7 +395,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .stash-theme-settings-divider
 }
 
 /* Advanced mode: render the whole row as a nav-link-shaped toggle.
-   Hide the iOS-style switch widget — clicking the visible label still
+   Hide the iOS-style switch widget - clicking the visible label still
    flips the underlying checkbox via its `for=` attribute. When the
    checkbox is :checked, the row glows orange like .nav-link.active. */
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item .advanced-switch {
@@ -429,13 +429,13 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item .advanced-switch .f
     min-width: 0;
     cursor: pointer !important;
 }
-/* Hide the switch widget — the label already toggles it via `for=`. */
+/* Hide the switch widget - the label already toggles it via `for=`. */
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item .advanced-switch .custom-control.custom-switch,
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item .advanced-switch .form-check.form-switch,
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item .advanced-switch .form-switch {
     display: none !important;
 }
-/* Active state — checkbox is checked → orange glow like .nav-link.active. */
+/* Active state - checkbox is checked → orange glow like .nav-link.active. */
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item:has(.advanced-switch input:checked) .advanced-switch {
     color: var(--accent-bright) !important;
     background: var(--accent-tint) !important;
@@ -501,7 +501,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button 
     background: var(--fill-4) !important;
     border-color: var(--glass-border) !important;
 }
-/* :focus alone (without hover) shouldn't paint the row — keep React's
+/* :focus alone (without hover) shouldn't paint the row - keep React's
    click from leaving a persistent rectangle. */
 body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button .btn:focus:not(:hover),
 body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button .btn:focus-visible:not(:hover),
@@ -534,7 +534,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button 
     background-color: var(--fill-4) !important;
     border-color: var(--glass-border) !important;
 }
-/* Active state for Troubleshooting button — orange glow like nav-link.active.
+/* Active state for Troubleshooting button - orange glow like nav-link.active.
    Matches whichever class Stash uses to mark it active (try a few). */
 body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button .btn.active,
 body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button button.active,
@@ -558,7 +558,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column hr {
 /* Settings panels share four ancestor scopes: #settings-container,
    .settings-container, .settings, [id^="configuration-tabs-tabpane-"].
    `:is()` collapses them. The ID selector lifts the matched specificity
-   from class-level (0,2,0) to ID-level (0,1,1,0) — but every rule in
+   from class-level (0,2,0) to ID-level (0,1,1,0) - but every rule in
    this section already had `#settings-container` as one alias, so the
    highest-specificity match in the original cascade was the same. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .btn.btn-secondary,
@@ -614,7 +614,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.32) !important;
 }
 
-/* Beat late-loading Bootstrap .btn-primary (blue) on settings content + dialogs — do not use
+/* Beat late-loading Bootstrap .btn-primary (blue) on settings content + dialogs - do not use
    #configuration-tabs alone: it wraps the sidebar too and was forcing primary chrome on
    Troubleshooting (overlap/stacking with Advanced). Scope to #settings-container only. */
 body.stash-liquid-glass :is(#configuration-tabs #settings-container, #settings-container .form-group, .modal-body .form-group, .modal-body, #setting-dialog) :is(.btn.btn-primary, button.btn-primary),
@@ -770,7 +770,7 @@ body.stash-liquid-glass #stash-table .minimal.dropdown-toggle.btn svg {
     width: 0.95rem !important;
     height: 0.95rem !important;
 }
-/* Library — Add: primary text button, right (JS sets btn-primary + label "Add"). */
+/* Library - Add: primary text button, right (JS sets btn-primary + label "Add"). */
 body.stash-liquid-glass #stash-table > button.btn.mt-2,
 body.stash-liquid-glass #stash-table button.btn.btn-primary.mt-2 {
     margin-top: 0.55rem !important;
@@ -791,7 +791,7 @@ body.stash-liquid-glass #stash-table button.btn.btn-primary.mt-2 {
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Settings — scraper lists (e.g. Scene scrapers collapse + table)
+   Settings - scraper lists (e.g. Scene scrapers collapse + table)
    ─────────────────────────────────────────────────────────────────── */
 
 /* Toolbar row: filter input + reload button */
@@ -889,14 +889,14 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 }
 
 /* Spacing between sections. Each section sits in its own unnamed wrapper div,
-   so .collapse-header is always :first-child of its parent — can't space on it.
+   so .collapse-header is always :first-child of its parent - can't space on it.
    Space the wrapper divs themselves: any section-wrapper that follows another
    section-wrapper gets a top margin. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) :is(.content, .card-body) > div:has(> .collapse-header) + div:has(> .collapse-header) {
     margin-top: 0.55rem;
 }
 
-/* Panel butts directly under its button — joined glass card */
+/* Panel butts directly under its button - joined glass card */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .collapse:has(> table.scraper-table),
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) div.collapsing:has(> table.scraper-table) {
     background: rgba(10, 10, 12, 0.52) !important;
@@ -928,7 +928,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 /* Suppress the bottom border whenever the panel is open OR transitioning, so:
    - Open state: button merges seamlessly with the panel below (no visible seam).
    - Closing animation (.st-collapse-transitioning, set by JS): the bottom border
-     stays transparent until the panel finishes collapsing — prevents a grey-line
+     stays transparent until the panel finishes collapsing - prevents a grey-line
      flash where the bottom edge would otherwise animate from accent-glow back to
      glass-border while the panel is still visible. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .collapse-header:has(+ .collapse.show) > button.collapse-button.btn.btn-primary,
@@ -975,7 +975,7 @@ body.stash-liquid-glass .setting-section .setting-group > .setting:has(.st-toggl
     align-self: center !important;
     white-space: nowrap;
 }
-/* Project link icon — moved out of the action column into the title row
+/* Project link icon - moved out of the action column into the title row
    by refract.js. Render it as a small inline icon (no button chrome)
    nestled next to the plugin's name + version. */
 body.stash-liquid-glass .setting-section .setting-group h3 > a.st-title-link {
@@ -1016,12 +1016,12 @@ body.stash-liquid-glass .setting-section .setting-group > .setting:has(.st-toggl
 
 /* Hide Stash's native `.setting-group-collapse-button` chevron on the
    Tasks page (Scan / Generate / Migrate / Identify / etc.). The
-   per-task option toggles below the row stay visible — the chevron
+   per-task option toggles below the row stay visible - the chevron
    collapse is redundant UI in this theme. */
 body.stash-liquid-glass .setting-group-collapse-button {
     display: none !important;
 }
-/* Hide the native Enable/Disable button — replaced by the JS-injected
+/* Hide the native Enable/Disable button - replaced by the JS-injected
    custom-switch toggle. We keep the button in the DOM so clicks can be
    forwarded to it; just visually remove it. */
 body.stash-liquid-glass .setting-section .setting-group > .setting .st-toggle-injected ~ button.btn.btn-primary.btn-sm:not(.st-plugin-chevron) {
@@ -1039,7 +1039,7 @@ body.stash-liquid-glass .setting-section .setting-group .st-toggle-wrap {
    the chevron to communicate state. */
 /* In the plugin row, force the toggle's track + thumb to be exactly
    vertically centered within the .custom-switch container by anchoring
-   them to top:50% with translateY(-50%) — this defeats Bootstrap's
+   them to top:50% with translateY(-50%) - this defeats Bootstrap's
    default top-offset positioning that leaves the track ~3px above
    center and visually misaligns it from the sibling chevron button.
    Scoped to the plugins page only. */
@@ -1068,7 +1068,7 @@ body.stash-liquid-glass .setting-section .setting-group .custom-switch .custom-c
     transform: translateY(-50%) translateX(1.18rem) !important;
 }
 
-/* Bare chevron — no surrounding pill, just the icon. Selector matches
+/* Bare chevron - no surrounding pill, just the icon. Selector matches
    the same `:is(#settings-container, ...)` scope used by the global
    `.btn.btn-primary` rule earlier in this file so we beat its border /
    border-radius / box-shadow / background overrides on specificity. */
@@ -1130,7 +1130,7 @@ body.stash-liquid-glass .setting-group[data-st-collapsible-injected="1"] > .sett
     cursor: default;
 }
 
-/* Plugin filter input — reuses Stash's .clearable-input-group classes
+/* Plugin filter input - reuses Stash's .clearable-input-group classes
    so the theme's existing styles for those (glass bg, accent focus)
    carry over. Only thing we add: make the wrap fill the hijacked
    "Reload plugins" row width. Hidden plugins (filter miss) collapse to
@@ -1155,13 +1155,13 @@ body.stash-liquid-glass .setting-section .setting-group.st-plugin-hidden {
 }
 
 /* Settings → Tasks: Plugin Tasks card. JS injects identical st-plugin-chevron
-   buttons and st-plugin-collapsed class as the Plugins page — all chevron CSS
+   buttons and st-plugin-collapsed class as the Plugins page - all chevron CSS
    above already applies. Only card-specific additions needed here. */
 body.stash-liquid-glass .st-task-plugin-card .setting-group.st-plugin-hidden {
     display: none !important;
 }
 
-/* Plugin Tasks rows — tighter padding + hover lift. Dividers from the
+/* Plugin Tasks rows - tighter padding + hover lift. Dividers from the
    generic .setting-section .setting border-bottom rule in 08_misc_mid.css
    L5904 are kept; user preferred the visual separation over a bare list.
 
@@ -1184,18 +1184,18 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     margin: 0 !important;
     line-height: 1.3 !important;
 }
-/* Native .setting-group-collapse-button — same specificity story; the
+/* Native .setting-group-collapse-button - same specificity story; the
    global hide at L994 loses to the per-setting cascade. Match :is() here too. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"] .setting-group-collapse-button {
     display: none !important;
 }
-/* Hover only when collapsed — an expanded row keeping its tint would
+/* Hover only when collapsed - an expanded row keeping its tint would
    conflict with the inner task buttons' own hover affordances. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"].st-plugin-collapsed:hover {
     background: var(--fill-1) !important;
 }
 
-/* Search row — mirrors st-plugin-reload-row layout so clearable-input sits inline. */
+/* Search row - mirrors st-plugin-reload-row layout so clearable-input sits inline. */
 body.stash-liquid-glass .setting.st-task-search-row {
     padding-top: 0.6rem !important;
     padding-bottom: 0.6rem !important;
@@ -1207,7 +1207,7 @@ body.stash-liquid-glass .setting.st-task-search-row > .clearable-input-group {
     min-width: 0;
 }
 
-/* Plugins page rows — hover affordance, mirrors the Plugin Tasks polish.
+/* Plugins page rows - hover affordance, mirrors the Plugin Tasks polish.
    Scoped on :has(.st-toggle-injected) since Plugins page rows have a
    refract-injected toggle, while Plugin Tasks rows do not. Tints the
    whole .setting-group when collapsed (or for non-collapsible plugins);
@@ -1243,7 +1243,7 @@ body.stash-liquid-glass .setting.st-plugin-reload-row > div:last-child {
 }
 
 /* Icon-only reload button: same bare-affordance language as the plugin
-   chevron — flat, no pill, accent-on-hover, with the rotate SVG sized
+   chevron - flat, no pill, accent-on-hover, with the rotate SVG sized
    to match the chevron. Scoped under the same :is() ancestor list as
    the chevron so we beat the global `.btn.btn-primary` overrides on
    specificity. */
@@ -1373,7 +1373,7 @@ body.stash-liquid-glass .search-item {
    .scene-card (thumbnail) + .scene-link (title) side by side.
    The card has no natural width constraint so it balloons to fill
    its half-page column. Cap the card to 150px; let the title fill the rest.
-   .scene-link.overflow-hidden already clips text — min-width:0 lets
+   .scene-link.overflow-hidden already clips text - min-width:0 lets
    flex shrink it past content intrinsic size so TruncatedText works. */
 body.stash-liquid-glass .search-item .scene-card {
     flex: 0 0 150px !important;
@@ -1530,7 +1530,7 @@ body.stash-liquid-glass .tagger-container-header .input-group > .input-group-pre
 /* Single-button .input-group-prepend / .input-group-append (e.g. scrape
    comparison accept/reject icon buttons). Two issues:
    (1) Bootstrap flattens one side via LONGHAND border-top/bottom-right-
-       radius:0 etc — defeats shorthand overrides. Set longhand explicitly.
+       radius:0 etc - defeats shorthand overrides. Set longhand explicitly.
    (2) The PARENT div often has bg-secondary + border-secondary classes
        painting a colored rectangle behind the button. The button's
        rounded corners can't hide it. Neutralise the parent. */
@@ -1616,7 +1616,7 @@ body.stash-liquid-glass .tagger-container-header .form-group .form-label {
    ─────────────────────────────────────────────────────────────────── */
 
 /* Outer .card wrapper around the whole PerformerTagger page is
-   redundant — each performer is its own glass card. Strip the
+   redundant - each performer is its own glass card. Strip the
    wrapper's bg/border/shadow/padding so only the inner cards show. */
 body.stash-liquid-glass .card:has(> .PerformerTagger) {
     background: transparent !important;
@@ -1642,13 +1642,13 @@ body.stash-liquid-glass .tagger-container-header .ml-auto.mb-3 > .btn {
     margin: 0 !important;
 }
 
-/* Configuration dropdown — the .collapse.card that drops out of the
+/* Configuration dropdown - the .collapse.card that drops out of the
    header's gear icon when clicked. Bootstrap toggles three classes:
    .collapse (closed) → .collapsing (animating) → .collapse.show (open).
    We match all three so styling stays consistent throughout the
    animation rather than reverting to Bootstrap defaults mid-slide. */
 body.stash-liquid-glass .tagger-container-header > :is(.collapse, .collapsing).card {
-    /* Opaque bg + no backdrop-filter — animating height with
+    /* Opaque bg + no backdrop-filter - animating height with
        backdrop-filter active causes expensive recomposition every
        frame, which reads as stutter. Solid glass keeps the look
        while staying cheap. */
@@ -1667,7 +1667,7 @@ body.stash-liquid-glass .tagger-container-header > :is(.collapse, .collapsing).c
     transform: translateZ(0);
 }
 /* Smoother easing curve than Bootstrap's default `ease`. Drop
-   box-shadow during the active animation phase — shadows on a
+   box-shadow during the active animation phase - shadows on a
    resizing box have to be repainted every frame and are the most
    common single-frame stutter source. */
 body.stash-liquid-glass .tagger-container-header > .collapsing.card {
@@ -1720,7 +1720,7 @@ body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).car
     padding: 0 !important;
 }
 
-/* Grid container — auto-fill 280px+ columns; cards take their natural
+/* Grid container - auto-fill 280px+ columns; cards take their natural
    height (align-items: start) so the full performer photo can render
    in its native aspect ratio without forcing a uniform card height. */
 body.stash-liquid-glass .PerformerTagger {
@@ -1731,7 +1731,7 @@ body.stash-liquid-glass .PerformerTagger {
     margin-top: 0.75rem;
 }
 
-/* Card frame — vertical layout: image fills top at 3:4 aspect ratio
+/* Card frame - vertical layout: image fills top at 3:4 aspect ratio
    (image takes the majority of the card visually), details stack
    below in a compact info block. */
 body.stash-liquid-glass .PerformerTagger-performer {
@@ -1756,7 +1756,7 @@ body.stash-liquid-glass .PerformerTagger-performer:hover {
     transform: translateY(-1px);
 }
 
-/* Image wrapper — aggressive reset of ALL inherited .performer-card /
+/* Image wrapper - aggressive reset of ALL inherited .performer-card /
    .card / Bootstrap rules via `all: unset`, then a 3:4 aspect frame
    with the img absolute-positioned to fill it (object-fit: cover so
    the photo crops uniformly, keeping all cards the same height). */
@@ -1784,7 +1784,7 @@ body.stash-liquid-glass .PerformerTagger-performer:hover > .performer-card > img
     filter: saturate(1.15);
 }
 
-/* Details block — sits below the image in a compact info section
+/* Details block - sits below the image in a compact info section
    separated from the image by an accent-tinted top border.
    `margin: 0` overrides Stash's native `margin-left: 14px` (left over
    from the horizontal layout the UI was originally designed for) and
@@ -1847,7 +1847,7 @@ body.stash-liquid-glass .PerformerTagger-details .text-left > h5.text-bold {
     border: 1px solid rgba(34, 197, 94, 0.35);
     color: #4ade80;
     border-radius: var(--radius-pill);
-    padding: 0.12rem 0.48rem;  /* rem, not em — parent has font-size:0;
+    padding: 0.12rem 0.48rem;  /* rem, not em - parent has font-size:0;
                                    matches NEEDS MATCH pill's effective size */
     font-size: 0;              /* hide the verbose Stash text */
     font-weight: 600;
@@ -1897,7 +1897,7 @@ body.stash-liquid-glass .PerformerTagger-details .sub-content {
 body.stash-liquid-glass .PerformerTagger-details .sub-content:empty {
     display: none;
 }
-/* UUID + Refresh control — accent-bordered pill. The raw UUID is
+/* UUID + Refresh control - accent-bordered pill. The raw UUID is
    hidden (dense monospace string that bloats every card); replaced
    via a ::before pseudo on the anchor with a clean "↗ StashDB" label
    that still inherits the link's click target + href. Refresh button
@@ -1976,7 +1976,7 @@ body.stash-liquid-glass .PerformerTagger-box-link .btn-primary:hover {
     color: var(--accent-light) !important;
 }
 
-/* Untagged-state search input group — same accent-pill design as the
+/* Untagged-state search input group - same accent-pill design as the
    tagged StashDB link pill, but with an editable input on the left
    instead of a fixed link, and a "Search" button on the right.
    Two-row grid: badge spans full width on row 1, input + button
@@ -2036,7 +2036,7 @@ body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTa
     outline: none !important;
     box-shadow: none !important;
 }
-/* Focus the parent pill instead — brighter accent border ring */
+/* Focus the parent pill instead - brighter accent border ring */
 body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link):focus-within::after {
     border-color: rgba(var(--accent-rgb), 0.55);
     background: rgba(var(--accent-rgb), 0.10);
@@ -2048,7 +2048,7 @@ body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTa
     align-items: stretch !important;
     z-index: 1;
 }
-/* Search button — mirrors the Refresh button's integrated styling */
+/* Search button - mirrors the Refresh button's integrated styling */
 body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) .btn-primary,
 body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) .btn-primary.btn {
     all: unset !important;
@@ -2125,7 +2125,7 @@ body.stash-liquid-glass .PerformerTagger-performer-search.refract-search-hidden 
     animation: none;
 }
 
-/* Close chevron — bottom-center, accent-tinted glass pill. Click
+/* Close chevron - bottom-center, accent-tinted glass pill. Click
    triggers the slide-up dismiss. */
 body.stash-liquid-glass .PerformerTagger-performer-search .refract-search-close {
     position: absolute;
@@ -2275,7 +2275,7 @@ body.stash-liquid-glass .TagTagger-details {
     box-sizing: border-box;
 }
 
-/* Tag image — 1:1 frame, image absolutely positioned, cover crop */
+/* Tag image - 1:1 frame, image absolutely positioned, cover crop */
 body.stash-liquid-glass .TagTagger-tag .tag-card {
     all: unset !important;
     display: block !important;
@@ -2300,7 +2300,7 @@ body.stash-liquid-glass .TagTagger-tag:hover .tag-card > img {
     filter: saturate(1.15);
 }
 
-/* Details text block — sits below the image, accent-tinted top border */
+/* Details text block - sits below the image, accent-tinted top border */
 body.stash-liquid-glass .TagTagger-details-text {
     display: flex !important;
     flex-direction: column !important;
@@ -2460,7 +2460,7 @@ body.stash-liquid-glass .TagTagger-box-link .btn-primary.btn:hover {
     color: var(--accent-light) !important;
 }
 
-/* Untagged search input pill — two-row grid: badge → input+button row */
+/* Untagged search input pill - two-row grid: badge → input+button row */
 body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link) {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -2547,7 +2547,7 @@ body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-bo
     color: var(--accent-light) !important;
 }
 
-/* ── Performer Edit Tags Tab — native taxonomy editor ─────────────────
+/* ── Performer Edit Tags Tab - native taxonomy editor ─────────────────
    Refract-injected "Edit Tags" tab on the performer page. Hierarchical
    taxonomy editor with groups → subgroups → tag buttons. The native
    .tab-content is hidden via the body class while our tab is active. */
@@ -2795,7 +2795,7 @@ body.stash-liquid-glass .refract-tag-editor__subgroup-header:not(.refract-tag-ed
     color: var(--text) !important;
 }
 
-/* Group body — only show when .is-open */
+/* Group body - only show when .is-open */
 body.stash-liquid-glass .refract-tag-editor__group-body {
     display: none;
     padding: 0.55rem 0.7rem 0.85rem;
@@ -2953,11 +2953,11 @@ body.refract-lite.stash-liquid-glass .refract-tag-editor__tag[aria-pressed="true
 
 /* ── Tag hover tooltip (image + name + description) ─────────────────
    Inspired by Performer Tags Overhaul by RollainKraus
-   (https://github.com/RollainKraus/stash-plugins) — same "rich hover
+   (https://github.com/RollainKraus/stash-plugins) - same "rich hover
    popup with image + description" pattern, re-implemented here for
    the refract Edit-Tags tab. Lives at document.body so ancestor
    `overflow: hidden` / clip can't cut it off. Positioned by JS via
-   getBoundingClientRect() — see refractShowTagTip in refract.js. */
+   getBoundingClientRect() - see refractShowTagTip in refract.js. */
 body.stash-liquid-glass .refract-tag-tooltip-portal {
     position: fixed;
     top: 0;
@@ -2965,7 +2965,7 @@ body.stash-liquid-glass .refract-tag-tooltip-portal {
     width: 240px;
     max-width: 90vw;
     z-index: 10000;
-    /* Liquid-glass recipe — light-edge highlight, depth shadow, blurred
+    /* Liquid-glass recipe - light-edge highlight, depth shadow, blurred
        saturated backdrop. Background is a soft top-to-bottom gradient
        (brighter at the top, suggesting a light source) rather than a
        flat fill, which reads as more physical. */
@@ -3042,11 +3042,11 @@ body.refract-lite.stash-liquid-glass .refract-tag-tooltip-portal {
     -webkit-backdrop-filter: none;
 }
 
-/* Performer-name tooltip portal — appended to document.body by
+/* Performer-name tooltip portal - appended to document.body by
    initPerformerNameTooltip() in refract.js when a scene-card avatar
    circle is hovered. Position is set inline via JS (fixed coordinates
    computed from the avatar's getBoundingClientRect), so no ancestor
-   can clip the tooltip — it can render outside any card / grid edge. */
+   can clip the tooltip - it can render outside any card / grid edge. */
 body.stash-liquid-glass .refract-performer-name-tooltip-portal {
     position: fixed;
     top: 0;
@@ -3074,7 +3074,7 @@ body.stash-liquid-glass .refract-performer-name-tooltip-portal.refract-performer
 }
 
 /* Card mode (Suggestion Box → "Performer card on hover"): render a mini
-   performer card — image above the name — instead of the plain text
+   performer card - image above the name - instead of the plain text
    label. Same class, so positioning/show transition are reused. */
 body.stash-liquid-glass .refract-performer-name-tooltip-portal--card {
     display: flex;

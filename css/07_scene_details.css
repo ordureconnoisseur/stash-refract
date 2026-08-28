@@ -1,13 +1,13 @@
 /* ───────────────────────────────────────────────────────────────────
    Scene-detail panel (v2.0 redesign)
    Single floating glass card containing title + toolbar + tabs +
-   tab content. Subsections inside flow flat — no nested cards.
+   tab content. Subsections inside flow flat - no nested cards.
    ─────────────────────────────────────────────────────────────────── */
 
 /* Outer panel. Transparent BORDER is the visual margin (counts inside
    box-sizing:border-box so Bootstrap's flex column sizing isn't
    disturbed); background-clip:padding-box paints the glass inside the
-   transparent border. NO overflow:hidden — would clip the lifted
+   transparent border. NO overflow:hidden - would clip the lifted
    performer-row at the bottom of the tab-pane. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
     background: var(--glass-bg-strong) !important;
@@ -34,7 +34,7 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> :is(.scene-tabs, .ima
     padding: 20px !important;
     /* Row top sits at ~70px below viewport top (navbar 12 + 52 + tiny
        gap). Setting height to (100vh - 70) makes the row end flush
-       against the viewport bottom — no black band below. */
+       against the viewport bottom - no black band below. */
     min-height: 0 !important;
     max-height: calc(100vh - 70px) !important;
     height: calc(100vh - 70px) !important;
@@ -60,7 +60,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs).collapsed {
    .scene-tabs and .expanded to the player). Refract used to hide it as
    dead UI; instead FLOAT its chevron over the existing seam. The divider
    is taken out of grid flow (position:absolute) so the 2-column layout and
-   its single gap are unchanged — no extra column, no doubled gap. */
+   its single gap are unchanged - no extra column, no doubled gap. */
 body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-divider) {
     position: relative !important;
 }
@@ -106,7 +106,7 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs.collapsed
         left: 1rem !important;
     }
 }
-/* Bare chevron — no pill, no border. The button fills the full-height
+/* Bare chevron - no pill, no border. The button fills the full-height
    strip so the entire seam (panel height) is clickable; a faint hover
    tint hints at the target without reintroducing a pill. */
 body.stash-liquid-glass .scene-divider .btn {
@@ -144,14 +144,14 @@ body.stash-liquid-glass .scene-divider .btn:active {
 body.stash-liquid-glass .scene-divider .btn svg {
     width: 0.85rem !important;
     height: 0.85rem !important;
-    /* taller than wide — a stretched chevron, width unchanged */
+    /* taller than wide - a stretched chevron, width unchanged */
     transform: scaleY(2) !important;
 }
 
 /* Narrow viewports: drop the details panel entirely, leaving the
    player to fill the row. Threshold matches Stash's own 1200px
    breakpoint where its native player-container max-width rules
-   change — keeping these aligned avoids a janky in-between state
+   change - keeping these aligned avoids a janky in-between state
    where the panel takes 340px but the player gets squeezed to 0. */
 @media (max-width: 1199.98px) {
     body.stash-liquid-glass .main.container-fluid > .row:has(> :is(.scene-tabs, .image-tabs)) {
@@ -203,7 +203,7 @@ body.stash-liquid-glass .gallery-container .tab-content {
     box-shadow: none !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-    /* Flex column that fills the remaining panel height — required so
+    /* Flex column that fills the remaining panel height - required so
        .tab-pane.active can also flex-grow and the lifted performer row
        inside can be pushed to the bottom via margin-top: auto. */
     display: flex !important;
@@ -227,7 +227,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane.active.show {
    Stash's SceneDetailPanel renders the description, tags AND performers
    into a SINGLE .col-12 (it gets the scene-performers-row class in-place,
    no node move). So putting margin-top:auto on that .col-12's .row wrapper
-   pushed the *entire* block — description included — to the panel bottom,
+   pushed the *entire* block - description included - to the panel bottom,
    leaving a big gap under the header whenever the description was short
    (long descriptions filled the panel and hid the bug). Instead:
      1. let the content row + its col fill the pane height (top-aligned),
@@ -255,7 +255,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .col-12.sce
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Gallery-detail layout — same viewport-height grid pattern as scene
+   Gallery-detail layout - same viewport-height grid pattern as scene
    detail. Row children: .gallery-tabs (left details) | .gallery-divider
    (hidden) | .gallery-container (right tabs + image grid).
    ─────────────────────────────────────────────────────────────────── */
@@ -274,7 +274,7 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .gallery-container) {
     box-sizing: border-box !important;
 }
 
-/* Hide the manual collapse divider — the < 1200px media query below
+/* Hide the manual collapse divider - the < 1200px media query below
    handles narrow widths automatically. */
 body.stash-liquid-glass .gallery-divider {
     display: none !important;
@@ -436,7 +436,7 @@ body.stash-liquid-glass:has(.main.container-fluid > .row > .gallery-container) .
 }
 
 /* Both panels fill their grid track and scroll internally. min-height:0
-   is critical — without it CSS Grid items default to intrinsic content
+   is critical - without it CSS Grid items default to intrinsic content
    height and break the parent's overflow:hidden clipping. width/max-width
    defeat Stash's Bootstrap col-style 50%-width rules on the container. */
 /* The container still fills its track; the details panel is sized by its
@@ -485,7 +485,7 @@ body.stash-liquid-glass .gallery-container::-webkit-scrollbar-thumb {
     border-radius: 3px !important;
 }
 
-/* Glass card styling for the details panel — matches scene-tabs. */
+/* Glass card styling for the details panel - matches scene-tabs. */
 body.stash-liquid-glass .gallery-tabs {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
@@ -509,7 +509,7 @@ body.stash-liquid-glass .gallery-tabs {
     }
 }
 
-/* ── Title row — studio label stacked above the scene title ──────── */
+/* ── Title row - studio label stacked above the scene title ──────── */
 body.stash-liquid-glass :is(.scene-header-container, .image-header-container) {
     display: flex !important;
     flex-direction: column !important;
@@ -659,7 +659,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     opacity: 0.4 !important;
 }
 
-/* ── Toolbar — strict single row of small glass-pill buttons ──────── */
+/* ── Toolbar - strict single row of small glass-pill buttons ──────── */
 /* Wraps rather than scrolls. As a strict single row this needed 409px of
    width inside a column that caps at 358px, with `overflow-x: auto` and
    `scrollbar-width: none` hiding the fact: the scene actions menu and the
@@ -785,7 +785,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 }
 
 /* Stash renders .o-counter as a btn-group with a split-button dropdown
-   caret next to the count, but the menu is empty on image pages — kill
+   caret next to the count, but the menu is empty on image pages - kill
    both the split-button and the Bootstrap dropdown-toggle::after caret
    so the pill stays clean. Scoped to image-toolbar; scene-page .o-counter
    (if it ever uses this markup) keeps its dropdown. */
@@ -799,7 +799,7 @@ body.stash-liquid-glass .image-toolbar .o-counter .dropdown-toggle::after {
    wrapper (.count-button or .o-counter) for ~280ms when a hold fires the
    decrement mutation. Tint red briefly so the user sees the action
    registered. Regular click increments and gets no flash. Covers all
-   surfaces — detail toolbars, lightbox, scene/image card popovers. */
+   surfaces - detail toolbars, lightbox, scene/image card popovers. */
 body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented,
 body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented > button,
 body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented .count-icon,
@@ -837,7 +837,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     border-color: var(--accent-glow) !important;
     color: #fff !important;
 }
-/* Active (organized) state — accent fill + glow so the toggle reads as ON.
+/* Active (organized) state - accent fill + glow so the toggle reads as ON.
    Stash adds `.organized` to the button when the scene is organized. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized {
     background: var(--accent-tint) !important;
@@ -860,7 +860,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     height: 11px !important;
 }
 
-/* ── Tabs nav — compact pill row, single line ─────────────────────── */
+/* ── Tabs nav - compact pill row, single line ─────────────────────── */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs,
 body.stash-liquid-glass .gallery-tabs .nav-tabs,
 body.stash-liquid-glass .nav-tabs {
@@ -905,7 +905,7 @@ body.stash-liquid-glass .nav-tabs .nav-link {
 
 /* Stretch each tab wrapper (.nav-item is the flex child of .nav-tabs,
    not .nav-link). `flex: 1 1 auto` makes tabs grow proportionally from
-   their natural content width to fill the available navbar — the panel
+   their natural content width to fill the available navbar - the panel
    width is no longer pinned to the sum of tab widths; any extra space
    is absorbed by the tabs instead of leaving a trailing gap.
 
@@ -936,7 +936,7 @@ body.stash-liquid-glass .nav-tabs .nav-link.active {
         0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
 }
 
-/* Detail-page tab strips — bump padding + font over the compact default
+/* Detail-page tab strips - bump padding + font over the compact default
    so the tab buttons are a more comfortable hit target than the slim
    sidebar variants on scene/gallery pages.
    This used to name .performer-tabs only, so the tag, studio and group
@@ -1012,16 +1012,16 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table th {
     padding: 0.55rem 0.75rem !important;
 }
 
-/* ── Details tab inner sections (flat — no nested cards) ──────────── */
+/* ── Details tab inner sections (flat - no nested cards) ──────────── */
 
-/* Metadata strip (Created At / Updated At / Studio Code) — hidden per
+/* Metadata strip (Created At / Updated At / Studio Code) - hidden per
    user preference. The full row is wrapped, so hide the row too. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12.scene-details,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row:has(> .col-12.scene-details) {
     display: none !important;
 }
 
-/* Description+Tags column — flat content, no nested chrome.
+/* Description+Tags column - flat content, no nested chrome.
    Keep Bootstrap's column padding so the .row's -15px negative margin
    is properly compensated; only zero out chrome (bg/border/filter). */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row > .col-12:has(> p.pre) {
@@ -1064,7 +1064,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > p.pre {
     font-family: inherit !important;
 }
 
-/* Tag pills — compact in scene-tabs context (full size elsewhere).
+/* Tag pills - compact in scene-tabs context (full size elsewhere).
    The selector used to be unscoped despite what this comment says, so the
    compact treatment leaked onto every detail page. On the performer header
    that rendered tag chips at 0.7rem (9.8px) beside 14px field values, with
@@ -1114,7 +1114,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list {
     scrollbar-width: thin !important;
     scrollbar-color: var(--glass-border) transparent !important;
 }
-/* Subtle bottom fade — only when the strip actually overflows its
+/* Subtle bottom fade - only when the strip actually overflows its
    max-height (toggled by syncTagListFade in refract.js). Short tag
    lists stay sharply rendered with no half-faded last row. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list.refract-overflow {
@@ -1141,8 +1141,8 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list.st-tag-list .
     flex-shrink: 0 !important;
 }
 
-/* Performer-row — JS adds class scene-performers-row to the .col-12 that
-   directly contains .scene-performers (no node move — avoids React removeChild
+/* Performer-row - JS adds class scene-performers-row to the .col-12 that
+   directly contains .scene-performers (no node move - avoids React removeChild
    errors on scene save). The containing .row gets margin-top:auto to anchor the
    performer strip at the bottom of the .tab-pane flex column.
    In the narrow scene-tabs sidebar performers render as a count-adaptive layout
@@ -1198,8 +1198,8 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
 }
 
 /* Cards as direct children of .scene-performers (a Bootstrap .row) pick
-   up `.row > *` rules — width:100%, padding-left/right from --bs-gutter-x.
-   With gutter zeroed above, padding goes to 0 — but force the reset
+   up `.row > *` rules - width:100%, padding-left/right from --bs-gutter-x.
+   With gutter zeroed above, padding goes to 0 - but force the reset
    explicitly on the cards too in case any later rule re-introduces it. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card {
     padding-left: 0 !important;
@@ -1292,7 +1292,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
    a centred [‹][dots][›] strip. The chevrons reuse the main-column
    .stash-perf-prev/.stash-perf-next glyph + accent styling, but here we
    flip them from the absolute overlay to plain inline flex items that
-   flank the dots — more visible and self-positioning. */
+   flank the dots - more visible and self-positioning. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-nav {
     display: flex !important;
     align-items: center !important;
@@ -1321,7 +1321,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
     transform: scale(1.15) !important;
 }
 
-/* Pagination dots — only present when count="many" (JS only appends them
+/* Pagination dots - only present when count="many" (JS only appends them
    in that case). Active dot is an accent-coloured pill; inactive dots are
    subtle glass-border circles that brighten on hover. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-dots {
@@ -1364,7 +1364,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
 /* Stash wraps the <img> in an <a href="/performers/N">. The anchor is
    inline-level by default so it doesn't fill the thumbnail-section,
    leaving the image at its natural top-left position. Target ONLY that
-   anchor (the one containing the image) — there's a second <a> in the
+   anchor (the one containing the image) - there's a second <a> in the
    thumbnail-section for the country flag that we must not stretch. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .thumbnail-section > a:has(> .performer-card-image) {
     display: block !important;
@@ -1382,7 +1382,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
     /* Portrait headshots in a 34px circle: a centred crop takes the
        middle of the body and cuts the face off. */
     object-position: top center !important;
-    /* Default center-center crop — matches vanilla Stash behaviour. */
+    /* Default center-center crop - matches vanilla Stash behaviour. */
     object-position: center center !important;
 }
 
@@ -1443,7 +1443,7 @@ body.stash-liquid-glass.refract-perf-layout-card :is(.scene-tabs, .image-tabs, .
     width: 7.7cqw !important;
     height: 7.7cqw !important;
 }
-/* Tier ribbon (diagonal sash) — fixed rem geometry (top 1.4 / right -3 /
+/* Tier ribbon (diagonal sash) - fixed rem geometry (top 1.4 / right -3 /
    width 11 / 0.72rem text) likewise scaled to cqw so the sash + its text
    shrink with the card. Calibrated to match the grid at ~280px. */
 body.stash-liquid-glass.refract-flourish-tiers :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card[class*="refract-card-tier-"] .refract-pc-tier-label {
@@ -2000,7 +2000,7 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
 /* ── Wall / masonry view ────────────────────────────────────────────── */
 
 /* ───────────────────────────────────────────────────────────────────
-   Scene-detail panel — v3 composition (1b "Marquee" + 2c "Chips")
+   Scene-detail panel - v3 composition (1b "Marquee" + 2c "Chips")
    From the Claude Design project "Token and Stash markup", implementing
    `Scene Panel v3.dc.html`. Supersedes the v2 one-row toolbar and the
    v2 rating popover, both removed above rather than layered over.
@@ -2582,7 +2582,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
     margin: 1.25rem 0 0 0 !important;
 }
 
-/* ── Tab strip — same six destinations, one step larger ───────────── */
+/* ── Tab strip - same six destinations, one step larger ───────────── */
 /* The tab strip, as a segmented control rather than a row of touching
    pills. Three measured faults: the links sat at a 0px gap so adjacent
    12px pills abutted with no daylight between them; the link radius

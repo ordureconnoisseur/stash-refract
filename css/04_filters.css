@@ -57,7 +57,7 @@ body.stash-liquid-glass .dropdown-divider {
    ─────────────────────────────────────────────────────────────────── */
 
 body.stash-liquid-glass .modal-content {
-    /* Neutral grey — avoid (n,n,n+4) mixes that read as blue next to --bg-0 */
+    /* Neutral grey - avoid (n,n,n+4) mixes that read as blue next to --bg-0 */
     background: var(--surface-solid) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
@@ -202,7 +202,7 @@ body.stash-liquid-glass .modal-footer .btn {
     margin: 0 !important;
 }
 
-/* Modals are often portaled outside .settings — footer buttons otherwise keep default Bootstrap blues. */
+/* Modals are often portaled outside .settings - footer buttons otherwise keep default Bootstrap blues. */
 body.stash-liquid-glass .modal .modal-footer .btn,
 body.stash-liquid-glass .modal .modal-footer button.btn {
     border-radius: var(--radius-sm) !important;
@@ -346,7 +346,7 @@ body.stash-liquid-glass .search-term-row .clearable-input-group {
     min-width: 0 !important;
 }
 
-/* Clear (×) button inside any .clearable-input-group — fill the parent
+/* Clear (×) button inside any .clearable-input-group - fill the parent
    vertically (top:0 + bottom:0 + height:100%) and flex-center the SVG
    inside, so Bootstrap's .btn padding can't offset it. */
 body.stash-liquid-glass .clearable-input-group {
@@ -396,7 +396,7 @@ body.stash-liquid-glass .search-term-row .clearable-text-field {
     box-shadow: none !important;
 }
 
-/* Criterion accordion — flat list, override glass card styling */
+/* Criterion accordion - flat list, override glass card styling */
 body.stash-liquid-glass .criterion-list {
     border-top: 1px solid rgba(255,255,255,0.07) !important;
     margin-top: 0.25rem !important;
@@ -451,7 +451,7 @@ body.stash-liquid-glass .filter-item-header .mr-auto {
     min-width: 0 !important;
 }
 
-/* Collapse chevron — small, rotates when open */
+/* Collapse chevron - small, rotates when open */
 body.stash-liquid-glass .collapse-icon {
     width: 0.55rem !important;
     height: 0.55rem !important;
@@ -467,7 +467,7 @@ body.stash-liquid-glass .criterion-list .card:has(.collapse.show) .collapse-icon
     opacity: 0.75 !important;
 }
 
-/* Pin button — hidden until row is hovered */
+/* Pin button - hidden until row is hovered */
 body.stash-liquid-glass .pin-criterion-button {
     background: transparent !important;
     border: none !important;
@@ -496,7 +496,7 @@ body.stash-liquid-glass .criterion-list .card-body {
     padding: 0.35rem 0.5rem 0.65rem 1.25rem !important;
 }
 
-/* Modifier pills — override global .btn-primary */
+/* Modifier pills - override global .btn-primary */
 body.stash-liquid-glass .modifier-options {
     display: flex !important;
     flex-wrap: wrap !important;
@@ -582,7 +582,7 @@ body.stash-liquid-glass .popover-body {
     background-color: transparent !important;
     color: var(--text) !important;
 }
-/* Arrow tinted to match — covers all four directions */
+/* Arrow tinted to match - covers all four directions */
 body.stash-liquid-glass .popover-arrow::before,
 body.stash-liquid-glass .bs-popover-top .popover-arrow::before,
 body.stash-liquid-glass .bs-popover-bottom .popover-arrow::before,
@@ -690,11 +690,11 @@ body.stash-liquid-glass .form-control::placeholder {
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Filter list toolbar — each button is its own rounded rectangle.
-   No capsule pill, no overflow:hidden — dropdowns can't be clipped.
+   Filter list toolbar - each button is its own rounded rectangle.
+   No capsule pill, no overflow:hidden - dropdowns can't be clipped.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Sticky toolbar — pins below the floating navbar while scrolling.
+/* Sticky toolbar - pins below the floating navbar while scrolling.
    Glass platform painted via ::before pseudo-element (so React/Stash
    inline styles can't wipe it). Width shrinks to fit contents and
    centres horizontally so the platform hugs the buttons rather than
@@ -718,7 +718,7 @@ body.stash-liquid-glass .filtered-list-toolbar {
     top: calc(var(--nav-btn-size) + 2.6rem) !important;
     z-index: 90 !important;
     max-width: 100% !important;
-    /* margin: 0 auto on inline element doesn't centre — wrap parent
+    /* margin: 0 auto on inline element doesn't centre - wrap parent
        padding instead. The toolbar will sit left-aligned within Stash's
        container, but with breathing room from the column edges. */
 }
@@ -742,7 +742,7 @@ body.stash-liquid-glass .filtered-list-toolbar > * {
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
-/* Pill-shaped glass platform — matches the floating pagination at the
+/* Pill-shaped glass platform - matches the floating pagination at the
    bottom of long lists. Painted via ::before so React/Stash inline
    style overrides on the toolbar itself can't wipe it. Negative inset
    provides visual breathing room around the buttons. */
@@ -765,13 +765,13 @@ body.stash-liquid-glass .filtered-list-toolbar::before {
     pointer-events: none !important;
 }
 
-/* Hide Stash's redundant left filter sidebar entirely — the top filter
+/* Hide Stash's redundant left filter sidebar entirely - the top filter
    toolbar already exposes search/saved-filters/edit-filter/etc., so the
    sidebar duplicates UI. Also kill the sidebar-toggle button and the
    sidebar-pane-content's hard-coded margin-left so the main list fills
    the row instead of leaving a 235px reservation for the hidden
    sidebar. (An opt-in restore with a TagSidebar-style skin was tried
-   2026-07-28 and pulled before shipping — the restored panel never
+   2026-07-28 and pulled before shipping - the restored panel never
    looked right; revisit with a real design if the forum asks again.) */
 body.stash-liquid-glass .sidebar,
 body.stash-liquid-glass [class*="col-"]:has(> .sidebar),
@@ -785,7 +785,7 @@ body.stash-liquid-glass .sidebar-pane-content {
 /* Image lists now use the same sticky-pill toolbar design as scene/
    performer lists. But inside a gallery → Images tab the panel is its
    own scroll container (height = grid track), so the viewport-level
-   `top: 5rem` puts the toolbar 80px below the panel top — leaving a
+   `top: 5rem` puts the toolbar 80px below the panel top - leaving a
    visual gap. Pin to `top: 0` in that nested scroll context so the pill
    sits flush with the tab nav above it. */
 body.stash-liquid-glass .gallery-container .image-list .filtered-list-toolbar {
@@ -804,7 +804,7 @@ body.stash-liquid-glass .filtered-list-toolbar .btn-group > * {
 }
 
 /* Every toolbar control: glass rounded rectangle. No backdrop-filter
-   here — these sit on top of the toolbar's already-blurred ::before
+   here - these sit on top of the toolbar's already-blurred ::before
    pill platform, so re-blurring inside is wasted GPU. */
 body.stash-liquid-glass .filtered-list-toolbar .btn-secondary,
 body.stash-liquid-glass .filtered-list-toolbar select.form-control,
@@ -846,7 +846,7 @@ body.stash-liquid-glass .filtered-list-toolbar .btn-secondary svg {
    and :has() rules so :has() parser failure doesn't invalidate the
    explicit-class side. */
 
-/* Explicit class list — works in all browsers */
+/* Explicit class list - works in all browsers */
 body.stash-liquid-glass .filtered-list-toolbar .filter-button.btn.btn-secondary,
 body.stash-liquid-glass .filtered-list-toolbar .play-button.btn.btn-secondary,
 body.stash-liquid-glass .filtered-list-toolbar #more-menu.btn.btn-secondary,
@@ -872,7 +872,7 @@ body.stash-liquid-glass .filtered-list-toolbar .saved-filter-dropdown > button.d
     border: none !important;
 }
 
-/* :has() fallback — catches any other icon-only toolbar buttons (shuffle
+/* :has() fallback - catches any other icon-only toolbar buttons (shuffle
    inside .sort-by-select, etc.) without enumerating them */
 body.stash-liquid-glass .filtered-list-toolbar .btn.btn-secondary:has(> svg:only-child) {
     background: transparent !important;
@@ -911,7 +911,7 @@ body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .input-group-prep
     color: #fff !important;
 }
 
-/* Danger / delete button — red-tinted glass instead of Bootstrap solid red */
+/* Danger / delete button - red-tinted glass instead of Bootstrap solid red */
 body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger,
 body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger-minimal {
     background: rgba(239, 68, 68, 0.10) !important;
@@ -936,7 +936,7 @@ body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger-minimal svg {
     height: 0.95rem;
 }
 
-/* Zoom slider container — Stash renders an empty <div class="zoom-slider-container"></div>
+/* Zoom slider container - Stash renders an empty <div class="zoom-slider-container"></div>
    on list views that don't have a zoom slider (no children). Hide the
    empty wrapper so it doesn't reserve dead space in the toolbar row. */
 body.stash-liquid-glass .filtered-list-toolbar .zoom-slider-container:empty,
@@ -965,7 +965,7 @@ body.stash-liquid-glass .filtered-list-toolbar .selected-items-info .selected-co
     min-width: 1.4rem;
     text-align: center;
 }
-/* Strip the toolbar's glass-button style off the inner minimal buttons —
+/* Strip the toolbar's glass-button style off the inner minimal buttons -
    they live inside the pill and should feel like icon-only affordances. */
 body.stash-liquid-glass .filtered-list-toolbar .selected-items-info .btn.btn-secondary.minimal {
     background: transparent !important;
@@ -1009,7 +1009,7 @@ body.stash-liquid-glass .filtered-list-toolbar .filter-button .badge {
     box-shadow: 0 0 6px var(--accent-glow);
 }
 
-/* Zoom slider — match toolbar control height (2.2rem), longer track, thumb orange “flow” */
+/* Zoom slider - match toolbar control height (2.2rem), longer track, thumb orange “flow” */
 body.stash-liquid-glass .zoom-slider-container {
     display: inline-flex;
     align-items: center;
@@ -1037,7 +1037,7 @@ body.stash-liquid-glass .filtered-list-toolbar .zoom-slider-container {
         0 1px 0 rgba(255, 255, 255, 0.04) inset,
         0 4px 12px rgba(0, 0, 0, 0.18);
 }
-/* Zoom slider — accent-tracking thumb + filled-track on the left side.
+/* Zoom slider - accent-tracking thumb + filled-track on the left side.
    The filled portion uses a webkit-only trick: ::-webkit-slider-thumb has a
    massive box-shadow extending leftward, and the track's overflow:hidden
    clips it to the track bounds. Firefox has a native ::-moz-range-progress
@@ -1222,7 +1222,7 @@ body.stash-liquid-glass .tag-item .tag-icon {
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Pagination — capsule pill (no overflow:hidden)
+   Pagination - capsule pill (no overflow:hidden)
    The base `.pagination` capsule is now defined in 09_buttons.css with
    `!important`s and a more comprehensive declaration set; only the
    button-based (.pagination.btn-group) variant rules remain here.
@@ -1383,7 +1383,7 @@ body.stash-liquid-glass .pagination-index-container > .pagination {
            data-pager-row="hide" (rowOf() resolves the top pager's wrapper
            to .pagination-index-container, which also holds the stats), so
            09_buttons.css hides it with display:none. That's why the totals
-           were invisible — and why they "randomly" reappeared: on a
+           were invisible - and why they "randomly" reappeared: on a
            single-page result Stash renders the top pager as an empty <div>
            (not .pagination), so nothing gets tagged and the row stays
            visible. This selector out-specifies the hide rule (0,4,1 vs
@@ -1411,7 +1411,7 @@ body.stash-liquid-glass .pagination-index-container > .pagination {
         --refract-stats-inset: 0.85rem;
         margin: -0.85rem 0 0.05rem 0 !important;
         padding: 0 var(--refract-stats-inset) 0 0 !important;
-        /* It's a passive label — never intercept clicks on the toolbar
+        /* It's a passive label - never intercept clicks on the toolbar
            controls or cards it floats over. */
         pointer-events: none;
     }
@@ -1511,7 +1511,7 @@ body.stash-liquid-glass .table-striped > tbody > tr:nth-of-type(odd) {
     color: var(--text);
 }
 
-/* Filtered list grid (scenes / movies / performers table view) — glass shell like package manager */
+/* Filtered list grid (scenes / movies / performers table view) - glass shell like package manager */
 body.stash-liquid-glass .table-responsive:has(> table.table:has(thead th.select-col)) {
     background: rgba(10, 10, 12, 0.9) !important;
     border: 1px solid var(--glass-border) !important;
@@ -1600,7 +1600,7 @@ body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.se
 
 
 /* ───────────────────────────────────────────────────────────────────
-   A-01 / R5 — page-level horizontal overflow and gutter alignment.
+   A-01 / R5 - page-level horizontal overflow and gutter alignment.
 
    Every list route scrolled sideways by exactly 3px: measured
    documentElement.scrollWidth 1588 against clientWidth 1585 on scenes,
