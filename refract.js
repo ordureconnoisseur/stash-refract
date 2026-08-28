@@ -12987,9 +12987,13 @@
         });
 
         if (caption) {
-            caption.textContent = (counted === sorted.length)
-                ? (sorted.length + ", rarest first")
-                : String(sorted.length);
+            /* Just the count. It used to read "24, rarest first", which
+               explained the ordering in words next to a list whose
+               ordering is already visible: the counts beside the chips
+               ascend. A caption that narrates what the reader can see
+               is filler, and this one sat in the tightest line on the
+               surface. */
+            caption.textContent = String(sorted.length);
         }
         var hidden = sorted.length - lead;
         if (more) {

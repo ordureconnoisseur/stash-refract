@@ -1512,6 +1512,16 @@ body.stash-liquid-glass dl.details-list dt {
     text-transform: uppercase !important;
     letter-spacing: var(--track-label) !important;
     margin: 0 !important;
+    /* The column cap above is deliberate and stays; what it produced was
+       not. These labels inherit overflow-wrap: break-word, so capping the
+       column made "File Modification Time:" break INSIDE a word and
+       render as "FILE / MODIFICATIO / N TIME:" across three lines. A
+       label wraps between its words or not at all: break-word is for
+       unbroken strings like a path or a hash, which is the dd's job
+       below, not a caption's. */
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
 }
 body.stash-liquid-glass .scene-file-info dd,
 body.stash-liquid-glass dl.details-list dd {
