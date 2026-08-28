@@ -708,24 +708,12 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
    multiview button were 100% off the end, and the organised button was
    sliced at 74%, at EVERY supported width (still 51px over at 2560).
    A second row in a 385px sidebar costs 30px and reaches everything. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    /* ONE row, as the heading above says. The overflow fix that started
-       this let the toolbar wrap, which reached every control but cost a
-       second row -- and the strict single row is the design. Everything
-       fits now because the star rating was the thing making it not fit:
-       eight controls needed 333.7px of a 338px column with seven gaps to
-       find, and the stars alone were 109px of that. Smaller stars and a
-       tighter gap bring the row to ~310px, so nothing wraps and nothing
-       is hidden. */
-    flex-wrap: nowrap !important;
-    gap: var(--gap-2xs) !important;
-    margin: 0 0 0.65rem 0 !important;
-    overflow: visible !important;
-}
+/* The toolbar container is declared once, further down, where the strip
+   is built. An identical block used to sit here too, 1,475 lines
+   earlier, losing every property the two shared to the later one --
+   including its own flex-wrap: nowrap, which the live block overrode
+   back to wrap. Its comment argued for a single row that the rule below
+   it was undoing. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar)::-webkit-scrollbar {
     display: none !important;
 }
@@ -783,7 +771,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, 
    accent-light and 0. Two contradictory fills 1,475 lines apart, and the
    one that lost was the one with no comment explaining the choice. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
-    height: 26px !important;
+    height: 22px !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     font-size: var(--fs-xs) !important;
@@ -2130,18 +2118,26 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-header, .image-
     letter-spacing: -0.015em !important;
     margin-top: 0.7rem !important;
 }
+/* Direction B. These three are FACTS ABOUT THE FILE and nothing else:
+   they report, they never mutate, and 6.7 says a pill that reports must
+   not look like a pill that acts. As bordered pills they were three of
+   the eleven rounded objects stacked above the tab strip, and the two
+   loudest of them by contrast (11.99:1) outranked the scene description
+   they sit above.
+
+   So they stop being objects and become a subtitle: one muted run under
+   the title, separated by the divider Stash already renders between the
+   frame rate and the resolution. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) {
     display: flex !important;
-    align-items: center !important;
-    gap: 5px !important;
-    margin: 0.7rem 0 0 0 !important;
+    align-items: baseline !important;
+    gap: 0 !important;
+    margin: 0.4rem 0 0 0 !important;
     flex-wrap: wrap !important;
-    /* Measured 119.81px of dead air between the date pill and the
-       fps/resolution group: justify-content resolves to space-between
-       from outside both refract blocks, so the two ends were pushed
-       apart across the full 338px. The pills are a group, not a
-       distributed row. */
     justify-content: flex-start !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 500 !important;
+    color: rgba(255, 255, 255, 0.45) !important;
 }
 /* One real star, defined once. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
@@ -2158,14 +2154,23 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     gap: 5px !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) :is(.date, .frame-rate, .resolution) {
-    padding: 3px 9px !important;
-    border-radius: var(--radius-pill) !important;
-    background: rgba(255, 255, 255, 0.06) !important;
-    border: 1px solid var(--glass-border) !important;
-    color: rgba(255, 255, 255, 0.86) !important;
-    font-size: var(--fs-sm) !important;
-    font-weight: 600 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+    border: 0 !important;
+    color: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
     font-variant-numeric: tabular-nums !important;
+}
+/* The separator between the date and the pair that follows it. The
+   divider Stash renders sits INSIDE that pair, so it only ever
+   separates two of the three; this supplies the missing one, and only
+   when there is a date to separate from. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .date:not(:empty)::after {
+    content: "\00b7";
+    margin: 0 7px;
+    color: rgba(255, 255, 255, 0.25);
 }
 /* Stash renders the spec spans whether or not it has a value for them,
    so a scene with no date got an empty .date -- which the pill styling
@@ -2176,8 +2181,18 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) :is(.date, .frame-rate, .resolution):empty {
     display: none !important;
 }
+/* Stash's own " | " between frame rate and resolution, which the pill
+   layout had to hide. A middle dot at a quarter alpha reads as a
+   separator rather than a rule. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .divider {
-    display: none !important;
+    display: inline !important;
+    font-size: 0 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .divider::after {
+    content: "\00b7";
+    margin: 0 7px;
+    font-size: var(--fs-sm);
+    color: rgba(255, 255, 255, 0.25);
 }
 
 /* ── State: one anchor row, one chip row ──────────────────────────── */
@@ -2185,13 +2200,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
    both rows live in one flex container with no injected nodes. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
     display: flex !important;
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    row-gap: 9px !important;
-    column-gap: 5px !important;
-    margin: 0.9rem 0 0 0 !important;
-    padding: 0 !important;
+    row-gap: 0 !important;
+    column-gap: 6px !important;
+    /* The strip itself: one pill holding the whole control row. --fill-2
+       and a hairline, the recipe the operations button already used, so
+       the container reads as one surface rather than a fourth kind of
+       chip. */
+    margin: 0.85rem 0 0 0 !important;
+    padding: 5px 9px !important;
+    border-radius: var(--radius-pill) !important;
+    background: var(--fill-2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     overflow: visible !important;
     position: relative !important;
 }
@@ -2212,25 +2234,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs {
     max-width: 620px !important;
 }
 
-/* The row breaks into two lines, and the split is by what a control IS,
-   not by how many fit: everything that REPORTS on the scene above
-   (rating, score, play count, O count), everything that ACTS on it
-   below (the toggles, then the operations menu and multiview). 6.5
-   draws that line between a readout and a control; the row now draws
-   it too.
+/* Direction B: the toolbar is ONE strip, and it is the only object left
+   above the tab bar.
 
-   The previous split was rating-and-utilities over chips, which put
-   four word chips on one 338px line when they measure 350.3px with
-   their gaps. Organised wrapped alone onto a third line 12.3px short
-   of fitting, and the utilities' auto margin left a 98.2px hole in
-   the middle of line one. Regrouped, line one measures 296.7px and
-   line two 284.4px, both inside 338 with room to spare, and the
-   toolbar loses a whole row of height. */
+   It used to be two lines of chips split by what a control is. That
+   split was right about the taxonomy and wrong about the remedy: it
+   still drew nine bordered objects, and it still made a play count look
+   like a button. Everything that merely reports has left the row (the
+   file facts to the subtitle above, the counts to plain text inside the
+   strip), so what is left is the rating, its two numbers, and the four
+   things that act on the scene.
+
+   The line break that used to force two rows is gone with them. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar)::after {
-    content: "";
-    flex: 0 0 100%;
-    height: 0;
-    order: 5;
+    content: none !important;
 }
 /* Groups AND their span wrappers dissolve, so the real controls are the
    flex items and `order` can address them directly. */
@@ -2269,14 +2286,18 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     padding: 0 !important;
     transform: none !important;
 }
+/* 14px, not 17. Inside the strip the five stars and their gaps are the
+   single widest thing in the row, and at 17px the row measured 356.5px
+   against 338. 17px was the right size when the rating had a line to
+   itself; sharing one with six other controls, it is not. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars button {
-    width: 17px !important;
-    height: 17px !important;
-    min-width: 17px !important;
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars button svg {
-    width: 17px !important;
-    height: 17px !important;
+    width: 14px !important;
+    height: 14px !important;
 }
 /* Advanced Ratings value beside the stars. Absent -> the stars alone are
    the anchor and nothing reflows. */
@@ -2298,12 +2319,9 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     align-items: center !important;
     justify-content: center !important;
     flex: 0 0 auto !important;
-    width: 26px !important;
-    height: 26px !important;
-    min-width: 26px !important;
-    /* Was 9px, which read as detached: the row's own column gap is
-       5px, so a 14px step made the one control that IS about the
-       rating look like it belonged to neither group. */
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
     margin: 0 !important;
     padding: 0 !important;
     /* Measured against the operations and multiview buttons: they fill
@@ -2375,20 +2393,39 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 /* Actions: right of the anchor, behind a hairline, read as a different
    kind of object than the chips. The auto margin sits on the wrapper
    that still has a box, so a missing plugin leaves no gap. */
+/* The auto margin moves to the first ACTION (the favourite glyph), so
+   the whole right-hand group travels together and the operations menu
+   stops carrying a divider of its own: inside one strip the gap is
+   enough. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) div.dropdown {
     order: 8 !important;
     display: block !important;
-    margin-left: auto !important;
-    padding-left: 7px !important;
-    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.12) !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    box-shadow: none !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn {
     order: 9 !important;
 }
+/* Inside the strip the container is the strip. A glass circle around
+   each control made three of the five actions read as objects and the
+   other two as glyphs, on one row, for no reason a viewer could infer.
+   All five are bare now, and hover is what draws a shape. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.adv-rating-btn, #operation-menu, .mv-scene-page-btn, .dropdown-toggle) {
+    background: none !important;
+    background-color: transparent !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.adv-rating-btn, #operation-menu, .mv-scene-page-btn, .dropdown-toggle):hover {
+    background: var(--fill-3) !important;
+    border-color: transparent !important;
+    color: var(--accent-light) !important;
+}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(#operation-menu, .mv-scene-page-btn) {
-    width: 26px !important;
-    min-width: 26px !important;
-    height: 26px !important;
+    width: 22px !important;
+    min-width: 22px !important;
+    height: 22px !important;
     padding: 0 !important;
     border-radius: var(--radius-pill) !important;
 }
@@ -2396,33 +2433,46 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 /* Counters -> word chips. Still Stash's buttons, still incrementing; the
    word is a pseudo-element so React never sees it. Told apart by the
    inner button's title, because both carry the same class. */
+/* A count REPORTS. Inside the strip it is a glyph and a number, with no
+   fill, no rim and no radius of its own: 6.7's rule that a pill which
+   reports must not look like a pill that acts, taken to its conclusion
+   -- it stops being a pill. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button {
-    height: 24px !important;
-    /* The pill carried padding: 0, so its two halves insetted it very
-       differently: the icon button has no padding of its own and sat
-       1px from the outer edge (the border, and nothing else), while
-       the value's 10px right padding held the number 11px off the
-       other end. Measured 1px left against 11px right, which is why
-       the icon read as jammed. The 10px here restores the pill's own
-       inset on the side the icon is on, so both ends are 11px. */
-    padding: 0 0 0 10px !important;
-    border-radius: var(--radius-pill) !important;
-    border: 1px solid var(--glass-border) !important;
-    background: var(--fill-3) !important;
-    overflow: hidden !important;
+    height: 22px !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    overflow: visible !important;
+    /* The fill was never the thing drawing the box. Measured, the pill
+       carried backdrop-filter: blur(14px) and a 10px drop shadow, and
+       those survived clearing the background: a blurred rectangle over
+       the strip reads as a lighter fill even with no fill set. 6.5 also
+       forbids it outright -- blur is for the few large surfaces, never
+       the many small ones, and a play count is as small as they come. */
+    -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
+    box-shadow: none !important;
 }
+/* Reading order inside the strip: the rating and its two counts on the
+   left, then everything that acts on the scene pushed right. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) {
     order: 3 !important;
-    /* Opens the rating cluster away from the counters. Everything else
-       on the line is 5px apart, so the counters read as their own pair
-       without a rule or a bigger step. */
-    margin-left: 6px !important;
+    margin-left: 3px !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) {
     order: 4 !important;
 }
+/* The pill lost its fill, but each half is a Bootstrap .btn and carried
+   its own: two grey rectangles around the numbers, which left the only
+   two READOUTS in the strip as the only things in it drawn as boxes. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .btn {
-    height: 24px !important;
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    height: 22px !important;
     padding: 0 !important;
     font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
@@ -2438,71 +2488,82 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     flex: 0 0 auto !important;
     margin: 0 !important;
     padding: 0 !important;
-    color: rgba(255, 255, 255, 0.5) !important;
+    color: rgba(255, 255, 255, 0.38) !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .btn:hover {
+    background: none !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-value {
     /* 6px between the icon and its number, 10px to the pill's edge. The
        icon and the count are one object, so the gap that binds them has
        to be smaller than the gap that separates the pair from the pill,
        or the icon reads as a third item in a row of two. */
-    padding: 0 10px 0 6px !important;
+    /* 5px binds the number to its glyph; the strip's own 7px column gap
+       separates one count from the next, so the pair reads as a pair
+       without needing a container to say so. */
+    padding: 0 0 0 5px !important;
+    color: rgba(255, 255, 255, 0.62) !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) .count-value::after {
-    content: " plays";
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.5);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) .count-value::after {
-    content: " O";
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.5);
+/* The words go with the pills. An eye beside a number is a play count
+   and a drop beside a number is an O count; spelling it out cost 46px
+   of the row and put "plays" at the same weight as the number it
+   qualifies. The title attribute still carries the words for anyone who
+   hovers or reads it aloud. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-value::after {
+    content: none !important;
 }
 
-/* Toggles -> word chips, with the off state drawn AS an off state:
-   dashed, dimmed, and saying so. Neither needs a hover to read. */
+/* Toggles become the minimal icon button 6.5 already defines -- "the
+   glyph is the button", and the favourite heart is the example it names.
+   As word chips they were the two widest objects in the panel at 105px
+   and 110px, they were the only dashed things on the surface (a border
+   that conventionally reads as disabled or as a drop target), and their
+   labels measured 3.83:1 while carrying the state on their own.
+
+   Off is a dim outline glyph, on is the accent, which is how the rest of
+   the theme signals state. The words survive in the title attribute. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn) {
-    width: auto !important;
-    min-width: 0 !important;
-    height: 24px !important;
-    padding: 0 10px !important;
-    gap: 5px !important;
+    width: 22px !important;
+    min-width: 22px !important;
+    height: 22px !important;
+    padding: 0 !important;
+    gap: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
+    justify-content: center !important;
     border-radius: var(--radius-pill) !important;
-    font-size: var(--fs-sm) !important;
-    font-weight: 500 !important;
-    background: var(--fill-1) !important;
-    border: 1px dashed rgba(255, 255, 255, 0.16) !important;
+    background: none !important;
+    border: 1px solid transparent !important;
     color: rgba(255, 255, 255, 0.42) !important;
     box-shadow: none !important;
 }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn):hover {
+    color: var(--accent-light) !important;
+    background: var(--fill-3) !important;
+}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn {
     order: 6 !important;
+    margin-left: auto !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button {
     order: 7 !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn) svg {
-    width: 11px !important;
-    height: 11px !important;
+    width: 13px !important;
+    height: 13px !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn::after {
-    content: "Not favourite";
+/* No labels: the glyph is the button (6.5). */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn)::after {
+    content: none !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button::after {
-    content: "Not organised";
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized::after {
-    content: "Organised";
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn[aria-pressed="true"]::after {
-    content: "Favourited";
-}
+/* On is the accent glyph itself, not a filled chip: at 22px a tinted
+   fill with a rim is a third object in the strip, and the colour alone
+   is how the rest of the theme says a state is set. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn[aria-pressed="true"] {
-    background: var(--accent-tint) !important;
-    border: 1px solid rgba(var(--accent-rgb), 0.36) !important;
-    color: var(--accent-light) !important;
+    background: none !important;
+    border: 1px solid transparent !important;
+    color: var(--accent-bright) !important;
     font-weight: 600 !important;
 }
 
