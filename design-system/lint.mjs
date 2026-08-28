@@ -16,12 +16,26 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dir = dirname(fileURLToPath(import.meta.url));
+const root = join(dir, '..');
 
-// The ladder (px at the 14px root) plus sanctioned display sizes:
-// 96 = the Type artboard's cap-height specimen glyph, 44 = the cover
-// hero, 22 = swatch "Aa" glyphs. Display sizes are cover/specimen only,
-// never row content.
-const LADDER = new Set(['10.08', '11.2', '12.25', '12.88', '14', '17.5', '28']);
+// The ladder is READ OUT OF THE SHIPPED TOKENS, not copied here. A
+// hardcoded copy is a second source of truth that goes stale silently,
+// which is the exact failure this lint exists to catch: when --fs-xl was
+// retuned from 28px to 21px and --fs-2xl added, a hardcoded set kept
+// passing an artboard that still showed the old number.
+const tokens = readFileSync(join(root, 'css', '01_tokens.css'), 'utf8');
+const LADDER = new Set();
+for (const m of tokens.matchAll(/--fs-[a-z0-9]+:\s*([0-9.]+)rem/g)) {
+  LADDER.add(String(+(m[1] * 14).toFixed(2)).replace(/\.?0+$/, ''));
+}
+if (LADDER.size < 5) {
+  console.error('FAIL could not read the type scale out of css/01_tokens.css');
+  process.exit(1);
+}
+
+// Sanctioned display sizes: 96 = the Type artboard's cap-height specimen
+// glyph, 44 = the cover hero, 22 = swatch "Aa" glyphs. Display sizes are
+// cover/specimen only, never row content.
 const DISPLAY = new Set(['22', '44', '96']);
 const MAX_DISTINCT = 9; // 3.5: six or seven pairs; 9 sizes is the hard stop
 
