@@ -2252,6 +2252,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     --ic-box: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3.2 8.6h17.6v10.2a1.6 1.6 0 0 1-1.6 1.6H4.8a1.6 1.6 0 0 1-1.6-1.6Z'/><path d='M2.4 4.8h19.2v3.8H2.4Z'/><path d='M10 12.6h4'/></svg>");
     --ic-kebab: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='5.2' r='1.55' fill='%23000' stroke='none'/><circle cx='12' cy='12' r='1.55' fill='%23000' stroke='none'/><circle cx='12' cy='18.8' r='1.55' fill='%23000' stroke='none'/></svg>");
     --ic-grid: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'><rect x='3.4' y='3.4' width='6.4' height='6.4' rx='1.1'/><rect x='14.2' y='3.4' width='6.4' height='6.4' rx='1.1'/><rect x='3.4' y='14.2' width='6.4' height='6.4' rx='1.1'/><rect x='14.2' y='14.2' width='6.4' height='6.4' rx='1.1'/></svg>");
+    --ic-sliders: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7.5h6M14 7.5h6M4 16.5h10M18 16.5h2'/><circle cx='12' cy='7.5' r='2.2'/><circle cx='16' cy='16.5' r='2.2'/></svg>");
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn) > svg,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn) > span > svg {
@@ -2396,8 +2397,22 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
        everything inside it starts at 18.5 with the title, the subtitle
        and the description. The tab strip below takes the same treatment
        for the same reason. */
-    margin: 0.85rem -6px 0 -6px !important;
-    padding: 5px 5px !important;
+    /* Width auto, or the bleed only moves the bar. Something upstream
+       sets width: 100% on the toolbar, so the negative margins shifted
+       it 6px left without widening it: measured, the toolbar came out
+       338px against the tab strip's 350px, sharing a left edge and
+       missing the right one by 12px. Two stacked bars of different
+       lengths, which is what that looked like.
+
+       9px, not 5. The bar is 34.5px tall around 14px of content, so the
+       vertical inset is 10.25px; at 5px horizontal the row read as
+       cramped against its own ends. Matching the two is why the stars no
+       longer sit tight to the left edge. The bleed pays for the padding
+       exactly, so the content still starts at 18.5 and the tabs still
+       get 338px to lay out in. */
+    width: auto !important;
+    margin: 0.85rem -10px 0 -10px !important;
+    padding: 5px 9px !important;
     border-radius: var(--radius-pill) !important;
     background: var(--fill-2) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -2552,10 +2567,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
        time does not exist. The score itself has a home already: the
        Scored row below.
 
-       As a 26px glass circle it matches the operations and multiview
-       buttons exactly -- three controls, one shape -- and stays beside
-       the stars because it is about rating. */
-    order: 2 !important;
+       Not a star, and not in the rating group. It sat immediately after
+       five stars, in the position a sixth star would occupy, drawn AS a
+       star, so it read as part of the rating rather than as the control
+       that edits it. The sliders glyph says what it opens: a set of
+       criteria each carrying its own value, which is what the Scored row
+       below shows. And it moves to the right half of the strip, because
+       what it is is a control. */
+    order: 8 !important;
     position: relative !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -2573,7 +2592,12 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     box-shadow: none !important;
-    color: var(--accent-light) !important;
+    /* Muted like the four glyphs it now sits among. It kept the accent
+       from when it lived beside the stars, which made it the only
+       coloured thing in a row of neutral controls for no reason a
+       viewer could infer. The accent belongs to its state dot, which
+       appears only when there are criteria left to rate. */
+    color: rgba(255, 255, 255, 0.42) !important;
     overflow: visible !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn:hover {
@@ -2591,11 +2615,11 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn::before {
     content: "";
     display: block;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     background-color: currentColor;
-    -webkit-mask: var(--st-star-svg) center / contain no-repeat;
-            mask: var(--st-star-svg) center / contain no-repeat;
+    -webkit-mask: var(--ic-sliders) center / contain no-repeat;
+            mask: var(--ic-sliders) center / contain no-repeat;
 }
 /* The plus is the "edit me" affordance; the star already says that. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn .adv-rating-btn-plus {
@@ -2645,8 +2669,11 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
    the whole right-hand group travels together and the operations menu
    stops carrying a divider of its own: inside one strip the gap is
    enough. */
+/* The overflow menu goes last. It is the only control in the row whose
+   contents are unknown until you open it, so it belongs at the end,
+   after everything that says what it does. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) div.dropdown {
-    order: 8 !important;
+    order: 10 !important;
     display: block !important;
     margin-left: 0 !important;
     padding-left: 0 !important;
@@ -2681,84 +2708,28 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 /* Counters -> word chips. Still Stash's buttons, still incrementing; the
    word is a pseudo-element so React never sees it. Told apart by the
    inner button's title, because both carry the same class. */
-/* A count REPORTS. Inside the strip it is a glyph and a number, with no
-   fill, no rim and no radius of its own: 6.7's rule that a pill which
-   reports must not look like a pill that acts, taken to its conclusion
-   -- it stops being a pill. */
+/* The counts leave the strip.
+
+   They were the only text in a row of glyphs and the only readouts among
+   controls, so they broke its rhythm twice over. Two ways out: give them
+   a different display, or take them off the strip. The first does not
+   fit -- as an eyebrow label with a value after it, the pair measured
+   63.9px and 40.3px against a strip that had 41px less room than that,
+   and buying the space meant shrinking the stars and every action glyph
+   past the sizes they were measured into.
+
+   So they go, and 6.6's rule is what makes that safe rather than
+   lossy: nothing Stash could do before may become impossible. The
+   History tab carries both counts in its section headings (Play History
+   5, O History 2), every play and every O with its timestamp, an "Add
+   play" and an "Add O" control, and an operations menu on each. Every
+   capability the two chips carried is there, with the numbers in
+   context instead of stranded in a control row.
+
+   Hidden, not removed: the buttons stay in the DOM with their handlers
+   (P4), so nothing about Stash's own state changes. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button {
-    height: 22px !important;
-    padding: 0 !important;
-    border-radius: 0 !important;
-    border: 0 !important;
-    background: none !important;
-    overflow: visible !important;
-    /* The fill was never the thing drawing the box. Measured, the pill
-       carried backdrop-filter: blur(14px) and a 10px drop shadow, and
-       those survived clearing the background: a blurred rectangle over
-       the strip reads as a lighter fill even with no fill set. 6.5 also
-       forbids it outright -- blur is for the few large surfaces, never
-       the many small ones, and a play count is as small as they come. */
-    -webkit-backdrop-filter: none !important;
-            backdrop-filter: none !important;
-    box-shadow: none !important;
-}
-/* Reading order inside the strip: the rating and its two counts on the
-   left, then everything that acts on the scene pushed right. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) {
-    order: 3 !important;
-    margin-left: 3px !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) {
-    order: 4 !important;
-}
-/* The pill lost its fill, but each half is a Bootstrap .btn and carried
-   its own: two grey rectangles around the numbers, which left the only
-   two READOUTS in the strip as the only things in it drawn as boxes. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .btn {
-    background: none !important;
-    background-color: transparent !important;
-    background-image: none !important;
-    border: 0 !important;
-    box-shadow: none !important;
-    height: 22px !important;
-    padding: 0 !important;
-    font-size: var(--fs-sm) !important;
-    font-weight: 600 !important;
-    font-variant-numeric: tabular-nums !important;
-}
-/* This rule used to be `display: none`, and it had been dead since the
-   tab-centring pass: that block lists .count-icon among the elements it
-   sets to display: inline-flex !important, at identical specificity and
-   further down the file, so it won on source order and the icons came
-   back unpadded without anything in the source saying so. Stating the
-   intent where it actually holds instead of leaving a rule that loses. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-icon {
-    flex: 0 0 auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    color: rgba(255, 255, 255, 0.38) !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .btn:hover {
-    background: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-value {
-    /* 6px between the icon and its number, 10px to the pill's edge. The
-       icon and the count are one object, so the gap that binds them has
-       to be smaller than the gap that separates the pair from the pill,
-       or the icon reads as a third item in a row of two. */
-    /* 5px binds the number to its glyph; the strip's own 7px column gap
-       separates one count from the next, so the pair reads as a pair
-       without needing a container to say so. */
-    padding: 0 0 0 5px !important;
-    color: rgba(255, 255, 255, 0.62) !important;
-}
-/* The words go with the pills. An eye beside a number is a play count
-   and a drop beside a number is an O count; spelling it out cost 46px
-   of the row and put "plays" at the same weight as the number it
-   qualifies. The title attribute still carries the words for anyone who
-   hovers or reads it aloud. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-value::after {
-    content: none !important;
+    display: none !important;
 }
 
 /* Toggles become the minimal icon button 6.5 already defines -- "the
@@ -3044,12 +3015,18 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs {
        Measured 11.9 above and 10.5 below beforehand, which is near enough
        to equal that the strip read as floating between two things
        instead of belonging to one. */
-    margin: 1rem -6px 0.6rem -6px !important;
-    /* 5px, not 3px: with the -6px bleed above, the container's inset plus
-       its border has to come to 6px so the first tab's ink lands on the
-       text column's 18.5px like everything else. The 12px of width the
-       bleed buys goes straight to the tabs. */
-    padding: 5px !important;
+    margin: 1rem -10px 0.6rem -10px !important;
+    /* 9px, matching the strip above: the container's inset plus its
+       border has to equal the bleed so the first tab's ink lands on the
+       text column's 18.5px like everything else. The bleed pays for the
+       padding exactly, so the tabs still get 338px whatever the inset
+       is.
+
+       Horizontal only. 9px all round made the strip 48.8px tall against
+       the 40.8px it needs, and the 3px vertical is load-bearing: the
+       links' 9px radius is concentric with the container's 12px across
+       that gap. */
+    padding: 3px 9px !important;
     gap: 3px !important;
     border-radius: var(--radius-sm) !important;
     background: var(--fill-1) !important;
@@ -3112,6 +3089,87 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .badge
     color: rgba(255, 255, 255, 0.4) !important;
     vertical-align: baseline !important;
 }
+/* ── The activity badge ───────────────────────────────────────────────
+   The play count, on the tab that owns it, in the badge idiom the strip
+   already carries on File Info. refract.js mirrors Stash's own counter
+   into it and never writes back.
+
+   Hover reveals the breakdown as a themed popover rather than the
+   browser's tooltip: the panel has a voice and a native tooltip is not
+   in it. The text comes from --st-activity-tip, which the JS sets, so
+   the markup stays one empty element. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-activity {
+    margin-left: 4px;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, 0.4);
+    transition: color var(--dur-fast) ease;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-activity[hidden] {
+    display: none;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active .st-activity {
+    color: rgba(var(--accent-rgb), 0.75);
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:hover .st-activity {
+    color: var(--accent-light);
+}
+
+/* The popover. Anchored to the tab, above it, so it never covers the
+   pane it describes; pointer-events off so it cannot eat the click that
+   opens the tab underneath it. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:has(.st-activity:not([hidden])) {
+    position: relative;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:has(.st-activity:not([hidden]))::after {
+    content: var(--st-activity-tip, "");
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translate(-50%, 3px);
+    z-index: var(--z-overlay, 1060);
+    padding: 5px 9px;
+    border-radius: var(--radius-sm);
+    background: rgba(var(--surface-rgb), 0.97);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-md);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--track-tight);
+    color: var(--text);
+    white-space: nowrap;
+    text-transform: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:has(.st-activity:not([hidden])):hover::after,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:has(.st-activity:not([hidden])):focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* The increment. One short lift and a colour flash, so a play or an O
+   registering somewhere else in the panel is visible without stealing
+   attention. 3.7 rule 3: it is a state change, so reduced-motion keeps
+   the colour and drops the movement. */
+@keyframes st-activity-bump {
+    0%   { transform: translateY(0)     scale(1);    color: var(--accent-bright); }
+    35%  { transform: translateY(-3px)  scale(1.28); color: var(--accent-bright); }
+    100% { transform: translateY(0)     scale(1);    }
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-activity.st-activity-bump {
+    display: inline-block;
+    animation: st-activity-bump var(--dur-settle) var(--ease-spring);
+}
+@media (prefers-reduced-motion: reduce) {
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-activity.st-activity-bump {
+        animation: none;
+        color: var(--accent-bright);
+    }
+}
+
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active .badge {
     color: rgba(var(--accent-rgb), 0.75) !important;
 }
