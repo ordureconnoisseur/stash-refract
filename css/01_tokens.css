@@ -225,6 +225,15 @@ body.stash-liquid-glass {
     --accent-rgb: 249, 115, 22;
     --accent-glow: rgba(var(--accent-rgb), 0.28);
     --accent-tint: rgba(var(--accent-rgb), 0.12);
+    /* The accent shade that is safe as TEXT, per 3.1 rule 4. In dark
+       that is --accent-bright, which measures 6.60 to 11.92:1 on a card
+       fill over the modal surface across the eight accents. Light needs
+       a different value entirely and redefines this in 14_light: there
+       --accent-bright reaches only 1.39 to 2.51 and --accent only 1.74
+       to 3.60, so neither can carry a label on a light panel. Use this
+       wherever the accent is the ink; keep --accent and
+       --accent-bright for fills, rims and marks. */
+    --accent-ink: var(--accent-bright);
 
     --nav-btn-size: 2.4rem;
     --nav-icon-size: 1rem;

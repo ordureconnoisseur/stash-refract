@@ -54,6 +54,14 @@ body.stash-liquid-glass.refract-light {
 
     --accent-glow: rgba(var(--accent-rgb), 0.18);
     --accent-tint: rgba(var(--accent-rgb), 0.08);
+    /* Accent as ink on a light panel. Neither authored accent shade can
+       do this job: measured on the modal card fill (#f4f4f4) across the
+       eight accents, --accent-bright lands 1.39 to 2.51:1 and --accent
+       1.74 to 3.60, with yellow, green and teal the worst in both. The
+       accent darkened to 55% lands 5.19 to 8.61, worst case yellow, so
+       every preset clears 4.5 and none of them stops being its own
+       colour. Derived from --accent, so custom accents follow. */
+    --accent-ink: color-mix(in srgb, var(--accent) 55%, #000);
 
     /* Bootstrap re-pegs */
     --bs-link-color: rgba(0, 0, 0, 0.78);
@@ -997,4 +1005,69 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-t
 }
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .scene-performers .st-perf-names {
     color: var(--text);
+}
+
+
+/* ═══════ 29. Scrape results: the line-up ══════════════════════════
+   The contact sheet shipped with no light counterpart at all, and it
+   leans on three things that do not cross over: the fill ramp, which
+   deliberately does not retheme (3.2), --surface-rgb, which has no
+   light value at all, and the accent as text, which fails on white --
+   measured on the card fill here, --accent-bright lands 1.39 to 2.51:1
+   across the eight accents and --accent only 1.74 to 3.60 (3.1 rule
+   4). Left alone, the cards would have been invisible, the
+   empty-picture plate a charcoal block on white, and the line that
+   decides the weakest thing on the card. The third of those is not a
+   local problem, so it is fixed as a token: --accent-ink, defined in
+   01_tokens and redefined above. */
+
+/* Cards: the ramp is white-on-dark, so it needs the mirror. */
+body.stash-liquid-glass.refract-light :is(.PerformerScrapeModal, .SceneScrapeModal) .search-item {
+    background: rgba(0, 0, 0, 0.03) !important;
+    border-color: var(--glass-border) !important;
+}
+body.stash-liquid-glass.refract-light :is(.PerformerScrapeModal, .SceneScrapeModal) .search-item:hover,
+body.stash-liquid-glass.refract-light :is(.PerformerScrapeModal, .SceneScrapeModal) .search-item:focus-visible {
+    background: var(--accent-tint) !important;
+    border-color: rgba(var(--accent-rgb), 0.45) !important;
+}
+body.stash-liquid-glass.refract-light :is(.PerformerScrapeModal, .SceneScrapeModal) .search-item:focus-visible {
+    outline-color: var(--accent);
+}
+
+/* The plate. Same idea -- flat and hatched where a picture is soft --
+   drawn dark-on-light instead of light-on-dark. */
+body.stash-liquid-glass.refract-light .refract-sr-plate {
+    background:
+        repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.05) 0 6px, transparent 6px 12px),
+        rgba(0, 0, 0, 0.05);
+}
+/* The line that decides and the plate's key both read var(--accent-ink),
+   which this file already redefines for the mode, so neither needs a
+   partner here. What does is the accent used as a MARK: --accent-bright
+   is a pale wash on white for half the presets. */
+body.stash-liquid-glass.refract-light .refract-sr-collide-note::before,
+body.stash-liquid-glass.refract-light .modal-dialog:has(.PerformerScrapeModal) .modal-header::before,
+body.stash-liquid-glass.refract-light .modal-dialog:has(.SceneScrapeModal) .modal-header::before {
+    background: var(--accent);
+}
+
+/* The query field and its count chip, both on the ramp. */
+body.stash-liquid-glass.refract-light .modal-body .PerformerScrapeModal .text-input {
+    background-color: rgba(0, 0, 0, 0.03) !important;
+    /* The glyph is drawn into a data URI, so it cannot inherit a colour
+       and has to be re-drawn dark. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(0,0,0,0.5)' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") !important;
+}
+body.stash-liquid-glass.refract-light .modal-body .PerformerScrapeModal .text-input:focus {
+    background-color: rgba(0, 0, 0, 0.06) !important;
+}
+body.stash-liquid-glass.refract-light .modal-body .SceneScrapeModal .input-group > .text-input {
+    background: rgba(0, 0, 0, 0.03) !important;
+}
+body.stash-liquid-glass.refract-light .modal-body .SceneScrapeModal .input-group > .text-input:focus {
+    background: rgba(0, 0, 0, 0.06) !important;
+}
+body.stash-liquid-glass.refract-light :is(.PerformerScrapeModal-list-container, .SceneScrapeModal-list-container) > .mt-1 {
+    background: rgba(0, 0, 0, 0.06);
 }

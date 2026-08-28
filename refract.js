@@ -7846,20 +7846,68 @@
        sibling initializers running in the same MutationObserver callback). */
 
     /* ── Scrape results: the line-up ──────────────────────────────────
-       05_list_views.css turns the performer scrape list into a contact
-       sheet. Two things it cannot know from CSS alone: which names in
-       the result set collide with each other, and whether a card has a
-       photograph worth showing. Both decide what the card says, so they
-       are settled here and expressed as classes and one injected node. */
-    var SCRAPE_LIST_SEL = ".PerformerScrapeModal-list";
+       05_list_views.css turns the two scrape result lists -- performers
+       and scenes -- into contact sheets. Three things it cannot know
+       from CSS alone: which records in the result set collide with each
+       other, whether a card has a picture worth showing, and how to
+       reach a card from the keyboard, since Stash's cards are plain
+       divs with an onClick and no tab stop. All three decide what the
+       card says or does, so they are settled here and expressed as
+       classes, attributes and one injected node.
 
-    function scrapeResultName(item) {
-        var h = item.querySelector(".performer-name");
-        if (!h) { return ""; }
-        var first = h.querySelector("span");
-        var txt = first ? first.textContent : h.textContent;
-        return String(txt || "").trim();
-    }
+       The two modals differ only in where each field lives, so the
+       differences are a table and the logic below is written once. */
+    var SCRAPE_KINDS = [{
+        list: ".PerformerScrapeModal-list",
+        row: ".performer-result > .row",
+        /* The name may be wrapped in a span with the disambiguation as
+           a sibling; the first span is the name alone. */
+        name: function (item) {
+            var h = item.querySelector(".performer-name");
+            if (!h) { return ""; }
+            var first = h.querySelector("span");
+            return String((first ? first.textContent : h.textContent) || "").trim();
+        },
+        /* What the empty well should carry: the field that decides. */
+        key: function (item) {
+            var dis = item.querySelector(".performer-disambiguation");
+            return dis ? String(dis.textContent || "").replace(/^\s*\(|\)\s*$/g, "").trim() : "";
+        },
+        keyEmpty: "nothing else on record",
+        absent: "NO PHOTO",
+        /* The mockup put a scene count here. ScrapedPerformer has no
+           such field -- that number was invented for the drawing -- so
+           the slot takes the bio instead, which is real, is already in
+           the DOM, and is hidden everywhere else on the card. */
+        note: function (item) {
+            var bio = item.querySelector(".performer-result > .row:nth-of-type(2)");
+            return bio ? String(bio.textContent || "").trim() : "";
+        },
+        tell: "The line under each name is what tells them apart."
+    }, {
+        list: ".SceneScrapeModal-list",
+        row: ".scene-details > .row",
+        name: function (item) {
+            var h = item.querySelector(".scene-details h4");
+            return h ? String(h.textContent || "").trim() : "";
+        },
+        /* Stash renders studio and date as one string joined by a
+           bullet. The studio is the half that belongs in an empty well;
+           the date is already on the card underneath it. */
+        key: function (item) {
+            var h = item.querySelector(".scene-details h5");
+            var txt = h ? String(h.textContent || "").trim() : "";
+            var parts = txt.split("•");
+            return (parts.length > 1 ? parts[0] : txt).trim();
+        },
+        keyEmpty: "no studio listed",
+        absent: "NO STILL",
+        note: function (item) {
+            var syn = item.querySelector(".scene-details > .row:nth-of-type(2)");
+            return syn ? String(syn.textContent || "").trim() : "";
+        },
+        tell: "The studio and the date are what tell them apart."
+    }];
 
     /* A result has no usable picture in two different ways, and they are
        not the same news: the source has none (permanent), or it named
@@ -7867,14 +7915,14 @@
        loading with no intrinsic width is the second case -- worth
        distinguishing, since every StashDB image failed to load on a
        cold cache while this was being built. */
-    function scrapeResultPlate(item) {
-        var row = item.querySelector(".performer-result > .row");
+    function scrapeResultPlate(item, kind) {
+        var row = item.querySelector(kind.row);
         if (!row) { return; }
         var holder = row.querySelector(".scene-image-container");
         var img = holder ? holder.querySelector("img") : null;
         var state = "";
         if (!holder || !img) {
-            state = "NO PHOTO";
+            state = kind.absent;
         } else if (img.complete && !img.naturalWidth) {
             state = "WOULD NOT LOAD";
         } else if (!img.complete && !img.getAttribute("data-refract-sr-watch")) {
@@ -7896,8 +7944,8 @@
             plate.className = "refract-sr-plate";
             plate.appendChild(document.createElement("span"))
                 .className = "refract-sr-plate__label";
-            /* Label at the top, everything else in one foot, so the studio
-               sits on the same line whether or not there is a bio under
+            /* Label at the top, everything else in one foot, so the key
+               sits on the same line whether or not there is a note under
                it. Three loose children would move it. */
             var foot = document.createElement("div");
             foot.className = "refract-sr-plate__foot";
@@ -7910,23 +7958,38 @@
         }
         var label = plate.querySelector(".refract-sr-plate__label");
         var key = plate.querySelector(".refract-sr-plate__key");
-        /* The mockup put a scene count here. ScrapedPerformer has no such
-           field -- that number was invented for the drawing -- so the slot
-           takes the bio instead, which is real, is already in the DOM, and
-           is hidden everywhere else on the card. */
         var note = plate.querySelector(".refract-sr-plate__note");
-        var bio = item.querySelector(".performer-result > .row:nth-of-type(2)");
-        var bioTxt = bio ? String(bio.textContent || "").trim() : "";
-        if (note && note.textContent !== bioTxt) { note.textContent = bioTxt; }
+        var noteTxt = kind.note(item);
+        if (note && note.textContent !== noteTxt) { note.textContent = noteTxt; }
         if (label && label.textContent !== state) { label.textContent = state; }
-        /* The slot carries the field that decides. Empty is handled in
-           CSS, so a performer with no disambiguation still reads. */
-        var dis = item.querySelector(".performer-disambiguation");
-        var want = dis ? String(dis.textContent || "").replace(/^\s*\(|\)\s*$/g, "").trim() : "";
+        /* The slot carries the field that decides. When the record has
+           not got that either, the CSS says so in the modal's own terms
+           rather than leaving a hole. */
+        var want = kind.key(item);
         if (key && key.textContent !== want) { key.textContent = want; }
+        if (key && key.getAttribute("data-refract-sr-empty") !== kind.keyEmpty) {
+            key.setAttribute("data-refract-sr-empty", kind.keyEmpty);
+        }
     }
 
-    function scrapeCollisionNote(list, name, count, groups) {
+    /* Stash's result cards are divs carrying an onClick, so a keyboard
+       cannot reach them at all. Giving them a tab stop and Enter/Space
+       adds a way in; it takes nothing away, and every click still lands
+       on Stash's own element. */
+    function scrapeResultReachable(item) {
+        if (item.getAttribute("data-refract-sr-key")) { return; }
+        item.setAttribute("data-refract-sr-key", "1");
+        item.setAttribute("tabindex", "0");
+        item.setAttribute("role", "button");
+        item.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+                e.preventDefault();
+                item.click();
+            }
+        });
+    }
+
+    function scrapeCollisionNote(list, kind, name, count, groups) {
         var host = list.parentElement;
         if (!host) { return; }
         var note = host.querySelector(".refract-sr-collide-note");
@@ -7945,44 +8008,48 @@
            separate groups. Naming only the largest would report a third
            of the problem and imply the rest were unique. */
         var txt = (groups === 1)
-            ? count + " of these are called " + name + ". The studio and the age are what tell them apart."
-            : count + " of these share a name with another result. The studio and the age are what tell them apart.";
+            ? count + " of these are called " + name + ". " + kind.tell
+            : count + " of these share a name with another result. " + kind.tell;
         if (note.textContent !== txt) { note.textContent = txt; }
     }
 
     function initScrapeResults() {
-        var lists = document.querySelectorAll(SCRAPE_LIST_SEL);
-        for (var i = 0; i < lists.length; i++) {
-            var list = lists[i];
-            var items = list.querySelectorAll(".search-item");
-            if (!items.length) { scrapeCollisionNote(list, "", 0, 0); continue; }
-            var names = [];
-            var counts = {};
-            var j;
-            for (j = 0; j < items.length; j++) {
-                var n = scrapeResultName(items[j]);
-                names.push(n);
-                var k = n.toLowerCase();
-                counts[k] = (counts[k] || 0) + 1;
-            }
-            var biggest = "";
-            var biggestN = 0;
-            var colliding = 0;
-            var groups = 0;
-            var seen = {};
-            for (j = 0; j < items.length; j++) {
-                var key = names[j].toLowerCase();
-                var dup = counts[key] > 1;
-                if (dup) { items[j].classList.add("refract-sr-collide"); }
-                else { items[j].classList.remove("refract-sr-collide"); }
-                if (dup) {
-                    colliding += 1;
-                    if (!seen[key]) { seen[key] = 1; groups += 1; }
-                    if (counts[key] > biggestN) { biggestN = counts[key]; biggest = names[j]; }
+        for (var k = 0; k < SCRAPE_KINDS.length; k++) {
+            var kind = SCRAPE_KINDS[k];
+            var lists = document.querySelectorAll(kind.list);
+            for (var i = 0; i < lists.length; i++) {
+                var list = lists[i];
+                var items = list.querySelectorAll(".search-item");
+                if (!items.length) { scrapeCollisionNote(list, kind, "", 0, 0); continue; }
+                var names = [];
+                var counts = {};
+                var j;
+                for (j = 0; j < items.length; j++) {
+                    var n = kind.name(items[j]);
+                    names.push(n);
+                    var c = n.toLowerCase();
+                    counts[c] = (counts[c] || 0) + 1;
                 }
-                scrapeResultPlate(items[j]);
+                var biggest = "";
+                var biggestN = 0;
+                var colliding = 0;
+                var groups = 0;
+                var seen = {};
+                for (j = 0; j < items.length; j++) {
+                    var key = names[j].toLowerCase();
+                    var dup = counts[key] > 1;
+                    if (dup) { items[j].classList.add("refract-sr-collide"); }
+                    else { items[j].classList.remove("refract-sr-collide"); }
+                    if (dup) {
+                        colliding += 1;
+                        if (!seen[key]) { seen[key] = 1; groups += 1; }
+                        if (counts[key] > biggestN) { biggestN = counts[key]; biggest = names[j]; }
+                    }
+                    scrapeResultPlate(items[j], kind);
+                    scrapeResultReachable(items[j]);
+                }
+                scrapeCollisionNote(list, kind, biggest, colliding, groups);
             }
-            scrapeCollisionNote(list, biggest, colliding, groups);
         }
     }
 
