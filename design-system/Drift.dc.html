@@ -15,7 +15,7 @@
   </style>
 </helmet>
 
-<div style="width: 900px; min-height: 1240px; box-sizing: border-box; padding: 60px 56px 64px; background: radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.045) 0%, transparent 55%), radial-gradient(100% 60% at 100% 30%, rgba(249,115,22,0.05) 0%, transparent 50%), linear-gradient(180deg, #111 0%, #0a0a0a 100%); color: rgba(255,255,255,0.92); letter-spacing: 0.005em;">
+<div style="width: 900px; min-height: 1330px; box-sizing: border-box; padding: 60px 56px 64px; background: radial-gradient(120% 80% at 20% 0%, rgba(255,255,255,0.045) 0%, transparent 55%), radial-gradient(100% 60% at 100% 30%, rgba(249,115,22,0.05) 0%, transparent 50%), linear-gradient(180deg, #111 0%, #0a0a0a 100%); color: rgba(255,255,255,0.92); letter-spacing: 0.005em;">
 
   <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 34px;">
     <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f97316;">Sections 9 and 10.3</div>
@@ -55,6 +55,12 @@
     <div style="font-size: 12.25px; font-weight: 700;">Z-index</div>
     <div style="font-size: 11.9px; color: rgba(255,255,255,0.68); line-height: 1.55;">Values run 0 through 12, then 20, 30, 50, 90, 99, 100, 400, 1050, 1060, 1100, 9999, 10000, each chosen ad hoc. A band map now exists; nothing has migrated yet. New code picks a band: content 0-9, tiers 20-70, floating chrome 90-120, page overlays 400, Bootstrap 1050-1100, topmost 9999+.</div>
     <div class="mono" style="font-size: 10.08px; color: #fb923c; text-align: right;">3.8</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: start;">
+    <div style="font-size: 12.25px; font-weight: 700;">Spacing</div>
+    <div style="font-size: 11.9px; color: rgba(255,255,255,0.68); line-height: 1.55;">No scale. Gaps cluster at 0.3, 0.35, 0.4, 0.5, 0.55, 0.75, 0.85 and 1rem, chosen by eye per cluster. Until one exists, match the neighbouring cluster.</div>
+    <div class="mono" style="font-size: 10.08px; color: #fb923c; text-align: right;">3.6</div>
   </div>
 
   <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: start;">

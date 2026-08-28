@@ -287,6 +287,12 @@ Navbar controls scale with viewport: `--nav-btn-size` steps 2.4rem, then
 2.7rem at 1441px, 3rem at 1921px, 3.4rem at 2561px, with icon size and gap
 following. The defaults are tuned for a 13 to 15 inch laptop at 100% scaling.
 
+**Spacing has no scale yet** (see the drift ledger). The de-facto rhythm in
+the shipped CSS: `0.3` to `0.55rem` for gaps inside a control cluster,
+`0.75` to `1rem` between clusters, with `0.5rem` the most common single value.
+Until a scale exists, match the neighbouring cluster rather than inventing a
+new gap.
+
 ### 3.7 Motion
 
 The de-facto scale, measured across all sheets:
@@ -640,7 +646,112 @@ today.
 An eyebrow labels; it is always `--text-muted` or accent, never brighter than
 the content it introduces (P1).
 
-### 6.14 Voice
+### 6.14 Modals and dialogs
+
+The modal is NOT the standard glass recipe, deliberately:
+
+```css
+background: rgba(11, 11, 11, 0.94);   /* near-opaque neutral, not --glass-bg */
+border: 1px solid var(--glass-border);
+border-radius: var(--radius);
+backdrop-filter: var(--glass-blur);
+color-scheme: dark;
+box-shadow: var(--glass-shadow), 0 0 0 1px rgba(0,0,0,0.35) inset;
+```
+
+Two rules inside it:
+
+1. **Neutral grey, never a blue-ish mix.** An `(n, n, n+4)` background reads
+   as blue next to `--bg-0`. The fill is exactly neutral.
+2. **Headers justify flex-start, never space-between.** A two-child header
+   with `space-between` once put 399px of nothing between an icon and its
+   title in a 498px bar. The close button reaches the right edge with
+   `margin-left: auto`, which only works from flex-start.
+
+Dialog column labels use the eyebrow (6.13) with a hairline underline. An
+empty `.modal-footer` child is display-none rather than left to reserve ghost
+space.
+
+### 6.15 The lightbox
+
+Viewer chrome floats like the navbar: the footer is a fixed bar inset 12px
+left, right and bottom, near-opaque dark (`rgba(18,18,22,0.92)`), hairline
+rim, three anchored groups (left, centre, right). The mutation watcher pauses
+while the lightbox is open, so nothing injected may rely on observer ticks
+inside it. Media stays the subject (P1): chrome sits at the edges and never
+overlaps the image.
+
+### 6.16 The scene player
+
+Redesigned separately and settled (section 8), but its vocabulary is design
+law for anything added near it:
+
+- **Chrome lives on the wrapper.** Border, radius, shadow and margin belong to
+  `.video-wrapper`, not the video element.
+- **Idle fade is asymmetric.** Controls and overlay leave together on a slow
+  1s fade when the user goes inactive; pointer-driven hides (mouseleave,
+  keyboard handoff) keep a 0.2s snap. Slow out, fast when intentional.
+- **The overlay hides while scrubbing** so it never sits on the frame being
+  previewed.
+- **Unknown controls stay visible.** A third-party plugin's player button gets
+  default placement, never display-none; Refract only styles the controls it
+  knows.
+- The scrubber groove uses `--shadow-inset-track`; centre overlay buttons
+  (back, play-pause, forward) appear on hover only.
+
+### 6.17 List and table views
+
+The table view is a glass shell: `--glass-bg` fill, hairline rim, `--radius`,
+with Bootstrap's table variables re-pegged at body level (transparent bg,
+0.02-alpha stripes, 0.045 hover). Header cells are sticky at `top: 0` with
+`--glass-bg-strong` plus a blur rung; the sticky offset is 0 because
+`.table-list` is its own scrollport, not the window. The background moves onto
+the `th` itself because a sticky cell paints its own layer.
+
+### 6.18 Floating platforms
+
+Two more members of the floating-chrome family, both pill-shaped
+(`--radius-pill`) to distinguish them from the rectangular navbar:
+
+- **The toolbar pill** behind the filtered-list toolbar, painted via
+  `::before` so React inline-style overrides on the toolbar itself cannot wipe
+  it, with negative inset for breathing room.
+- **The pagination capsule**, fixed bottom-centre, z 400. Width is
+  content-sized (`width: auto` plus a viewport max), because a stretched
+  wrapper once took clicks across the whole page width.
+
+A new floating control joins this family: pill, glass, fixed, inset from the
+viewport edge, never touching it.
+
+### 6.19 Selection mode
+
+The card checkbox is custom-drawn (`appearance: none`), sits top-left inside
+the card, and is invisible until the card is hovered or it is checked. Checked
+state fills accent. It uses `--glass-blur-xs`, the one small-control exception
+to the no-blur-on-repeated-controls rule (6.5), acceptable because at most a
+handful are visible mid-interaction. Beware: `:has(.card-check:hover)` in the
+grid is the known scroll-perf hazard (section 7); new selection affordances
+must not add another.
+
+### 6.20 Theming third-party plugins
+
+`13_plugins.css` re-skins other people's UIs (multiview, Ascension,
+advanced-rating, ThumbPreviews, DiceR, SFWSwitch, date pickers, and more).
+The law for adding one:
+
+1. **Theme their surfaces with our tokens; never change their behaviour.** P4
+   applies doubly: it is not even our state to break.
+2. **Their DOM is weather.** Selectors must tolerate the plugin being absent,
+   renamed, or updated; a broken plugin selector may not damage the base
+   theme. Scope every rule to the plugin's own root class or id.
+3. **Navbar injections get slot ordering, not redesign.** A plugin's navbar
+   button is arranged into the icon row and inherits `--nav-btn-size`; its
+   glyph is not redrawn.
+4. Minimal-compat is a valid tier: some plugins (stashGlobalSearch) get one
+   tweak, not a re-skin. Match effort to how visible the plugin's UI is
+   inside the theme.
+
+### 6.21 Voice
 
 The words are part of the theme and follow the same discipline:
 
@@ -730,10 +841,23 @@ that file.
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px, 9px and 10px literals. | 3.4 |
 | Surfaces | Four `backdrop-filter` expressions still bypass the ladder, including `blur(16px) saturate(1.1)`. | 3.2 |
 | Z-index | Values run 0, 1 through 12, then 20, 30, 50, 90, 99, 100, 400, 1050, 1060, 1100, 9999, 10000, each chosen ad hoc. A band map now exists (3.8); nothing has migrated to it yet. | 3.8 |
+| Spacing | No scale. Gaps cluster at 0.3, 0.35, 0.4, 0.5, 0.55, 0.75, 0.85 and 1rem, chosen by eye per cluster. | 3.6 |
 | Specificity | 8,268 `!important` declarations. Largely unavoidable against Bootstrap, but it means load order and class doubling are the only remaining levers. | 5.2 |
 
 If a sub-`--fs-xs` step is genuinely needed, add it to the scale once rather
 than writing `0.62rem` a sixth time.
+
+**Not yet designed at all** (distinct from drift; these have no treatment to
+follow yet):
+
+- **Empty states.** No styled "no results" or first-run surface exists;
+  Stash's defaults show through. An empty screen is an invitation to act, and
+  currently it is nobody's.
+- **Loading.** The player spinner is styled; list and grid loading is
+  whatever Stash renders. No skeleton language exists, and inventing one is a
+  brief-worthy decision, not a drive-by.
+- **The gallery/image performer popover** is styled to text-names-only as a
+  stopgap; true scene-card parity is a tracked TODO in `CLAUDE.md`.
 
 ---
 
