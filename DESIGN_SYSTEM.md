@@ -121,7 +121,19 @@ Four authored tokens, two derived:
 --accent-rgb    249,115,22 the one that matters
 --accent-glow   rgba(var(--accent-rgb), 0.28)   derived
 --accent-tint   rgba(var(--accent-rgb), 0.12)   derived
+--accent-ink    the accent when it is INK                  derived, per mode
 ```
+
+`--accent-ink` exists because neither authored shade can be text on a
+light panel, which rule 4 below says about `--accent-light` and which is
+just as true of the other two. Measured on a modal card fill (`#f4f4f4`)
+across the eight accents: `--accent-bright` lands 1.39 to 2.51:1 and
+`--accent` 1.74 to 3.60, yellow, green and teal worst in both. So the
+token resolves to `--accent-bright` in dark (6.60 to 11.92:1 on the dark
+counterpart) and to `color-mix(in srgb, var(--accent) 55%, #000)` in
+light (5.19 to 8.61). Use it wherever the accent is the ink; keep
+`--accent` and `--accent-bright` for fills, rims and marks, where the
+contrast bar does not apply.
 
 Presets swap the four on `body.stash-liquid-glass.refract-<name>`: blue, pink,
 red, yellow, purple, green, teal. Everything else resolves through them.
@@ -960,6 +972,20 @@ bug.
    session: the same mistake put the video-filter read-out back on screen
    truncated to "10...", because `06`'s column rule is a group whose first
    selector is (0,6,1) against a tidier (0,4,1) replacement.
+
+   **`:is()` is that same group, folded inside one selector, and it is
+   worse because the group is invisible in the part you are reading.**
+   Every branch of an `:is()` takes the specificity of its STRONGEST
+   branch. `05_list_views.css:620` styles dialog primary buttons through
+   `:is(#configuration-tabs #settings-container, ..., .modal-body)`: the
+   `.modal-body` branch, which reads like one class, carries (2,3,1) --
+   two IDs' worth -- and pins every primary button in every modal to
+   `--radius-sm !important`. Four `!important` longhands at (0,6,1) lost
+   to it silently while the source looked correct on both sides. Never
+   put an ID branch in an `:is()` with class branches; use `:where()` for
+   the branches meant to stay weak, or write the ID case as its own rule.
+   This is only findable with `CSS.getMatchedStylesForNode` (10.1), which
+   reports each matching selector's real specificity.
 10. **A rule that defers to a feature must name the feature in its
    selector.** `06_scene_player.css` hid the numeric read-out beside every
    video-filter slider because a live-preview swatch chip replaces it. The
