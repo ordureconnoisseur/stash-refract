@@ -2044,6 +2044,59 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
        around a `.divider`, so no `.st-spec` injection is needed.
    ─────────────────────────────────────────────────────────────────── */
 
+/* ── Focus ────────────────────────────────────────────────────────────
+   Every interactive element in the panel was unreachable by eye: 33
+   controls measured, and focusing each one changed nothing at all. No
+   outline, no ring, no border or colour shift. The document carries 251
+   rules mentioning :focus and not one of them matched a panel control,
+   while three separate rules were actively removing the default.
+
+   An OUTLINE, not the 6.6 box-shadow ring. The shadow ring cannot work
+   here: 09_buttons.css:32 sets box-shadow: none !important on
+   .btn.minimal:focus and 08_misc_mid.css:2663 does the same to every
+   .rating-stars button, both in files that load after this one. An
+   outline survives that, stays out of layout, and follows the pill
+   radius on its own.
+
+   Specificity, not load order, is what wins this: :focus-visible adds a
+   class-weight, so these sit at (0,4,1) and beat 08's (0,2,2) blanket
+   `outline: none !important` from an earlier file. Verified against
+   computed style, not assumed.
+
+   :focus-visible rather than :focus, so a ring appears for the keyboard
+   and not on every mouse click. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(a, button, [tabindex="0"]):focus-visible {
+    outline: 2px solid rgba(var(--accent-rgb), 0.9) !important;
+    outline-offset: 2px !important;
+}
+/* The counter pill clips (overflow: hidden), so neither half can wear a
+   ring of its own; the pill wears it for them. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .count-button:has(:focus-visible) {
+    outline: 2px solid rgba(var(--accent-rgb), 0.9) !important;
+    outline-offset: 2px !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .count-button :is(a, button):focus-visible {
+    outline: none !important;
+}
+/* Five 17px stars with 3px between them: a 2px ring at a 2px offset
+   would touch its neighbours.
+
+   The class pile is not decoration. 08_misc_mid.css:2658 is a GROUP, and
+   its first selector (.rating-stars .btn.btn-secondary.minimal) is
+   (0,5,1), which outranks the (0,4,1) of the base rule above -- so the
+   stars, alone out of 39 controls, kept `outline: none !important` and
+   measured ringless while everything else was fixed. Counting only the
+   second selector in a group is how that was missed the first time.
+   This is (0,6,1). */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars .btn.minimal:focus-visible,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars button.minimal:focus-visible {
+    outline: 2px solid rgba(var(--accent-rgb), 0.9) !important;
+    outline-offset: 1px !important;
+}
+/* .tab-content clips horizontally (overflow-x: hidden), so a full-width
+   control's ring would be shaved off at both ends. Nothing in the panel
+   needs to be full width anyway: see the disclosure width fix below. */
+
 /* ── Marquee ──────────────────────────────────────────────────────── */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-header, .image-header) {
     font-size: var(--fs-xl) !important;
@@ -2956,6 +3009,11 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc.st
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more {
     display: block;
+    /* Was a full-width block: a 338px box around 60.3px of ink, so 278px
+       of empty column silently toggled the description, and its focus
+       ring would have been shaved off by .tab-content's overflow-x.
+       fit-content keeps it left-placed and makes the target the words. */
+    width: fit-content;
     /* The details column is centre-aligned, which the button inherits and
        which reads as a stray link floating mid-column. */
     text-align: left;
