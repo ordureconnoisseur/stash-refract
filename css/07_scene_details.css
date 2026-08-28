@@ -770,26 +770,22 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, 
 /* Star rating styling lives in the global block in 08_misc_mid.css.
    Scene-tabs only needs to size the button frame to align with adjacent
    pill controls; the icon styling is inherited. */
-/* 15px, not 18. Five stars at 18px plus their margins came to 109px --
-   nearly a third of the whole toolbar's width budget, and the single
-   reason the other seven controls could not share the row. At 15px the
-   rating still reads clearly and the row fits. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars button {
-    width: 15px !important;
-    height: 15px !important;
-    min-width: 15px !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars button svg {
-    width: 15px !important;
-    height: 15px !important;
-}
+/* The 15px sizing that used to live here is gone. It had not applied
+   since the toolbar rework: the block further down sets 17px at higher
+   specificity, and computed style confirms 17. What made it worth
+   deleting rather than leaving is that it carried four lines of
+   arithmetic arguing for 15 over 18 -- a claim about a value nobody
+   was seeing. A dead rule is invisible; a dead rule with a rationale
+   actively misleads the next person to read the file. */
+/* Only the declarations that survive. The block that rebuilds this
+   control as a 26px glass circle sets its own fill, colour and padding,
+   so the --fill-3 / --text / 0.55rem written here measured as 0.04,
+   accent-light and 0. Two contradictory fills 1,475 lines apart, and the
+   one that lost was the one with no comment explaining the choice. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
     height: 26px !important;
-    padding: 0 0.55rem !important;
-    background: var(--fill-3) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
-    color: var(--text) !important;
     font-size: var(--fs-xs) !important;
     line-height: 1 !important;
     display: inline-flex !important;
@@ -1074,14 +1070,13 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row > .col-12:has(> p.pre
     backdrop-filter: none !important;
 }
 
-/* Section labels (h6 "Details:", "Tags") */
+/* Section labels ("Details:", "Tags"). Everything except text-transform
+   used to be set here as well and every bit of it lost to the block
+   further down -- weight, tracking, colour and margin all measured as
+   the later rule's values. Only the parts that still do something are
+   left. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
-    margin: 0.6rem 0 0.35rem 0 !important;
-    font-size: var(--fs-xs) !important;
-    font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: var(--track-eyebrow) !important;
-    color: var(--text-muted) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6:first-child {
     margin-top: 0 !important;
@@ -2702,7 +2697,11 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6.st-tags-empty
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
     font-size: var(--fs-xs) !important;
     font-weight: 700 !important;
-    letter-spacing: var(--track-wide) !important;
+    /* --track-eyebrow, not --track-wide. 6.13 names 0.08em as the
+       eyebrow rung and the rule that was overridden here had it right;
+       the one that replaced it reached a step further out for no stated
+       reason. The ladder has a rung for this job, so use it. */
+    letter-spacing: var(--track-eyebrow) !important;
     color: rgba(255, 255, 255, 0.38) !important;
     margin: 1.25rem 0 0 0 !important;
 }
