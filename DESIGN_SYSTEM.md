@@ -949,20 +949,28 @@ bug.
    last for hiding. On `/scenes` the top wrapper is also the totals summary, so
    naive hiding swallows the stats.
 8. No emoji. No em dashes. Anywhere: CSS, JS, UI copy, commit messages.
-9. **A shorthand with `!important` erases longhands set anywhere else, at any
+9. **A selector group's specificity is its MOST specific selector, not the
+   one you happened to read.** `08_misc_mid.css:2658` groups
+   `.rating-stars .btn.btn-secondary.minimal` with `.rating-stars button`;
+   the second is (0,2,2) and the first is (0,5,1), so a new rule pitched to
+   beat (0,2,2) lost. The five stars were the only controls out of 39 that
+   stayed without a focus ring while every other one was fixed, and the
+   source looked correct. Count every selector in the group, or check the
+   computed style and let it tell you.
+10. **A shorthand with `!important` erases longhands set anywhere else, at any
    specificity.** `background: x !important` resets `background-image` too,
    and a higher-specificity longhand without `!important` still loses. This
    is a different failure from losing the cascade: the rule wins and your
    longhand vanishes silently. When extending a surface where any rule sets a
    shorthand with `!important`, every longhand you set must repeat
    `!important`.
-10. **Changing `flex-direction` re-points every inherited alignment
+11. **Changing `flex-direction` re-points every inherited alignment
     property.** Alignment is axis-relative: a container that becomes a column
     silently re-purposes `align-items` from vertical to horizontal, and a rule
     written for the old axis (a modal header's `align-items: center`) starts
     doing something else entirely. When you change an axis, re-declare both
     alignment properties explicitly.
-11. **Collapsing something Stash sized from a grid track means zeroing the
+12. **Collapsing something Stash sized from a grid track means zeroing the
     MINIMUMS, not just the dimensions.** Stash sizes cards and their images
     off the track they were laid out in, and those minimums outrank a
     `width: 100%` set later. Twice now: collapsed performer cards stuck at
@@ -973,7 +981,7 @@ bug.
     hugely zoomed picture and it looked like a bad crop rather than a
     layout fault. Set `min-width` and `min-height` to 0 on every box down
     to the replaced element.
-12. **Below 1200px the panel is not a column, and anything tuned to 338px
+13. **Below 1200px the panel is not a column, and anything tuned to 338px
     has to say what it does at 1060px.** Three separate things stretched
     when the page stacked: the tab strip's `flex: 1 1 auto` turned six tabs
     into 166 to 181px slabs around 46px of ink; the description ran the
@@ -981,7 +989,7 @@ bug.
     ordering flips at exactly 1200px, sending the studio eyebrow below the
     title it labels. A row composed for the column needs a cap, a measure,
     or an explicit order, and the check is to measure at 1600 AND at 1100.
-13. **Replaced-element physics.** A border or radius on an element whose
+14. **Replaced-element physics.** A border or radius on an element whose
     content does not fill its box frames the box, not the picture:
     `object-fit: contain` plus a border produced a 168px frame around a 94px
     portrait with 29px of dead space each side. And `max-width: 100%` on a
@@ -1157,7 +1165,17 @@ Before a design ships:
 - [ ] Survives at the stacked or narrow width, not just the design width, and
       on phones coexists with the bottom dock rather than fighting it.
 - [ ] Focus is visible on every interactive element, using the house ring
-      (6.6), not the browser default and not nothing.
+      (6.6), not the browser default and not nothing. Count the controls and
+      count the rings: the scene panel had 39 controls, 251 rules in the
+      document mentioning `:focus`, and not one of them matching. Where a
+      surface sets `box-shadow: none !important` on its controls, 6.6's
+      shadow ring cannot work and the ring has to be an `outline`.
+      **Measuring this needs the harness set up for it**: a headless page is
+      not focused, so `.focus()` does nothing and nothing matches `:focus`,
+      which is indistinguishable from a missing style; and Chrome only
+      matches `:focus-visible` after the page has seen a real keyboard
+      event. `probe.js` enables focus emulation always and presses Tab under
+      `PROBE_KEYBOARD=1`.
 - [ ] Survives every third-party plugin element being absent.
 - [ ] No React node relocated; every click still lands on Stash's element.
 - [ ] Every size comes from the type scale, and the surface has six or seven
