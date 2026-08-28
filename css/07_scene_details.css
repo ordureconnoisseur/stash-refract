@@ -2241,10 +2241,15 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
        wrapper span holding frame-rate + resolution stayed display:block
        with gap:normal, so those two pills sat at 0px while the date sat
        at the row's declared 5px. Measured 5px / 0px before, 5px / 5px
-       after. One gap value, one container. */
+       after. One gap value, one container.
+
+       Zero now, not 5. As a text run the separators carry their own
+       margins, so a flex gap here was ADDED to them: measured, the dot
+       after the date had 7px each side and the dot inside this wrapper
+       had 12px, which is why the subtitle read as unevenly spaced. */
     display: inline-flex !important;
     align-items: center !important;
-    gap: 5px !important;
+    gap: 0 !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) :is(.date, .frame-rate, .resolution) {
     padding: 0 !important;
@@ -2302,8 +2307,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
        and a hairline, the recipe the operations button already used, so
        the container reads as one surface rather than a fourth kind of
        chip. */
-    margin: 0.85rem 0 0 0 !important;
-    padding: 5px 9px !important;
+    /* The panel had THREE left edges: every text block at 18.5px, the
+       first tab's ink at 24.5 and the strip's content at 28.5, because a
+       padded container indents what is inside it. Two bands stacked on a
+       text column, each starting somewhere different, is what read as
+       misaligned.
+
+       So the bands bleed and the CONTENT aligns: 5px of padding plus a
+       1px border is a 6px inset, and a -6px margin cancels it exactly.
+       The strip's box sits 6px outside the text column on both sides and
+       everything inside it starts at 18.5 with the title, the subtitle
+       and the description. The tab strip below takes the same treatment
+       for the same reason. */
+    margin: 0.85rem -6px 0 -6px !important;
+    padding: 5px 5px !important;
     border-radius: var(--radius-pill) !important;
     background: var(--fill-2) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -2889,8 +2906,12 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs {
        Measured 11.9 above and 10.5 below beforehand, which is near enough
        to equal that the strip read as floating between two things
        instead of belonging to one. */
-    margin: 1rem 0 0.6rem 0 !important;
-    padding: 3px !important;
+    margin: 1rem -6px 0.6rem -6px !important;
+    /* 5px, not 3px: with the -6px bleed above, the container's inset plus
+       its border has to come to 6px so the first tab's ink lands on the
+       text column's 18.5px like everything else. The 12px of width the
+       bleed buys goes straight to the tabs. */
+    padding: 5px !important;
     gap: 3px !important;
     border-radius: var(--radius-sm) !important;
     background: var(--fill-1) !important;
