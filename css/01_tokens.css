@@ -102,14 +102,24 @@ body.stash-liquid-glass {
        0.875rem, 0.86rem = 12.6 / 12.25 / 12.04px) sat inside half a
        pixel of each other while claiming to be different steps. Six more
        clustered between 9.2 and 10.8px. Anything picking a size should
-       reach for one of these six rather than inventing a seventh. */
-    --fs-xs:   0.72rem;   /* 10.08px  counters, overlay metadata      */
-    --fs-sm:   0.8rem;    /* 11.2px   pills, chips, badges            */
+       reach for one of these rather than inventing another.
+
+       The top of the ladder was retuned 2026-08-28. --fs-lg and --fs-xl
+       had ZERO consumers theme-wide while 14 literal sizes sat above
+       --fs-body, none of them at 17.5 or 28px, and the scene panel had
+       invented its own 21px step locally because the scale had a hole
+       between 17.5 and 28. Retuning two dead tokens is cheaper than
+       adding an eighth beside them, so --fs-xl became the 21px rung the
+       panel needed and the old 28px moved up to --fs-2xl. Nothing
+       referenced either name, so nothing changed on screen. */
+    --fs-xs:   0.72rem;   /* 10.08px  counters, eyebrows, captions    */
+    --fs-sm:   0.8rem;    /* 11.2px   pills, chips, badges, dense tabs*/
     --fs-base: 0.875rem;  /* 12.25px  controls: buttons, tabs, inputs */
-    --fs-md:   0.92rem;   /* 12.88px  card titles, dense headings   */
+    --fs-md:   0.92rem;   /* 12.88px  card titles, dense headings     */
     --fs-body: 1rem;      /* 14px     body copy, detail values        */
     --fs-lg:   1.25rem;   /* 17.5px   sub-headings                    */
-    --fs-xl:   2rem;      /* 28px     page title                      */
+    --fs-xl:   1.5rem;    /* 21px     panel and section titles        */
+    --fs-2xl:  2rem;      /* 28px     page title                      */
 
     /* Motion scale — tokenized 2026-08-28 from the measured de-facto
        scale (0.15s appeared 373 times as a literal before this), then

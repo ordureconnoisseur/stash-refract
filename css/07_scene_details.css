@@ -2020,19 +2020,9 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
        around a `.divider`, so no `.st-spec` injection is needed.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Type scale, local to the panel. Six steps, 10px floor. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
-    --sp-title: 21px;
-    --sp-value: 15px;
-    --sp-body: 13px;
-    --sp-chip: 11.5px;
-    --sp-tab: 11px;
-    --sp-label: 10px;
-}
-
 /* ── Marquee ──────────────────────────────────────────────────────── */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-header, .image-header) {
-    font-size: var(--sp-title) !important;
+    font-size: var(--fs-xl) !important;
     line-height: 1.22 !important;
     letter-spacing: -0.015em !important;
     margin-top: 0.7rem !important;
@@ -2070,7 +2060,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     background: rgba(255, 255, 255, 0.06) !important;
     border: 1px solid var(--glass-border) !important;
     color: rgba(255, 255, 255, 0.86) !important;
-    font-size: 11.5px !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
     font-variant-numeric: tabular-nums !important;
 }
@@ -2286,7 +2276,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .btn {
     height: 24px !important;
     padding: 0 !important;
-    font-size: var(--sp-chip) !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
     font-variant-numeric: tabular-nums !important;
 }
@@ -2318,7 +2308,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     display: inline-flex !important;
     align-items: center !important;
     border-radius: var(--radius-pill) !important;
-    font-size: var(--sp-chip) !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     background: var(--fill-1) !important;
     border: 1px dashed rgba(255, 255, 255, 0.16) !important;
@@ -2387,7 +2377,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-caption {
     position: absolute;
     top: -1.02rem;
     right: 0;
-    font-size: var(--sp-label);
+    font-size: var(--fs-xs);
     font-weight: 500;
     letter-spacing: 0.02em;
     color: rgba(255, 255, 255, 0.28);
@@ -2407,7 +2397,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-
     display: inline-flex !important;
     align-items: baseline !important;
     gap: 5px !important;
-    font-size: var(--sp-chip) !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
     background: var(--fill-4) !important;
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
@@ -2422,7 +2412,11 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead .st-tag-n {
     padding-right: 11px;
-    font-size: 9.5px;
+    /* Was 9.5px, which was below the scale's floor for no reason: the
+       count is secondary to an 11.2px chip label, and --fs-xs already
+       reads as secondary next to it without inventing a rung under the
+       ladder. One fewer size on the surface. */
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: rgba(255, 255, 255, 0.3);
     font-variant-numeric: tabular-nums;
@@ -2439,7 +2433,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-rest-run {
     display: none;
     margin-top: 0.6rem;
-    font-size: var(--sp-chip);
+    font-size: var(--fs-sm);
     line-height: 1.62;
     color: rgba(255, 255, 255, 0.55);
     text-wrap: pretty;
@@ -2478,7 +2472,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-more {
     border: 0;
     background: none;
     font-family: inherit;
-    font-size: var(--sp-tab);
+    font-size: var(--fs-sm);
     font-weight: 700;
     letter-spacing: var(--track-tight);
     color: var(--accent);
@@ -2496,7 +2490,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-more[hidden] {
    that made them look like a chip is stripped so they read as a readout. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored-head {
     margin: 1.25rem 0 0 0;
-    font-size: var(--sp-label);
+    font-size: var(--fs-xs);
     font-weight: 700;
     letter-spacing: var(--track-wide);
     text-transform: uppercase;
@@ -2518,7 +2512,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored .tag-item.st-sc
     border: 0 !important;
     border-radius: 0 !important;
     background: none !important;
-    font-size: var(--sp-tab) !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     color: rgba(255, 255, 255, 0.6) !important;
     white-space: nowrap !important;
@@ -2543,7 +2537,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6.st-tags-empty
 }
 
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
-    font-size: var(--sp-label) !important;
+    font-size: var(--fs-xs) !important;
     font-weight: 700 !important;
     letter-spacing: var(--track-wide) !important;
     color: rgba(255, 255, 255, 0.38) !important;
@@ -2588,12 +2582,16 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-item {
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link {
     display: block !important;
-    font-size: var(--sp-tab) !important;
+    font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
-    /* 4px horizontal is a MINIMUM, not the look: the items grow to fill
+    /* 2px horizontal is a MINIMUM, not the look: the items grow to fill
        the row, so with six tabs the boxes stretch and the padding never
-       shows. It only bites in the seven-tab play-queue case, where 7px
-       overflowed the strip by 38px and clipped Edit behind a scroll. */
+       shows -- measured, six tabs are byte-identical at 4px and at 2px.
+       It only bites in the seven-tab play-queue case, and there the
+       comment this replaces was wrong: 4px did not fix that overflow,
+       it reduced it from 38px to 17px and Edit stayed behind a scroll.
+       Simulated across the grid, 11.2px with 2px horizontal is the
+       setting that fits seven tabs at exactly 336px, zero overflow. */
     /* Asymmetric ON PURPOSE, and it is optical centring, not a fudge.
        Centring the line box is not the same as centring the text: the
        line box reserves descender space, and every tab label but History
@@ -2603,11 +2601,34 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link {
        vertical padding still sums to 10px, so the strip height is
        unchanged; the 1px is moved from below the text to above it, which
        centres the CAP HEIGHT and lets descenders hang as they should. */
-    padding: 6px 4px 4px !important;
+    padding: 6px 2px 4px !important;
     /* 12px container minus 3px padding: concentric with the outer edge. */
     border-radius: 9px !important;
     text-align: center !important;
     white-space: nowrap !important;
+}
+/* Stash hangs a count off some tab labels (the file count on File Info,
+   markers on Markers) as a Bootstrap .badge, which Refract had never
+   touched. Left alone it inherits Bootstrap's font-size: 75%, so it
+   rendered at 8.4px -- a size on no scale, arrived at by multiplication
+   -- with a pill background and no separation, so the tab read as one
+   word, "File Info2". It is a counter, not a control (6.5): quiet, on
+   the scale, and spaced off the label it belongs to. Dropping the pill
+   also narrows the widest tab, which is what the seven-tab strip is
+   short of. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .badge {
+    margin-left: 3px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 600 !important;
+    font-variant-numeric: tabular-nums !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    vertical-align: baseline !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active .badge {
+    color: rgba(var(--accent-rgb), 0.75) !important;
 }
 
 /* Performers: the credit row.
@@ -2721,7 +2742,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-extra {
     border: 1px solid var(--glass-border-bright);
     border-radius: var(--radius-pill);
     background: var(--fill-4);
-    font-size: var(--sp-label);
+    font-size: var(--fs-xs);
     font-weight: 700;
     color: rgba(255, 255, 255, 0.6);
     font-variant-numeric: tabular-nums;
@@ -2776,7 +2797,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    font-size: var(--sp-chip);
+    font-size: var(--fs-sm);
     line-height: 1.4;
     color: rgba(255, 255, 255, 0.72);
     text-wrap: pretty;
@@ -2797,7 +2818,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc {
     -webkit-box-orient: vertical;
     overflow: hidden !important;
     margin-bottom: 0 !important;
-    font-size: var(--sp-body) !important;
+    font-size: var(--fs-md) !important;
     line-height: 1.5 !important;
     color: rgba(255, 255, 255, 0.62) !important;
     text-wrap: pretty;
@@ -2817,7 +2838,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more {
     border: 0;
     background: none;
     font-family: inherit;
-    font-size: var(--sp-tab);
+    font-size: var(--fs-sm);
     font-weight: 700;
     letter-spacing: var(--track-tight);
     color: var(--accent);
