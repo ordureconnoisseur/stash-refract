@@ -2092,6 +2092,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     overflow: visible !important;
     position: relative !important;
 }
+/* The row breaks into two lines, and the split is by what a control IS,
+   not by how many fit: everything that REPORTS on the scene above
+   (rating, score, play count, O count), everything that ACTS on it
+   below (the toggles, then the operations menu and multiview). 6.5
+   draws that line between a readout and a control; the row now draws
+   it too.
+
+   The previous split was rating-and-utilities over chips, which put
+   four word chips on one 338px line when they measure 350.3px with
+   their gaps. Organised wrapped alone onto a third line 12.3px short
+   of fitting, and the utilities' auto margin left a 98.2px hole in
+   the middle of line one. Regrouped, line one measures 296.7px and
+   line two 284.4px, both inside 338 with room to spare, and the
+   toolbar loses a whole row of height. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar)::after {
     content: "";
     flex: 0 0 100%;
@@ -2167,7 +2181,10 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     width: 26px !important;
     height: 26px !important;
     min-width: 26px !important;
-    margin: 0 0 0 9px !important;
+    /* Was 9px, which read as detached: the row's own column gap is
+       5px, so a 14px step made the one control that IS about the
+       rating look like it belonged to neither group. */
+    margin: 0 !important;
     padding: 0 !important;
     /* Measured against the operations and multiview buttons: they fill
        at rgba(255,255,255,0.04), not --glass-bg's 0.06. Three controls,
@@ -2239,14 +2256,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
    kind of object than the chips. The auto margin sits on the wrapper
    that still has a box, so a missing plugin leaves no gap. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) div.dropdown {
-    order: 3 !important;
+    order: 8 !important;
     display: block !important;
     margin-left: auto !important;
     padding-left: 7px !important;
     box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.12) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn {
-    order: 4 !important;
+    order: 9 !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(#operation-menu, .mv-scene-page-btn) {
     width: 26px !important;
@@ -2268,10 +2285,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     overflow: hidden !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) {
-    order: 6 !important;
+    order: 3 !important;
+    /* Opens the rating cluster away from the counters. Everything else
+       on the line is 5px apart, so the counters read as their own pair
+       without a rule or a bigger step. */
+    margin-left: 6px !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) {
-    order: 7 !important;
+    order: 4 !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .btn {
     height: 24px !important;
@@ -2316,10 +2337,10 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     box-shadow: none !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn {
-    order: 8 !important;
+    order: 6 !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button {
-    order: 9 !important;
+    order: 7 !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn) svg {
     width: 11px !important;
