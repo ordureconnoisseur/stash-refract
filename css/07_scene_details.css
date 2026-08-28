@@ -195,8 +195,36 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs)::-webkit-scrollbar-thumb {
     background: var(--glass-border) !important;
     border-radius: 3px !important;
 }
+/* The scrollbar rules above are on .scene-tabs, which does not scroll:
+   measured, the panel reports scrollHeight === clientHeight in every
+   state. .tab-content is the real scrollport (overflow-y: auto), and it
+   had no scrollbar styling at all, so expanding the disclosures produced
+   a 15px browser-default bar. The content was always reachable, but the
+   affordance was the one thing on the surface Refract had not themed,
+   and it appeared without warning: scrollbar-gutter: stable reserves the
+   space so opening a disclosure no longer reflows the column by 15px.
+
+   8px with an accent thumb, per 6.10's content-pane treatment rather
+   than the quiet --glass-border variant. It is the one affordance that
+   says the rest of the list is down there, so it should be legible. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content::-webkit-scrollbar {
+    width: 8px !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content::-webkit-scrollbar-thumb {
+    background: rgba(var(--accent-rgb), 0.35) !important;
+    border-radius: var(--radius-pill) !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--accent-rgb), 0.6) !important;
+}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content,
 body.stash-liquid-glass .gallery-container .tab-content {
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(var(--accent-rgb), 0.35) transparent !important;
+    scrollbar-gutter: stable !important;
     background: transparent !important;
     border: none !important;
     border-radius: 0 !important;
@@ -1115,19 +1143,12 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.t
    "Tags" h6 in the scene-tabs panel. Tags wrap row-by-row left-to-right
    like the original layout; container is capped to ~5 rows of pills
    with internal vertical scroll for any overflow. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list {
-    display: flex !important;
-    flex-flow: row wrap !important;
-    align-content: flex-start !important;
-    max-height: 7rem !important;
-    gap: 4px 6px !important;
-    margin: 0.2rem 0 0.65rem 0 !important;
-    padding: 2px 2px 4px !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    scrollbar-width: thin !important;
-    scrollbar-color: var(--glass-border) transparent !important;
-}
+/* The scrolling tag box this used to be is gone: it was P7's canonical
+   failure (34 chips crushed into 98px above dead space) and the block
+   1,379 lines below supersedes its display, max-height and overflow.
+   What it did NOT supersede were the two scrollbar properties, which are
+   INHERITED, so a dead rule kept re-colouring the scrollbar of whatever
+   scrolled inside it. Deleted rather than left to lose quietly. */
 /* Subtle bottom fade - only when the strip actually overflows its
    max-height (toggled by syncTagListFade in refract.js). Short tag
    lists stay sharply rendered with no half-faded last row. */
