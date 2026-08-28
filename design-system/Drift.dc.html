@@ -41,7 +41,7 @@
 
   <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: start;">
     <div style="font-size: 12.25px; font-weight: 700;">Motion</div>
-    <div style="font-size: 12.25px; color: rgba(255,255,255,0.68); line-height: 1.55;">Tokenized 2026-08-28: five dur and three ease tokens, 647 canonical declarations migrated, then 83 near-duplicates (deltas 0.02s or less) folded on. Residue: 0.08s and the 0.25 to 0.35s band, where folding would be perceptible; needs a looked-at pass.</div>
+    <div style="font-size: 12.25px; color: rgba(255,255,255,0.68); line-height: 1.55;">Tokenized 2026-08-28 in three passes: the canonical five, the near-duplicates, then the 0.25 to 0.35s residue onto a new dur-settle (shifts up to 14 percent; eyeball drawers and reveals). Remaining literals are deliberate: 0.08s micro-flashes and the player 1s idle fade.</div>
     <div class="mono" style="font-size: 10.08px; color: #fb923c; text-align: right;">3.7</div>
   </div>
 
@@ -53,7 +53,7 @@
 
   <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: start;">
     <div style="font-size: 12.25px; font-weight: 700;">Surfaces</div>
-    <div style="font-size: 12.25px; color: rgba(255,255,255,0.68); line-height: 1.55;">Four backdrop-filter expressions still bypass the ladder, including blur(16px) saturate(1.1). Each one is a shader the ladder was built to avoid.</div>
+    <div style="font-size: 12.25px; color: rgba(255,255,255,0.68); line-height: 1.55;">RESOLVED 2026-08-28: the rogue expressions folded to ladder rungs; the 16px saturate pair sat behind 94 to 96 percent opaque fills, so the fold is invisible. Live shader count now equals the ladder: nine.</div>
     <div class="mono" style="font-size: 10.08px; color: #fb923c; text-align: right;">3.2</div>
   </div>
 
@@ -65,7 +65,7 @@
 
   <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr) 62px; gap: 20px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.07); align-items: start;">
     <div style="font-size: 12.25px; font-weight: 700;">Spacing</div>
-    <div style="font-size: 12.25px; color: rgba(255,255,255,0.68); line-height: 1.55;">No scale. Gaps cluster at 0.3, 0.35, 0.4, 0.5, 0.55, 0.75, 0.85 and 1rem, chosen by eye per cluster. Until one exists, match the neighbouring cluster.</div>
+    <div style="font-size: 12.25px; color: rgba(255,255,255,0.68); line-height: 1.55;">Gaps tokenized 2026-08-28 (gap-2xs to gap-xl, folds of at most 1.4px). Padding and margins remain unscaled: consolidating them moves layout, so they wait for a measured pass at the light-mode fill project.</div>
     <div class="mono" style="font-size: 10.08px; color: #fb923c; text-align: right;">3.6</div>
   </div>
 

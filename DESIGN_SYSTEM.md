@@ -152,6 +152,21 @@ Two fills: `--glass-bg` at 0.06 alpha for floating chrome, `--glass-bg-strong`
 at 0.10 for panels that hold reading content. Two rims: `--glass-border` at
 0.12, `--glass-border-bright` at 0.22 for hover and focus.
 
+**Below the glass fills sits the fill ramp** (tokenized 2026-08-28 from the
+measured background histogram): `--fill-1` 0.03 (hairline tint: rows, wells),
+`--fill-2` 0.04 (resting fill: inputs, tiles), `--fill-3` 0.05 (raised fill:
+chips, list items), `--fill-4` 0.08 (hover and active). The ramp does NOT
+retheme in light mode (14_light still overrides surfaces per-selector); the
+glass fills DO. That is why the two are separate vocabularies: never alias
+0.06 to `--glass-bg` or 0.10 to `--glass-bg-strong` in a rule that light mode
+does not override, or that surface will frost unexpectedly in light.
+
+**Near-opaque overlays use the surface family**: `rgba(var(--surface-rgb), A)`
+with `--surface-rgb: 20, 20, 24` (popovers, menus, floating overlay chrome;
+the alpha stays per use), and `--surface-solid` (`rgba(11,11,11,0.94)`) for
+the modal, which is exactly neutral on purpose (6.14). Two sanctioned surface
+colours, no third.
+
 **Blur is a fixed ladder, not a free parameter.** Nine live expressions: five
 plain rungs (`xs` 6px, `sm` 10px, `md` 14px, `xl` 24px, `2xl` 32px) and four
 saturating variants at `saturate(140%)`. On Windows Chromium every distinct
@@ -298,11 +313,15 @@ Navbar controls scale with viewport: `--nav-btn-size` steps 2.4rem, then
 2.7rem at 1441px, 3rem at 1921px, 3.4rem at 2561px, with icon size and gap
 following. The defaults are tuned for a 13 to 15 inch laptop at 100% scaling.
 
-**Spacing has no scale yet** (see the drift ledger). The de-facto rhythm in
-the shipped CSS: `0.3` to `0.55rem` for gaps inside a control cluster,
-`0.75` to `1rem` between clusters, with `0.5rem` the most common single value.
-Until a scale exists, match the neighbouring cluster rather than inventing a
-new gap.
+**The gap scale** (tokenized 2026-08-28 from the measured histogram):
+`--gap-2xs` 0.25rem (glyph-adjacent), `--gap-xs` 0.3 (inside a chip),
+`--gap-sm` 0.4 (control clusters), `--gap-md` 0.5 (the default between
+items), `--gap-lg` 0.75 (between groups), `--gap-xl` 1rem (between sections).
+New `gap` declarations pick a step. Pixel glyph gaps (2/4/5px icon spacing)
+stay literal, and **padding and margins are not yet in scope**: they are a
+far larger surface where consolidation moves layout, so they remain on the
+drift ledger for a measured pass. Until then, padding matches the
+neighbouring cluster.
 
 ### 3.7 Motion
 
@@ -315,6 +334,7 @@ Tokenized 2026-08-28 in `01_tokens.css`, from the measured de-facto scale
 | `--dur-fast` | 0.15s | the default: hover, colour, opacity, border |
 | `--dur-move` | 0.18s | transforms, small movement |
 | `--dur-enter` | 0.22s | panel and popover entrances |
+| `--dur-settle` | 0.3s | multi-property settles, reveals |
 | `--dur-slow` | 0.4s | large surfaces: drawer, flip, modal |
 
 Easing: plain `ease` for state change (the majority). `--ease-glide`
@@ -362,6 +382,11 @@ opportunistically, file by file, never in a sweep.
 | Page overlays | 400 | floating pagination |
 | Bootstrap layer | 1050 to 1100 | modals, dropdowns, popovers (Bootstrap's own values) |
 | Topmost | 9999 to 10000 | lightbox chrome, drag ghosts, absolute-last-resort |
+
+The cross-file singletons are named tokens (2026-08-28): `--z-scrim` 99,
+`--z-dock` 110, `--z-pager` 400, `--z-overlay` 1060 (above Bootstrap's modal),
+`--z-lightbox` 1100, `--z-top` 9999. In-component stacking (0 to 9) and the
+tier ladder stay literal by design; Bootstrap's own 1050 is theirs.
 
 Two standing rules already earned by bugs: the tier ladder must stay isolated
 inside its grid row (its 20 to 70 would otherwise fight the pagination's 400
@@ -675,11 +700,11 @@ trade is settled.
 ### 6.13 The eyebrow, and micro-type
 
 The house label pattern for section headers, column labels and stat captions:
-`--fs-xs`, weight 600 to 700, uppercase, tracked. Tracking has a de-facto
-ladder: `0.04em` for tight labels, `0.06` to `0.08em` for standard eyebrows,
-`0.1` to `0.14em` for wide display labels; body text sits at the global
-`0.005em` and never gets tracked wider. 64 uppercase uses follow this pattern
-today.
+`--fs-xs`, weight 600 to 700, uppercase, tracked. The tracking ladder is
+tokenized (2026-08-28): `--track-tight` 0.04em, `--track-label` 0.06,
+`--track-eyebrow` 0.08, `--track-wide` 0.1, `--track-display` 0.14. Body text
+sits at the global `0.005em` and never gets tracked wider; micro letterfit on
+display text (0.01 to 0.02em) is a different job and stays literal.
 
 An eyebrow labels; it is always `--text-muted` or accent, never brighter than
 the content it introduces (P1).
@@ -924,11 +949,11 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 |---|---|---|
 | Type | 301 uses of `var(--fs-*)` against 99 literal sizes, so 75% adoption. The literals cluster at 0.74, 0.66, 0.62, 0.6 and 0.58rem, which is a sub-`--fs-xs` tier the scale does not have. | 3.5 |
 | Type, second ladder | `07_scene_details.css` declares a six-step panel-local scale (`--sp-title` 21 down to `--sp-label` 10) used 15+ times alongside `var(--fs-*)` in the same file. Ruling, sharpened 2026-08-28: the second scale was four rounding errors and one missing step. Four steps restate global tokens within a third of a pixel and alias to `--fs-md`, `--fs-sm`, `--fs-sm`, `--fs-xs`; 15 is 1px off `--fs-body` and folds into it; only 21px is a genuine hole (between 17.5 and 28) and is promoted to the global scale when the panel lands. Logged 2026-08-27; revisit at the panel merge. | 3.5 |
-| Motion | Tokenized 2026-08-28: five `--dur-*` and three `--ease-*` tokens; 647 canonical declarations migrated, then 83 near-duplicates (0.1, 0.13, 0.14, 0.16, 0.2s, all deltas 0.02s or less, imperceptible) folded onto them the same day. Residue: 0.08s and the 0.25 to 0.35s band, roughly 46 uses, where folding would be a perceptible change; those need a looked-at pass, not a scripted one. | 3.7 |
+| Motion | Tokenized 2026-08-28 in three passes: the canonical five, then near-duplicates, then the 0.25 to 0.35s residue onto a new `--dur-settle` (shifts up to 14%, the one perceptible-in-principle fold; eyeball drawers and reveals). Remaining literals are deliberate: 0.08s micro-flashes and the player idle 1s fade. | 3.7 |
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px and 10px literals. 9px is removed from this row: where commented as concentric (inner = outer minus padding) it is computed, correct, and exempt per 3.4; uncommented 9px uses still need their derivation stated or a token. | 3.4 |
-| Surfaces | Four `backdrop-filter` expressions still bypass the ladder, including `blur(16px) saturate(1.1)`. Each is a shader the ladder was built to avoid. Revisit at the next blur pass. | 3.2 |
+| Surfaces | RESOLVED 2026-08-28: the rogue `backdrop-filter` expressions folded to ladder rungs (the 16px saturate(1.1) pair sat behind 94 to 96 percent opaque fills, so the fold is invisible; 8px went to sm). Live shader count now equals the ladder: nine. | 3.2 |
 | Z-index | Values run 0, 1 through 12, then 20, 30, 50, 90, 99, 100, 400, 1050, 1060, 1100, 9999, 10000, each chosen ad hoc. A band map now exists (3.8); nothing has migrated to it yet. | 3.8 |
-| Spacing | No scale. Gaps cluster at 0.3, 0.35, 0.4, 0.5, 0.55, 0.75, 0.85 and 1rem, chosen by eye per cluster. | 3.6 |
+| Spacing | Gaps tokenized 2026-08-28 (`--gap-2xs` to `--gap-xl`, folds of at most 1.4px). Padding and margins remain unscaled: consolidating them moves layout, so they wait for a measured pass. Fill literals 0.02, 0.06, 0.10 and 0.12 also remain: 0.02 is below the ramp, and 0.06/0.10 must not silently become glass tokens (3.2). Revisit at the light-mode fill project. | 3.6 |
 | Specificity | 8,268 `!important` declarations. Largely unavoidable against Bootstrap, but it means load order and class doubling are the only remaining levers. | 5.2 |
 
 If a sub-`--fs-xs` step is genuinely needed, add it to the scale once rather
