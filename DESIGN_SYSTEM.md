@@ -504,6 +504,16 @@ wrapping at narrow widths.
 supplies the rim and the floor and nothing else. Remember section 3.2: a child
 of a glass panel cannot paint its own glass without reading as a lighter band.
 
+**Free user text never sets a panel's height.** Descriptions, details, titles
+and file paths are unbounded input; the composition gives them a budget
+(line-clamp or max-height plus a disclosure to expand) and the budget comes
+from the layout, not the content. The canonical failure: a 1,838px scene
+description pushed the tag list to y=2246 inside an 890px panel, leaving
+everything below it invisible with no signal that it existed. Clamp with a
+visible affordance; do not solve it with an inner scrollbar, which is the P7
+failure wearing a different hat. This applies to every surface that renders
+user-entered text, cards included.
+
 ### 6.5 Buttons
 
 The primary recipe, from `09_buttons.css`:
@@ -876,7 +886,8 @@ shell and the next probe then silently measures a Chrome error page.
 What reading the source missed and measuring found, all in one session:
 
 - A scene description rendering 1,838px tall, pushing the tag list to y=2246
-  inside an 890px panel, so everything below it was invisible.
+  inside an 890px panel, so everything below it was invisible. (Now law in
+  6.4: free user text never sets a panel's height.)
 - Collapsed cards stuck at 169px because `[data-perf-count="2"]` outranked the
   collapse rules. Height applied, width did not, from the same block.
 - 119.81px of dead air from a `justify-content: space-between` inherited from
