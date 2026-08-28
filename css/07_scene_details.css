@@ -3012,3 +3012,31 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     padding-top: 0 !important;
     padding-bottom: 0 !important;
 }
+
+/* ...except the counter value, which that block leaves 1.5px high.
+
+   Scanned in rendered pixels against the pill each one sits in, every
+   other chip in the panel lands its ink at +0.50 from the pill centre:
+   both counter icons, the favourite and organised glyphs, the three
+   spec pills, and the active tab label. The counter text alone came
+   back at -1.00, so the number floated 1.5px above the icon beside it
+   and above every other chip in the row. Zero vertical padding plus a
+   centred line box is not the same as centred text: the line box
+   reserves descender space, so the cap band it contains sits about a
+   pixel above the box it is centred in.
+
+   Asymmetric vertical padding shifts a flex-centred line box down by
+   half the difference. The ink wanted 1.5px and Chrome rounds the
+   result to whole pixels at 1x, so 1px and 2px both land it and 3px
+   overshoots: the text and the icon now start on the same pixel row,
+   with the icon a row taller because its glyph is. 2px is the value
+   that still means 1.5px if the rounding differs.
+
+   Set from the ink, not from the box. By getBoundingClientRect the
+   icon and the number were already centred to 0.01px of each other,
+   and they still looked wrong, because the box model was measuring
+   the wrong thing. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-value {
+    padding-top: 2px !important;
+    padding-bottom: 0 !important;
+}

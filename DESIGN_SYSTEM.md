@@ -660,6 +660,19 @@ spread across one row of pills, invisible in the source and unmeasurable by
 eye. Negative leading never announces itself; when a row of chips will not
 align, check the line-height against the font box before touching padding.
 
+**Positive leading and a centred line box are still not centred text.** A
+chip with healthy line-height and `align-items: center` measures centred to
+a hundredth of a pixel by `getBoundingClientRect` and can still sit 1.5px
+high, because the line box it centres reserves descender space and the cap
+band inside it therefore sits about a pixel above the box. The counter
+pills read that way against their own icons while the box model said they
+were perfect. **Audit a row by scanning the rendered ink against the pill
+it sits in.** In this panel every correctly-set chip lands its ink at +0.50
+from the pill centre, icons included, so anything that is not +0.50 is the
+thing to fix. Asymmetric vertical padding moves a flex-centred line box by
+half the difference, and Chrome rounds the result to whole pixels at 1x, so
+pick the value from the measurement rather than from the arithmetic.
+
 ### 6.8 Popovers and hover cards
 
 Bootstrap's variables are re-pegged at body level so they cascade everywhere:
