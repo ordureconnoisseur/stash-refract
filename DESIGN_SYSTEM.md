@@ -11,11 +11,12 @@ newer, measured evidence wins over both.
 
 Every number here was read out of the shipped CSS or JS, not invented.
 
-There is a visual companion: nine artboards covering the thesis, colour, type,
-surfaces, depth, motion, the rating tiers, the modes and the drift ledger.
-Sources are in `design-system/` as `.dc.html` files plus `canvas.json`; re-seed
-with the design canvas helper after editing them. It is a view of this file, not
-a second source of truth.
+There is a visual companion: ten artboards covering the thesis, colour, type,
+surfaces, depth, motion, the rating tiers, the modes, component law and the
+drift ledger. Sources are in `design-system/` as `.dc.html` files plus
+`canvas.json`; re-seed with the design canvas helper after editing them, and
+run `node design-system/lint.mjs`, which checks the artboards against this
+file's own laws. It is a view of this file, not a second source of truth.
 
 ---
 
@@ -301,21 +302,25 @@ new gap.
 
 ### 3.7 Motion
 
-The de-facto scale, measured across all sheets:
+Tokenized 2026-08-28 in `01_tokens.css`, from the measured de-facto scale
+(0.15s appeared 373 times as a literal before this):
 
-| Duration | Uses | Job |
+| Token | Value | Job |
 |---|---|---|
-| 0.12s | 28 | instant feedback: press, check |
-| **0.15s** | **373** | the default: hover, colour, opacity, border |
-| 0.18s | 106 | transforms, small movement |
-| 0.22s | 39 | panel and popover entrances |
-| 0.35 to 0.4s | 12 | large surfaces: drawer, flip, modal |
+| `--dur-instant` | 0.12s | instant feedback: press, check |
+| `--dur-fast` | 0.15s | the default: hover, colour, opacity, border |
+| `--dur-move` | 0.18s | transforms, small movement |
+| `--dur-enter` | 0.22s | panel and popover entrances |
+| `--dur-slow` | 0.4s | large surfaces: drawer, flip, modal |
 
-Easing: plain `ease` for state change (287 uses).
-`cubic-bezier(0.4, 0, 0.2, 1)` for movement with a defined start and end.
-`cubic-bezier(0.34, 1.2, 0.64, 1)` and its stiffer sibling
-`cubic-bezier(0.34, 1.56, 0.64, 1)` for entrances that should feel physical.
-Overshoot is for things arriving, never for things leaving.
+Easing: plain `ease` for state change (the majority). `--ease-glide`
+(`cubic-bezier(0.4, 0, 0.2, 1)`) for movement with a defined start and end.
+`--ease-spring` (`0.34, 1.2, 0.64, 1`) and `--ease-spring-hard`
+(`0.34, 1.56, 0.64, 1`) for entrances that should feel physical. Overshoot is
+for things arriving, never for things leaving.
+
+New motion picks a token. `multiview-player.css` keeps literals deliberately:
+it loads in multiview's context, where the tokens may not resolve.
 
 **Card tilt** is the signature interaction and its constants are fixed:
 12 degrees maximum, 1.04 scale, 800px perspective, 400ms reset, 0.18 maximum
@@ -800,6 +805,23 @@ The words are part of the theme and follow the same discipline:
 - Errors say what happened and what to do, specifically. A toast that cannot
   say which of success or failure occurred is the 6.9 bug in words.
 
+### 6.22 Empty, failed, resolving
+
+Nothing here is designed yet (section 9 says so honestly); this is the law for
+when it is:
+
+1. **An empty slot carries information, and a repeated placeholder destroys
+   it.** In a grid where the image is the identifier, ten identical
+   silhouettes are anti-informative: they read as "dull photo", not "no
+   photo". The slot promotes whatever field is doing the disambiguating
+   instead.
+2. **Absent, failed and resolving are three different states.** Absent is
+   permanent and says so. Failed to load is not permanent and deserves a
+   retry affordance. Resolving must hold the slot's dimensions so the grid
+   does not reflow when it lands.
+3. An empty screen is an invitation to act (6.21): it says what would fill it
+   and offers the action, in the interface's voice.
+
 ---
 
 ## 7. Platform physics
@@ -841,6 +863,26 @@ bug.
    last for hiding. On `/scenes` the top wrapper is also the totals summary, so
    naive hiding swallows the stats.
 8. No emoji. No em dashes. Anywhere: CSS, JS, UI copy, commit messages.
+9. **A shorthand with `!important` erases longhands set anywhere else, at any
+   specificity.** `background: x !important` resets `background-image` too,
+   and a higher-specificity longhand without `!important` still loses. This
+   is a different failure from losing the cascade: the rule wins and your
+   longhand vanishes silently. When extending a surface where any rule sets a
+   shorthand with `!important`, every longhand you set must repeat
+   `!important`.
+10. **Changing `flex-direction` re-points every inherited alignment
+    property.** Alignment is axis-relative: a container that becomes a column
+    silently re-purposes `align-items` from vertical to horizontal, and a rule
+    written for the old axis (a modal header's `align-items: center`) starts
+    doing something else entirely. When you change an axis, re-declare both
+    alignment properties explicitly.
+11. **Replaced-element physics.** A border or radius on an element whose
+    content does not fill its box frames the box, not the picture:
+    `object-fit: contain` plus a border produced a 168px frame around a 94px
+    portrait with 29px of dead space each side. And `max-width: 100%` on a
+    replaced element inside a content-sized flex parent is circular; remove
+    the sizing floor and it collapses, measured at 2x2. Size replaced
+    elements from a real constraint, never from each other.
 
 ---
 
@@ -869,13 +911,16 @@ bug.
 
 An honest ledger. None of these are emergencies. All of them are places the
 system is not being followed, and each is a cheap win for whoever is already in
-that file.
+that file. A ledger without dates becomes a museum: every row carries when it
+was logged or ruled on and what triggers a revisit, so this stays a decision
+record rather than a list of things everyone has stopped seeing. Rows without
+an explicit date were logged at the ledger's creation, 2026-08-27.
 
 | Area | State | Rule |
 |---|---|---|
 | Type | 301 uses of `var(--fs-*)` against 99 literal sizes, so 75% adoption. The literals cluster at 0.74, 0.66, 0.62, 0.6 and 0.58rem, which is a sub-`--fs-xs` tier the scale does not have. | 3.5 |
-| Type, second ladder | `07_scene_details.css` declares a six-step panel-local scale (`--sp-title` 21, `--sp-value` 15, `--sp-body` 13, `--sp-chip` 11.5, `--sp-tab` 11, `--sp-label` 10) used 15+ times alongside `var(--fs-*)` in the same file. Ruling: four of its steps are sub-third-of-a-pixel restatements of global tokens (13 vs 12.88, 11.5 vs 11.2, 11 vs 11.2, 10 vs 10.08), and two of its own steps sit 0.5px apart, the exact 3.5 rule 1 failure. Those four alias to `--fs-md`, `--fs-sm`, `--fs-sm`, `--fs-xs` when the panel work lands. The other two are real: 21px exposes a genuine hole between `--fs-lg` (17.5) and `--fs-xl` (28), and 15px a plausible emphasis step above body. If the panel design holds, promote those two to the global scale rather than keeping a parallel ladder. | 3.5 |
-| Motion | Not tokenized at all. 0.15s appears 373 times as a literal. There is no `--dur-*` or `--ease-*`. | 3.7 |
+| Type, second ladder | `07_scene_details.css` declares a six-step panel-local scale (`--sp-title` 21 down to `--sp-label` 10) used 15+ times alongside `var(--fs-*)` in the same file. Ruling, sharpened 2026-08-28: the second scale was four rounding errors and one missing step. Four steps restate global tokens within a third of a pixel and alias to `--fs-md`, `--fs-sm`, `--fs-sm`, `--fs-xs`; 15 is 1px off `--fs-body` and folds into it; only 21px is a genuine hole (between 17.5 and 28) and is promoted to the global scale when the panel lands. Logged 2026-08-27; revisit at the panel merge. | 3.5 |
+| Motion | Tokenized 2026-08-28: five `--dur-*` and three `--ease-*` tokens; 647 canonical declarations migrated by script, values unchanged. Residue: the straggler durations (0.13, 0.14, 0.16, 0.2, 0.25 to 0.35s, roughly 90 uses) fold onto the tokens in a phase 2 measured pass. Revisit after the panel work lands. | 3.7 |
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px and 10px literals. 9px is removed from this row: where commented as concentric (inner = outer minus padding) it is computed, correct, and exempt per 3.4; uncommented 9px uses still need their derivation stated or a token. | 3.4 |
 | Surfaces | Four `backdrop-filter` expressions still bypass the ladder, including `blur(16px) saturate(1.1)`. | 3.2 |
 | Z-index | Values run 0, 1 through 12, then 20, 30, 50, 90, 99, 100, 400, 1050, 1060, 1100, 9999, 10000, each chosen ad hoc. A band map now exists (3.8); nothing has migrated to it yet. | 3.8 |
@@ -925,6 +970,19 @@ What reading the source missed and measuring found, all in one session:
 
 None of those were visible in the CSS.
 
+Two process rules the harness sessions earned:
+
+- **Measure a fresh document.** A page that loaded before the edit measures
+  the old CSS; two wrong conclusions in one session came from exactly this,
+  including a fix declared failed that had worked. Reload, then measure.
+- **Re-laying out a surface means hunting its old rules first.** In a
+  numbered cascade, stale rules for the superseded layout in a
+  higher-numbered file do not error; they win. A morning's row-layout rules
+  overrode the afternoon's grid from a later file, and the change "would not
+  take" through several edits. Before re-laying out a surface, grep every
+  numbered file for that surface's selectors and delete what the new layout
+  supersedes.
+
 ### 10.2 The brief format
 
 Refract's design work runs through briefs, and the format has earned its keep.
@@ -938,7 +996,11 @@ A brief that changes a surface has ten sections:
    available space. This section does most of the work.
 4. **The worst part, specifically.** Name it, and say why.
 5. **Data available, free.** What is already in the DOM or one GraphQL field
-   away, so directions can be ambitious without inventing plumbing.
+   away, so directions can be ambitious without inventing plumbing. Confirm
+   against returned data, not the schema: a field existing in the type is not
+   the same as a live query returning it filled. One mockup showed a count
+   the type does not carry at all, and the substitute field existed but came
+   back empty for every result tested.
 6. **Hard constraints.** Only things that have actually caused a bug.
 7. **Settled, not open.** So a direction does not spend itself on ground that
    is already decided.
@@ -976,4 +1038,7 @@ Before a design ships:
       rule, and three of four failures in one measured session were exactly
       this. Check `getComputedStyle` or the harness, per property changed.
 - [ ] Before and after measured on the live instance with the harness, with
-      screenshots.
+      screenshots, from a freshly loaded document.
+- [ ] If the change touched the canvas artboards:
+      `node design-system/lint.mjs` passes. The bible is measured against its
+      own laws by tool, not by eye.

@@ -20,42 +20,42 @@
   <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 34px;">
     <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #f97316;">Foundation 3.7</div>
     <div style="font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;">Motion</div>
-    <div style="font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.55; max-width: 66ch; text-wrap: pretty;">Not tokenized yet, but not arbitrary either. This is the scale the shipped CSS actually uses, counted across every sheet.</div>
+    <div style="font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.55; max-width: 66ch; text-wrap: pretty;">Tokenized 2026-08-28 as five dur and three ease tokens in 01_tokens, from this measured scale. 647 declarations migrated, values unchanged; stragglers fold in later.</div>
   </div>
 
   <div style="display: flex; align-items: baseline; gap: 14px; margin-bottom: 20px;">
-    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">Durations, by how often they appear</div>
+    <div style="font-size: 10.08px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.45);">The tokens, by how often their values appeared as literals</div>
     <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.10);"></div>
   </div>
 
   <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 42px;">
 
-    <div style="display: grid; grid-template-columns: 62px minmax(0, 1fr) 220px; gap: 18px; align-items: center;">
-      <div class="mono" style="font-size: 12.25px; color: rgba(255,255,255,0.75);">0.12s</div>
+    <div style="display: grid; grid-template-columns: 116px minmax(0, 1fr) 200px; gap: 18px; align-items: center;">
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.75);">--dur-instant<br>0.12s</div>
       <div style="height: 14px; border-radius: 9999px; background: rgba(255,255,255,0.05);"><div style="width: 30%; height: 100%; border-radius: 9999px; background: rgba(255,255,255,0.28);"></div></div>
       <div style="font-size: 11.2px; color: rgba(255,255,255,0.55);"><span style="color: rgba(255,255,255,0.85); font-weight: 600;">28 uses</span> instant feedback: press, check</div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 62px minmax(0, 1fr) 220px; gap: 18px; align-items: center;">
-      <div class="mono" style="font-size: 12.25px; font-weight: 700; color: #fb923c;">0.15s</div>
+    <div style="display: grid; grid-template-columns: 116px minmax(0, 1fr) 200px; gap: 18px; align-items: center;">
+      <div class="mono" style="font-size: 10.08px; font-weight: 700; color: #fb923c;">--dur-fast<br>0.15s</div>
       <div style="height: 14px; border-radius: 9999px; background: rgba(255,255,255,0.05);"><div style="width: 37.5%; height: 100%; border-radius: 9999px; background: #f97316; box-shadow: 0 0 14px rgba(249,115,22,0.5);"></div></div>
       <div style="font-size: 11.2px; color: rgba(255,255,255,0.55);"><span style="color: #fb923c; font-weight: 700;">373 uses</span> the default: hover, colour, opacity, border</div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 62px minmax(0, 1fr) 220px; gap: 18px; align-items: center;">
-      <div class="mono" style="font-size: 12.25px; color: rgba(255,255,255,0.75);">0.18s</div>
+    <div style="display: grid; grid-template-columns: 116px minmax(0, 1fr) 200px; gap: 18px; align-items: center;">
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.75);">--dur-move<br>0.18s</div>
       <div style="height: 14px; border-radius: 9999px; background: rgba(255,255,255,0.05);"><div style="width: 45%; height: 100%; border-radius: 9999px; background: rgba(255,255,255,0.42);"></div></div>
       <div style="font-size: 11.2px; color: rgba(255,255,255,0.55);"><span style="color: rgba(255,255,255,0.85); font-weight: 600;">106 uses</span> transforms, small movement</div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 62px minmax(0, 1fr) 220px; gap: 18px; align-items: center;">
-      <div class="mono" style="font-size: 12.25px; color: rgba(255,255,255,0.75);">0.22s</div>
+    <div style="display: grid; grid-template-columns: 116px minmax(0, 1fr) 200px; gap: 18px; align-items: center;">
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.75);">--dur-enter<br>0.22s</div>
       <div style="height: 14px; border-radius: 9999px; background: rgba(255,255,255,0.05);"><div style="width: 55%; height: 100%; border-radius: 9999px; background: rgba(255,255,255,0.3);"></div></div>
       <div style="font-size: 11.2px; color: rgba(255,255,255,0.55);"><span style="color: rgba(255,255,255,0.85); font-weight: 600;">39 uses</span> panel and popover entrances</div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 62px minmax(0, 1fr) 220px; gap: 18px; align-items: center;">
-      <div class="mono" style="font-size: 12.25px; color: rgba(255,255,255,0.75);">0.4s</div>
+    <div style="display: grid; grid-template-columns: 116px minmax(0, 1fr) 200px; gap: 18px; align-items: center;">
+      <div class="mono" style="font-size: 10.08px; color: rgba(255,255,255,0.75);">--dur-slow<br>0.4s</div>
       <div style="height: 14px; border-radius: 9999px; background: rgba(255,255,255,0.05);"><div style="width: 100%; height: 100%; border-radius: 9999px; background: rgba(255,255,255,0.22);"></div></div>
       <div style="font-size: 11.2px; color: rgba(255,255,255,0.55);"><span style="color: rgba(255,255,255,0.85); font-weight: 600;">12 uses</span> large surfaces: drawer, flip, modal</div>
     </div>
@@ -84,7 +84,7 @@
         <rect x="0" y="0" width="100" height="100" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"></rect>
         <path d="M0,100 C40,100 20,0 100,0" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5" stroke-linecap="round"></path>
       </svg>
-      <div class="mono" style="font-size: 10.08px; font-weight: 700; margin-top: 8px;">0.4, 0, 0.2, 1</div>
+      <div class="mono" style="font-size: 10.08px; font-weight: 700; margin-top: 8px;">--ease-glide</div>
       <div style="font-size: 10.08px; color: rgba(255,255,255,0.5); margin-top: 3px; line-height: 1.45;">Movement with a defined start and end.</div>
     </div>
 
@@ -93,7 +93,7 @@
         <rect x="0" y="0" width="100" height="100" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"></rect>
         <path d="M0,100 C34,-20 64,0 100,0" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"></path>
       </svg>
-      <div class="mono" style="font-size: 10.08px; font-weight: 700; margin-top: 8px;">0.34, 1.2, 0.64, 1</div>
+      <div class="mono" style="font-size: 10.08px; font-weight: 700; margin-top: 8px;">--ease-spring</div>
       <div style="font-size: 10.08px; color: rgba(255,255,255,0.5); margin-top: 3px; line-height: 1.45;">Entrances that should feel physical. A stiffer 1.56 sibling exists.</div>
     </div>
 
