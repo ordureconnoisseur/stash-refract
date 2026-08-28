@@ -214,7 +214,7 @@ body.stash-liquid-glass .gallery-container .tab-content {
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane.active.show {
     display: flex !important;
     flex-direction: column !important;
-    gap: 0.75rem !important;
+    gap: var(--gap-lg) !important;
     padding: 0 !important;
     /* Fill .tab-content's height so margin-top: auto on the performer
        row pushes it to the visible bottom of the panel. */
@@ -301,7 +301,7 @@ body.stash-liquid-glass .scene-performers {
     scroll-snap-type: x mandatory !important;
     scrollbar-width: thin !important;
     scrollbar-color: var(--glass-border) transparent !important;
-    gap: 0.75rem !important;
+    gap: var(--gap-lg) !important;
     padding: 0.25rem 0 0.5rem !important;
     justify-content: flex-start !important;
     margin: 0 !important;
@@ -390,7 +390,7 @@ body.stash-liquid-glass .st-op-menu-overlay {
 body.stash-liquid-glass .st-op-menu-card {
     width: calc(100% - 2.5rem);
     max-width: 320px;
-    background: rgba(20, 20, 24, 0.94);
+    background: rgba(var(--surface-rgb), 0.94);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     box-shadow:
@@ -547,7 +547,7 @@ body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1
     color: var(--accent-bright) !important;
     text-decoration: none !important;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--track-label);
     font-size: var(--fs-xs) !important;
     font-weight: 700;
     transition: color var(--dur-fast) ease;
@@ -636,7 +636,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     display: flex !important;
     flex-wrap: wrap !important;
     align-items: center !important;
-    gap: 0.6rem !important;
+    gap: var(--gap-md) !important;
     margin: 0 0 0.85rem 0 !important;
     font-size: var(--fs-sm) !important;
     color: var(--text-muted) !important;
@@ -670,7 +670,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
        tighter gap bring the row to ~310px, so nothing wraps and nothing
        is hidden. */
     flex-wrap: nowrap !important;
-    gap: 0.25rem !important;
+    gap: var(--gap-2xs) !important;
     margin: 0 0 0.65rem 0 !important;
     overflow: visible !important;
 }
@@ -680,7 +680,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) {
     display: flex !important;
     align-items: center !important;
-    gap: 0.3rem !important;
+    gap: var(--gap-xs) !important;
     flex-wrap: nowrap !important;
     /* Size to content. Stash sets `.scene-toolbar .scene-toolbar-group
        { width: 100% }`, so each group measured the full 338px against
@@ -734,7 +734,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars button svg {
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
     height: 26px !important;
     padding: 0 0.55rem !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: var(--fill-3) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
@@ -742,14 +742,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     line-height: 1 !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 0.2rem !important;
+    gap: var(--gap-2xs) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) {
     height: 26px !important;
     border-radius: var(--radius-pill) !important;
     overflow: hidden !important;
     border: 1px solid var(--glass-border) !important;
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: var(--fill-2) !important;
     display: inline-flex !important;
     align-items: center !important;
 }
@@ -763,11 +763,11 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     line-height: 1 !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 0.25rem !important;
+    gap: var(--gap-2xs) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) button:hover {
     color: #fff !important;
-    background: rgba(255, 255, 255, 0.07) !important;
+    background: var(--fill-4) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) svg {
     width: 11px !important;
@@ -812,7 +812,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     min-width: 26px !important;
     padding: 0 !important;
     border-radius: var(--radius-pill) !important;
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: var(--fill-2) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
     display: inline-flex !important;
@@ -912,7 +912,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:hover,
 body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-link:hover,
 body.stash-liquid-glass .nav-tabs .nav-link:hover {
     color: #fff !important;
-    background: rgba(255, 255, 255, 0.07) !important;
+    background: var(--fill-4) !important;
     border-color: var(--glass-border) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active,
@@ -981,20 +981,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table {
     font-size: var(--fs-sm) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table thead th {
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: var(--fill-2) !important;
     color: var(--text-muted) !important;
     border-bottom: 1px solid var(--glass-border) !important;
     font-weight: 500 !important;
     font-size: var(--fs-sm) !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.04em !important;
+    letter-spacing: var(--track-tight) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table tbody tr {
     border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
     transition: background var(--dur-fast) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: var(--fill-2) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table td,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table th {
@@ -1028,7 +1028,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.08em !important;
+    letter-spacing: var(--track-eyebrow) !important;
     color: var(--text-muted) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6:first-child {
@@ -1063,7 +1063,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > p.pre {
    04_filters.css (0.8rem, 0.22em/0.7em padding). */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.tag-link.badge.badge-secondary {
     display: inline-block !important;
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: var(--fill-2) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     margin: 0 0.25rem 0.25rem 0 !important;
@@ -1460,8 +1460,8 @@ body.stash-liquid-glass dl.details-list {
        being truncated (Stash IDs: scrollWidth 206 vs clientWidth 130).
        A hard cap lets the long label wrap and gives the width back. */
     grid-template-columns: minmax(0, 5.5rem) minmax(0, 1fr) !important;
-    column-gap: 1rem !important;
-    row-gap: 0.5rem !important;
+    column-gap: var(--gap-xl) !important;
+    row-gap: var(--gap-md) !important;
     align-items: baseline !important;
 }
 body.stash-liquid-glass .scene-file-info dt,
@@ -1470,7 +1470,7 @@ body.stash-liquid-glass dl.details-list dt {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.06em !important;
+    letter-spacing: var(--track-label) !important;
     margin: 0 !important;
 }
 body.stash-liquid-glass .scene-file-info dd,
@@ -1510,12 +1510,12 @@ body.stash-liquid-glass .history-header h5 {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 0.5rem !important;
+    gap: var(--gap-md) !important;
 }
 body.stash-liquid-glass .history-header h5 > span:first-child {
     display: inline-flex !important;
     align-items: center !important;
-    gap: 0.4rem !important;
+    gap: var(--gap-sm) !important;
 }
 body.stash-liquid-glass .history-header .badge.badge-pill.badge-secondary {
     background: var(--accent-tint) !important;
@@ -1531,14 +1531,14 @@ body.stash-liquid-glass .scene-history ul {
     margin: 0 0 0.5rem 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 0.3rem !important;
+    gap: var(--gap-xs) !important;
 }
 body.stash-liquid-glass .scene-history li {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     padding: 0.4rem 0.7rem !important;
-    background: rgba(255, 255, 255, 0.03) !important;
+    background: var(--fill-1) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     color: var(--text) !important;
@@ -1562,10 +1562,10 @@ body.stash-liquid-glass .queue-controls {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 0.5rem !important;
+    gap: var(--gap-md) !important;
     padding: 0.6rem 0.85rem !important;
     margin: 0 0 0.85rem 0 !important;
-    background: rgba(255, 255, 255, 0.03) !important;
+    background: var(--fill-1) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
 }
@@ -1575,13 +1575,13 @@ body.stash-liquid-glass #queue-content > ol {
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 0.4rem !important;
+    gap: var(--gap-sm) !important;
     counter-reset: queueitem !important;
 }
 body.stash-liquid-glass #queue-content > ol > li {
     margin: 0 !important;
     border-radius: var(--radius-sm) !important;
-    background: rgba(255, 255, 255, 0.03) !important;
+    background: var(--fill-1) !important;
     border: 1px solid var(--glass-border) !important;
     transition: background var(--dur-fast), border-color var(--dur-fast) !important;
 }
@@ -1653,7 +1653,7 @@ body.stash-liquid-glass .scene-wall-item-text-container {
 body.stash-liquid-glass .scene-markers-panel > .btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: var(--gap-sm);
     margin-bottom: 1.25rem;
     font-weight: 600;
 }
@@ -1701,7 +1701,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-tag.row {
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     align-items: start;
     margin: 0;
-    gap: 1rem;
+    gap: var(--gap-xl);
 }
 
 /* "Categories" section label (the .primary-tag wrapper only renders when the
@@ -1711,7 +1711,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-tag::before {
     grid-column: 1 / -1;
     font-size: var(--fs-xs);
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: var(--track-display);
     text-transform: uppercase;
     color: var(--text-muted);
 }
@@ -1761,7 +1761,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-card-body > div {
         "time main"
         ".    tags";
     column-gap: 0.7rem;
-    row-gap: 0.2rem;
+    row-gap: var(--gap-2xs);
     align-items: center;
     margin: 0 -0.4rem;
     padding: 0.4rem 0.4rem;
@@ -1769,7 +1769,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-card-body > div {
     transition: background var(--dur-fast) ease;
 }
 body.stash-liquid-glass .scene-markers-panel .primary-card-body > div:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--fill-2);
 }
 
 /* Leading timecode chip: the .d-flex wrapper occupies the "time" column. */
@@ -1796,7 +1796,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-card-body .row {
     align-items: baseline;
     justify-content: space-between;
     flex-wrap: nowrap;
-    gap: 0.5rem;
+    gap: var(--gap-md);
 }
 /* Marker title (first link) = primary content: readable, not blue. */
 body.stash-liquid-glass .scene-markers-panel .primary-card-body .row > .btn-link:first-child {
@@ -1835,7 +1835,7 @@ body.stash-liquid-glass .scene-markers-panel .card-section.centered {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
-    gap: 0.3rem;
+    gap: var(--gap-xs);
     margin: 0;
     padding: 0;
 }
@@ -1861,7 +1861,7 @@ body.stash-liquid-glass .scene-markers-panel > .row {
 body.stash-liquid-glass .scene-markers-panel .wall {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 0.85rem;
+    gap: var(--gap-lg);
     margin: 0;
     max-width: 100%;
 }
@@ -1872,7 +1872,7 @@ body.stash-liquid-glass .scene-markers-panel .wall:has(.wall-item)::before {
     grid-column: 1 / -1;
     font-size: var(--fs-xs);
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: var(--track-display);
     text-transform: uppercase;
     color: var(--text-muted);
 }
@@ -1893,9 +1893,9 @@ body.stash-liquid-glass .scene-markers-panel .wall .wall-item-media {
    not a black box with tiny text. */
 body.stash-liquid-glass .scene-markers-panel .wall-item-missing {
     flex-direction: column;
-    gap: 0.4rem;
+    gap: var(--gap-sm);
     font-size: 0.62rem !important;
-    letter-spacing: 0.05em;
+    letter-spacing: var(--track-label);
     text-transform: lowercase;
     color: var(--text-muted) !important;
     background:
@@ -2182,7 +2182,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     /* Measured against the operations and multiview buttons: they fill
        at rgba(255,255,255,0.04), not --glass-bg's 0.06. Three controls,
        one shape, one fill. */
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: var(--fill-2) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     box-shadow: none !important;
@@ -2274,7 +2274,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     padding: 0 !important;
     border-radius: var(--radius-pill) !important;
     border: 1px solid var(--glass-border) !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: var(--fill-3) !important;
     overflow: hidden !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) {
@@ -2320,7 +2320,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     border-radius: var(--radius-pill) !important;
     font-size: var(--sp-chip) !important;
     font-weight: 500 !important;
-    background: rgba(255, 255, 255, 0.03) !important;
+    background: var(--fill-1) !important;
     border: 1px dashed rgba(255, 255, 255, 0.16) !important;
     color: rgba(255, 255, 255, 0.42) !important;
     box-shadow: none !important;
@@ -2409,7 +2409,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-
     gap: 5px !important;
     font-size: var(--sp-chip) !important;
     font-weight: 600 !important;
-    background: rgba(255, 255, 255, 0.07) !important;
+    background: var(--fill-4) !important;
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
     border-radius: var(--radius-pill) !important;
     color: rgba(255, 255, 255, 0.88) !important;
@@ -2480,7 +2480,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-more {
     font-family: inherit;
     font-size: var(--sp-tab);
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--track-tight);
     color: var(--accent);
     cursor: pointer;
 }
@@ -2498,7 +2498,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored-head {
     margin: 1.25rem 0 0 0;
     font-size: var(--sp-label);
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: var(--track-wide);
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.38);
 }
@@ -2545,7 +2545,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6.st-tags-empty
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
     font-size: var(--sp-label) !important;
     font-weight: 700 !important;
-    letter-spacing: 0.1em !important;
+    letter-spacing: var(--track-wide) !important;
     color: rgba(255, 255, 255, 0.38) !important;
     margin: 1.25rem 0 0 0 !important;
 }
@@ -2573,7 +2573,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs {
     padding: 3px !important;
     gap: 3px !important;
     border-radius: var(--radius-sm) !important;
-    background: rgba(255, 255, 255, 0.03) !important;
+    background: var(--fill-1) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
@@ -2660,7 +2660,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data
     padding: 0 !important;
     border: 1px solid var(--glass-border-bright) !important;
     border-radius: var(--radius-pill) !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: var(--fill-3) !important;
     box-shadow: none !important;
     overflow: hidden !important;
     transform: none !important;
@@ -2720,7 +2720,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-extra {
     margin-left: -9px;
     border: 1px solid var(--glass-border-bright);
     border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.09);
+    background: var(--fill-4);
     font-size: var(--sp-label);
     font-weight: 700;
     color: rgba(255, 255, 255, 0.6);
@@ -2819,7 +2819,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more {
     font-family: inherit;
     font-size: var(--sp-tab);
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--track-tight);
     color: var(--accent);
     cursor: pointer;
 }

@@ -234,7 +234,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 110;
+        z-index: var(--z-dock);
         height: calc(4.6rem + env(safe-area-inset-bottom, 0px));
         box-sizing: border-box;
         align-items: center;
@@ -340,13 +340,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
         background: rgba(0, 0, 0, 0.42);
         opacity: 0;
         pointer-events: none;
-        z-index: 99;
+        z-index: var(--z-scrim);
         -webkit-backdrop-filter: blur(0px);
         backdrop-filter: blur(0px);
         transition:
             opacity var(--dur-enter) ease,
-            backdrop-filter 0.28s ease,
-            -webkit-backdrop-filter 0.28s ease;
+            backdrop-filter var(--dur-settle) ease,
+            -webkit-backdrop-filter var(--dur-settle) ease;
     }
     body.stash-liquid-glass.refract-burger-open .refract-burger-scrim {
         opacity: 1;
@@ -375,7 +375,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         width: var(--nav-btn-size);
         height: var(--nav-btn-size);
         flex: 0 0 auto;
-        background: rgba(255, 255, 255, 0.03);
+        background: var(--fill-1);
         border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: var(--radius-sm);
         color: var(--text);
@@ -398,7 +398,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         margin-left: 0 !important;
     }
     body.stash-liquid-glass nav.top-nav .refract-mobile-new:hover {
-        background: rgba(255, 255, 255, 0.08);
+        background: var(--fill-4);
         border-color: rgba(255, 255, 255, 0.20);
     }
     body.stash-liquid-glass nav.top-nav .refract-mobile-new:active {
@@ -429,7 +429,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px));
         left: 12px;
         right: 12px;
-        background: rgba(20, 20, 24, 0.92);
+        background: rgba(var(--surface-rgb), 0.92);
         -webkit-backdrop-filter: var(--glass-blur-md-sat);
         backdrop-filter: var(--glass-blur-md-sat);
         border: 1px solid var(--glass-border);
@@ -546,7 +546,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
 
     /* Stagger fade-in on open */
     body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer .refract-drawer-tile {
-        animation: refract-drawer-tile-in 0.32s var(--ease-spring) both;
+        animation: refract-drawer-tile-in var(--dur-settle) var(--ease-spring) both;
     }
     body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer .refract-drawer-tile:nth-child(3n+2) {
         animation-delay: 30ms;
@@ -863,7 +863,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         overflow: clip !important;
         overflow-clip-margin: 24px !important;
         box-sizing: border-box !important;
-        gap: 0.35rem !important;
+        gap: var(--gap-sm) !important;
         flex-wrap: nowrap !important;
     }
     /* Reset the ::before pill's negative inset so the painted background
@@ -1085,8 +1085,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
         isolation: isolate;
         transition:
             opacity var(--dur-enter) ease,
-            backdrop-filter 0.28s ease,
-            -webkit-backdrop-filter 0.28s ease;
+            backdrop-filter var(--dur-settle) ease,
+            -webkit-backdrop-filter var(--dur-settle) ease;
     }
     body.stash-liquid-glass.refract-toolbar-dropdown-open .refract-toolbar-dropdown-scrim {
         opacity: 1;
@@ -1100,7 +1100,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
        menu effectively renders below the scrim (1040) — and the scrim's
        backdrop-filter blurs over the menu. */
     body.stash-liquid-glass.refract-toolbar-dropdown-open .filtered-list-toolbar {
-        z-index: 1060 !important;
+        z-index: var(--z-overlay) !important;
     }
     /* Lock the page behind the modal — stops the scrim's backdrop-filter
        from flickering as scroll events propagate to the body. */
@@ -1118,7 +1118,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .row.justify-content-center {
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 0.6rem !important;
+        gap: var(--gap-md) !important;
         margin: 0.9rem 0 0 !important;
         padding: 0 0.6rem !important;
     }

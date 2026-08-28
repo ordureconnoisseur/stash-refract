@@ -3,7 +3,7 @@
    ─────────────────────────────────────────────────────────────────── */
 
 body.stash-liquid-glass .dropdown-menu {
-    background: rgba(20, 20, 24, 0.85) !important;
+    background: rgba(var(--surface-rgb), 0.85) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: var(--shadow-xl);
@@ -17,7 +17,7 @@ body.stash-liquid-glass .dropdown-menu {
 }
 body.stash-liquid-glass .dropdown-menu.bg-secondary.text-white,
 body.stash-liquid-glass .dropdown-menu.show.bg-secondary.text-white {
-    background: rgba(20, 20, 24, 0.9) !important;
+    background: rgba(var(--surface-rgb), 0.9) !important;
     color: var(--text) !important;
     border: 1px solid var(--glass-border) !important;
     -webkit-backdrop-filter: var(--glass-blur-xl) !important;
@@ -31,7 +31,7 @@ body.stash-liquid-glass .dropdown-item {
 }
 body.stash-liquid-glass .dropdown-item:hover,
 body.stash-liquid-glass .dropdown-item:focus {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--fill-4);
     color: #fff;
 }
 body.stash-liquid-glass .dropdown-item.bg-secondary.text-white {
@@ -40,7 +40,7 @@ body.stash-liquid-glass .dropdown-item.bg-secondary.text-white {
 }
 body.stash-liquid-glass .dropdown-item.bg-secondary.text-white:hover,
 body.stash-liquid-glass .dropdown-item.bg-secondary.text-white:focus {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     color: #fff !important;
 }
 body.stash-liquid-glass .dropdown-item.active,
@@ -58,7 +58,7 @@ body.stash-liquid-glass .dropdown-divider {
 
 body.stash-liquid-glass .modal-content {
     /* Neutral grey — avoid (n,n,n+4) mixes that read as blue next to --bg-0 */
-    background: rgba(11, 11, 11, 0.94) !important;
+    background: var(--surface-solid) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-xl);
@@ -83,10 +83,10 @@ body.stash-liquid-glass .modal-header {
        from flex-start. Headers with a close button are unchanged;
        headers without one no longer fling their title to the far edge. */
     justify-content: flex-start;
-    gap: 0.75rem;
+    gap: var(--gap-lg);
     flex-wrap: wrap;
     padding: 0.85rem 1.05rem !important;
-    background: rgba(255, 255, 255, 0.035) !important;
+    background: var(--fill-2) !important;
     border-bottom: 1px solid var(--glass-border) !important;
     border-color: var(--glass-border) !important;
     font-size: var(--fs-body);
@@ -178,7 +178,7 @@ body.stash-liquid-glass .modal-footer {
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.5rem;
+    gap: var(--gap-md);
     padding: 0.75rem 1.05rem !important;
     background: rgba(0, 0, 0, 0.18) !important;
     border-top: 1px solid var(--glass-border) !important;
@@ -251,7 +251,7 @@ body.stash-liquid-glass .modal-content .form-control,
 body.stash-liquid-glass .modal-content input.form-control,
 body.stash-liquid-glass .modal-content textarea.form-control,
 body.stash-liquid-glass .modal-content select.form-control {
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: var(--fill-3) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
     border-radius: var(--radius-sm) !important;
@@ -259,7 +259,7 @@ body.stash-liquid-glass .modal-content select.form-control {
 }
 body.stash-liquid-glass .modal-body .form-control:focus,
 body.stash-liquid-glass .modal-content .form-control:focus {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     border-color: var(--accent-glow) !important;
     color: #fff !important;
     outline: none !important;
@@ -300,7 +300,7 @@ body.stash-liquid-glass .modal-backdrop.show {
 body.stash-liquid-glass .modal-header {
     display: flex !important;
     align-items: center !important;
-    gap: 0.75rem !important;
+    gap: var(--gap-lg) !important;
     flex-wrap: nowrap !important;
 }
 body.stash-liquid-glass .modal-header > div:first-child {
@@ -310,7 +310,7 @@ body.stash-liquid-glass .modal-header > div:first-child {
     color: var(--text);
 }
 body.stash-liquid-glass .modal-header .search-input {
-    background: rgba(255,255,255,0.05) !important;
+    background: var(--fill-3) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
@@ -385,7 +385,7 @@ body.stash-liquid-glass .clearable-text-field-clear svg {
     margin: 0 !important;
 }
 body.stash-liquid-glass .search-term-row .clearable-text-field {
-    background: rgba(255,255,255,0.05) !important;
+    background: var(--fill-3) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
@@ -437,10 +437,10 @@ body.stash-liquid-glass .filter-item-header {
     text-align: left !important;
     box-shadow: none !important;
     transition: background var(--dur-fast), color var(--dur-fast) !important;
-    gap: 0.5rem !important;
+    gap: var(--gap-md) !important;
 }
 body.stash-liquid-glass .filter-item-header:hover {
-    background: rgba(255,255,255,0.04) !important;
+    background: var(--fill-2) !important;
     color: var(--text) !important;
 }
 body.stash-liquid-glass .filter-item-header .mr-auto {
@@ -500,7 +500,7 @@ body.stash-liquid-glass .criterion-list .card-body {
 body.stash-liquid-glass .modifier-options {
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 0.3rem !important;
+    gap: var(--gap-xs) !important;
     margin-bottom: 0.6rem !important;
 }
 body.stash-liquid-glass .modifier-option.btn-primary {
@@ -520,7 +520,7 @@ body.stash-liquid-glass .modifier-option.btn-primary {
     transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .modifier-option.btn-primary:hover {
-    background: rgba(255,255,255,0.07) !important;
+    background: var(--fill-4) !important;
     border-color: rgba(255,255,255,0.22) !important;
     color: var(--text) !important;
     box-shadow: none !important;
@@ -539,7 +539,7 @@ body.stash-liquid-glass .criterion-editor .form-group {
 }
 body.stash-liquid-glass .criterion-editor input.form-control,
 body.stash-liquid-glass .criterion-editor select.form-control {
-    background: rgba(255,255,255,0.05) !important;
+    background: var(--fill-3) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     color: var(--text) !important;
@@ -557,8 +557,8 @@ body.stash-liquid-glass .popover.bs-popover-bottom,
 body.stash-liquid-glass .popover.bs-popover-start,
 body.stash-liquid-glass .popover.bs-popover-end,
 body.stash-liquid-glass [data-popper-placement] {
-    background: rgba(20, 20, 24, 0.97) !important;
-    background-color: rgba(20, 20, 24, 0.97) !important;
+    background: rgba(var(--surface-rgb), 0.97) !important;
+    background-color: rgba(var(--surface-rgb), 0.97) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 12px !important;
     -webkit-backdrop-filter: var(--glass-blur-xl);
@@ -567,13 +567,13 @@ body.stash-liquid-glass [data-popper-placement] {
     box-shadow: var(--shadow-xl) !important;
 }
 body.stash-liquid-glass .popover-inner {
-    background: rgba(20, 20, 24, 0.97) !important;
-    background-color: rgba(20, 20, 24, 0.97) !important;
+    background: rgba(var(--surface-rgb), 0.97) !important;
+    background-color: rgba(var(--surface-rgb), 0.97) !important;
     border-radius: 11px !important;
     overflow: hidden;
 }
 body.stash-liquid-glass .popover-header {
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: var(--fill-3) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     color: var(--text) !important;
 }
@@ -596,7 +596,7 @@ body.stash-liquid-glass .bs-popover-bottom .popover-arrow::after,
 body.stash-liquid-glass .bs-popover-start .popover-arrow::after,
 body.stash-liquid-glass .bs-popover-end .popover-arrow::after {
     border-color: transparent !important;
-    border-top-color: rgba(20, 20, 24, 0.97) !important;
+    border-top-color: rgba(var(--surface-rgb), 0.97) !important;
 }
 /* Tags inside the overflow popup: same orange pill style */
 body.stash-liquid-glass .popover-body a {
@@ -652,7 +652,7 @@ body.stash-liquid-glass .popover-body .comma-list li::after {
     content: none !important;
 }
 body.stash-liquid-glass .toast {
-    background: rgba(20, 20, 24, 0.85) !important;
+    background: rgba(var(--surface-rgb), 0.85) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     -webkit-backdrop-filter: var(--glass-blur-xl);
@@ -671,7 +671,7 @@ body.stash-liquid-glass textarea.form-control {
     /* `background-color` instead of `background` shorthand so the native
        Bootstrap select chevron (set via `background-image` on the base
        `select` rule) and any plugin-supplied chevrons aren't clobbered. */
-    background-color: rgba(255, 255, 255, 0.04);
+    background-color: var(--fill-2);
     border: 1px solid var(--glass-border);
     color: var(--text);
     border-radius: var(--radius-sm);
@@ -704,7 +704,7 @@ body.stash-liquid-glass .filtered-list-toolbar {
     border: 0 !important;
     display: inline-flex !important;
     flex-wrap: nowrap !important;
-    gap: 0.5rem !important;
+    gap: var(--gap-md) !important;
     padding: 0.45rem 1.25rem !important;
     min-height: 2.9rem !important;
     align-items: center;
@@ -1133,13 +1133,13 @@ body.stash-liquid-glass input[type="range"].zoom-slider:hover::-moz-range-thumb 
    ─────────────────────────────────────────────────────────────────── */
 
 body.stash-liquid-glass .filter-tags {
-    gap: 0.35rem;
+    gap: var(--gap-sm);
     margin-bottom: 0.6rem;
 }
 body.stash-liquid-glass .filter-tags .tag-item {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--gap-md);
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
@@ -1292,7 +1292,7 @@ body.stash-liquid-glass .pagination-index-container {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.35rem;
+    gap: var(--gap-sm);
     width: 100%;
     text-align: center;
 }
@@ -1314,7 +1314,7 @@ body.stash-liquid-glass .pagination-index-container .filter-container.pagination
     text-align: center !important;
 }
 body.stash-liquid-glass .pagination-index-container .filter-container.text-muted.paginationIndex.center-text {
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: var(--fill-2) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text-muted) !important;
@@ -1441,7 +1441,7 @@ body.stash-liquid-glass .pagination-index-container > .pagination {
            the overlay via inheritance, so they only need declaring once here. */
         font-size: 0 !important;
         font-weight: 500 !important;
-        letter-spacing: 0.06em !important;
+        letter-spacing: var(--track-label) !important;
         color: var(--text-muted) !important;
         opacity: 0.85;
         font-variant-numeric: tabular-nums !important;
@@ -1563,7 +1563,7 @@ body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.se
     background: rgba(6, 6, 8, 0.34) !important;
 }
 body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) tbody > tr:hover {
-    background: rgba(255, 255, 255, 0.045) !important;
+    background: var(--fill-3) !important;
     color: #fff !important;
 }
 body.stash-liquid-glass table.table.table-striped.table-bordered:has(thead th.select-col) td,

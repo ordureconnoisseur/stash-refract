@@ -61,7 +61,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .refract-pc-nam
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 0.4rem;
+    gap: var(--gap-sm);
     position: absolute;
     top: 0;
     left: 0;
@@ -320,7 +320,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .card-section {
     display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 0.2rem !important;
+    gap: var(--gap-2xs) !important;
     pointer-events: none;
 }
 /* But the badges themselves still need to be interactive (scenes link
@@ -376,7 +376,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .stash-perf-lab
     grid-column: 1 / -1 !important;
     font-size: calc(0.6rem * var(--pc-badge-scale, 1)) !important;
     font-weight: 700 !important;
-    letter-spacing: 0.08em !important;
+    letter-spacing: var(--track-eyebrow) !important;
     text-transform: uppercase !important;
     line-height: 1 !important;
     white-space: nowrap !important;
@@ -535,7 +535,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .stash-perf-cou
     color: rgba(255, 255, 255, 0.95) !important;
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
-    letter-spacing: 0.03em !important;
+    letter-spacing: var(--track-tight) !important;
     line-height: 1 !important;
     text-align: left !important;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7) !important;
@@ -557,7 +557,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .stash-perf-cou
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 0.4rem !important;
+    gap: var(--gap-sm) !important;
     width: 100% !important;
     align-self: stretch !important;
     overflow: visible !important;
@@ -924,7 +924,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .refract-card-f
     background: rgba(10, 10, 12, 0.62);
     border: 1px solid var(--glass-border);
     border-right: none;
-    backdrop-filter: blur(8px);
+    backdrop-filter: var(--glass-blur-sm);
     color: var(--text);
     cursor: pointer;
     opacity: 0;
@@ -1238,7 +1238,7 @@ body.stash-liquid-glass .refract-mb-tray-title {
 body.stash-liquid-glass .refract-mb-tray-count {
     font-size: 2.8cqw;
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--track-label);
     color: rgba(236, 236, 245, 0.78);
     text-shadow: 0 0.35cqw 1cqw rgba(0, 0, 0, 0.85);
     white-space: nowrap;
@@ -1266,7 +1266,7 @@ body.stash-liquid-glass .refract-mb-cell-tag {
     bottom: 0.9cqw;
     font-size: 2.6cqw;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: var(--track-eyebrow);
     color: rgba(240, 240, 248, 0.82);
     text-shadow: 0 0.35cqw 1cqw rgba(0, 0, 0, 0.9);
 }
@@ -1449,7 +1449,7 @@ body.stash-liquid-glass .refract-cb-portrait {
     border-radius: 9px;
     background-size: cover;
     background-position: center top;
-    background-color: rgba(255, 255, 255, 0.04);
+    background-color: var(--fill-2);
     border: 1px solid rgba(var(--seal-rgb), 0.4);
     box-shadow:
         0 3px 10px rgba(0, 0, 0, 0.5),
@@ -1691,7 +1691,7 @@ body.stash-liquid-glass .refract-cb-media-img {
     inset: 0;
     background-size: cover;
     background-position: center;
-    background-color: rgba(255, 255, 255, 0.04);
+    background-color: var(--fill-2);
 }
 body.stash-liquid-glass .refract-cb-media-item::after {
     content: "";
@@ -1707,7 +1707,7 @@ body.stash-liquid-glass .refract-cb-media-tag {
     z-index: 1;
     font-size: 0.36rem;
     font-weight: 800;
-    letter-spacing: 0.1em;
+    letter-spacing: var(--track-wide);
     text-transform: uppercase;
     padding: 1px 4px;
     border-radius: 3px;
@@ -1763,7 +1763,7 @@ body.stash-liquid-glass .refract-cb-assets-head {
 }
 body.stash-liquid-glass .refract-cb-assets-n {
     color: rgba(255, 255, 255, 0.4);
-    letter-spacing: 0.05em;
+    letter-spacing: var(--track-label);
     font-variant-numeric: tabular-nums;
 }
 /* Centered when it fits; scrolls (this list only) when it overflows. The
@@ -1812,7 +1812,7 @@ body.stash-liquid-glass .refract-cb-seg {
     flex: 1 1 0;
     height: 9px;
     border-radius: 2px;
-    background: rgba(255, 255, 255, 0.07);
+    background: var(--fill-4);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 body.stash-liquid-glass .refract-s1 .refract-cb-seg.on { background: #e5484d; box-shadow: 0 0 6px rgba(229, 72, 77, 0.6); }
@@ -1847,7 +1847,7 @@ body.stash-liquid-glass .refract-cb-more {
     padding: 2px 0 0;
     font-size: 0.58rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: var(--track-wide);
     text-transform: uppercase;
     color: rgba(var(--seal-rgb), 0.85);
     text-align: right;
@@ -1881,7 +1881,7 @@ body.stash-liquid-glass .refract-cb-foot-item {
     gap: 4px;
     font-size: 0.54rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--track-label);
     color: rgba(255, 255, 255, 0.5);
 }
 /* The dossier's switchable panels (customiser chips). The ratings grid is
@@ -1991,8 +1991,8 @@ body.stash-liquid-glass .refract-pp-stage .refract-card-flip-btn.refract-pp-flip
     background: rgba(10, 10, 12, 0.62);
     border: 1px solid var(--glass-border);
     border-right: none;
-    -webkit-backdrop-filter: blur(8px);
-            backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: var(--glass-blur-sm);
+            backdrop-filter: var(--glass-blur-sm);
     color: var(--text);
     cursor: pointer;
     opacity: 0.85;
@@ -2033,7 +2033,7 @@ body.stash-liquid-glass .refract-pb-btn:hover {
 body.stash-liquid-glass .refract-pb-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 1060;
+    z-index: var(--z-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2106,7 +2106,7 @@ body.stash-liquid-glass .refract-pb-picker-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.5rem;
+    gap: var(--gap-md);
     margin-bottom: 0.5rem;
     font-size: var(--fs-xs);
     font-weight: 600;
@@ -2117,7 +2117,7 @@ body.stash-liquid-glass .refract-pb-grid {
     /* Portrait cells are half again as tall, so more of them fit across before
        any one becomes unrecognisable. */
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 0.4rem;
+    gap: var(--gap-sm);
     min-height: 0;
     overflow-y: auto;
     padding-right: 2px;
@@ -2128,7 +2128,7 @@ body.stash-liquid-glass .refract-pb-group {
     padding: 0.35rem 0.1rem 0.1rem;
     font-size: 0.62rem;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: var(--track-display);
     text-transform: uppercase;
     color: var(--text-dim, rgba(255, 255, 255, 0.6));
 }

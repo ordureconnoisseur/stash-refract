@@ -112,19 +112,73 @@ body.stash-liquid-glass {
     --fs-xl:   2rem;      /* 28px     page title                      */
 
     /* Motion scale — tokenized 2026-08-28 from the measured de-facto
-       scale (0.15s appeared 373 times as a literal before this). The
-       five canonical durations and three named curves; values are
-       unchanged, so this migration renders identically. Stragglers
-       (0.13/0.14/0.16/0.2/0.25-0.35s) map onto these in a later
-       measured pass — see DESIGN_SYSTEM.md section 9. */
+       scale (0.15s appeared 373 times as a literal before this), then
+       the near-duplicate and residue literals folded onto it the same
+       day. Only 0.08s and a couple of deliberate outliers (the player's
+       1s idle fade) remain literal — see DESIGN_SYSTEM.md 3.7 and 9. */
     --dur-instant: 0.12s;   /* press feedback, checks              */
     --dur-fast:    0.15s;   /* the default: hover, colour, borders */
     --dur-move:    0.18s;   /* transforms, small movement          */
     --dur-enter:   0.22s;   /* panel + popover entrances           */
+    --dur-settle:  0.3s;    /* multi-property settles, reveals     */
     --dur-slow:    0.4s;    /* large surfaces: drawer, flip, modal */
     --ease-glide:       cubic-bezier(0.4, 0, 0.2, 1);    /* defined start + end   */
     --ease-spring:      cubic-bezier(0.34, 1.2, 0.64, 1);  /* physical entrance   */
     --ease-spring-hard: cubic-bezier(0.34, 1.56, 0.64, 1); /* stiffer entrance    */
+
+    /* Surface fill ramp — tokenized 2026-08-28 from the measured
+       white-alpha background histogram (values 0.02-0.12 had drifted
+       nearly continuous; these four carry ~130 of the uses, with folds
+       of at most 0.01 alpha). Light mode does NOT redefine these yet —
+       14_light.css still overrides surfaces per-selector — so this is
+       purely vocabulary today and becomes the one-scope light flip
+       later. --glass-bg (0.06) / --glass-bg-strong (0.10) stay the
+       named glass fills; do not alias them to this ramp, they retheme
+       in light mode and the ramp deliberately does not. */
+    --fill-1: rgba(255, 255, 255, 0.03);   /* hairline tint: rows, wells      */
+    --fill-2: rgba(255, 255, 255, 0.04);   /* resting fill: inputs, tiles     */
+    --fill-3: rgba(255, 255, 255, 0.05);   /* raised fill: chips, list items  */
+    --fill-4: rgba(255, 255, 255, 0.08);   /* hover / active fill             */
+
+    /* Dark surface family — the near-opaque neutral behind popovers,
+       menus and floating overlays. One RGB triplet, alpha per use
+       (rgba(var(--surface-rgb), A)); 16,16,20 and 18,18,22 were folded
+       in (deltas of 4/255 or less, invisible). The MODAL is the other
+       sanctioned surface: exactly neutral, because an (n,n,n+4) mix
+       reads blue next to --bg-0 at modal size (see DESIGN_SYSTEM 6.14).
+       Both may be re-pointed wholesale by a future light-mode pass. */
+    --surface-rgb: 20, 20, 24;
+    --surface-solid: rgba(11, 11, 11, 0.94);
+
+    /* Gap scale — tokenized 2026-08-28 from the measured gap histogram.
+       Folds of at most 0.1rem (1.4px). Pixel-unit gaps (2/4/5px icon
+       and glyph spacing) stay literal; padding/margins are NOT in
+       scope yet (see DESIGN_SYSTEM section 9). */
+    --gap-2xs: 0.25rem;   /* 3.5px  glyph-adjacent            */
+    --gap-xs:  0.3rem;    /* 4.2px  inside a chip or pill     */
+    --gap-sm:  0.4rem;    /* 5.6px  control clusters          */
+    --gap-md:  0.5rem;    /* 7px    the default between items */
+    --gap-lg:  0.75rem;   /* 10.5px between groups            */
+    --gap-xl:  1rem;      /* 14px   between sections          */
+
+    /* Tracking ladder — the eyebrow / label letter-spacing steps
+       (DESIGN_SYSTEM 6.13). Micro letterfit on display text (0.005 to
+       0.02em) is a different job and stays literal. */
+    --track-tight:   0.04em;
+    --track-label:   0.06em;
+    --track-eyebrow: 0.08em;
+    --track-wide:    0.1em;
+    --track-display: 0.14em;
+
+    /* Named z layers — the cross-file singletons from the elevation
+       band map (DESIGN_SYSTEM 3.8). In-component stacking (0-9) and
+       the tier ladder (20-70) stay literal by design. */
+    --z-scrim:    99;     /* mobile drawer scrim                  */
+    --z-dock:     110;    /* mobile bottom dock, above the scrim  */
+    --z-pager:    400;    /* floating pagination                  */
+    --z-overlay:  1060;   /* above Bootstrap's modal layer        */
+    --z-lightbox: 1100;   /* lightbox chrome                      */
+    --z-top:      9999;   /* last resort: drag ghosts, top toasts */
 
     /* Accent palette — orange by default. Override the four `--accent`
        vars on `body.stash-liquid-glass.refract-<preset>` to retheme the

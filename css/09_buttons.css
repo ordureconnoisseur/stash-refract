@@ -74,7 +74,7 @@ body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"]:focus {
     border-color: var(--accent-glow) !important;
     box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.15) !important;
     outline: none !important;
-    background: rgba(255, 255, 255, 0.09) !important;
+    background: var(--fill-4) !important;
 }
 
 /* Secondary buttons — same base style as navbar buttons.
@@ -259,7 +259,7 @@ body.stash-liquid-glass .page-link {
     transition: background var(--dur-fast), color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .page-link:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     color: var(--text) !important;
 }
 body.stash-liquid-glass .page-item.active .page-link {
@@ -279,7 +279,7 @@ body.stash-liquid-glass [class*="list-count"],
 body.stash-liquid-glass [class*="total-count"] {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
-    letter-spacing: 0.07em !important;
+    letter-spacing: var(--track-eyebrow) !important;
     text-transform: uppercase !important;
     color: var(--text-muted) !important;
     opacity: 0.6 !important;
@@ -324,7 +324,7 @@ body.stash-liquid-glass .stash-view-trigger {
 body.stash-liquid-glass .stash-view-trigger svg {
     width: 14px !important;
     height: 14px !important;
-    transition: transform 0.25s var(--ease-glide) !important;
+    transition: transform var(--dur-enter) var(--ease-glide) !important;
 }
 /* Closed = › (right), open rotates to ‹ (left) */
 body.stash-liquid-glass .stash-view-trigger.open svg {
@@ -412,7 +412,7 @@ body.stash-liquid-glass .page-size-selector select:focus {
     box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.10) !important;
 }
 body.stash-liquid-glass .page-size-selector option {
-    background: rgba(20, 20, 24, 0.96) !important;
+    background: rgba(var(--surface-rgb), 0.96) !important;
     color: var(--text) !important;
 }
 
@@ -437,7 +437,7 @@ body.stash-liquid-glass [data-pager-row="float"] {
     bottom: 1.5rem !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    z-index: 400 !important;
+    z-index: var(--z-pager) !important;
     margin: 0 !important;
     display: flex !important;
     align-items: center !important;
@@ -499,7 +499,7 @@ body.stash-liquid-glass .stash-view-panel {
     overflow: hidden !important;
     opacity: 0 !important;
     transition:
-        max-width 0.28s var(--ease-glide),
+        max-width var(--dur-settle) var(--ease-glide),
         opacity var(--dur-move) ease !important;
 }
 body.stash-liquid-glass .stash-view-panel.open {
@@ -570,7 +570,7 @@ body.stash-liquid-glass #perf-rating-trigger {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 0.3rem;
+    gap: var(--gap-xs);
     padding: 0.35rem 0.85rem;
     border-radius: var(--radius-pill);
     background: var(--glass-bg-strong);
@@ -596,7 +596,7 @@ body.stash-liquid-glass #perf-rating-trigger:hover {
 body.stash-liquid-glass .adv-rating-modal-overlay {
     position: fixed;
     inset: 0;
-    z-index: 9999;
+    z-index: var(--z-top);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -637,7 +637,7 @@ body.stash-liquid-glass .adv-rating-header h3 {
     margin: 0 !important;
     font-size: var(--fs-sm) !important;
     font-weight: 700 !important;
-    letter-spacing: 0.1em !important;
+    letter-spacing: var(--track-wide) !important;
     text-transform: uppercase !important;
     color: var(--text-muted) !important;
 }
@@ -649,7 +649,7 @@ body.stash-liquid-glass .perf-rating-close {
     align-items: center;
     justify-content: center;
     border-radius: 50% !important;
-    background: rgba(255, 255, 255, 0.07) !important;
+    background: var(--fill-4) !important;
     border: 1px solid rgba(255, 255, 255, 0.09) !important;
     cursor: pointer;
     font-size: 0 !important;         /* hide × glyph */
@@ -692,21 +692,21 @@ body.stash-liquid-glass .rating-row {
     justify-content: space-between;
     padding: 0.6rem 1.25rem !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-    gap: 1rem;
+    gap: var(--gap-xl);
     transition: background var(--dur-instant);
 }
 body.stash-liquid-glass .rating-row:last-child {
     border-bottom: none !important;
 }
 body.stash-liquid-glass .rating-row:hover {
-    background: rgba(255, 255, 255, 0.03) !important;
+    background: var(--fill-1) !important;
 }
 
 /* Category label */
 body.stash-liquid-glass .rating-label {
     display: flex !important;
     align-items: center;
-    gap: 0.4rem;
+    gap: var(--gap-sm);
     font-size: var(--fs-base);
     font-weight: 500;
     color: var(--text) !important;
@@ -741,7 +741,7 @@ body.stash-liquid-glass .rating-tooltip {
     z-index: 10001;
     width: 230px;
     padding: 0.6rem 0.75rem;
-    background: rgba(18, 18, 22, 0.98) !important;
+    background: rgba(var(--surface-rgb), 0.98) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 10px;
     font-size: 0.71rem;
@@ -851,7 +851,7 @@ body.stash-liquid-glass .adv-rating-inline-head {
     display: flex !important;
     align-items: baseline;
     justify-content: space-between;
-    gap: 0.6rem;
+    gap: var(--gap-md);
     padding: 0.7rem 1rem 0.6rem !important;
     margin-bottom: 0 !important;
     border-bottom: 1px solid var(--glass-border) !important;
@@ -859,7 +859,7 @@ body.stash-liquid-glass .adv-rating-inline-head {
 body.stash-liquid-glass .adv-rating-inline-title {
     font-size: var(--fs-xs) !important;
     font-weight: 700 !important;
-    letter-spacing: 0.1em !important;
+    letter-spacing: var(--track-wide) !important;
     text-transform: uppercase !important;
     /* Accent the section title so the panel doesn't read flat. */
     color: var(--accent-bright) !important;

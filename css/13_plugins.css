@@ -206,7 +206,7 @@ body.stash-liquid-glass #mv-clear-queue::before {
     margin-top: -1px;
 }
 body.stash-liquid-glass #mv-clear-queue:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     color: #fff !important;
 }
 
@@ -421,7 +421,7 @@ body.stash-liquid-glass .performer-card .hon-battle-rank-badge.hon-battle-rank-b
     /* Measured 1.75px of daylight between the flame and the number -- the
        nominal gap is eaten by the glyph's own box. Widened until the two read
        as an icon and a number rather than as one smudge. */
-    gap: 0.5rem !important;
+    gap: var(--gap-md) !important;
     flex: 0 0 auto !important;
     width: auto !important;
     max-width: 100% !important;
@@ -550,7 +550,7 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-match-stat
    that open from the header can extend below the calendar boundary
    without being clipped. */
 body.stash-liquid-glass .react-datepicker {
-    background: rgba(18, 18, 22, 0.88) !important;
+    background: rgba(var(--surface-rgb), 0.88) !important;
     -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
     backdrop-filter: var(--glass-blur-xl-sat) !important;
     border: 1px solid var(--glass-border) !important;
@@ -583,13 +583,13 @@ body.stash-liquid-glass .react-datepicker__current-month {
 }
 body.stash-liquid-glass .react-datepicker__header__dropdown {
     display: flex;
-    gap: 0.35rem;
+    gap: var(--gap-sm);
     justify-content: center;
     margin-bottom: 0.4rem;
 }
 body.stash-liquid-glass .react-datepicker__month-read-view,
 body.stash-liquid-glass .react-datepicker__year-read-view {
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: var(--fill-3) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     padding: 0.18rem 0.6rem !important;
@@ -598,7 +598,7 @@ body.stash-liquid-glass .react-datepicker__year-read-view {
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--gap-2xs);
     transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
 }
 body.stash-liquid-glass .react-datepicker__month-read-view:hover,
@@ -632,7 +632,7 @@ body.stash-liquid-glass .react-datepicker__day-name {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--track-tight);
     width: 2rem !important;
     line-height: 2rem !important;
     text-align: center;
@@ -663,7 +663,7 @@ body.stash-liquid-glass .react-datepicker__day {
     transition: background var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-instant) ease;
 }
 body.stash-liquid-glass .react-datepicker__day:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     color: #fff !important;
 }
 body.stash-liquid-glass .react-datepicker__day--outside-month {
@@ -1116,7 +1116,7 @@ body.stash-liquid-glass .modal-content:has(.fast-tagger-card .dropdown.show) {
 /* Menu surface — glass language to match other Refract dropdowns,
    instead of Bootstrap's flat white default. */
 body.stash-liquid-glass .fast-tagger-card .dropdown-menu.show {
-    background: rgba(20, 20, 24, 0.97) !important;
+    background: rgba(var(--surface-rgb), 0.97) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: var(--shadow-lg) !important;
@@ -1316,7 +1316,7 @@ body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn {
     color: var(--accent-bright) !important;
     font-size: var(--fs-xs) !important;
     font-weight: 700 !important;
-    letter-spacing: 0.06em !important;
+    letter-spacing: var(--track-label) !important;
     text-transform: uppercase !important;
     text-decoration: none !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
@@ -1356,7 +1356,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-secti
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.08em !important;
+    letter-spacing: var(--track-eyebrow) !important;
     color: var(--text-muted) !important;
 }
 
@@ -1386,7 +1386,7 @@ body.stash-liquid-glass .stash-scribe-review-edit-row {
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-heading {
     display: flex !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: var(--gap-md) !important;
 }
 
 /* Edit affordance — small, muted, accent on hover so it stays
@@ -1457,20 +1457,20 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
+    gap: var(--gap-lg);
     margin-bottom: 0.85rem;
     flex-wrap: wrap;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-header-info {
     display: flex;
     align-items: baseline;
-    gap: 0.6rem;
+    gap: var(--gap-md);
     min-width: 0;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-title {
     font-size: var(--fs-sm) !important;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--track-label);
     color: var(--text-muted) !important;
     margin: 0 !important;
     font-weight: 600;
@@ -1483,7 +1483,7 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-summary {
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-actions {
     display: inline-flex;
-    gap: 0.4rem;
+    gap: var(--gap-sm);
     flex-wrap: wrap;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-btn {
@@ -1494,7 +1494,7 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-btn {
     padding: 0.22rem 0.7rem;
     font-size: var(--fs-xs);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--track-tight);
     font-weight: 600;
     line-height: 1.2;
     cursor: pointer;
@@ -1547,7 +1547,7 @@ body.stash-liquid-glass .edit-tags-overhaul__search-empty {
 body.stash-liquid-glass .edit-tags-overhaul__groups {
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
+    gap: var(--gap-md);
 }
 body.stash-liquid-glass .edit-tags-overhaul__group {
     background: var(--glass-bg-strong);
@@ -1572,7 +1572,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-header {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: 0.55rem;
+    gap: var(--gap-md);
     padding: 0.4rem 0.75rem;
     text-align: left;
     cursor: pointer;
@@ -1584,7 +1584,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-header-main {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: 0.5rem;
+    gap: var(--gap-md);
     min-width: 0;
     flex: 0 1 auto;
     text-align: left;
@@ -1636,7 +1636,7 @@ body.stash-liquid-glass .edit-tags-overhaul__header-main,
 body.stash-liquid-glass .edit-tags-overhaul__subgroup-header-main {
     display: flex;
     align-items: baseline;
-    gap: 0.55rem;
+    gap: var(--gap-md);
     min-width: 0;
     flex: 1 1 auto;
 }
@@ -1660,7 +1660,7 @@ body.stash-liquid-glass .edit-tags-overhaul__meta,
 body.stash-liquid-glass .edit-tags-overhaul__subgroup-meta {
     display: inline-flex;
     align-items: baseline;
-    gap: 0.25rem;
+    gap: var(--gap-2xs);
     font-size: var(--fs-xs);
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
@@ -1686,7 +1686,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-total-count {
 body.stash-liquid-glass .edit-tags-overhaul__header-actions {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: var(--gap-xs);
     flex-shrink: 0;
 }
 body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn {
@@ -1732,7 +1732,7 @@ body.stash-liquid-glass .edit-tags-overhaul__body {
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 0.4rem;
+    gap: var(--gap-sm);
     border-top: 1px solid var(--glass-border);
     background: rgba(0, 0, 0, 0.18);
 }
@@ -1758,7 +1758,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-body {
     display: none;
     padding: 0.45rem 0.6rem 0.6rem;
     flex-wrap: wrap;
-    gap: 0.35rem;
+    gap: var(--gap-sm);
     border-top: 1px solid var(--glass-border);
     background: rgba(0, 0, 0, 0.12);
 }
@@ -1949,13 +1949,13 @@ body.stash-liquid-glass #kmv-details-tags-overhaul.details-tags-overhaul {
 body.stash-liquid-glass .details-tags-overhaul__panel-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--gap-lg);
     flex-wrap: wrap;
 }
 body.stash-liquid-glass .details-tags-overhaul__panel-title {
     font-size: var(--fs-sm) !important;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--track-label);
     color: var(--text-muted) !important;
     margin: 0 !important;
     font-weight: 600;
@@ -2014,7 +2014,7 @@ body.stash-liquid-glass .details-tags-overhaul__groups {
 body.stash-liquid-glass .details-tags-overhaul.is-open > .details-tags-overhaul__groups {
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
+    gap: var(--gap-md);
     margin-top: 0.75rem;
 }
 
@@ -2052,7 +2052,7 @@ body.stash-liquid-glass .details-tags-overhaul__header-main,
 body.stash-liquid-glass .details-tags-overhaul__subgroup-header-main {
     display: flex;
     align-items: baseline;
-    gap: 0.55rem;
+    gap: var(--gap-md);
     min-width: 0;
     flex: 1 1 auto;
 }
@@ -2072,7 +2072,7 @@ body.stash-liquid-glass .details-tags-overhaul__meta,
 body.stash-liquid-glass .details-tags-overhaul__subgroup-meta {
     display: inline-flex;
     align-items: baseline;
-    gap: 0.25rem;
+    gap: var(--gap-2xs);
     font-size: var(--fs-xs);
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
@@ -2132,7 +2132,7 @@ body.stash-liquid-glass .details-tags-overhaul__body {
     display: none;
     padding: 0.5rem 0.7rem 0.7rem;
     flex-direction: column;
-    gap: 0.55rem;
+    gap: var(--gap-md);
     border-top: 1px solid var(--glass-border);
     background: rgba(0, 0, 0, 0.18);
 }
@@ -2157,7 +2157,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup-body {
     display: none;
     padding: 0.45rem 0.6rem 0.6rem;
     flex-wrap: wrap;
-    gap: 0.35rem;
+    gap: var(--gap-sm);
     border-top: 1px solid var(--glass-border);
     background: rgba(0, 0, 0, 0.12);
 }
@@ -2173,7 +2173,7 @@ body.stash-liquid-glass .details-tags-overhaul__tag {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    gap: 0.4rem;
+    gap: var(--gap-sm);
     background: var(--glass-bg-strong);
     border: 1px solid var(--glass-border);
     color: var(--text) !important;
@@ -2263,7 +2263,7 @@ body.stash-liquid-glass .tag-sidebar__panel {
     margin-left: 12px !important;
     height: calc(100vh - var(--nav-btn-size) - 2.6rem - 12px) !important;
     max-height: calc(100vh - var(--nav-btn-size) - 2.6rem - 12px) !important;
-    background: rgba(16, 16, 20, 0.92) !important;
+    background: rgba(var(--surface-rgb), 0.92) !important;
     -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
             backdrop-filter: var(--glass-blur-xl-sat) !important;
     border: 1px solid var(--glass-border) !important;
@@ -2316,7 +2316,7 @@ body.stash-liquid-glass .tag-sidebar__header {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 0.5rem !important;
+    gap: var(--gap-md) !important;
     margin-bottom: 0.7rem !important;
 }
 body.stash-liquid-glass .tag-sidebar__eyebrow {
@@ -2349,19 +2349,19 @@ body.stash-liquid-glass .tag-sidebar__clear:disabled {
 body.stash-liquid-glass .tag-sidebar__segmented {
     display: flex !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: var(--gap-md) !important;
     margin-bottom: 0.7rem !important;
 }
 body.stash-liquid-glass .tag-sidebar__segmented-label {
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.06em !important;
+    letter-spacing: var(--track-label) !important;
     color: var(--text-muted) !important;
     font-weight: 600 !important;
 }
 body.stash-liquid-glass .tag-sidebar__segmented-buttons {
     display: inline-flex !important;
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: var(--fill-2) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     padding: 2px !important;
@@ -2374,7 +2374,7 @@ body.stash-liquid-glass .tag-sidebar__segmented-button {
     border-radius: var(--radius-pill) !important;
     font-size: var(--fs-xs) !important;
     font-weight: 700 !important;
-    letter-spacing: 0.04em !important;
+    letter-spacing: var(--track-tight) !important;
     padding: 0.2rem 0.7rem !important;
     transition: background var(--dur-fast), color var(--dur-fast) !important;
 }
@@ -2413,7 +2413,7 @@ body.stash-liquid-glass .tag-sidebar__section {
 body.stash-liquid-glass .tag-sidebar__section-label {
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.08em !important;
+    letter-spacing: var(--track-eyebrow) !important;
     font-weight: 700 !important;
     color: var(--text-muted) !important;
     margin: 0 0 0.5rem !important;
@@ -2467,7 +2467,7 @@ body.stash-liquid-glass .tag-sidebar__row {
     box-sizing: border-box !important;
 }
 body.stash-liquid-glass .tag-sidebar__row:hover {
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: var(--fill-2) !important;
 }
 
 /* Action buttons — small square; expand ▸ neutral, include + accent,
@@ -2489,7 +2489,7 @@ body.stash-liquid-glass .tag-sidebar__action {
     transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .tag-sidebar__action--expand:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     color: var(--text) !important;
 }
 body.stash-liquid-glass .tag-sidebar__action--include:hover {
@@ -2561,10 +2561,10 @@ body.stash-liquid-glass .tag-sidebar__toggle {
     padding: 0.7rem 0.28rem !important;
     font-size: 0.66rem !important;
     font-weight: 700 !important;
-    letter-spacing: 0.14em !important;
+    letter-spacing: var(--track-display) !important;
     text-transform: uppercase !important;
     line-height: 1 !important;
-    background: rgba(16, 16, 20, 0.92) !important;
+    background: rgba(var(--surface-rgb), 0.92) !important;
     border: 1px solid var(--glass-border) !important;
     /* Attach flush to the panel's flat right edge — no left border, round
        only the right corners, drop the shadow on the right side. */

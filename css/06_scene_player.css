@@ -155,7 +155,7 @@ body.stash-liquid-glass .video-js:not(.vjs-has-started) .st-player-overlay {
 }
 /* Inactivity hides ride the same 1s fade as the stock control bar so
    the two leave together. Pointer-driven hides (mouseleave, keydown
-   handing off to the keyboard) keep the base var(--dur-move) snap — there the bar
+   handing off to the keyboard) keep the base 0.2s-class snap (--dur-move) — there the bar
    isn't fading and a slow overlay fade would just linger. */
 body.stash-liquid-glass .video-js.vjs-user-inactive .st-player-overlay {
     transition: opacity 1s, visibility 1s !important;
@@ -394,7 +394,7 @@ body.stash-liquid-glass .video-js div.vjs-menu-button {
 body.stash-liquid-glass .video-js .vjs-button:hover,
 body.stash-liquid-glass .video-js .vjs-control > button:hover {
     color: #fff !important;
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
 }
 
 /* Visually hide screen-reader-only text */
@@ -629,7 +629,7 @@ body.stash-liquid-glass .video-js .vjs-menu-item {
 }
 body.stash-liquid-glass .video-js .vjs-menu-item:hover,
 body.stash-liquid-glass .video-js .vjs-menu-item:focus {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     color: #fff !important;
 }
 body.stash-liquid-glass .video-js .vjs-menu-item.vjs-selected {
@@ -823,7 +823,7 @@ body.stash-liquid-glass .scene-video-filter h5 {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.08em !important;
+    letter-spacing: var(--track-eyebrow) !important;
     margin: 0.5rem 0 0.4rem 0 !important;
     padding-bottom: 0.35rem !important;
     border-bottom: 1px solid var(--glass-border) !important;
@@ -837,7 +837,7 @@ body.stash-liquid-glass .scene-video-filter .row.form-group {
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
-    gap: 0.6rem !important;
+    gap: var(--gap-md) !important;
     margin: 0 0 0.5rem 0 !important;
     padding: 0 0.25rem !important;
 }
@@ -925,7 +925,7 @@ body.stash-liquid-glass .scene-video-filter .row.form-group:has(> .col-6) {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: wrap !important;
-    gap: 0.5rem !important;
+    gap: var(--gap-md) !important;
     padding: 0 !important;
 }
 body.stash-liquid-glass .scene-video-filter .row.form-group > .col-12 {
@@ -1035,7 +1035,7 @@ body.stash-liquid-glass .video-js.refract-video-idle .st-player-overlay {
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
-    transition: opacity 0.35s ease, visibility 0.35s ease !important;
+    transition: opacity var(--dur-slow) ease, visibility var(--dur-slow) ease !important;
 }
 body.stash-liquid-glass .video-js.refract-video-idle {
     cursor: none !important;
@@ -1097,12 +1097,12 @@ body.stash-liquid-glass .video-js .refract-src-group {
        -2.8px and -3.6px, i.e. touching. */
     grid-template-columns: 5.4rem minmax(0, 1fr);
     align-items: start;
-    column-gap: 0.5rem;
+    column-gap: var(--gap-md);
 }
 body.stash-liquid-glass .video-js .refract-src-head {
     font-size: var(--fs-xs);
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.5);
     text-align: right;
@@ -1138,7 +1138,7 @@ body.stash-liquid-glass .video-js .refract-src-row > .refract-src-opt {
 body.stash-liquid-glass .video-js .refract-src-rate {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--gap-md);
     min-height: 26px;
 }
 body.stash-liquid-glass .video-js .refract-src-slider {

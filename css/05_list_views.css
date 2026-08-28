@@ -80,7 +80,7 @@ body.stash-liquid-glass .table-list thead th {
     color: var(--text-muted) !important;
     font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: var(--track-label);
     text-transform: uppercase;
     border: none !important;
     border-bottom: 1px solid var(--glass-border) !important;
@@ -145,7 +145,7 @@ body.stash-liquid-glass .table-list th.select-col input[type="checkbox"] {
     min-height: unset !important;
     border-radius: 50%;
     border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: var(--fill-3) !important;
     box-shadow: none !important;
     cursor: pointer;
     vertical-align: middle;
@@ -338,7 +338,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-link {
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-link:hover,
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-link:focus {
     color: #fff !important;
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     border-color: var(--glass-border) !important;
 }
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-link.active {
@@ -404,7 +404,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item .advanced-switch {
     flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-start;
-    gap: 0.5rem;
+    gap: var(--gap-md);
     width: 100%;
     box-sizing: border-box;
     margin: 0;
@@ -417,7 +417,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item .advanced-switch {
 }
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item .advanced-switch:hover {
     color: #fff !important;
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     border-color: var(--glass-border) !important;
 }
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item .advanced-switch .form-label {
@@ -498,7 +498,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button 
 body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button .btn:hover,
 body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button button.btn:hover {
     color: #fff !important;
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     border-color: var(--glass-border) !important;
 }
 /* :focus alone (without hover) shouldn't paint the row — keep React's
@@ -530,8 +530,8 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button 
 body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button .btn.btn-primary:hover,
 body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button button.btn-primary:hover {
     color: #fff !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    background-color: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
+    background-color: var(--fill-4) !important;
     border-color: var(--glass-border) !important;
 }
 /* Active state for Troubleshooting button — orange glow like nav-link.active.
@@ -649,7 +649,7 @@ body.stash-liquid-glass [id^="configuration-tabs-tabpane-"] :is(.filter-containe
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) :is(.form-control, .form-select, .custom-select) {
     /* `background-color` (not the shorthand) so we don't clobber the
        background-image used for native + plugin select chevrons. */
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    background-color: var(--fill-3) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
     border-radius: var(--radius-sm) !important;
@@ -660,7 +660,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 }
 
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .input-group-text {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text-muted) !important;
 }
@@ -704,7 +704,7 @@ body.stash-liquid-glass #stash-table > .row.d-none.d-md-flex > h6 {
     color: var(--text-muted) !important;
     font-family: var(--theme-font-stack) !important;
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--track-tight);
     text-transform: uppercase;
     font-size: var(--fs-xs);
     border-bottom: none !important;
@@ -721,7 +721,7 @@ body.stash-liquid-glass #stash-table .stash-row {
 }
 body.stash-liquid-glass #stash-table .stash-row.bg-dark,
 body.stash-liquid-glass #stash-table .stash-row[class*="bg-dark"] {
-    background: rgba(255, 255, 255, 0.025) !important;
+    background: var(--fill-1) !important;
     border-color: rgba(255, 255, 255, 0.05) !important;
 }
 body.stash-liquid-glass #stash-table .stash-row + .stash-row {
@@ -798,7 +798,7 @@ body.stash-liquid-glass #stash-table button.btn.btn-primary.mt-2 {
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .scraper-toolbar {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: var(--gap-md);
     padding: 0.75rem 0.85rem !important;
     border-bottom: 1px solid var(--glass-border);
     margin-bottom: 0.85rem;
@@ -832,13 +832,13 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
     transition:
-        background 0.35s ease,
-        border-top-color 0.35s ease,
-        border-left-color 0.35s ease,
-        border-right-color 0.35s ease,
-        color 0.35s ease,
-        border-bottom-left-radius 0.35s ease,
-        border-bottom-right-radius 0.35s ease;
+        background var(--dur-slow) ease,
+        border-top-color var(--dur-slow) ease,
+        border-left-color var(--dur-slow) ease,
+        border-right-color var(--dur-slow) ease,
+        color var(--dur-slow) ease,
+        border-bottom-left-radius var(--dur-slow) ease,
+        border-bottom-right-radius var(--dur-slow) ease;
     font-weight: 500 !important;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) button.collapse-button.btn.btn-primary:hover {
@@ -871,7 +871,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.35rem 0.5rem;
+    gap: var(--gap-sm) 0.5rem;
     color: inherit;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) button.collapse-button .badge {
@@ -879,7 +879,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     font-weight: 600 !important;
     padding: 0.2em 0.55em !important;
     border-radius: var(--radius-pill) !important;
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: var(--fill-4) !important;
     color: var(--text-muted) !important;
     border: 1px solid var(--glass-border) !important;
     box-shadow: none !important;
@@ -907,7 +907,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     overflow: hidden;
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
-    transition: border-color 0.35s ease;
+    transition: border-color var(--dur-slow) ease;
 }
 /* React-Bootstrap uses the same `.collapsing` class for open AND close, so CSS
    can't sync the button to both. Companion JS adds `.st-collapse-opening` to the
@@ -955,7 +955,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 body.stash-liquid-glass .setting-section .setting-group > .setting:has(.st-toggle-injected) {
     flex-wrap: nowrap !important;
     align-items: center !important;
-    gap: 1rem !important;
+    gap: var(--gap-xl) !important;
 }
 body.stash-liquid-glass .setting-section .setting-group > .setting:has(.st-toggle-injected) > div:first-child {
     flex: 1 1 auto !important;
@@ -970,7 +970,7 @@ body.stash-liquid-glass .setting-section .setting-group > .setting:has(.st-toggl
     display: grid !important;
     grid-template-columns: 1fr 1.8rem !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: var(--gap-md) !important;
     justify-items: end !important;
     align-self: center !important;
     white-space: nowrap;
@@ -1192,7 +1192,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 /* Hover only when collapsed — an expanded row keeping its tint would
    conflict with the inner task buttons' own hover affordances. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"].st-plugin-collapsed:hover {
-    background: rgba(255, 255, 255, 0.025) !important;
+    background: var(--fill-1) !important;
 }
 
 /* Search row — mirrors st-plugin-reload-row layout so clearable-input sits inline. */
@@ -1219,7 +1219,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     border-radius: var(--radius-sm);
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:has(.st-toggle-injected):hover {
-    background: rgba(255, 255, 255, 0.025) !important;
+    background: var(--fill-1) !important;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group[data-st-collapsible-injected="1"]:not(.st-plugin-collapsed):hover {
     background: transparent !important;
@@ -1296,10 +1296,10 @@ body.stash-liquid-glass .st-plugin-reload-btn .fa-icon svg {
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) table.scraper-table thead th {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--track-tight);
     text-transform: uppercase;
     color: var(--text-muted) !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: var(--fill-3) !important;
     border-bottom: 1px solid var(--glass-border) !important;
     padding: 0.5rem 0.7rem !important;
     white-space: nowrap;
@@ -1314,7 +1314,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     border-bottom: none !important;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) table.scraper-table tbody tr:nth-child(even) {
-    background: rgba(255, 255, 255, 0.025) !important;
+    background: var(--fill-1) !important;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) table.scraper-table tbody td:first-child {
     font-weight: 600;
@@ -1335,7 +1335,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     font-size: var(--fs-xs);
     line-height: 1.4;
     color: var(--text-muted) !important;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--fill-3);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-pill);
     white-space: nowrap;
@@ -1397,7 +1397,7 @@ body.stash-liquid-glass .tagger-container-header {
 }
 
 body.stash-liquid-glass .tagger-container-header .col-12.col-lg.my-1 {
-    background: rgba(255, 255, 255, 0.03) !important;
+    background: var(--fill-1) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     padding: 0.4rem 0.55rem;
@@ -1423,7 +1423,7 @@ body.stash-liquid-glass .tagger-container-header .col-12.col-lg.my-1 .mt-2.text-
 body.stash-liquid-glass .tagger-container-header .col-12.col-lg.my-1 .mt-2.text-right.tagger-remove {
     display: flex;
     justify-content: flex-end;
-    gap: 0.4rem;
+    gap: var(--gap-sm);
     margin-top: 0.5rem !important;
 }
 
@@ -1566,7 +1566,7 @@ body.stash-liquid-glass .tagger-container-header select.input-control,
 body.stash-liquid-glass .tagger-container-header select.form-control {
     appearance: none !important;
     -webkit-appearance: none !important;
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    background-color: var(--fill-3) !important;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
     background-repeat: no-repeat !important;
     background-position: right 0.65rem center !important;
@@ -1635,7 +1635,7 @@ body.stash-liquid-glass .card:has(> .PerformerTagger) {
 body.stash-liquid-glass .tagger-container-header .ml-auto.mb-3 {
     margin: 0 !important;
     display: flex !important;
-    gap: 0.5rem;
+    gap: var(--gap-md);
     align-items: center;
 }
 body.stash-liquid-glass .tagger-container-header .ml-auto.mb-3 > .btn {
@@ -1652,7 +1652,7 @@ body.stash-liquid-glass .tagger-container-header > :is(.collapse, .collapsing).c
        backdrop-filter active causes expensive recomposition every
        frame, which reads as stutter. Solid glass keeps the look
        while staying cheap. */
-    background: rgba(20, 20, 24, 0.92) !important;
+    background: rgba(var(--surface-rgb), 0.92) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     box-shadow: var(--shadow-md) !important;
@@ -1671,14 +1671,14 @@ body.stash-liquid-glass .tagger-container-header > :is(.collapse, .collapsing).c
    resizing box have to be repainted every frame and are the most
    common single-frame stutter source. */
 body.stash-liquid-glass .tagger-container-header > .collapsing.card {
-    transition: height 0.32s var(--ease-glide) !important;
+    transition: height var(--dur-settle) var(--ease-glide) !important;
     box-shadow: none !important;
     will-change: height;
 }
 body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card h4 {
     font-size: var(--fs-sm) !important;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--track-label);
     color: var(--text-muted) !important;
     margin: 0 0 0.7rem 0 !important;
     font-weight: 600;
@@ -1697,7 +1697,7 @@ body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).car
     margin: 0 0 0.5rem 0 !important;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--track-tight);
     font-family: var(--theme-font-stack) !important;
 }
 body.stash-liquid-glass .tagger-container-header :is(.collapse, .collapsing).card .form-text {
@@ -1727,7 +1727,7 @@ body.stash-liquid-glass .PerformerTagger {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     align-items: start;
-    gap: 0.85rem;
+    gap: var(--gap-lg);
     margin-top: 0.75rem;
 }
 
@@ -1778,7 +1778,7 @@ body.stash-liquid-glass .PerformerTagger-performer > .performer-card > img {
     height: 100% !important;
     object-fit: cover !important;
     object-position: center 20% !important;
-    transition: filter var(--dur-move), transform 0.3s;
+    transition: filter var(--dur-move), transform var(--dur-settle);
 }
 body.stash-liquid-glass .PerformerTagger-performer:hover > .performer-card > img {
     filter: saturate(1.15);
@@ -1854,7 +1854,7 @@ body.stash-liquid-glass .PerformerTagger-details .text-left > h5.text-bold {
     line-height: 1;
     margin: 0;
     width: max-content;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--track-tight);
 }
 body.stash-liquid-glass .PerformerTagger-details .text-left > h5.text-bold::before {
     content: "✓ TAGGED";
@@ -1880,7 +1880,7 @@ body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTa
     margin-bottom: 0.5rem;          /* identical to tagged badge wrapper */
     width: max-content;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--track-tight);
 }
 /* The pseudo-element above sits inside a flex input-group; we need
    the input-group to switch to flex-column so the badge stacks above
@@ -1959,7 +1959,7 @@ body.stash-liquid-glass .PerformerTagger-box-link .btn-primary.btn {
     padding: 0 0.95rem !important;
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
+    letter-spacing: var(--track-label) !important;
     font-weight: 600 !important;
     line-height: 1 !important;
     cursor: pointer !important;
@@ -2061,7 +2061,7 @@ body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTa
     padding: 0 0.95rem !important;
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
+    letter-spacing: var(--track-label) !important;
     font-weight: 600 !important;
     line-height: 1 !important;
     cursor: pointer !important;
@@ -2086,14 +2086,14 @@ body.stash-liquid-glass .PerformerTagger-performer-search {
     position: absolute;
     inset: 0;
     z-index: 10;
-    background: rgba(20, 20, 24, 0.96);
+    background: rgba(var(--surface-rgb), 0.96);
     border-radius: var(--radius);
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0.6rem 0.6rem 2.4rem;   /* bottom padding leaves room for chevron */
     display: flex !important;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: var(--gap-sm);
     scrollbar-width: thin;
     scrollbar-color: var(--glass-border) transparent;
     box-sizing: border-box;
@@ -2101,8 +2101,8 @@ body.stash-liquid-glass .PerformerTagger-performer-search {
     transform: translateY(0);
     visibility: visible;
     transition:
-        opacity 0.25s var(--ease-glide),
-        transform 0.25s var(--ease-glide),
+        opacity var(--dur-enter) var(--ease-glide),
+        transform var(--dur-enter) var(--ease-glide),
         visibility 0s linear 0s;
     animation: refract-search-fade-in var(--dur-enter) var(--ease-glide);
 }
@@ -2119,9 +2119,9 @@ body.stash-liquid-glass .PerformerTagger-performer-search.refract-search-hidden 
     visibility: hidden;
     pointer-events: none;
     transition:
-        opacity 0.25s var(--ease-glide),
-        transform 0.25s var(--ease-glide),
-        visibility 0s linear 0.25s;
+        opacity var(--dur-enter) var(--ease-glide),
+        transform var(--dur-enter) var(--ease-glide),
+        visibility 0s linear var(--dur-enter);
     animation: none;
 }
 
@@ -2169,13 +2169,13 @@ body.stash-liquid-glass .PerformerTagger-performer-search-item.btn {
     all: unset !important;
     display: flex !important;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--gap-lg);
     padding: 0.45rem 0.6rem !important;
     width: 100% !important;
     max-width: 100% !important;
     flex: none !important;
     box-sizing: border-box !important;
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: var(--fill-2) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     color: var(--text) !important;
@@ -2237,7 +2237,7 @@ body.stash-liquid-glass .TagTagger {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     align-items: start;
-    gap: 0.85rem;
+    gap: var(--gap-lg);
     margin-top: 0.75rem;
 }
 
@@ -2294,7 +2294,7 @@ body.stash-liquid-glass .TagTagger-tag .tag-card > img {
     height: 100% !important;
     object-fit: cover !important;
     object-position: center !important;
-    transition: filter var(--dur-move), transform 0.3s;
+    transition: filter var(--dur-move), transform var(--dur-settle);
 }
 body.stash-liquid-glass .TagTagger-tag:hover .tag-card > img {
     filter: saturate(1.15);
@@ -2356,7 +2356,7 @@ body.stash-liquid-glass .TagTagger-details-text .text-left > h5.text-bold {
     line-height: 1;
     margin: 0;
     width: max-content;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--track-tight);
 }
 body.stash-liquid-glass .TagTagger-details-text .text-left > h5.text-bold::before {
     content: "✓ TAGGED";
@@ -2380,7 +2380,7 @@ body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-bo
     margin-bottom: 0.5rem;
     width: max-content;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--track-tight);
 }
 
 body.stash-liquid-glass .TagTagger-details-text .sub-content {
@@ -2447,7 +2447,7 @@ body.stash-liquid-glass .TagTagger-box-link .btn-primary.btn {
     padding: 0 0.95rem !important;
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
+    letter-spacing: var(--track-label) !important;
     font-weight: 600 !important;
     line-height: 1 !important;
     cursor: pointer !important;
@@ -2535,7 +2535,7 @@ body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-bo
     padding: 0 0.95rem !important;
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
+    letter-spacing: var(--track-label) !important;
     font-weight: 600 !important;
     line-height: 1 !important;
     cursor: pointer !important;
@@ -2611,7 +2611,7 @@ body.stash-liquid-glass .refract-tag-editor__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.85rem;
+    gap: var(--gap-lg);
     padding-bottom: 0.85rem;
     margin-bottom: 0.85rem;
     border-bottom: 1px solid var(--glass-border);
@@ -2638,7 +2638,7 @@ body.stash-liquid-glass .refract-tag-editor__summary {
 body.stash-liquid-glass .refract-tag-editor__actions {
     display: flex;
     align-items: center;
-    gap: 0.55rem;
+    gap: var(--gap-md);
 }
 body.stash-liquid-glass .refract-tag-editor__discard {
     background: none;
@@ -2672,7 +2672,7 @@ body.stash-liquid-glass .refract-tag-editor__search {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 0.55rem;
+    gap: var(--gap-md);
     background: rgba(0, 0, 0, 0.22);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
@@ -2707,7 +2707,7 @@ body.stash-liquid-glass .refract-tag-editor__search-input::placeholder {
 body.stash-liquid-glass .refract-tag-editor__groups {
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
+    gap: var(--gap-md);
 }
 body.stash-liquid-glass .refract-tag-editor__group {
     background: rgba(255, 255, 255, 0.022);
@@ -2718,7 +2718,7 @@ body.stash-liquid-glass .refract-tag-editor__group {
 }
 body.stash-liquid-glass .refract-tag-editor__group.is-open {
     border-color: rgba(var(--accent-rgb), 0.22);
-    background: rgba(255, 255, 255, 0.035);
+    background: var(--fill-2);
 }
 body.stash-liquid-glass .refract-tag-editor__group:hover {
     border-color: rgba(var(--accent-rgb), 0.28);
@@ -2751,7 +2751,7 @@ body.stash-liquid-glass .refract-tag-editor__group-title {
 body.stash-liquid-glass .refract-tag-editor__group-meta {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--gap-md);
     flex: 0 0 auto;
     color: var(--text-muted);
     font-size: 0.74rem;
@@ -2782,7 +2782,7 @@ body.stash-liquid-glass .refract-tag-editor__subgroup-toggle {
        Open: rotates to point DOWN. `!important` needed to beat the
        `all: unset !important` in this same rule. */
     transform: rotate(-90deg) !important;
-    transition: background var(--dur-fast), color var(--dur-fast), transform 0.25s !important;
+    transition: background var(--dur-fast), color var(--dur-fast), transform var(--dur-enter) !important;
     pointer-events: none;  /* whole header is clickable; let it through */
 }
 body.stash-liquid-glass .refract-tag-editor__group.is-open .refract-tag-editor__group-toggle,
@@ -2806,7 +2806,7 @@ body.stash-liquid-glass .refract-tag-editor__group.is-open .refract-tag-editor__
 body.stash-liquid-glass .refract-tag-editor__subgroup-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 0.55rem;
+    gap: var(--gap-md);
     /* Keep collapsed subgroups at their natural header height instead
        of stretching to match an expanded sibling in the same row. */
     align-items: start;
@@ -2831,7 +2831,7 @@ body.stash-liquid-glass .refract-tag-editor__subgroup-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.55rem;
+    gap: var(--gap-md);
     padding: 0.42rem 0.7rem;
     cursor: pointer;
 }
@@ -2842,7 +2842,7 @@ body.stash-liquid-glass .refract-tag-editor__subgroup-header--static {
 body.stash-liquid-glass .refract-tag-editor__subgroup-header-main {
     display: flex;
     align-items: center;
-    gap: 0.55rem;
+    gap: var(--gap-md);
     flex: 1 1 auto;
     min-width: 0;
 }
@@ -2857,7 +2857,7 @@ body.stash-liquid-glass .refract-tag-editor__subgroup-title {
 body.stash-liquid-glass .refract-tag-editor__subgroup-meta {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: var(--gap-sm);
     color: var(--text-muted);
     font-size: var(--fs-xs);
     font-variant-numeric: tabular-nums;
@@ -2882,7 +2882,7 @@ body.stash-liquid-glass .refract-tag-editor__subgroup.is-open .refract-tag-edito
 body.stash-liquid-glass .refract-tag-editor__leaf-wrap {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem 0.45rem;
+    gap: var(--gap-sm) 0.45rem;
     width: 100%;
 }
 body.stash-liquid-glass .refract-tag-editor__tag {
@@ -2894,7 +2894,7 @@ body.stash-liquid-glass .refract-tag-editor__tag {
     flex: 0 0 auto;
     max-width: 100%;
     padding: 0.36rem 0.85rem !important;
-    background: rgba(255, 255, 255, 0.03) !important;
+    background: var(--fill-1) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
@@ -2986,7 +2986,7 @@ body.stash-liquid-glass .refract-tag-tooltip-portal {
     padding: 0.55rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--gap-md);
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
@@ -3017,7 +3017,7 @@ body.stash-liquid-glass .refract-tag-tooltip-portal .refract-tag-tooltip__img {
 body.stash-liquid-glass .refract-tag-tooltip-portal .refract-tag-tooltip__body {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: var(--gap-2xs);
     text-align: left;
 }
 body.stash-liquid-glass .refract-tag-tooltip-portal .refract-tag-tooltip__name {
@@ -3167,7 +3167,7 @@ body.stash-liquid-glass .PerformerScrapeModal .search-item {
     padding: 7px !important;
     border-radius: 14px !important;
     border: 1px solid rgba(255, 255, 255, 0.10) !important;
-    background: rgba(255, 255, 255, 0.035) !important;
+    background: var(--fill-2) !important;
     box-shadow: none;
     cursor: pointer;
     transition: border-color var(--dur-fast) ease, background-color var(--dur-fast) ease, transform var(--dur-fast) ease;
@@ -3425,7 +3425,7 @@ body.stash-liquid-glass .modal-body .PerformerScrapeModal .text-input {
        none, so every background longhand here has to say it too. */
     border-radius: var(--radius-pill) !important;
     border: 1px solid var(--glass-border) !important;
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    background-color: var(--fill-3) !important;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") !important;
     background-repeat: no-repeat !important;
     background-position: 15px center !important;
@@ -3441,7 +3441,7 @@ body.stash-liquid-glass .modal-body .PerformerScrapeModal .text-input {
 body.stash-liquid-glass .modal-body .PerformerScrapeModal .text-input:focus {
     border-color: rgba(var(--accent-rgb), 0.55);
     box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.18);
-    background-color: rgba(255, 255, 255, 0.07) !important;
+    background-color: var(--fill-4) !important;
 }
 
 /* The count belongs to the field, not to the sheet. Sitting under it as
@@ -3461,10 +3461,10 @@ body.stash-liquid-glass .PerformerScrapeModal-list-container > .mt-1 {
     margin: 0 !important;
     padding: 5px 12px;
     border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--fill-4);
     font-size: var(--fs-sm);
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: var(--track-label);
     text-transform: uppercase;
     color: var(--text-muted);
     pointer-events: none;

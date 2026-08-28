@@ -72,7 +72,7 @@ body.stash-liquid-glass .stash-id-pill > span:first-child {
     font-weight: 700 !important;
     font-size: var(--fs-xs) !important;
     line-height: 1 !important;
-    letter-spacing: 0.04em !important;
+    letter-spacing: var(--track-tight) !important;
     white-space: nowrap;
     flex-shrink: 0;
     flex-grow: 0;
@@ -126,7 +126,7 @@ body.stash-liquid-glass .detail-item-value.stash-ids ul {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.35rem;
+    gap: var(--gap-sm);
 }
 body.stash-liquid-glass .detail-item-value.stash-ids li,
 body.stash-liquid-glass .detail-item-value.stash-ids li.row {

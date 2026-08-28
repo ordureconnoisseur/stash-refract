@@ -217,7 +217,7 @@ body.stash-liquid-glass .stash-tilt-glare-inner {
     transform: rotate(0deg) translate(-50%, -50%);
     background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.14) 100%);
     opacity: 0;
-    transition: opacity 0.25s ease;
+    transition: opacity var(--dur-enter) ease;
     pointer-events: none;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -353,7 +353,7 @@ body.stash-liquid-glass.refract-lite .refract-heart-twinkle {
            persisting animation transform cascades ABOVE inline styles,
            silently blocking the JS hover-tilt's `card.style.transform`
            on every non-Legendary/Perfect card. */
-        animation: stash-card-in 0.32s ease;
+        animation: stash-card-in var(--dur-settle) ease;
     }
 }
 
@@ -431,7 +431,7 @@ body.stash-liquid-glass .rating-banner {
        the home page in Chromium/D3D11. Solid background reads almost
        identically on top of card thumbnails (which are themselves dark
        enough that the blur was barely visible) and costs zero GPU. */
-    background: rgba(20, 20, 24, 0.78) !important;
+    background: rgba(var(--surface-rgb), 0.78) !important;
     border: 1px solid rgba(var(--accent-rgb), 0.35) !important;
     color: var(--accent-bright) !important;
     font-size: 1.28rem;
@@ -776,7 +776,7 @@ body.stash-liquid-glass.refract-flourish-tiers .refract-card-tier-perfect   { z-
 
 /* Isolate the grid row so the cards' z-indices stay scoped inside it.
    Without this, the cards' z-indices (20–70) compete in the global root
-   stacking context against the floating pagination (z-index: 400) — and
+   stacking context against the floating pagination (z-index 400, --z-pager) — and
    because the pagination's `position: fixed` is anchored to a transformed
    ancestor (Stash's main scroll container uses transform), it ends up
    sharing the cards' stacking context and losing to high-tier cards.
@@ -1583,7 +1583,7 @@ body.stash-liquid-glass .rating-number {
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
-    gap: 0.3rem;
+    gap: var(--gap-xs);
     padding: 0.35rem 0.85rem;
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
@@ -1639,9 +1639,9 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     height: 26px !important;
     padding: 0 0.55rem !important;
     font-size: var(--fs-xs) !important;
-    gap: 0.25rem !important;
+    gap: var(--gap-2xs) !important;
     box-shadow: none !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: var(--fill-3) !important;
 }
 
 /* Edit-mode number input — Stash REPLACES the entire pill contents with
@@ -2023,7 +2023,7 @@ body.stash-liquid-glass .stash-perf-age {
 body.stash-liquid-glass .stash-perf-scenes {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--gap-2xs);
     font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--text-muted);
@@ -2045,7 +2045,7 @@ body.stash-liquid-glass .stash-perf-scenes:hover {
 body.stash-liquid-glass .stash-perf-ocount {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--gap-2xs);
     font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--text-muted);
