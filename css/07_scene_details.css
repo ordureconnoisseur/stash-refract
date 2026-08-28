@@ -531,9 +531,19 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-studio img,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .studio-logo img {
     display: none !important;
 }
-/* Studio name label injected by JS — small accent-bright link sitting
-   above the scene title, matching the muted-label aesthetic used for
-   inline studio text elsewhere. */
+/* Studio name label injected by JS, a small link sitting
+   above the scene title.
+
+   It used to be --accent-bright, which is the EMPHASIS shade, on a
+   10px uppercase tracked label above a white 21px title. Ranked by
+   chroma it came out joint-second loudest thing in the panel and the
+   first thing the eye landed on, above the title it exists to label.
+   That is P1's canonical failure by name, and 6.13's rule that an
+   eyebrow is never brighter than the content it introduces.
+
+   Muted at rest, accent on hover: it is still a link, and the colour
+   arrives when you point at it rather than competing for the title's
+   job. */
 body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1.studio-logo {
     margin: 0 0 0.15rem 0 !important;
     padding: 0 !important;
@@ -544,7 +554,7 @@ body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1
     border: none !important;
 }
 body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1.studio-logo > a {
-    color: var(--accent-bright) !important;
+    color: var(--text-muted) !important;
     text-decoration: none !important;
     text-transform: uppercase;
     letter-spacing: var(--track-label);
@@ -2496,7 +2506,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-more {
     font-size: var(--fs-sm);
     font-weight: 700;
     letter-spacing: var(--track-tight);
-    color: var(--accent);
+    /* --accent is a fill and border token (3.1); as TEXT it made the
+       two quietest affordances in the panel the two loudest things in
+       it, measured at chroma 162 against the active tab's 120. On the
+       light shade they read as an affordance without outranking the
+       one piece of state the panel has to communicate. The hover was
+       backwards too: --accent-bright is LESS chromatic than --accent,
+       so pointing at the link used to calm it down. */
+    color: var(--accent-light);
     cursor: pointer;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-more:hover {
@@ -2862,7 +2879,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more {
     font-size: var(--fs-sm);
     font-weight: 700;
     letter-spacing: var(--track-tight);
-    color: var(--accent);
+    /* --accent is a fill and border token (3.1); as TEXT it made the
+       two quietest affordances in the panel the two loudest things in
+       it, measured at chroma 162 against the active tab's 120. On the
+       light shade they read as an affordance without outranking the
+       one piece of state the panel has to communicate. The hover was
+       backwards too: --accent-bright is LESS chromatic than --accent,
+       so pointing at the link used to calm it down. */
+    color: var(--accent-light);
     cursor: pointer;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more:hover {
