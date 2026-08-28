@@ -2232,10 +2232,9 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     font-weight: 500 !important;
     color: rgba(255, 255, 255, 0.45) !important;
 }
-/* One real star, defined once. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
-    --st-star-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 2l2.9 6.2 6.6.9-4.8 4.7 1.2 6.7L12 17.3 6.1 20.5l1.2-6.7L2.5 9.1l6.6-.9z'/%3E%3C/svg%3E");
-}
+/* --st-star-svg is defined in 01_tokens.css now: the advanced-rating
+   trigger and Stash's own rating stars draw the same shape as the
+   performer rating badge, so a scene page shows one star, not three. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) > span {
     /* The flex was on the CHILDREN, not the container: the unclassed
        wrapper span holding frame-rate + resolution stayed display:block
@@ -2405,9 +2404,28 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     height: 14px !important;
     min-width: 14px !important;
 }
+/* The stars hung 2px below every other glyph in the strip. Scanned in
+   rendered ink: the star button's box centres correctly on the strip,
+   but the SVG inside it carries vertical-align: -1.75px -- Font Awesome
+   ships -0.125em, which at this size is 1.75px, and it is baked into
+   the icon rather than the theme. Every other glyph in the row is
+   vertical-align: middle and lands within a pixel of centre; the stars
+   alone were +2.00 against a -1.00 to 0.00 cluster.
+
+   Centring the button as a flex box and giving the SVG the same middle
+   alignment as its neighbours fixes it at the source rather than by
+   nudging the row. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars button svg {
     width: 14px !important;
     height: 14px !important;
+    display: block !important;
+    vertical-align: middle !important;
 }
 /* Advanced Ratings value beside the stars. Absent -> the stars alone are
    the anchor and nothing reflows. */

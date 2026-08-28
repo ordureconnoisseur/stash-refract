@@ -2676,6 +2676,25 @@ body.stash-liquid-glass .rating-stars button:hover {
 body.stash-liquid-glass .rating-stars svg {
     filter: none !important;
 }
+/* The star artwork, everywhere the rating control appears. Stash builds
+   each star as an .unfilled-star div with an absolutely positioned,
+   width-clipped .filled-star over it -- that clip is how a 4.4 renders a
+   40 percent star, so it has to survive.
+
+   Painting the mask on the DIVS keeps it: mask-size `auto 100%` draws
+   the star at full height whatever the div's width, left-anchored, so
+   the filled div's own overflow: hidden does the clipping exactly as
+   before. Sizing off the div also means this works at every size the
+   control appears in without naming one. The native <svg> stays in the
+   flow, invisible, because the div takes its box from it. */
+body.stash-liquid-glass .rating-stars :is(.filled-star, .unfilled-star) {
+    background-color: currentColor !important;
+    -webkit-mask: var(--st-star-svg) left center / auto 100% no-repeat !important;
+            mask: var(--st-star-svg) left center / auto 100% no-repeat !important;
+}
+body.stash-liquid-glass .rating-stars :is(.filled-star, .unfilled-star) > svg {
+    visibility: hidden !important;
+}
 body.stash-liquid-glass .rating-stars .filled-star {
     color: var(--star) !important;
     fill: var(--star) !important;
