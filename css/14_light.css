@@ -1042,6 +1042,13 @@ body.stash-liquid-glass.refract-light .refract-sr-plate {
         repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.05) 0 6px, transparent 6px 12px),
         rgba(0, 0, 0, 0.05);
 }
+/* Nothing came back: the same hatch, mirrored, for the same reason. */
+body.stash-liquid-glass.refract-light .refract-sr-empty {
+    background:
+        repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.03) 0 6px, transparent 6px 12px),
+        rgba(0, 0, 0, 0.03);
+}
+
 /* The line that decides and the plate's key both read var(--accent-ink),
    which this file already redefines for the mode, so neither needs a
    partner here. What does is the accent used as a MARK: --accent-bright

@@ -3302,6 +3302,14 @@ body.stash-liquid-glass .PerformerScrapeModal .performer-disambiguation {
     display: block;
     margin-bottom: var(--gap-2xs);
     font-size: var(--fs-sm);
+    /* Weight 600 whether or not it collides. Left at 400 it was
+       --text-muted at 11.2px directly above a cast or age line that is
+       --text-muted at 10.08px: 1.12px apart, same weight, same colour,
+       which is two labels rather than two levels (3.5 rules 1 and 3).
+       The collision state now moves colour and nothing else, which is
+       also the honest encoding -- the accent means "this is what
+       decides", not "this line is important". */
+    font-weight: 600;
     line-height: 1.3;
     color: var(--text-muted);
     white-space: nowrap;
@@ -3312,7 +3320,6 @@ body.stash-liquid-glass .PerformerScrapeModal .performer-disambiguation {
    it stops being an aside. Marked by initScrapeResults. */
 body.stash-liquid-glass .PerformerScrapeModal .search-item.refract-sr-collide .performer-disambiguation {
     color: var(--accent-ink);
-    font-weight: 600;
 }
 body.stash-liquid-glass .PerformerScrapeModal .performer-details {
     display: inline-flex;
@@ -3377,7 +3384,10 @@ body.stash-liquid-glass .SceneScrapeModal .scene-details h4 {
 body.stash-liquid-glass .SceneScrapeModal .scene-details h5 {
     margin: 0;
     font-size: var(--fs-sm);
-    font-weight: 400;
+    /* See the performer disambiguation above: this line holds its
+       weight in both states so it stays a level above the cast, and
+       the collision moves colour only. */
+    font-weight: 600;
     line-height: 1.3;
     color: var(--text-muted);
     white-space: nowrap;
@@ -3388,7 +3398,6 @@ body.stash-liquid-glass .SceneScrapeModal .scene-details h5 {
    so it stops being an aside. Marked by initScrapeResults. */
 body.stash-liquid-glass .SceneScrapeModal .search-item.refract-sr-collide .scene-details h5 {
     color: var(--accent-ink);
-    font-weight: 600;
 }
 
 /* The cast. Stash renders performers as badges with no separator
@@ -3520,6 +3529,58 @@ body.stash-liquid-glass .refract-sr-plate__key:empty::before {
     content: attr(data-refract-sr-empty);
     color: var(--text-muted);
     font-weight: 400;
+}
+
+/* ── Nothing came back ──────────────────────────────────────────── */
+
+/* Same hatch as the plate, so an empty sheet and an empty well are
+   visibly the same kind of nothing. Injected by initScrapeResults,
+   which is also where the copy lives, since the hint differs per
+   modal. */
+body.stash-liquid-glass .refract-sr-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-sm);
+    min-height: 132px;
+    padding: var(--gap-xl);
+    border-radius: var(--radius);
+    text-align: center;
+    /* One rung below the plate's hatch. The stripe carries the same
+       contrast against its own base either way, but this block is
+       132px of full dialog width against the plate's 280px well, and
+       at that area the same texture stops being a surface and starts
+       competing with the sentence on top of it. */
+    background:
+        repeating-linear-gradient(135deg, var(--fill-1) 0 6px, transparent 6px 12px),
+        var(--fill-1);
+}
+/* Stash's own heading, wearing the block. Its text node is an
+   anonymous flex item, so the lead type goes on the container and the
+   hint re-declares its own. */
+body.stash-liquid-glass .refract-sr-empty--stash {
+    margin: 0;
+    font-size: var(--fs-md);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text);
+}
+body.stash-liquid-glass .refract-sr-empty__lead {
+    font-size: var(--fs-md);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text);
+}
+body.stash-liquid-glass .refract-sr-empty__hint {
+    max-width: 42ch;
+    font-size: var(--fs-base);
+    /* Said, not inherited: in the performer modal the block IS Stash's
+       heading, so an unstated weight comes down as 600 and the hint
+       stops being a level below the lead. */
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--text-muted);
 }
 
 /* ── The modal around the sheet ─────────────────────────────────── */

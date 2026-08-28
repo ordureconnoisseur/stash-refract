@@ -7883,7 +7883,15 @@
             var bio = item.querySelector(".performer-result > .row:nth-of-type(2)");
             return bio ? String(bio.textContent || "").trim() : "";
         },
-        tell: "The line under each name is what tells them apart."
+        tell: "The line under each name is what tells them apart.",
+        noun: "name",
+        emptyHint: "Try fewer words, or the name they are credited under.",
+        modal: ".PerformerScrapeModal",
+        /* Stash drops the list entirely here and writes its own heading
+           instead, so this modal already has an empty state and only
+           needs dressing. The scene one renders an empty <ul> and says
+           nothing, so that one is built from scratch below. */
+        stashEmpty: "h5.text-center"
     }, {
         list: ".SceneScrapeModal-list",
         row: ".scene-details > .row",
@@ -7906,7 +7914,11 @@
             var syn = item.querySelector(".scene-details > .row:nth-of-type(2)");
             return syn ? String(syn.textContent || "").trim() : "";
         },
-        tell: "The studio and the date are what tell them apart."
+        tell: "The studio and the date are what tell them apart.",
+        noun: "title",
+        emptyHint: "Try fewer words, or the studio instead of the title.",
+        modal: ".SceneScrapeModal",
+        stashEmpty: null
     }];
 
     /* A result has no usable picture in two different ways, and they are
@@ -8009,18 +8021,72 @@
            of the problem and imply the rest were unique. */
         var txt = (groups === 1)
             ? count + " of these are called " + name + ". " + kind.tell
-            : count + " of these share a name with another result. " + kind.tell;
+            : count + " of these share a " + kind.noun + " with another result. " + kind.tell;
         if (note.textContent !== txt) { note.textContent = txt; }
+    }
+
+    /* A search that returns nothing leaves the body of this dialog
+       completely blank, because the one string Stash puts there -- the
+       count -- is the string 05_list_views lifts into the search field.
+       An empty screen says what would fill it and offers the next move
+       (6.22.3); before the sheet, "0 scenes found" at least sat where
+       the results would have been. */
+    function scrapeEmptyState(list, kind, count) {
+        var host = list.parentElement;
+        if (!host) { return; }
+        var box = host.querySelector(".refract-sr-empty");
+        if (count) {
+            if (box) { box.parentNode.removeChild(box); }
+            return;
+        }
+        if (!box) {
+            box = document.createElement("div");
+            box.className = "refract-sr-empty";
+            box.appendChild(document.createElement("span"))
+                .className = "refract-sr-empty__lead";
+            box.appendChild(document.createElement("span"))
+                .className = "refract-sr-empty__hint";
+            host.insertBefore(box, list);
+        }
+        var lead = box.querySelector(".refract-sr-empty__lead");
+        var hint = box.querySelector(".refract-sr-empty__hint");
+        if (lead && lead.textContent !== "Nothing came back.") { lead.textContent = "Nothing came back."; }
+        if (hint && hint.textContent !== kind.emptyHint) { hint.textContent = kind.emptyHint; }
+    }
+
+    /* The same nothing, where Stash already supplies the words. Its
+       heading becomes the block and keeps its own string, localised,
+       with the hint added under it. */
+    function scrapeStashEmpty(kind) {
+        if (!kind.stashEmpty) { return; }
+        var modal = document.querySelector(kind.modal);
+        if (!modal) { return; }
+        var lead = modal.querySelector(":scope > " + kind.stashEmpty);
+        if (!lead) { return; }
+        lead.classList.add("refract-sr-empty", "refract-sr-empty--stash");
+        var hint = lead.querySelector(".refract-sr-empty__hint");
+        if (!hint) {
+            hint = document.createElement("span");
+            hint.className = "refract-sr-empty__hint";
+            lead.appendChild(hint);
+        }
+        if (hint.textContent !== kind.emptyHint) { hint.textContent = kind.emptyHint; }
     }
 
     function initScrapeResults() {
         for (var k = 0; k < SCRAPE_KINDS.length; k++) {
             var kind = SCRAPE_KINDS[k];
+            scrapeStashEmpty(kind);
             var lists = document.querySelectorAll(kind.list);
             for (var i = 0; i < lists.length; i++) {
                 var list = lists[i];
                 var items = list.querySelectorAll(".search-item");
-                if (!items.length) { scrapeCollisionNote(list, kind, "", 0, 0); continue; }
+                if (!items.length) {
+                    scrapeCollisionNote(list, kind, "", 0, 0);
+                    scrapeEmptyState(list, kind, 0);
+                    continue;
+                }
+                scrapeEmptyState(list, kind, items.length);
                 var names = [];
                 var counts = {};
                 var j;
@@ -13577,12 +13643,98 @@
         }, false);
     }
 
+    /* ── Activity badge on the History tab ────────────────────────────
+       The play and O counts used to sit in the control strip as two
+       chips. They were the only text in a row of glyphs and the only
+       readouts among controls, and giving them a label wide enough to
+       say which was which did not fit the 338px strip.
+
+       So the number moves to the tab that already owns it. Stash puts a
+       badge on the File Info tab for its file count, so the idiom is on
+       the strip already; History gets the same badge carrying the play
+       count, sitting next to the word that explains it. Hovering shows
+       the full breakdown, and the badge pulses when either count goes
+       up, so an increment is visible from wherever you are in the panel.
+
+       This READS Stash's own counters (still in the DOM, hidden by CSS)
+       and never writes them: the badge is a mirror, not a second source
+       of truth (P4). */
+    function stSceneActivityBadge() {
+        var tabs = document.querySelector(
+            ":is(.scene-tabs, .image-tabs) .nav-tabs");
+        if (!tabs) { return; }
+        var links = tabs.querySelectorAll(".nav-link");
+        var link = null;
+        for (var i = 0; i < links.length; i++) {
+            if (/history/i.test(links[i].textContent || "")) {
+                link = links[i];
+                break;
+            }
+        }
+        if (!link) { return; }
+
+        var plays = null;
+        var os = null;
+        var buttons = document.querySelectorAll(
+            ":is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button");
+        for (var j = 0; j < buttons.length; j++) {
+            var titled = buttons[j].querySelector("[title]");
+            var title = titled ? (titled.getAttribute("title") || "") : "";
+            var value = buttons[j].querySelector(".count-value");
+            if (!value) { continue; }
+            var n = parseInt((value.textContent || "").replace(/[^0-9]/g, ""), 10);
+            if (isNaN(n)) { continue; }
+            if (/play/i.test(title)) { plays = n; }
+            else if (/o count/i.test(title)) { os = n; }
+        }
+        if (plays === null && os === null) { return; }
+
+        var badge = link.querySelector(".st-activity");
+        if (!badge) {
+            badge = document.createElement("span");
+            badge.className = "st-activity";
+            link.appendChild(badge);
+        }
+        /* The badge carries the play count and appears only when there
+           is one. A "0" on a tab reads as a broken counter rather than
+           as an absence, and an unwatched scene has nothing to report. */
+        var total = (plays || 0);
+        var next = String(total);
+        var had = badge.__stPrev;
+        if (badge.textContent !== next) { badge.textContent = next; }
+        badge.hidden = !total;
+
+        /* The hover readout. Written as a custom property so the CSS can
+           put it in `content:` -- one tooltip, themed like the panel,
+           instead of the browser's own. */
+        var parts = [];
+        if (plays !== null) {
+            parts.push(plays + (plays === 1 ? " play" : " plays"));
+        }
+        if (os !== null) { parts.push(os + " O"); }
+        /* Built from a char code rather than a literal: the source stays
+           ASCII, which the deploy checks for. */
+        var sep = "  " + String.fromCharCode(183) + "  ";
+        link.style.setProperty("--st-activity-tip", JSON.stringify(parts.join(sep)));
+
+        /* Pulse only on a real increase, and only after a first read, so
+           opening a scene does not animate every badge on the way in. */
+        if (had !== undefined && total > had) {
+            badge.classList.remove("st-activity-bump");
+            /* reflow, or the class re-add does not restart the animation */
+            void badge.offsetWidth;
+            badge.classList.add("st-activity-bump");
+        }
+        badge.__stPrev = total;
+    }
+
     function applyScenePlayerFixes() {
         injectScenePlayerOverlay();
         setupSceneTabsPerformers();
         wrapSceneTagList();
         stPerformerCredit();
         stClampDescription();
+        stSceneActivityBadge();
         initImageCardLightbox();
         initRatingInputSelectAll();
         tagFilledRatings();
