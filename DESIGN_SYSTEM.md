@@ -262,13 +262,21 @@ The font is forced onto everything except `code`, `pre`, `kbd`, `samp`.
 | `--fs-md` | 0.92 | 12.88 | card titles, dense headings |
 | `--fs-body` | 1.0 | 14 | body copy, detail values |
 | `--fs-lg` | 1.25 | 17.5 | sub-headings |
-| `--fs-xl` | 2.0 | 28 | page title |
+| `--fs-xl` | 1.5 | 21 | panel and section titles |
+| `--fs-2xl` | 2.0 | 28 | page title |
 
 **Rules**
 
-1. Reach for a step. Do not invent an eighth. The scale exists because the
+1. Reach for a step. Do not invent another. The scale exists because the
    performer header once rendered twelve distinct sizes, three of which sat
    within half a pixel of each other while claiming to be different levels.
+   When a step is genuinely missing, check whether the ladder already has a
+   dead rung before adding one: `--fs-lg` and `--fs-xl` had ZERO consumers
+   theme-wide while 14 literal sizes sat above `--fs-body`, none of them at
+   17.5 or 28px, so the 21px the scene panel needed was met by retuning
+   `--fs-xl` and moving the old 28px to `--fs-2xl` rather than by adding an
+   eighth name beside two nobody used. Retuning a token nothing references
+   changes nothing on screen; adding one grows the vocabulary forever.
 2. **A surface gets six or seven size/weight pairs, not twenty.** The scene
    detail panel measured 20 pairs in a 338px column, with 10.08px doing six
    different jobs across three weights. When one size carries 119 elements it
@@ -277,7 +285,14 @@ The font is forced onto everything except `code`, `pre`, `kbd`, `samp`.
    hierarchy.
 3. Hierarchy is size *and* weight *and* colour together. Muted text at the same
    size is a level. Three weights at the same size is not.
-4. **Centre on cap height, and let descenders hang.** `getBoundingClientRect`
+4. **A fixed set of controls in a fixed-width container overrides the job
+   column.** The table puts tabs at `--fs-base`, and the scene panel's six
+   tab labels do not fit 338px at 12.25px: 366px against 338, and 354 even
+   with the padding at its floor. They sit at `--fs-sm`. This is the one
+   sanctioned reason to take a control below its row in the table, it is
+   settled by measurement rather than taste, and it does not generalise to
+   controls that can wrap or scroll.
+5. **Centre on cap height, and let descenders hang.** `getBoundingClientRect`
    returns the line box, which reserves descender space whether or not the
    string has a descender, so a box-centred label without one reads high.
    Albert Sans at 11px measures ascent 10, descent 3, cap 8, and that asymmetry
@@ -948,7 +963,9 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 | Area | State | Rule |
 |---|---|---|
 | Type | 301 uses of `var(--fs-*)` against 99 literal sizes, so 75% adoption. The literals cluster at 0.74, 0.66, 0.62, 0.6 and 0.58rem, which is a sub-`--fs-xs` tier the scale does not have. | 3.5 |
-| Type, second ladder | `07_scene_details.css` declares a six-step panel-local scale (`--sp-title` 21 down to `--sp-label` 10) used 15+ times alongside `var(--fs-*)` in the same file. Ruling, sharpened 2026-08-28: the second scale was four rounding errors and one missing step. Four steps restate global tokens within a third of a pixel and alias to `--fs-md`, `--fs-sm`, `--fs-sm`, `--fs-xs`; 15 is 1px off `--fs-body` and folds into it; only 21px is a genuine hole (between 17.5 and 28) and is promoted to the global scale when the panel lands. Logged 2026-08-27; revisit at the panel merge. | 3.5 |
+| Type, second ladder | RESOLVED 2026-08-28: the panel-local scale is gone and every size in the panel is a scale token. Folded as ruled, with two corrections measurement forced. `--sp-value` had no consumers left and was deleted rather than aliased. 21px was promoted by retuning `--fs-xl` (and moving 28px to `--fs-2xl`) rather than adding an eighth step, because both top rungs had zero consumers theme-wide. Measured before and after: 13 size/weight pairs across 9 distinct sizes became 10 across 5. Logged 2026-08-27. | 3.5 |
+| Type, sub-scale literals | 31 literal font sizes sit below `--fs-xs` across 16 distinct values from 5.04 to 9.5px, 20 of them clustered in 8.12 to 9.24. The scene panel's own (9.5px tag counts) folded UP to `--fs-xs` rather than down, which removed a size instead of adding a rung, so no `--fs-2xs` was created. Whether the other 30 want one rung or none is a measured pass, not a drive-by. Logged 2026-08-28; revisit with the padding pass. | 3.5 |
+| Em dashes | 1,003 in the shipped source (766 across the stylesheets, 237 in `refract.js`), all inside comments, against a house rule that says anywhere. Nothing user-facing, but it also breaks `Edit` string matching, which has cost time twice. A find-and-replace sweep, cheap, needs its own commit so it never hides a behaviour change. Logged 2026-08-28. | 6.21, 7.8 |
 | Motion | Tokenized 2026-08-28 in three passes: the canonical five, then near-duplicates, then the 0.25 to 0.35s residue onto a new `--dur-settle` (shifts up to 14%, the one perceptible-in-principle fold; eyeball drawers and reveals). Remaining literals are deliberate: 0.08s micro-flashes and the player idle 1s fade. | 3.7 |
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px and 10px literals. 9px is removed from this row: where commented as concentric (inner = outer minus padding) it is computed, correct, and exempt per 3.4; uncommented 9px uses still need their derivation stated or a token. | 3.4 |
 | Surfaces | RESOLVED 2026-08-28: the rogue `backdrop-filter` expressions folded to ladder rungs (the 16px saturate(1.1) pair sat behind 94 to 96 percent opaque fills, so the fold is invisible; 8px went to sm). Live shader count now equals the ladder: nine. | 3.2 |
@@ -996,6 +1013,28 @@ What reading the source missed and measuring found, all in one session:
   outside Refract's own blocks.
 - The Advanced Rating trigger rendering no number at all in its complete state,
   which made a "score pill" design wrong before it was drawn.
+
+And in the session that folded the panel's type scale, all four of these,
+none of which is visible in the source either:
+
+- A comment asserting a fix that had not worked. The tab strip's 4px padding
+  was documented as the cure for the seven-tab overflow; simulated, it had
+  reduced that overflow from 38px to 17px and left Edit behind a scroll.
+  **A comment is a claim, and an old claim is measurable.**
+- Arithmetic predicting an overflow that could not happen. Raising the tab
+  size looked like +4.9px of text against zero slack; measured, the six-tab
+  case did not move at all, because `flex: 1 1 auto` had already stretched
+  the items past max-content. Predicting a flex layout by adding up widths
+  is guessing with extra steps.
+- A rule that shipped, was correctly written, and matched nothing on screen:
+  Stash hangs a `.badge` inside some tab labels that Refract had never
+  selected, so it inherited Bootstrap's `font-size: 75%` and rendered at
+  8.4px, a size arrived at by multiplication and belonging to no scale.
+- A hierarchy inversion invisible to the eye but obvious to a sort. Ranking
+  every element by chroma put the two disclosure links (162) above the
+  studio eyebrow and the active tab (120), so the panel's quietest
+  affordances were its loudest objects. **Rank a surface by saturation the
+  way you rank it by size; P1 and P3 are both testable that way.**
 
 None of those were visible in the CSS.
 
