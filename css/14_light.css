@@ -258,6 +258,31 @@ body.stash-liquid-glass.refract-light .scrubber-item-time {
 
 
 /* ═══════ 8. Scene details / wall items ════════════════════════════ */
+/* The scene panel's two disclosure links sit on --accent-light in dark,
+   where the shade is a high-key tint on near-black and measures 13.9:1.
+   Light mode redefines --accent-light to a PALE tint meant to sit ON an
+   accent fill, and on white that is 1.32 to 1.90:1 across the seven
+   presets: present in the DOM and invisible on screen.
+
+   --accent-bright is this file's usual answer for accent text, but
+   measured across all seven it only reaches 2.28 to 3.96:1, so these
+   take --accent, the deepest of the three, at 3.30 to 5.38:1. Hover
+   underlines rather than shifting colour, because there is no darker
+   accent token to shift to and a lighter one would undo the fix.
+
+   The general rule this is an instance of: a token that flips between
+   modes can flip its JOB as well as its value. --accent-light is
+   high-key text in dark and a fill tint in light, so any new use of it
+   as text needs a light-mode partner rule or it ships invisible. */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-desc-more,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-more {
+    color: var(--accent) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-desc-more:hover,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-more:hover {
+    color: var(--accent) !important;
+    text-decoration: underline !important;
+}
 body.stash-liquid-glass.refract-light .scene-wall-item-text-container {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(252, 252, 252, 0.92) 100%) !important;
     color: var(--text) !important;

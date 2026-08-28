@@ -135,6 +135,15 @@ red, yellow, purple, green, teal. Everything else resolves through them.
    is allowed to override the accent, because it is encoding data.
 3. Semantic colour (error red, success green) is Bootstrap's and stays
    Bootstrap's. Do not add a third palette.
+4. **A token that flips between modes can flip its JOB, not just its
+   value.** `--accent-light` is high-key TEXT in dark and a pale FILL tint
+   in light: measured across the seven presets it is 1.32 to 1.90:1 on the
+   light panel, so a new use of it as text ships invisible in light mode
+   while looking correct in dark and correct in the source. `--accent` is
+   the light-mode text shade at 3.30 to 5.38:1 (this file's habitual
+   `--accent-bright` only reaches 2.28 to 3.96). Any use of an accent token
+   in a role the other mode does not share needs a partner rule in
+   `14_light.css`, and the check is a contrast number, not a look.
 
 ### 3.2 Surfaces
 
@@ -1082,7 +1091,13 @@ A brief that changes a surface has ten sections:
 Before a design ships:
 
 - [ ] Reads correctly in all eight accents, and depends on none of them.
-- [ ] Reads correctly in light mode.
+- [ ] Reads correctly in light mode, checked as a CONTRAST NUMBER against
+      the surface behind it and across all seven presets, not by eye. Light
+      mode cannot be measured by toggling the body class from a probe: the
+      class is mirrored to Stash's server-side UI config and re-read at
+      boot, and toggling it leaves some elements reporting the colour from
+      the previous style pass while their own tokens report the new one.
+      Compute from the token values, or have the mode genuinely on.
 - [ ] Readable in lite mode, with no low-alpha surface left unpinned.
 - [ ] Defined behaviour under `prefers-reduced-motion` and
       `prefers-reduced-transparency`.
