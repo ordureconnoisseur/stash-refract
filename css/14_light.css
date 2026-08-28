@@ -605,12 +605,22 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-t
 
 
 /* ═══════ 22. Rating stars - visible unfilled state ════════════════
-   Global rule sets unfilled stars to rgba(255,255,255,0.22) - totally
-   invisible on white. Flip to a dark muted equivalent. Filled stars
-   stay gold (#fbbf24) which works on both backgrounds. */
-body.stash-liquid-glass.refract-light .rating-stars .unfilled-star {
-    color: rgba(0, 0, 0, 0.22) !important;
-    fill: rgba(0, 0, 0, 0.22) !important;
+   The comment this replaces said the filled star "stays gold (#fbbf24)
+   which works on both backgrounds". Measured, it does not: #fbbf24 is
+   1.67:1 on the light panel and the old empty star was 1.69:1, so
+   filled and empty sat at 1.01:1 of each other. In light mode the
+   rating control conveyed NOTHING: five stars, all alike, whatever the
+   score. That is the checklist's own light-mode line skipped, and the
+   line says a contrast number rather than a look.
+
+   Re-pegging the two tokens fixes every consumer at once, which is why
+   they are tokens now. Deep amber for the filled star at 5.02:1 on
+   white, and a LIGHTER empty star than before, because a paler track
+   separates further from a dark filled star even as it sits closer to
+   the page. Measured: 3.13:1 between filled and empty, up from 1.01. */
+body.stash-liquid-glass.refract-light {
+    --star: #b45309;
+    --star-empty: rgba(0, 0, 0, 0.20);
 }
 
 
