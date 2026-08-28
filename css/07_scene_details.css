@@ -2232,6 +2232,84 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     font-weight: 500 !important;
     color: rgba(255, 255, 255, 0.45) !important;
 }
+/* ── The strip's icon set ─────────────────────────────────────────────
+   One family, one grid, one weight. The row used to mix five idioms at
+   four optical sizes: solid stars, a solid heart, a solid archive box, a
+   hairline eye, three blob droplets, three hairline dots and four tiny
+   squares. Individually each is Stash's or a plugin's own; together they
+   read as a row nobody drew. 6.12 asks for one family and matching
+   weights, and this is the only way to get it on controls the theme does
+   not own -- the mask treatment from 6.20, the same one the stars use.
+
+   Every glyph is a 24x24 box with a 1.7 stroke, round caps and joins,
+   masked into a fixed 14x14 square. Fixed, not em-sized: a mask box of
+   the same size for every icon is what makes them share an optical
+   centre, which is the thing the row never had. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
+    --ic-eye: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12s3.8-6 10-6 10 6 10 6-3.8 6-10 6-10-6-10-6Z'/><circle cx='12' cy='12' r='2.6'/></svg>");
+    --ic-drop: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 2.9c0 0 5.7 5.9 5.7 9.7a5.7 5.7 0 0 1-11.4 0C6.3 8.8 12 2.9 12 2.9Z'/></svg>");
+    --ic-heart: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20.2 4.6 12.8a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9a4.6 4.6 0 0 1 6.5 6.5Z'/></svg>");
+    --ic-box: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3.2 8.6h17.6v10.2a1.6 1.6 0 0 1-1.6 1.6H4.8a1.6 1.6 0 0 1-1.6-1.6Z'/><path d='M2.4 4.8h19.2v3.8H2.4Z'/><path d='M10 12.6h4'/></svg>");
+    --ic-kebab: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='5.2' r='1.55' fill='%23000' stroke='none'/><circle cx='12' cy='12' r='1.55' fill='%23000' stroke='none'/><circle cx='12' cy='18.8' r='1.55' fill='%23000' stroke='none'/></svg>");
+    --ic-grid: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'><rect x='3.4' y='3.4' width='6.4' height='6.4' rx='1.1'/><rect x='14.2' y='3.4' width='6.4' height='6.4' rx='1.1'/><rect x='3.4' y='14.2' width='6.4' height='6.4' rx='1.1'/><rect x='14.2' y='14.2' width='6.4' height='6.4' rx='1.1'/></svg>");
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn) > svg,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn) > span > svg {
+    display: none !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn)::before {
+    content: "";
+    display: block;
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+    background-color: currentColor;
+    -webkit-mask: var(--ic) center / contain no-repeat;
+            mask: var(--ic) center / contain no-repeat;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) .count-icon { --ic: var(--ic-eye); }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) .count-icon    { --ic: var(--ic-drop); }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn                                  { --ic: var(--ic-heart); }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button                                   { --ic: var(--ic-box); }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle                                    { --ic: var(--ic-kebab); }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn                                  { --ic: var(--ic-grid); }
+
+/* ── The strip's icon set ─────────────────────────────────────────────
+   One family, one grid, one weight. The row used to mix five idioms at
+   four optical sizes: solid stars, a solid heart, a solid archive box, a
+   hairline eye, three blob droplets, three hairline dots and four tiny
+   squares. Individually each is Stash's or a plugin's own; together they
+   read as a row nobody drew. 6.12 asks for one family and matching
+   weights, and this is the only way to get it on controls the theme does
+   not own -- the mask treatment from 6.20, the same one the stars use.
+
+   Every glyph is a 24x24 box with a 1.7 stroke, round caps and joins,
+   masked into a fixed 14x14 square. Fixed, not em-sized: a mask box of
+   the same size for every icon is what makes them share an optical
+   centre, which is the thing the row never had. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn) > svg,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn) > span > svg {
+    display: none !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn)::before {
+    content: "";
+    display: block;
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+    background-color: currentColor;
+    -webkit-mask: var(--ic) center / contain no-repeat;
+            mask: var(--ic) center / contain no-repeat;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) .count-icon { --ic: var(--ic-eye); }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) .count-icon    { --ic: var(--ic-drop); }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn                                  { --ic: var(--ic-heart); }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button                                   { --ic: var(--ic-box); }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle                                    { --ic: var(--ic-kebab); }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn                                  { --ic: var(--ic-grid); }
+
 /* --st-star-svg is defined in 01_tokens.css now: the advanced-rating
    trigger and Stash's own rating stars draw the same shape as the
    performer rating badge, so a scene page shows one star, not three. */
@@ -2380,20 +2458,56 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 
 /* Anchor: Stash's own five stars, back at readable size. This is what
    the v2 row lost -- something that says the row is about this scene. */
+/* The rating number is display:none on an unrated scene and appears on
+   hover to preview the value you are about to set -- INSIDE the star
+   container and ahead of the stars. Measured: every star jumped 24.47px
+   right the moment the pointer entered the row and back when it left,
+   which is the movement that made the control feel unsteady. Reserving
+   the width costs nothing and stops the row moving at all. Tabular
+   figures keep "10", "4.4" and "3" the same width as each other, so the
+   preview cannot shove even on a scene that is already rated. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .star-rating-number {
+    /* Out of the flow, into a slot the stars reserve for it. Setting a
+       min-width was not enough: something upstream keeps display: none
+       on the empty number, so the reserved width never applied and the
+       stars still moved. Absolute positioning does not care who hides
+       it -- the padding on .rating-stars holds the slot open whether the
+       number is drawn or not, so the row is identical at rest, on hover
+       and rated or unrated. */
+    position: absolute !important;
+    /* After the stars, not before them. Reserving the slot on the LEFT
+       left a 30px hole at the start of the row on any unrated scene,
+       which read as a mis-set edge. On the right the same reserved slot
+       is empty space between the stars and the advanced-rating trigger,
+       where it reads as the gap between two groups instead. */
+    right: 0 !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin: 0 !important;
+    width: 26px !important;
+    text-align: right !important;
+    font-variant-numeric: tabular-nums !important;
+}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars {
     order: 1 !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 2px !important;
-    position: static !important;
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
     background: none !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 0 !important;
     transform: none !important;
+    /* Last, and stated once. This block previously declared position
+       twice (relative, then static) and padding twice (a left inset,
+       then a blanket 0) -- later-wins inside one rule, so the number's
+       slot never existed and "4.4" sat on top of the first star.
+       relative makes this the number's containing block; the left
+       padding is the slot it lives in. */
+    position: relative !important;
+    padding: 0 30px 0 0 !important;
 }
 /* 14px, not 17. Inside the strip the five stars and their gaps are the
    single widest thing in the row, and at 17px the row measured 356.5px
@@ -2502,14 +2616,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
        deep, so an equal-specificity tie let `content: none` win on source
        order and the dot never drew. */
     content: "" !important;
+    /* Inside the strip, not over its rim. At -2px with a 1.5px ring the
+       dot crossed the strip's top edge, so it read as a notification
+       pinned to the panel rather than a state on the control, and it was
+       the tallest ink in a row of 14px glyphs (measured -3.00 against a
+       -0.50 cluster). Smaller, tucked in, and ringless: nothing overlaps
+       it, so it needs no ring to separate it from anything. */
     position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 7px;
-    height: 7px;
+    top: 1px;
+    right: 0;
+    width: 5px;
+    height: 5px;
     border-radius: var(--radius-pill);
-    background: var(--accent);
-    border: 1.5px solid var(--bg-0);
+    background: var(--accent-bright);
+    border: 0;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn::after {
     /* Was a "RATING" caption. Five stars beside a control do not need a
