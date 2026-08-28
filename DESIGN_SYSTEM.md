@@ -418,6 +418,26 @@ through a transformed ancestor), and tier cards get no `isolation` or
 `will-change`, because promoting each card to its own compositor layer makes
 Chrome sometimes paint them out of z-order.
 
+### 3.9 Contrast
+
+The floors, checked as numbers per 10.1 (and for light mode computed from the
+`14_light.css` token values, since toggling the body class does not probe it
+faithfully):
+
+| Role | Floor | Applies to |
+|---|---|---|
+| Reading text | 4.5:1 | body copy, values, any text that is the sole carrier of its information |
+| Secondary text | 3:1 | muted labels, dates, captions doing support work |
+| Non-text state | 3:1 | focus rings, active indicators, borders that encode state |
+
+Both modes, all eight accents; the binding constraint is almost always light
+mode with the yellow preset. Quieter than the floor is possible, but only as a
+**listed exemption in the drift ledger with its reason**, so that subordination
+is a decision someone made and dated, never an accident nobody measured. An
+element that fails its floor in one mode only is the 3.1 rule 4 case: fix it
+with a partner rule in the other mode's scope, not by splitting the
+difference.
+
 ---
 
 ## 4. The rating tier system
@@ -974,6 +994,7 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 | Type | 301 uses of `var(--fs-*)` against 99 literal sizes, so 75% adoption. The literals cluster at 0.74, 0.66, 0.62, 0.6 and 0.58rem, which is a sub-`--fs-xs` tier the scale does not have. | 3.5 |
 | Type, second ladder | RESOLVED 2026-08-28: the panel-local scale is gone and every size in the panel is a scale token. Folded as ruled, with two corrections measurement forced. `--sp-value` had no consumers left and was deleted rather than aliased. 21px was promoted by retuning `--fs-xl` (and moving 28px to `--fs-2xl`) rather than adding an eighth step, because both top rungs had zero consumers theme-wide. Measured before and after: 13 size/weight pairs across 9 distinct sizes became 10 across 5. Logged 2026-08-27. | 3.5 |
 | Type, sub-scale literals | 31 literal font sizes sit below `--fs-xs` across 16 distinct values from 5.04 to 9.5px, 20 of them clustered in 8.12 to 9.24. The scene panel's own (9.5px tag counts) folded UP to `--fs-xs` rather than down, which removed a size instead of adding a rung, so no `--fs-2xs` was created. Whether the other 30 want one rung or none is a measured pass, not a drive-by. Logged 2026-08-28; revisit with the padding pass. | 3.5 |
+| Contrast | `.st-tag-caption` measures 2.48:1 and `.st-tag-n` 2.67:1 in dark, below the 3:1 secondary floor. Deliberately subordinate, but the rarity counts are near-ghostly and are the sole carrier of that information. Whether they brighten to the floor or stand as a listed exemption is the user's call. Logged 2026-08-28. | 3.9 |
 | Em dashes | 1,003 in the shipped source (766 across the stylesheets, 237 in `refract.js`), all inside comments, against a house rule that says anywhere. Nothing user-facing, but it also breaks `Edit` string matching, which has cost time twice. A find-and-replace sweep, cheap, needs its own commit so it never hides a behaviour change. Logged 2026-08-28. | 6.21, 7.8 |
 | Motion | Tokenized 2026-08-28 in three passes: the canonical five, then near-duplicates, then the 0.25 to 0.35s residue onto a new `--dur-settle` (shifts up to 14%, the one perceptible-in-principle fold; eyeball drawers and reveals). Remaining literals are deliberate: 0.08s micro-flashes and the player idle 1s fade. | 3.7 |
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px and 10px literals. 9px is removed from this row: where commented as concentric (inner = outer minus padding) it is computed, correct, and exempt per 3.4; uncommented 9px uses still need their derivation stated or a token. | 3.4 |
