@@ -193,7 +193,7 @@ body.stash-liquid-glass nav.top-nav button.gs-trigger {
     box-shadow: none !important;
     line-height: 1 !important;
     overflow: visible !important;
-    transition: background 0.22s ease, color 0.22s ease;
+    transition: background var(--dur-enter) ease, color var(--dur-enter) ease;
 }
 /* Glare-overlay sheen on hover — matches the ::before pattern the
    main nav-button rule uses (lines ~229-243) for the icons whose
@@ -212,7 +212,7 @@ body.stash-liquid-glass nav.top-nav button.gs-trigger::before {
         rgba(255, 255, 255, 0) 100%
     ) !important;
     opacity: 0 !important;
-    transition: opacity 0.22s ease !important;
+    transition: opacity var(--dur-enter) ease !important;
 }
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn:hover,
 body.stash-liquid-glass nav.top-nav button.gs-trigger:hover {
@@ -257,7 +257,7 @@ body.stash-liquid-glass nav.top-nav .notification-btn.dropdown-toggle::after {
     background-color: currentColor !important;
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M19 8C20.6569 8 22 6.65685 22 5C22 3.34315 20.6569 2 19 2C17.3431 2 16 3.34315 16 5C16 6.65685 17.3431 8 19 8Z' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14.02 2.2C13.36 2.07 12.69 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 11.32 21.93 10.65 21.8 10.01' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain !important;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M19 8C20.6569 8 22 6.65685 22 5C22 3.34315 20.6569 2 19 2C17.3431 2 16 3.34315 16 5C16 6.65685 17.3431 8 19 8Z' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14.02 2.2C13.36 2.07 12.69 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 11.32 21.93 10.65 21.8 10.01' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain !important;
-    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease !important;
+    transition: transform 0.28s var(--ease-spring-hard), filter var(--dur-enter) ease !important;
 }
 /* When the count badge is showing, drop the icon's engraved dot from
    the mask (arc-only variant): the translucent badge sits where the
@@ -394,12 +394,12 @@ body.stash-liquid-glass nav.top-nav .navbar-toggler {
     overflow: visible !important;
     transform: translateZ(0);
     transition:
-        transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
-        background 0.22s ease,
-        border-color 0.22s ease,
-        color 0.22s ease,
-        box-shadow 0.22s ease,
-        backdrop-filter 0.22s ease;
+        transform 0.28s var(--ease-spring-hard),
+        background var(--dur-enter) ease,
+        border-color var(--dur-enter) ease,
+        color var(--dur-enter) ease,
+        box-shadow var(--dur-enter) ease,
+        backdrop-filter var(--dur-enter) ease;
 
     &::before {
         content: "" !important;
@@ -414,7 +414,7 @@ body.stash-liquid-glass nav.top-nav .navbar-toggler {
             rgba(255, 255, 255, 0) 100%
         ) !important;
         opacity: 0 !important;
-        transition: opacity 0.22s ease !important;
+        transition: opacity var(--dur-enter) ease !important;
     }
 
     &:hover {
@@ -469,7 +469,7 @@ body.stash-liquid-glass nav.top-nav .navbar-nav a.nav-link > button:where(:not(.
     color: var(--text) !important;
     box-shadow: none !important;
     line-height: 1 !important;
-    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    transition: background var(--dur-move) ease, border-color var(--dur-move) ease, color var(--dur-move) ease;
 
     &:hover {
         background: var(--glass-bg) !important;
@@ -505,13 +505,13 @@ body.stash-liquid-glass nav.top-nav a.btn:hover svg,
 body.stash-liquid-glass nav.top-nav button.btn:hover svg,
 body.stash-liquid-glass nav.top-nav .navbar-toggler:hover svg {
     transform: scale(1.04);
-    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease;
+    transition: transform 0.28s var(--ease-spring-hard), filter var(--dur-enter) ease;
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.18));
 }
 body.stash-liquid-glass nav.top-nav a.btn svg,
 body.stash-liquid-glass nav.top-nav button.btn svg,
 body.stash-liquid-glass nav.top-nav .navbar-toggler svg {
-    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease;
+    transition: transform 0.28s var(--ease-spring-hard), filter var(--dur-enter) ease;
 }
 
 /* Active route — orange glow halo. JS adds .stash-nav-active to both left and right nav links.
@@ -603,10 +603,10 @@ html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button {
     align-items: center !important;
     justify-content: center !important;
     transition:
-        transform 0.2s cubic-bezier(0.34, 1.2, 0.64, 1),
-        box-shadow 0.22s ease,
-        border-color 0.22s ease,
-        filter 0.22s ease;
+        transform 0.2s var(--ease-spring),
+        box-shadow var(--dur-enter) ease,
+        border-color var(--dur-enter) ease,
+        filter var(--dur-enter) ease;
 }
 /* Custom logo (refract.customLogoUrl) — masked span tinted to --text so
    the logo matches the soft-white tone of the surrounding navbar icons.

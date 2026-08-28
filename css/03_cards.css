@@ -40,7 +40,7 @@ body.stash-liquid-glass .grid-card {
        `auto` keeps the remembered value; only the height needs a
        sensible first guess. */
     contain-intrinsic-size: auto none auto 200px;
-    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.2s ease;
+    transition: transform var(--dur-enter) ease, box-shadow var(--dur-enter) ease, border-color 0.2s ease;
     position: relative;
 }
 /* Slick-carousel exception: the home-page Slick carousels render every
@@ -378,7 +378,7 @@ body.stash-liquid-glass .card-check {
     cursor: pointer;
     opacity: 0;
     box-shadow: none !important;
-    transition: opacity 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    transition: opacity var(--dur-move) ease, background var(--dur-move) ease, border-color var(--dur-move) ease, box-shadow var(--dur-move) ease;
 }
 body.stash-liquid-glass .card:hover .card-check,
 body.stash-liquid-glass .grid-card:hover .card-check,
@@ -524,7 +524,7 @@ body.stash-liquid-glass .scene-card:has(.card-check:checked) > .rating-banner,
 body.stash-liquid-glass .performer-card.refract-check-hover .rating-banner,
 body.stash-liquid-glass .performer-card:has(.card-check:checked) .rating-banner {
     opacity: 0;
-    transition: opacity 0.15s ease;
+    transition: opacity var(--dur-fast) ease;
 }
 
 /* Tiers (coloured) mode used to repaint the rating-banner with red /
@@ -1595,7 +1595,7 @@ body.stash-liquid-glass .rating-number {
     font-variant-numeric: tabular-nums;
     vertical-align: middle;
     box-shadow: var(--shadow-sm);
-    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+    transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease, color var(--dur-fast) ease;
 }
 body.stash-liquid-glass .rating-number:hover {
     border-color: var(--accent-glow) !important;
@@ -1616,7 +1616,7 @@ body.stash-liquid-glass .rating-number > svg.fa-star {
     flex-shrink: 0;
     opacity: 0.7;
     filter: none;
-    transition: color 0.18s ease, opacity 0.18s ease, filter 0.18s ease;
+    transition: color var(--dur-move) ease, opacity var(--dur-move) ease, filter var(--dur-move) ease;
 }
 body.stash-liquid-glass .rating-number.refract-rated > svg.fa-star,
 body.stash-liquid-glass .rating-number.refract-rated > svg.fa-star path {
@@ -1726,7 +1726,7 @@ body.stash-liquid-glass .edit-rating-button {
     align-items: center;
     justify-content: center;
     box-shadow: none !important;
-    transition: color 0.15s ease, transform 0.15s ease;
+    transition: color var(--dur-fast) ease, transform var(--dur-fast) ease;
 }
 body.stash-liquid-glass .edit-rating-button:hover,
 body.stash-liquid-glass .edit-rating-button:focus {
@@ -2029,11 +2029,11 @@ body.stash-liquid-glass .stash-perf-scenes {
     color: var(--text-muted);
     text-decoration: none !important;
     line-height: 1;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass .stash-perf-scenes svg {
     flex-shrink: 0;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass .stash-perf-scenes:hover {
     color: var(--accent-bright) !important;
@@ -2051,7 +2051,7 @@ body.stash-liquid-glass .stash-perf-ocount {
     color: var(--text-muted);
     line-height: 1;
     margin-right: 0.5rem;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass .stash-perf-ocount svg {
     width: 0.85em;

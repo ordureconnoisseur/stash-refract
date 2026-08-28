@@ -127,7 +127,7 @@ body.stash-liquid-glass .scene-divider .btn {
     cursor: pointer !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-    transition: color 0.15s ease, background 0.15s ease !important;
+    transition: color var(--dur-fast) ease, background var(--dur-fast) ease !important;
 }
 body.stash-liquid-glass .scene-divider .btn:hover,
 body.stash-liquid-glass .scene-divider .btn:focus,
@@ -342,7 +342,7 @@ body.stash-liquid-glass .stash-perf-next {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
     cursor: pointer;
     opacity: 0.85;
-    transition: opacity 0.18s, transform 0.18s, filter 0.18s;
+    transition: opacity var(--dur-move), transform var(--dur-move), filter var(--dur-move);
     padding: 0;
     color: transparent;
 }
@@ -381,7 +381,7 @@ body.stash-liquid-glass .st-op-menu-overlay {
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: var(--glass-blur-md-sat);
     -webkit-backdrop-filter: var(--glass-blur-md-sat);
-    animation: st-op-menu-fade-in 0.15s ease-out;
+    animation: st-op-menu-fade-in var(--dur-fast) ease-out;
 }
 @keyframes st-op-menu-fade-in {
     from { opacity: 0; }
@@ -415,7 +415,7 @@ body.stash-liquid-glass .st-op-menu-item {
     font-size: var(--fs-base);
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.12s, border-color 0.12s, color 0.12s;
+    transition: background var(--dur-instant), border-color var(--dur-instant), color var(--dur-instant);
 }
 body.stash-liquid-glass .st-op-menu-item:hover {
     background: var(--glass-bg-strong);
@@ -550,7 +550,7 @@ body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1
     letter-spacing: 0.06em;
     font-size: var(--fs-xs) !important;
     font-weight: 700;
-    transition: color 0.15s ease;
+    transition: color var(--dur-fast) ease;
 }
 body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1.studio-logo > a:hover {
     color: var(--accent-light) !important;
@@ -796,7 +796,7 @@ body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented .co
 body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented .count-value {
     background: rgba(244, 60, 60, 0.18) !important;
     color: #fca5a5 !important;
-    transition: background 0.15s, color 0.15s !important;
+    transition: background var(--dur-fast), color var(--dur-fast) !important;
 }
 /* `.mv-scene-page-btn` (multiview plugin) shares this size/shape rule
    with Stash core toolbar buttons; reference intentionally retained
@@ -890,7 +890,7 @@ body.stash-liquid-glass .nav-tabs .nav-link {
     white-space: nowrap !important;
     text-align: center !important;
     display: block !important;
-    transition: color 0.15s, background 0.15s, border-color 0.15s !important;
+    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast) !important;
 }
 
 /* Stretch each tab wrapper (.nav-item is the flex child of .nav-tabs,
@@ -965,7 +965,7 @@ body.stash-liquid-glass .markers-panel .marker-card {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    transition: border-color 0.15s, box-shadow 0.15s !important;
+    transition: border-color var(--dur-fast), box-shadow var(--dur-fast) !important;
 }
 body.stash-liquid-glass .scene-markers-list .marker-card:hover,
 body.stash-liquid-glass .markers-panel .marker-card:hover {
@@ -991,7 +991,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table thead th {
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table tbody tr {
     border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
-    transition: background 0.15s !important;
+    transition: background var(--dur-fast) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table tbody tr:hover {
     background: rgba(255, 255, 255, 0.04) !important;
@@ -1071,7 +1071,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.t
     font-size: var(--fs-xs) !important;
     font-weight: 500 !important;
     color: var(--text) !important;
-    transition: background 0.15s, border-color 0.15s, color 0.15s !important;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.tag-link.badge.badge-secondary:hover {
     background: var(--accent-tint) !important;
@@ -1332,7 +1332,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
     padding: 0 !important;
     border-radius: 999px !important;
     cursor: pointer !important;
-    transition: background 0.18s ease, width 0.22s ease, opacity 0.15s ease !important;
+    transition: background var(--dur-move) ease, width var(--dur-enter) ease, opacity var(--dur-fast) ease !important;
     opacity: 0.65 !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-dots .dot:hover,
@@ -1484,7 +1484,7 @@ body.stash-liquid-glass .scene-file-info a,
 body.stash-liquid-glass dl.details-list a {
     color: var(--accent-bright) !important;
     text-decoration: none !important;
-    transition: color 0.15s !important;
+    transition: color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .scene-file-info a:hover,
 body.stash-liquid-glass dl.details-list a:hover {
@@ -1550,7 +1550,7 @@ body.stash-liquid-glass .scene-history .remove-date-button {
     color: var(--text-muted) !important;
     padding: 0.15rem 0.35rem !important;
     border-radius: 4px !important;
-    transition: color 0.15s, background 0.15s !important;
+    transition: color var(--dur-fast), background var(--dur-fast) !important;
 }
 body.stash-liquid-glass .scene-history .remove-date-button:hover {
     color: #ff6b6b !important;
@@ -1583,7 +1583,7 @@ body.stash-liquid-glass #queue-content > ol > li {
     border-radius: var(--radius-sm) !important;
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid var(--glass-border) !important;
-    transition: background 0.15s, border-color 0.15s !important;
+    transition: background var(--dur-fast), border-color var(--dur-fast) !important;
 }
 body.stash-liquid-glass #queue-content > ol > li:hover {
     background: rgba(255, 255, 255, 0.06) !important;
@@ -1766,7 +1766,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-card-body > div {
     margin: 0 -0.4rem;
     padding: 0.4rem 0.4rem;
     border-radius: 8px;
-    transition: background 0.15s ease;
+    transition: background var(--dur-fast) ease;
 }
 body.stash-liquid-glass .scene-markers-panel .primary-card-body > div:hover {
     background: rgba(255, 255, 255, 0.04);
@@ -1819,7 +1819,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-card-body .row > .btn-link
     line-height: 1.3;
     color: var(--text-muted) !important;
     opacity: 0;
-    transition: opacity 0.15s ease;
+    transition: opacity var(--dur-fast) ease;
 }
 body.stash-liquid-glass .scene-markers-panel .primary-card-body > div:hover .btn-link.ml-auto,
 body.stash-liquid-glass .scene-markers-panel .primary-card-body > div:focus-within .btn-link.ml-auto {
@@ -2745,7 +2745,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-toggle {
     background: none;
     color: rgba(255, 255, 255, 0.45);
     cursor: pointer;
-    transition: color 0.14s ease, transform 0.18s ease;
+    transition: color 0.14s ease, transform var(--dur-move) ease;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-toggle:hover {
     color: var(--accent-light);

@@ -174,7 +174,7 @@ body.stash-liquid-glass .video-js.vjs-user-inactive .st-player-overlay {
 body.stash-liquid-glass .video-js:is(.vjs-waiting, .vjs-seeking) .st-player-overlay {
     opacity: 0 !important;
     visibility: hidden !important;
-    transition: opacity 0.12s ease !important;
+    transition: opacity var(--dur-instant) ease !important;
 }
 /* ...and put the spinner above the overlay regardless, so it is never
    occluded even in a state that does not carry those classes. */
@@ -217,7 +217,7 @@ body.refract-hide-center-controls .st-player-overlay {
     box-shadow:
         0 4px 18px rgba(0, 0, 0, 0.45),
         inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-    transition: background 0.15s, border-color 0.15s, transform 0.12s, box-shadow 0.15s !important;
+    transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-instant), box-shadow var(--dur-fast) !important;
 }
 .st-overlay-btn:hover {
     background: var(--accent-tint) !important;
@@ -373,7 +373,7 @@ body.stash-liquid-glass .video-js .vjs-control {
     margin: 0 !important;
     border-radius: var(--radius-sm) !important;
     cursor: pointer !important;
-    transition: color 0.15s, background 0.15s !important;
+    transition: color var(--dur-fast), background var(--dur-fast) !important;
 }
 body.stash-liquid-glass .video-js button.vjs-button {
     width: 36px !important;
@@ -472,7 +472,7 @@ body.stash-liquid-glass .video-js .vjs-progress-holder {
     margin: 0 !important;
     background: rgba(255, 255, 255, 0.12) !important;
     border-radius: 2px !important;
-    transition: height 0.15s !important;
+    transition: height var(--dur-fast) !important;
 }
 body.stash-liquid-glass .video-js .vjs-progress-control:hover .vjs-progress-holder {
     height: 6px !important;
@@ -625,7 +625,7 @@ body.stash-liquid-glass .video-js .vjs-menu-item {
     padding: 0.35rem 0.65rem !important;
     border-radius: 6px !important;
     text-transform: none !important;
-    transition: color 0.15s, background 0.15s !important;
+    transition: color var(--dur-fast), background var(--dur-fast) !important;
 }
 body.stash-liquid-glass .video-js .vjs-menu-item:hover,
 body.stash-liquid-glass .video-js .vjs-menu-item:focus {
@@ -688,7 +688,7 @@ body.stash-liquid-glass .scrubber-wrapper > .scrubber-button {
     box-shadow:
         0 2px 12px rgba(0, 0, 0, 0.4),
         inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-    transition: background 0.15s, border-color 0.15s, transform 0.12s, box-shadow 0.15s !important;
+    transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-instant), box-shadow var(--dur-fast) !important;
     cursor: pointer !important;
 }
 body.stash-liquid-glass #scrubber-back {
@@ -725,7 +725,7 @@ body.stash-liquid-glass .scrubber-content {
 /* Subtle border between thumbnail tiles + slight dim on hover */
 body.stash-liquid-glass .scrubber-item {
     border-right: 1px solid rgba(0, 0, 0, 0.25) !important;
-    transition: opacity 0.15s !important;
+    transition: opacity var(--dur-fast) !important;
 }
 body.stash-liquid-glass .scrubber-item:hover {
     opacity: 0.85 !important;
@@ -981,7 +981,7 @@ body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider::-
     box-shadow:
         -100vw 0 0 calc(100vw - 6px) rgba(var(--accent-rgb), 0.45),
         0 0 8px rgba(var(--accent-rgb), 0.4);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
 body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider:hover::-webkit-slider-thumb {
     transform: scale(1.15);
@@ -1009,7 +1009,7 @@ body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider::-
     background: rgba(var(--accent-rgb), 0.78);
     border: none;
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.4);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
 body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider:hover::-moz-range-thumb {
     transform: scale(1.15);
@@ -1185,7 +1185,7 @@ body.stash-liquid-glass .video-js .refract-src-slider::-webkit-slider-thumb {
     box-shadow:
         -100vw 0 0 calc(100vw - 6px) rgba(var(--accent-rgb), 0.45),
         0 0 10px rgba(var(--accent-rgb), 0.45);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
 body.stash-liquid-glass .video-js .refract-src-slider:hover::-webkit-slider-thumb {
     transform: scale(1.15);

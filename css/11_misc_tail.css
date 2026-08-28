@@ -66,7 +66,7 @@ body.stash-liquid-glass .include-exclude-button {
     justify-content: center !important;
     font-size: var(--fs-sm) !important;
     opacity: 0.38;
-    transition: opacity 0.15s, color 0.15s !important;
+    transition: opacity var(--dur-fast), color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .include-exclude-button svg {
     width: 0.7rem !important;
@@ -88,7 +88,7 @@ body.stash-liquid-glass .search-result .scene-link {
     color: #fff !important;
     font-weight: 600;
     text-decoration: none;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass .search-result .scene-link:hover {
     color: var(--accent-bright) !important;
@@ -125,7 +125,7 @@ body.stash-liquid-glass .scene-details a {
     font-size: var(--fs-xs);
     color: var(--text-muted) !important;
     text-decoration: none;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
     word-break: break-all;
 }
 body.stash-liquid-glass .scene-details a:hover {
@@ -159,7 +159,7 @@ body.stash-liquid-glass .entity-name a {
     font-family: inherit !important;
     font-size: inherit !important;
     text-decoration: none !important;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass .entity-name a:hover {
     color: #fff !important;
@@ -174,7 +174,7 @@ body.stash-liquid-glass .search-result .btn-group .btn {
     font-size: var(--fs-sm) !important;
     padding: 0.25rem 0.65rem !important;
     border-radius: 0 !important;
-    transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast) !important;
     box-shadow: none !important;
 }
 body.stash-liquid-glass .search-result .btn-group .btn:first-child {
@@ -212,7 +212,7 @@ body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn):not
     letter-spacing: 0.04em !important;
     margin-top: 0.5rem;
     box-shadow: 0 2px 12px rgba(var(--accent-rgb), 0.22) !important;
-    transition: background 0.15s, box-shadow 0.15s !important;
+    transition: background var(--dur-fast), box-shadow var(--dur-fast) !important;
 }
 body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn):not(.tag-item .btn):hover {
     background: var(--accent-bright) !important;
@@ -231,7 +231,7 @@ body.stash-liquid-glass .search-result .tag-item.badge .btn.btn-primary {
     border-radius: var(--radius-sm) !important;
     line-height: 1 !important;
     font-size: var(--fs-xs) !important;
-    transition: color 0.15s, background 0.15s !important;
+    transition: color var(--dur-fast), background var(--dur-fast) !important;
 }
 body.stash-liquid-glass .search-result .tag-item.badge .btn.btn-primary:hover {
     color: var(--accent-bright) !important;
@@ -316,7 +316,7 @@ body.stash-liquid-glass .search-item-check {
     box-shadow: none !important;
     cursor: pointer !important;
     flex-shrink: 0;
-    transition: background 0.15s, border-color 0.15s !important;
+    transition: background var(--dur-fast), border-color var(--dur-fast) !important;
     padding: 0 !important;
     vertical-align: middle;
 }
@@ -482,7 +482,7 @@ body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
     align-items: center !important;
     justify-content: center !important;
     line-height: 1 !important;
-    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-fast) ease;
 }
 body.stash-liquid-glass .Lightbox-header .btn.btn-link:hover,
 body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link:hover {
@@ -515,7 +515,7 @@ body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
     color: var(--text) !important;
     opacity: 0.55;
     z-index: 1100;
-    transition: opacity 0.18s, background 0.18s, transform 0.18s, border-color 0.18s;
+    transition: opacity var(--dur-move), background var(--dur-move), transform var(--dur-move), border-color var(--dur-move);
 }
 /* First navbutton in the display = chevron-left, second = chevron-right */
 body.stash-liquid-glass .Lightbox-display .Lightbox-navbutton.btn.btn-link:first-of-type {
@@ -635,7 +635,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-input[type="che
     box-shadow: none !important;
     cursor: pointer;
     vertical-align: middle;
-    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    transition: border-color var(--dur-fast), background var(--dur-fast), box-shadow var(--dur-fast);
     flex-shrink: 0;
 }
 body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-input[type="checkbox"]:checked {
@@ -710,7 +710,7 @@ body.stash-liquid-glass .Lightbox-footer-center .image-link {
     font-size: var(--fs-sm);
     text-decoration: none;
     margin-right: 0.6rem;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass .Lightbox-footer-center .image-link:hover {
     color: var(--accent-bright) !important;
@@ -726,7 +726,7 @@ body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link {
     border-radius: var(--radius-pill);
     background: var(--accent-tint);
     border: 1px solid var(--accent-glow);
-    transition: background 0.15s, color 0.15s;
+    transition: background var(--dur-fast), color var(--dur-fast);
 }
 body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link:hover {
     background: rgba(var(--accent-rgb), 0.22) !important;
@@ -825,7 +825,7 @@ body.stash-liquid-glass .Lightbox-footer .o-counter {
     font-variant-numeric: tabular-nums !important;
     line-height: 1 !important;
     box-sizing: border-box !important;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
 }
 body.stash-liquid-glass .Lightbox-footer .o-counter:hover {
     background: var(--accent-tint) !important;
@@ -887,7 +887,7 @@ body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link {
     padding: 0.35rem 0.5rem !important;
     border-radius: var(--radius-sm) !important;
     text-decoration: none !important;
-    transition: background 0.15s, color 0.15s;
+    transition: background var(--dur-fast), color var(--dur-fast);
 }
 body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link:hover {
     background: rgba(255, 255, 255, 0.08) !important;
@@ -925,7 +925,7 @@ body.stash-liquid-glass .refract-accent-swatch {
     border: 2px solid rgba(255, 255, 255, 0.18) !important;
     padding: 0 !important;
     cursor: pointer !important;
-    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+    transition: transform var(--dur-fast) ease, border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
 }
 body.stash-liquid-glass .refract-accent-swatch:hover {
@@ -985,7 +985,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav {
     font-size: 1rem !important;
     line-height: 1 !important;
     box-shadow: none !important;
-    transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s !important;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast), box-shadow var(--dur-fast) !important;
 }
 body.stash-liquid-glass.refract-show-light-nav nav.top-nav .navbar-buttons > .st-light-toggle-nav {
     display: inline-flex !important;
@@ -1049,7 +1049,7 @@ body.stash-liquid-glass .refract-segmented-btn {
     padding: 0.3rem 0.75rem;
     border-radius: var(--radius-pill);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    transition: background var(--dur-fast), color var(--dur-fast), box-shadow var(--dur-fast);
 }
 body.stash-liquid-glass .refract-segmented-btn:hover {
     color: var(--text) !important;
@@ -1071,7 +1071,7 @@ body.stash-liquid-glass .refract-logo-input {
     border-radius: var(--radius-sm) !important;
     padding: 0.4rem 0.75rem !important;
     font-size: var(--fs-base) !important;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
 }
 body.stash-liquid-glass .refract-logo-input:focus {
     outline: none !important;
@@ -1103,7 +1103,7 @@ body.stash-liquid-glass .refract-suggestion-summary {
     gap: 0.15rem;
     /* extra right padding leaves room for the chevron on the right edge */
     padding: 0.85rem 2.2rem 0.85rem 1rem;
-    transition: background 0.15s ease;
+    transition: background var(--dur-fast) ease;
 }
 body.stash-liquid-glass .refract-suggestion-summary::-webkit-details-marker,
 body.stash-liquid-glass .refract-suggestion-summary::marker {
@@ -1140,7 +1140,7 @@ body.stash-liquid-glass .refract-suggestion-summary::after {
     mask-size: contain;
     opacity: 0.35;
     transform: translateY(-50%) rotate(0deg);
-    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
+    transition: transform var(--dur-move) ease, opacity var(--dur-fast), background-color var(--dur-fast);
 }
 body.stash-liquid-glass .refract-suggestion-summary:hover::after {
     opacity: 0.65;
@@ -1226,7 +1226,7 @@ body.stash-liquid-glass .refract-preview-shuffle {
     border: 1px solid var(--glass-border);
     color: var(--text-muted);
     cursor: pointer;
-    transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.15s;
+    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast);
 }
 body.stash-liquid-glass .refract-preview-shuffle:hover {
     color: var(--accent-bright);
@@ -1359,7 +1359,7 @@ body.stash-liquid-glass .refract-dock-grid-item {
     color: var(--text-muted);
     cursor: pointer;
     padding: 0;
-    transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.12s;
+    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-instant);
 }
 body.stash-liquid-glass .refract-dock-grid-item svg {
     width: 1.25rem;
@@ -1430,7 +1430,7 @@ body.stash-liquid-glass .refract-toggle-track {
     border-radius: 999px !important;
     background: rgba(255, 255, 255, 0.10) !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease !important;
+    transition: background var(--dur-move) ease, border-color var(--dur-move) ease, box-shadow var(--dur-move) ease !important;
 }
 body.stash-liquid-glass .refract-toggle-thumb {
     position: absolute !important;
@@ -1799,7 +1799,7 @@ body.stash-liquid-glass .refract-cc-kind-btn {
     color: var(--text-muted);
     cursor: pointer;
     white-space: nowrap;
-    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast);
 }
 body.stash-liquid-glass .refract-cc-kind-btn:hover {
     color: var(--text);
@@ -1847,7 +1847,7 @@ body.stash-liquid-glass .refract-cc-face-btn {
     color: var(--text-muted);
     cursor: pointer;
     white-space: nowrap;
-    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast);
 }
 body.stash-liquid-glass .refract-cc-face-btn:hover {
     color: var(--text);
@@ -1890,7 +1890,7 @@ body.stash-liquid-glass .refract-cc-shuffle {
     font-weight: 500;
     color: var(--text-dim, var(--text-muted));
     cursor: pointer;
-    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
 }
 /* The Plain toggle: a Shuffle-shaped button that holds its state. */
 body.stash-liquid-glass .refract-cc-plain.is-on {
@@ -2114,7 +2114,7 @@ body.stash-liquid-glass .refract-cc-ring:not(.is-intro) {
     box-shadow: 0 0 0 640px rgba(7, 7, 11, 0.45);
     /* The ring element is created on arm, so without this the scrim hit full
        strength in one frame -- a hard flash across the whole card. */
-    animation: refract-cc-arm 0.18s ease-out both;
+    animation: refract-cc-arm var(--dur-move) ease-out both;
 }
 @keyframes refract-cc-arm {
     from { box-shadow: 0 0 0 640px rgba(7, 7, 11, 0); }
@@ -2144,7 +2144,7 @@ body.stash-liquid-glass .refract-cc-chips {
             backdrop-filter: blur(16px) saturate(1.1);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
     /* The whole arm is one moment: the scrim fades in, the tray with it. */
-    animation: refract-cc-tray-in 0.18s ease-out both;
+    animation: refract-cc-tray-in var(--dur-move) ease-out both;
 }
 /* Chips share each row rather than centring it, so a wrapped tray never ends
    in one orphaned pill floating under a full row above it. */
@@ -2615,7 +2615,7 @@ body.stash-liquid-glass .refract-cc-reset {
     text-transform: none;
     color: var(--text-muted);
     cursor: pointer;
-    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
 }
 body.stash-liquid-glass .refract-cc-reset:hover {
     color: var(--text);
@@ -2646,7 +2646,7 @@ body.stash-liquid-glass .refract-cc-seg-btn {
     color: var(--text-muted);
     cursor: pointer;
     white-space: nowrap;
-    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast);
 }
 body.stash-liquid-glass .refract-cc-seg-btn:hover {
     color: var(--text);
@@ -2711,7 +2711,7 @@ body.stash-liquid-glass .refract-cc-preset-art {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--glass-border);
     overflow: hidden;
-    transition: border-color 0.15s, background 0.15s;
+    transition: border-color var(--dur-fast), background var(--dur-fast);
 }
 body.stash-liquid-glass .refract-cc-preset:hover .refract-cc-preset-art {
     border-color: rgba(var(--accent-rgb), 0.55);

@@ -94,7 +94,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .refract-pc-nam
 body.stash-liquid-glass.refract-perf-layout-card .performer-card.refract-check-hover .refract-pc-name-banner,
 body.stash-liquid-glass.refract-perf-layout-card .performer-card:has(.card-check:checked) .refract-pc-name-banner {
     opacity: 0;
-    transition: opacity 0.15s ease;
+    transition: opacity var(--dur-fast) ease;
 }
 
 /* Gender "type" slot — sits to the left of the name like a Pokemon
@@ -470,7 +470,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .stash-perf-sta
     text-decoration: none !important;
     backdrop-filter: var(--glass-blur-xs) !important;
     -webkit-backdrop-filter: var(--glass-blur-xs) !important;
-    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+    transition: background var(--dur-move) ease, border-color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
 }
 /* Badge number — gradient text fill matching the name banner. JS
    wraps the number in an inner <span> for every badge type (rating,
@@ -675,10 +675,10 @@ body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .scene-card)
 body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-fav-hover .refract-pc-tier-label,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card:hover .refract-pc-tier-label {
     opacity: 0;
-    transition: opacity 0.18s ease-out;
+    transition: opacity var(--dur-move) ease-out;
 }
 body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .scene-card) .refract-pc-tier-label {
-    transition: opacity 0.22s ease-in;
+    transition: opacity var(--dur-enter) ease-in;
 }
 
 /* Per-tier ribbon text content. */
@@ -929,7 +929,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .refract-card-f
     cursor: pointer;
     opacity: 0;
     transform: translate(100%, -50%);
-    transition: opacity 0.18s ease, transform 0.2s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    transition: opacity var(--dur-move) ease, transform 0.2s ease, background var(--dur-move) ease, color var(--dur-move) ease, border-color var(--dur-move) ease;
 }
 body.stash-liquid-glass.refract-perf-layout-card .performer-card:hover .refract-card-flip-btn {
     opacity: 1;
@@ -1676,7 +1676,7 @@ body.stash-liquid-glass .refract-cb-media-item {
     box-shadow:
         0 4px 12px rgba(0, 0, 0, 0.5),
         0 0 12px rgba(var(--seal-rgb), var(--tier-glow));
-    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease, border-color var(--dur-fast) ease;
 }
 /* Clickable: lift + glow on hover to signal it opens the scene/image. */
 body.stash-liquid-glass a.refract-cb-media-item:hover {
@@ -1997,7 +1997,7 @@ body.stash-liquid-glass .refract-pp-stage .refract-card-flip-btn.refract-pp-flip
     cursor: pointer;
     opacity: 0.85;
     transform: translate(0, -50%);
-    transition: opacity 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    transition: opacity var(--dur-move) ease, background var(--dur-move) ease, color var(--dur-move) ease, border-color var(--dur-move) ease;
 }
 body.stash-liquid-glass .refract-pp-stage .refract-card-flip-btn.refract-pp-flip:hover {
     opacity: 1;
@@ -2021,7 +2021,7 @@ body.stash-liquid-glass .refract-pb-btn {
     font-weight: 500;
     color: var(--text-muted);
     cursor: pointer;
-    transition: color 0.15s, border-color 0.15s;
+    transition: color var(--dur-fast), border-color var(--dur-fast);
 }
 body.stash-liquid-glass .refract-pb-btn:hover {
     border-color: rgba(var(--accent-rgb), 0.5);
@@ -2142,7 +2142,7 @@ body.stash-liquid-glass .refract-pb-cell {
     background: rgba(0, 0, 0, 0.25);
     overflow: hidden;
     cursor: pointer;
-    transition: border-color 0.15s;
+    transition: border-color var(--dur-fast);
 }
 body.stash-liquid-glass .refract-pb-cell:hover {
     border-color: rgba(var(--accent-rgb), 0.6);

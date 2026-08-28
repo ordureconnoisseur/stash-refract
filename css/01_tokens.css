@@ -106,6 +106,21 @@ body.stash-liquid-glass {
     --fs-lg:   1.25rem;   /* 17.5px   sub-headings                    */
     --fs-xl:   2rem;      /* 28px     page title                      */
 
+    /* Motion scale — tokenized 2026-08-28 from the measured de-facto
+       scale (0.15s appeared 373 times as a literal before this). The
+       five canonical durations and three named curves; values are
+       unchanged, so this migration renders identically. Stragglers
+       (0.13/0.14/0.16/0.2/0.25-0.35s) map onto these in a later
+       measured pass — see DESIGN_SYSTEM.md section 9. */
+    --dur-instant: 0.12s;   /* press feedback, checks              */
+    --dur-fast:    0.15s;   /* the default: hover, colour, borders */
+    --dur-move:    0.18s;   /* transforms, small movement          */
+    --dur-enter:   0.22s;   /* panel + popover entrances           */
+    --dur-slow:    0.4s;    /* large surfaces: drawer, flip, modal */
+    --ease-glide:       cubic-bezier(0.4, 0, 0.2, 1);    /* defined start + end   */
+    --ease-spring:      cubic-bezier(0.34, 1.2, 0.64, 1);  /* physical entrance   */
+    --ease-spring-hard: cubic-bezier(0.34, 1.56, 0.64, 1); /* stiffer entrance    */
+
     /* Accent palette — orange by default. Override the four `--accent`
        vars on `body.stash-liquid-glass.refract-<preset>` to retheme the
        entire UI; the preset classes at the bottom of this file ship

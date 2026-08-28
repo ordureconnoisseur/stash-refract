@@ -490,7 +490,7 @@ body.stash-liquid-glass.refract-light .performer-card .card-section-title {
     color: transparent !important;
     -webkit-text-fill-color: transparent;
     text-shadow: 0 0 14px rgba(var(--accent-rgb), 0.18);
-    transition: text-shadow 0.18s ease;
+    transition: text-shadow var(--dur-move) ease;
 }
 @keyframes refract-title-shimmer {
     0%   { background-position: 0% 50%; }
@@ -667,7 +667,7 @@ body.stash-liquid-glass.refract-light .favorite-button.favorite {
 ::view-transition-old(root),
 ::view-transition-new(root) {
     animation-duration: 0.55s;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-timing-function: var(--ease-glide);
 }
 @media (prefers-reduced-motion: reduce) {
     ::view-transition-old(root),
@@ -811,7 +811,7 @@ body.stash-liquid-glass.refract-light .refract-cc-chips .refract-cc-chip:not(.re
    "disabled / loading"; darkening reads as a spotlight in either theme. */
 body.stash-liquid-glass.refract-light .refract-cc-ring:not(.is-intro) {
     box-shadow: 0 0 0 640px rgba(20, 22, 34, 0.34);
-    animation: refract-cc-arm-light 0.18s ease-out both;
+    animation: refract-cc-arm-light var(--dur-move) ease-out both;
 }
 @keyframes refract-cc-arm-light {
     from { box-shadow: 0 0 0 640px rgba(20, 22, 34, 0); }

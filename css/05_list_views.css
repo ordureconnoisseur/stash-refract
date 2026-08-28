@@ -91,7 +91,7 @@ body.stash-liquid-glass .table-list thead th {
 body.stash-liquid-glass .table-list thead th a {
     color: var(--text-muted) !important;
     text-decoration: none;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass .table-list thead th a:hover {
     color: var(--accent-bright) !important;
@@ -111,7 +111,7 @@ body.stash-liquid-glass .table-list tbody > tr:nth-of-type(even) {
 }
 body.stash-liquid-glass .table-list tbody > tr {
     border-bottom: 1px solid rgba(255, 255, 255, 0.045) !important;
-    transition: background 0.12s ease;
+    transition: background var(--dur-instant) ease;
 }
 body.stash-liquid-glass .table-list tbody > tr:hover {
     background: rgba(var(--accent-rgb), 0.06) !important;
@@ -149,7 +149,7 @@ body.stash-liquid-glass .table-list th.select-col input[type="checkbox"] {
     box-shadow: none !important;
     cursor: pointer;
     vertical-align: middle;
-    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    transition: border-color var(--dur-fast), background var(--dur-fast), box-shadow var(--dur-fast);
 }
 body.stash-liquid-glass .table-list td.select-col input[type="checkbox"]:checked,
 body.stash-liquid-glass .table-list th.select-col input[type="checkbox"]:checked {
@@ -181,7 +181,7 @@ body.stash-liquid-glass .table-list .title-data a {
     color: var(--text) !important;
     font-weight: 500;
     text-decoration: none;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass .table-list .title-data a:hover {
     color: var(--accent-bright) !important;
@@ -191,7 +191,7 @@ body.stash-liquid-glass .table-list .title-data a:hover {
 body.stash-liquid-glass .table-list td a {
     color: var(--text-muted) !important;
     text-decoration: none;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass .table-list td a:hover {
     color: var(--accent-bright) !important;
@@ -259,7 +259,7 @@ body.stash-liquid-glass .table-list .comma-list a {
     color: rgba(255, 255, 255, 0.75) !important;
     text-decoration: none;
     white-space: nowrap;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
     line-height: 1.4;
 }
 body.stash-liquid-glass .table-list .comma-list a:hover {
@@ -333,7 +333,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-link {
     border-radius: var(--radius-sm) !important;
     border: 1px solid transparent !important;
     background: transparent !important;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
 }
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-link:hover,
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-link:focus {
@@ -362,7 +362,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column a.refract-support-stash {
     gap: 0.45rem !important;
     color: var(--text-muted) !important;
     font-weight: 400 !important;
-    transition: color 0.18s ease, background 0.18s ease !important;
+    transition: color var(--dur-move) ease, background var(--dur-move) ease !important;
 }
 body.stash-liquid-glass .nav.nav-pills.flex-column a.refract-support-stash:hover {
     color: var(--accent-bright) !important;
@@ -413,7 +413,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item .advanced-switch {
     border: 1px solid transparent !important;
     background: transparent !important;
     cursor: pointer !important;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease, box-shadow var(--dur-fast) ease !important;
 }
 body.stash-liquid-glass .nav.nav-pills.flex-column .nav-item .advanced-switch:hover {
     color: #fff !important;
@@ -483,7 +483,7 @@ body.stash-liquid-glass .nav.nav-pills.flex-column .troubleshooting-mode-button 
     color: var(--text) !important;
     box-shadow: none !important;
     padding: 0.5rem 1rem !important;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
     position: static !important;
     float: none !important;
     transform: none !important;
@@ -994,7 +994,7 @@ body.stash-liquid-glass .setting-section .setting-group h3 > a.st-title-link {
     box-shadow: none !important;
     color: var(--text-muted) !important;
     vertical-align: middle;
-    transition: color 0.15s, background 0.15s;
+    transition: color var(--dur-fast), background var(--dur-fast);
 }
 body.stash-liquid-glass .setting-section .setting-group h3 > a.st-title-link:hover {
     background: var(--accent-tint) !important;
@@ -1092,7 +1092,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     line-height: 1 !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"], #stash-table) .setting-group .st-plugin-chevron:hover,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"], #stash-table) .setting-group .st-plugin-chevron.btn.btn-primary:hover {
@@ -1105,7 +1105,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     width: 1.05rem;
     height: 1.05rem;
     display: block;
-    transition: transform 0.22s ease;
+    transition: transform var(--dur-enter) ease;
 }
 body.stash-liquid-glass .setting-group.st-plugin-collapsed .st-plugin-chevron svg {
     transform: rotate(0deg);
@@ -1171,7 +1171,7 @@ body.stash-liquid-glass .st-task-plugin-card .setting-group.st-plugin-hidden {
    land (final: 0,1,5,2). Without it, plain-class !important loses. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"] {
     border-radius: var(--radius-sm);
-    transition: background 0.18s ease;
+    transition: background var(--dur-move) ease;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .st-task-plugin-card .setting-group[data-st-task-chevron-done="1"] > .setting {
     padding: 0.55rem 0.85rem !important;
@@ -1215,7 +1215,7 @@ body.stash-liquid-glass .setting.st-task-search-row > .clearable-input-group {
    panel keeps its own hover affordances clean.
    Specificity matches the L5904 divider rule via the same :is() ancestor. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:has(.st-toggle-injected) {
-    transition: background 0.18s ease;
+    transition: background var(--dur-move) ease;
     border-radius: var(--radius-sm);
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group:has(.st-toggle-injected):hover {
@@ -1267,7 +1267,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     color: var(--accent-bright) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    transition: color 0.15s, border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast), box-shadow var(--dur-fast);
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"], #stash-table) .st-plugin-reload-btn:hover,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"], #stash-table) .st-plugin-reload-btn.btn.btn-primary:hover {
@@ -1281,7 +1281,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
    what the button does (reload = rotate). */
 body.stash-liquid-glass .st-plugin-reload-btn:hover .fa-icon svg {
     transform: rotate(180deg);
-    transition: transform 0.4s ease;
+    transition: transform var(--dur-slow) ease;
 }
 body.stash-liquid-glass .st-plugin-reload-btn .fa-icon {
     margin: 0 !important;
@@ -1290,7 +1290,7 @@ body.stash-liquid-glass .st-plugin-reload-btn .fa-icon svg {
     width: 0.95rem;
     height: 0.95rem;
     display: block;
-    transition: transform 0.4s ease;
+    transition: transform var(--dur-slow) ease;
 }
 
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) table.scraper-table thead th {
@@ -1352,7 +1352,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     color: var(--accent-bright) !important;
     text-decoration: none;
     word-break: break-all;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) table.scraper-table td a:hover {
     color: var(--accent-light) !important;
@@ -1447,7 +1447,7 @@ body.stash-liquid-glass .tagger-container-header .btn {
     color: var(--text) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: none !important;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
 }
 body.stash-liquid-glass .tagger-container-header .btn:hover {
     background: var(--glass-bg-strong) !important;
@@ -1671,7 +1671,7 @@ body.stash-liquid-glass .tagger-container-header > :is(.collapse, .collapsing).c
    resizing box have to be repainted every frame and are the most
    common single-frame stutter source. */
 body.stash-liquid-glass .tagger-container-header > .collapsing.card {
-    transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: height 0.32s var(--ease-glide) !important;
     box-shadow: none !important;
     will-change: height;
 }
@@ -1746,7 +1746,7 @@ body.stash-liquid-glass .PerformerTagger-performer {
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
     overflow: hidden;
-    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+    transition: border-color var(--dur-move), box-shadow var(--dur-move), transform var(--dur-move);
 }
 body.stash-liquid-glass .PerformerTagger-performer:hover {
     border-color: rgba(var(--accent-rgb), 0.28);
@@ -1778,7 +1778,7 @@ body.stash-liquid-glass .PerformerTagger-performer > .performer-card > img {
     height: 100% !important;
     object-fit: cover !important;
     object-position: center 20% !important;
-    transition: filter 0.18s, transform 0.3s;
+    transition: filter var(--dur-move), transform 0.3s;
 }
 body.stash-liquid-glass .PerformerTagger-performer:hover > .performer-card > img {
     filter: saturate(1.15);
@@ -1820,7 +1820,7 @@ body.stash-liquid-glass .PerformerTagger-header h2 {
     text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--text);
-    transition: color 0.18s;
+    transition: color var(--dur-move);
 }
 body.stash-liquid-glass .PerformerTagger-header:hover h2 {
     color: var(--accent-bright);
@@ -1931,7 +1931,7 @@ body.stash-liquid-glass .PerformerTagger-box-link .input-group-text a {
     display: inline-block;
     color: transparent !important;
     text-decoration: none !important;
-    transition: opacity 0.18s;
+    transition: opacity var(--dur-move);
 }
 body.stash-liquid-glass .PerformerTagger-box-link .input-group-text a::before {
     content: "↗ View on StashDB";
@@ -1964,7 +1964,7 @@ body.stash-liquid-glass .PerformerTagger-box-link .btn-primary.btn {
     line-height: 1 !important;
     cursor: pointer !important;
     border-left: 1px solid rgba(var(--accent-rgb), 0.18) !important;
-    transition: background 0.18s, color 0.18s;
+    transition: background var(--dur-move), color var(--dur-move);
 }
 body.stash-liquid-glass .PerformerTagger-box-link > .input-group-append > .btn-primary:hover,
 body.stash-liquid-glass .PerformerTagger-box-link .btn-primary.btn:hover {
@@ -2066,7 +2066,7 @@ body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTa
     line-height: 1 !important;
     cursor: pointer !important;
     border-left: 1px solid rgba(var(--accent-rgb), 0.18) !important;
-    transition: background 0.18s, color 0.18s;
+    transition: background var(--dur-move), color var(--dur-move);
 }
 body.stash-liquid-glass .PerformerTagger-details > .input-group:not(.PerformerTagger-box-link) .btn-primary:hover {
     background: rgba(var(--accent-rgb), 0.14) !important;
@@ -2101,10 +2101,10 @@ body.stash-liquid-glass .PerformerTagger-performer-search {
     transform: translateY(0);
     visibility: visible;
     transition:
-        opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.25s var(--ease-glide),
+        transform 0.25s var(--ease-glide),
         visibility 0s linear 0s;
-    animation: refract-search-fade-in 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: refract-search-fade-in var(--dur-enter) var(--ease-glide);
 }
 @keyframes refract-search-fade-in {
     from { opacity: 0; transform: translateY(8px); }
@@ -2119,8 +2119,8 @@ body.stash-liquid-glass .PerformerTagger-performer-search.refract-search-hidden 
     visibility: hidden;
     pointer-events: none;
     transition:
-        opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.25s var(--ease-glide),
+        transform 0.25s var(--ease-glide),
         visibility 0s linear 0.25s;
     animation: none;
 }
@@ -2146,7 +2146,7 @@ body.stash-liquid-glass .PerformerTagger-performer-search .refract-search-close 
     cursor: pointer;
     z-index: 12;
     padding: 0;
-    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast);
 }
 body.stash-liquid-glass .PerformerTagger-performer-search .refract-search-close:hover {
     background: rgba(var(--accent-rgb), 0.28);
@@ -2181,7 +2181,7 @@ body.stash-liquid-glass .PerformerTagger-performer-search-item.btn {
     color: var(--text) !important;
     cursor: pointer !important;
     text-align: left;
-    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+    transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast);
 }
 body.stash-liquid-glass .PerformerTagger-performer-search-item:hover {
     background: var(--accent-tint) !important;
@@ -2251,7 +2251,7 @@ body.stash-liquid-glass .TagTagger-tag {
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
     overflow: hidden;
-    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+    transition: border-color var(--dur-move), box-shadow var(--dur-move), transform var(--dur-move);
 }
 body.stash-liquid-glass .TagTagger-tag:hover {
     border-color: rgba(var(--accent-rgb), 0.28);
@@ -2294,7 +2294,7 @@ body.stash-liquid-glass .TagTagger-tag .tag-card > img {
     height: 100% !important;
     object-fit: cover !important;
     object-position: center !important;
-    transition: filter 0.18s, transform 0.3s;
+    transition: filter var(--dur-move), transform 0.3s;
 }
 body.stash-liquid-glass .TagTagger-tag:hover .tag-card > img {
     filter: saturate(1.15);
@@ -2330,7 +2330,7 @@ body.stash-liquid-glass .TagTagger-header h2 {
     text-overflow: ellipsis;
     white-space: nowrap;
     color: var(--text);
-    transition: color 0.18s;
+    transition: color var(--dur-move);
 }
 body.stash-liquid-glass .TagTagger-header:hover h2 {
     color: var(--accent-bright);
@@ -2419,7 +2419,7 @@ body.stash-liquid-glass .TagTagger-box-link .input-group-text a {
     display: inline-block;
     color: transparent !important;
     text-decoration: none !important;
-    transition: opacity 0.18s;
+    transition: opacity var(--dur-move);
 }
 body.stash-liquid-glass .TagTagger-box-link .input-group-text a::before {
     content: "↗ View on StashDB";
@@ -2452,7 +2452,7 @@ body.stash-liquid-glass .TagTagger-box-link .btn-primary.btn {
     line-height: 1 !important;
     cursor: pointer !important;
     border-left: 1px solid rgba(var(--accent-rgb), 0.18) !important;
-    transition: background 0.18s, color 0.18s;
+    transition: background var(--dur-move), color var(--dur-move);
 }
 body.stash-liquid-glass .TagTagger-box-link > .input-group-append > .btn-primary:hover,
 body.stash-liquid-glass .TagTagger-box-link .btn-primary.btn:hover {
@@ -2540,7 +2540,7 @@ body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-bo
     line-height: 1 !important;
     cursor: pointer !important;
     border-left: 1px solid rgba(var(--accent-rgb), 0.18) !important;
-    transition: background 0.18s, color 0.18s;
+    transition: background var(--dur-move), color var(--dur-move);
 }
 body.stash-liquid-glass .TagTagger-details-text > .input-group:not(.TagTagger-box-link) .btn-primary:hover {
     background: rgba(var(--accent-rgb), 0.14) !important;
@@ -2559,7 +2559,7 @@ body.stash-liquid-glass .refract-tag-editor-tab {
 }
 body.stash-liquid-glass .refract-tag-editor-tab .refract-tag-editor-tab-icon {
     opacity: 0.85;
-    transition: opacity 0.15s, color 0.15s;
+    transition: opacity var(--dur-fast), color var(--dur-fast);
 }
 body.stash-liquid-glass .refract-tag-editor-tab.active .refract-tag-editor-tab-icon,
 body.stash-liquid-glass .refract-tag-editor-tab:hover .refract-tag-editor-tab-icon {
@@ -2647,7 +2647,7 @@ body.stash-liquid-glass .refract-tag-editor__discard {
     padding: 0.35rem 0.6rem;
     font-size: var(--fs-sm);
     cursor: pointer;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass .refract-tag-editor__discard:hover:not(:disabled) {
     color: var(--text);
@@ -2678,7 +2678,7 @@ body.stash-liquid-glass .refract-tag-editor__search {
     border-radius: var(--radius-sm);
     padding: 0 0.7rem;
     margin-bottom: 1rem;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
 }
 body.stash-liquid-glass .refract-tag-editor__search:focus-within {
     border-color: rgba(var(--accent-rgb), 0.45);
@@ -2714,7 +2714,7 @@ body.stash-liquid-glass .refract-tag-editor__group {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    transition: border-color 0.18s, background 0.18s;
+    transition: border-color var(--dur-move), background var(--dur-move);
 }
 body.stash-liquid-glass .refract-tag-editor__group.is-open {
     border-color: rgba(var(--accent-rgb), 0.22);
@@ -2782,7 +2782,7 @@ body.stash-liquid-glass .refract-tag-editor__subgroup-toggle {
        Open: rotates to point DOWN. `!important` needed to beat the
        `all: unset !important` in this same rule. */
     transform: rotate(-90deg) !important;
-    transition: background 0.15s, color 0.15s, transform 0.25s !important;
+    transition: background var(--dur-fast), color var(--dur-fast), transform 0.25s !important;
     pointer-events: none;  /* whole header is clickable; let it through */
 }
 body.stash-liquid-glass .refract-tag-editor__group.is-open .refract-tag-editor__group-toggle,
@@ -2818,7 +2818,7 @@ body.stash-liquid-glass .refract-tag-editor__subgroup {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    transition: border-color 0.18s;
+    transition: border-color var(--dur-move);
 }
 body.stash-liquid-glass .refract-tag-editor__subgroup.is-open {
     border-color: rgba(var(--accent-rgb), 0.20);
@@ -2903,7 +2903,7 @@ body.stash-liquid-glass .refract-tag-editor__tag {
     cursor: pointer;
     text-align: center;
     position: relative !important; /* anchor for hover tooltip */
-    transition: background 0.14s, border-color 0.14s, color 0.14s, transform 0.12s, box-shadow 0.14s;
+    transition: background 0.14s, border-color 0.14s, color 0.14s, transform var(--dur-instant), box-shadow 0.14s;
 }
 body.stash-liquid-glass .refract-tag-editor__tag-label {
     overflow: hidden;
@@ -3065,7 +3065,7 @@ body.stash-liquid-glass .refract-performer-name-tooltip-portal {
     opacity: 0;
     transform: scale(0.92);
     transform-origin: bottom center;
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease;
     z-index: 10000;
 }
 body.stash-liquid-glass .refract-performer-name-tooltip-portal.refract-performer-name-tooltip-portal--show {

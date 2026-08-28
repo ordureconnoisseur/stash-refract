@@ -156,7 +156,7 @@ body.stash-liquid-glass #mv-open-btn {
     color: var(--accent-bright) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.28) !important;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
 body.stash-liquid-glass #mv-open-btn:hover {
     background: rgba(var(--accent-rgb), 0.22) !important;
@@ -196,7 +196,7 @@ body.stash-liquid-glass #mv-clear-queue {
     font-size: 0 !important;
     line-height: 1 !important;
     padding: 0 !important;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
 }
 body.stash-liquid-glass #mv-clear-queue::before {
     content: "×";
@@ -599,7 +599,7 @@ body.stash-liquid-glass .react-datepicker__year-read-view {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
 }
 body.stash-liquid-glass .react-datepicker__month-read-view:hover,
 body.stash-liquid-glass .react-datepicker__year-read-view:hover {
@@ -660,7 +660,7 @@ body.stash-liquid-glass .react-datepicker__day {
     font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-instant) ease;
 }
 body.stash-liquid-glass .react-datepicker__day:hover {
     background: rgba(255, 255, 255, 0.08) !important;
@@ -706,7 +706,7 @@ body.stash-liquid-glass .react-datepicker__navigation {
     border-radius: 50% !important;
     background: transparent !important;
     border: 1px solid transparent !important;
-    transition: background 0.15s, border-color 0.15s;
+    transition: background var(--dur-fast), border-color var(--dur-fast);
 }
 body.stash-liquid-glass .react-datepicker__navigation:hover {
     background: var(--accent-tint) !important;
@@ -761,7 +761,7 @@ body.stash-liquid-glass .react-datepicker__year-option {
     padding: 0.3rem 0.6rem !important;
     border-radius: var(--radius-sm) !important;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background var(--dur-fast), color var(--dur-fast);
 }
 body.stash-liquid-glass .react-datepicker__month-option:hover,
 body.stash-liquid-glass .react-datepicker__year-option:hover {
@@ -837,7 +837,7 @@ body.stash-liquid-glass .gs-chip.gs-focused {
 }
 body.stash-liquid-glass .gs-see-all {
     color: var(--accent-bright) !important;
-    transition: color 0.15s ease;
+    transition: color var(--dur-fast) ease;
 }
 body.stash-liquid-glass .gs-see-all:hover {
     color: var(--accent) !important;
@@ -877,8 +877,8 @@ body.stash-liquid-glass .adv-rating-btn {
     gap: 8px;
     line-height: 1 !important;
     font-size: var(--fs-base) !important;
-    transition: background 0.18s ease, border-color 0.18s ease,
-                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+    transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
+                color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
 }
 /* Render the ★ as the same FontAwesome star SVG the rating badges use, via
    mask-image (so the glyph colour comes from background-color and tracks the
@@ -974,8 +974,8 @@ body.stash-liquid-glass .adv-favourite-btn {
     width: 30px !important;
     margin-left: 6px !important;
     box-shadow: none !important;
-    transition: background 0.18s ease, border-color 0.18s ease,
-                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+    transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
+                color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
 }
 /* Empty + hover: just a subtle pink preview on the heart and a barely
    visible pink in the border. No background fill, no lift — keeps it
@@ -1031,8 +1031,8 @@ body.stash-liquid-glass .adv-favourite-card-btn {
     height: 28px !important;
     margin: 0 !important;
     padding: 0 !important;
-    transition: background 0.18s ease, border-color 0.18s ease,
-                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+    transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
+                color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
 }
 /* Picking-mode shift: when multiview's add button takes top:6/right:6,
    slide the favourite to right:40 (28 width + 6 gap). Overrides the
@@ -1125,7 +1125,7 @@ body.stash-liquid-glass .fast-tagger-card .dropdown-menu.show {
 }
 body.stash-liquid-glass .fast-tagger-card .dropdown-menu .dropdown-item {
     color: var(--text) !important;
-    transition: background 0.12s ease, color 0.12s ease;
+    transition: background var(--dur-instant) ease, color var(--dur-instant) ease;
 }
 body.stash-liquid-glass .fast-tagger-card .dropdown-menu .dropdown-item:hover,
 body.stash-liquid-glass .fast-tagger-card .dropdown-menu .dropdown-item:focus {
@@ -1178,8 +1178,8 @@ body.stash-liquid-glass .stash-scribe-trigger-btn {
     height: 26px !important;
     width: 30px !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
-    transition: background 0.18s ease, border-color 0.18s ease,
-                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+    transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
+                color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
 }
 body.stash-liquid-glass .stash-scribe-trigger-btn:hover {
     background: rgba(var(--accent-rgb), 0.22) !important;
@@ -1257,8 +1257,8 @@ body.stash-liquid-glass .stash-scribe-mode-tabs .btn.active {
     color: var(--accent-bright) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
-    transition: background 0.18s ease, border-color 0.18s ease,
-                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+    transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
+                color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
 }
 body.stash-liquid-glass .stash-scribe-send:hover,
 body.stash-liquid-glass .stash-scribe-primary:hover,
@@ -1320,8 +1320,8 @@ body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn {
     text-transform: uppercase !important;
     text-decoration: none !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
-    transition: background 0.15s ease, border-color 0.15s ease,
-                color 0.15s ease, box-shadow 0.15s ease !important;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease,
+                color var(--dur-fast) ease, box-shadow var(--dur-fast) ease !important;
 }
 body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn:hover {
     background: rgba(var(--accent-rgb), 0.22) !important;
@@ -1498,7 +1498,7 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-btn {
     font-weight: 600;
     line-height: 1.2;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-btn:hover:not([disabled]) {
     background: var(--accent-tint);
@@ -1526,7 +1526,7 @@ body.stash-liquid-glass .edit-tags-overhaul__search-input {
     line-height: 1.2;
     outline: none;
     box-shadow: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
 }
 body.stash-liquid-glass .edit-tags-overhaul__search-input::placeholder {
     color: var(--text-muted);
@@ -1554,7 +1554,7 @@ body.stash-liquid-glass .edit-tags-overhaul__group {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    transition: border-color 0.18s, box-shadow 0.18s;
+    transition: border-color var(--dur-move), box-shadow var(--dur-move);
 }
 body.stash-liquid-glass .edit-tags-overhaul__group:hover {
     border-color: rgba(var(--accent-rgb), 0.22);
@@ -1577,7 +1577,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-header {
     text-align: left;
     cursor: pointer;
     user-select: none;
-    transition: background 0.15s;
+    transition: background var(--dur-fast);
 }
 body.stash-liquid-glass .edit-tags-overhaul__header-main,
 body.stash-liquid-glass .edit-tags-overhaul__subgroup-header-main {
@@ -1616,7 +1616,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-header-main::before {
     opacity: 0.35;
     flex-shrink: 0;
     transform: rotate(0deg);
-    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
+    transition: transform var(--dur-move) ease, opacity var(--dur-fast), background-color var(--dur-fast);
 }
 body.stash-liquid-glass .edit-tags-overhaul__header:hover .edit-tags-overhaul__header-main::before,
 body.stash-liquid-glass .edit-tags-overhaul__subgroup-header:hover .edit-tags-overhaul__subgroup-header-main::before {
@@ -1704,7 +1704,7 @@ body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn {
     justify-content: center;
     padding: 0;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
 }
 body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn:hover {
     background: var(--accent-tint);
@@ -1784,7 +1784,7 @@ body.stash-liquid-glass .edit-tags-overhaul__tag {
     font-weight: 500;
     line-height: 1.2;
     cursor: pointer;
-    transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.12s, box-shadow 0.12s;
+    transition: background var(--dur-instant), color var(--dur-instant), border-color var(--dur-instant), transform var(--dur-instant), box-shadow var(--dur-instant);
     white-space: nowrap;
     box-shadow: none;
 }
@@ -1996,7 +1996,7 @@ body.stash-liquid-glass .details-tags-overhaul__panel-toggle::before {
     mask-size: contain;
     opacity: 0.5;
     transform: rotate(0deg);
-    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
+    transition: transform var(--dur-move) ease, opacity var(--dur-fast), background-color var(--dur-fast);
 }
 body.stash-liquid-glass .details-tags-overhaul__panel-header:hover .details-tags-overhaul__panel-toggle::before {
     opacity: 0.8;
@@ -2024,7 +2024,7 @@ body.stash-liquid-glass .details-tags-overhaul__group {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     overflow: hidden;
-    transition: border-color 0.18s, box-shadow 0.18s;
+    transition: border-color var(--dur-move), box-shadow var(--dur-move);
 }
 body.stash-liquid-glass .details-tags-overhaul__group:hover {
     border-color: rgba(var(--accent-rgb), 0.22);
@@ -2042,7 +2042,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup-header {
     justify-content: space-between;
     padding: 0.5rem 0.8rem;
     user-select: none;
-    transition: background 0.15s;
+    transition: background var(--dur-fast);
 }
 body.stash-liquid-glass .details-tags-overhaul__header:hover,
 body.stash-liquid-glass .details-tags-overhaul__subgroup-header:hover {
@@ -2114,7 +2114,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup-toggle::before {
     mask-size: contain;
     opacity: 0.35;
     transform: rotate(0deg);
-    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
+    transition: transform var(--dur-move) ease, opacity var(--dur-fast), background-color var(--dur-fast);
 }
 body.stash-liquid-glass .details-tags-overhaul__header:hover .details-tags-overhaul__toggle::before,
 body.stash-liquid-glass .details-tags-overhaul__subgroup-header:hover .details-tags-overhaul__subgroup-toggle::before {
@@ -2184,7 +2184,7 @@ body.stash-liquid-glass .details-tags-overhaul__tag {
     line-height: 1.25;
     text-decoration: none !important;
     text-align: center;
-    transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.12s, box-shadow 0.12s;
+    transition: background var(--dur-instant), color var(--dur-instant), border-color var(--dur-instant), transform var(--dur-instant), box-shadow var(--dur-instant);
 }
 body.stash-liquid-glass .details-tags-overhaul__tag:hover {
     background: var(--accent-tint);
@@ -2333,7 +2333,7 @@ body.stash-liquid-glass .tag-sidebar__clear {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     padding: 0.2rem 0.7rem !important;
-    transition: background 0.15s, border-color 0.15s, color 0.15s !important;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .tag-sidebar__clear:not(:disabled):hover {
     background: var(--accent-tint) !important;
@@ -2376,7 +2376,7 @@ body.stash-liquid-glass .tag-sidebar__segmented-button {
     font-weight: 700 !important;
     letter-spacing: 0.04em !important;
     padding: 0.2rem 0.7rem !important;
-    transition: background 0.15s, color 0.15s !important;
+    transition: background var(--dur-fast), color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .tag-sidebar__segmented-button.is-active {
     background: var(--accent) !important;
@@ -2394,7 +2394,7 @@ body.stash-liquid-glass .tag-sidebar__search-input {
     font-size: var(--fs-sm) !important;
     padding: 0.4rem 0.85rem !important;
     margin-bottom: 0.8rem !important;
-    transition: border-color 0.15s, box-shadow 0.15s !important;
+    transition: border-color var(--dur-fast), box-shadow var(--dur-fast) !important;
 }
 body.stash-liquid-glass .tag-sidebar__search-input:focus {
     outline: none !important;
@@ -2461,7 +2461,7 @@ body.stash-liquid-glass .tag-sidebar__row {
     padding-bottom: 0.13rem !important;
     padding-right: 0.35rem !important;
     border-radius: var(--radius-sm) !important;
-    transition: background 0.12s ease !important;
+    transition: background var(--dur-instant) ease !important;
     max-width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
@@ -2577,8 +2577,8 @@ body.stash-liquid-glass .tag-sidebar__toggle {
     /* The plugin slides the toggle via `transition: left 180ms ease`. Our
        override MUST keep `left` (and the same 180ms) or the toggle teleports
        while the panel slides. */
-    transition: left 180ms ease, background 0.15s ease,
-                border-color 0.15s ease, color 0.15s ease !important;
+    transition: left 180ms ease, background var(--dur-fast) ease,
+                border-color var(--dur-fast) ease, color var(--dur-fast) ease !important;
 }
 body.stash-liquid-glass .tag-sidebar__toggle:hover {
     background: var(--accent-tint) !important;

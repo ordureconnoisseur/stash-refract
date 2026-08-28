@@ -4,7 +4,7 @@ body.stash-liquid-glass .wall-item {
     overflow: hidden;
     cursor: pointer;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-    transition: box-shadow 0.22s ease;
+    transition: box-shadow var(--dur-enter) ease;
 }
 body.stash-liquid-glass .wall-item:hover {
     box-shadow:
@@ -106,7 +106,7 @@ body.stash-liquid-glass .wall-item .wall-item-check {
     box-shadow: none !important;
     opacity: 0;
     cursor: pointer;
-    transition: opacity 0.16s ease, background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    transition: opacity 0.16s ease, background var(--dur-fast), border-color var(--dur-fast), box-shadow var(--dur-fast);
 }
 body.stash-liquid-glass .wall-item:hover .wall-item-check,
 body.stash-liquid-glass .wall-item .wall-item-check:checked {
@@ -309,7 +309,7 @@ body.stash-liquid-glass .react-select__multi-value__remove {
     border-radius: 0 var(--radius-pill) var(--radius-pill) 0 !important;
     padding: 0 0.35rem !important;
     background: transparent !important;
-    transition: background 0.15s, color 0.15s !important;
+    transition: background var(--dur-fast), color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .react-select__multi-value__remove:hover {
     background: rgba(244, 60, 60, 0.18) !important;
@@ -417,7 +417,7 @@ body.stash-liquid-glass .input-group-prepend.bg-secondary > .btn.btn-secondary {
     border: 1px solid var(--glass-border) !important;
     color: var(--text-muted) !important;
     box-shadow: none !important;
-    transition: background 0.15s, border-color 0.15s, color 0.15s !important;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast) !important;
 }
 /* 3. Flat right side — these buttons are always connected to an input */
 body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary,
@@ -728,7 +728,7 @@ body.stash-liquid-glass form .date-input-group > .refract-date-fix-btn {
     line-height: 1.2 !important;
     text-decoration: none !important;
     cursor: pointer !important;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
     white-space: nowrap !important;
 }
 body.stash-liquid-glass .date-input-group > .refract-date-fix-btn:hover,
@@ -956,12 +956,12 @@ body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary:acti
     backdrop-filter: none !important;
     padding: 0.3rem !important;
     border-radius: 50% !important;
-    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-fast) ease;
 }
 body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary svg {
     width: 1.05rem !important;
     height: 1.05rem !important;
-    transition: filter 0.18s ease;
+    transition: filter var(--dur-move) ease;
 }
 /* Brand-glow per icon — subtle at rest, stronger on hover */
 body.stash-liquid-glass .name-icons .external-links-button .btn.btn-primary.link svg {
@@ -1313,7 +1313,7 @@ body.stash-liquid-glass .details-edit .btn {
     box-shadow: none !important;
     font-size: var(--fs-base) !important;
     padding: 0.35rem 0.85rem !important;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
 }
 
 /* Secondary (Merge, Auto tag) */
@@ -1446,7 +1446,7 @@ body.stash-liquid-glass .favorite-button {
     box-shadow: none !important;
     color: var(--text-muted) !important;
     padding: 0.25rem !important;
-    transition: color 0.18s ease, filter 0.18s ease;
+    transition: color var(--dur-move) ease, filter var(--dur-move) ease;
 }
 body.stash-liquid-glass .favorite-button:hover {
     background: transparent !important;
@@ -1539,7 +1539,7 @@ body.stash-liquid-glass .tag-card .tag-card-image {
     height: 100% !important;
     object-fit: cover;
     border-radius: 0 !important;
-    transition: transform 0.4s ease;
+    transition: transform var(--dur-slow) ease;
 }
 body.stash-liquid-glass .tag-card:hover .tag-card-image {
     transform: scale(1.04);
@@ -1554,7 +1554,7 @@ body.stash-liquid-glass .tag-card .thumbnail-section > a:has(> .favorite-button)
     right: 0.85rem;
     z-index: 5;
     opacity: 0;
-    transition: opacity 0.18s ease;
+    transition: opacity var(--dur-move) ease;
 }
 body.stash-liquid-glass .tag-card:hover .thumbnail-section > a:has(> .favorite-button),
 body.stash-liquid-glass .tag-card .thumbnail-section > a:has(> .favorite-button.favorite) {
@@ -1631,7 +1631,7 @@ body.stash-liquid-glass .tag-card .tag-sub-tags a,
 body.stash-liquid-glass .tag-card .tag-parent-tags a {
     color: var(--accent-bright) !important;
     text-decoration: none;
-    transition: color 0.15s ease;
+    transition: color var(--dur-fast) ease;
 }
 body.stash-liquid-glass .tag-card .tag-sub-tags a:hover,
 body.stash-liquid-glass .tag-card .tag-parent-tags a:hover {
@@ -1692,7 +1692,7 @@ body.stash-liquid-glass .image-card .image-card-preview-image {
     height: 100% !important;
     object-fit: cover;
     border-radius: 0 !important;
-    transition: transform 0.4s ease;
+    transition: transform var(--dur-slow) ease;
     display: block;
 }
 body.stash-liquid-glass .gallery-card:hover .gallery-card-image,
@@ -1807,7 +1807,7 @@ body.stash-liquid-glass .scene-marker-card video {
     height: 100% !important;
     object-fit: cover !important;
     border-radius: 0 !important;
-    transition: transform 0.4s ease;
+    transition: transform var(--dur-slow) ease;
     display: block;
 }
 body.stash-liquid-glass .scene-marker-card:hover img,
@@ -1883,7 +1883,7 @@ body.stash-liquid-glass .studio-card img.studio-card-image {
     padding: 0.85rem;
     box-sizing: border-box;
     border-radius: 0 !important;
-    transition: transform 0.4s ease;
+    transition: transform var(--dur-slow) ease;
     display: block;
 }
 body.stash-liquid-glass .group-card .group-card-image,
@@ -1894,7 +1894,7 @@ body.stash-liquid-glass .movie-card img.movie-card-image {
     height: 100% !important;
     object-fit: cover !important;
     border-radius: 0 !important;
-    transition: transform 0.4s ease;
+    transition: transform var(--dur-slow) ease;
     display: block;
 }
 body.stash-liquid-glass .studio-card:hover .studio-card-image,
@@ -1969,7 +1969,7 @@ body.stash-liquid-glass .movie-card .thumbnail-section > a:has(> .favorite-butto
     right: 0.85rem;
     z-index: 5;
     opacity: 0;
-    transition: opacity 0.18s ease;
+    transition: opacity var(--dur-move) ease;
 }
 body.stash-liquid-glass .studio-card:hover .thumbnail-section > a:has(> .favorite-button),
 body.stash-liquid-glass .studio-card .thumbnail-section > a:has(> .favorite-button.favorite),
@@ -2046,7 +2046,7 @@ body.stash-liquid-glass .movie-card button.favorite-button.btn {
     bottom: auto !important;
     z-index: 6 !important;
     opacity: 0 !important;
-    transition: opacity 0.18s ease !important;
+    transition: opacity var(--dur-move) ease !important;
     padding: 0 !important;
     margin: 0 !important;
     background: transparent !important;
@@ -2129,7 +2129,7 @@ body.stash-liquid-glass .expand-collapse {
     color: var(--text-muted) !important;
     box-shadow: none !important;
     border-radius: var(--radius-sm) !important;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
 }
 body.stash-liquid-glass .expand-collapse:hover {
     background: var(--glass-bg) !important;
@@ -2318,7 +2318,7 @@ body.stash-liquid-glass .form-check input[type="checkbox"]:not(.form-switch inpu
     box-shadow: none !important;
     cursor: pointer;
     vertical-align: middle;
-    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    transition: border-color var(--dur-fast), background var(--dur-fast), box-shadow var(--dur-fast);
     flex-shrink: 0;
 }
 /* Checked state — matches the base rule's :not chain so specificity is
@@ -2371,7 +2371,7 @@ body.stash-liquid-glass .custom-switch .custom-control-label::after {
         0 2px 6px rgba(0, 0, 0, 0.38),
         0 0 0 1px rgba(255, 255, 255, 0.4) inset !important;
     transform: none !important;
-    transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease !important;
+    transition: transform var(--dur-enter) ease, background var(--dur-enter) ease, box-shadow var(--dur-enter) ease !important;
 }
 
 body.stash-liquid-glass .custom-switch .custom-control-input:checked ~ .custom-control-label::before {
@@ -2403,7 +2403,7 @@ body.stash-liquid-glass .form-switch .form-check-input {
         inset 0 1px 0 rgba(255, 255, 255, 0.2),
         inset 0 -1px 0 rgba(0, 0, 0, 0.22),
         0 6px 18px rgba(0, 0, 0, 0.26) !important;
-    transition: background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background-position 0.22s ease !important;
+    transition: background-color var(--dur-enter) ease, border-color var(--dur-enter) ease, box-shadow var(--dur-enter) ease, background-position var(--dur-enter) ease !important;
 }
 body.stash-liquid-glass .form-switch .form-check-input:focus {
     border-color: rgba(var(--accent-rgb), 0.45) !important;
@@ -2445,7 +2445,7 @@ body.stash-liquid-glass .btn.btn-secondary:where(:not(.minimal):not(.page-link):
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
     box-shadow: none !important;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
 }
 body.stash-liquid-glass .btn.btn-secondary:where(:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle)):hover,
 body.stash-liquid-glass .btn.btn-secondary:where(:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle)):focus {
@@ -2463,7 +2463,7 @@ body.stash-liquid-glass .btn.btn-secondary.dropdown-toggle:where(:not(.minimal):
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
     box-shadow: none !important;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
 }
 body.stash-liquid-glass .btn.btn-secondary.dropdown-toggle:where(:not(.minimal):not(.page-link)):hover,
 body.stash-liquid-glass .btn.btn-secondary.dropdown-toggle:where(:not(.minimal):not(.page-link)):focus {
@@ -2694,7 +2694,7 @@ body.stash-liquid-glass .btn.btn-danger {
     box-shadow: none !important;
     -webkit-backdrop-filter: var(--glass-blur-md);
     backdrop-filter: var(--glass-blur-md);
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
 body.stash-liquid-glass .btn.btn-danger:hover,
 body.stash-liquid-glass .btn.btn-danger:focus {
@@ -2713,7 +2713,7 @@ body.stash-liquid-glass .btn.btn-success {
     box-shadow: none !important;
     -webkit-backdrop-filter: var(--glass-blur-md);
     backdrop-filter: var(--glass-blur-md);
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
 body.stash-liquid-glass .btn.btn-success:hover,
 body.stash-liquid-glass .btn.btn-success:focus {
@@ -2777,7 +2777,7 @@ body.stash-liquid-glass #tasks-panel .tasks-panel-queue {
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
     line-height: 1.35;
     letter-spacing: 0.005em;
-    transition: border-color 0.22s ease, box-shadow 0.22s ease !important;
+    transition: border-color var(--dur-enter) ease, box-shadow var(--dur-enter) ease !important;
 }
 /* Match the orange-glow hover effect that other settings cards use. */
 body.stash-liquid-glass #tasks-panel .tasks-panel-queue:hover {
@@ -2882,7 +2882,7 @@ body.stash-liquid-glass .package-manager-table-container .table thead .border-ro
 body.stash-liquid-glass .package-manager-table-container .table tbody tr {
     background: transparent !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
-    transition: background 0.15s ease;
+    transition: background var(--dur-fast) ease;
 }
 body.stash-liquid-glass .package-manager-table-container .table tbody tr:nth-child(odd) {
     background: rgba(0, 0, 0, 0.18) !important;
@@ -2950,7 +2950,7 @@ body.stash-liquid-glass .package-manager-table-container .form-check input[type=
     cursor: pointer;
     vertical-align: middle;
     position: static !important;
-    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    transition: border-color var(--dur-fast), background var(--dur-fast), box-shadow var(--dur-fast);
     flex-shrink: 0;
 }
 body.stash-liquid-glass .package-manager-table-container input[type="checkbox"].form-check-input:hover,
@@ -3008,7 +3008,7 @@ body.stash-liquid-glass .package-manager-table-container .source-collapse .btn {
     color: var(--text-muted) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-    transition: color 0.15s, transform 0.22s ease;
+    transition: color var(--dur-fast), transform var(--dur-enter) ease;
 }
 body.stash-liquid-glass .package-manager-table-container .source-collapse .btn:hover {
     color: var(--accent-bright) !important;
@@ -3522,7 +3522,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup
     visibility: hidden;
     transform: translateY(4px) scale(0.96);
     transform-origin: bottom right;
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease, visibility 0s linear var(--dur-fast);
     z-index: 50;
 }
 body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-pill:hover .stash-performer-popup,
@@ -3530,7 +3530,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0s;
+    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease, visibility 0s linear 0s;
 }
 body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup-chip {
     display: flex;
@@ -3540,7 +3540,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup
     border-radius: 6px;
     color: var(--text);
     text-decoration: none !important;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
 }
 body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-performer-popup-chip:hover {
     background: var(--accent-tint);
@@ -3683,7 +3683,7 @@ body.stash-liquid-glass .stash-performer-link {
     flex-shrink: 0;
     margin-left: -9px;
     border-radius: 50%;
-    transition: transform 0.15s ease, z-index 0s;
+    transition: transform var(--dur-fast) ease, z-index 0s;
     position: relative;
     z-index: 1;
 }
@@ -3719,7 +3719,7 @@ body.stash-liquid-glass .stash-performer-avatar {
     background: var(--glass-bg-strong);
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.22);
     display: block !important;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
 body.stash-liquid-glass .stash-performer-link:hover .stash-performer-avatar {
     border-color: var(--accent);
@@ -3813,7 +3813,7 @@ body.stash-liquid-glass .stash-o-count {
     white-space: nowrap;
     /* Not a link, unlike the tag count: it opens nothing. */
     cursor: default;
-    transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    transition: color var(--dur-fast) ease, background var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
 }
 body.stash-liquid-glass .stash-o-count:hover {
     background: rgba(var(--accent-rgb), 0.22);
@@ -3867,7 +3867,7 @@ body.stash-liquid-glass .stash-tag-popup {
     /* Quick fade-out on un-hover; instant when hover starts.
        `visibility` is delayed so the popup stays interactive during the
        transition. */
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease, visibility 0s linear var(--dur-fast);
     z-index: 50;
 }
 body.stash-liquid-glass .stash-tag-popup::-webkit-scrollbar {
@@ -3884,7 +3884,7 @@ body.stash-liquid-glass .stash-tag-popup:hover {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0s;
+    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease, visibility 0s linear 0s;
 }
 body.stash-liquid-glass .stash-tag-popup-chip {
     display: inline-block;
@@ -3899,7 +3899,7 @@ body.stash-liquid-glass .stash-tag-popup-chip {
     white-space: nowrap;
     text-decoration: none !important;
     cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
 }
 body.stash-liquid-glass .stash-tag-popup-chip:hover {
     background: var(--accent-tint);
@@ -4029,7 +4029,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .hover-scrubber .hover
    scrubber. */
 body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section,
 body.stash-liquid-glass.refract-minimal-cards .scene-card .card-section-title {
-    transition: opacity 0.18s ease;
+    transition: opacity var(--dur-move) ease;
 }
 body.stash-liquid-glass.refract-minimal-cards .scene-card:has(.hover-scrubber:hover) .card-section {
     opacity: 0;
@@ -4113,7 +4113,7 @@ body.stash-liquid-glass .stash-performer-popup::before {
     cursor: pointer;
     -webkit-backdrop-filter: var(--glass-blur-lg);
     backdrop-filter: var(--glass-blur-lg);
-    transition: background 0.18s, border-color 0.18s;
+    transition: background var(--dur-move), border-color var(--dur-move);
 }
 #stash-category-browser .stash-cat-close {
     width: 2.4rem;
@@ -4252,7 +4252,7 @@ body.stash-liquid-glass a[href*="?sortby="][href*="perPage=25"]:not([href*="page
     border: 1px solid rgba(255, 255, 255, 0.10) !important;
     box-shadow: none !important;
     text-decoration: none !important;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease;
     overflow: hidden;
     font-size: 0 !important;
     color: transparent !important;
@@ -4266,7 +4266,7 @@ body.stash-liquid-glass a[href*="?sortby="][href*="perPage=25"]:not([href*="page
     background-color: var(--text-muted);
     -webkit-mask: url("data:image/svg+xml;utf8,%3Csvg%20viewBox='0%200%2024%2024'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3E%3Cpath%20d='M10%207L15%2012L10%2017'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
     mask: url("data:image/svg+xml;utf8,%3Csvg%20viewBox='0%200%2024%2024'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3E%3Cpath%20d='M10%207L15%2012L10%2017'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
-    transition: background-color 0.15s ease;
+    transition: background-color var(--dur-fast) ease;
 }
 body.stash-liquid-glass a.st-view-all.st-view-all:hover,
 body.stash-liquid-glass a[href*="?sortby="][href*="perPage=25"]:not([href*="page="]):hover {
@@ -4317,7 +4317,7 @@ body.stash-liquid-glass .stash-carousel-fill {
     border-radius: 2px;
     background: linear-gradient(90deg, var(--accent-glow, var(--accent)), var(--accent-bright, var(--accent-bright)));
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.7);
-    transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.35s var(--ease-glide);
 }
 
 /* ── Slick carousel: minimal SVG arrow buttons ───────────────────────────
@@ -4367,7 +4367,7 @@ body.stash-liquid-glass .slick-next {
             backdrop-filter: none !important;
     cursor: pointer;
     opacity: 1;
-    transition: opacity 0.18s, transform 0.18s, filter 0.18s, background 0.18s, border-color 0.18s;
+    transition: opacity var(--dur-move), transform var(--dur-move), filter var(--dur-move), background var(--dur-move), border-color var(--dur-move);
     padding: 0 !important;
     color: transparent !important;
     font-size: 0 !important;
@@ -4509,10 +4509,10 @@ body.stash-liquid-glass .recommendations-container-edit > div > [draggable="true
     cursor: grab;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
     transition:
-        background 0.18s ease,
-        border-color 0.18s ease,
-        transform 0.18s ease,
-        box-shadow 0.18s ease;
+        background var(--dur-move) ease,
+        border-color var(--dur-move) ease,
+        transform var(--dur-move) ease,
+        box-shadow var(--dur-move) ease;
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
 }
@@ -4534,7 +4534,7 @@ body.stash-liquid-glass .recommendations-container-edit > div > [draggable="true
         7px 6px 0 var(--text-muted),
         7px 12px 0 var(--text-muted);
     opacity: 0.55;
-    transition: opacity 0.15s ease;
+    transition: opacity var(--dur-fast) ease;
 }
 body.stash-liquid-glass .recommendations-container-edit > div > [draggable="true"]:hover {
     background: var(--glass-bg-strong) !important;
@@ -4590,7 +4590,7 @@ body.stash-liquid-glass .recommendation-row-add {
     border: 1.5px dashed rgba(255, 255, 255, 0.18) !important;
     border-radius: var(--radius-sm) !important;
     padding: 0 !important;
-    transition: background 0.18s ease, border-color 0.18s ease;
+    transition: background var(--dur-move) ease, border-color var(--dur-move) ease;
 }
 body.stash-liquid-glass .recommendation-row-add:hover {
     background: var(--accent-tint) !important;
@@ -4616,7 +4616,7 @@ body.stash-liquid-glass .recommendations-add.btn.btn-primary {
     align-items: center !important;
     justify-content: center !important;
     gap: 0.5rem !important;
-    transition: color 0.18s ease;
+    transition: color var(--dur-move) ease;
 }
 body.stash-liquid-glass .recommendations-add.btn.btn-primary::before {
     content: "+";
@@ -4657,7 +4657,7 @@ body.stash-liquid-glass div.preview-button > button.btn.btn-primary {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
     color: #fff !important;
-    transition: transform 0.18s ease, color 0.18s ease;
+    transition: transform var(--dur-move) ease, color var(--dur-move) ease;
 }
 body.stash-liquid-glass .preview-button > button.btn.btn-primary:hover,
 body.stash-liquid-glass .preview-button > button.btn.btn-primary:focus,
@@ -4678,7 +4678,7 @@ body.stash-liquid-glass .preview-button .svg-inline--fa {
     margin: 0 !important;
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7)) !important;
     opacity: 0;
-    transition: opacity 0.25s ease, transform 0.18s ease !important;
+    transition: opacity 0.25s ease, transform var(--dur-move) ease !important;
 }
 /* Reveal on card hover (covers both .image-card-preview and .grid-card
    wrappers — Stash uses different parents in different list contexts). */
@@ -4758,7 +4758,7 @@ body.stash-liquid-glass .stats-element {
     padding: 1.75rem 1.3rem 1.4rem !important;
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
-    transition: border-color 0.22s, box-shadow 0.22s, transform 0.22s;
+    transition: border-color var(--dur-enter), box-shadow var(--dur-enter), transform var(--dur-enter);
     flex: none !important;
     width: auto !important;
     max-width: none !important;
@@ -4773,7 +4773,7 @@ body.stash-liquid-glass .stats-element::after {
     height: 1px;
     background: linear-gradient(90deg, transparent 0%, rgba(var(--accent-rgb), 0.35) 50%, transparent 100%);
     opacity: 0.6;
-    transition: opacity 0.22s, background 0.22s;
+    transition: opacity var(--dur-enter), background var(--dur-enter);
 }
 body.stash-liquid-glass .stats-element:hover {
     border-color: rgba(var(--accent-rgb), 0.45) !important;
@@ -4811,7 +4811,7 @@ body.stash-liquid-glass .stats-element .heading {
     text-transform: uppercase;
     letter-spacing: 0.13em;
     font-weight: 600;
-    transition: color 0.22s;
+    transition: color var(--dur-enter);
 }
 body.stash-liquid-glass .stats-element:hover .heading {
     color: var(--accent-bright) !important;
@@ -4865,7 +4865,7 @@ body.stash-liquid-glass .custom-stats-row > div[style*="max-width"] {
 body.stash-liquid-glass .custom-stats-row .stats-element[style*="max-width"] {
     padding: 0 !important;
     overflow: hidden;
-    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+    transition: border-color var(--dur-move), box-shadow var(--dur-move), transform var(--dur-move);
 }
 body.stash-liquid-glass .custom-stats-row .stats-element[style*="max-width"]:hover {
     border-color: rgba(var(--accent-rgb), 0.35) !important;
@@ -4908,7 +4908,7 @@ body.stash-liquid-glass .custom-stats-row button[style*="rgb(85, 85, 85)"] {
     border: 1px solid var(--glass-border) !important;
     color: var(--text-muted) !important;
     border-radius: var(--radius-pill) !important;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
 }
 body.stash-liquid-glass .custom-stats-row button[style*="rgb(85, 85, 85)"]:hover:not([disabled]) {
     border-color: rgba(var(--accent-rgb), 0.35) !important;
@@ -4994,7 +4994,7 @@ body.stash-liquid-glass .stats-chart-title {
 body.stash-liquid-glass .country-row {
     padding: 0.3rem 0.4rem;
     border-radius: var(--radius-sm);
-    transition: background 0.15s;
+    transition: background var(--dur-fast);
 }
 body.stash-liquid-glass .country-row:hover {
     background: rgba(var(--accent-rgb), 0.06);
@@ -5055,7 +5055,7 @@ body.stash-liquid-glass .custom-stats-row button[style*="font-size: 1rem"] {
     border: 1px solid var(--glass-border) !important;
     background: var(--glass-bg-strong) !important;
     color: var(--text) !important;
-    transition: background 0.15s, border-color 0.15s;
+    transition: background var(--dur-fast), border-color var(--dur-fast);
 }
 body.stash-liquid-glass .custom-stats-row button[style*="font-size: 1rem"]:hover {
     background: var(--accent-tint) !important;
@@ -5217,7 +5217,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
     background-position: right 0.7rem center !important;
     background-size: 0.85rem !important;
     background-repeat: no-repeat !important;
-    transition: border-color 0.15s, background-color 0.15s;
+    transition: border-color var(--dur-fast), background-color var(--dur-fast);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form select:hover {
     border-color: rgba(var(--accent-rgb), 0.4) !important;
@@ -5274,7 +5274,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > f
     border-radius: var(--radius-sm) !important;
     padding: 0.5rem 0.85rem !important;
     font-size: var(--fs-base) !important;
-    transition: background 0.12s, color 0.12s;
+    transition: background var(--dur-instant), color var(--dur-instant);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown-menu .dropdown-item:hover,
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .duplicate-checker > form .dropdown-menu .dropdown-item:focus {
@@ -5544,7 +5544,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-toolbar-s
     border-radius: var(--radius-pill);
     color: var(--accent-bright);
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.08s;
+    transition: background var(--dur-fast), border-color var(--dur-fast), box-shadow var(--dur-fast), transform 0.08s;
     white-space: nowrap;
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-toolbar-select b {
@@ -5580,7 +5580,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel {
     -webkit-backdrop-filter: var(--glass-blur);
     box-shadow: var(--shadow-md);
     overflow: hidden;
-    transition: border-color 0.18s, box-shadow 0.18s;
+    transition: border-color var(--dur-move), box-shadow var(--dur-move);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-panel:hover {
     border-color: rgba(var(--accent-rgb), 0.22);
@@ -5650,7 +5650,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card {
     display: flex;
     flex-direction: column;
     position: relative;
-    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+    transition: border-color var(--dur-move), box-shadow var(--dur-move), transform var(--dur-move);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card:hover {
     border-color: rgba(var(--accent-rgb), 0.32);
@@ -5691,7 +5691,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__spr
     -webkit-backdrop-filter: var(--glass-blur-sm);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.18s;
+    transition: opacity var(--dur-move);
     z-index: 2;
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__sprite-pop > img {
@@ -5738,7 +5738,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__tit
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    transition: color 0.15s;
+    transition: color var(--dur-fast);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__title:hover {
     color: var(--accent-bright);
@@ -5771,7 +5771,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-pill);
     color: var(--text-muted);
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-spec__icon {
     font-size: var(--fs-sm);
@@ -5871,7 +5871,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__che
     font-size: var(--fs-sm);
     color: var(--text-muted);
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
     user-select: none;
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__check:hover {
@@ -5898,7 +5898,7 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__del
     font-size: var(--fs-sm);
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, color 0.15s;
+    transition: background var(--dur-fast), border-color var(--dur-fast), box-shadow var(--dur-fast), color var(--dur-fast);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__merge {
     background: var(--accent-tint);
@@ -6068,7 +6068,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     color: var(--text-muted) !important;
     padding: 0.3rem 0.5rem !important;
     box-shadow: none !important;
-    transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button.drag-handle:hover {
     background: var(--glass-bg-strong) !important;
@@ -6082,7 +6082,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     color: rgba(252, 165, 165, 0.78) !important;
     padding: 0.3rem 0.5rem !important;
     box-shadow: none !important;
-    transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button.btn.btn-danger:hover {
     background: rgba(239, 68, 68, 0.16) !important;
@@ -6455,7 +6455,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     color: var(--text-muted) !important;
     padding: 0 0.6rem !important;
     margin-left: 0 !important;
-    transition: background 0.15s, color 0.15s !important;
+    transition: background var(--dur-fast), color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button:hover {
     background: var(--glass-bg-strong) !important;
@@ -6547,7 +6547,7 @@ body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item
     color: var(--text) !important;
     text-decoration: none !important;
     box-shadow: none !important;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
 }
 body.stash-liquid-glass .dialog-container > ul.folder-list > li.folder-list-item > button.btn.btn-link:hover {
     background: var(--accent-tint) !important;
@@ -6624,7 +6624,7 @@ body.stash-liquid-glass .job-table.card > ul > li.job {
     padding: 0.7rem 0.85rem !important;
     margin: 0 !important;
     border-bottom: 1px solid var(--glass-border) !important;
-    transition: background 0.18s ease, height 0.22s ease, max-height 0.22s ease !important;
+    transition: background var(--dur-move) ease, height var(--dur-enter) ease, max-height var(--dur-enter) ease !important;
     position: relative;
     height: 64px !important;
     max-height: 64px !important;
@@ -6676,7 +6676,7 @@ body.stash-liquid-glass .refract-job-chevron {
     line-height: 1 !important;
     box-shadow: none !important;
     z-index: 5 !important;
-    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease !important;
 }
 body.stash-liquid-glass .refract-job-chevron:hover {
     background: rgba(var(--accent-rgb), 0.2) !important;
@@ -6686,7 +6686,7 @@ body.stash-liquid-glass .refract-job-chevron:hover {
 body.stash-liquid-glass .refract-job-chevron svg {
     width: 0.9rem !important;
     height: 0.9rem !important;
-    transition: transform 0.22s ease !important;
+    transition: transform var(--dur-enter) ease !important;
 }
 body.stash-liquid-glass .job.refract-job-expanded .refract-job-chevron svg {
     transform: rotate(90deg) !important;
@@ -6720,7 +6720,7 @@ body.stash-liquid-glass .job-table.card .job button.minimal.stop.btn.btn-sm {
     border-radius: var(--radius-sm) !important;
     color: rgba(252, 165, 165, 0.85) !important;
     box-shadow: none !important;
-    transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s !important;
+    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast), box-shadow var(--dur-fast) !important;
     margin: 0.1rem 0 0 0 !important;
 }
 body.stash-liquid-glass .job-table.card .job button.btn.btn-primary.stop:hover,
@@ -6972,7 +6972,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     text-underline-offset: 0.25em !important;
     text-decoration-color: rgba(var(--accent-rgb), 0.45) !important;
     cursor: help;
-    transition: text-decoration-color 0.15s, color 0.15s !important;
+    transition: text-decoration-color var(--dur-fast), color var(--dur-fast) !important;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting :is(h6, h5, label, .setting-name) > a[href]:hover,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting :is(h6, h5, label, .setting-name) > .clickable:hover {
@@ -7000,7 +7000,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     font-size: var(--fs-base) !important;
     height: auto !important;
     min-height: 2.2rem !important;
-    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s !important;
+    transition: background var(--dur-fast), border-color var(--dur-fast), box-shadow var(--dur-fast) !important;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting .form-control:focus,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group .setting .form-select:focus,
@@ -7063,7 +7063,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     box-shadow: none !important;
     vertical-align: middle;
     opacity: 0.75;
-    transition: color 0.15s, opacity 0.15s, background 0.15s !important;
+    transition: color var(--dur-fast), opacity var(--dur-fast), background var(--dur-fast) !important;
 }
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 .help-button:hover,
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .setting-section .setting-group h3 button.btn:has(svg.fa-question-circle):hover,
