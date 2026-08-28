@@ -970,20 +970,29 @@ bug.
    class the injection adds (`.refract-has-swatch`) makes the fallback
    automatic in both directions. A feature flag that lives only in JS
    silently desynchronises every rule written in anticipation of it.
-11. **A shorthand with `!important` erases longhands set anywhere else, at any
+11. **Read a third-party control's mechanism off the DOM, not off its
+   name.** Stash's partial star looks like a left-anchored clip and is
+   not: on a 40 percent star `.filled-star` measures `left: 4.20px,
+   width: 5.59px`, a WINDOW onto a region of the glyph. A mask painted on
+   that div starts at the div's own left edge, so it drew the star's tip
+   inside a window meant to show its middle and every partial star came
+   out wrong. Where a control encodes a value geometrically, measure the
+   geometry at more than one value before building on it: one full star
+   and one empty star both look correct under either theory.
+12. **A shorthand with `!important` erases longhands set anywhere else, at any
    specificity.** `background: x !important` resets `background-image` too,
    and a higher-specificity longhand without `!important` still loses. This
    is a different failure from losing the cascade: the rule wins and your
    longhand vanishes silently. When extending a surface where any rule sets a
    shorthand with `!important`, every longhand you set must repeat
    `!important`.
-12. **Changing `flex-direction` re-points every inherited alignment
+13. **Changing `flex-direction` re-points every inherited alignment
     property.** Alignment is axis-relative: a container that becomes a column
     silently re-purposes `align-items` from vertical to horizontal, and a rule
     written for the old axis (a modal header's `align-items: center`) starts
     doing something else entirely. When you change an axis, re-declare both
     alignment properties explicitly.
-13. **Collapsing something Stash sized from a grid track means zeroing the
+14. **Collapsing something Stash sized from a grid track means zeroing the
     MINIMUMS, not just the dimensions.** Stash sizes cards and their images
     off the track they were laid out in, and those minimums outrank a
     `width: 100%` set later. Twice now: collapsed performer cards stuck at
@@ -994,7 +1003,7 @@ bug.
     hugely zoomed picture and it looked like a bad crop rather than a
     layout fault. Set `min-width` and `min-height` to 0 on every box down
     to the replaced element.
-14. **Below 1200px the panel is not a column, and anything tuned to 338px
+15. **Below 1200px the panel is not a column, and anything tuned to 338px
     has to say what it does at 1060px.** Three separate things stretched
     when the page stacked: the tab strip's `flex: 1 1 auto` turned six tabs
     into 166 to 181px slabs around 46px of ink; the description ran the
@@ -1002,7 +1011,7 @@ bug.
     ordering flips at exactly 1200px, sending the studio eyebrow below the
     title it labels. A row composed for the column needs a cap, a measure,
     or an explicit order, and the check is to measure at 1600 AND at 1100.
-15. **Replaced-element physics.** A border or radius on an element whose
+16. **Replaced-element physics.** A border or radius on an element whose
     content does not fill its box frames the box, not the picture:
     `object-fit: contain` plus a border produced a 168px frame around a 94px
     portrait with 29px of dead space each side. And `max-width: 100%` on a
