@@ -1044,6 +1044,20 @@ bug.
     replaced element inside a content-sized flex parent is circular; remove
     the sizing floor and it collapses, measured at 2x2. Size replaced
     elements from a real constraint, never from each other.
+17. **When one selector appears more than once, the rule that wins is
+    never the one you are reading.** Three times in one pass: two
+    `--ic-grid` blocks where the stale later one drew rings instead of
+    squares; a `display: none` on `.count-icon` that a later
+    `inline-flex` list had silently killed; and three identical
+    `.adv-rating-btn` selectors where the hide sat in the middle, so a
+    control meant to be gone stayed on screen and could be clicked. Equal
+    specificity is decided by source order alone, which is invisible when
+    the blocks are a thousand lines apart and each carries a comment
+    arguing for its own value. Before adding a declaration, grep the
+    selector across the file; when a block turns out to be dead, delete
+    it rather than outvote it, because a fourth rule leaves the same trap
+    for the next person. A dead rule with a rationale is worse than no
+    rule at all.
 
 ---
 
