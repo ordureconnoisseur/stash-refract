@@ -7311,11 +7311,24 @@ body.stash-liquid-glass #performer-page .refract-ph-blur {
     filter: blur(52px) saturate(118%);
     transform: scale(1.14);
 }
+/* The top stop is the one that decides whether this band is readable,
+   because everything that is not on its own plate -- the action row, the
+   name, the standing figures -- sits up there on the blurred
+   photograph. At 0.28 that ground was 122,94,79 on a pale, sunlit
+   portrait, and the ink measured Delete 2.14:1, Edit 2.76:1 and the
+   standing labels 2.91:1. It passed for two months because it is
+   photo-dependent: a dark-haired performer against a dark set measures
+   fine, and the failure only shows on bright ones.
+
+   0.62 puts the same ink at 3.70, 4.35 and 3.61 without the photograph
+   going away -- it is still a warm wash, just behind the text rather
+   than in it. The middle stop went 0.76 to 0.82 with it so the standing
+   row does not sit on the seam between the two. */
 body.stash-liquid-glass #performer-page .refract-ph-veil {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(0deg, var(--bg-0) 1%, rgba(10, 10, 10, 0.76) 46%, rgba(10, 10, 10, 0.28) 100%);
+        linear-gradient(0deg, var(--bg-0) 1%, rgba(10, 10, 10, 0.82) 46%, rgba(10, 10, 10, 0.62) 100%);
 }
 /* No photograph yet, or a performer with none: the band still needs a
    floor, and an unpainted one shows the page through it. */
