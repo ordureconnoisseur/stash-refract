@@ -2706,44 +2706,52 @@ body.stash-liquid-glass .rating-stars button::after {
     position: absolute;
     top: 0;
     left: 0;
+    /* BOTH layers are the whole button, and both size the mask the same
+       way: 100% auto draws the star exactly the button's width, and the
+       1:1 artwork then centres itself in the taller box. They have to
+       agree. The empty layer used `center / contain` and the filled one
+       `left center / auto 100%`, which on a 17.5 by 21 button meant a
+       17.5px star sitting 1.75px down against a 21px star at the top:
+       the track showed as a grey fringe around every filled star, and
+       the filled star overhung its own button by 3.5px into the next
+       one. */
+    width: 100%;
     height: 100%;
     pointer-events: none;
+    -webkit-mask: var(--st-star-svg) left center / 100% auto no-repeat;
+            mask: var(--st-star-svg) left center / 100% auto no-repeat;
 }
 body.stash-liquid-glass .rating-stars button::before {
-    width: 100%;
     background-color: var(--star-empty);
-    -webkit-mask: var(--st-star-svg) center / contain no-repeat;
-            mask: var(--st-star-svg) center / contain no-repeat;
 }
+/* The partial fill is a clip on a full-size layer rather than a narrower
+   layer, which is what lets the two masks stay identical: shrinking the
+   element would shrink the star with it. Enumerated in fives, which
+   covers the tenth-precision control and anything coarser. */
 body.stash-liquid-glass .rating-stars button::after {
-    width: 0;
     background-color: var(--star);
-    /* auto 100% keeps the star at full width whatever this element's own
-       width is, so the width below clips it rather than squashing it. */
-    -webkit-mask: var(--st-star-svg) left center / auto 100% no-repeat;
-            mask: var(--st-star-svg) left center / auto 100% no-repeat;
+    clip-path: inset(0 100% 0 0);
 }
-body.stash-liquid-glass .rating-stars button.star-fill-5::after { width: 5%; }
-body.stash-liquid-glass .rating-stars button.star-fill-10::after { width: 10%; }
-body.stash-liquid-glass .rating-stars button.star-fill-15::after { width: 15%; }
-body.stash-liquid-glass .rating-stars button.star-fill-20::after { width: 20%; }
-body.stash-liquid-glass .rating-stars button.star-fill-25::after { width: 25%; }
-body.stash-liquid-glass .rating-stars button.star-fill-30::after { width: 30%; }
-body.stash-liquid-glass .rating-stars button.star-fill-35::after { width: 35%; }
-body.stash-liquid-glass .rating-stars button.star-fill-40::after { width: 40%; }
-body.stash-liquid-glass .rating-stars button.star-fill-45::after { width: 45%; }
-body.stash-liquid-glass .rating-stars button.star-fill-50::after { width: 50%; }
-body.stash-liquid-glass .rating-stars button.star-fill-55::after { width: 55%; }
-body.stash-liquid-glass .rating-stars button.star-fill-60::after { width: 60%; }
-body.stash-liquid-glass .rating-stars button.star-fill-65::after { width: 65%; }
-body.stash-liquid-glass .rating-stars button.star-fill-70::after { width: 70%; }
-body.stash-liquid-glass .rating-stars button.star-fill-75::after { width: 75%; }
-body.stash-liquid-glass .rating-stars button.star-fill-80::after { width: 80%; }
-body.stash-liquid-glass .rating-stars button.star-fill-85::after { width: 85%; }
-body.stash-liquid-glass .rating-stars button.star-fill-90::after { width: 90%; }
-body.stash-liquid-glass .rating-stars button.star-fill-95::after { width: 95%; }
-body.stash-liquid-glass .rating-stars button.star-fill-100::after { width: 100%; }
-body.stash-liquid-glass .rating-stars button.star-fill-100::after { width: 100%; }
+body.stash-liquid-glass .rating-stars button.star-fill-5::after { clip-path: inset(0 95% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-10::after { clip-path: inset(0 90% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-15::after { clip-path: inset(0 85% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-20::after { clip-path: inset(0 80% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-25::after { clip-path: inset(0 75% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-30::after { clip-path: inset(0 70% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-35::after { clip-path: inset(0 65% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-40::after { clip-path: inset(0 60% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-45::after { clip-path: inset(0 55% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-50::after { clip-path: inset(0 50% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-55::after { clip-path: inset(0 45% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-60::after { clip-path: inset(0 40% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-65::after { clip-path: inset(0 35% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-70::after { clip-path: inset(0 30% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-75::after { clip-path: inset(0 25% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-80::after { clip-path: inset(0 20% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-85::after { clip-path: inset(0 15% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-90::after { clip-path: inset(0 10% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-95::after { clip-path: inset(0 5% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-100::after { clip-path: inset(0 0% 0 0); }
 body.stash-liquid-glass .rating-stars .filled-star {
     color: var(--star) !important;
     fill: var(--star) !important;
@@ -7611,20 +7619,25 @@ body.stash-liquid-glass #performer-page .refract-ph .psrc-wrap {
 body.stash-liquid-glass #performer-page .refract-ph .details-edit .psrc-dim {
     display: none !important;
 }
-/* Destructive, and therefore last, quiet, and past a gap of its own. */
+/* Destructive, and therefore last and past a gap of its own -- but not
+   disguised. This was transparent-on-muted, which read as the least
+   important control in the row when it is the only one that cannot be
+   undone. Position carries "last resort"; colour carries "destructive",
+   and the theme already says destructive in red, so the button is left
+   to look like every other danger button in Refract. */
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.delete,
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-danger {
     order: 9;
     margin-left: var(--gap-md) !important;
-    background: transparent !important;
-    border-color: transparent !important;
-    color: var(--text-muted) !important;
+    background: rgba(239, 68, 68, 0.12) !important;
+    border: 1px solid rgba(239, 68, 68, 0.32) !important;
+    color: #f87171 !important;
 }
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.delete:hover,
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-danger:hover {
-    background: rgba(239, 68, 68, 0.12) !important;
-    border-color: rgba(239, 68, 68, 0.28) !important;
-    color: #f87171 !important;
+    background: rgba(239, 68, 68, 0.22) !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    color: #fca5a5 !important;
 }
 
 /* Row 2: what she is in this library. Injected, because none of these
