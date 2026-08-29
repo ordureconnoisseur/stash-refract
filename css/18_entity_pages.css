@@ -462,8 +462,8 @@ body.stash-liquid-glass .detail-header:has(.tag-head) .detail-header-image,
 body.stash-liquid-glass .detail-header:has(.group-head) .detail-header-image {
     float: left;
     display: block !important;
-    width: 11rem !important;
-    max-width: 11rem !important;
+    width: 20rem !important;
+    max-width: 20rem !important;
     min-width: 0 !important;
     min-height: 0 !important;
     margin: 0 var(--gap-xl) var(--gap-md) 0 !important;
@@ -477,7 +477,7 @@ body.stash-liquid-glass .detail-header:has(.group-head) .detail-header-image img
     box-sizing: border-box !important;
     width: 100% !important;
     height: auto !important;
-    max-height: 6.5rem !important;
+    max-height: 7.5rem !important;
     min-width: 0 !important;
     min-height: 0 !important;
     object-fit: contain !important;
