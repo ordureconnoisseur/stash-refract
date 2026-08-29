@@ -13902,15 +13902,14 @@
           Checked against the densest scene in the library (61948, 107
           tags): the lead becomes Fivesome (BBBBG) at 2 scenes, Blowjob
           (DVP) at 3, Spooning Blowjob at 15.
-       3. Only the first ST_TAG_LEAD draw as chips; the remainder is a
-          comma run behind one button. A hundred chips behind a click is
-          still a hundred chips.
+       3. As many as the panel has room for draw as chips; the remainder
+          is a comma run behind one button. A hundred chips behind a click
+          is still a hundred chips, but so is blank space below eight.
 
        scene_count comes from one aliased GraphQL call, cached for the life
        of the page, so the second scene you open only asks about ids it has
        not seen. Until it answers the list renders alphabetically, so the
        panel is never empty waiting on a fetch. */
-    var ST_TAG_LEAD = 8;
     /* Two spellings. The visible label is "Aesthetics ★: 5", but
        data-sort-name is "#Aesthetics: 5" -- no star, a leading hash, and
        it is what the first version matched against, so the split silently
@@ -13978,6 +13977,109 @@
         more.setAttribute("aria-expanded", expanded ? "true" : "false");
     }
 
+    /* How many chips get to stay chips. The old answer was the constant 8,
+       and 8 is a count standing in for a constraint it cannot see. Chip
+       width follows the tag name, measured 64px to 138px in the same
+       panel, so eight chips is three rows on one scene and four on the
+       next; and neither filled the space. Measured with the fold at 8:
+       the pane did not scroll on either scene, leaving 333px unused below
+       a 24-tag scene and 400px below a 107-tag one. The panel was hiding
+       tags it had room to show.
+
+       The fold's only real job is to stop the tag block overrunning the
+       panel, so it now happens exactly where the panel runs out and not
+       before. Tags are the last section, so growing costs nothing below
+       them. A scene whose tags all fit loses the fold and the button
+       entirely, which is most of them.
+
+       The row budget is an ESTIMATE and is then checked against the
+       outcome. Predicting it outright needs every margin and padding
+       between the chips and the bottom of the scrollport to be known, and
+       the first attempt at that overshot by 17px on the dense scene while
+       reserving 48px for a tail that measured 27. So the estimate places,
+       asks the scrollport whether it now scrolls, and gives back a row at
+       a time until it does not. Removing trailing chips never moves the
+       ones before them, so the recorded row indices stay valid and each
+       retry is a re-place, not a re-measure.
+
+       Falls back to the old constant whenever the measurement cannot be
+       trusted -- no scrollport, zero-height chips, a hidden tab -- because
+       a wrong count is recoverable and a collapsed list is not. */
+    var ST_TAG_LEAD_FALLBACK = 8;
+    var ST_TAG_MIN_ROWS = 2;
+    var ST_TAG_TAIL_RESERVE = 32;
+    var ST_TAG_FIT_TRIES = 6;
+
+    function stTagPane(wrapper) {
+        return (wrapper.closest && wrapper.closest(".tab-content")) ||
+            document.querySelector(":is(.scene-tabs, .image-tabs) .tab-content");
+    }
+
+    /* Row index per chip, read off the layout the flex row already did.
+       Reading it back is exact where predicting the wrap is not. */
+    function stTagRowIndex(sorted) {
+        var tops = [];
+        var out = [];
+        for (var i = 0; i < sorted.length; i++) {
+            var t = Math.round(sorted[i].getBoundingClientRect().top);
+            var at = tops.indexOf(t);
+            if (at === -1) { at = tops.push(t) - 1; }
+            out.push(at);
+        }
+        return out;
+    }
+
+    function stTagRowBudget(wrapper, leadRow, sorted) {
+        var pane = stTagPane(wrapper);
+        if (!pane) { return 0; }
+        var paneBottom = pane.getBoundingClientRect().bottom;
+        var top = leadRow.getBoundingClientRect().top;
+        var chipH = sorted[0].getBoundingClientRect().height;
+        if (!chipH || !paneBottom || paneBottom <= top) { return 0; }
+        var gap = parseFloat(getComputedStyle(leadRow).rowGap) || 6;
+        var rows = Math.floor(
+            (paneBottom - top - ST_TAG_TAIL_RESERVE + gap) / (chipH + gap));
+        return rows < ST_TAG_MIN_ROWS ? ST_TAG_MIN_ROWS : rows;
+    }
+
+    function stTagCountForRows(rowOf, rows) {
+        var n = 0;
+        while (n < rowOf.length && rowOf[n] < rows) { n++; }
+        return n;
+    }
+
+    function stTagPlace(leadRow, restRun, sorted, lead) {
+        restRun.textContent = "";
+        for (var i = 0; i < sorted.length; i++) {
+            var chip = sorted[i];
+            var badge = chip.querySelector(":scope > .st-tag-n");
+            if (i < lead) {
+                chip.classList.add("st-tag-is-lead");
+                chip.classList.remove("st-tag-is-rest");
+                var count = stTagCountCache[chip.__stId];
+                if (count !== undefined && count !== null) {
+                    if (!badge) {
+                        badge = document.createElement("span");
+                        badge.className = "st-tag-n";
+                        chip.appendChild(badge);
+                    }
+                    badge.textContent = stGroupDigits(count);
+                } else if (badge) {
+                    badge.remove();
+                }
+                leadRow.appendChild(chip);
+            } else {
+                chip.classList.remove("st-tag-is-lead");
+                chip.classList.add("st-tag-is-rest");
+                if (badge) { badge.remove(); }
+                if (restRun.childNodes.length) {
+                    restRun.appendChild(document.createTextNode(", "));
+                }
+                restRun.appendChild(chip);
+            }
+        }
+    }
+
     function stApplyTagOrder(wrapper) {
         var chips = wrapper.__stChips || [];
         var leadRow = wrapper.querySelector(":scope > .st-tag-lead-row");
@@ -14008,34 +14110,28 @@
 
         leadRow.textContent = "";
         restRun.textContent = "";
-        var lead = Math.min(ST_TAG_LEAD, sorted.length);
-        sorted.forEach(function (chip, i) {
-            var badge = chip.querySelector(":scope > .st-tag-n");
-            var count = stTagCountCache[chip.__stId];
-            if (i < lead) {
-                chip.classList.add("st-tag-is-lead");
-                chip.classList.remove("st-tag-is-rest");
-                if (count !== undefined && count !== null) {
-                    if (!badge) {
-                        badge = document.createElement("span");
-                        badge.className = "st-tag-n";
-                        chip.appendChild(badge);
-                    }
-                    badge.textContent = stGroupDigits(count);
-                } else if (badge) {
-                    badge.remove();
-                }
-                leadRow.appendChild(chip);
-            } else {
-                chip.classList.remove("st-tag-is-lead");
-                chip.classList.add("st-tag-is-rest");
-                if (badge) { badge.remove(); }
-                if (restRun.childNodes.length) {
-                    restRun.appendChild(document.createTextNode(", "));
-                }
-                restRun.appendChild(chip);
+        /* Every chip goes in as a chip first: where the fold falls depends
+           on where the chips land, and nothing knows that until the flex
+           row has wrapped them. */
+        stTagPlace(leadRow, restRun, sorted, sorted.length);
+
+        var pane = stTagPane(wrapper);
+        var rows = stTagRowBudget(wrapper, leadRow, sorted);
+        var lead = sorted.length;
+        if (rows > 0) {
+            var rowOf = stTagRowIndex(sorted);
+            lead = stTagCountForRows(rowOf, rows);
+            stTagPlace(leadRow, restRun, sorted, lead);
+            /* The estimate places; the scrollport rules on it. */
+            var tries = 0;
+            while (pane && rows > ST_TAG_MIN_ROWS && tries < ST_TAG_FIT_TRIES &&
+                   pane.scrollHeight - pane.clientHeight > 1) {
+                rows--;
+                tries++;
+                lead = stTagCountForRows(rowOf, rows);
+                stTagPlace(leadRow, restRun, sorted, lead);
             }
-        });
+        }
 
         if (caption) {
             /* Just the count. It used to read "24, rarest first", which
