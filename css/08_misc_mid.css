@@ -7980,3 +7980,464 @@ body.stash-liquid-glass.refract-light #performer-page .refract-ph-cats__fill {
 }
 /* The card keeps its own floor: the chin scrim and the neon strip are
    the card's, and the card does not change with the page mode. */
+
+/* ═══════════════════════════════════════════════════════════════════
+   Performer page: the edit form
+   ═══════════════════════════════════════════════════════════════════
+   Measured on Dainty Wilder: 26 rows in one flat <form>, every one
+   1134px wide whatever it holds, every label in the same 189px
+   Bootstrap gutter, and no grouping at all. Three of those rows are
+   lists of short strings given one full-width row per item with its
+   own delete button -- aliases 154px, tags 187px and URLs 385px, 726px
+   of the form between them. Penis Length and Circumcised were both
+   rendered, at 34px each, on a female performer. Save was the last
+   control in the bar, greyed, sitting after a red Clear Image.
+
+   The form is a twelve-column grid now and every row is sized to what
+   it holds. Nothing is moved: refract.js reads each row's label, puts
+   a slug on it, and CSS places it with `order` -- so the sections are
+   real groups without a single node changing parent.
+   ═══════════════════════════════════════════════════════════════════ */
+
+body.stash-liquid-glass #performer-page .detail-header.edit.refract-pe .detail-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+}
+
+/* ── The image, whole ──────────────────────────────────────────────
+   This is the one place it is not the 2:3 the cards crop to. Here you
+   are judging the image itself, so the whole frame shows with the crop
+   drawn on it: her front is 1279x1600, which is 4:5, so the guide
+   takes 8.3% off each side and what the card will lose is visible
+   rather than assumed. */
+body.stash-liquid-glass #performer-page .refract-pe .detail-header-image {
+    position: relative;
+    width: 320px;
+    flex: 0 0 320px;
+    max-width: 320px !important;
+    align-self: flex-start;
+    padding: 0;
+}
+/* The real <img> is `visibility: hidden` (16_playing_card): what you
+   see is the flip stage, absolutely positioned and sized by refract.js
+   from the img's BOX. So the box is what has to be right, and the
+   button that wraps it has to stop shrink-wrapping the picture. */
+body.stash-liquid-glass #performer-page .refract-pe .detail-header-image > button.btn-link {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe .detail-header-image img.performer {
+    display: block;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+}
+body.stash-liquid-glass #performer-page .refract-pe-crop {
+    position: absolute;
+    inset: 0;
+    /* Above the flip stage, which is z-index 3 and paints the picture:
+       the guide is about the picture, so it cannot sit under it. */
+    z-index: 5;
+    pointer-events: none;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+body.stash-liquid-glass #performer-page .refract-pe-crop__side {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: var(--refract-pe-gutter, 0%);
+    background: rgba(0, 0, 0, 0.55);
+}
+body.stash-liquid-glass #performer-page .refract-pe-crop__side.is-left { left: 0; border-right: 1px dashed var(--accent-ink); }
+body.stash-liquid-glass #performer-page .refract-pe-crop__side.is-right { right: 0; border-left: 1px dashed var(--accent-ink); }
+body.stash-liquid-glass #performer-page .refract-pe-crop__label {
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    padding: 3px 9px;
+    border-radius: var(--radius-pill);
+    background: rgba(0, 0, 0, 0.62);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    white-space: nowrap;
+}
+body.stash-liquid-glass #performer-page .refract-pe-shot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--gap-md);
+    padding: var(--gap-md) 2px 0;
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+}
+
+/* ── The form ──────────────────────────────────────────────────── */
+
+body.stash-liquid-glass #performer-page .refract-pe .performer-head {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe form {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gap-xl);
+    row-gap: var(--gap-lg);
+    align-items: start;
+}
+
+/* Label above the field, not in a 189px gutter beside it. Bootstrap's
+   col classes set width, max-width, flex and padding, so all four have
+   to be undone. */
+/* EVERY direct child spans, and only the named rows narrow. The form
+   holds more than form-groups -- two rules, the custom-fields block and
+   a second copy of the action bar -- and without this they became grid
+   items one twelfth wide, stacked in a column: the action bar rendered
+   as a 64px tower of buttons down the middle of the form. */
+body.stash-liquid-glass #performer-page .refract-pe form > * {
+    grid-column: 1 / -1;
+    order: 85;
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-pe form > .form-group {
+    display: flex !important;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    margin: 0 !important;
+    min-width: 0;
+    order: 85;
+    grid-column: span 12;
+}
+/* Stash's own rules between blocks; the sections draw their own. */
+body.stash-liquid-glass #performer-page .refract-pe form > hr {
+    display: none;
+}
+body.stash-liquid-glass #performer-page .refract-pe form > .custom-fields-input {
+    order: 82;
+}
+body.stash-liquid-glass #performer-page .refract-pe form > .form-group > label.col-form-label {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 0 !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 400;
+    line-height: 1.3;
+    text-align: left !important;
+    color: var(--text-muted) !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe form > .form-group > *:not(label) {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    min-width: 0;
+}
+
+/* Sections. Injected headings placed by order alongside the rows they
+   introduce, so the grouping is real without a node changing parent. */
+body.stash-liquid-glass #performer-page .refract-pe-sec {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: var(--gap-lg);
+    margin-top: var(--gap-md);
+}
+body.stash-liquid-glass #performer-page .refract-pe-sec:first-of-type {
+    margin-top: 0;
+}
+body.stash-liquid-glass #performer-page .refract-pe-sec__label {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--track-eyebrow);
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    white-space: nowrap;
+}
+body.stash-liquid-glass #performer-page .refract-pe-sec__rule {
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--glass-border);
+}
+
+body.stash-liquid-glass #performer-page .refract-pe-sec.is-identity   { order: 10; }
+body.stash-liquid-glass #performer-page .refract-pe-sec.is-appearance { order: 20; }
+body.stash-liquid-glass #performer-page .refract-pe-sec.is-marks      { order: 40; }
+body.stash-liquid-glass #performer-page .refract-pe-sec.is-career     { order: 50; }
+body.stash-liquid-glass #performer-page .refract-pe-sec.is-links      { order: 60; }
+body.stash-liquid-glass #performer-page .refract-pe-sec.is-tags       { order: 70; }
+body.stash-liquid-glass #performer-page .refract-pe-sec.is-options    { order: 80; }
+
+/* Every field sized to what it holds, where the live form gave all
+   twenty-six of them 1134px. */
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="name"]            { order: 11; grid-column: span 6; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="disambiguation"]  { order: 12; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="gender"]          { order: 13; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="aliases"]         { order: 14; grid-column: span 12; }
+
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="birthdate"]       { order: 21; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="death-date"]      { order: 22; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="country"]         { order: 23; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="ethnicity"]       { order: 24; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="hair-color"]      { order: 25; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="eye-color"]       { order: 26; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="height-cm"]       { order: 27; grid-column: span 2; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="weight-kg"]       { order: 28; grid-column: span 2; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="measurements"]    { order: 29; grid-column: span 4; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="fake-tits"]       { order: 30; grid-column: span 4; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="penis-length-cm"] { order: 31; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="circumcised"]     { order: 32; grid-column: span 3; }
+
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="tattoos"]         { order: 41; grid-column: span 6; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="piercings"]       { order: 42; grid-column: span 6; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="details"]         { order: 43; grid-column: span 12; }
+
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="career-start"]    { order: 51; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="career-end"]      { order: 52; grid-column: span 3; }
+
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="urls"]            { order: 61; grid-column: span 12; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="stash-ids"]       { order: 62; grid-column: span 12; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="tags"]            { order: 71; grid-column: span 12; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="ignore-auto-tag"] { order: 81; grid-column: span 12; }
+
+/* Fields that do not apply to the gender drop out rather than sitting
+   empty forever, and come back in one click because gender can be
+   wrong and the fields are still real. */
+body.stash-liquid-glass #performer-page .refract-pe form.refract-pe-hide-male > [data-refract-pe="penis-length-cm"],
+body.stash-liquid-glass #performer-page .refract-pe form.refract-pe-hide-male > [data-refract-pe="circumcised"] {
+    display: none !important;
+}
+/* This sits inside the form, so it loses to `form > *` unless it is
+   scoped the same way -- which cost one round: the notice rendered at
+   order 85, at the very bottom, a long way from the fields it is
+   about. */
+body.stash-liquid-glass #performer-page .refract-pe form > .refract-pe-na {
+    grid-column: 1 / -1;
+    order: 33;
+    display: flex;
+    align-items: center;
+    gap: var(--gap-lg);
+    padding: var(--gap-md) var(--gap-lg);
+    border: 1px dashed var(--glass-border-bright);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-base);
+    color: var(--text-muted);
+}
+body.stash-liquid-glass #performer-page .refract-pe form:not(.refract-pe-hide-male) > .refract-pe-na {
+    display: none;
+}
+body.stash-liquid-glass #performer-page .refract-pe-na__show {
+    margin-left: auto;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--accent-ink);
+    cursor: pointer;
+}
+
+/* ── The list fields ───────────────────────────────────────────────
+   One full-width row per item is why aliases cost 154px, tags 187 and
+   URLs 385. The rows become a wrapping track instead: nine URLs read
+   as two lines rather than nine. The inputs are React's own and are
+   not touched -- only the box they sit in. */
+body.stash-liquid-glass #performer-page .refract-pe .string-list-input > .form-group {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: var(--gap-md);
+    margin: 0 !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group {
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group > .form-control {
+    min-width: 0;
+    font-size: var(--fs-base) !important;
+}
+/* The delete button was a full-height red block on every row. It is a
+   quiet glyph that colours on hover: twenty-six of them shouting at
+   once is a row of alarms, not a form. */
+body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group-append > .btn.btn-danger {
+    background: var(--fill-3) !important;
+    border-color: var(--glass-border) !important;
+    color: var(--text-muted) !important;
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group-append > .btn.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.16) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    color: #f87171 !important;
+}
+
+/* ── The bar ───────────────────────────────────────────────────────
+   Save was the last control in a wrapping row of seven, greyed, after
+   a red Clear Image. It is the primary action and it says what is
+   waiting on it. */
+/* Two of these exist: Stash renders one above the form and a second
+   copy inside it, at the bottom. Only the first is pinned -- pinning
+   both put the same seven controls on screen twice at once. */
+body.stash-liquid-glass #performer-page .refract-pe form > .details-edit {
+    order: 90;
+    position: static;
+    margin-top: var(--gap-xl) !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe .performer-head > .details-edit {
+    position: sticky;
+    top: 4.5rem;
+    z-index: 20;
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-sm);
+    margin: 0 0 var(--gap-xl) !important;
+    padding: var(--gap-md) var(--gap-lg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    background: rgba(14, 13, 16, 0.92);
+    -webkit-backdrop-filter: var(--glass-blur-md);
+    backdrop-filter: var(--glass-blur-md);
+    box-shadow: var(--shadow-lg);
+}
+body.stash-liquid-glass #performer-page .refract-pe .details-edit > * {
+    order: 4;
+    margin: 0 !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe .details-edit .btn {
+    height: 2rem;
+    padding: 0 0.75rem !important;
+    font-size: var(--fs-base) !important;
+    border-radius: var(--radius-sm) !important;
+    white-space: nowrap;
+}
+body.stash-liquid-glass #performer-page .refract-pe-state {
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-right: auto !important;
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-pe-state__eyebrow {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+body.stash-liquid-glass #performer-page .refract-pe-state__line {
+    font-size: var(--fs-base);
+    color: var(--text-muted);
+}
+body.stash-liquid-glass #performer-page .refract-pe-state.is-dirty .refract-pe-state__line {
+    color: var(--accent-ink);
+    font-weight: 600;
+}
+/* Cancel is the quiet way out, not a second primary. */
+body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-primary {
+    order: 8;
+    background: transparent !important;
+    border-color: transparent !important;
+    color: var(--text-muted) !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-primary:hover {
+    background: var(--fill-4) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-success {
+    order: 9;
+    height: 2.2rem;
+    padding: 0 1.25rem !important;
+    font-weight: 600 !important;
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
+    color: var(--accent-ink) !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-success:disabled {
+    background: var(--fill-2) !important;
+    border-color: var(--glass-border) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+/* The image controls belong with the image, and Clear Image is
+   destructive, so it stops sitting between them and Save. */
+body.stash-liquid-glass #performer-page .refract-pe .details-edit .psrc-wrap,
+body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.refract-set-back-btn,
+body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-secondary {
+    order: 5;
+}
+body.stash-liquid-glass #performer-page .refract-pe .details-edit .psrc-dim {
+    display: none !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe .details-edit > div:has(> .btn.btn-danger) {
+    order: 7;
+}
+body.stash-liquid-glass #performer-page .refract-pe .details-edit .btn.btn-danger {
+    background: transparent !important;
+    border-color: transparent !important;
+    color: var(--text-muted) !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe .details-edit .btn.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.12) !important;
+    border-color: rgba(239, 68, 68, 0.28) !important;
+    color: #f87171 !important;
+}
+
+/* ── Field states ──────────────────────────────────────────────────
+   The house focus ring (6.6). Stash pins every field in this form to
+   `box-shadow: none`, so the ring is an outline. */
+body.stash-liquid-glass #performer-page .refract-pe form .form-control:focus,
+body.stash-liquid-glass #performer-page .refract-pe form .text-input:focus,
+body.stash-liquid-glass #performer-page .refract-pe form .date-input:focus {
+    outline: 2px solid var(--accent-glow) !important;
+    outline-offset: 1px;
+    border-color: var(--accent-glow) !important;
+    background: var(--fill-4) !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe form .form-control.is-invalid,
+body.stash-liquid-glass #performer-page .refract-pe form .text-input.is-invalid {
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    background: rgba(239, 68, 68, 0.10) !important;
+}
+
+@media (max-width: 1200px) {
+    body.stash-liquid-glass #performer-page .refract-pe .detail-container {
+        flex-direction: column;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .detail-header-image {
+        width: 240px;
+        flex: 0 0 auto;
+        max-width: 240px !important;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe form {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="name"],
+    body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="tattoos"],
+    body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="piercings"] {
+        grid-column: span 6;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="measurements"],
+    body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="fake-tits"] {
+        grid-column: span 3;
+    }
+}
