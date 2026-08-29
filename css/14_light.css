@@ -1140,13 +1140,21 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-t
 }
 
 /* The summary band and its label. */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-rating-open .rating-stars {
+/* .st-rating-open is the toolbar ITSELF, not something inside it. These
+   three were written with a descendant combinator, so they looked for a
+   .st-rating-open child of the toolbar, matched nothing, and the dark
+   rules kept the surface. The band's "Overall" label stayed white on a
+   white panel and measured 1.17:1 -- invisible, not merely quiet. Same
+   mistake, same file, same session as the one 7.17 is about; the
+   difference is that a compound selector reads almost exactly like a
+   descendant one. */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .rating-stars {
     border-top-color: rgba(0, 0, 0, 0.08) !important;
 }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-rating-open .rating-stars::before {
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .rating-stars::before {
     color: rgba(0, 0, 0, 0.5) !important;
 }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-rating-open {
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open {
     border-bottom-color: rgba(0, 0, 0, 0.10) !important;
 }
 
@@ -1186,8 +1194,12 @@ body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-info-icon
 body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-clear {
     color: rgba(0, 0, 0, 0.35) !important;
 }
+/* The heading and caret were given a colour; the element that actually
+   carries the text was not, so it kept the dark rule's white 0.32 and
+   measured 1.13:1 on the light panel. */
 body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-breakdown {
     border-top-color: rgba(0, 0, 0, 0.08) !important;
+    color: rgba(0, 0, 0, 0.47) !important;
 }
 body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-breakdown-heading,
 body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-breakdown-caret {

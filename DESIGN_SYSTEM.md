@@ -1073,6 +1073,22 @@ bug.
     it rather than outvote it, because a fourth rule leaves the same trap
     for the next person. A dead rule with a rationale is worse than no
     rule at all.
+18. **A contrast number is only as good as the ground you measured it
+    against, and `backgroundColor` is not the ground.** Light mode paints
+    the page with `background-image` gradients over a transparent
+    `background-color`, so `getComputedStyle(document.body).backgroundColor`
+    returns `rgba(0, 0, 0, 0)`. Parsed for channels that is black, and
+    every composite built on it inverts: the panel came out mid-grey
+    (179,179,179) instead of white, and two disclosure controls were
+    reported at 2.55:1 when they actually measured between 3.30 and
+    5.38:1 depending on the accent preset. Nothing errored, and the
+    numbers looked entirely ordinary. Sample the rendered pixel instead:
+    screenshot, take the modal colour of a blank region of the surface,
+    and composite the element's computed `color` onto that. The panel's
+    real ground is 255,255,255 and the drawer's is 214,214,214, and
+    neither is derivable from a property read. The one honest tell was
+    that the arithmetic had produced a grey nobody had chosen; treat an
+    unexpected ground as a broken measurement, not a surprising result.
 
 ---
 
