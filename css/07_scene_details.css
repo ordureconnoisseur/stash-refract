@@ -2335,6 +2335,87 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 }
 
 
+/* ---- The rating drawer, welded to the advanced-rating panel ---------
+   The plugin ships its own inline drawer and it is the toolbar's NEXT
+   SIBLING at the same width in the same column, so the old design was
+   two disclosures for one subject sitting on top of each other. The chip
+   now drives both (refract.js) and these rules make them one object.
+
+   One 16px shell with a hairline seam, and nothing inside it is rounded
+   at all -- which is also why there is no concentric-radius problem to
+   solve (3.4). The pill only survives while the strip is closed: a
+   stadium welded to a rectangle is neither. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open {
+    /* The row wraps only while the drawer is open; closed it is a strict
+       single line. Without this the break below has nothing to break and
+       the summary band rides off the end of the row. */
+    flex-wrap: wrap !important;
+    border-radius: var(--radius) var(--radius) 0 0 !important;
+    border-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+/* No plugin, or its panel closed: the strip is the whole drawer, so it
+   keeps all four corners. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open:not(:has(+ .adv-rating-inline-panel.open)) {
+    border-radius: var(--radius) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* The summary band. Overall was a row that looked like a criterion and
+   was not one, with a header bar between it and the list: four kinds of
+   band stacked. It is one band now -- tinted with the scene's own tier
+   colour, the score at display size -- and the criteria follow it
+   directly as a plain list. Two kinds of thing, not four. */
+/* The break that puts the summary band on its own line. Without it the
+   band is just another flex item and rides off the end of the row --
+   which is exactly what happened when the older two-drawer rules were
+   removed and this went with them. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open::after {
+    content: "" !important;
+    flex: 0 0 100%;
+    height: 0;
+    order: 19;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .rating-stars {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    order: 20 !important;
+    width: calc(100% + 18px) !important;
+    align-items: center !important;
+    gap: 9px !important;
+    margin: 7px -9px 0 -9px !important;
+    padding: 8px 12px !important;
+    background: rgba(var(--st-tier-rgb, 255, 255, 255), 0.05) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .rating-stars::before {
+    content: "Overall";
+    flex: 0 0 auto;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--track-eyebrow);
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.35;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .star-rating-number {
+    /* The number is absolutely positioned into a reserved slot, so it
+       does not inherit the band's padding -- it measured flush against
+       the band's right edge. 12px matches the band's own inset and the
+       criterion rows below it. */
+    right: 12px !important;
+    font-size: var(--fs-md) !important;
+    font-weight: 700 !important;
+    color: var(--text) !important;
+}
+/* The trigger leaves the action row. The chip opens the drawer the
+   trigger used to open, so two controls for one drawer is the
+   duplication this whole pass is about. It stays in the DOM, hidden,
+   because the chip drives it. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
+    display: none !important;
+}
+
 /* ── The strip's icon set ─────────────────────────────────────────────
    One family, one grid, one weight. The row used to mix five idioms at
    four optical sizes: solid stars, a solid heart, a solid archive box, a
@@ -2600,47 +2681,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
    sets display: inline-flex at the same specificity, so a hide rule
    written earlier in the file loses on source order and the drawer
    never closes. */
-/* Open: the star row unfolds INSIDE the strip on its own line. The stars
-   never move in the DOM -- they are Stash's control and physics 1 says
-   leave them where React put them -- they are simply not displayed until
-   asked for. The advanced-rating trigger joins them, because with the
-   drawer open the row is about rating and that is what it edits. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars { display: none !important; }
-/* On the toolbar itself, not a descendant of it. The prefix used
-   everywhere else in this file ends in a descendant combinator, so
-   pasting the class onto it asked for a .st-rating-open INSIDE the
-   toolbar -- which never matches, so the row never wrapped and the
-   stars unfolded inline instead of onto their own line. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open {
-    flex-wrap: wrap !important;
-}
-/* The drawer is one line, not two. Giving the stars flex-basis 100%
-   made them a full-width item, which pushed the trigger after them onto
-   a third line; a zero-height break before them does the same job and
-   lets the two share a row. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open::after {
-    content: "" !important;
-    flex: 0 0 100%;
-    height: 0;
-    order: 19;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-toolbar.st-rating-open .rating-stars {
-    display: inline-flex !important;
-    flex: 0 0 auto !important;
-    order: 20 !important;
-    margin: 8px 0 0 0 !important;
-    padding: 0 30px 0 0 !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-toolbar.st-rating-open .adv-rating-btn {
-    order: 21 !important;
-    margin: 8px 0 0 4px !important;
-}
-/* A stadium is the right shape for a 34.5px control row and the wrong
-   one for an 60px drawer: the curve stops reading as a rim and starts
-   reading as a lozenge. --radius sits it with the panel's own corners. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open {
-    border-radius: var(--radius) !important;
-}
 
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars button {
     width: 14px !important;

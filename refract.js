@@ -13819,6 +13819,20 @@
                 e.stopPropagation();
                 var open = bar.classList.toggle("st-rating-open");
                 chip.setAttribute("aria-expanded", open ? "true" : "false");
+                /* One control, one drawer. The advanced-rating plugin ships
+                   its own inline panel as the toolbar's next sibling, so
+                   the two used to be separate disclosures for one subject.
+                   The chip drives both: its own second line carries the
+                   overall rating, the plugin's panel carries the criteria,
+                   and CSS welds them into a single shell. Driving the
+                   plugin's own trigger rather than its classes keeps the
+                   panel's state its own (P4). */
+                var trigger = bar.querySelector(".adv-rating-btn");
+                if (trigger) {
+                    var panel = document.querySelector(".adv-rating-inline-panel");
+                    var panelOpen = !!(panel && panel.classList.contains("open"));
+                    if (panelOpen !== open) { trigger.click(); }
+                }
             }, false);
             bar.insertBefore(chip, bar.firstChild);
         }
@@ -13859,6 +13873,28 @@
         val.hidden = !value;
     }
 
+    /* ── Advanced-rating criterion stars ──────────────────────────────
+       The plugin carries each criterion star's fill in the CHARACTER --
+       a filled star is the glyph U+2605 and an empty one U+2606, same
+       class, same colour, so the two are told apart by shape alone at
+       0.2 alpha. CSS cannot select on text content, so the state is
+       mirrored onto a class here and the stylesheet does the rest: the
+       criterion stars then draw the same badge star, in the same gold,
+       as the overall rating directly above them.
+
+       A mirror, never a write: the plugin owns the value, this only
+       reads what it rendered (P4). */
+    var ST_STAR_FILLED = String.fromCharCode(0x2605);
+
+    function stAdvCriterionStars() {
+        var stars = document.querySelectorAll(
+            ".adv-rating-inline-panel .rating-star");
+        for (var i = 0; i < stars.length; i++) {
+            var on = (stars[i].textContent || "").indexOf(ST_STAR_FILLED) !== -1;
+            stars[i].classList.toggle("st-crit-on", on);
+        }
+    }
+
     function applyScenePlayerFixes() {
         injectScenePlayerOverlay();
         setupSceneTabsPerformers();
@@ -13867,6 +13903,7 @@
         stClampDescription();
         stSceneActivityBadge();
         stRatingTierChip();
+        stAdvCriterionStars();
         initImageCardLightbox();
         initRatingInputSelectAll();
         tagFilledRatings();

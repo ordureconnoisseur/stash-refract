@@ -906,3 +906,190 @@ body.stash-liquid-glass .adv-rating-btn--active {
                 inset 0 0 0 1px rgba(var(--accent-rgb), 0.5) !important;
 }
 
+/* ── Welded to the scene strip ────────────────────────────────────────
+   The rules below live here, next to the panel's existing styling,
+   because 09 loads after 07: written in the scene-details sheet they
+   were correct and lost every property this file already sets. One home
+   for one component.
+
+   The panel is the toolbar's NEXT SIBLING at the same width in the same
+   column, so when the strip's tier chip opens the drawer the two become
+   one 16px shell with a hairline seam. Nothing inside is rounded, which
+   is also why there is no concentric-radius problem to solve (3.4). */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open + .adv-rating-inline-panel.open {
+    /* The plugin insets the panel from the column; the strip bleeds out
+       of it by 10px. Both edges are stated here so the two boxes are the
+       same width whatever either of them started from. */
+    margin: 0 -10px !important;
+    margin-left: -10px !important;
+    margin-right: -10px !important;
+    width: auto !important;
+    border-radius: 0 0 var(--radius) var(--radius) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: rgba(0, 0, 0, 0.16) !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+
+/* ---- The panel's own contents, in the panel's language --------------
+   Mostly subtraction. Five amber "unrated" pills plus one in the header
+   are six objects saying what five empty stars already say, in a colour
+   that appears nowhere else in the theme. */
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-unrated-pill {
+    display: none !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-inline-head {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 8px !important;
+    padding: 9px 12px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+    background: none !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-inline-title {
+    font-size: var(--fs-xs) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: var(--track-eyebrow) !important;
+    /* Was --accent-bright at 11.2px, which made it the loudest thing on
+       the surface and a second heading competing with the panel's own
+       eyebrows. It is a section label like the others now. */
+    color: rgba(255, 255, 255, 0.38) !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-subhead,
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-summary {
+    margin-left: auto !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 600 !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .ratings-list {
+    padding: 0 !important;
+    background: none !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+    padding: 6px 12px !important;
+    margin: 0 !important;
+    background: none !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 0 !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-row:last-child {
+    border-bottom: 0 !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-row:hover {
+    background: var(--fill-1) !important;
+}
+/* One line, with an ellipsis. "Production Quality" wrapped and made its
+   row 52px against every other row's 33px. */
+body.stash-liquid-glass .adv-rating-inline-panel .rating-label {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 500 !important;
+    color: rgba(255, 255, 255, 0.72) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-label > span:first-child {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+/* The description carrier, and the only thing that says what a
+   criterion means, so it stays. A drawn ring instead of the unicode
+   circled-i, which renders differently on every platform (6.12). */
+body.stash-liquid-glass .adv-rating-inline-panel .rating-info-icon {
+    flex: 0 0 auto !important;
+    width: 13px !important;
+    height: 13px !important;
+    font-size: 0 !important;
+    border: 1px solid rgba(255, 255, 255, 0.28) !important;
+    border-radius: var(--radius-pill) !important;
+    color: rgba(255, 255, 255, 0.45) !important;
+    cursor: help !important;
+    position: relative !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-info-icon::before {
+    content: "i";
+    display: block;
+    font-size: 8.5px;
+    font-weight: 700;
+    line-height: 11px;
+    text-align: center;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-info-icon:hover {
+    border-color: rgba(var(--accent-rgb), 0.6) !important;
+    color: var(--accent-light) !important;
+}
+
+/* The criterion stars take the theme's star. refract.js marks the
+   filled ones, because the plugin carries that state in the glyph
+   itself and CSS cannot read text. */
+body.stash-liquid-glass .adv-rating-inline-panel .rating-stars-modal {
+    display: flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    flex: 0 0 auto !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-star {
+    width: 12px !important;
+    height: 12px !important;
+    font-size: 0 !important;
+    background-color: var(--star-empty) !important;
+    -webkit-mask: var(--st-star-svg) center / contain no-repeat !important;
+            mask: var(--st-star-svg) center / contain no-repeat !important;
+    cursor: pointer !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-star.st-crit-on {
+    background-color: var(--star) !important;
+}
+/* The clear control appears with the row it clears. */
+body.stash-liquid-glass .adv-rating-inline-panel .rating-clear {
+    margin-left: 5px !important;
+    font-size: var(--fs-sm) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+    opacity: 0 !important;
+    transition: opacity var(--dur-fast) ease, color var(--dur-fast) ease !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-row:hover .rating-clear {
+    opacity: 1 !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-clear:hover {
+    color: #ff6b6b !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown {
+    padding: 7px 12px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: var(--track-eyebrow) !important;
+    color: rgba(255, 255, 255, 0.32) !important;
+}
+
+/* The breakdown heading and its caret lose the accent. With the panel
+   welded under the strip they were the only coloured text in the drawer,
+   competing with the tier chip that names the rating -- and a disclosure
+   for a subtotal is not the loudest thing here. */
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown-heading,
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown-caret {
+    color: rgba(255, 255, 255, 0.32) !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 700 !important;
+    letter-spacing: var(--track-eyebrow) !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown:hover
+    .adv-rating-breakdown-heading,
+body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown:hover
+    .adv-rating-breakdown-caret {
+    color: var(--accent-light) !important;
+}
