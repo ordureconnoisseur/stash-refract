@@ -968,6 +968,23 @@ body.stash-liquid-glass .adv-rating-inline-panel .ratings-list {
     padding: 0 !important;
     background: none !important;
 }
+/* The list carries its own status text as a BARE TEXT NODE -- no
+   element, nothing to select -- so "Loading..." landed at 14px hard
+   against the panel's inner edge, outside the 12px column every row
+   below it sits in, for the whole of the first open. There is no
+   child to style, so the state is selected on the parent instead:
+   no rows means the list is showing a message rather than criteria.
+   Uppercased and muted, it reads as the status it is instead of as
+   the panel's first line of content. Covers the genuinely empty list
+   too, which renders the same way. */
+body.stash-liquid-glass .adv-rating-inline-panel .ratings-list:not(:has(.rating-row)) {
+    padding: 11px 12px !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: var(--track-eyebrow) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+}
 body.stash-liquid-glass .adv-rating-inline-panel .rating-row {
     display: flex !important;
     align-items: center !important;
@@ -1052,9 +1069,23 @@ body.stash-liquid-glass .adv-rating-inline-panel .rating-star {
 body.stash-liquid-glass .adv-rating-inline-panel .rating-star.st-crit-on {
     background-color: var(--star) !important;
 }
-/* The clear control appears with the row it clears. */
+/* The clear control appears with the row it clears, and it is a CHILD
+   of the star group rather than a sibling -- which is what made the
+   criteria column look ragged against the two right-aligned readouts
+   above it. Every box in the panel ends at the same 373.5, stars
+   included, but the last 14.7px of the star group is this control
+   holding its slot at zero opacity, so the STARS ended at 358.8 and
+   only the text reached the margin. Geometrically aligned, visibly
+   not (6.7).
+
+   It keeps the slot -- giving it up means five stars jumping sideways
+   every time the pointer crosses a row -- and takes it at the front of
+   the group instead. The dead space moves into the gap after the
+   label, where nothing is aligned to anything, and the stars come out
+   flush with the score above them. */
 body.stash-liquid-glass .adv-rating-inline-panel .rating-clear {
-    margin-left: 5px !important;
+    order: -1 !important;
+    margin: 0 5px 0 0 !important;
     font-size: var(--fs-sm) !important;
     color: rgba(255, 255, 255, 0.3) !important;
     opacity: 0 !important;

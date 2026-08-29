@@ -758,28 +758,6 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, 
 /* Star rating styling lives in the global block in 08_misc_mid.css.
    Scene-tabs only needs to size the button frame to align with adjacent
    pill controls; the icon styling is inherited. */
-/* The 15px sizing that used to live here is gone. It had not applied
-   since the toolbar rework: the block further down sets 17px at higher
-   specificity, and computed style confirms 17. What made it worth
-   deleting rather than leaving is that it carried four lines of
-   arithmetic arguing for 15 over 18 -- a claim about a value nobody
-   was seeing. A dead rule is invisible; a dead rule with a rationale
-   actively misleads the next person to read the file. */
-/* Only the declarations that survive. The block that rebuilds this
-   control as a 26px glass circle sets its own fill, colour and padding,
-   so the --fill-3 / --text / 0.55rem written here measured as 0.04,
-   accent-light and 0. Two contradictory fills 1,475 lines apart, and the
-   one that lost was the one with no comment explaining the choice. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
-    height: 22px !important;
-    border: 1px solid var(--glass-border) !important;
-    border-radius: var(--radius-pill) !important;
-    font-size: var(--fs-xs) !important;
-    line-height: 1 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: var(--gap-2xs) !important;
-}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) {
     height: 26px !important;
     border-radius: var(--radius-pill) !important;
@@ -2438,7 +2416,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 /* The trigger leaves the action row. The chip opens the drawer the
    trigger used to open, so two controls for one drawer is the
    duplication this whole pass is about. It stays in the DOM, hidden,
-   because the chip drives it. */
+   because the chip drives it.
+
+   This rule is the ONLY one left for the control. Hiding it stranded
+   two blocks that dressed it as a visible pill -- a 22px stadium up at
+   the top of the file and a 26px glass circle with a masked sliders
+   glyph, a hover, a badge and two pseudo-elements further down -- and
+   the second of those was setting display: inline-flex at the same
+   specificity from LATER in the file, so the control stayed on screen
+   and clicking it opened the panel while the strip above stayed shut.
+   The weld came apart at the one place a stray click could reach it.
+
+   The fix is deletion, not a fourth rule: three blocks with the same
+   selector is what made the display fight invisible in the first
+   place, and the loser is never the one you are reading (7). */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
     display: none !important;
 }
@@ -2737,111 +2728,6 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     height: 14px !important;
     display: block !important;
     vertical-align: middle !important;
-}
-/* Advanced Ratings value beside the stars. Absent -> the stars alone are
-   the anchor and nothing reflows. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
-    /* What this control actually is, measured in both states: complete
-       renders a star and a plus and NO number; incomplete renders a
-       star, a plus and a badge carrying a count. So it is a TRIGGER that
-       opens the per-criterion editor, not a score readout -- drawing it
-       as a bare number (or a score pill) shows a value that half the
-       time does not exist. The score itself has a home already: the
-       Scored row below.
-
-       Not a star, and not in the rating group. It sat immediately after
-       five stars, in the position a sixth star would occupy, drawn AS a
-       star, so it read as part of the rating rather than as the control
-       that edits it. The sliders glyph says what it opens: a set of
-       criteria each carrying its own value, which is what the Scored row
-       below shows. And it moves to the right half of the strip, because
-       what it is is a control. */
-    order: 8 !important;
-    position: relative !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 0 auto !important;
-    width: 22px !important;
-    height: 22px !important;
-    min-width: 22px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    /* Measured against the operations and multiview buttons: they fill
-       at rgba(255,255,255,0.04), not --glass-bg's 0.06. Three controls,
-       one shape, one fill. */
-    background: var(--fill-2) !important;
-    border: 1px solid var(--glass-border) !important;
-    border-radius: var(--radius-pill) !important;
-    box-shadow: none !important;
-    /* Muted like the four glyphs it now sits among. It kept the accent
-       from when it lived beside the stars, which made it the only
-       coloured thing in a row of neutral controls for no reason a
-       viewer could infer. The accent belongs to its state dot, which
-       appears only when there are criteria left to rate. */
-    color: rgba(255, 255, 255, 0.42) !important;
-    overflow: visible !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn:hover {
-    background: var(--accent-tint) !important;
-    border-color: rgba(var(--accent-rgb), 0.4) !important;
-}
-/* The plugin draws its star as a UNICODE glyph with color:#ffc107
-   hard-coded inline. A text glyph renders differently on every platform
-   and cannot be recoloured reliably, so it is hidden and replaced with a
-   real SVG carried as a mask -- masked rather than a background image so
-   it takes currentColor and follows the hover state for free. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn .adv-rating-btn-star {
-    display: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn::before {
-    content: "";
-    display: block;
-    width: 14px;
-    height: 14px;
-    background-color: currentColor;
-    -webkit-mask: var(--ic-sliders) center / contain no-repeat;
-            mask: var(--ic-sliders) center / contain no-repeat;
-}
-/* The plus is the "edit me" affordance; the star already says that. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn .adv-rating-btn-plus {
-    display: none !important;
-}
-/* The count, rendered only while criteria are outstanding, as a corner
-   badge rather than a word sitting in the row. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn .adv-rating-btn-badge {
-    /* The plugin's count badge measured 22.6px wide for a single digit
-       and sat across most of a 26px button. At this size a number cannot
-       be read anyway, so the state is carried by a dot instead and the
-       exact count stays one click away in the editor. */
-    display: none !important;
-}
-/* Outstanding criteria: a plain accent dot, no glyph. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn.adv-rating-btn--incomplete::after {
-    /* Class doubled: the caption-removal rule above is also four classes
-       deep, so an equal-specificity tie let `content: none` win on source
-       order and the dot never drew. */
-    content: "" !important;
-    /* Inside the strip, not over its rim. At -2px with a 1.5px ring the
-       dot crossed the strip's top edge, so it read as a notification
-       pinned to the panel rather than a state on the control, and it was
-       the tallest ink in a row of 14px glyphs (measured -3.00 against a
-       -0.50 cluster). Smaller, tucked in, and ringless: nothing overlaps
-       it, so it needs no ring to separate it from anything. */
-    position: absolute;
-    top: 1px;
-    right: 0;
-    width: 5px;
-    height: 5px;
-    border-radius: var(--radius-pill);
-    background: var(--accent-bright);
-    border: 0;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn::after {
-    /* Was a "RATING" caption. Five stars beside a control do not need a
-       word telling you they are a rating, and it was the third unrelated
-       object in a row that should hold two. */
-    content: none !important;
 }
 
 /* Actions: right of the anchor, behind a hairline, read as a different

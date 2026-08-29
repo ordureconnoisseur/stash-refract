@@ -1078,3 +1078,107 @@ body.stash-liquid-glass.refract-light .modal-body .SceneScrapeModal .input-group
 body.stash-liquid-glass.refract-light :is(.PerformerScrapeModal-list-container, .SceneScrapeModal-list-container) > .mt-1 {
     background: rgba(0, 0, 0, 0.06);
 }
+
+
+/* ═══════ 23. The rating chip and drawer ═══════════════════════════
+   Everything the scene panel's rating control is built from was written
+   in white alphas and dark-mode tier colours, and none of it survives a
+   light background. Measured on the light panel before this block
+   existed: every white alpha from 0.20 to 0.72 comes out at exactly
+   1.00:1, and the six tier colours land between 1.17 and 1.87:1. The
+   whole control -- chip, summary band, criteria list -- rendered blank.
+
+   The tier palette is the harder half. Section 4's colours are chosen to
+   glow on near-black; on white the bright end of each is the wrong end,
+   so light mode gets the deep end of the same hue. They keep their
+   identity (a Gold scene is still gold, a Diamond still teal) and clear
+   5:1 instead of 1.4:1. */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="bronze"] { --tier-color: 146, 90, 32; --tier-color-bright: 146, 90, 32; }
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="silver"] { --tier-color: 91, 98, 112; --tier-color-bright: 91, 98, 112; }
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="gold"] { --tier-color: 138, 106, 14; --tier-color-bright: 138, 106, 14; }
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="diamond"] { --tier-color: 16, 107, 102; --tier-color-bright: 16, 107, 102; }
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="legendary"] { --tier-color: 176, 24, 101; --tier-color-bright: 176, 24, 101; }
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] { --tier-color: 74, 58, 128; --tier-color-bright: 74, 58, 128; }
+
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(0, 0, 0, 0.14) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip:hover {
+    background: rgba(0, 0, 0, 0.07) !important;
+    border-color: rgba(0, 0, 0, 0.22) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-name {
+    color: rgba(0, 0, 0, 0.55) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-rated="0"] .st-tier-name {
+    color: rgba(0, 0, 0, 0.45) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value {
+    color: var(--text) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value::before {
+    background: rgba(0, 0, 0, 0.2) !important;
+}
+/* Perfect keeps its spectrum, at an alpha that reads as a tint on white
+   rather than the wash it becomes at the dark-mode value. */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] {
+    background: linear-gradient(100deg,
+        rgba(244, 114, 182, 0.14), rgba(96, 165, 250, 0.14),
+        rgba(192, 132, 252, 0.14)) !important;
+}
+
+/* The summary band and its label. */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-rating-open .rating-stars {
+    border-top-color: rgba(0, 0, 0, 0.08) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-rating-open .rating-stars::before {
+    color: rgba(0, 0, 0, 0.5) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-rating-open {
+    border-bottom-color: rgba(0, 0, 0, 0.10) !important;
+}
+
+/* The panel. A recessed well on near-black is a dark tint; on white it
+   has to be a light one, or the drawer reads as a hole. */
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel {
+    background: rgba(0, 0, 0, 0.028) !important;
+    border-color: rgba(0, 0, 0, 0.10) !important;
+    box-shadow: none !important;
+}
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-inline-head {
+    border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-inline-title {
+    color: rgba(0, 0, 0, 0.45) !important;
+}
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-subhead,
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-summary {
+    color: rgba(0, 0, 0, 0.47) !important;
+}
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .ratings-list:not(:has(.rating-row)) {
+    color: rgba(0, 0, 0, 0.4) !important;
+}
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-row {
+    border-bottom-color: rgba(0, 0, 0, 0.07) !important;
+}
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-row:hover {
+    background: rgba(0, 0, 0, 0.03) !important;
+}
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-label {
+    color: rgba(0, 0, 0, 0.78) !important;
+}
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-info-icon {
+    border-color: rgba(0, 0, 0, 0.3) !important;
+    color: rgba(0, 0, 0, 0.5) !important;
+}
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-clear {
+    color: rgba(0, 0, 0, 0.35) !important;
+}
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-breakdown {
+    border-top-color: rgba(0, 0, 0, 0.08) !important;
+}
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-breakdown-heading,
+body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-breakdown-caret {
+    color: rgba(0, 0, 0, 0.47) !important;
+}
