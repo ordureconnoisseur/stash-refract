@@ -677,7 +677,7 @@ body.stash-liquid-glass .perf-rating-close:hover::before {
     background-color: var(--accent-bright);
 }
 
-/* Ratings list scroll container */
+/* Ratings list scroll container. */
 body.stash-liquid-glass .ratings-list {
     padding: 0.4rem 0 !important;
     overflow-y: auto;
@@ -808,11 +808,16 @@ body.stash-liquid-glass .ratings-list::-webkit-scrollbar-track {
     background: transparent;
 }
 body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 4px;
+    /* Was a 0.12 white thumb with an accent only on hover, which is
+       under 6.10's house values. It mattered little while this list
+       scrolled only in the modal; the inline drawer now caps at 7.5
+       rows, so the thumb is the one thing telling you the rest of the
+       criteria are down there and it has to be legible at rest. */
+    background: rgba(var(--accent-rgb), 0.35);
+    border-radius: var(--radius-pill);
 }
 body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb:hover {
-    background: rgba(var(--accent-rgb), 0.4);
+    background: rgba(var(--accent-rgb), 0.6);
 }
 
 /* ── Scene inline ratings panel ─────────────────────────────────────
@@ -876,17 +881,6 @@ body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-subhead {
     font-size: var(--fs-xs) !important;
     color: var(--text-muted) !important;
     opacity: 0.85;
-}
-/* Tighten the shared row / list / breakdown horizontal padding for the
-   sidebar (the overlay uses a roomier 1.25rem); drop the list scroll cap
-   since the sidebar already scrolls. */
-body.stash-liquid-glass .adv-rating-inline-panel .ratings-list {
-    padding: 0.25rem 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .rating-row {
-    padding: 0.5rem 1rem !important;
 }
 body.stash-liquid-glass .adv-rating-inline-panel .rating-star {
     font-size: 1.25rem;
@@ -964,9 +958,71 @@ body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-summary {
     font-weight: 600 !important;
     color: rgba(255, 255, 255, 0.3) !important;
 }
+/* The one rule that sets anything on the inline list. It used to be
+   three: this one, plus a block that zeroed the shared 72vh cap
+   because "the sidebar already scrolls", plus a row padding that a
+   later rule fully overrode. Only the first was doing anything a
+   reader could see (7.17).
+
+   The uncap is reversed. It was right when the panel was a second
+   disclosure in a scrolling sidebar; the panel is welded into the
+   strip now and opens ABOVE the tab bar, so an uncapped list pushes
+   the tabs and everything under them down by however many criteria
+   the user happens to have defined. Criteria are user-defined, so the
+   list has no natural length -- five is the common setup and reads
+   well at 148px, but nothing stops fifteen.
+
+   The cap is 7.5 rows at the measured 29.8px row: seven fit whole and
+   the eighth is cut in half, which says there is more below without
+   spending a row on saying so. Under eight criteria nothing engages
+   and the drawer is exactly as it was. overscroll-behavior keeps a
+   flick past the last criterion from carrying on into the page. */
 body.stash-liquid-glass .adv-rating-inline-panel .ratings-list {
     padding: 0 !important;
     background: none !important;
+    /* 7 x 29.8 + half a row */
+    max-height: 224px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    /* Two lines of undo, and they are what makes 6.10's 4px bar above
+       actually appear. scrollbar-color and scrollbar-width are
+       INHERITED properties, .scene-tabs sets the colour for the whole
+       column, and Chrome discards every ::-webkit-scrollbar rule for
+       any element with either standard property in effect. So the list
+       inherited a colour it never asked for, lost the 4px rule to it,
+       and drew the 15px platform default in theme paint -- the one
+       width nobody chose, with Windows arrow buttons on both ends,
+       inside a 224px drawer.
+
+       Setting the standard properties instead only trades 15px for the
+       10px Chrome calls thin, buttons and all. Resetting them to auto
+       is what hands the element back to ::-webkit: measured 15 -> 10 ->
+       4. Firefox has no ::-webkit and keeps its platform bar, which is
+       what it drew here before any of this. */
+    scrollbar-width: auto !important;
+    scrollbar-color: auto !important;
+}
+/* A scrollable region is a keyboard stop (refract.js gives it the
+   tabindex older Chromium will not), so it needs the house ring --
+   inset, because at the +2px offset it would draw outside the drawer
+   it sits in. */
+body.stash-liquid-glass .adv-rating-inline-panel .ratings-list:focus-visible {
+    outline: 2px solid rgba(var(--accent-rgb), 0.9) !important;
+    outline-offset: -2px !important;
+}
+/* The scrollbar takes its width out of the list's content, which would
+   drag every star group left of the score and the criteria count they
+   were just aligned to. The rows give it back out of their own right
+   padding, so the star column holds its edge whether the list scrolls
+   or not.
+
+   The width is measured rather than assumed: refract.js writes the real
+   gutter to --st-sb, because "thin" is whatever the engine says it is
+   (4px here, 10 on a Chrome told to use the standard property, 15
+   unstyled) and a literal would be right on exactly one of them. The
+   floor keeps a star off the thumb when the gutter is wide. */
+body.stash-liquid-glass .adv-rating-inline-panel .ratings-list.st-crit-scroll .rating-row {
+    padding-right: max(4px, calc(12px - var(--st-sb, 4px))) !important;
 }
 /* The list carries its own status text as a BARE TEXT NODE -- no
    element, nothing to select -- so "Loading..." landed at 14px hard

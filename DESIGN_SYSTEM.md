@@ -727,6 +727,21 @@ Thin, track-less, accent-thumbed:
 
 A scrollbar is chrome; it gets accent only because it is interactive.
 
+**These widths only exist through `::-webkit-scrollbar`, and Chrome discards
+every one of those rules for an element that has a standard scrollbar property
+in effect.** `scrollbar-width` and `scrollbar-color` are INHERITED, so an
+ancestor setting either -- `.scene-tabs` sets the colour for the whole detail
+column -- silently disables the pseudo-element styling for everything inside
+it. The element then draws the 15px platform default in theme paint, with
+Windows arrow buttons: the one width nobody chose. Adding the standard
+properties back only trades 15px for the 10px Chrome calls thin. What restores
+the intended bar is resetting them, `scrollbar-width: auto` and
+`scrollbar-color: auto`, which hands the element back to `::-webkit`; measured
+in the rating drawer at 15 then 10 then 4. Firefox has no `::-webkit` and keeps
+its platform bar in either case. Never read a width off the `::-webkit` rule --
+measure `offsetWidth - clientWidth`, which is also the only honest source for
+any layout that has to compensate for the gutter.
+
 ### 6.11 Mobile chrome
 
 Below phone widths Refract does not shrink the desktop navbar; it replaces it,

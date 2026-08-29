@@ -14420,6 +14420,52 @@
             var on = (stars[i].textContent || "").indexOf(ST_STAR_FILLED) !== -1;
             stars[i].classList.toggle("st-crit-on", on);
         }
+        stAdvCriteriaOverflow();
+    }
+
+    /* ── The capped criteria list ─────────────────────────────────────
+       CSS caps the list at 7.5 rows, which the stylesheet cannot then
+       react to: whether the cap actually bit depends on how many
+       criteria this user defined, and no selector can ask that.
+
+       Two things follow from it and both need the answer. The scrollbar
+       takes its 4px out of the content width, so the rows have to give
+       4px back or the star column slides off the edge the score above
+       it is aligned to. And a scrollable region is a keyboard stop --
+       Chromium only makes one focusable on its own from 127, so older
+       builds strand the criteria for anyone not using a mouse.
+
+       Attributes are set only when they are not already right: this
+       runs from the shared mutation observer, and writing on every
+       pass would feed it its own changes. */
+    function stAdvCriteriaOverflow() {
+        var list = document.querySelector(
+            ".adv-rating-inline-panel .ratings-list");
+        if (!list) { return; }
+        var over = list.scrollHeight - list.clientHeight > 1;
+        list.classList.toggle("st-crit-scroll", over);
+        /* The real gutter, not an assumed one: "thin" is whatever the
+           engine decides, so the stylesheet is told what it actually
+           got and does its padding arithmetic from that. */
+        var gutter = list.offsetWidth - list.clientWidth;
+        var want = (over && gutter > 0) ? gutter + "px" : "";
+        if (list.style.getPropertyValue("--st-sb") !== want) {
+            if (want) {
+                list.style.setProperty("--st-sb", want);
+            } else {
+                list.style.removeProperty("--st-sb");
+            }
+        }
+        if (over === list.hasAttribute("tabindex")) { return; }
+        if (over) {
+            list.setAttribute("tabindex", "0");
+            list.setAttribute("role", "group");
+            list.setAttribute("aria-label", "Rating criteria");
+        } else {
+            list.removeAttribute("tabindex");
+            list.removeAttribute("role");
+            list.removeAttribute("aria-label");
+        }
     }
 
     function applyScenePlayerFixes() {
