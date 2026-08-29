@@ -5976,6 +5976,207 @@
         return true;
     }
 
+    /* ── Entity pages: the scope control ──────────────────────────────
+       A studio or tag detail page hangs on one question: are you looking
+       at this entity, or at everything underneath it. Stash answers it
+       with an unlabelled switch sitting below the tab strip
+       (`#showSubContent`) whose two states differ, on Brazzers, by 12
+       scenes against 963.
+
+       This paints a two-segment readout into the header carrying BOTH
+       counts, so the choice states its own consequence before you make
+       it. Nothing is re-implemented and nothing is moved: the native
+       checkbox stays exactly where React put it, every click is
+       forwarded to it, and Stash keeps the state (P4). The native row
+       is hidden by CSS only while `body.refract-has-scope` says the
+       proxy is actually up, so if any of this fails the original
+       control is still there.
+
+       The counts are asked of the server, never summed from the
+       children. A scene carries both a parent tag and its child, so
+       summing Anal's 22 sub-tags gives 12,360 against a true 6,567.
+       `depth: -1` is the only honest source. Studios happen to be
+       summable (a scene has one studio) but go through the same path.
+       One query per entity, cached for the session. */
+    var REFRACT_EP_COUNTS = {};
+    var REFRACT_EP_KINDS = {
+        studios: { kind: "studio", field: "studios", head: ".studio-head", query: "findStudio", kids: "child_studios" },
+        tags: { kind: "tag", field: "tags", head: ".tag-head", query: "findTag", kids: "children" }
+    };
+
+    function refractEpContext() {
+        var m = refractPathFromLocation().match(/^\/(studios|tags)\/(\d+)/);
+        if (!m) { return null; }
+        var spec = REFRACT_EP_KINDS[m[1]];
+        if (!spec) { return null; }
+        var head = document.querySelector(".detail-header " + spec.head);
+        if (!head) { return null; }
+        return { spec: spec, id: m[2], head: head, key: spec.kind + ":" + m[2] };
+    }
+
+    function refractEpFetchCounts(ctx) {
+        if (REFRACT_EP_COUNTS[ctx.key] !== undefined) { return; }
+        REFRACT_EP_COUNTS[ctx.key] = "pending";
+        var f = ctx.spec.field;
+        var sel = ':{value:["' + ctx.id + '"], modifier:INCLUDES, depth:';
+        var q = "{ own: findScenes(filter:{per_page:0}, scene_filter:{" + f + sel + '0}}){ count } ' +
+                "all: findScenes(filter:{per_page:0}, scene_filter:{" + f + sel + '-1}}){ count } ' +
+                'kids: ' + ctx.spec.query + '(id:"' + ctx.id + '"){ ' + ctx.spec.kids + ' { id } } }';
+        refractGqlQuery(q).then(function (r) {
+            var d = r && r.data;
+            if (!d || !d.own || !d.all) { REFRACT_EP_COUNTS[ctx.key] = "failed"; return; }
+            var kids = d.kids && d.kids[ctx.spec.kids];
+            REFRACT_EP_COUNTS[ctx.key] = {
+                own: d.own.count,
+                all: d.all.count,
+                kids: kids ? kids.length : 0
+            };
+            try { injectEntityScope(); } catch (e) {}
+        }).catch(function () { REFRACT_EP_COUNTS[ctx.key] = "failed"; });
+    }
+
+    function refractEpNum(n) {
+        try { return Number(n).toLocaleString(); } catch (e) { return String(n); }
+    }
+
+    function refractEpLabels(ctx, counts) {
+        var n = counts.kids;
+        if (ctx.spec.kind === "studio") {
+            return ["This studio", n === 1 ? "With its 1 site" : "With all " + refractEpNum(n) + " sites"];
+        }
+        return ["This tag", n === 1 ? "With its 1 sub-tag" : "With all " + refractEpNum(n) + " sub-tags"];
+    }
+
+    function injectEntityScope() {
+        var ctx = refractEpContext();
+        var cb = document.querySelector("#showSubContent");
+        var existing = document.querySelector(".refract-scope");
+        /* No switch on this tab, or no children to widen to: a control
+           that cannot do anything is worse than no control, so it does
+           not draw and the body class comes off with it. */
+        if (!ctx || !cb) {
+            if (existing) { existing.parentNode.removeChild(existing); }
+            document.body.classList.remove("refract-has-scope");
+            return false;
+        }
+        if (REFRACT_EP_COUNTS[ctx.key] === undefined) { refractEpFetchCounts(ctx); }
+        var counts = REFRACT_EP_COUNTS[ctx.key];
+        if (!counts || typeof counts !== "object" || !counts.kids) {
+            if (existing) { existing.parentNode.removeChild(existing); }
+            document.body.classList.remove("refract-has-scope");
+            return false;
+        }
+
+        var labels = refractEpLabels(ctx, counts);
+        var sig = labels[0] + "|" + labels[1] + "|" + counts.own + "|" + counts.all;
+        var wrap = existing;
+        if (!wrap || wrap.dataset.refractSig !== sig || !ctx.head.contains(wrap)) {
+            if (wrap && wrap.parentNode) { wrap.parentNode.removeChild(wrap); }
+            wrap = document.createElement("div");
+            wrap.className = "refract-scope";
+            wrap.dataset.refractSig = sig;
+            wrap.innerHTML =
+                '<button type="button" class="refract-scope-seg" data-seg="own">' +
+                    '<span class="refract-scope-label"></span>' +
+                    '<span class="refract-scope-value"></span>' +
+                '</button>' +
+                '<button type="button" class="refract-scope-seg" data-seg="all">' +
+                    '<span class="refract-scope-label"></span>' +
+                    '<span class="refract-scope-value"></span>' +
+                '</button>';
+            var segs = wrap.querySelectorAll(".refract-scope-seg");
+            segs[0].querySelector(".refract-scope-label").textContent = labels[0];
+            segs[0].querySelector(".refract-scope-value").textContent = refractEpNum(counts.own) + " scenes";
+            segs[1].querySelector(".refract-scope-label").textContent = labels[1];
+            segs[1].querySelector(".refract-scope-value").textContent = refractEpNum(counts.all) + " scenes";
+            /* The click goes to Stash's own input. It is never moved and
+               never mirrored: whatever it does with the state is what
+               the page shows. */
+            wrap.addEventListener("click", function (e) {
+                var seg = e.target.closest && e.target.closest(".refract-scope-seg");
+                if (!seg) { return; }
+                var live = document.querySelector("#showSubContent");
+                if (!live) { return; }
+                var want = seg.getAttribute("data-seg") === "all";
+                if (live.checked !== want) { live.click(); }
+            });
+            var group = ctx.head.querySelector(".detail-group");
+            if (group) { ctx.head.insertBefore(wrap, group); } else { ctx.head.appendChild(wrap); }
+        }
+
+        /* State is read from the live input every tick, so the readout
+           cannot drift from Stash. */
+        var on = !!cb.checked;
+        wrap.setAttribute("data-scope", on ? "all" : "own");
+        var all = wrap.querySelectorAll(".refract-scope-seg");
+        for (var i = 0; i < all.length; i++) {
+            var isOn = (all[i].getAttribute("data-seg") === "all") === on;
+            all[i].setAttribute("aria-pressed", isOn ? "true" : "false");
+        }
+        document.body.classList.add("refract-has-scope");
+        return true;
+    }
+
+    /* ── Entity pages: capping an unbounded relation row ──────────────
+       The sub-tag row has no budget. Measured on the Scene Descriptor
+       axis tag, its 1,328 chips render 4,731px tall, which puts the tab
+       strip at y=4,998 and every scene below the first 19% of the page.
+       That is the law in DESIGN_SYSTEM 6.4 (free user text never sets a
+       panel's height) broken by a field kind the law does not name: a
+       relation list is not user-entered text.
+
+       The clamp is CSS; this decides whether it is needed and supplies
+       the disclosure, because a cap without a way past it loses access
+       to the tags, and P6 says reachable beats visible. Overflow is
+       measured rather than counted, so it holds for any chip width and
+       any viewport. */
+    function capEntityRelationRows() {
+        if (!refractEpContext()) { return false; }
+        var row = document.querySelector(".detail-header .detail-item.sub_tags");
+        if (!row) { return false; }
+        var val = row.querySelector(".detail-item-value");
+        if (!val) { return false; }
+
+        var btn = row.querySelector(".refract-cap-toggle");
+        var open = row.classList.contains("refract-cap-open");
+        row.classList.add("refract-capped");
+        /* A row that spills by a few pixels does not want a disclosure:
+           the cap would hide nothing and cost a control. Only engage
+           when the overflow is worth a click. Measured on tag 67, whose
+           22 chips run 110px against a 140px budget and are therefore
+           left alone. */
+        var overflowing = open || val.scrollHeight > val.clientHeight + 12;
+        if (!overflowing) {
+            row.classList.remove("refract-capped");
+            if (btn) { btn.parentNode.removeChild(btn); }
+            return true;
+        }
+
+        var total = val.querySelectorAll(".tag-item").length;
+        if (!btn) {
+            btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "refract-cap-toggle";
+            btn.addEventListener("click", function () {
+                var nowOpen = row.classList.toggle("refract-cap-open");
+                btn.setAttribute("aria-expanded", nowOpen ? "true" : "false");
+                refractEpCapLabel(btn, row, nowOpen);
+            });
+            row.appendChild(btn);
+        }
+        btn.dataset.refractTotal = String(total);
+        refractEpCapLabel(btn, row, row.classList.contains("refract-cap-open"));
+        return true;
+    }
+
+    function refractEpCapLabel(btn, row, open) {
+        var total = btn.dataset.refractTotal || "0";
+        var n = Number(total);
+        btn.textContent = open
+            ? "Show fewer"
+            : (n === 1 ? "Show the 1 sub-tag" : "All " + refractEpNum(n) + " sub-tags");
+    }
+
     /* ── Performer card flip (playing-card mode) ──────────────────────
        JoeBiden/detox22 idea: a trading-card "flip" on performer cards.
        The corner flip button reveals a back face: a mirrored, heavily
@@ -16444,6 +16645,8 @@
             try { injectPerformerCardFlip(); } catch (e) {}
             try { tagBulkDateInputGroups(); } catch (e) {}
             try { setupVideoFilterSwatches(); } catch (e) {}
+            try { injectEntityScope(); } catch (e) {}
+            try { capEntityRelationRows(); } catch (e) {}
         }
         function sched() {
             clearTimeout(_t);
