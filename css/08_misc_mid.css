@@ -7344,6 +7344,17 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-container {
 
 /* ── The card slot ─────────────────────────────────────────────── */
 
+/* Bootstrap's .row is flex: 0 1 auto, so the readout column sized to its
+   content and stopped 83px short of the band's right edge while the card
+   sat hard against the left one. Nothing in the header wanted that: the
+   band is a plate with even padding, and a table that stops short of it
+   reads as a mistake rather than a margin. Growing the row puts the
+   facts, the ratings and the tag bars on the same right edge the card
+   has on the left, and the extra 58px is enough for BODY OVERALL to
+   stop being BODY OVER... . */
+body.stash-liquid-glass #performer-page .refract-ph .detail-container > .row {
+    flex: 1 1 auto;
+}
 body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
     width: 340px;
     flex: 0 0 340px;
