@@ -7472,15 +7472,26 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head > div:has(> 
 body.stash-liquid-glass #performer-page .refract-ph .alias-head {
     display: none !important;
 }
+/* The run clips; the control that un-clips it does not. */
 body.stash-liquid-glass #performer-page .refract-ph-alias {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--gap-sm);
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-ph-alias__list {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--gap-sm);
-    max-height: 1.55rem;
+    min-width: 0;
+    /* One chip row, whole: a chip is 3px padding + 16.24px line + 3px
+       + 2px rim = 24.24, so the window has to clear that or every name
+       loses its bottom rim to the clip. */
+    max-height: 1.75rem;
     overflow: hidden;
 }
-body.stash-liquid-glass #performer-page .refract-ph-alias.is-open {
+body.stash-liquid-glass #performer-page .refract-ph-alias.is-open .refract-ph-alias__list {
     max-height: none;
 }
 body.stash-liquid-glass #performer-page .refract-ph-alias__n {
@@ -7493,6 +7504,12 @@ body.stash-liquid-glass #performer-page .refract-ph-alias__n {
     color: var(--text);
 }
 body.stash-liquid-glass #performer-page .refract-ph-alias__more {
+    flex: none;
+    /* On the first row, not centred against the block: expanded to two
+       rows, a centred control floats between them and reads as though
+       it belongs to neither. */
+    align-self: flex-start;
+    margin-top: 1px;
     padding: 3px 6px;
     font-size: var(--fs-sm);
     font-weight: 600;
@@ -8279,11 +8296,23 @@ body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-gr
    quiet glyph that colours on hover: twenty-six of them shouting at
    once is a row of alarms, not a form. */
 body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group-append > .btn.btn-danger {
+    /* Centred on the box, not hung off a baseline. As a block button
+       with an inline-block glyph the minus rode the line box: measured
+       0.78px above the button's centre on every row of every list
+       field, which is small enough to read as sloppiness rather than as
+       a bug and is why it survived a build and a review. */
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
     background: var(--fill-3) !important;
     border-color: var(--glass-border) !important;
     color: var(--text-muted) !important;
     transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
 }
+/* The seam needs nothing: measured, the input already carries no right
+   border and the button's 1px left border IS the single hairline. A
+   -1px pull here would have eaten a pixel of the field to fix a doubled
+   rim that was never there. */
 body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group-append > .btn.btn-danger:hover {
     background: rgba(239, 68, 68, 0.16) !important;
     border-color: rgba(239, 68, 68, 0.4) !important;

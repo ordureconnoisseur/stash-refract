@@ -8362,6 +8362,185 @@
     /* Everything initPerformerHeader adds, removed. Called when the
        header switches to edit mode, and when the playing-card layout is
        off for the card half of it. */
+    /* ── Performer page: the edit form ────────────────────────────────
+       08_misc_mid.css turns the flat form into a twelve-column grid in
+       named sections. It cannot do that alone: CSS can place a row but
+       it cannot tell which row is which, since Stash ships 26 identical
+       `.form-group.row` siblings whose only distinguishing mark is the
+       text of a label. So the label is read here and left on the row as
+       a slug; every placement in CSS keys off that.
+
+       Nothing is moved. The rows keep their parent and their order in
+       the DOM; `order` does the grouping, which is what makes the
+       sections safe. */
+    var REFRACT_PE_SECTIONS = [
+        { key: "identity", label: "Identity" },
+        { key: "appearance", label: "Appearance" },
+        { key: "marks", label: "Marks and notes" },
+        { key: "career", label: "Career" },
+        { key: "links", label: "Links and identifiers" },
+        { key: "tags", label: "Tags" },
+        { key: "options", label: "Options" }
+    ];
+
+    function refractPeSlug(text) {
+        return String(text || "")
+            .toLowerCase()
+            .replace(/\(.*?\)/g, function (m) { return " " + m.replace(/[()]/g, "") + " "; })
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "");
+    }
+
+    function initPerformerEdit() {
+        var page = document.querySelector("#performer-page");
+        if (!page) { return; }
+        var header = page.querySelector(".detail-header");
+        if (!header) { return; }
+        if (!header.classList.contains("edit")) {
+            header.classList.remove("refract-pe");
+            return;
+        }
+        var form = header.querySelector("form");
+        if (!form) { return; }
+        header.classList.add("refract-pe");
+
+        /* 1. Name every row from its label. */
+        for (var i = 0; i < form.children.length; i++) {
+            var row = form.children[i];
+            if (!row.classList || !row.classList.contains("form-group")) { continue; }
+            if (row.hasAttribute("data-refract-pe")) { continue; }
+            var lab = row.querySelector("label");
+            var slug = refractPeSlug(lab ? lab.textContent : "");
+            if (slug) { row.setAttribute("data-refract-pe", slug); }
+        }
+
+        /* 2. Section headings, placed by order beside the rows they
+           introduce. Appended once; the grid does the rest. */
+        if (!form.querySelector(".refract-pe-sec")) {
+            for (var s = 0; s < REFRACT_PE_SECTIONS.length; s++) {
+                var sec = document.createElement("div");
+                sec.className = "refract-pe-sec is-" + REFRACT_PE_SECTIONS[s].key;
+                sec.innerHTML =
+                    '<span class="refract-pe-sec__label">' + escapeHtml(REFRACT_PE_SECTIONS[s].label) + "</span>" +
+                    '<span class="refract-pe-sec__rule"></span>';
+                form.appendChild(sec);
+            }
+        }
+
+        /* 3. Fields that do not apply to the gender. Agreed and settled:
+           Penis Length and Circumcised were both rendered at 34px on a
+           female performer. They drop out, and the escape hatch stays
+           because gender can be wrong and the fields are still real. */
+        var genderRow = form.querySelector('[data-refract-pe="gender"]');
+        var genderSel = genderRow ? genderRow.querySelector("select") : null;
+        var na = form.querySelector(".refract-pe-na");
+        if (!na) {
+            na = document.createElement("div");
+            na.className = "refract-pe-na";
+            na.innerHTML =
+                "<span>Penis length and circumcised do not apply to this gender</span>" +
+                '<button type="button" class="refract-pe-na__show">Show anyway</button>';
+            na.querySelector(".refract-pe-na__show").addEventListener("click", function () {
+                form.classList.remove("refract-pe-hide-male");
+                form.setAttribute("data-refract-pe-forced", "1");
+            });
+            form.appendChild(na);
+        }
+        var applyGender = function () {
+            if (form.getAttribute("data-refract-pe-forced")) { return; }
+            var v = genderSel ? String(genderSel.value || "") : "";
+            var male = /MALE/.test(v) && !/FEMALE/.test(v);
+            form.classList.toggle("refract-pe-hide-male", !!v && !male);
+        };
+        if (genderSel && !genderSel.getAttribute("data-refract-pe-watch")) {
+            genderSel.setAttribute("data-refract-pe-watch", "1");
+            genderSel.addEventListener("change", applyGender);
+        }
+        applyGender();
+
+        /* 4. The crop guide. The card shows 2:3; this shows the whole
+           frame with the part the card keeps marked on it, computed
+           from the file's own dimensions rather than assumed. */
+        var host = header.querySelector(".detail-header-image");
+        var img = host ? host.querySelector("img.performer") : null;
+        if (host && img) {
+            var crop = host.querySelector(".refract-pe-crop");
+            if (!crop) {
+                crop = document.createElement("div");
+                crop.className = "refract-pe-crop";
+                crop.innerHTML =
+                    '<div class="refract-pe-crop__side is-left"></div>' +
+                    '<div class="refract-pe-crop__side is-right"></div>' +
+                    '<div class="refract-pe-crop__label"></div>';
+                host.appendChild(crop);
+            }
+            var shot = host.parentNode.querySelector(".refract-pe-shot");
+            if (!shot) {
+                shot = document.createElement("div");
+                shot.className = "refract-pe-shot";
+                host.appendChild(shot);
+            }
+            var paint = function () {
+                var w = img.naturalWidth, h = img.naturalHeight;
+                if (!w || !h) { return; }
+                var ratio = w / h;
+                var target = 2 / 3;
+                var gutter = 0;
+                var note;
+                if (ratio > target) {
+                    gutter = (1 - target / ratio) / 2 * 100;
+                    note = "the card keeps the middle";
+                } else {
+                    note = ratio === target ? "already 2:3, nothing cropped" : "the card keeps the top";
+                }
+                host.style.setProperty("--refract-pe-gutter", gutter.toFixed(2) + "%");
+                var lab = crop.querySelector(".refract-pe-crop__label");
+                if (lab && lab.textContent !== note) { lab.textContent = note; }
+                var g = Math.round(gutter * 10) / 10;
+                var line = w + " x " + h + "   ·   " +
+                    (g > 0 ? g + "% off each side" : "no crop");
+                if (shot.textContent !== line) { shot.textContent = line; }
+            };
+            if (img.complete) { paint(); }
+            if (!img.getAttribute("data-refract-pe-watch")) {
+                img.setAttribute("data-refract-pe-watch", "1");
+                img.addEventListener("load", function () { safeRun(paint); });
+            }
+        }
+
+        /* 5. What is waiting on Save. Stash disables the button until
+           something changes, so that flag is the truth about the form
+           and the bar reports it rather than inventing a count it
+           cannot derive. */
+        var saveBtn = null;
+        var bar = header.querySelector(".details-edit");
+        if (bar) {
+            var bb = bar.querySelectorAll("button");
+            for (var b = 0; b < bb.length; b++) {
+                if (/^save$/i.test((bb[b].textContent || "").trim())) { saveBtn = bb[b]; break; }
+            }
+            var state = bar.querySelector(".refract-pe-state");
+            if (!state) {
+                state = document.createElement("div");
+                state.className = "refract-pe-state";
+                state.innerHTML =
+                    '<span class="refract-pe-state__eyebrow">Editing</span>' +
+                    '<span class="refract-pe-state__line"></span>';
+                bar.insertBefore(state, bar.firstChild);
+            }
+            var nameEl = form.querySelector('[data-refract-pe="name"] input');
+            var who = nameEl ? (nameEl.value || "").trim() : "";
+            var dirty = !!(saveBtn && !saveBtn.disabled);
+            var line = dirty ? "Unsaved changes" : (who || "No changes yet");
+            var lineEl = state.querySelector(".refract-pe-state__line");
+            if (lineEl.textContent !== line) { lineEl.textContent = line; }
+            state.classList.toggle("is-dirty", dirty);
+            var eyeb = state.querySelector(".refract-pe-state__eyebrow");
+            var eyeText = dirty ? "Editing " + (who || "this performer") : "Editing";
+            if (eyeb.textContent !== eyeText) { eyeb.textContent = eyeText; }
+        }
+    }
+
     function refractPhTeardown(header) {
         header.classList.remove("refract-ph");
         header.style.removeProperty("--refract-ph-shot");
@@ -8465,6 +8644,15 @@
                 chips.setAttribute("data-raw", raw);
                 chips.classList.remove("is-open");
                 chips.innerHTML = "";
+                /* The names are clipped to one line; the control that
+                   un-clips them is NOT in the clipped box. It was, and
+                   with nine aliases it wrapped to the second line and
+                   sat at top=31 inside a 22px window: the only way to
+                   see the hidden names was itself hidden. Three aliases
+                   never showed the bug, because three do not overflow. */
+                var list = document.createElement("div");
+                list.className = "refract-ph-alias__list";
+                chips.appendChild(list);
                 var names = raw ? raw.split(",") : [];
                 var shown = 0;
                 for (var a = 0; a < names.length; a++) {
@@ -8473,7 +8661,7 @@
                     var chip = document.createElement("span");
                     chip.className = "refract-ph-alias__n";
                     chip.textContent = nm;
-                    chips.appendChild(chip);
+                    list.appendChild(chip);
                     shown += 1;
                 }
                 if (shown > 3) {
@@ -8481,10 +8669,11 @@
                     more.type = "button";
                     more.className = "refract-ph-alias__more";
                     more.textContent = "all " + shown;
+                    more.setAttribute("data-refract-count", String(shown));
                     more.addEventListener("click", function () {
                         var box = this.parentNode;
                         var open = box.classList.toggle("is-open");
-                        this.textContent = open ? "fewer" : "all " + (box.children.length - 1);
+                        this.textContent = open ? "fewer" : "all " + this.getAttribute("data-refract-count");
                     });
                     chips.appendChild(more);
                 }
@@ -8984,6 +9173,7 @@
                 safeRun(initTagCountPopover);
                 safeRun(initScrapeResults);
                 safeRun(initPerformerHeader);
+                safeRun(initPerformerEdit);
             } finally {
                 observer.observe(document.body, { childList: true, subtree: true });
             }
