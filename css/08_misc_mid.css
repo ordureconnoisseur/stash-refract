@@ -7398,7 +7398,7 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head {
        by align-content. A 1fr row here gave ALL of it to one track and
        centred the read-out grid in a 255px band with 90px of nothing
        above it -- the same hole the design was drawn to close. */
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto auto auto auto auto;
     align-content: space-between;
     align-items: start;
     column-gap: var(--gap-lg);
@@ -7407,20 +7407,41 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head {
     min-width: 0;
 }
 
-/* Row 1: aliases, the icons Stash puts beside the name, and the
-   actions. The name itself is hidden -- the card carries it, in
-   Concert One at the top of the image, and setting it twice on one
-   screen is the loudest kind of duplication. */
+/* Row 1: the name, then the icons Stash puts beside it.
+
+   The name was hidden here at first, on the reasoning that the card
+   already carries it in Concert One and setting it twice is
+   duplication. That was wrong, and it is the thing a page cannot get
+   away with: a page has to say whose page it is, in plain text, in the
+   page's own voice. The card's name is part of the artwork -- display
+   face, neon, inside the object. This is the title. They do different
+   jobs, which is what stops two names on one screen reading as a
+   mistake, and the two are 32px apart precisely so the difference is
+   legible. */
 body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 {
     grid-row: 1;
-    grid-column: 2;
+    grid-column: 1 / 3;
     display: flex;
     align-items: center;
-    gap: var(--gap-sm);
+    gap: var(--gap-lg);
     margin: 0 !important;
     min-width: 0;
 }
-body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 > .performer-name,
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 > .performer-name {
+    display: block !important;
+    font-size: var(--fs-2xl) !important;
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* Stash's collapse chevron. It toggles .detail-header.collapsed, which
+   this band has no design for; hiding it is a capability removed, and
+   it is on the list rather than settled. */
 body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 > .detail-expand-collapse {
     display: none !important;
 }
@@ -7465,8 +7486,8 @@ body.stash-liquid-glass #performer-page .refract-ph .name-icons .favorite-button
    them as chips and hides the run, because a list of unknown length
    needs a budget and a comma run has none. */
 body.stash-liquid-glass #performer-page .refract-ph .performer-head > div:has(> .alias-head) {
-    grid-row: 1;
-    grid-column: 1;
+    grid-row: 2;
+    grid-column: 1 / 4;
     min-width: 0;
 }
 body.stash-liquid-glass #performer-page .refract-ph .alias-head {
@@ -7539,6 +7560,11 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head > .col > .ro
     margin: 0 !important;
 }
 body.stash-liquid-glass #performer-page .refract-ph .details-edit {
+    /* Stash rules this block off from the content above it, which was
+       right when it was a bar at the foot of a page. In the band it has
+       nothing above it, so the rule floated over the gap between the
+       name row and the buttons and read as a stray hairline. */
+    border-top: 0 !important;
     display: flex !important;
     flex-wrap: nowrap;
     align-items: center;
@@ -7593,7 +7619,7 @@ body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-dan
    count lives on a tab, the rank inside a plugin badge, the career in
    a detail row. */
 body.stash-liquid-glass #performer-page .refract-ph-standing {
-    grid-row: 2;
+    grid-row: 3;
     grid-column: 1 / -1;
     display: flex;
     align-items: flex-end;
@@ -7612,15 +7638,17 @@ body.stash-liquid-glass #performer-page .refract-ph-standing__label {
     text-transform: uppercase;
     color: var(--text-muted);
 }
+/* One step down from --fs-2xl, which is now the name's. Two things at
+   28px on one surface is two headlines and no hierarchy. */
 body.stash-liquid-glass #performer-page .refract-ph-standing__value {
-    font-size: var(--fs-2xl);
+    font-size: var(--fs-xl);
     font-weight: 600;
     line-height: 1;
     letter-spacing: -0.02em;
     color: var(--text);
 }
 body.stash-liquid-glass #performer-page .refract-ph-standing__tail {
-    font-size: var(--fs-body);
+    font-size: var(--fs-md);
     font-weight: 400;
     color: var(--text-muted);
 }
@@ -7630,7 +7658,7 @@ body.stash-liquid-glass #performer-page .refract-ph-standing__tail {
    column and they keep working. The rank badge is hidden because the
    standing row above already states it, in words. */
 body.stash-liquid-glass #performer-page .refract-ph .quality-group {
-    grid-row: 2;
+    grid-row: 3;
     grid-column: 4;
     display: flex !important;
     align-items: center;
@@ -7648,7 +7676,7 @@ body.stash-liquid-glass #performer-page .refract-ph .quality-group .hon-battle-r
    value it holds, where the live page gave every one of them a 540px
    row and let a thirty-one chip tag run set the height of the block. */
 body.stash-liquid-glass #performer-page .refract-ph .detail-group {
-    grid-row: 3;
+    grid-row: 4;
     grid-column: 1 / -1;
     display: grid !important;
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -7726,7 +7754,7 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.c
    Built by refract.js from the tag chips; absent when the plugin is
    not in use, and the row simply does not appear. */
 body.stash-liquid-glass #performer-page .refract-ph-cats {
-    grid-row: 4;
+    grid-row: 5;
     grid-column: 1 / -1;
     display: flex;
     align-items: flex-end;
