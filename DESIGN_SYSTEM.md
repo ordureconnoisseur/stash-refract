@@ -1059,6 +1059,15 @@ bug.
     replaced element inside a content-sized flex parent is circular; remove
     the sizing floor and it collapses, measured at 2x2. Size replaced
     elements from a real constraint, never from each other.
+12. **CSS and JS version skew fails silently.** The body-class contract
+    (section 5) and the injected scaffolds mean much of the CSS keys on
+    classes that JS adds at runtime. Deploy CSS from one build over
+    refract.js from another and those rules match nothing: no error, no
+    visual break, just rules that quietly stopped existing. A hybrid build
+    did exactly this on 2026-08-29. The deploy protocol that prevents it
+    (one committed tree, reproducible from a hash) is process and lives in
+    CLAUDE.md; the physics fact is recorded here because no review that
+    reads source can catch it.
 17. **When one selector appears more than once, the rule that wins is
     never the one you are reading.** Three times in one pass: two
     `--ic-grid` blocks where the stale later one drew rings instead of
@@ -1190,6 +1199,12 @@ Two process rules the harness sessions earned:
 - **Measure a fresh document.** A page that loaded before the edit measures
   the old CSS; two wrong conclusions in one session came from exactly this,
   including a fix declared failed that had worked. Reload, then measure.
+- **Measure a deployed, committed build.** The harness measures whatever is
+  in the plugin directory, not what is in your tree, and with parallel lanes
+  that directory can hold a hybrid (one lane's CSS over another's JS). A
+  hybrid measures perfectly plausibly while rules keyed on JS-added classes
+  match nothing (section 7 rule 12). Before measuring: re-deploy your own
+  build, from a committed tree, so the numbers are attributable to a hash.
 - **Re-laying out a surface means hunting its old rules first.** In a
   numbered cascade, stale rules for the superseded layout in a
   higher-numbered file do not error; they win. A morning's row-layout rules
