@@ -8359,6 +8359,29 @@
         else { standing.appendChild(cell); }
     }
 
+    /* Everything initPerformerHeader adds, removed. Called when the
+       header switches to edit mode, and when the playing-card layout is
+       off for the card half of it. */
+    function refractPhTeardown(header) {
+        header.classList.remove("refract-ph");
+        header.style.removeProperty("--refract-ph-shot");
+        var host = header.querySelector(".detail-header-image");
+        if (host) {
+            host.classList.remove("refract-ph-card");
+            ["bronze", "silver", "gold", "diamond", "legendary", "perfect"].forEach(function (t) {
+                host.classList.remove("refract-card-tier-" + t);
+            });
+        }
+        [".refract-ph-fill", ".refract-ph-standing", ".refract-ph-cats",
+         ".refract-ph-tags", ".refract-ph-alias", ".refract-pc-name-banner",
+         ".refract-pc-tier-label", ".refract-ph-chin"].forEach(function (sel) {
+            var n = header.querySelectorAll(sel);
+            for (var i = 0; i < n.length; i++) {
+                if (n[i].parentNode) { n[i].parentNode.removeChild(n[i]); }
+            }
+        });
+    }
+
     function refractPerfHeadChild(head, cls) {
         for (var i = 0; i < head.children.length; i++) {
             if (head.children[i].classList.contains(cls)) { return head.children[i]; }
@@ -8373,6 +8396,21 @@
         if (!header) { return; }
         var head = header.querySelector(".performer-head");
         if (!head) { return; }
+
+        /* Edit mode reuses this header: same .detail-header, same
+           .performer-head, entirely different children -- 28 form groups
+           where the read-outs were. Left alone the band applied to it,
+           and the result was a 2528px header with the blurred backdrop
+           behind the whole form and two of the grid's four columns
+           resolved to 0px, pushing the fields off the right edge.
+
+           Every rule in 08_misc_mid is scoped under .refract-ph, so
+           dropping the class is the whole gate; the injected nodes go
+           with it so nothing stale survives the mode change. */
+        if (header.classList.contains("edit")) {
+            refractPhTeardown(header);
+            return;
+        }
         header.classList.add("refract-ph");
 
         /* 1. The backdrop. Same file the card shows, blurred and scaled
