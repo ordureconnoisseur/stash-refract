@@ -2285,15 +2285,30 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
    the tier's own colour so it belongs to the chip rather than sitting on
    it, and the 6px each side matches the gap it replaces, so the chip
    grows by exactly one pixel. It cannot appear on an unrated scene,
-   because the value it separates is not rendered. */
+   because the value it separates is not rendered.
+
+   Drawn, not bordered. A border-left spans the LINE BOX, which measured
+   16px in a 22px chip against letterforms of 13 and a cap height of 8:
+   at nearly three quarters of the chip's height it read as a divider
+   between two halves of a container rather than a separator between two
+   words. 10px sits between the cap height and the full ink, which is
+   where a rule between words belongs. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value {
-    padding-left: 6px;
-    border-left: 1px solid rgba(255, 255, 255, 0.16);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: var(--fs-sm);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     color: var(--text);
     line-height: 1.35;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value::before {
+    content: "";
+    flex: 0 0 auto;
+    width: 1px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.18);
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value[hidden] { display: none; }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip:hover {
@@ -2316,7 +2331,9 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-value {
     color: rgba(var(--tier-color-bright), 1);
-    border-left-color: rgba(var(--tier-color-bright), 0.32);
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-value::before {
+    background: rgba(var(--tier-color-bright), 0.34);
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="bronze"] { --tier-color: 215, 148, 92; --tier-color-bright: 240, 180, 130; }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="silver"] { --tier-color: 192, 196, 204; --tier-color-bright: 226, 230, 238; }
