@@ -2232,6 +2232,109 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     font-weight: 500 !important;
     color: rgba(255, 255, 255, 0.45) !important;
 }
+/* ---- The rating tier chip -------------------------------------------
+   The rating reads as its tier, which is the theme's own idea about
+   ratings and the one thing the rating control never used. Section 4
+   grants the tier palette the right to override the accent because it
+   encodes data: this chip is gold because the scene is 8.2, not because
+   gold looks good (P3).
+
+   Restrained on purpose. The cards get breathing glows, sheen sweeps and
+   rotating halos; a 22px chip in a control row gets the tier's colour on
+   its text, a tint of it behind and a rim of it, and nothing that moves.
+   Escalation stays monotonic (rule 3) because the colours carry the
+   ladder, and P1 holds because the chip is quieter than the poster it
+   sits beside. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip {
+    order: 0 !important;
+    flex: 0 0 auto;
+    display: inline-flex;
+    /* Centre, not baseline. Baseline alignment lines the two spans up
+       with each other and then places the whole line by the tallest
+       ascent above it -- with line-height: 1 on both, that pinned the
+       text to the top of the chip: measured 0px above the ink and 12px
+       below in a 22px chip, with the value's ink breaking 1px past the
+       top edge. */
+    align-items: center;
+    gap: 6px;
+    height: 22px;
+    padding: 0 10px;
+    border-radius: var(--radius-pill);
+    background: var(--fill-3);
+    border: 1px solid var(--glass-border);
+    box-shadow: none;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-name {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--track-eyebrow);
+    color: rgba(255, 255, 255, 0.55);
+    /* 6.7: the line-height has to clear ascent plus descent or the
+       half-leading goes negative and the baseline is dragged up. Both
+       spans carry the same one so their boxes are equal and the two
+       words sit on one line despite the size difference. */
+    line-height: 1.35;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value {
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    line-height: 1.35;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value[hidden] { display: none; }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip:hover {
+    background: var(--fill-4);
+    border-color: var(--glass-border-bright);
+}
+
+/* Tiered: the chip takes the tier's own colour, from the same values the
+   cards read, so a Gold scene is the same gold in both places. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) {
+    background: rgba(var(--tier-color), 0.13);
+    border-color: rgba(var(--tier-color), 0.4);
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]):hover {
+    background: rgba(var(--tier-color), 0.2);
+    border-color: rgba(var(--tier-color-bright), 0.75);
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-name {
+    color: rgba(var(--tier-color-bright), 0.95);
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-value {
+    color: rgba(var(--tier-color-bright), 1);
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="bronze"] { --tier-color: 215, 148, 92; --tier-color-bright: 240, 180, 130; }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="silver"] { --tier-color: 192, 196, 204; --tier-color-bright: 226, 230, 238; }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="gold"] { --tier-color: 230, 185, 78; --tier-color-bright: 255, 215, 120; }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="diamond"] { --tier-color: 165, 223, 219; --tier-color-bright: 205, 245, 242; }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="legendary"] { --tier-color: 244, 114, 182; --tier-color-bright: 255, 160, 210; }
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] { --tier-color: 255, 255, 255; --tier-color-bright: 255, 255, 255; }
+
+/* Legendary and Perfect are where the ladder is meant to be felt. They
+   get a rim light rather than an animation: a chip that breathes in a
+   control row is the ambient motion 3.7 rule 2 forbids, but a static
+   halo still says this one is different. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="legendary"],
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] {
+    box-shadow: 0 0 0 1px rgba(var(--tier-color), 0.25),
+                0 0 14px rgba(var(--tier-color), 0.3);
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] {
+    background: linear-gradient(100deg,
+        rgba(244, 114, 182, 0.18), rgba(96, 165, 250, 0.18), rgba(192, 132, 252, 0.18));
+}
+
+/* Unrated: an invitation, with no tier colour and no false emphasis. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-rated="0"] .st-tier-name {
+    color: rgba(255, 255, 255, 0.42);
+}
+
+
 /* ── The strip's icon set ─────────────────────────────────────────────
    One family, one grid, one weight. The row used to mix five idioms at
    four optical sizes: solid stars, a solid heart, a solid archive box, a
@@ -2275,41 +2378,6 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle                                    { --ic: var(--ic-kebab); }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn                                  { --ic: var(--ic-grid); }
 
-/* ── The strip's icon set ─────────────────────────────────────────────
-   One family, one grid, one weight. The row used to mix five idioms at
-   four optical sizes: solid stars, a solid heart, a solid archive box, a
-   hairline eye, three blob droplets, three hairline dots and four tiny
-   squares. Individually each is Stash's or a plugin's own; together they
-   read as a row nobody drew. 6.12 asks for one family and matching
-   weights, and this is the only way to get it on controls the theme does
-   not own -- the mask treatment from 6.20, the same one the stars use.
-
-   Every glyph is a 24x24 box with a 1.7 stroke, round caps and joins,
-   masked into a fixed 14x14 square. Fixed, not em-sized: a mask box of
-   the same size for every icon is what makes them share an optical
-   centre, which is the thing the row never had. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn) > svg,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn) > span > svg {
-    display: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn)::before {
-    content: "";
-    display: block;
-    width: 14px;
-    height: 14px;
-    flex: 0 0 14px;
-    background-color: currentColor;
-    -webkit-mask: var(--ic) center / contain no-repeat;
-            mask: var(--ic) center / contain no-repeat;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) .count-icon { --ic: var(--ic-eye); }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) .count-icon    { --ic: var(--ic-drop); }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn                                  { --ic: var(--ic-heart); }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button                                   { --ic: var(--ic-box); }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle                                    { --ic: var(--ic-kebab); }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn                                  { --ic: var(--ic-grid); }
 
 /* --st-star-svg is defined in 01_tokens.css now: the advanced-rating
    trigger and Stash's own rating stars draw the same shape as the
@@ -2528,6 +2596,52 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
    single widest thing in the row, and at 17px the row measured 356.5px
    against 338. 17px was the right size when the rating had a line to
    itself; sharing one with six other controls, it is not. */
+/* These sit AFTER the .rating-stars block above on purpose: that block
+   sets display: inline-flex at the same specificity, so a hide rule
+   written earlier in the file loses on source order and the drawer
+   never closes. */
+/* Open: the star row unfolds INSIDE the strip on its own line. The stars
+   never move in the DOM -- they are Stash's control and physics 1 says
+   leave them where React put them -- they are simply not displayed until
+   asked for. The advanced-rating trigger joins them, because with the
+   drawer open the row is about rating and that is what it edits. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars { display: none !important; }
+/* On the toolbar itself, not a descendant of it. The prefix used
+   everywhere else in this file ends in a descendant combinator, so
+   pasting the class onto it asked for a .st-rating-open INSIDE the
+   toolbar -- which never matches, so the row never wrapped and the
+   stars unfolded inline instead of onto their own line. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open {
+    flex-wrap: wrap !important;
+}
+/* The drawer is one line, not two. Giving the stars flex-basis 100%
+   made them a full-width item, which pushed the trigger after them onto
+   a third line; a zero-height break before them does the same job and
+   lets the two share a row. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open::after {
+    content: "" !important;
+    flex: 0 0 100%;
+    height: 0;
+    order: 19;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-toolbar.st-rating-open .rating-stars {
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    order: 20 !important;
+    margin: 8px 0 0 0 !important;
+    padding: 0 30px 0 0 !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-toolbar.st-rating-open .adv-rating-btn {
+    order: 21 !important;
+    margin: 8px 0 0 4px !important;
+}
+/* A stadium is the right shape for a 34.5px control row and the wrong
+   one for an 60px drawer: the curve stops reading as a rim and starts
+   reading as a lozenge. --radius sits it with the panel's own corners. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open {
+    border-radius: var(--radius) !important;
+}
+
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars button {
     width: 14px !important;
     height: 14px !important;

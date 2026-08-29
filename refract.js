@@ -13728,6 +13728,137 @@
         badge.__stPrev = total;
     }
 
+    /* ── The rating tier chip ─────────────────────────────────────────
+       The scene panel showed a rating the way every other application
+       shows one: five stars. Refract has its own idea about ratings --
+       the tier ladder in section 4, which is the loudest thing the theme
+       does and the one thing a user remembers about it -- and the rating
+       control was the single place that idea was not being used.
+
+       So the rating reads as its tier: GOLD 8.2, DIAMOND 9.1, PERFECT
+       10. The stars do not disappear, they move behind the chip: click
+       it and the star row unfolds inside the strip, still Stash's own
+       control, still where React put it (physics 1). 6.6 permits exactly
+       this -- a disclosure is a legitimate place for a control, losing it
+       is not.
+
+       Below 5.0 there is deliberately NO tier (section 4 rule 1: the
+       floor is real, and if everything is a collectible nothing is), so
+       the chip carries the bare score on default glass. Unrated, it says
+       so and invites the click.
+
+       The rating is summed off Stash's own star-fill-N classes rather
+       than read from a label: those classes are how the control encodes
+       the value, they are precision-independent (five stars, hundredths
+       of a star each, so the sum IS the rating), and they are present
+       whether or not the numeric readout is being rendered. */
+    var ST_TIERS = [
+        [10,  "perfect"],
+        [9.5, "legendary"],
+        [8.5, "diamond"],
+        [7.5, "gold"],
+        [6.5, "silver"],
+        [5,   "bronze"]
+    ];
+
+    function stRatingFromStars(row) {
+        var buttons = row.querySelectorAll("button");
+        if (!buttons.length) { return null; }
+        var total = 0;
+        var sawFill = false;
+        for (var i = 0; i < buttons.length; i++) {
+            var m = (buttons[i].className || "").match(/star-fill-(\d+)/);
+            if (!m) { continue; }
+            sawFill = true;
+            total += parseInt(m[1], 10);
+        }
+        if (!sawFill) { return null; }
+        /* Five stars, hundredths of a star each, so the sum is stars x
+           100 -- and the tier ladder in section 4 is stated on the 0-10
+           scale the cards use. Dividing by 50 converts: five full stars
+           is 10, and a scene rated 100/100 lands on Perfect instead of
+           the Bronze that /100 gave it. Every tier was reading one or
+           two rungs low until this was measured against scenes queried
+           by their known rating. */
+        return Math.round(total) / 50;
+    }
+
+    /* Stash can be set to show ratings as five stars or as a decimal out
+       of ten, and refract mirrors that on the body. The chip states the
+       score in whichever the user chose, so it never disagrees with the
+       stars it hides; the TIER is always computed on the 0-10 scale,
+       because that is what section 4 is written in. */
+    function stRatingDisplay(v10) {
+        var stars = document.body.classList.contains("refract-rating-system-stars");
+        var v = stars ? (v10 / 2) : v10;
+        return (Math.round(v * 10) % 10 === 0) ? String(Math.round(v)) : v.toFixed(1);
+    }
+
+    function stTierFor(v) {
+        for (var i = 0; i < ST_TIERS.length; i++) {
+            if (v >= ST_TIERS[i][0]) { return ST_TIERS[i][1]; }
+        }
+        return "";
+    }
+
+    function stRatingTierChip() {
+        var bar = document.querySelector(
+            ":is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar)");
+        if (!bar) { return; }
+        var row = bar.querySelector(".rating-stars");
+        if (!row) { return; }
+
+        var chip = bar.querySelector(":scope > .st-tier-chip");
+        if (!chip) {
+            chip = document.createElement("button");
+            chip.type = "button";
+            chip.className = "st-tier-chip";
+            chip.setAttribute("aria-expanded", "false");
+            chip.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var open = bar.classList.toggle("st-rating-open");
+                chip.setAttribute("aria-expanded", open ? "true" : "false");
+            }, false);
+            bar.insertBefore(chip, bar.firstChild);
+        }
+
+        var v = stRatingFromStars(row);
+        var tier = (v === null || v <= 0) ? "" : stTierFor(v);
+        var label, value;
+        if (v === null || v <= 0) {
+            label = "Unrated";
+            value = "";
+        } else {
+            label = tier ? tier : "Rated";
+            value = stRatingDisplay(v);
+        }
+        chip.setAttribute("data-tier", tier);
+        chip.setAttribute("data-rated", v && v > 0 ? "1" : "0");
+        var outOf = document.body.classList.contains("refract-rating-system-stars")
+            ? " of 5" : " of 10";
+        chip.title = v && v > 0
+            ? ("Rated " + value + outOf + (tier ? ", " + label : "") +
+               ". Click to change.")
+            : "Not rated. Click to rate.";
+
+        var lab = chip.querySelector(".st-tier-name");
+        var val = chip.querySelector(".st-tier-value");
+        if (!lab) {
+            lab = document.createElement("span");
+            lab.className = "st-tier-name";
+            chip.appendChild(lab);
+        }
+        if (!val) {
+            val = document.createElement("span");
+            val.className = "st-tier-value";
+            chip.appendChild(val);
+        }
+        if (lab.textContent !== label) { lab.textContent = label; }
+        if (val.textContent !== value) { val.textContent = value; }
+        val.hidden = !value;
+    }
+
     function applyScenePlayerFixes() {
         injectScenePlayerOverlay();
         setupSceneTabsPerformers();
@@ -13735,6 +13866,7 @@
         stPerformerCredit();
         stClampDescription();
         stSceneActivityBadge();
+        stRatingTierChip();
         initImageCardLightbox();
         initRatingInputSelectAll();
         tagFilledRatings();
