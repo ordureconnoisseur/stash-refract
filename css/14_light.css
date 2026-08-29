@@ -283,12 +283,23 @@ body.stash-liquid-glass.refract-light .scrubber-item-time {
    high-key text in dark and a fill tint in light, so any new use of it
    as text needs a light-mode partner rule or it ships invisible. */
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-desc-more,
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-more {
-    color: var(--accent) !important;
+/* The panel's two disclosures, "Read more" and "+N more", were painted
+   with --accent as TEXT. That is the same mistake the dark rule for
+   .st-tag-more documents having already fixed once, and 3.1 says plainly
+   that --accent is a fill and border token. On the light panel the two
+   measured 2.55:1, under the floor for a control anyone is expected to
+   read and click, and they are the only way to reach the rest of the
+   description or the folded tags.
+
+   Light mode already defines --accent-ink for exactly this, accent mixed
+   55% into black so it can carry text, and nothing here was using it. */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-more,
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-desc-more {
+    color: var(--accent-ink) !important;
 }
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-desc-more:hover,
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-more:hover {
-    color: var(--accent) !important;
+    color: var(--accent-ink) !important;
     text-decoration: underline !important;
 }
 body.stash-liquid-glass.refract-light .scene-wall-item-text-container {

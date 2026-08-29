@@ -1118,8 +1118,16 @@ body.stash-liquid-glass .adv-rating-inline-panel .rating-star {
     height: 12px !important;
     font-size: 0 !important;
     background-color: var(--star-empty) !important;
-    -webkit-mask: var(--st-star-svg) center / contain no-repeat !important;
-            mask: var(--st-star-svg) center / contain no-repeat !important;
+    /* Same sizing as the Overall band above, which 08 moved to
+       `100% auto`. Measured, the two agree today: the star's viewBox is
+       0 0 24 24 and both boxes are square, so `contain` and `100% auto`
+       resolve identically. The reason to match anyway is that they only
+       agree while the box stays square -- `100% auto` keeps drawing the
+       star the box's width whatever happens to it, where `contain`
+       silently starts meaning something else. Two stars 30px apart
+       should not be one box-resize away from disagreeing. */
+    -webkit-mask: var(--st-star-svg) left center / 100% auto no-repeat !important;
+            mask: var(--st-star-svg) left center / 100% auto no-repeat !important;
     cursor: pointer !important;
 }
 body.stash-liquid-glass .adv-rating-inline-panel .rating-star.st-crit-on {
