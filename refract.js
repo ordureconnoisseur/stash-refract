@@ -8133,6 +8133,232 @@
 
        Nothing is moved. The alias run and the tag chips are hidden and
        proxied, everything else is appended. */
+    /* ── The performer page's own card ────────────────────────────────
+       The header shows the same object the grid showed, at the size the
+       grid never gives it. Not a second drawing of the card: 16_playing
+       _card.css accepts `.refract-ph-card` beside `.performer-card` on
+       all 88 of its rules, so what is built here IS the card -- the
+       name floating over the image with no strip behind it, the gender
+       glyph as a type symbol, the tier ribbon across the corner, the
+       neon strip across the foot.
+
+       The stats come from one query rather than from the star DOM. The
+       rating is the tier, and reading a tenth-precision star row back
+       out of button classes is guesswork where `rating100` is a number. */
+    var REFRACT_PH_CARD_QUERY =
+        "query($id: ID!) { findPerformer(id: $id) { rating100 o_counter scene_count birthdate gender country } }";
+    /* No Ascension, no rank -- so Refract works one out from the rating
+       instead, exactly rather than approximately: everyone rated higher,
+       plus one, out of everyone rated at all. It is a different question
+       from Ascension's (which ranks by its own battles), so it carries a
+       different label and never pretends to be the same number. */
+    var REFRACT_PH_RANK_QUERY =
+        "query($v: Int!) {" +
+        " above: findPerformers(filter: {per_page: 0}, performer_filter: {rating100: {value: $v, modifier: GREATER_THAN}}) { count }" +
+        " rated: findPerformers(filter: {per_page: 0}, performer_filter: {rating100: {value: 0, modifier: GREATER_THAN}}) { count } }";
+    var refractPhCardCache = {};
+
+    function refractPhOrdinal(n) {
+        var t = n % 100;
+        if (t >= 11 && t <= 13) { return n + "th"; }
+        var l = n % 10;
+        return n + (l === 1 ? "st" : l === 2 ? "nd" : l === 3 ? "rd" : "th");
+    }
+
+    function refractPhAge(birthdate) {
+        if (!birthdate) { return null; }
+        var b = String(birthdate).split("-");
+        if (b.length < 3) { return null; }
+        var now = new Date();
+        var age = now.getFullYear() - parseInt(b[0], 10);
+        var m = (now.getMonth() + 1) - parseInt(b[1], 10);
+        if (m < 0 || (m === 0 && now.getDate() < parseInt(b[2], 10))) { age -= 1; }
+        return (age > 0 && age < 130) ? age : null;
+    }
+
+    function refractPhPill(cls, icon, label, value) {
+        var el = document.createElement("span");
+        el.className = cls + (value == null ? " stash-perf-empty" : "");
+        el.innerHTML = icon +
+            '<span class="stash-perf-label">' + escapeHtml(label) + "</span>" +
+            "<span>" + (value == null ? "-" : escapeHtml(String(value))) + "</span>";
+        return el;
+    }
+
+    function refractPhBuildCard(header, host, d) {
+        /* Tier first: the ribbon, the halo and every --badge-color in the
+           strip below read off the class this sets. */
+        var r10 = (d.rating100 != null) ? d.rating100 / 10 : 0;
+        applyCardTier(host, r10);
+
+        var nameEl = header.querySelector(".performer-head .performer-name");
+        var name = nameEl ? (nameEl.textContent || "").trim() : "";
+        var banner = host.querySelector(".refract-pc-name-banner");
+        if (!banner) {
+            banner = document.createElement("div");
+            banner.className = "refract-pc-name-banner";
+            host.insertBefore(banner, host.firstChild);
+        }
+        var wantGender = (d.gender === "FEMALE" || d.gender === "TRANSGENDER_FEMALE");
+        var hasGender = !!banner.querySelector(".gender-icon");
+        /* Only the one glyph is drawn in this file, so only the genders
+           it actually depicts get one. The banner reserves the slot
+           either way (16_playing_card), so a performer without an icon
+           does not start their name 25px left of everyone else. */
+        if (wantGender && !hasGender) {
+            banner.insertAdjacentHTML("afterbegin", REFRACT_PREVIEW_GENDER_SVG);
+            var gi = banner.querySelector(".gender-icon");
+            if (gi) { gi.setAttribute("data-gender", d.gender); }
+        } else if (!wantGender && hasGender) {
+            banner.querySelector(".gender-icon").remove();
+        }
+        var nameSpan = banner.querySelector(".refract-pc-name-text");
+        if (!nameSpan) {
+            nameSpan = document.createElement("span");
+            nameSpan.className = "refract-pc-name-text";
+            banner.appendChild(nameSpan);
+        }
+        if (nameSpan.textContent !== name) { nameSpan.textContent = name; }
+
+        /* The ribbon is an empty div; per-tier ::after rules fill it. */
+        if (!host.querySelector(".refract-pc-tier-label")) {
+            var ribbon = document.createElement("div");
+            ribbon.className = "refract-pc-tier-label";
+            host.appendChild(ribbon);
+        }
+
+        /* The chin: country caption with the rank pushed to the right
+           edge, then the neon strip. */
+        var chin = host.querySelector(".refract-ph-chin");
+        if (!chin) {
+            chin = document.createElement("div");
+            chin.className = "refract-ph-chin card-section";
+            host.appendChild(chin);
+        }
+        var country = chin.querySelector(".stash-perf-country");
+        if (!country) {
+            country = document.createElement("span");
+            country.className = "stash-perf-country";
+            country.innerHTML = '<span class="stash-perf-country-name"></span>';
+            chin.appendChild(country);
+        }
+        var cname = country.querySelector(".stash-perf-country-name");
+        var cval = "";
+        var cItem = header.querySelector(".detail-item.country .detail-item-value");
+        if (cItem) { cval = (cItem.textContent || "").trim(); }
+        if (cname.textContent !== cval) { cname.textContent = cval; }
+
+        var strip = chin.querySelector(".stash-perf-stats");
+        if (!strip) {
+            strip = document.createElement("div");
+            strip.className = "stash-perf-stats";
+            chin.appendChild(strip);
+        }
+        var age = refractPhAge(d.birthdate);
+        var ratingTxt = null;
+        if (d.rating100 != null && d.rating100 > 0) {
+            ratingTxt = refractStarsMode() ? (Math.round(d.rating100 / 2) / 10).toFixed(1)
+                                           : String(Math.round(d.rating100 / 10 * 10) / 10);
+        }
+        var sig = [ratingTxt, age, d.scene_count, d.o_counter].join("|");
+        if (strip.getAttribute("data-sig") !== sig) {
+            strip.setAttribute("data-sig", sig);
+            strip.innerHTML = "";
+            strip.appendChild(refractPhPill("stash-perf-rating", STAR_SVG, "Rating", ratingTxt));
+            strip.appendChild(refractPhPill("stash-perf-age", CAKE_SVG, "Age", age));
+            strip.appendChild(refractPhPill("stash-perf-scenes", PLAY_SVG, "Scenes",
+                d.scene_count ? refractPhShort(d.scene_count) : null));
+            strip.appendChild(refractPhPill("stash-perf-ocount", O_ICON_SVG, "O Count",
+                d.o_counter ? d.o_counter : null));
+        }
+    }
+
+    /* Four digits do not fit a pill beside three others. */
+    function refractPhShort(n) {
+        return n >= 1000 ? (Math.round(n / 100) / 10) + "K" : String(n);
+    }
+
+    /* Stash's rating system is a setting: five stars or a ten-point
+       number. The pill says whichever the user reads everywhere else. */
+    function refractStarsMode() {
+        return !!document.querySelector(".rating-stars");
+    }
+
+    function refractPhCard(header, head, page) {
+        var host = header.querySelector(".detail-header-image");
+        if (!host) { return; }
+        var pidEl = header.querySelector(".refract-pp[data-pid]");
+        var pid = pidEl ? pidEl.getAttribute("data-pid") : null;
+        if (!pid) {
+            var m = String(location.pathname).match(/\/performers\/(\d+)/);
+            pid = m ? m[1] : null;
+        }
+        if (!pid) { return; }
+        /* The page shows YOUR card in YOUR style. With the playing-card
+           layout off, 16_playing_card.css styles none of this and the
+           injected chin would show as unstyled text over the portrait,
+           so it is torn down rather than merely unstyled. */
+        if (!document.body.classList.contains("refract-perf-layout-card")) {
+            host.classList.remove("refract-ph-card");
+            ["bronze", "silver", "gold", "diamond", "legendary", "perfect"].forEach(function (t) {
+                host.classList.remove("refract-card-tier-" + t);
+            });
+            [".refract-pc-name-banner", ".refract-pc-tier-label", ".refract-ph-chin"].forEach(function (sel) {
+                var n = host.querySelector(sel);
+                if (n) { n.parentNode.removeChild(n); }
+            });
+            return;
+        }
+        host.classList.add("refract-ph-card");
+        var cached = refractPhCardCache[pid];
+        if (cached && cached.data) {
+            refractPhBuildCard(header, host, cached.data);
+            refractPhStandingRank(head, cached);
+            return;
+        }
+        if (cached) { return; }
+        refractPhCardCache[pid] = { data: null, rank: null };
+        gqlWithVars(REFRACT_PH_CARD_QUERY, { id: pid }).then(function (res) {
+            var d = res && res.data && res.data.findPerformer;
+            if (!d) { return; }
+            refractPhCardCache[pid].data = d;
+            safeRun(function () { refractPhBuildCard(header, host, d); });
+            if (d.rating100 == null || d.rating100 <= 0) { return; }
+            return gqlWithVars(REFRACT_PH_RANK_QUERY, { v: d.rating100 }).then(function (r2) {
+                var a = r2 && r2.data && r2.data.above;
+                var t = r2 && r2.data && r2.data.rated;
+                if (!a || !t || !t.count) { return; }
+                refractPhCardCache[pid].rank = { place: a.count + 1, total: t.count };
+                safeRun(function () { refractPhStandingRank(head, refractPhCardCache[pid]); });
+            });
+        }).catch(function () { /* offline or an expired key: the header
+            simply keeps the plain portrait, which is what it had */ });
+    }
+
+    /* Ascension's badge wins when it is there: it ranks by its own
+       battles and that is a different, richer question than "who is
+       rated higher". Refract's answer only fills the hole. */
+    function refractPhStandingRank(head, cache) {
+        if (!cache || !cache.rank) { return; }
+        var standing = refractPerfHeadChild(head, "refract-ph-standing");
+        if (!standing) { return; }
+        if (standing.querySelector('[data-ph-rank]')) { return; }
+        for (var i = 0; i < standing.children.length; i++) {
+            var lab = standing.children[i].querySelector(".refract-ph-standing__label");
+            if (lab && lab.textContent === "Ranked") { return; }
+        }
+        var cell = document.createElement("div");
+        cell.className = "refract-ph-standing__cell";
+        cell.setAttribute("data-ph-rank", "1");
+        cell.innerHTML =
+            '<span class="refract-ph-standing__label">By rating</span>' +
+            '<span class="refract-ph-standing__value">' + escapeHtml(refractPhOrdinal(cache.rank.place)) +
+            '<span class="refract-ph-standing__tail"> of ' + escapeHtml(String(cache.rank.total)) + "</span></span>";
+        /* Second, where Ascension's would have been. */
+        if (standing.children.length > 1) { standing.insertBefore(cell, standing.children[1]); }
+        else { standing.appendChild(cell); }
+    }
+
     function refractPerfHeadChild(head, cls) {
         for (var i = 0; i < head.children.length; i++) {
             if (head.children[i].classList.contains(cls)) { return head.children[i]; }
@@ -8286,6 +8512,10 @@
                 standing.appendChild(cell);
             }
         }
+
+        /* 5. The card itself. Last, because the rank cell it may add
+           slots into the standing row built just above. */
+        refractPhCard(header, head, page);
 
         /* 4. The category scores, and the tag run they were buried in.
            Advanced Ratings writes each category as a tag whose name ends

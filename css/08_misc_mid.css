@@ -7267,7 +7267,10 @@ body.stash-liquid-glass #performer-page .detail-header.refract-ph {
        Shorter and the card would ride up over the navbar rather than
        overhang the foot of the band. */
     min-height: 440px;
-    margin-bottom: 4.25rem;
+    /* The card overhangs the foot of the band by 96px and the tab strip
+       is the next thing on the page, so the band owes it that much plus
+       air. At 4.25rem the pills sat 3px off the tabs. */
+    margin-bottom: 7.5rem;
     overflow: visible;
 }
 
@@ -7354,6 +7357,32 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-header-image img.per
     object-position: 50% 22%;
     border-radius: var(--radius);
     box-shadow: var(--shadow-2xl);
+}
+
+/* The host is the card. Everything 16_playing_card.css positions --
+   the name banner, the diagonal tier ribbon, the chin -- is absolute
+   against this box, and the ribbon is clipped to a sash by its
+   overflow exactly as it is on a grid card. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-header-image.refract-ph-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius);
+}
+/* On a grid card the chin sits over a dark base. Here it sits over a
+   photograph that could be anything, so it brings its own floor. */
+body.stash-liquid-glass #performer-page .refract-ph .refract-ph-chin {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.86) 0%, rgba(0, 0, 0, 0) 100%) !important;
+    padding: 0.75rem 0.7rem !important;
+}
+/* The card is 1.29x a grid card, so its strip gets the room to match
+   rather than four pills sized for a 263px column. */
+body.stash-liquid-glass #performer-page .refract-ph .refract-ph-card .stash-perf-stats {
+    --pc-badge-scale: 1.12;
+}
+/* The flip tab rides above the chin, since it is the only route to the
+   other face and the chin is 6. */
+body.stash-liquid-glass #performer-page .refract-ph .refract-pp-stage .refract-card-flip-btn {
+    z-index: 8;
 }
 
 /* ── The right column ──────────────────────────────────────────── */
@@ -7757,9 +7786,11 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     display: flex;
 }
 
-/* Below 1200px the band stops being a column: the card caps so it
-   cannot eat the fold, the read-outs step down, and the action row is
-   allowed to wrap rather than run off the edge. */
+/* Below 1400 the read-outs step down. The band keeps its shape well
+   below that: stacking the card above the head leaves the right half
+   of the band empty, which is the hole this design exists to close, so
+   the card only stops being a column when there is genuinely no room
+   for one beside the text. */
 @media (max-width: 1400px) {
     body.stash-liquid-glass #performer-page .refract-ph .detail-group {
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -7768,19 +7799,103 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
 @media (max-width: 1200px) {
     body.stash-liquid-glass #performer-page .detail-header.refract-ph,
     body.stash-liquid-glass #performer-page .refract-ph .detail-container {
+        min-height: 380px;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-container {
+        padding: 0 1.25rem 1.2rem;
+        gap: var(--gap-xl);
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
+        width: 240px;
+        flex: 0 0 240px;
+        max-width: 240px !important;
+        margin-bottom: -72px;
+    }
+    /* The strip is sized for a 340px card. At 240 the fourth pill runs
+       off the edge, which on a grid card is what initPerformerCards's
+       refit() prevents; here the card has one known width per step, so
+       the step sets the scale. */
+    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-card .stash-perf-stats {
+        --pc-badge-scale: 0.78;
+    }
+    body.stash-liquid-glass #performer-page .detail-header.refract-ph {
+        margin-bottom: 5.75rem;
+    }
+    /* Three things no longer share row one: measured at 900px the icons
+       took 137 and the seven actions took 439 of 587, so the aliases'
+       1fr column resolved to zero and three chips rendered inside it at
+       no width at all. They get a row. */
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head {
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto auto auto auto;
+        padding: 1.2rem 0 0 !important;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 {
+        grid-row: 1;
+        grid-column: 1;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head > .col {
+        grid-row: 1;
+        grid-column: 2;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head > div:has(> .alias-head) {
+        grid-row: 2;
+        grid-column: 1 / -1;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph-standing {
+        grid-row: 3;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .quality-group {
+        grid-row: 3;
+        grid-column: 2;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group {
+        grid-row: 4;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph-cats {
+        grid-row: 5;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .details-edit {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    body.stash-liquid-glass #performer-page .refract-ph-cats {
+        flex-wrap: wrap;
+        row-gap: var(--gap-md);
+    }
+    body.stash-liquid-glass #performer-page .refract-ph-cats__cell {
+        flex: 1 1 8rem;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph-tags {
+        margin-left: calc(240px + 2.5rem);
+    }
+}
+
+/* Only now does a column beside the text stop fitting. */
+@media (max-width: 820px) {
+    body.stash-liquid-glass #performer-page .detail-header.refract-ph,
+    body.stash-liquid-glass #performer-page .refract-ph .detail-container {
         min-height: 0;
     }
     body.stash-liquid-glass #performer-page .refract-ph .detail-container {
         flex-direction: column;
         padding: 1.25rem;
-        gap: var(--gap-xl);
     }
     body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
-        width: 240px;
+        width: 200px;
         flex: 0 0 auto;
-        max-width: 240px !important;
+        max-width: 200px !important;
         align-self: flex-start;
         margin-bottom: 0;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-card .stash-perf-stats {
+        --pc-badge-scale: 0.62;
+    }
+    body.stash-liquid-glass #performer-page .detail-header.refract-ph {
+        margin-bottom: 0.85rem;
     }
     body.stash-liquid-glass #performer-page .refract-ph .performer-head {
         grid-template-columns: minmax(0, 1fr);
@@ -7797,8 +7912,8 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
         grid-row: auto !important;
         justify-self: stretch !important;
     }
-    body.stash-liquid-glass #performer-page .refract-ph .performer-head > .col {
-        flex-wrap: wrap;
+    body.stash-liquid-glass #performer-page .refract-ph .details-edit {
+        justify-content: flex-start;
     }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -7807,8 +7922,12 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
         margin-left: 1.25rem;
         margin-right: 1.25rem;
     }
-    body.stash-liquid-glass #performer-page .detail-header.refract-ph {
-        margin-bottom: 0.85rem;
+    /* 44px is the floor for a touch target (appropriate scales). */
+    body.stash-liquid-glass #performer-page .refract-ph .details-edit .btn,
+    body.stash-liquid-glass #performer-page .refract-ph .name-icons .btn,
+    body.stash-liquid-glass #performer-page .refract-ph .name-icons .dropdown-toggle {
+        height: 2.75rem !important;
+        min-width: 2.75rem !important;
     }
 }
 
@@ -7819,3 +7938,45 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
         opacity: 0.35;
     }
 }
+
+/* ── The marquee in light mode ──────────────────────────────────────
+   These belong in 14_light.css by 3.1, and they are here instead for
+   one reason: that file is being edited in another session as this
+   lands, and staging it would sweep work that is not mine. They are
+   self-contained and scoped to .refract-light, so they can move across
+   whole when the file is free. Move them.
+
+   What needs a partner: the read-out cells are a near-opaque dark
+   because they sit over a photograph, the fill ramp deliberately does
+   not retheme (3.2), and --surface-rgb has no light value at all. */
+body.stash-liquid-glass.refract-light #performer-page .refract-ph-veil {
+    background: linear-gradient(0deg, var(--bg-0) 1%, rgba(255, 255, 255, 0.82) 46%, rgba(255, 255, 255, 0.42) 100%);
+}
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .detail-group {
+    background: rgba(252, 252, 252, 0.9) !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
+}
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .detail-group .detail-item {
+    background: rgba(252, 252, 252, 0.9);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+body.stash-liquid-glass.refract-light #performer-page .refract-ph-alias__n {
+    border-color: rgba(0, 0, 0, 0.12);
+    background: rgba(0, 0, 0, 0.05);
+}
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .name-icons .btn,
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .name-icons .dropdown-toggle {
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .name-icons .btn:hover,
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .name-icons .dropdown-toggle:hover {
+    background: rgba(0, 0, 0, 0.09) !important;
+}
+body.stash-liquid-glass.refract-light #performer-page .refract-ph-cats__track {
+    background: rgba(0, 0, 0, 0.10);
+}
+body.stash-liquid-glass.refract-light #performer-page .refract-ph-cats__fill {
+    background: rgba(0, 0, 0, 0.45);
+}
+/* The card keeps its own floor: the chin scrim and the neon strip are
+   the card's, and the card does not change with the page mode. */

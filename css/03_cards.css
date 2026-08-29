@@ -984,11 +984,11 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card[class*="refract-card-
 }
 
 /* ── Bronze (5.0–6.4): quiet - breathing only ──────────────────────── */
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-bronze,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-bronze,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-bronze {
     animation: refractCardBreathe 7s ease-in-out infinite;
 }
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-bronze:hover,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-bronze:hover,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-bronze:hover {
     border-color: rgba(var(--tier-color-bright), 0.85) !important;
     box-shadow:
@@ -999,11 +999,11 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-bro
 }
 
 /* ── Silver (6.5–7.4): breathing + sheen sweep ─────────────────────── */
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-silver,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-silver,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-silver {
     animation: refractCardBreathe 6.5s ease-in-out infinite;
 }
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-silver:hover,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-silver:hover,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-silver:hover {
     border-color: rgba(var(--tier-color-bright), 0.95) !important;
     box-shadow:
@@ -1014,11 +1014,11 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-sil
 }
 
 /* ── Gold (7.5–8.4): breathing (faster) + sheen + warm inset ───────── */
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-gold,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-gold,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-gold {
     animation: refractCardBreathe 6s ease-in-out infinite;
 }
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-gold:hover,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-gold:hover,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-gold:hover {
     border-color: rgba(var(--tier-color-bright), 1) !important;
     box-shadow:
@@ -1029,11 +1029,11 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-gol
 }
 
 /* ── Diamond (8.5–9.4): breathing + sparkles ──────────────────────── */
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-diamond,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-diamond,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-diamond {
     animation: refractCardBreathe 5.5s ease-in-out infinite;
 }
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-diamond:hover,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-diamond:hover,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-diamond:hover {
     border-color: var(--accent-bright) !important;
     box-shadow:
@@ -1044,7 +1044,7 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-dia
 }
 
 /* ── Legendary (9.5–9.9): breathing + rotating dual-color border ──── */
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-legendary,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-legendary,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-legendary {
     position: relative;
     /* Two animations: breathing (controls box-shadow) + floating
@@ -1058,7 +1058,7 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-leg
     /* z-index handled in the shared tier hierarchy block below */
     transform-origin: center center !important;
 }
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-legendary:hover,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-legendary:hover,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-legendary:hover {
     box-shadow:
         0 14px 40px rgba(0, 0, 0, 0.6),
@@ -1072,7 +1072,7 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-leg
    Uses the dedicated refractCardBreathePerfect keyframe so all six
    halo layers (white core + pink/yellow/blue/violet outer layers) are
    present at every animation tick - no rainbow disappearing on pulse. */
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-perfect,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-perfect,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-perfect {
     position: relative;
     animation:
@@ -1081,7 +1081,7 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-per
     /* z-index handled in the shared tier hierarchy block below */
     transform-origin: center center !important;
 }
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-perfect:hover,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-perfect:hover,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-perfect:hover {
     box-shadow:
         0 18px 46px rgba(0, 0, 0, 0.65),
@@ -1096,13 +1096,13 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-per
 /* Silver, Gold, Diamond, Legendary all get a diagonal sheen that
    sweeps across the card every 8–14 seconds. Stagger durations so they
    don't all flash in sync. */
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-silver::before,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-silver::before,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-silver::before,
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-gold::before,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-gold::before,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-gold::before,
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-diamond::before,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-diamond::before,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-diamond::before,
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-legendary::before,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-legendary::before,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-legendary::before {
     content: "";
     position: absolute;
@@ -1120,19 +1120,19 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-leg
     pointer-events: none;
     z-index: 4;
 }
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-silver::before,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-silver::before,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-silver::before {
     animation: refractCardSheen 18s ease-in-out infinite;
 }
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-gold::before,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-gold::before,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-gold::before {
     animation: refractCardSheen 14s ease-in-out infinite;
 }
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-diamond::before,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-diamond::before,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-diamond::before {
     animation: refractCardSheen 11s ease-in-out infinite;
 }
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-legendary::before,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-legendary::before,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-legendary::before {
     animation: refractCardSheen 9s ease-in-out infinite;
 }
@@ -1140,7 +1140,7 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-leg
 /* ── ::after pseudo - sparkles (diamond) and rotating border (legendary, perfect) */
 
 /* Diamond sparkles - five tiny twinkling dots scattered across the card */
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-diamond::after,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-diamond::after,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-diamond::after {
     content: "";
     position: absolute;
@@ -1159,7 +1159,7 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-dia
 }
 
 /* Legendary rotating border - triadic conic gradient (pink/blue/purple) */
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-legendary::after,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-legendary::after,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-legendary::after {
     content: "";
     position: absolute;
@@ -1189,7 +1189,7 @@ body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-leg
    reads clearly even at gallery zoom levels - was looking washed out
    in playing-card mode where the diagonal tier ribbon was covering
    the brightest top-right segment. */
-body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier-perfect::after,
+body.stash-liquid-glass.refract-flourish-tiers :is(.performer-card, .refract-ph-card).refract-card-tier-perfect::after,
 body.stash-liquid-glass.refract-flourish-tiers .scene-card.refract-card-tier-perfect::after {
     content: "";
     position: absolute;
