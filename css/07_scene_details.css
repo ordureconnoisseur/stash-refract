@@ -2279,7 +2279,16 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
        words sit on one line despite the size difference. */
     line-height: 1.35;
 }
+/* A hairline between the tier and its number. They are two different
+   kinds of fact -- a name the ladder gives it and a value out of ten --
+   and a gap alone left them reading as one run of text. The rule takes
+   the tier's own colour so it belongs to the chip rather than sitting on
+   it, and the 6px each side matches the gap it replaces, so the chip
+   grows by exactly one pixel. It cannot appear on an unrated scene,
+   because the value it separates is not rendered. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value {
+    padding-left: 6px;
+    border-left: 1px solid rgba(255, 255, 255, 0.16);
     font-size: var(--fs-sm);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
@@ -2307,6 +2316,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-value {
     color: rgba(var(--tier-color-bright), 1);
+    border-left-color: rgba(var(--tier-color-bright), 0.32);
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="bronze"] { --tier-color: 215, 148, 92; --tier-color-bright: 240, 180, 130; }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="silver"] { --tier-color: 192, 196, 204; --tier-color-bright: 226, 230, 238; }
