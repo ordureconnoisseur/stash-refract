@@ -1,0 +1,226 @@
+/* ===================================================================
+   Entity detail pages: studio, tag, group
+   ===================================================================
+
+   The three pages Stash builds from one skeleton:
+
+       .detail-container
+           .detail-header-image        (img.logo, or .group-images)
+           .row
+               .studio-head | .tag-head | .group-head
+                   h2 > span.<kind>-name + .name-icons
+                   [.quality-group > .rating-stars]   (studio)
+                   [span.alias-head]                   (tag)
+                   .detail-group
+                       .detail-item.<field>
+                           span.detail-item-title
+                           span.detail-item-value
+                   .details-edit
+       .<kind>-tabs
+           nav.nav-tabs > a.nav-link[ + span.badge[data-value] ]
+           .tab-content > .tab-pane > .item-list-header > .custom-switch
+
+   Measured on the live instance at 1600px before any of this was
+   written (see design-entity-pages/ for the full brief):
+
+   | studio 464 Brazzers  | header 436.28px, URL row 236.59px,
+   |                      | tab strip y=527.72, first card y=714.44
+   | studio 458 TeamSkeet | header 394.28px, URL row 166px, 0 own scenes
+   | tag 67 Anal          | 22 sub-tag chips, 3 rows
+   | tag 2629 Scene Desc. | header 4,909.84px, sub-tag row 4,731.17px,
+   |                      | tab strip y=4,998.48
+   | group 1              | header 210px, no rows at all
+
+   The rules below are scoped to these three head classes so the
+   performer page and gallery pages, which share `.detail-header`,
+   are untouched.
+
+   ------------------------------------------------------------------
+   Phase 1 (this file's first pass): stop printing what the page
+   already says elsewhere, and stop drawing doors into empty rooms.
+   The scope control and the relation-row disclosures are phase 2.
+   =================================================================== */
+
+/* -------------------------------------------------------------------
+   1. The URL wall
+   -------------------------------------------------------------------
+   Stash prints every external URL twice: once as an icon dropdown in
+   `.name-icons`, and again as a full-width list of raw hrefs in the
+   detail group. On Brazzers that list is 236.59px of the 436.28px
+   header, ten links deep, reading
+
+       https://www.iafd.com/distrib.rme/distrib=5268/brazzers-network.htm
+
+   Verified before deleting it, by opening each dropdown and reading
+   the portalled menus: the three icon buttons together carry all ten
+   URLs (eight generic, one twitter, one instagram). Nothing becomes
+   unreachable, which is the only question that matters here (P6).
+
+   Scoped to the three entity heads. The performer page keeps its URL
+   row until direction E lands. */
+body.stash-liquid-glass .detail-header:has(.studio-head) .detail-item.urls,
+body.stash-liquid-glass .detail-header:has(.tag-head) .detail-item.urls,
+body.stash-liquid-glass .detail-header:has(.group-head) .detail-item.urls {
+    display: none !important;
+}
+
+/* The icon row is now the only route to those links, so it stops being
+   an afterthought beside the name: same rhythm as the rest of the bar,
+   and a hit target that does not depend on hitting a 13px glyph. */
+body.stash-liquid-glass .detail-header:has(.studio-head) .name-icons,
+body.stash-liquid-glass .detail-header:has(.tag-head) .name-icons,
+body.stash-liquid-glass .detail-header:has(.group-head) .name-icons {
+    gap: var(--gap-sm) !important;
+}
+
+/* -------------------------------------------------------------------
+   2. Tabs that lead nowhere
+   -------------------------------------------------------------------
+   Stash draws every destination whether or not it holds anything.
+   Measured: Brazzers draws six tabs and three are empty; the Anal tag
+   draws seven and five are empty; an empty group draws three and all
+   three are empty.
+
+   A badge is present if and only if the count is greater than zero.
+   Verified on studio 2358, which has 3,800 images and 0 galleries: the
+   Images tab carries `data-value="3,800"` and Galleries carries no
+   badge at all. So `:not(:has(.badge))` reads "this is empty" and not
+   "this has not loaded".
+
+   The `:has(.badge)` guard on the strip itself is what makes this safe
+   in the two cases that would otherwise break it:
+
+     - Nothing has loaded yet, so no tab has a badge and none is hidden.
+     - The entity is empty in every direction, as group 1 is, so the
+       whole strip stays and the page still shows its destinations
+       rather than an empty rail.
+
+   The badges follow the sub-content toggle (measured: Scenes 12 -> 963,
+   Performers 6 -> 211 on Brazzers), so a tab that is empty at this
+   scope and has content at the wider one returns on its own.
+
+   `:has()` is cheap here: one strip per page, at most seven items. It
+   is NOT cheap in the card grid, where it is a known scroll-perf
+   problem (design system 7.2). Do not copy this pattern there. */
+body.stash-liquid-glass .studio-tabs > .nav-tabs:has(.badge) > .nav-link:not(:has(.badge)),
+body.stash-liquid-glass .tag-tabs > .nav-tabs:has(.badge) > .nav-link:not(:has(.badge)),
+body.stash-liquid-glass .group-tabs > .nav-tabs:has(.badge) > .nav-link:not(:has(.badge)) {
+    display: none !important;
+}
+
+/* -------------------------------------------------------------------
+   3. The scope switch
+   -------------------------------------------------------------------
+   "Include sub-studio content" is the most consequential control on a
+   network studio page, and Stash renders it as a bare switch floating
+   between the tab strip and the filter toolbar. It is the difference
+   between the 12 scenes Brazzers shows and the 963 it has.
+
+   Phase 2 replaces it with a two-count segmented control painted into
+   the bar. Until then it at least gets a body: a glass platform of the
+   same family as the toolbar pill and the pagination capsule (design
+   system 6.18), so it reads as chrome that belongs to the page rather
+   than as a stray input.
+
+   The switch itself is not restyled. It is styled globally in
+   08_misc_mid and that treatment is deliberate; this only gives it a
+   surface to sit on.
+
+   The fill uses the GLASS tokens, not the fill ramp. `--fill-2` would
+   be correct-looking in dark and invisible in light, because the ramp
+   deliberately does not retheme and 0.04 white on a white panel is
+   nothing (design system 3.2). `--glass-bg` flips to 0.55 white in
+   `14_light` and every consumer follows for free. */
+body.stash-liquid-glass .studio-tabs .item-list-header:has(#showSubContent),
+body.stash-liquid-glass .tag-tabs .item-list-header:has(#showSubContent),
+body.stash-liquid-glass .group-tabs .item-list-header:has(#showSubContent) {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: -moz-fit-content;
+    width: fit-content;
+    margin: 0 auto var(--gap-lg) !important;
+    padding: 0 var(--gap-xl) 0 calc(var(--gap-xl) + 2.6rem);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-pill);
+    background: var(--glass-bg);
+    transition:
+        background var(--dur-fast) ease,
+        border-color var(--dur-fast) ease,
+        box-shadow var(--dur-fast) ease;
+}
+
+body.stash-liquid-glass .studio-tabs .item-list-header:has(#showSubContent):hover,
+body.stash-liquid-glass .tag-tabs .item-list-header:has(#showSubContent):hover,
+body.stash-liquid-glass .group-tabs .item-list-header:has(#showSubContent):hover {
+    border-color: var(--glass-border-bright);
+    background: var(--glass-bg-strong);
+}
+
+/* The label is the only thing on the platform that says what the
+   switch does, so it stops being 14px of muted body copy sitting at
+   the same weight as everything else on the page. */
+body.stash-liquid-glass .studio-tabs .item-list-header:has(#showSubContent) .custom-control-label,
+body.stash-liquid-glass .tag-tabs .item-list-header:has(#showSubContent) .custom-control-label,
+body.stash-liquid-glass .group-tabs .item-list-header:has(#showSubContent) .custom-control-label {
+    font-size: var(--fs-base) !important;
+    font-weight: 600 !important;
+    color: var(--text) !important;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/* On, the platform says so without the reader having to find the
+   thumb: the page is showing more than this entity's own content, and
+   that is a state worth carrying an accent (P3, emphasis is earned by
+   data). */
+body.stash-liquid-glass .studio-tabs .item-list-header:has(#showSubContent:checked),
+body.stash-liquid-glass .tag-tabs .item-list-header:has(#showSubContent:checked),
+body.stash-liquid-glass .group-tabs .item-list-header:has(#showSubContent:checked) {
+    border-color: var(--accent-glow);
+    background: var(--accent-tint);
+}
+
+body.stash-liquid-glass .studio-tabs .item-list-header:has(#showSubContent:checked) .custom-control-label,
+body.stash-liquid-glass .tag-tabs .item-list-header:has(#showSubContent:checked) .custom-control-label,
+body.stash-liquid-glass .group-tabs .item-list-header:has(#showSubContent:checked) .custom-control-label {
+    color: var(--accent-ink) !important;
+}
+
+/* Keyboard focus lands on the input, which is visually hidden by
+   Bootstrap, so the ring has to be drawn on the platform. The house
+   ring is a box-shadow (6.6); nothing here sets `box-shadow: none` on
+   the wrapper, so it works as written. */
+body.stash-liquid-glass .studio-tabs .item-list-header:has(#showSubContent:focus-visible),
+body.stash-liquid-glass .tag-tabs .item-list-header:has(#showSubContent:focus-visible),
+body.stash-liquid-glass .group-tabs .item-list-header:has(#showSubContent:focus-visible) {
+    border-color: var(--accent-glow);
+    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.15);
+    outline: none;
+}
+
+/* -------------------------------------------------------------------
+   Narrow
+   -------------------------------------------------------------------
+   Below 1200px the detail group is already one column (08_misc_mid).
+   The platform keeps its shape but loses the outer breathing room, and
+   the tab strip is allowed to scroll rather than wrap, because a
+   wrapped strip pushes the content down again which is the fault this
+   file exists to fix. */
+@media (max-width: 1200px) {
+    body.stash-liquid-glass .studio-tabs .item-list-header:has(#showSubContent),
+    body.stash-liquid-glass .tag-tabs .item-list-header:has(#showSubContent),
+    body.stash-liquid-glass .group-tabs .item-list-header:has(#showSubContent) {
+        margin-bottom: var(--gap-md) !important;
+        padding-right: var(--gap-lg);
+    }
+
+    body.stash-liquid-glass .studio-tabs > .nav-tabs,
+    body.stash-liquid-glass .tag-tabs > .nav-tabs,
+    body.stash-liquid-glass .group-tabs > .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+    }
+}
