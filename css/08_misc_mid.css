@@ -8046,6 +8046,25 @@ body.stash-liquid-glass.refract-light #performer-page .refract-ph-alias__n {
     border-color: rgba(0, 0, 0, 0.12);
     background: rgba(0, 0, 0, 0.05);
 }
+/* The danger red is a dark-mode red: #f87171 on this band measures
+   1.48:1 in light, which is worse than the muted grey it replaced, so
+   making Delete red would have traded a legibility problem for a real
+   one. Darkening the ink the way --accent-ink does takes it to 5.0:1
+   against the band's own ground. If a second surface ever needs this,
+   it should become --danger-ink beside --accent-ink rather than be
+   copied. */
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.delete,
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.btn-danger {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(185, 28, 28, 0.4) !important;
+    color: color-mix(in srgb, #ef4444 55%, #000) !important;
+}
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.delete:hover,
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.18) !important;
+    border-color: rgba(185, 28, 28, 0.6) !important;
+    color: color-mix(in srgb, #ef4444 40%, #000) !important;
+}
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .name-icons .btn,
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .name-icons .dropdown-toggle {
     background: rgba(0, 0, 0, 0.05) !important;
