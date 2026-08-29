@@ -477,10 +477,58 @@ body.stash-liquid-glass .detail-header:has(.group-head) .detail-header-image img
     box-sizing: border-box !important;
     width: 100% !important;
     height: auto !important;
-    max-height: 7.5rem !important;
+    max-height: 11rem !important;
     min-width: 0 !important;
     min-height: 0 !important;
     object-fit: contain !important;
+}
+
+/* The plate hugs the mark instead of framing it.
+   Reviewed against a spread of real studios, logos run from 1.89:1 to
+   5.30:1 and some are SVG. A fixed 280px plate suits the wide ones and
+   letterboxes the rest: a border or radius on a box the content does
+   not fill frames the box, not the picture (design system 7.16). The
+   plate takes a definite width and the image fills it at its own
+   ratio, with the height cap raised until it stops binding, so nothing
+   is letterboxed at the ratios that actually occur here (1.89:1 to
+   5.30:1 across the studios reviewed).
+
+   The width has to be DEFINITE on the wrapper, not `fit-content`.
+   Several logos are SVGs carrying only a viewBox, which gives them an
+   intrinsic ratio but no intrinsic size, and inside a shrink-to-fit
+   float that is circular: measured, Brazzers Exxtra and Tushy both
+   rendered 22 x 22, which is their padding and rim and no picture,
+   while the PNG logos beside them were fine. This is the same trap as
+   before wearing a different hat, and the tell is that it only hits
+   some images. */
+
+/* A tag's image is not a mark, it is an arbitrary frame out of one of
+   its scenes, so it does not get the width a studio logo gets. A logo
+   identifies the studio and is the only brand the page carries; a
+   still identifies nothing and at 280px it was the brightest object
+   on the tag page, louder than the tag's own name. Half the width,
+   and it reads as a thumbnail rather than a hero. Groups keep the
+   larger size: cover art is a real mark. */
+body.stash-liquid-glass .detail-header:has(.tag-head) .detail-header-image {
+    width: 10rem !important;
+    max-width: 10rem !important;
+}
+
+body.stash-liquid-glass .detail-header:has(.tag-head) .detail-header-image img {
+    max-height: 8rem !important;
+}
+
+/* A studio with no image gets a Font Awesome placeholder from Stash,
+   and `image_path` says so in the query string. Drawing it means a
+   280 x 105 plate around a 40px glyph, which reads as a broken box
+   rather than an absent one, and it is 516 of the 2,378 studios here.
+   An empty slot carries information and a repeated placeholder
+   destroys it (design system 6.22). So it does not draw, and the name
+   simply starts at the left edge. */
+body.stash-liquid-glass .detail-header:has(.studio-head) .detail-header-image:has(img[src*="default=true"]),
+body.stash-liquid-glass .detail-header:has(.tag-head) .detail-header-image:has(img[src*="default=true"]),
+body.stash-liquid-glass .detail-header:has(.group-head) .detail-header-image:has(img[src*="default=true"]) {
+    display: none !important;
 }
 
 /* -------------------------------------------------------------------
