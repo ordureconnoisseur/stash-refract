@@ -767,7 +767,7 @@ body.stash-liquid-glass .rating-stars-modal {
 /* Star glyphs - empty state */
 body.stash-liquid-glass .rating-star {
     font-size: 1.35rem;
-    color: rgba(255, 255, 255, 0.2) !important;
+    color: rgba(var(--fg-rgb), 0.2) !important;
     cursor: pointer;
     line-height: 1;
     user-select: none;
@@ -786,7 +786,7 @@ body.stash-liquid-glass .rating-star:hover {
 /* Clear × */
 body.stash-liquid-glass .rating-clear {
     font-size: var(--fs-base);
-    color: rgba(255, 255, 255, 0.2) !important;
+    color: rgba(var(--fg-rgb), 0.2) !important;
     cursor: pointer;
     padding: 0.1rem 0.3rem;
     border-radius: 4px;
@@ -949,14 +949,14 @@ body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-inline-title {
     /* Was --accent-bright at 11.2px, which made it the loudest thing on
        the surface and a second heading competing with the panel's own
        eyebrows. It is a section label like the others now. */
-    color: rgba(255, 255, 255, 0.38) !important;
+    color: rgba(var(--fg-rgb), 0.38) !important;
 }
 body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-subhead,
 body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-summary {
     margin-left: auto !important;
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
-    color: rgba(255, 255, 255, 0.3) !important;
+    color: rgba(var(--fg-rgb), 0.3) !important;
 }
 /* The one rule that sets anything on the inline list. It used to be
    three: this one, plus a block that zeroed the shared 72vh cap
@@ -1039,7 +1039,7 @@ body.stash-liquid-glass .adv-rating-inline-panel .ratings-list:not(:has(.rating-
     font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(255, 255, 255, 0.3) !important;
+    color: rgba(var(--fg-rgb), 0.3) !important;
 }
 body.stash-liquid-glass .adv-rating-inline-panel .rating-row {
     display: flex !important;
@@ -1068,7 +1068,7 @@ body.stash-liquid-glass .adv-rating-inline-panel .rating-label {
     gap: 7px !important;
     font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
-    color: rgba(255, 255, 255, 0.72) !important;
+    color: rgba(var(--fg-rgb), 0.72) !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -1087,7 +1087,7 @@ body.stash-liquid-glass .adv-rating-inline-panel .rating-info-icon {
     font-size: 0 !important;
     border: 1px solid rgba(255, 255, 255, 0.28) !important;
     border-radius: var(--radius-pill) !important;
-    color: rgba(255, 255, 255, 0.45) !important;
+    color: rgba(var(--fg-rgb), 0.45) !important;
     cursor: help !important;
     position: relative !important;
 }
@@ -1151,7 +1151,7 @@ body.stash-liquid-glass .adv-rating-inline-panel .rating-clear {
     order: -1 !important;
     margin: 0 5px 0 0 !important;
     font-size: var(--fs-sm) !important;
-    color: rgba(255, 255, 255, 0.3) !important;
+    color: rgba(var(--fg-rgb), 0.3) !important;
     opacity: 0 !important;
     transition: opacity var(--dur-fast) ease, color var(--dur-fast) ease !important;
 }
@@ -1168,7 +1168,7 @@ body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown {
     font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(255, 255, 255, 0.32) !important;
+    color: rgba(var(--fg-rgb), 0.32) !important;
 }
 
 /* The breakdown heading and its caret lose the accent. With the panel
@@ -1177,7 +1177,7 @@ body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown {
    for a subtotal is not the loudest thing here. */
 body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown-heading,
 body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown-caret {
-    color: rgba(255, 255, 255, 0.32) !important;
+    color: rgba(var(--fg-rgb), 0.32) !important;
     font-size: var(--fs-xs) !important;
     font-weight: 700 !important;
     letter-spacing: var(--track-eyebrow) !important;
