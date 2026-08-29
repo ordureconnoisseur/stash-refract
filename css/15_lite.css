@@ -326,3 +326,26 @@ body.stash-liquid-glass.refract-lite .row.justify-content-center > .movie-card {
     content-visibility: auto;
     contain-intrinsic-size: auto 320px;
 }
+
+
+/* ── 11. Rating drawer: tertiary labels get lite's darker backdrop ──
+   Nothing here needs the blur strip -- section 1 already takes it off
+   the panel, and the chip and summary band never had one. What lite
+   does change is the ground. In dark mode the drawer sits on a
+   translucent glass panel that is several stops off black, so the two
+   tertiary labels written at 0.30 and 0.32 white measured comfortably.
+   Lite pins the surface opaque and the ground drops to #000, where the
+   same alphas are dark grey on black: measured 2.46:1 for the criteria
+   count and 2.67:1 for the breakdown heading, both under the 3:1 floor.
+
+   Lite is a different mode over a different ground, so it gets its own
+   values rather than the dark ones being raised to satisfy it. 0.44
+   clears 4.2:1 against black and is still plainly the quietest text in
+   the panel (5). */
+body.stash-liquid-glass.refract-lite .adv-rating-inline-panel .adv-rating-subhead,
+body.stash-liquid-glass.refract-lite .adv-rating-inline-panel .adv-rating-summary,
+body.stash-liquid-glass.refract-lite .adv-rating-inline-panel .adv-rating-breakdown-heading,
+body.stash-liquid-glass.refract-lite .adv-rating-inline-panel .adv-rating-breakdown-caret,
+body.stash-liquid-glass.refract-lite .adv-rating-inline-panel .adv-rating-breakdown {
+    color: rgba(255, 255, 255, 0.44) !important;
+}
