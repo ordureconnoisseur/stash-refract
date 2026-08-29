@@ -7263,14 +7263,21 @@ body.stash-liquid-glass #performer-page .detail-header.refract-ph {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
     border-radius: var(--radius) !important;
-    /* Tall enough to hold the card, which is 2:3 on a 340px column.
-       Shorter and the card would ride up over the navbar rather than
-       overhang the foot of the band. */
-    min-height: 440px;
+    /* Tall enough to hold the card AND the tier's motion. 440 was sized
+       from the card's static box; a Legendary card floats 6px and
+       rotates 0.35deg, so its rendered box swings between 348.5 and
+       353.6 wide and its top sat between 4 and 12px ABOVE the band for
+       the whole cycle -- never inside it. The layout has to reserve
+       room for the loudest tier, not for the still frame. */
+    min-height: 480px;
     /* The card overhangs the foot of the band by 96px and the tab strip
        is the next thing on the page, so the band owes it that much plus
-       air. At 4.25rem the pills sat 3px off the tabs. */
-    margin-bottom: 7.5rem;
+       air. At 4.25rem the pills sat 3px off the tabs. At 7.5 they sat
+       26px off, which is fine for a box and not for this one: a
+       Legendary halo is 100px and 160px of glow, so it washed straight
+       over the tab labels. The box clears by 50; the glow fades across
+       it instead of landing on text. */
+    margin-bottom: 9rem;
     overflow: visible;
 }
 
@@ -7315,9 +7322,15 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-container {
     z-index: 1;
     display: flex;
     align-items: stretch;
-    gap: 2rem;
-    padding: 0 2rem 1.4rem;
-    min-height: 440px;
+    /* 2rem left 6 to 9px of daylight between the card and the text,
+       because the rotation pushes the rendered corner past where the
+       layout thinks the edge is. Measured, not guessed. */
+    gap: 3rem;
+    /* 2rem on the left rendered as 23px of daylight against roughly 32
+       above, so the card read as inset further from the top than from
+       the side it sits against. 2.25 evens the two optically. */
+    padding: 0 2.25rem 1.4rem;
+    min-height: 480px;
     background: transparent !important;
 }
 
