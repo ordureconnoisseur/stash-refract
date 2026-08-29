@@ -2706,44 +2706,52 @@ body.stash-liquid-glass .rating-stars button::after {
     position: absolute;
     top: 0;
     left: 0;
+    /* BOTH layers are the whole button, and both size the mask the same
+       way: 100% auto draws the star exactly the button's width, and the
+       1:1 artwork then centres itself in the taller box. They have to
+       agree. The empty layer used `center / contain` and the filled one
+       `left center / auto 100%`, which on a 17.5 by 21 button meant a
+       17.5px star sitting 1.75px down against a 21px star at the top:
+       the track showed as a grey fringe around every filled star, and
+       the filled star overhung its own button by 3.5px into the next
+       one. */
+    width: 100%;
     height: 100%;
     pointer-events: none;
+    -webkit-mask: var(--st-star-svg) left center / 100% auto no-repeat;
+            mask: var(--st-star-svg) left center / 100% auto no-repeat;
 }
 body.stash-liquid-glass .rating-stars button::before {
-    width: 100%;
     background-color: var(--star-empty);
-    -webkit-mask: var(--st-star-svg) center / contain no-repeat;
-            mask: var(--st-star-svg) center / contain no-repeat;
 }
+/* The partial fill is a clip on a full-size layer rather than a narrower
+   layer, which is what lets the two masks stay identical: shrinking the
+   element would shrink the star with it. Enumerated in fives, which
+   covers the tenth-precision control and anything coarser. */
 body.stash-liquid-glass .rating-stars button::after {
-    width: 0;
     background-color: var(--star);
-    /* auto 100% keeps the star at full width whatever this element's own
-       width is, so the width below clips it rather than squashing it. */
-    -webkit-mask: var(--st-star-svg) left center / auto 100% no-repeat;
-            mask: var(--st-star-svg) left center / auto 100% no-repeat;
+    clip-path: inset(0 100% 0 0);
 }
-body.stash-liquid-glass .rating-stars button.star-fill-5::after { width: 5%; }
-body.stash-liquid-glass .rating-stars button.star-fill-10::after { width: 10%; }
-body.stash-liquid-glass .rating-stars button.star-fill-15::after { width: 15%; }
-body.stash-liquid-glass .rating-stars button.star-fill-20::after { width: 20%; }
-body.stash-liquid-glass .rating-stars button.star-fill-25::after { width: 25%; }
-body.stash-liquid-glass .rating-stars button.star-fill-30::after { width: 30%; }
-body.stash-liquid-glass .rating-stars button.star-fill-35::after { width: 35%; }
-body.stash-liquid-glass .rating-stars button.star-fill-40::after { width: 40%; }
-body.stash-liquid-glass .rating-stars button.star-fill-45::after { width: 45%; }
-body.stash-liquid-glass .rating-stars button.star-fill-50::after { width: 50%; }
-body.stash-liquid-glass .rating-stars button.star-fill-55::after { width: 55%; }
-body.stash-liquid-glass .rating-stars button.star-fill-60::after { width: 60%; }
-body.stash-liquid-glass .rating-stars button.star-fill-65::after { width: 65%; }
-body.stash-liquid-glass .rating-stars button.star-fill-70::after { width: 70%; }
-body.stash-liquid-glass .rating-stars button.star-fill-75::after { width: 75%; }
-body.stash-liquid-glass .rating-stars button.star-fill-80::after { width: 80%; }
-body.stash-liquid-glass .rating-stars button.star-fill-85::after { width: 85%; }
-body.stash-liquid-glass .rating-stars button.star-fill-90::after { width: 90%; }
-body.stash-liquid-glass .rating-stars button.star-fill-95::after { width: 95%; }
-body.stash-liquid-glass .rating-stars button.star-fill-100::after { width: 100%; }
-body.stash-liquid-glass .rating-stars button.star-fill-100::after { width: 100%; }
+body.stash-liquid-glass .rating-stars button.star-fill-5::after { clip-path: inset(0 95% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-10::after { clip-path: inset(0 90% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-15::after { clip-path: inset(0 85% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-20::after { clip-path: inset(0 80% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-25::after { clip-path: inset(0 75% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-30::after { clip-path: inset(0 70% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-35::after { clip-path: inset(0 65% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-40::after { clip-path: inset(0 60% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-45::after { clip-path: inset(0 55% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-50::after { clip-path: inset(0 50% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-55::after { clip-path: inset(0 45% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-60::after { clip-path: inset(0 40% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-65::after { clip-path: inset(0 35% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-70::after { clip-path: inset(0 30% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-75::after { clip-path: inset(0 25% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-80::after { clip-path: inset(0 20% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-85::after { clip-path: inset(0 15% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-90::after { clip-path: inset(0 10% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-95::after { clip-path: inset(0 5% 0 0); }
+body.stash-liquid-glass .rating-stars button.star-fill-100::after { clip-path: inset(0 0% 0 0); }
 body.stash-liquid-glass .rating-stars .filled-star {
     color: var(--star) !important;
     fill: var(--star) !important;
@@ -7303,11 +7311,24 @@ body.stash-liquid-glass #performer-page .refract-ph-blur {
     filter: blur(52px) saturate(118%);
     transform: scale(1.14);
 }
+/* The top stop is the one that decides whether this band is readable,
+   because everything that is not on its own plate -- the action row, the
+   name, the standing figures -- sits up there on the blurred
+   photograph. At 0.28 that ground was 122,94,79 on a pale, sunlit
+   portrait, and the ink measured Delete 2.14:1, Edit 2.76:1 and the
+   standing labels 2.91:1. It passed for two months because it is
+   photo-dependent: a dark-haired performer against a dark set measures
+   fine, and the failure only shows on bright ones.
+
+   0.62 puts the same ink at 3.70, 4.35 and 3.61 without the photograph
+   going away -- it is still a warm wash, just behind the text rather
+   than in it. The middle stop went 0.76 to 0.82 with it so the standing
+   row does not sit on the seam between the two. */
 body.stash-liquid-glass #performer-page .refract-ph-veil {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(0deg, var(--bg-0) 1%, rgba(10, 10, 10, 0.76) 46%, rgba(10, 10, 10, 0.28) 100%);
+        linear-gradient(0deg, var(--bg-0) 1%, rgba(10, 10, 10, 0.82) 46%, rgba(10, 10, 10, 0.62) 100%);
 }
 /* No photograph yet, or a performer with none: the band still needs a
    floor, and an unpainted one shows the page through it. */
@@ -7336,6 +7357,17 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-container {
 
 /* ── The card slot ─────────────────────────────────────────────── */
 
+/* Bootstrap's .row is flex: 0 1 auto, so the readout column sized to its
+   content and stopped 83px short of the band's right edge while the card
+   sat hard against the left one. Nothing in the header wanted that: the
+   band is a plate with even padding, and a table that stops short of it
+   reads as a mistake rather than a margin. Growing the row puts the
+   facts, the ratings and the tag bars on the same right edge the card
+   has on the left, and the extra 58px is enough for BODY OVERALL to
+   stop being BODY OVER... . */
+body.stash-liquid-glass #performer-page .refract-ph .detail-container > .row {
+    flex: 1 1 auto;
+}
 body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
     width: 340px;
     flex: 0 0 340px;
@@ -7611,20 +7643,25 @@ body.stash-liquid-glass #performer-page .refract-ph .psrc-wrap {
 body.stash-liquid-glass #performer-page .refract-ph .details-edit .psrc-dim {
     display: none !important;
 }
-/* Destructive, and therefore last, quiet, and past a gap of its own. */
+/* Destructive, and therefore last and past a gap of its own -- but not
+   disguised. This was transparent-on-muted, which read as the least
+   important control in the row when it is the only one that cannot be
+   undone. Position carries "last resort"; colour carries "destructive",
+   and the theme already says destructive in red, so the button is left
+   to look like every other danger button in Refract. */
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.delete,
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-danger {
     order: 9;
     margin-left: var(--gap-md) !important;
-    background: transparent !important;
-    border-color: transparent !important;
-    color: var(--text-muted) !important;
+    background: rgba(239, 68, 68, 0.12) !important;
+    border: 1px solid rgba(239, 68, 68, 0.32) !important;
+    color: #f87171 !important;
 }
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.delete:hover,
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-danger:hover {
-    background: rgba(239, 68, 68, 0.12) !important;
-    border-color: rgba(239, 68, 68, 0.28) !important;
-    color: #f87171 !important;
+    background: rgba(239, 68, 68, 0.22) !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    color: #fca5a5 !important;
 }
 
 /* Row 2: what she is in this library. Injected, because none of these
@@ -8021,6 +8058,25 @@ body.stash-liquid-glass.refract-light #performer-page .refract-ph .detail-group 
 body.stash-liquid-glass.refract-light #performer-page .refract-ph-alias__n {
     border-color: rgba(0, 0, 0, 0.12);
     background: rgba(0, 0, 0, 0.05);
+}
+/* The danger red is a dark-mode red: #f87171 on this band measures
+   1.48:1 in light, which is worse than the muted grey it replaced, so
+   making Delete red would have traded a legibility problem for a real
+   one. Darkening the ink the way --accent-ink does takes it to 5.0:1
+   against the band's own ground. If a second surface ever needs this,
+   it should become --danger-ink beside --accent-ink rather than be
+   copied. */
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.delete,
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.btn-danger {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(185, 28, 28, 0.4) !important;
+    color: color-mix(in srgb, #ef4444 55%, #000) !important;
+}
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.delete:hover,
+body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.18) !important;
+    border-color: rgba(185, 28, 28, 0.6) !important;
+    color: color-mix(in srgb, #ef4444 40%, #000) !important;
 }
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .name-icons .btn,
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .name-icons .dropdown-toggle {
