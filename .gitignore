@@ -25,3 +25,5 @@ tools/
 # Seeded design-canvas output (2.5 MB editor payload, rebuilt from the .dc.html sources)
 design-system/refract-design-system.html
 design-declutter/
+# Design working files for the performer page (real library data, private)
+design-performer-page/

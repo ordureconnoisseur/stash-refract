@@ -7234,3 +7234,588 @@ body.stash-liquid-glass .gallery-card .thumbnail-section {
     padding-left: 0.85rem !important;
     padding-right: 0.85rem !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   Performer page: the marquee
+   ═══════════════════════════════════════════════════════════════════
+   The header was a 592px panel holding a 4:5 photo beside twelve facts,
+   each given a 540px row whatever it held, a tag run of thirty-one
+   chips at 1104x139, four rating read-outs in one line and seven equal
+   buttons underneath. Measured on Dainty Wilder at 1530px wide.
+
+   It becomes a band: her image blurred and scaled behind, the sharp
+   copy in front as the card, and the right column carrying what a card
+   cannot -- what she is in this library, then the record itself as
+   read-outs sized to the pair they hold.
+
+   Scoped to #performer-page throughout. Tags, studios and galleries
+   share .detail-header and keep the panel they already have.
+   ═══════════════════════════════════════════════════════════════════ */
+
+body.stash-liquid-glass #performer-page .detail-header.refract-ph {
+    position: relative;
+    /* The band is the surface now, so it drops the panel's own glass:
+       a frosted rim over a blurred photograph reads as two surfaces. */
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border-radius: var(--radius) !important;
+    /* Tall enough to hold the card, which is 2:3 on a 340px column.
+       Shorter and the card would ride up over the navbar rather than
+       overhang the foot of the band. */
+    min-height: 440px;
+    margin-bottom: 4.25rem;
+    overflow: visible;
+}
+
+/* The blur wants clipping and the card wants to overhang, and one
+   element cannot do both. This layer clips; the band stays visible. */
+body.stash-liquid-glass #performer-page .refract-ph-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+body.stash-liquid-glass #performer-page .refract-ph-blur {
+    position: absolute;
+    inset: -60px;
+    background-image: var(--refract-ph-shot, none);
+    background-size: cover;
+    background-position: 50% 30%;
+    /* A background-image blur, not a backdrop-filter: one raster for
+       the band rather than a compositor layer that recomposites with
+       everything moving over it. */
+    filter: blur(52px) saturate(118%);
+    transform: scale(1.14);
+}
+body.stash-liquid-glass #performer-page .refract-ph-veil {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(0deg, var(--bg-0) 1%, rgba(10, 10, 10, 0.76) 46%, rgba(10, 10, 10, 0.28) 100%);
+}
+/* No photograph yet, or a performer with none: the band still needs a
+   floor, and an unpainted one shows the page through it. */
+body.stash-liquid-glass #performer-page .refract-ph-fill:not([data-shot]) .refract-ph-blur {
+    background: linear-gradient(125deg, var(--fill-4) 0%, var(--fill-2) 60%, transparent 100%);
+    filter: none;
+    transform: none;
+}
+
+body.stash-liquid-glass #performer-page .refract-ph .detail-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: stretch;
+    gap: 2rem;
+    padding: 0 2rem 1.4rem;
+    min-height: 440px;
+    background: transparent !important;
+}
+
+/* ── The card slot ─────────────────────────────────────────────── */
+
+body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
+    width: 340px;
+    flex: 0 0 340px;
+    max-width: 340px !important;
+    align-self: flex-end;
+    /* Overhangs the band by 96px, which is what makes it read as an
+       object sitting on the page rather than a picture inside a panel. */
+    margin-bottom: -96px;
+    padding: 0;
+    z-index: 2;
+}
+body.stash-liquid-glass #performer-page .refract-ph .detail-header-image > button.btn-link {
+    display: block;
+    width: 100%;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+}
+/* The 2:3 the cards crop to, cover and centred, so the face here is
+   framed exactly like the card that was clicked to reach it. Her front
+   is 1279x1600, which is 4:5, so this genuinely takes a slice off each
+   side -- edit mode is where the whole frame is shown. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-header-image img.performer {
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    object-position: 50% 22%;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-2xl);
+}
+
+/* ── The right column ──────────────────────────────────────────── */
+
+/* Four blocks spread over the band's height. Grid rather than flex
+   because the top row is three separate children of Stash's own head
+   -- aliases, the name icons, the action buttons -- and they have to
+   share one line without any of them moving in the DOM. */
+body.stash-liquid-glass #performer-page .refract-ph .performer-head {
+    display: grid !important;
+    grid-template-columns: auto auto 1fr auto;
+    /* Every row sized to its content, and the slack shared between them
+       by align-content. A 1fr row here gave ALL of it to one track and
+       centred the read-out grid in a 255px band with 90px of nothing
+       above it -- the same hole the design was drawn to close. */
+    grid-template-rows: auto auto auto auto;
+    align-content: space-between;
+    align-items: start;
+    column-gap: var(--gap-lg);
+    row-gap: var(--gap-lg);
+    padding: 1.6rem 0 0 !important;
+    min-width: 0;
+}
+
+/* Row 1: aliases, the icons Stash puts beside the name, and the
+   actions. The name itself is hidden -- the card carries it, in
+   Concert One at the top of the image, and setting it twice on one
+   screen is the loudest kind of duplication. */
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 {
+    grid-row: 1;
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    margin: 0 !important;
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 > .performer-name,
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 > .detail-expand-collapse {
+    display: none !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 > .name-icons {
+    display: flex !important;
+    align-items: center;
+    gap: var(--gap-2xs);
+    margin: 0 !important;
+}
+/* Four brand hues beside the name was a second palette competing with
+   the accent. They sit at the muted step and take their own colour
+   back on hover, which is when the colour is doing something. */
+body.stash-liquid-glass #performer-page .refract-ph .name-icons .btn,
+body.stash-liquid-glass #performer-page .refract-ph .name-icons .dropdown-toggle {
+    width: 1.9rem !important;
+    height: 1.9rem !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm) !important;
+    background: var(--fill-3) !important;
+    border: 0 !important;
+    color: var(--text-muted) !important;
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+body.stash-liquid-glass #performer-page .refract-ph .name-icons .btn:hover,
+body.stash-liquid-glass #performer-page .refract-ph .name-icons .dropdown-toggle:hover {
+    background: var(--fill-4) !important;
+    color: var(--text) !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .name-icons svg {
+    width: 0.85rem !important;
+    height: 0.85rem !important;
+}
+/* The favourite heart keeps its own colour: it is state, not a brand. */
+body.stash-liquid-glass #performer-page .refract-ph .name-icons .favorite-button.favorite {
+    color: var(--accent-ink) !important;
+}
+
+/* Aliases. Stash renders them as one comma run; refract.js rebuilds
+   them as chips and hides the run, because a list of unknown length
+   needs a budget and a comma run has none. */
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > div:has(> .alias-head) {
+    grid-row: 1;
+    grid-column: 1;
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-ph .alias-head {
+    display: none !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph-alias {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-sm);
+    max-height: 1.55rem;
+    overflow: hidden;
+}
+body.stash-liquid-glass #performer-page .refract-ph-alias.is-open {
+    max-height: none;
+}
+body.stash-liquid-glass #performer-page .refract-ph-alias__n {
+    padding: 3px 9px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--glass-border-bright);
+    background: var(--fill-4);
+    font-size: var(--fs-sm);
+    line-height: 1.45;
+    color: var(--text);
+}
+body.stash-liquid-glass #performer-page .refract-ph-alias__more {
+    padding: 3px 6px;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--accent-ink);
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+/* The action row. Stash gives seven controls equal weight, two of them
+   accent and Delete in the middle, wrapped in a Bootstrap row-cols-8
+   grid inside a .col inside .details-edit -- three levels of wrapper
+   before the first button. Ordered here into one primary, a secondary
+   cluster and Delete alone past a gap, with `order` inside Stash's own
+   flex row so nothing moves in the DOM. */
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > .col {
+    grid-row: 1;
+    grid-column: 4;
+    padding: 0 !important;
+    margin: 0 !important;
+    justify-self: end;
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > .col > .row {
+    display: block !important;
+    margin: 0 !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .details-edit {
+    display: flex !important;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--gap-sm);
+    margin: 0 !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > * {
+    order: 2;
+    margin: 0 !important;
+    flex: 0 0 auto;
+}
+body.stash-liquid-glass #performer-page .refract-ph .details-edit .btn {
+    height: 2rem;
+    padding: 0 0.7rem !important;
+    font-size: var(--fs-base) !important;
+    border-radius: var(--radius-sm) !important;
+    white-space: nowrap;
+}
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.edit {
+    order: 1;
+}
+body.stash-liquid-glass #performer-page .refract-ph .psrc-wrap {
+    order: 8;
+    display: flex !important;
+    align-items: center;
+    gap: var(--gap-sm);
+}
+/* The dimension hint is 110px of a row that has to hold seven controls,
+   and the button already carries the same number in its title. */
+body.stash-liquid-glass #performer-page .refract-ph .details-edit .psrc-dim {
+    display: none !important;
+}
+/* Destructive, and therefore last, quiet, and past a gap of its own. */
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.delete,
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-danger {
+    order: 9;
+    margin-left: var(--gap-md) !important;
+    background: transparent !important;
+    border-color: transparent !important;
+    color: var(--text-muted) !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.delete:hover,
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.12) !important;
+    border-color: rgba(239, 68, 68, 0.28) !important;
+    color: #f87171 !important;
+}
+
+/* Row 2: what she is in this library. Injected, because none of these
+   three numbers exists as a single element on the page -- the scene
+   count lives on a tab, the rank inside a plugin badge, the career in
+   a detail row. */
+body.stash-liquid-glass #performer-page .refract-ph-standing {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: flex-end;
+    gap: 2.25rem;
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-ph-standing__cell {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+}
+body.stash-liquid-glass #performer-page .refract-ph-standing__label {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--track-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+body.stash-liquid-glass #performer-page .refract-ph-standing__value {
+    font-size: var(--fs-2xl);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--text);
+}
+body.stash-liquid-glass #performer-page .refract-ph-standing__tail {
+    font-size: var(--fs-body);
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+/* The live rating controls stay live: stars, the Advanced Rating
+   button and the O counter are the only interactive things in this
+   column and they keep working. The rank badge is hidden because the
+   standing row above already states it, in words. */
+body.stash-liquid-glass #performer-page .refract-ph .quality-group {
+    grid-row: 2;
+    grid-column: 4;
+    display: flex !important;
+    align-items: center;
+    gap: var(--gap-lg);
+    justify-self: end;
+    align-self: flex-end;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .quality-group .hon-battle-rank-badge {
+    display: none !important;
+}
+
+/* Row 3: the record. Twelve read-outs, each sized to the label and
+   value it holds, where the live page gave every one of them a 540px
+   row and let a thirty-one chip tag run set the height of the block. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group {
+    grid-row: 3;
+    grid-column: 1 / -1;
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 1px !important;
+    column-gap: 1px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 1px solid var(--glass-border-bright) !important;
+    border-radius: var(--radius) !important;
+    /* The gaps ARE the hairlines: this shows through them. It is also
+       what shows where a row runs out of fields, so it is the cell
+       colour rather than the rim colour, and a short last row reads as
+       empty surface instead of a lit block. */
+    background: rgba(14, 13, 16, 0.74) !important;
+    overflow: hidden;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item {
+    display: flex !important;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.6rem 0.8rem !important;
+    margin: 0 !important;
+    border: 0 !important;
+    /* Opaque, not a fill: these sit over a blurred photograph, and a
+       0.03 white on top of that is a lighter band rather than a
+       surface (3.2, glass stacking). */
+    background: rgba(14, 13, 16, 0.74);
+    box-shadow: 0 0 0 1px var(--glass-border);
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item-title {
+    font-size: var(--fs-xs) !important;
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    line-height: 1.2;
+    color: var(--text-muted) !important;
+    width: auto !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item-value {
+    font-size: var(--fs-md) !important;
+    line-height: 1.3;
+    color: var(--text) !important;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* Height ships both units stacked; the metric one is the value. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .height-imperial {
+    display: none !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids .stash-id-pill,
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids a {
+    font-size: var(--fs-sm) !important;
+}
+/* The tag run is the one field the band cannot size: thirty-one chips
+   need three lines and the grid gives every cell one. It leaves the
+   grid entirely (row 4, below) rather than setting the height of the
+   eleven read-outs beside it. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.tags,
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.details,
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.description,
+/* Career is the standing row's Active cell, three lines up and set at
+   28px. Twice on one screen is once too many. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.career_length {
+    display: none !important;
+}
+
+/* Row 4: the category scores. Seven of her thirty-one tags are
+   Advanced Rating categories wearing a star and a number -- they are
+   scores sitting in a list of descriptions, so they read as scores.
+   Built by refract.js from the tag chips; absent when the plugin is
+   not in use, and the row simply does not appear. */
+body.stash-liquid-glass #performer-page .refract-ph-cats {
+    grid-row: 4;
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: flex-end;
+    gap: var(--gap-lg);
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-ph-cats__cell {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-ph-cats__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-sm);
+    min-width: 0;
+}
+body.stash-liquid-glass #performer-page .refract-ph-cats__label {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+body.stash-liquid-glass #performer-page .refract-ph-cats__value {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--text-muted);
+    flex: none;
+    margin-left: auto;
+}
+body.stash-liquid-glass #performer-page .refract-ph-cats__cell.is-full .refract-ph-cats__value {
+    color: var(--accent-ink);
+}
+body.stash-liquid-glass #performer-page .refract-ph-cats__track {
+    height: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--glass-bg-strong);
+    overflow: hidden;
+}
+body.stash-liquid-glass #performer-page .refract-ph-cats__fill {
+    height: 100%;
+    border-radius: var(--radius-pill);
+    background: var(--text-muted);
+}
+body.stash-liquid-glass #performer-page .refract-ph-cats__cell.is-full .refract-ph-cats__fill {
+    background: var(--accent-ink);
+}
+body.stash-liquid-glass #performer-page .refract-ph-tags-toggle {
+    flex: none;
+    padding: 0 0 1px;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--accent-ink);
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+/* The tag run itself, under the band and clear of the card's
+   overhang, shown only when asked for. */
+body.stash-liquid-glass #performer-page .refract-ph-tags {
+    display: none;
+    flex-wrap: wrap;
+    gap: var(--gap-sm);
+    margin: 0.9rem 2rem 0 calc(340px + 4rem);
+}
+body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
+    display: flex;
+}
+
+/* Below 1200px the band stops being a column: the card caps so it
+   cannot eat the fold, the read-outs step down, and the action row is
+   allowed to wrap rather than run off the edge. */
+@media (max-width: 1400px) {
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+@media (max-width: 1200px) {
+    body.stash-liquid-glass #performer-page .detail-header.refract-ph,
+    body.stash-liquid-glass #performer-page .refract-ph .detail-container {
+        min-height: 0;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-container {
+        flex-direction: column;
+        padding: 1.25rem;
+        gap: var(--gap-xl);
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
+        width: 240px;
+        flex: 0 0 auto;
+        max-width: 240px !important;
+        align-self: flex-start;
+        margin-bottom: 0;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 0 !important;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2,
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head > div:has(> .alias-head),
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head > .col,
+    body.stash-liquid-glass #performer-page .refract-ph .quality-group,
+    body.stash-liquid-glass #performer-page .refract-ph-standing,
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group,
+    body.stash-liquid-glass #performer-page .refract-ph-cats {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+        justify-self: stretch !important;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head > .col {
+        flex-wrap: wrap;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    body.stash-liquid-glass #performer-page .refract-ph-tags {
+        margin-left: 1.25rem;
+        margin-right: 1.25rem;
+    }
+    body.stash-liquid-glass #performer-page .detail-header.refract-ph {
+        margin-bottom: 0.85rem;
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    body.stash-liquid-glass #performer-page .refract-ph-blur {
+        filter: none;
+        transform: none;
+        opacity: 0.35;
+    }
+}

@@ -8119,6 +8119,264 @@
         }
     }
 
+    /* ── Performer page: the marquee ──────────────────────────────────
+       08_misc_mid.css turns the performer header into a band. Four
+       things it cannot do from CSS alone, so they are settled here:
+
+       the blurred backdrop needs the photograph's URL, which only the
+       <img> knows; the aliases arrive as one comma run and a list of
+       unknown length needs a budget; the three standing numbers exist
+       nowhere as a single element (the scene count is on a tab, the
+       rank inside a plugin badge, the career in a detail row); and the
+       category scores are hidden inside the tag run, where Advanced
+       Ratings writes them as chips reading "Breasts * : 5".
+
+       Nothing is moved. The alias run and the tag chips are hidden and
+       proxied, everything else is appended. */
+    function refractPerfHeadChild(head, cls) {
+        for (var i = 0; i < head.children.length; i++) {
+            if (head.children[i].classList.contains(cls)) { return head.children[i]; }
+        }
+        return null;
+    }
+
+    function initPerformerHeader() {
+        var page = document.querySelector("#performer-page");
+        if (!page) { return; }
+        var header = page.querySelector(".detail-header");
+        if (!header) { return; }
+        var head = header.querySelector(".performer-head");
+        if (!head) { return; }
+        header.classList.add("refract-ph");
+
+        /* 1. The backdrop. Same file the card shows, blurred and scaled
+           behind it, so the band is always in the photograph's colours. */
+        var fill = null;
+        for (var f = 0; f < header.children.length; f++) {
+            if (header.children[f].classList.contains("refract-ph-fill")) { fill = header.children[f]; break; }
+        }
+        if (!fill) {
+            fill = document.createElement("div");
+            fill.className = "refract-ph-fill";
+            fill.innerHTML = '<div class="refract-ph-blur"></div><div class="refract-ph-veil"></div>';
+            header.insertBefore(fill, header.firstChild);
+        }
+        var pimg = header.querySelector(".detail-header-image img.performer");
+        var psrc = pimg ? (pimg.getAttribute("src") || "") : "";
+        if (psrc && fill.getAttribute("data-shot") !== psrc) {
+            fill.setAttribute("data-shot", psrc);
+            header.style.setProperty("--refract-ph-shot", 'url("' + psrc.replace(/"/g, "%22") + '")');
+        } else if (!psrc && fill.hasAttribute("data-shot")) {
+            fill.removeAttribute("data-shot");
+            header.style.removeProperty("--refract-ph-shot");
+        }
+
+        /* The read-out labels lose their colon. Stash writes "Height:"
+           because its label sits beside the value; here it sits above it
+           as an eyebrow, and an eyebrow does not introduce itself with
+           punctuation. The colon is stripped from the text node rather
+           than hidden, so it cannot come back as a stray glyph when the
+           label wraps. */
+        var titles = header.querySelectorAll(".detail-group .detail-item-title");
+        for (var ti = 0; ti < titles.length; ti++) {
+            var raw0 = titles[ti].textContent || "";
+            var cut = raw0.replace(/\s*:\s*$/, "");
+            if (cut !== raw0) { titles[ti].textContent = cut; }
+        }
+
+        /* 2. Aliases. One line of chips and a count that opens the rest;
+           the comma run stays in the DOM, hidden, so nothing Stash
+           renders is lost. */
+        var aliasSrc = head.querySelector(".alias-head");
+        if (aliasSrc) {
+            var aliasHost = aliasSrc.parentNode;
+            var chips = aliasHost.querySelector(".refract-ph-alias");
+            var raw = (aliasSrc.textContent || "").trim();
+            if (!chips) {
+                chips = document.createElement("div");
+                chips.className = "refract-ph-alias";
+                aliasHost.appendChild(chips);
+            }
+            if (chips.getAttribute("data-raw") !== raw) {
+                chips.setAttribute("data-raw", raw);
+                chips.classList.remove("is-open");
+                chips.innerHTML = "";
+                var names = raw ? raw.split(",") : [];
+                var shown = 0;
+                for (var a = 0; a < names.length; a++) {
+                    var nm = names[a].trim();
+                    if (!nm) { continue; }
+                    var chip = document.createElement("span");
+                    chip.className = "refract-ph-alias__n";
+                    chip.textContent = nm;
+                    chips.appendChild(chip);
+                    shown += 1;
+                }
+                if (shown > 3) {
+                    var more = document.createElement("button");
+                    more.type = "button";
+                    more.className = "refract-ph-alias__more";
+                    more.textContent = "all " + shown;
+                    more.addEventListener("click", function () {
+                        var box = this.parentNode;
+                        var open = box.classList.toggle("is-open");
+                        this.textContent = open ? "fewer" : "all " + (box.children.length - 1);
+                    });
+                    chips.appendChild(more);
+                }
+            }
+        }
+
+        /* 3. What she is in this library. Each of the three is read from
+           wherever Stash happens to keep it, and a cell is skipped
+           rather than shown empty when its source is absent. */
+        var standing = refractPerfHeadChild(head, "refract-ph-standing");
+        if (!standing) {
+            standing = document.createElement("div");
+            standing.className = "refract-ph-standing";
+            head.appendChild(standing);
+        }
+        var cells = [];
+        var tabs = page.querySelectorAll(".performer-tabs .nav-link, .performer-tabs [role='tab']");
+        for (var t = 0; t < tabs.length; t++) {
+            var tt = (tabs[t].textContent || "").trim();
+            if (tt.indexOf("Scene") === 0) {
+                var sc = tt.replace(/^Scenes?/, "").trim();
+                if (sc) { cells.push({ label: "Scenes", value: sc, tail: "" }); }
+                break;
+            }
+        }
+        var rankEl = header.querySelector(".hon-battle-rank-badge");
+        if (rankEl) {
+            var rk = (rankEl.textContent || "").replace(/\s+/g, " ");
+            var rm = rk.match(/#\s*(\d+)\s*(?:of\s*([\d,]+))?/i);
+            if (rm && rm[1] !== "0") {
+                cells.push({ label: "Ranked", value: rm[1], tail: rm[2] ? " of " + rm[2] : "" });
+            }
+        }
+        var career = header.querySelector(".detail-item.career_length .detail-item-value");
+        if (career) {
+            var cv = (career.textContent || "").trim();
+            var cm = cv.match(/(\d{4})/);
+            if (cm) {
+                cells.push({ label: "Active", value: cm[1], tail: /-\s*$/.test(cv) ? " to now" : cv.replace(/^\d{4}\s*-?\s*/, " to ") });
+            }
+        }
+        var sig = cells.map(function (c) { return c.label + c.value + c.tail; }).join("|");
+        if (standing.getAttribute("data-sig") !== sig) {
+            standing.setAttribute("data-sig", sig);
+            standing.innerHTML = "";
+            for (var c2 = 0; c2 < cells.length; c2++) {
+                var cell = document.createElement("div");
+                cell.className = "refract-ph-standing__cell";
+                var lab = document.createElement("span");
+                lab.className = "refract-ph-standing__label";
+                lab.textContent = cells[c2].label;
+                var val = document.createElement("span");
+                val.className = "refract-ph-standing__value";
+                val.textContent = cells[c2].value;
+                if (cells[c2].tail) {
+                    var tl = document.createElement("span");
+                    tl.className = "refract-ph-standing__tail";
+                    tl.textContent = cells[c2].tail;
+                    val.appendChild(tl);
+                }
+                cell.appendChild(lab);
+                cell.appendChild(val);
+                standing.appendChild(cell);
+            }
+        }
+
+        /* 4. The category scores, and the tag run they were buried in.
+           Advanced Ratings writes each category as a tag whose name ends
+           in a star and a number, so seven of thirty-one chips on this
+           page are scores wearing a description's clothes. They come out
+           and read as scores; the rest stay a tag run, behind a count,
+           because thirty-one chips is the one thing the band cannot
+           size. */
+        var tagItem = header.querySelector(".detail-item.tags");
+        var cats = refractPerfHeadChild(head, "refract-ph-cats");
+        var run = null;
+        for (var r = 0; r < header.children.length; r++) {
+            if (header.children[r].classList.contains("refract-ph-tags")) { run = header.children[r]; break; }
+        }
+        if (!tagItem) {
+            if (cats) { cats.parentNode.removeChild(cats); }
+            if (run) { run.parentNode.removeChild(run); }
+            return;
+        }
+        var chipsAll = tagItem.querySelectorAll(".tag-item");
+        var scored = [];
+        var plain = [];
+        for (var i2 = 0; i2 < chipsAll.length; i2++) {
+            var txt = (chipsAll[i2].getAttribute("data-sort-name") || chipsAll[i2].textContent || "").trim();
+            var sm = txt.match(/^(.+?)\s*★\s*:\s*(\d+(?:\.\d+)?)\s*$/);
+            if (sm) { scored.push({ label: sm[1].trim(), value: parseFloat(sm[2]) }); }
+            else if (txt) { plain.push(chipsAll[i2]); }
+        }
+        var csig = scored.map(function (s) { return s.label + s.value; }).join("|") + "::" + plain.length;
+        if (!cats) {
+            cats = document.createElement("div");
+            cats.className = "refract-ph-cats";
+            head.appendChild(cats);
+        }
+        if (!run) {
+            run = document.createElement("div");
+            run.className = "refract-ph-tags";
+            header.appendChild(run);
+        }
+        if (cats.getAttribute("data-sig") === csig) { return; }
+        cats.setAttribute("data-sig", csig);
+        cats.innerHTML = "";
+        run.innerHTML = "";
+        /* Advanced Ratings is a five-point scale; anything above that is
+           somebody else's tag that happens to end in a number, so the
+           bar is drawn against the largest score present rather than
+           against an assumed maximum. */
+        var top = 5;
+        for (var s2 = 0; s2 < scored.length; s2++) { if (scored[s2].value > top) { top = scored[s2].value; } }
+        for (var s3 = 0; s3 < scored.length; s3++) {
+            var cc = document.createElement("div");
+            cc.className = "refract-ph-cats__cell" + (scored[s3].value >= top ? " is-full" : "");
+            var hd = document.createElement("div");
+            hd.className = "refract-ph-cats__head";
+            var cl = document.createElement("span");
+            cl.className = "refract-ph-cats__label";
+            cl.textContent = scored[s3].label;
+            cl.title = scored[s3].label;
+            var cvv = document.createElement("span");
+            cvv.className = "refract-ph-cats__value";
+            cvv.textContent = scored[s3].value + " of " + top;
+            hd.appendChild(cl);
+            hd.appendChild(cvv);
+            var tr = document.createElement("div");
+            tr.className = "refract-ph-cats__track";
+            var fl = document.createElement("div");
+            fl.className = "refract-ph-cats__fill";
+            fl.style.width = Math.round(scored[s3].value / top * 100) + "%";
+            tr.appendChild(fl);
+            cc.appendChild(hd);
+            cc.appendChild(tr);
+            cats.appendChild(cc);
+        }
+        if (plain.length) {
+            for (var p2 = 0; p2 < plain.length; p2++) {
+                run.appendChild(plain[p2].cloneNode(true));
+            }
+            var tog = document.createElement("button");
+            tog.type = "button";
+            tog.className = "refract-ph-tags-toggle";
+            tog.textContent = plain.length + " tags";
+            tog.addEventListener("click", function () {
+                var box = document.querySelector("#performer-page .refract-ph-tags");
+                if (!box) { return; }
+                var open = box.classList.toggle("is-open");
+                this.textContent = open ? "hide tags" : plain.length + " tags";
+            });
+            cats.appendChild(tog);
+        }
+    }
+
     function safeRun(fn) {
         try { fn(); } catch (e) { /* swallow - Stash re-renders will trigger another cycle */ }
     }
@@ -8457,6 +8715,7 @@
                 safeRun(initPerformerNameTooltip);
                 safeRun(initTagCountPopover);
                 safeRun(initScrapeResults);
+                safeRun(initPerformerHeader);
             } finally {
                 observer.observe(document.body, { childList: true, subtree: true });
             }
