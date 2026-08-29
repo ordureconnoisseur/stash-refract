@@ -384,3 +384,215 @@ body.stash-liquid-glass .detail-header .detail-item.sub_tags .refract-cap-toggle
         min-width: 9rem;
     }
 }
+
+/* ===================================================================
+   Phase 3: one composition, one left edge
+   ===================================================================
+
+   Measured at 1600 after phase 2, which is what prompted this:
+
+   | studio 464 | dead zone under the mark 350 x 182.52 = 63,882px2,
+   |            | 15.6% of the header. Two content left edges, 411
+   |            | and 398.
+   | tag 67     | dead zone 358 x 242.56 = 86,836px2, 12%. Two edges,
+   |            | 419 and 406. Widest row: a 1,009px value box holding
+   |            | 187.91px of ink.
+
+   The dead zone is P7 exactly, and it is the same failure the design
+   system already records: 34 tag chips crushed into 98px above 46.5px
+   of dead space. Phase 2 recreated it at scale by capping 1,328 chips
+   at 140px while 86,836px2 sat unused in the same panel.
+
+   The cause is structural. `.detail-container` is `display: block`
+   with `.detail-header-image` floated left at a fixed 350px, and the
+   head beside it is a flex container, which establishes its own block
+   formatting context and therefore can never wrap under the float. No
+   amount of spacing fixes that; the container has to stop being a
+   float layout.
+
+   The 12.89px stagger is the negative side margins on `.detail-group`
+   meeting a `.col` that pads by 15px while its `.row` pulls back by
+   the same amount. Both are cancelled here so there is one edge. */
+
+/* Stash floats the mark and lays the content beside it. That is the
+   right structure and it was only failing because the float was a
+   fixed 350px and the row beside it is a flex container, which
+   establishes a block formatting context and therefore can never
+   wrap under the float however short the mark is.
+
+   So the row goes back to block flow and the mark goes back to its
+   own size. The name and the scope control sit beside it; the facts
+   begin below its bottom edge and take the full width of the bar,
+   because a block that clears a float is simply full width. No dead
+   zone, and no second column to align to.
+
+   The mark's WRAPPER carries the definite width and the image fills
+   it. Sizing the two from each other is circular and the browser
+   resolves it to nothing: measured, with both set to auto the Brazzers
+   wordmark computed `width: 0px` and rendered as 22 x 22, which is
+   its padding and border and no picture at all (design system 7.16).
+   11rem is narrow enough that the space beside it is a name rather
+   than a column, and the facts clear it entirely.
+
+   `box-sizing` has to be restated. 08_misc_mid gives `img.logo`
+   content-box plus 10px of padding and a 1px rim so a logo does not
+   touch its own rounded corner. With `width: 100%` that makes the
+   image 22px WIDER than the wrapper holding it, which swallowed the
+   float's right margin and printed the mark hard against the name. */
+body.stash-liquid-glass .detail-header:has(.studio-head) .detail-container > .row,
+body.stash-liquid-glass .detail-header:has(.tag-head) .detail-container > .row,
+body.stash-liquid-glass .detail-header:has(.group-head) .detail-container > .row {
+    display: block !important;
+    margin: 0 !important;
+}
+
+body.stash-liquid-glass .detail-header:has(.studio-head) .studio-head,
+body.stash-liquid-glass .detail-header:has(.tag-head) .tag-head,
+body.stash-liquid-glass .detail-header:has(.group-head) .group-head {
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    flex: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+body.stash-liquid-glass .detail-header:has(.studio-head) .detail-header-image,
+body.stash-liquid-glass .detail-header:has(.tag-head) .detail-header-image,
+body.stash-liquid-glass .detail-header:has(.group-head) .detail-header-image {
+    float: left;
+    display: block !important;
+    width: 11rem !important;
+    max-width: 11rem !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 var(--gap-xl) var(--gap-md) 0 !important;
+    padding: 0 !important;
+}
+
+body.stash-liquid-glass .detail-header:has(.studio-head) .detail-header-image img,
+body.stash-liquid-glass .detail-header:has(.tag-head) .detail-header-image img,
+body.stash-liquid-glass .detail-header:has(.group-head) .detail-header-image img {
+    display: block !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: 6.5rem !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    object-fit: contain !important;
+}
+
+/* -------------------------------------------------------------------
+   The facts stop being a panel inside a panel
+   -------------------------------------------------------------------
+   The bar is already a glass surface. A bordered, filled, blurred box
+   painted on a child of it reads as a lighter band rather than a
+   match, which is the stacking rule in 3.2, and it is what forced the
+   negative side margins that produced the second left edge.
+
+   So the fill, the rim and the blur come off, the negative margins go
+   with them, and the rows keep their hairlines. The panel supplies the
+   rim and the floor; the content sets its own rhythm (6.4). */
+body.stash-liquid-glass .detail-header:has(.studio-head) .detail-group,
+body.stash-liquid-glass .detail-header:has(.tag-head) .detail-group,
+body.stash-liquid-glass .detail-header:has(.group-head) .detail-group {
+    margin: var(--gap-md) 0 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+    -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
+    column-gap: var(--gap-xl);
+}
+
+/* A row whose value is one pill has no business spanning the full
+   width: measured, a 1,009px box holding 187.91px of ink. Stash IDs
+   and aliases go back into the two-column flow unless they genuinely
+   carry a list. Rows that DO run long (descriptions, chip runs) keep
+   the full span, which is the rule they were given for a reason. */
+body.stash-liquid-glass .detail-header:has(.studio-head) .detail-item.stash_ids:not(:has(li:nth-child(2))),
+body.stash-liquid-glass .detail-header:has(.tag-head) .detail-item.stash_ids:not(:has(li:nth-child(2))) {
+    grid-column: auto;
+}
+
+/* -------------------------------------------------------------------
+   The tab strip joins the same edge
+   -------------------------------------------------------------------
+   Everything in the bar is left-aligned and the strip beneath it was
+   centred, so the page had a composition and then an ornament. It
+   starts where the content starts. */
+body.stash-liquid-glass .studio-tabs > .nav-tabs,
+body.stash-liquid-glass .tag-tabs > .nav-tabs,
+body.stash-liquid-glass .group-tabs > .nav-tabs {
+    justify-content: flex-start;
+    padding-left: 1.25rem;
+}
+
+/* The scope control sits with the name rather than under the stars, so
+   the first two things read are what this is and how much of it you
+   are looking at. */
+/* The scope control clears the mark instead of being pushed right by
+   it. As a flex container it is its own formatting context, so beside
+   a float it indents to the float's edge and the bar gains a third
+   left edge: measured at x=218.38 against 45.5 for everything else. */
+body.stash-liquid-glass .refract-scope {
+    clear: left;
+    margin-top: var(--gap-md);
+}
+
+/* Everything after the name clears too, for the same reason. Measured
+   on the studio page, the rating stars were the last thing left on a
+   second edge at x=214 against 45.5. The name is the only thing that
+   sits beside the mark, which is what a mark is for. */
+body.stash-liquid-glass .detail-header:has(.studio-head) .quality-group,
+body.stash-liquid-glass .detail-header:has(.studio-head) .rating-stars,
+body.stash-liquid-glass .detail-header:has(.studio-head) .detail-group,
+body.stash-liquid-glass .detail-header:has(.studio-head) .details-edit,
+body.stash-liquid-glass .detail-header:has(.tag-head) .detail-group,
+body.stash-liquid-glass .detail-header:has(.tag-head) .details-edit,
+body.stash-liquid-glass .detail-header:has(.group-head) .rating-stars,
+body.stash-liquid-glass .detail-header:has(.group-head) .detail-group,
+body.stash-liquid-glass .detail-header:has(.group-head) .details-edit {
+    clear: left;
+}
+
+/* `clear` is ignored on an inline-level box, and Stash ships the studio
+   rating wrapper as `inline-flex`, so the property computed to `left`
+   and did nothing: the stars stayed at x=214 beside the mark while
+   everything else sat at 45.5. Block-level outer display, same inner
+   flex, so no alignment property changes meaning (7.13). */
+body.stash-liquid-glass .detail-header:has(.studio-head) .quality-group,
+body.stash-liquid-glass .detail-header:has(.group-head) .quality-group {
+    display: flex !important;
+}
+
+/* The mark's bottom margin was the last thing keeping the float alive
+   past the name: its margin box ended at 133 against a name ending at
+   127.5, so the next block was still beside it. */
+body.stash-liquid-glass .detail-header:has(.studio-head) .detail-header-image,
+body.stash-liquid-glass .detail-header:has(.tag-head) .detail-header-image,
+body.stash-liquid-glass .detail-header:has(.group-head) .detail-header-image {
+    margin-bottom: 0 !important;
+}
+
+@media (max-width: 900px) {
+    body.stash-liquid-glass .detail-header:has(.studio-head) .detail-container,
+    body.stash-liquid-glass .detail-header:has(.tag-head) .detail-container,
+    body.stash-liquid-glass .detail-header:has(.group-head) .detail-container {
+        gap: var(--gap-lg);
+    }
+
+    body.stash-liquid-glass .detail-header:has(.studio-head) .detail-header-image,
+    body.stash-liquid-glass .detail-header:has(.tag-head) .detail-header-image,
+    body.stash-liquid-glass .detail-header:has(.group-head) .detail-header-image {
+        max-width: 8rem !important;
+    }
+
+    body.stash-liquid-glass .studio-tabs > .nav-tabs,
+    body.stash-liquid-glass .tag-tabs > .nav-tabs,
+    body.stash-liquid-glass .group-tabs > .nav-tabs {
+        padding-left: 0;
+    }
+}
