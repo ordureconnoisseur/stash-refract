@@ -162,6 +162,23 @@ red, yellow, purple, green, teal. Everything else resolves through them.
    white-on-white. A token that flips cannot be forgotten. (Ruled
    2026-08-30; the token ships with the scene lane and reaches every lane
    at merge.)
+
+   Text stands on one of three grounds, and only the first two flip:
+
+   - **A mode ground** (panel, page): ink is `rgba(var(--fg-rgb), A)`.
+   - **A dark island inside light** (the player bar, the card back): the
+     island re-flips `--fg-rgb` locally, following `--text`.
+   - **Artwork** (a thumbnail, a wall tile, a photograph): NOT a mode
+     ground at all. Text on imagery keeps its own light ink plus a dark
+     text-shadow, and is never swept onto the flipping token, because the
+     picture does not change with the mode. **The tell is the shadow**:
+     text on a photograph needs one, text on a panel never wants one.
+
+   And the reason sweeps are scoped by hand, proven on the card back: the
+   one legible string in light mode was a hardcoded white that happened to
+   be right. A grep-driven sweep removes the one declaration that worked
+   and keeps the three that did not. Classify each white against its
+   actual ground; never sweep ink as a batch.
 5. **A token that flips between modes can flip its JOB, not just its
    value.** `--accent-light` is high-key TEXT in dark and a pale FILL tint
    in light: measured across the seven presets it is 1.32 to 1.90:1 on the
@@ -1164,6 +1181,7 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 | Contrast | RULED 2026-08-30: brighten. `.st-tag-caption` and `.st-tag-n` go to alpha 0.42, clearing the 3:1 secondary floor. The scene lane is executing; this row closes when the change lands and is measured. | 3.9 |
 | Destructive actions | OPEN RULING 2026-08-30: 6.5 says destructive actions live in a menu, not in a row of peers, but the performer-band Delete and the string-list remove buttons sit inline and contradict it. The user has explicitly NOT decided; 6.5 stands as written and neither surface changes until ruled. | 6.5 |
 | Browser floor | `--accent-ink` and `--danger-ink` resolve through `color-mix()` in light mode, which needs Chrome 111; the documented floor is Chrome 105 (set by `:has()`). On 105 to 110 in light mode those ink consumers hit rule 13's dropped-declaration failure. Either the README floor bumps to 111 or the two light overrides get baked literal fallbacks. Logged 2026-08-30. | 3.1, 7.13 |
+| Tag-card heart | OPEN INVESTIGATION 2026-08-30: `.tag-card .favorite-button:not(.favorite)` renders nothing capturable even at forced opacity 1, and its svg reports `fill: rgb(0,0,0)` where the source (Stash's FontAwesome heart on currentColor in a `.minimal` button) says the styled `color` should reach it. Either the un-favourited heart is invisible on hover in light mode, or something outranks `color` on the way to the svg. Unowned surface; needs a live look before any rule is written. | 6.1 |
 | Em dashes | RESOLVED 2026-08-28: 1,091 swept from the shipped source in one mechanical commit (853 in the stylesheets, 236 in refract.js comments, plus two that were live UI strings, one of them a latent crash: `createElement("...")` with the dash as a TAG NAME, saved only by sitting behind a hardcoded-false flag). Zero remain; the `Edit` string-matching trap is gone with them. | 6.21, 7.8 |
 | Motion | Tokenized 2026-08-28 in three passes: the canonical five, then near-duplicates, then the 0.25 to 0.35s residue onto a new `--dur-settle` (shifts up to 14%, the one perceptible-in-principle fold; eyeball drawers and reveals). Remaining literals are deliberate: 0.08s micro-flashes and the player idle 1s fade. | 3.7 |
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px and 10px literals. 9px is removed from this row: where commented as concentric (inner = outer minus padding) it is computed, correct, and exempt per 3.4; uncommented 9px uses still need their derivation stated or a token. | 3.4 |
