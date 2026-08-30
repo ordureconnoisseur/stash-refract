@@ -188,6 +188,16 @@ red, yellow, purple, green, teal. Everything else resolves through them.
    `--accent-bright` only reaches 2.28 to 3.96). Any use of an accent token
    in a role the other mode does not share needs a partner rule in
    `14_light.css`, and the check is a contrast number, not a look.
+6. **A token's fallback cannot know its consumer's ground; a concrete rule
+   can.** When a token needs a pre-support fallback, the only honest value
+   is another token (`--accent-ink: var(--accent)`), because the token
+   serves every surface at once. A rule on ONE known surface may instead
+   bake the resolved value of the thing it falls back from, byte-identical
+   where supported (measured delta 0,0,0 per channel on the performer
+   band), so old browsers get the same pixels rather than merely legible
+   ones. The two-line token fallback is the floor; baking is available
+   wherever the ground is known. A baked literal derived from a token
+   carries a comment saying to recompute it if that token ever moves.
 
 ### 3.2 Surfaces
 
@@ -473,6 +483,12 @@ faithfully):
 | Reading text | 4.5:1 | body copy, values, any text that is the sole carrier of its information |
 | Secondary text | 3:1 | muted labels, dates, captions doing support work |
 | Non-text state | 3:1 | focus rings, active indicators, borders that encode state |
+
+Contrast is measured against the element's ACTUAL rendered ground, never the
+surface it nominally sits on. The performer band's "white panel" measures
+210,187,174 under its translucent veil over a portrait, which turns
+`--danger`'s passing 3.76:1 into a failing 2.04:1; arithmetic against the
+nominal panel passes things the screen fails.
 
 Both modes, all eight accents; the binding constraint is almost always light
 mode with the yellow preset. Quieter than the floor is possible, but only as a
