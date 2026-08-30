@@ -8589,3 +8589,34 @@ body.stash-liquid-glass #performer-page .refract-pe form .text-input.is-invalid 
         grid-column: span 3;
     }
 }
+
+/* ── The entity tab strip ───────────────────────────────────
+   Moved here from 07_scene_details.css on 2026-08-30. It styles the
+   performer, studio, tag, group and movie tab strips, which are this
+   lane's surface, and it had been living in the scene panel's file --
+   flagged and handed over by the scene lane rather than left.
+
+   Content is the scene lane's CURRENT version, not the one my branch
+   carried: my 07 still said var(--radius), theirs says var(--radius-sm),
+   and theirs is what is deployed and what the tabs actually render.
+
+   Why the size: this used to name .performer-tabs only, so the tag,
+   studio and group strips kept the sidebar variant -- 9.24px links 22px
+   tall under a 28px title, against 12.25px links 35.8px tall on the
+   performer page. Same markup, same job, same size.
+
+   Radius is --radius-sm to match the scene tabs. Measured on the
+   performer page after the move: 12px computed against a 12px
+   --radius-sm, so the two strips agree on this side. The scene strip
+   computes 9px from a more specific segmented-control rule in 07; that
+   divergence is on that side, not this one. */
+body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link {
+    padding: 0.55rem 1rem !important;
+    font-size: var(--fs-base) !important;
+    border-radius: var(--radius-sm) !important;
+    letter-spacing: 0.015em !important;
+}
+body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link .badge {
+    font-size: var(--fs-xs) !important;
+    padding: 0.18em 0.5em !important;
+}
