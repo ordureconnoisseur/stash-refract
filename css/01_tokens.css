@@ -235,6 +235,16 @@ body.stash-liquid-glass {
        --accent-bright for fills, rims and marks. */
     --accent-ink: var(--accent-bright);
 
+    /* Danger family - sanctioned 2026-08-30, amending the old "semantic
+       colour is Bootstrap's" rule for this one role: destructive state
+       had already converged on Tailwind red de facto (the same base as
+       the refract-red accent preset), with one stray crimson toast.
+       Success and warning remain Bootstrap's until ruled. */
+    --danger: #ef4444;
+    --danger-bright: #f87171;   /* ink on danger tints            */
+    --danger-light: #fca5a5;    /* ink on strong danger fills     */
+    --danger-rgb: 239, 68, 68;
+
     --nav-btn-size: 2.4rem;
     --nav-icon-size: 1rem;
     --nav-gap: 0.2rem;

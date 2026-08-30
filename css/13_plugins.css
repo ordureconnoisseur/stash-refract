@@ -2504,15 +2504,15 @@ body.stash-liquid-glass .tag-sidebar__action--include.is-active {
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.45) !important;
 }
 body.stash-liquid-glass .tag-sidebar__action--exclude:hover {
-    background: rgba(239, 68, 68, 0.16) !important;
-    border-color: rgba(239, 68, 68, 0.45) !important;
-    color: #f87171 !important;
+    background: rgba(var(--danger-rgb), 0.16) !important;
+    border-color: rgba(var(--danger-rgb), 0.45) !important;
+    color: var(--danger-bright) !important;
 }
 body.stash-liquid-glass .tag-sidebar__action--exclude.is-active {
-    background: rgba(239, 68, 68, 0.85) !important;
-    border-color: rgba(239, 68, 68, 0.9) !important;
+    background: rgba(var(--danger-rgb), 0.85) !important;
+    border-color: rgba(var(--danger-rgb), 0.9) !important;
     color: #fff !important;
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.45) !important;
+    box-shadow: 0 0 8px rgba(var(--danger-rgb), 0.45) !important;
 }
 
 /* Tag-name button */

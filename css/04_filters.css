@@ -629,8 +629,8 @@ body.stash-liquid-glass .toast.bg-success .toast-header {
 }
 body.stash-liquid-glass .toast.bg-danger,
 body.stash-liquid-glass .toast.bg-danger .toast-header {
-    background: rgba(217, 45, 32, 0.22) !important;
-    border-color: rgba(217, 45, 32, 0.5) !important;
+    background: rgba(var(--danger-rgb), 0.22) !important;
+    border-color: rgba(var(--danger-rgb), 0.5) !important;
 }
 body.stash-liquid-glass .toast.bg-warning,
 body.stash-liquid-glass .toast.bg-warning .toast-header {
@@ -914,9 +914,9 @@ body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .input-group-prep
 /* Danger / delete button - red-tinted glass instead of Bootstrap solid red */
 body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger,
 body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger-minimal {
-    background: rgba(239, 68, 68, 0.10) !important;
-    border: 1px solid rgba(239, 68, 68, 0.32) !important;
-    color: #f87171 !important;
+    background: rgba(var(--danger-rgb), 0.10) !important;
+    border: 1px solid rgba(var(--danger-rgb), 0.32) !important;
+    color: var(--danger-bright) !important;
     box-shadow: none !important;
     border-radius: var(--radius-sm) !important;
     height: 2.2rem;
@@ -925,10 +925,10 @@ body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger-minimal {
 }
 body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger:hover,
 body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger-minimal:hover {
-    background: rgba(239, 68, 68, 0.18) !important;
-    border-color: rgba(239, 68, 68, 0.55) !important;
-    color: #fca5a5 !important;
-    box-shadow: 0 0 12px rgba(239, 68, 68, 0.30) !important;
+    background: rgba(var(--danger-rgb), 0.18) !important;
+    border-color: rgba(var(--danger-rgb), 0.55) !important;
+    color: var(--danger-light) !important;
+    box-shadow: 0 0 12px rgba(var(--danger-rgb), 0.30) !important;
 }
 body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger svg,
 body.stash-liquid-glass .filtered-list-toolbar .btn.btn-danger-minimal svg {

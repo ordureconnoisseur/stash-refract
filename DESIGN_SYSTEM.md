@@ -145,9 +145,24 @@ red, yellow, purple, green, teal. Everything else resolves through them.
    keep working.
 2. The tier palette (section 4) is the only second colour system permitted. It
    is allowed to override the accent, because it is encoding data.
-3. Semantic colour (error red, success green) is Bootstrap's and stays
-   Bootstrap's. Do not add a third palette.
-4. **A token that flips between modes can flip its JOB, not just its
+3. Semantic colour is Bootstrap's and stays Bootstrap's, with one ruled
+   exception (2026-08-30): **danger is ours.** Destructive state had
+   converged on Tailwind red de facto, so it is tokenized as the accent
+   pattern: `--danger` `#ef4444`, `--danger-bright` `#f87171` (ink on danger
+   tints), `--danger-light` `#fca5a5` (ink on strong fills), `--danger-rgb`
+   `239, 68, 68`. It deliberately shares a base with the refract-red accent
+   preset; in that preset, danger reads as emphasis, which is accepted.
+   Success and warning remain Bootstrap's until ruled.
+4. **White is not ink; `--fg-rgb` is.** Text colour derivations are written
+   `rgba(var(--fg-rgb), A)`, where the token is `255, 255, 255` in dark and
+   `0, 0, 0` in light, and any island that stays dark inside light mode
+   re-flips it locally, following `--text` wherever `--text` is re-pointed.
+   The evidence: 44 of the theme's 76 hardcoded white text declarations
+   never got their hand-written light counterpart, and two shipped as
+   white-on-white. A token that flips cannot be forgotten. (Ruled
+   2026-08-30; the token ships with the scene lane and reaches every lane
+   at merge.)
+5. **A token that flips between modes can flip its JOB, not just its
    value.** `--accent-light` is high-key TEXT in dark and a pale FILL tint
    in light: measured across the seven presets it is 1.32 to 1.90:1 on the
    light panel, so a new use of it as text ships invisible in light mode
@@ -707,8 +722,13 @@ Status tints layer ONTO the glass; they do not replace it:
 | State | Fill | Border |
 |---|---|---|
 | success | `rgba(46,125,91,0.22)` | `rgba(46,125,91,0.45)` |
-| danger | `rgba(217,45,32,0.22)` | `rgba(217,45,32,0.5)` |
+| danger | `rgba(var(--danger-rgb),0.22)` | `rgba(var(--danger-rgb),0.5)` |
 | warning | `rgba(232,121,43,0.2)` | `rgba(232,121,43,0.45)` |
+
+Danger rows use the 3.1 danger tokens (ruled 2026-08-30; the toast's old
+`217,45,32` crimson was the one stray and was folded onto `--danger-rgb`, a
+slight visible warm-up at 0.22 alpha). Success and warning stay literal until
+their families are ruled.
 
 The rule this encodes: **state must survive the glass.** The original flat
 glass toast beat Bootstrap's `.bg-success` / `.bg-danger` with `!important`, so
@@ -935,6 +955,15 @@ when it is:
 3. An empty screen is an invitation to act (6.21): it says what would fill it
    and offers the action, in the interface's voice.
 
+### 6.23 Tabs and segmented controls
+
+Ruled 2026-08-30: **tab links take `--radius-sm`.** A tab is a rectangular
+door into a rectangular panel, and a pill-shaped door reads as a button. The
+pill silhouette belongs to the 6.18 floating family: the scope control and
+floating segmented controls stay `--radius-pill`, because they float free of
+any panel they would need to match. The shape is the type signal: rounded
+rectangle = takes you somewhere in place, pill = floating chooser.
+
 ---
 
 ## 7. Platform physics
@@ -1120,7 +1149,8 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 | Type | 301 uses of `var(--fs-*)` against 99 literal sizes, so 75% adoption. The literals cluster at 0.74, 0.66, 0.62, 0.6 and 0.58rem, which is a sub-`--fs-xs` tier the scale does not have. | 3.5 |
 | Type, second ladder | RESOLVED 2026-08-28: the panel-local scale is gone and every size in the panel is a scale token. Folded as ruled, with two corrections measurement forced. `--sp-value` had no consumers left and was deleted rather than aliased. 21px was promoted by retuning `--fs-xl` (and moving 28px to `--fs-2xl`) rather than adding an eighth step, because both top rungs had zero consumers theme-wide. Measured before and after: 13 size/weight pairs across 9 distinct sizes became 10 across 5. Logged 2026-08-27. | 3.5 |
 | Type, sub-scale literals | 31 literal font sizes sit below `--fs-xs` across 16 distinct values from 5.04 to 9.5px, 20 of them clustered in 8.12 to 9.24. The scene panel's own (9.5px tag counts) folded UP to `--fs-xs` rather than down, which removed a size instead of adding a rung, so no `--fs-2xs` was created. Whether the other 30 want one rung or none is a measured pass, not a drive-by. Logged 2026-08-28; revisit with the padding pass. | 3.5 |
-| Contrast | `.st-tag-caption` measures 2.48:1 and `.st-tag-n` 2.67:1 in dark, below the 3:1 secondary floor. Deliberately subordinate, but the rarity counts are near-ghostly and are the sole carrier of that information. Whether they brighten to the floor or stand as a listed exemption is the user's call. Logged 2026-08-28. | 3.9 |
+| Contrast | RULED 2026-08-30: brighten. `.st-tag-caption` and `.st-tag-n` go to alpha 0.42, clearing the 3:1 secondary floor. The scene lane is executing; this row closes when the change lands and is measured. | 3.9 |
+| Destructive actions | OPEN RULING 2026-08-30: 6.5 says destructive actions live in a menu, not in a row of peers, but the performer-band Delete and the string-list remove buttons sit inline and contradict it. The user has explicitly NOT decided; 6.5 stands as written and neither surface changes until ruled. | 6.5 |
 | Em dashes | RESOLVED 2026-08-28: 1,091 swept from the shipped source in one mechanical commit (853 in the stylesheets, 236 in refract.js comments, plus two that were live UI strings, one of them a latent crash: `createElement("...")` with the dash as a TAG NAME, saved only by sitting behind a hardcoded-false flag). Zero remain; the `Edit` string-matching trap is gone with them. | 6.21, 7.8 |
 | Motion | Tokenized 2026-08-28 in three passes: the canonical five, then near-duplicates, then the 0.25 to 0.35s residue onto a new `--dur-settle` (shifts up to 14%, the one perceptible-in-principle fold; eyeball drawers and reveals). Remaining literals are deliberate: 0.08s micro-flashes and the player idle 1s fade. | 3.7 |
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px and 10px literals. 9px is removed from this row: where commented as concentric (inner = outer minus padding) it is computed, correct, and exempt per 3.4; uncommented 9px uses still need their derivation stated or a token. | 3.4 |
