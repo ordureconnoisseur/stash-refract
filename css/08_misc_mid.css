@@ -72,7 +72,14 @@ body.stash-liquid-glass .wall-item .wall-item-title {
     line-height: 1.3;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
 }
-/* Performer name */
+/* Performer name.
+
+   These two stay hardcoded white through the --fg-rgb sweep, and so
+   does .wall-item-title above them. The wall footer sits ON the tile's
+   own artwork, not on the page, which is what the dark text-shadows on
+   all three are for. Ink that follows the mode would turn them black
+   over a photograph in light mode -- the mode tells you about the page,
+   and this text is not on the page. Leave them. */
 body.stash-liquid-glass .wall-item .wall-item-footer a > .TruncatedText:not(.wall-item-title) {
     font-size: var(--fs-xs);
     color: rgba(255, 255, 255, 0.65) !important;
@@ -916,7 +923,7 @@ body.stash-liquid-glass .name-icons .external-links-button.dropdown {
    (overrides the generic .favorite-button colour which leaks orange via
    the .btn-primary cascade in the detail-header context). */
 body.stash-liquid-glass .name-icons .favorite-button:not(.favorite) {
-    color: rgba(255, 255, 255, 0.85) !important;
+    color: rgba(var(--fg-rgb), 0.85) !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
@@ -1564,7 +1571,7 @@ body.stash-liquid-glass .tag-card .favorite-button {
     padding: 0 !important;
 }
 body.stash-liquid-glass .tag-card .favorite-button:not(.favorite) {
-    color: rgba(255, 255, 255, 0.85) !important;
+    color: rgba(var(--fg-rgb), 0.85) !important;
 }
 body.stash-liquid-glass .tag-card .favorite-button:not(.favorite):hover {
     color: #fff !important;
@@ -1982,7 +1989,7 @@ body.stash-liquid-glass .movie-card .thumbnail-section > a:has(> .favorite-butto
 body.stash-liquid-glass .studio-card .favorite-button:not(.favorite),
 body.stash-liquid-glass .group-card .favorite-button:not(.favorite),
 body.stash-liquid-glass .movie-card .favorite-button:not(.favorite) {
-    color: rgba(255, 255, 255, 0.85) !important;
+    color: rgba(var(--fg-rgb), 0.85) !important;
 }
 body.stash-liquid-glass .studio-card .favorite-button:not(.favorite):hover,
 body.stash-liquid-glass .group-card .favorite-button:not(.favorite):hover,
@@ -3167,7 +3174,7 @@ body.stash-liquid-glass code,
 body.stash-liquid-glass .CodeMirror,
 body.stash-liquid-glass .cm-editor {
     background: rgba(6, 6, 8, 0.82) !important;
-    color: rgba(255, 255, 255, 0.9) !important;
+    color: rgba(var(--fg-rgb), 0.9) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 10px !important;
 }
@@ -4283,7 +4290,7 @@ body.stash-liquid-glass .stash-performer-popup::before {
     justify-content: center;
     font-size: 1.5rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(var(--fg-rgb), 0.4);
     letter-spacing: var(--track-eyebrow);
 }
 #stash-category-browser .stash-cat-tile-text {
@@ -8502,7 +8509,7 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-suc
 body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-success:disabled {
     background: var(--fill-2) !important;
     border-color: var(--glass-border) !important;
-    color: rgba(255, 255, 255, 0.3) !important;
+    color: rgba(var(--fg-rgb), 0.3) !important;
 }
 /* The image controls belong with the image, and Clear Image is
    destructive, so it stops sitting between them and Save. */
