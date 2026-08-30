@@ -1776,7 +1776,7 @@ body.stash-liquid-glass .refract-cb-assets-head {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 body.stash-liquid-glass .refract-cb-assets-n {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(var(--fg-rgb), 0.4);
     letter-spacing: var(--track-label);
     font-variant-numeric: tabular-nums;
 }
@@ -1809,7 +1809,7 @@ body.stash-liquid-glass .refract-cb-stat {
 body.stash-liquid-glass .refract-cb-stat-name {
     flex: 0 0 42%;
     font-size: var(--fs-xs);
-    color: rgba(255, 255, 255, 0.88);
+    color: rgba(var(--fg-rgb), 0.88);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1896,7 +1896,7 @@ body.stash-liquid-glass .refract-cb-foot-item {
     font-size: 0.54rem;
     text-transform: uppercase;
     letter-spacing: var(--track-label);
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(var(--fg-rgb), 0.5);
 }
 /* The dossier's switchable panels (customiser chips). The ratings grid is
    flex 1 1 auto, so it absorbs the freed room and the fitter shows more
@@ -2214,4 +2214,34 @@ body.stash-liquid-glass .performer-card.refract-flipping * {
 body.stash-liquid-glass.refract-perf-layout-card :is(.performer-card, .refract-ph-card) .stash-perf-stats > * {
     margin-left: 0 !important;
     margin-right: 0 !important;
+}
+
+/* ── The card back is a dark island ──────────────────────────────────
+   The back stays dark in light mode and always will: it is a playing
+   card back, drawn as a foil ring over dark inset shadows, and nothing
+   in 14_light rethemes it. But .refract-cb sets `color: var(--text)`,
+   and --text flips. So in light mode the back's body text was painting
+   near-black on a dark card. Measured live on a flipped card, same
+   element and the same ground (62,50,44) in both modes:
+
+       dark    ink 168,163,161    4.96:1
+       light   ink  21, 14, 11    1.54:1
+
+   Only the name survived, because it is hardcoded white -- which is to
+   say the one string that still worked was the one a white sweep would
+   have removed.
+
+   The fix is the island re-pin 14_light already uses for the video
+   control bar: restore the dark tokens on the island itself, which
+   fixes every var(--text) consumer inside it at once, and re-pin
+   --fg-rgb with them so the three rgba(var(--fg-rgb), a) declarations
+   above stay white here rather than following the page (3.1 rule 4,
+   island clause).
+
+   This block is scoped to .refract-light and self-contained, so it can
+   move to 14_light whole when that file is free. Move it. */
+body.stash-liquid-glass.refract-light .refract-cb {
+    --text: rgba(255, 255, 255, 0.92);
+    --text-muted: rgba(255, 255, 255, 0.55);
+    --fg-rgb: 255, 255, 255;
 }
