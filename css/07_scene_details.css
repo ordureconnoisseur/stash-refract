@@ -1527,7 +1527,7 @@ body.stash-liquid-glass .history-header h5 {
     font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(255, 255, 255, 0.38) !important;
+    color: rgba(var(--fg-rgb), 0.38) !important;
     margin: 0 !important;
     display: flex !important;
     align-items: center !important;
@@ -1544,7 +1544,7 @@ body.stash-liquid-glass .history-header h5 > span:first-child {
    of times a scene had been played the most emphatic thing on the tab. */
 body.stash-liquid-glass .history-header .badge.badge-pill.badge-secondary {
     background: none !important;
-    color: rgba(255, 255, 255, 0.3) !important;
+    color: rgba(var(--fg-rgb), 0.3) !important;
     border: 0 !important;
     padding: 0 !important;
     font-size: var(--fs-xs) !important;
@@ -1571,7 +1571,7 @@ body.stash-liquid-glass .scene-history li {
     border: 0 !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
     border-radius: 0 !important;
-    color: rgba(255, 255, 255, 0.72) !important;
+    color: rgba(var(--fg-rgb), 0.72) !important;
     font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
 }
@@ -1602,14 +1602,14 @@ body.stash-liquid-glass .scene-video-filter h5 {
     font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(255, 255, 255, 0.38) !important;
+    color: rgba(var(--fg-rgb), 0.38) !important;
     margin: 0.4rem 0 0.2rem 0 !important;
 }
 body.stash-liquid-glass .scene-video-filter .btn.btn-primary,
 body.stash-liquid-glass .scene-video-filter .btn.btn-secondary {
     background: var(--fill-3) !important;
     border: 1px solid var(--glass-border) !important;
-    color: rgba(255, 255, 255, 0.72) !important;
+    color: rgba(var(--fg-rgb), 0.72) !important;
     font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
     box-shadow: none !important;
@@ -1640,7 +1640,7 @@ body.stash-liquid-glass .scene-video-filter .filter-slider-value:not(.refract-ha
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     font-variant-numeric: tabular-nums !important;
-    color: rgba(255, 255, 255, 0.45) !important;
+    color: rgba(var(--fg-rgb), 0.45) !important;
 }
 
 /* ── Queue tab ────────────────────────────────────────────────────── */
@@ -1798,7 +1798,7 @@ body.stash-liquid-glass .scene-markers-panel:not(:has(.wall > *))::after {
     text-wrap: pretty;
     font-size: var(--fs-sm);
     line-height: 1.55;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(var(--fg-rgb), 0.4);
 }
 
 /* Card grid: drop the row's negative margins, add a real gutter. */
@@ -2208,7 +2208,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     justify-content: flex-start !important;
     font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
-    color: rgba(255, 255, 255, 0.45) !important;
+    color: rgba(var(--fg-rgb), 0.45) !important;
 }
 /* ---- The rating tier chip -------------------------------------------
    The rating reads as its tier, which is the theme's own idea about
@@ -2250,7 +2250,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: var(--track-eyebrow);
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--text-muted);
     /* 6.7: the line-height has to clear ascent plus descent or the
        half-leading goes negative and the baseline is dragged up. Both
        spans carry the same one so their boxes are equal and the two
@@ -2336,7 +2336,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 
 /* Unrated: an invitation, with no tier colour and no false emphasis. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-rated="0"] .st-tier-name {
-    color: rgba(255, 255, 255, 0.42);
+    color: rgba(var(--fg-rgb), 0.42);
 }
 
 
@@ -2400,7 +2400,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: var(--track-eyebrow);
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(var(--fg-rgb), 0.4);
     line-height: 1.35;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .star-rating-number {
@@ -2513,7 +2513,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .date:not(:empty)::after {
     content: "\00b7";
     margin: 0 7px;
-    color: rgba(255, 255, 255, 0.25);
+    color: rgba(var(--fg-rgb), 0.25);
 }
 /* Stash renders the spec spans whether or not it has a value for them,
    so a scene with no date got an empty .date -- which the pill styling
@@ -2535,7 +2535,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     content: "\00b7";
     margin: 0 7px;
     font-size: var(--fs-sm);
-    color: rgba(255, 255, 255, 0.25);
+    color: rgba(var(--fg-rgb), 0.25);
 }
 
 /* ── State: one anchor row, one chip row ──────────────────────────── */
@@ -2821,7 +2821,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     border-radius: var(--radius-pill) !important;
     background: none !important;
     border: 1px solid transparent !important;
-    color: rgba(255, 255, 255, 0.42) !important;
+    color: rgba(var(--fg-rgb), 0.42) !important;
     box-shadow: none !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn):hover {
@@ -2889,7 +2889,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-caption {
     font-size: var(--fs-xs);
     font-weight: 500;
     letter-spacing: 0.02em;
-    color: rgba(255, 255, 255, 0.28);
+    color: rgba(var(--fg-rgb), 0.28);
     pointer-events: none;
 }
 
@@ -2911,7 +2911,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-
     background: var(--fill-4) !important;
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
     border-radius: var(--radius-pill) !important;
-    color: rgba(255, 255, 255, 0.88) !important;
+    color: rgba(var(--fg-rgb), 0.88) !important;
     white-space: nowrap !important;
     transition: color var(--dur-fast) ease, border-color var(--dur-fast) ease, background var(--dur-fast) ease !important;
 }
@@ -2927,7 +2927,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-
        ladder. One fewer size on the surface. */
     font-size: var(--fs-xs);
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(var(--fg-rgb), 0.3);
     font-variant-numeric: tabular-nums;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge:hover,
@@ -2944,7 +2944,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-rest-run {
     margin-top: 0.6rem;
     font-size: var(--fs-sm);
     line-height: 1.62;
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--text-muted);
     text-wrap: pretty;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list.st-tags-expanded .st-tag-rest-run {
@@ -3010,7 +3010,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored-head {
     font-weight: 700;
     letter-spacing: var(--track-wide);
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.38);
+    color: rgba(var(--fg-rgb), 0.38);
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored {
     display: flex;
@@ -3030,7 +3030,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored .tag-item.st-sc
     background: none !important;
     font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
-    color: rgba(255, 255, 255, 0.6) !important;
+    color: rgba(var(--fg-rgb), 0.6) !important;
     white-space: nowrap !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored .tag-item.st-scored-item.tag-link.badge a {
@@ -3060,7 +3060,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
        the one that replaced it reached a step further out for no stated
        reason. The ladder has a rung for this job, so use it. */
     letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(255, 255, 255, 0.38) !important;
+    color: rgba(var(--fg-rgb), 0.38) !important;
     margin: 1.25rem 0 0 0 !important;
 }
 
@@ -3154,7 +3154,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .badge
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     font-variant-numeric: tabular-nums !important;
-    color: rgba(255, 255, 255, 0.4) !important;
+    color: rgba(var(--fg-rgb), 0.4) !important;
     vertical-align: baseline !important;
 }
 /* ── The activity badge ───────────────────────────────────────────────
@@ -3171,7 +3171,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-ac
     font-size: var(--fs-xs);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(var(--fg-rgb), 0.4);
     transition: color var(--dur-fast) ease;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-activity[hidden] {
@@ -3379,7 +3379,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-extra {
     background: var(--fill-4);
     font-size: var(--fs-xs);
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(var(--fg-rgb), 0.6);
     font-variant-numeric: tabular-nums;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-extra[hidden],
@@ -3399,7 +3399,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-toggle {
     border: 0;
     border-radius: var(--radius-pill);
     background: none;
-    color: rgba(255, 255, 255, 0.45);
+    color: rgba(var(--fg-rgb), 0.45);
     cursor: pointer;
     transition: color var(--dur-fast) ease, transform var(--dur-move) ease;
 }
@@ -3434,7 +3434,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data
     overflow: hidden;
     font-size: var(--fs-sm);
     line-height: 1.4;
-    color: rgba(255, 255, 255, 0.72);
+    color: rgba(var(--fg-rgb), 0.72);
     text-wrap: pretty;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-perf-is-open .st-perf-names {
@@ -3468,7 +3468,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc {
     margin-bottom: 0 !important;
     font-size: var(--fs-md) !important;
     line-height: 1.5 !important;
-    color: rgba(255, 255, 255, 0.62) !important;
+    color: rgba(var(--fg-rgb), 0.62) !important;
     text-wrap: pretty;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc.st-desc-open {
