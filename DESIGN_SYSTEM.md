@@ -1195,6 +1195,19 @@ bug.
     and deliberately. A working scan of this app walks about 9,700 rules
     across 16 to 17 sheets with 0 skipped; anything far below that is the
     instrument, not the finding.
+21. **A diff is not evidence of deletion in a file that gets rewritten in
+    place.** `DESIGN_SYSTEM.md` is edited by several lanes, so paragraphs
+    get renumbered, reworded and folded into neighbours constantly. A
+    line diff calls every one of those a deletion. Checking two lanes'
+    additions this way produced nine reported losses of which eight were
+    imaginary: a principle that had gained a ruled exception, a rule that
+    had been renumbered, a table row folded onto a token, and a ledger
+    row another lane had rewritten better than the original. Verify a
+    passage still exists by searching the FLATTENED file
+    (`tr '\n' ' '`) for two or three independent markers from inside it,
+    never by reading a diff and never with a pattern that could span a
+    line break. Only content that fails every marker is actually gone --
+    which, across both lanes and one whole day, was exactly one rule.
 
 ---
 
