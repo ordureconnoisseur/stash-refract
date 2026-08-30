@@ -199,6 +199,16 @@ red, yellow, purple, green, teal. Everything else resolves through them.
    wherever the ground is known. A baked literal derived from a token
    carries a comment saying to recompute it if that token ever moves.
 
+   The corollary, proven on the performer band 2026-08-30: **a rule cannot
+   have both the token's identity and its own ground-correct fallback.**
+   The parse-time double declaration only works when the later value is
+   INVALID on the old engine, and a token with its own built-in fallback is
+   always valid, so a baked literal declared before `var(--danger-ink)` is
+   dead on every browser. A rule picks one: the token, accepting the
+   token's ground-blind fallback (2.08:1 on that band), or its own baked
+   pair (5.15:1 there). On a known surface, pick the ground and keep the
+   recompute comment; the token is for surfaces the theme does not know.
+
 ### 3.2 Surfaces
 
 The canonical glass recipe, five properties, in this order:
