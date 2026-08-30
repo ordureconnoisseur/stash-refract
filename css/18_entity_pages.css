@@ -744,8 +744,28 @@ body.stash-liquid-glass .detail-header.refract-eh-banded .detail-header-image im
     background: rgba(0, 0, 0, 0.42) !important;
 }
 
-body.stash-liquid-glass.refract-light .detail-header.refract-eh-banded .detail-header-image img {
-    background: rgba(255, 255, 255, 0.72) !important;
+/* The plate stays DARK in light mode, which looks wrong written down
+   and is right on screen. Rendering light mode caught the reason: the
+   plate was flipped to white here, and the Brazzers wordmark is white
+   on transparent, so it vanished into its own ground and only the
+   yellow ZZ survived.
+
+   There is no single ground that serves every logo. Sampled luminance
+   runs 47 to 239, so a plate light enough for a black mark is one that
+   erases a white one. Studio logos are overwhelmingly drawn
+   light-on-transparent, because they are brand marks made for dark
+   sites, so a dark plate serves the majority and matches what dark
+   mode already does successfully. It reads as a deliberate tile on a
+   white page rather than an accident.
+
+   The minority case, a genuinely dark logo, is now the one that
+   suffers, and it suffers equally in both modes rather than only in
+   one. That is a real trade and it is made knowingly. */
+body.stash-liquid-glass.refract-light .detail-header.refract-eh-banded .detail-header-image img,
+body.stash-liquid-glass.refract-light .detail-header:has(.studio-head) .detail-header-image img,
+body.stash-liquid-glass.refract-light .detail-header:has(.tag-head) .detail-header-image img,
+body.stash-liquid-glass.refract-light .detail-header:has(.group-head) .detail-header-image img {
+    background: rgba(0, 0, 0, 0.55) !important;
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -919,4 +939,17 @@ body.stash-liquid-glass.refract-lite .detail-header.refract-eh-banded {
     background:
         radial-gradient(58% 76% at 18% 22%, rgba(var(--accent-rgb), 0.16) 0%, rgba(var(--accent-rgb), 0) 70%),
         var(--bg-1) !important;
+}
+
+/* On a phone the grid drops to two tracks, which turns twelve cells
+   into six rows. Measured at 390: the studio header ran 701.52px on an
+   844px screen, so the whole viewport was header and the scenes began
+   below the fold. Fewer COLUMNS is not the same as less content.
+
+   Six cells, three rows, and the disclosure still reaches all of them.
+   Gated on the collapsed state so expanding still shows everything. */
+@media (max-width: 768px) {
+    body.stash-liquid-glass .refract-eh-kin:not(.refract-eh-kin-open) .refract-eh-kin-cell:nth-child(n + 7) {
+        display: none;
+    }
 }
