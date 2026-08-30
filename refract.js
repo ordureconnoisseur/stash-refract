@@ -6159,7 +6159,7 @@
        Studios only. A tag header already renders its sub-tags, so a
        ranked grid there would duplicate them; that row keeps its cap
        and disclosure. */
-    var REFRACT_EP_KIN_CAP = 11;
+    var REFRACT_EP_KIN_CAP = 12;
 
     function injectEntityKin() {
         var ctx = refractEpContext();

@@ -860,3 +860,32 @@ body.stash-liquid-glass .refract-eh-kin-count {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
+
+/* -------------------------------------------------------------------
+   The rating control on an unrated entity
+   -------------------------------------------------------------------
+   Measured: 1 of 2,378 studios is rated, 0 are favourited. So on 2,377
+   pages this control is five identical grey placeholders, which is the
+   6.22 failure exactly: an empty slot carries information and a
+   repeated placeholder destroys it.
+
+   It is not removed, because rating a studio has to stay possible (P6)
+   and it is Stash's own control. It is quietened while it holds
+   nothing and comes back to full strength on hover, on focus, and the
+   moment a rating exists, so emphasis follows data (P3).
+
+   The selector reads "no star is filled": Stash puts `star-fill-N` on
+   each button, and an unrated control is five `star-fill-0`. One
+   instance per page, so `:has()` is cheap here. */
+body.stash-liquid-glass .detail-header:has(.studio-head) .rating-stars:not(:has([class*="star-fill-"]:not(.star-fill-0))),
+body.stash-liquid-glass .detail-header:has(.group-head) .rating-stars:not(:has([class*="star-fill-"]:not(.star-fill-0))) {
+    opacity: 0.4;
+    transition: opacity var(--dur-fast) ease;
+}
+
+body.stash-liquid-glass .detail-header:has(.studio-head) .rating-stars:not(:has([class*="star-fill-"]:not(.star-fill-0))):hover,
+body.stash-liquid-glass .detail-header:has(.studio-head) .rating-stars:not(:has([class*="star-fill-"]:not(.star-fill-0))):focus-within,
+body.stash-liquid-glass .detail-header:has(.group-head) .rating-stars:not(:has([class*="star-fill-"]:not(.star-fill-0))):hover,
+body.stash-liquid-glass .detail-header:has(.group-head) .rating-stars:not(:has([class*="star-fill-"]:not(.star-fill-0))):focus-within {
+    opacity: 1;
+}
