@@ -7903,9 +7903,15 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     body.stash-liquid-glass #performer-page .refract-ph .detail-container {
         min-height: 380px;
     }
+    /* The gap has to clear two things that are not the gap: Bootstrap's
+       -15px row gutter on the readout column, and the ~5px the card's
+       rendered box gains from the Legendary tilt. --gap-xl is 14px, so
+       14 - 15 - 5 left the text 5px INSIDE the card at 1024 and 900.
+       Measured, both widths. 2.25rem leaves about 11px of real
+       daylight, which is the same arithmetic the desktop 3rem does. */
     body.stash-liquid-glass #performer-page .refract-ph .detail-container {
         padding: 0 1.25rem 1.2rem;
-        gap: var(--gap-xl);
+        gap: 2.25rem;
     }
     body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
         width: 240px;
