@@ -698,9 +698,18 @@ The **minimal** variant (`.btn.minimal`) is the icon-only button: transparent
 fill, transparent border, no shadow, no blur. The glyph is the button. Used for
 the favourite heart and its peers.
 
-Destructive actions live in a menu, not in a row of peers. A counter that
-happens to be clickable is a readout, not a button, and must not dress like
-one.
+Destructive actions, ruled 2026-08-30: **inside an edit context, a
+destructive action may sit inline in a row of peers when it wears the quiet
+danger recipe** - danger tint fill, danger ink (3.1), never primary weight -
+with the performer band's Delete as built as the reference. Repeating rows
+may use compact danger remove buttons (the string-list pattern). Outside
+edit contexts the old law stands: destructive actions live in a menu, not in
+a row of peers. The distinction is the context's own contract: an edit
+surface is where the user came to change things, so a quiet red door there
+is honest; the same door in a browsing row is an ambush.
+
+A counter that happens to be clickable is a readout, not a button, and must
+not dress like one.
 
 ### 6.6 Inputs and forms
 
@@ -1240,7 +1249,7 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 | Type, second ladder | RESOLVED 2026-08-28: the panel-local scale is gone and every size in the panel is a scale token. Folded as ruled, with two corrections measurement forced. `--sp-value` had no consumers left and was deleted rather than aliased. 21px was promoted by retuning `--fs-xl` (and moving 28px to `--fs-2xl`) rather than adding an eighth step, because both top rungs had zero consumers theme-wide. Measured before and after: 13 size/weight pairs across 9 distinct sizes became 10 across 5. Logged 2026-08-27. | 3.5 |
 | Type, sub-scale literals | 31 literal font sizes sit below `--fs-xs` across 16 distinct values from 5.04 to 9.5px, 20 of them clustered in 8.12 to 9.24. The scene panel's own (9.5px tag counts) folded UP to `--fs-xs` rather than down, which removed a size instead of adding a rung, so no `--fs-2xs` was created. Whether the other 30 want one rung or none is a measured pass, not a drive-by. Logged 2026-08-28; revisit with the padding pass. | 3.5 |
 | Contrast | RULED 2026-08-30: brighten. `.st-tag-caption` and `.st-tag-n` go to alpha 0.42, clearing the 3:1 secondary floor. The scene lane is executing; this row closes when the change lands and is measured. | 3.9 |
-| Destructive actions | OPEN RULING 2026-08-30: 6.5 says destructive actions live in a menu, not in a row of peers, but the performer-band Delete and the string-list remove buttons sit inline and contradict it. The user has explicitly NOT decided; 6.5 stands as written and neither surface changes until ruled. | 6.5 |
+| Destructive actions | RULED 2026-08-30: inline delete. 6.5 revised to codify shipped practice - inline destructive actions are legal in edit contexts with the quiet danger recipe (the performer band Delete as built is the reference; string-list compact removes likewise); outside edit contexts the menu law stands. No CSS changed anywhere; the ruling codifies what shipped. | 6.5 |
 | Browser floor | RESOLVED 2026-08-30, ruled baked fallbacks: the documented Chrome 105 floor stands. Both light ink tokens now declare a literal-token fallback first (`--accent-ink: var(--accent)`, `--danger-ink: var(--danger)`, both above their floors) with the color-mix upgrade gated behind `@supports`, so 105-110 gets legible ink instead of a silent drop and 111+ gets the better shade. The performer lane mirrors the pattern for its 08 hand-roll via double declaration. | 3.1, 7.13 |
 | Tag-card heart | RESOLVED 2026-08-30, same day: no defect. The blank captures were a probe artifact - the hover reveal lives on an unclassed ancestor `<a>` at opacity 0, so the element computed visible and topmost while an ancestor kept it unpainted, and the black `fill` was the svg container's inert default (the path carries currentColor and the styled colour reaches it, both modes measured). The sweep still fixed something real: the revealed heart was white-on-white in light mode and is now legible. Method lesson recorded in 10.1. | 10.1 |
 | Em dashes | RESOLVED 2026-08-28: 1,091 swept from the shipped source in one mechanical commit (853 in the stylesheets, 236 in refract.js comments, plus two that were live UI strings, one of them a latent crash: `createElement("...")` with the dash as a TAG NAME, saved only by sitting behind a hardcoded-false flag). Zero remain; the `Edit` string-matching trap is gone with them. | 6.21, 7.8 |
