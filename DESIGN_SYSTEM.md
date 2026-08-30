@@ -1156,6 +1156,45 @@ bug.
     it rather than outvote it, because a fourth rule leaves the same trap
     for the next person. A dead rule with a rationale is worse than no
     rule at all.
+18. **A contrast number is only as good as the ground you measured it
+    against, and `backgroundColor` is not the ground.** Light mode paints
+    the page with `background-image` gradients over a transparent
+    `background-color`, so `getComputedStyle(document.body).backgroundColor`
+    returns `rgba(0, 0, 0, 0)`. Parsed for channels that is black, and
+    every composite built on it inverts: the panel came out mid-grey
+    (179,179,179) instead of white, and two disclosure controls were
+    reported at 2.55:1 when they actually measured between 3.30 and
+    5.38:1 depending on the accent preset. Nothing errored, and the
+    numbers looked entirely ordinary. Sample the rendered pixel instead:
+    screenshot, take the modal colour of a blank region of the surface,
+    and composite the element's computed `color` onto that. The panel's
+    real ground is 255,255,255 and the drawer's is 214,214,214, and
+    neither is derivable from a property read. The one honest tell was
+    that the arithmetic had produced a grey nobody had chosen; treat an
+    unexpected ground as a broken measurement, not a surprising result.
+19. **Balanced braces are not a valid CSS file.** A scripted edit that
+    appends a paragraph without opening `/*` leaves prose sitting in the
+    stylesheet; the parser error-recovers by skipping to the next thing
+    it can parse, and what it skips is whatever rule happens to follow.
+    Exactly one rule vanished, its neighbours were untouched, and the
+    file passed the brace-balance check this project's notes prescribe.
+    From outside it looks impossible: the rule is in the file, absent
+    from `document.styleSheets`, and everything around it is fine. Count
+    `/*` against `*/` as well as `{` against `}` after every scripted
+    edit, and treat a rule that is present on disk but missing from the
+    parsed sheet as a syntax fault ABOVE it, not a specificity problem
+    in it.
+20. **A probe that returns nothing is broken until proven otherwise.**
+    `sh.cssRules` throws a SecurityError on a cross-origin stylesheet, so
+    a `try/catch` around the whole loop rather than the single access
+    kills the entire scan at the first foreign sheet: 0 sheets read,
+    0 rules, no error. The same scan must also recurse into grouping
+    rules or every `@supports` and `@media` body is invisible. Both
+    faults report absence, and absence reads as evidence. This cost a
+    reported "gap" on a surface that turned out to be styled correctly
+    and deliberately. A working scan of this app walks about 9,700 rules
+    across 16 to 17 sheets with 0 skipped; anything far below that is the
+    instrument, not the finding.
 
 ---
 

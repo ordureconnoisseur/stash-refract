@@ -3117,7 +3117,11 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link {
        unchanged; the 1px is moved from below the text to above it, which
        centres the CAP HEIGHT and lets descenders hang as they should. */
     padding: 6px 2px 4px !important;
-    /* 12px container minus 3px padding: concentric with the outer edge. */
+    /* 12px container minus 3px padding: concentric with the outer edge.
+       NOT drift against the entity strips, which take --radius-sm flat at
+       12px: those tabs have no container to be concentric with. Same
+       token, two geometries. Checked 2026-08-30 when the two measured 9
+       and 12 and it looked like an inconsistency. Do not "fix" to 12. */
     border-radius: 9px !important;
     text-align: center !important;
     white-space: nowrap !important;
