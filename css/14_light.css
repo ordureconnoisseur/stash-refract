@@ -62,8 +62,14 @@ body.stash-liquid-glass.refract-light {
        accent darkened to 55% lands 5.19 to 8.61, worst case yellow, so
        every preset clears 4.5 and none of them stops being its own
        colour. Derived from --accent, so custom accents follow. */
-    --accent-ink: color-mix(in srgb, var(--accent) 55%, #000);
-    --danger-ink: color-mix(in srgb, var(--danger) 55%, #000);
+    /* Ink fallbacks first: --accent is the light-mode text shade
+       (3.30-5.38:1 across presets) and --danger sits ~3.9:1 on the light
+       ground. The color-mix upgrades below need Chrome 111; on the
+       documented 105 floor an unsupported color-mix in a custom property
+       is DROPPED AT THE CONSUMER (7.13), so without these fallbacks the
+       ink vanishes silently on 105-110. @supports gates the upgrade. */
+    --accent-ink: var(--accent);
+    --danger-ink: var(--danger);
 
     /* Bootstrap re-pegs */
     --bs-link-color: rgba(0, 0, 0, 0.78);
@@ -83,6 +89,14 @@ body.stash-liquid-glass.refract-light {
         radial-gradient(100% 60% at 100% 30%, rgba(var(--accent-rgb), 0.12) 0%, transparent 50%),
         linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
     background-attachment: fixed;
+}
+
+/* color-mix ink upgrade - Chrome 111+. See the fallback comment above. */
+@supports (color: color-mix(in srgb, red, blue)) {
+    body.stash-liquid-glass.refract-light {
+        --accent-ink: color-mix(in srgb, var(--accent) 55%, #000);
+        --danger-ink: color-mix(in srgb, var(--danger) 55%, #000);
+    }
 }
 
 

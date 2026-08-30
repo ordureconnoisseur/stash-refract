@@ -8073,16 +8073,31 @@ body.stash-liquid-glass.refract-light #performer-page .refract-ph-alias__n {
    against the band's own ground. If a second surface ever needs this,
    it should become --danger-ink beside --accent-ink rather than be
    copied. */
+/* Each pair is the pre-111 fallback then the color-mix upgrade, which
+   on a normal property is decided at PARSE time and needs no @supports
+   (7.14). The fallbacks are the mix's own RESOLVED value rather than
+   var(--danger), which is what the token fallbacks in 14_light use: a
+   token cannot know its consumer's ground, but this rule can, and on
+   this band var(--danger) measures 2.04:1 -- barely better than the
+   1.48:1 that started this. Baking the resolved value instead means
+   105-110 renders identically to 111+ rather than merely legibly.
+   --danger is a fixed family, not accent-derived, so these stay
+   correct across every preset. Recompute them if --danger ever moves:
+   they are 70 / 55 / 55 / 40 per cent of #ef4444. */
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.delete,
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.btn-danger {
     background: rgba(var(--danger-rgb), 0.1) !important;
+    border-color: #a73030 !important;
     border-color: color-mix(in srgb, var(--danger) 70%, #000) !important;
+    color: #832525 !important;
     color: color-mix(in srgb, var(--danger) 55%, #000) !important;
 }
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.delete:hover,
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.btn-danger:hover {
     background: rgba(var(--danger-rgb), 0.18) !important;
+    border-color: #832525 !important;
     border-color: color-mix(in srgb, var(--danger) 55%, #000) !important;
+    color: #601b1b !important;
     color: color-mix(in srgb, var(--danger) 40%, #000) !important;
 }
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .name-icons .btn,

@@ -188,6 +188,16 @@ red, yellow, purple, green, teal. Everything else resolves through them.
    `--accent-bright` only reaches 2.28 to 3.96). Any use of an accent token
    in a role the other mode does not share needs a partner rule in
    `14_light.css`, and the check is a contrast number, not a look.
+6. **A token's fallback cannot know its consumer's ground; a concrete rule
+   can.** When a token needs a pre-support fallback, the only honest value
+   is another token (`--accent-ink: var(--accent)`), because the token
+   serves every surface at once. A rule on ONE known surface may instead
+   bake the resolved value of the thing it falls back from, byte-identical
+   where supported (measured delta 0,0,0 per channel on the performer
+   band), so old browsers get the same pixels rather than merely legible
+   ones. The two-line token fallback is the floor; baking is available
+   wherever the ground is known. A baked literal derived from a token
+   carries a comment saying to recompute it if that token ever moves.
 
 ### 3.2 Surfaces
 
@@ -473,6 +483,12 @@ faithfully):
 | Reading text | 4.5:1 | body copy, values, any text that is the sole carrier of its information |
 | Secondary text | 3:1 | muted labels, dates, captions doing support work |
 | Non-text state | 3:1 | focus rings, active indicators, borders that encode state |
+
+Contrast is measured against the element's ACTUAL rendered ground, never the
+surface it nominally sits on. The performer band's "white panel" measures
+210,187,174 under its translucent veil over a portrait, which turns
+`--danger`'s passing 3.76:1 into a failing 2.04:1; arithmetic against the
+nominal panel passes things the screen fails.
 
 Both modes, all eight accents; the binding constraint is almost always light
 mode with the yellow preset. Quieter than the floor is possible, but only as a
@@ -1180,7 +1196,7 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 | Type, sub-scale literals | 31 literal font sizes sit below `--fs-xs` across 16 distinct values from 5.04 to 9.5px, 20 of them clustered in 8.12 to 9.24. The scene panel's own (9.5px tag counts) folded UP to `--fs-xs` rather than down, which removed a size instead of adding a rung, so no `--fs-2xs` was created. Whether the other 30 want one rung or none is a measured pass, not a drive-by. Logged 2026-08-28; revisit with the padding pass. | 3.5 |
 | Contrast | RULED 2026-08-30: brighten. `.st-tag-caption` and `.st-tag-n` go to alpha 0.42, clearing the 3:1 secondary floor. The scene lane is executing; this row closes when the change lands and is measured. | 3.9 |
 | Destructive actions | OPEN RULING 2026-08-30: 6.5 says destructive actions live in a menu, not in a row of peers, but the performer-band Delete and the string-list remove buttons sit inline and contradict it. The user has explicitly NOT decided; 6.5 stands as written and neither surface changes until ruled. | 6.5 |
-| Browser floor | `--accent-ink` and `--danger-ink` resolve through `color-mix()` in light mode, which needs Chrome 111; the documented floor is Chrome 105 (set by `:has()`). On 105 to 110 in light mode those ink consumers hit rule 13's dropped-declaration failure. Either the README floor bumps to 111 or the two light overrides get baked literal fallbacks. Logged 2026-08-30. | 3.1, 7.13 |
+| Browser floor | RESOLVED 2026-08-30, ruled baked fallbacks: the documented Chrome 105 floor stands. Both light ink tokens now declare a literal-token fallback first (`--accent-ink: var(--accent)`, `--danger-ink: var(--danger)`, both above their floors) with the color-mix upgrade gated behind `@supports`, so 105-110 gets legible ink instead of a silent drop and 111+ gets the better shade. The performer lane mirrors the pattern for its 08 hand-roll via double declaration. | 3.1, 7.13 |
 | Tag-card heart | RESOLVED 2026-08-30, same day: no defect. The blank captures were a probe artifact - the hover reveal lives on an unclassed ancestor `<a>` at opacity 0, so the element computed visible and topmost while an ancestor kept it unpainted, and the black `fill` was the svg container's inert default (the path carries currentColor and the styled colour reaches it, both modes measured). The sweep still fixed something real: the revealed heart was white-on-white in light mode and is now legible. Method lesson recorded in 10.1. | 10.1 |
 | Em dashes | RESOLVED 2026-08-28: 1,091 swept from the shipped source in one mechanical commit (853 in the stylesheets, 236 in refract.js comments, plus two that were live UI strings, one of them a latent crash: `createElement("...")` with the dash as a TAG NAME, saved only by sitting behind a hardcoded-false flag). Zero remain; the `Edit` string-matching trap is gone with them. | 6.21, 7.8 |
 | Motion | Tokenized 2026-08-28 in three passes: the canonical five, then near-duplicates, then the 0.25 to 0.35s residue onto a new `--dur-settle` (shifts up to 14%, the one perceptible-in-principle fold; eyeball drawers and reveals). Remaining literals are deliberate: 0.08s micro-flashes and the player idle 1s fade. | 3.7 |
