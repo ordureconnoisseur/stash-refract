@@ -235,11 +235,25 @@ at 0.10 for panels that hold reading content. Two rims: `--glass-border` at
 **Below the glass fills sits the fill ramp** (tokenized 2026-08-28 from the
 measured background histogram): `--fill-1` 0.03 (hairline tint: rows, wells),
 `--fill-2` 0.04 (resting fill: inputs, tiles), `--fill-3` 0.05 (raised fill:
-chips, list items), `--fill-4` 0.08 (hover and active). The ramp does NOT
-retheme in light mode (14_light still overrides surfaces per-selector); the
-glass fills DO. That is why the two are separate vocabularies: never alias
-0.06 to `--glass-bg` or 0.10 to `--glass-bg-strong` in a rule that light mode
-does not override, or that surface will frost unexpectedly in light.
+chips, list items), `--fill-4` 0.08 (hover and active).
+
+**The ramp flips in light mode on matched perceptual lift, not mirrored
+alpha** (ruled 2026-08-30, landing with the scene lane's fill flip). The L*
+curve is steep near black, so a white alpha lifts a dark ground more than
+the same black alpha drops a light one; naive mirroring makes every light
+fill about 23% weaker than its dark twin (dL* 2.65 against 3.43 at step 1).
+The light values are black alphas computed to match each step's dark dL*
+against the measured grounds (dark panel 26,25,29; light pane 255,255,255):
+0.04 / 0.053 / 0.065 / 0.10 - exact matches, not rounded, because the
+number's job is the invariant, and the fills are SEMANTIC (resting vs raised
+vs hover must read equally in both modes), unlike the depth shadows, which
+light deliberately quiets. They live in `14_light` per section 5's
+token-scope pattern. Retuning either end means recomputing the other from
+the invariant, never copying the alpha across.
+
+The glass fills are a separate vocabulary from the ramp: never alias 0.06 to
+`--glass-bg` or 0.10 to `--glass-bg-strong` in a rule light mode does not
+override, or that surface will frost unexpectedly in light.
 
 **Near-opaque overlays use the surface family**: `rgba(var(--surface-rgb), A)`
 with `--surface-rgb: 20, 20, 24` (popovers, menus, floating overlay chrome;
