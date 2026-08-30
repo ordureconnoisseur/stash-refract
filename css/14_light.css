@@ -63,6 +63,7 @@ body.stash-liquid-glass.refract-light {
        every preset clears 4.5 and none of them stops being its own
        colour. Derived from --accent, so custom accents follow. */
     --accent-ink: color-mix(in srgb, var(--accent) 55%, #000);
+    --danger-ink: color-mix(in srgb, var(--danger) 55%, #000);
 
     /* Bootstrap re-pegs */
     --bs-link-color: rgba(0, 0, 0, 0.78);

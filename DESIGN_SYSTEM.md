@@ -1097,6 +1097,18 @@ bug.
     (one committed tree, reproducible from a hash) is process and lives in
     CLAUDE.md; the physics fact is recorded here because no review that
     reads source can catch it.
+13. **A token and its first consumer are one atomic unit at deploy time,
+    whatever the repo says.** `var(--x)` with `--x` undefined is invalid at
+    computed-value time: the declaration is DROPPED, not defaulted - no
+    warning, no fallback, no layout break. When a consumer of a new token
+    deployed ahead of its definition on 2026-08-30, every danger declaration
+    in the theme vanished at once and the Delete button rendered as
+    plausible-looking plain white text at 9.87:1. The discipline: whoever
+    lands a new token deploys the token file FIRST and announces it before
+    any lane migrates onto it, and the token file is superset-checked
+    against the deployed copy before every deploy - it is the one file
+    where "my committed tree" is not enough, because it must carry every
+    lane's vocabulary at once.
 17. **When one selector appears more than once, the rule that wins is
     never the one you are reading.** Three times in one pass: two
     `--ic-grid` blocks where the stale later one drew rings instead of
@@ -1151,6 +1163,7 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 | Type, sub-scale literals | 31 literal font sizes sit below `--fs-xs` across 16 distinct values from 5.04 to 9.5px, 20 of them clustered in 8.12 to 9.24. The scene panel's own (9.5px tag counts) folded UP to `--fs-xs` rather than down, which removed a size instead of adding a rung, so no `--fs-2xs` was created. Whether the other 30 want one rung or none is a measured pass, not a drive-by. Logged 2026-08-28; revisit with the padding pass. | 3.5 |
 | Contrast | RULED 2026-08-30: brighten. `.st-tag-caption` and `.st-tag-n` go to alpha 0.42, clearing the 3:1 secondary floor. The scene lane is executing; this row closes when the change lands and is measured. | 3.9 |
 | Destructive actions | OPEN RULING 2026-08-30: 6.5 says destructive actions live in a menu, not in a row of peers, but the performer-band Delete and the string-list remove buttons sit inline and contradict it. The user has explicitly NOT decided; 6.5 stands as written and neither surface changes until ruled. | 6.5 |
+| Browser floor | `--accent-ink` and `--danger-ink` resolve through `color-mix()` in light mode, which needs Chrome 111; the documented floor is Chrome 105 (set by `:has()`). On 105 to 110 in light mode those ink consumers hit rule 13's dropped-declaration failure. Either the README floor bumps to 111 or the two light overrides get baked literal fallbacks. Logged 2026-08-30. | 3.1, 7.13 |
 | Em dashes | RESOLVED 2026-08-28: 1,091 swept from the shipped source in one mechanical commit (853 in the stylesheets, 236 in refract.js comments, plus two that were live UI strings, one of them a latent crash: `createElement("...")` with the dash as a TAG NAME, saved only by sitting behind a hardcoded-false flag). Zero remain; the `Edit` string-matching trap is gone with them. | 6.21, 7.8 |
 | Motion | Tokenized 2026-08-28 in three passes: the canonical five, then near-duplicates, then the 0.25 to 0.35s residue onto a new `--dur-settle` (shifts up to 14%, the one perceptible-in-principle fold; eyeball drawers and reveals). Remaining literals are deliberate: 0.08s micro-flashes and the player idle 1s fade. | 3.7 |
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px and 10px literals. 9px is removed from this row: where commented as concentric (inner = outer minus padding) it is computed, correct, and exempt per 3.4; uncommented 9px uses still need their derivation stated or a token. | 3.4 |
