@@ -139,7 +139,7 @@ body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-to
        ghost text on the thumbnail. Hover keeps a cheap colour shift
        for feedback (no glow halo). */
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .stash-performer-pill {
-    background: rgba(var(--surface-rgb), 0.92) !important;
+    background: rgba(var(--scrim-rgb), 0.92) !important;
 }
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .stash-performer-pill:hover {
     background: rgba(30, 30, 34, 0.92) !important;
@@ -166,7 +166,7 @@ body.stash-liquid-glass.refract-lite .refract-perf-tip-img {
     background: rgb(16, 16, 20) !important;
 }
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .scene-specs-overlay > span {
-    background: rgba(var(--surface-rgb), 0.92) !important;
+    background: rgba(var(--scrim-rgb), 0.92) !important;
 }
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .scene-specs-overlay > .overlay-resolution {
     background: rgba(30, 30, 34, 0.92) !important;

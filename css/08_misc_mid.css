@@ -3541,7 +3541,7 @@ body.stash-liquid-glass.refract-minimal-cards .scene-card .stash-duration-pill {
        a blur backdrop reads as glassy rather than solid. backdrop-blur
        is acceptable here because it's at most one pill per card (not
        per-element-per-card like the previous palette). */
-    background: rgba(var(--surface-rgb), 0.4);
+    background: rgba(var(--scrim-rgb), 0.4);
     -webkit-backdrop-filter: var(--glass-blur-sm-sat);
             backdrop-filter: var(--glass-blur-sm-sat);
     border: 1px solid rgba(255, 255, 255, 0.14);
@@ -4446,7 +4446,7 @@ body.stash-liquid-glass .slick-next {
        changed. A solid dark fill reads almost identical at this size
        without the GPU cost. */
     z-index: 10;
-    background: rgba(var(--surface-rgb), 0.72) !important;
+    background: rgba(var(--scrim-rgb), 0.72) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: 50%;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;

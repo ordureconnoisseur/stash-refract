@@ -28,6 +28,12 @@ body.stash-liquid-glass.refract-light {
        on white. Accent flavor goes on titles, not muted text. */
     --text-muted: rgba(0, 0, 0, 0.65);
     --fg-rgb: 0, 0, 0;
+    /* Light surface family (3.2): the overlay surface channel flips to
+       white, per-use alphas stay; --scrim-rgb deliberately does NOT
+       flip (artwork scrims are mode-fixed). Grounds and rationale in
+       DESIGN_SYSTEM 3.2. */
+    --surface-rgb: 255, 255, 255;
+    --bg-0-rgb: 255, 255, 255;
 
     --glass-bg: rgba(255, 255, 255, 0.55);
     --glass-bg-strong: rgba(255, 255, 255, 0.70);
