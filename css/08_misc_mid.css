@@ -313,7 +313,7 @@ body.stash-liquid-glass .react-select__multi-value__remove {
 }
 body.stash-liquid-glass .react-select__multi-value__remove:hover {
     background: rgba(244, 60, 60, 0.18) !important;
-    color: #fca5a5 !important;
+    color: var(--danger-light) !important;
 }
 /* Performer disambiguation - Stash renders the parenthetical "(Disambiguation)"
    with a dark muted colour that's near-invisible on Refract's dark pills /
@@ -445,16 +445,16 @@ body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary:has(svg.f
 body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark),
 body.stash-liquid-glass .input-group-prepend.bg-secondary > .btn.btn-secondary:has(svg.fa-xmark),
 body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark) {
-    background: rgba(239, 68, 68, 0.08) !important;
-    border-color: rgba(239, 68, 68, 0.28) !important;
+    background: rgba(var(--danger-rgb), 0.08) !important;
+    border-color: rgba(var(--danger-rgb), 0.28) !important;
     color: rgba(252, 165, 165, 0.85) !important;
 }
 body.stash-liquid-glass .scraper-edit .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark):hover,
 body.stash-liquid-glass .input-group-prepend.bg-secondary > .btn.btn-secondary:has(svg.fa-xmark):hover,
 body.stash-liquid-glass form .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark):hover {
-    background: rgba(239, 68, 68, 0.18) !important;
-    border-color: rgba(239, 68, 68, 0.55) !important;
-    color: #fca5a5 !important;
+    background: rgba(var(--danger-rgb), 0.18) !important;
+    border-color: rgba(var(--danger-rgb), 0.55) !important;
+    color: var(--danger-light) !important;
 }
 /* 6. Flat left side on whatever follows the prepend button */
 body.stash-liquid-glass .scraper-edit .input-group-prepend + .form-control,
@@ -719,8 +719,8 @@ body.stash-liquid-glass form .date-input-group > .refract-date-fix-btn {
     align-self: center !important;
     margin-top: 0.3rem !important;
     padding: 0.18rem 0.65rem !important;
-    background: rgba(220, 53, 69, 0.14) !important;
-    border: 1px solid rgba(220, 53, 69, 0.45) !important;
+    background: rgba(var(--danger-rgb), 0.14) !important;
+    border: 1px solid rgba(var(--danger-rgb), 0.45) !important;
     border-radius: 999px !important;
     color: #ff7a8a !important;
     font-size: var(--fs-xs) !important;
@@ -733,8 +733,8 @@ body.stash-liquid-glass form .date-input-group > .refract-date-fix-btn {
 }
 body.stash-liquid-glass .date-input-group > .refract-date-fix-btn:hover,
 body.stash-liquid-glass form .date-input-group > .refract-date-fix-btn:hover {
-    background: rgba(220, 53, 69, 0.24) !important;
-    border-color: rgba(220, 53, 69, 0.75) !important;
+    background: rgba(var(--danger-rgb), 0.24) !important;
+    border-color: rgba(var(--danger-rgb), 0.75) !important;
     color: #ffb0bb !important;
 }
 body.stash-liquid-glass .date-input-group > .form-control,
@@ -1353,14 +1353,14 @@ body.stash-liquid-glass .details-edit .btn.btn-primary:hover {
    but is no longer mistakable for a primary. Revert to `--accent-tint`
    if the uniform accent row was the point. */
 body.stash-liquid-glass .details-edit .btn.btn-danger {
-    background: rgba(239, 68, 68, 0.12) !important;
-    border: 1px solid rgba(239, 68, 68, 0.3) !important;
-    color: #f87171 !important;
+    background: rgba(var(--danger-rgb), 0.12) !important;
+    border: 1px solid rgba(var(--danger-rgb), 0.3) !important;
+    color: var(--danger-bright) !important;
     box-shadow: none !important;
 }
 body.stash-liquid-glass .details-edit .btn.btn-danger:hover {
-    background: rgba(239, 68, 68, 0.22) !important;
-    border-color: rgba(239, 68, 68, 0.55) !important;
+    background: rgba(var(--danger-rgb), 0.22) !important;
+    border-color: rgba(var(--danger-rgb), 0.55) !important;
     color: #fff !important;
 }
 
@@ -2767,10 +2767,10 @@ body.stash-liquid-glass .rating-stars .unfilled-star {
 
 /* Red-tinted glass for danger / destructive buttons */
 body.stash-liquid-glass .btn.btn-danger {
-    background: rgba(239, 68, 68, 0.10) !important;
+    background: rgba(var(--danger-rgb), 0.10) !important;
     background-image: none !important;
-    border: 1px solid rgba(239, 68, 68, 0.32) !important;
-    color: #f87171 !important;
+    border: 1px solid rgba(var(--danger-rgb), 0.32) !important;
+    color: var(--danger-bright) !important;
     box-shadow: none !important;
     -webkit-backdrop-filter: var(--glass-blur-md);
     backdrop-filter: var(--glass-blur-md);
@@ -2778,10 +2778,10 @@ body.stash-liquid-glass .btn.btn-danger {
 }
 body.stash-liquid-glass .btn.btn-danger:hover,
 body.stash-liquid-glass .btn.btn-danger:focus {
-    background: rgba(239, 68, 68, 0.18) !important;
-    border-color: rgba(239, 68, 68, 0.55) !important;
-    color: #fca5a5 !important;
-    box-shadow: 0 0 12px rgba(239, 68, 68, 0.30) !important;
+    background: rgba(var(--danger-rgb), 0.18) !important;
+    border-color: rgba(var(--danger-rgb), 0.55) !important;
+    color: var(--danger-light) !important;
+    box-shadow: 0 0 12px rgba(var(--danger-rgb), 0.30) !important;
 }
 
 /* Green-tinted glass for success / confirm buttons (Add source, etc.) */
@@ -5490,13 +5490,13 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="b
     border-left: 1px solid var(--glass-border) !important;
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .btn-group:not(.pagination) > .btn-danger {
-    background: rgba(239, 68, 68, 0.18) !important;
-    border-color: rgba(239, 68, 68, 0.5) !important;
-    color: #fca5a5 !important;
+    background: rgba(var(--danger-rgb), 0.18) !important;
+    border-color: rgba(var(--danger-rgb), 0.5) !important;
+    color: var(--danger-light) !important;
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .btn-group:not(.pagination) > .btn-danger:hover {
-    background: rgba(239, 68, 68, 0.3) !important;
-    box-shadow: 0 0 14px rgba(239, 68, 68, 0.4) !important;
+    background: rgba(var(--danger-rgb), 0.3) !important;
+    box-shadow: 0 0 14px rgba(var(--danger-rgb), 0.4) !important;
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker [data-refract-pager="bottom"] > .btn-group:not(.pagination) > .btn-secondary {
     background: var(--accent-tint) !important;
@@ -5910,15 +5910,15 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--sug
 
 /* Checked-for-delete state - red danger ring + strike title */
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--checked {
-    border-color: rgba(239, 68, 68, 0.5);
+    border-color: rgba(var(--danger-rgb), 0.5);
     box-shadow:
         var(--shadow-md),
-        0 0 0 1px rgba(239, 68, 68, 0.22),
-        0 0 28px 4px rgba(239, 68, 68, 0.2);
+        0 0 0 1px rgba(var(--danger-rgb), 0.22),
+        0 0 28px 4px rgba(var(--danger-rgb), 0.2);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--checked .refract-dup-card__title {
     text-decoration: line-through;
-    text-decoration-color: rgba(239, 68, 68, 0.7);
+    text-decoration-color: rgba(var(--danger-rgb), 0.7);
     text-decoration-thickness: 2px;
     color: var(--text-muted);
 }
@@ -5926,9 +5926,9 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--che
     filter: saturate(0.4) brightness(0.65);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--checked .refract-dup-card__chip {
-    color: #fca5a5;
-    background: rgba(239, 68, 68, 0.18);
-    border-color: rgba(239, 68, 68, 0.5);
+    color: var(--danger-light);
+    background: rgba(var(--danger-rgb), 0.18);
+    border-color: rgba(var(--danger-rgb), 0.5);
 }
 
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__actions {
@@ -5955,21 +5955,21 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__che
     user-select: none;
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__check:hover {
-    background: rgba(239, 68, 68, 0.1);
-    border-color: rgba(239, 68, 68, 0.32);
-    color: #fca5a5;
+    background: rgba(var(--danger-rgb), 0.1);
+    border-color: rgba(var(--danger-rgb), 0.32);
+    color: var(--danger-light);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__check input[type="checkbox"] {
     margin: 0;
     width: 0.95rem;
     height: 0.95rem;
-    accent-color: #ef4444;
+    accent-color: var(--danger);
     cursor: pointer;
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card--checked .refract-dup-card__check {
-    background: rgba(239, 68, 68, 0.14);
-    border-color: rgba(239, 68, 68, 0.45);
-    color: #fca5a5;
+    background: rgba(var(--danger-rgb), 0.14);
+    border-color: rgba(var(--danger-rgb), 0.45);
+    color: var(--danger-light);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__merge,
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__delete {
@@ -5991,14 +5991,14 @@ body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__mer
     box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.32);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__delete {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.32);
-    color: #fca5a5;
+    background: rgba(var(--danger-rgb), 0.1);
+    border: 1px solid rgba(var(--danger-rgb), 0.32);
+    color: var(--danger-light);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__delete:hover {
-    background: rgba(239, 68, 68, 0.22);
-    border-color: rgba(239, 68, 68, 0.55);
-    box-shadow: 0 0 14px rgba(239, 68, 68, 0.32);
+    background: rgba(var(--danger-rgb), 0.22);
+    border-color: rgba(var(--danger-rgb), 0.55);
+    box-shadow: 0 0 14px rgba(var(--danger-rgb), 0.32);
 }
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__merge:disabled,
 body.stash-liquid-glass.stash-route-sceneduplicatechecker .refract-dup-card__delete:disabled {
@@ -6137,7 +6137,7 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .i
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18) !important;
 }
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .input-group-prepend > .btn.btn-secondary:has(svg.fa-xmark):hover {
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18) !important;
+    box-shadow: 0 0 0 3px rgba(var(--danger-rgb), 0.18) !important;
 }
 
 /* 7. Drag handle + remove (minus) chips inside string-list rows */
@@ -6157,17 +6157,17 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
 }
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button.btn.btn-danger,
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button.btn.btn-danger.btn-sm {
-    background: rgba(239, 68, 68, 0.06) !important;
-    border: 1px solid rgba(239, 68, 68, 0.22) !important;
+    background: rgba(var(--danger-rgb), 0.06) !important;
+    border: 1px solid rgba(var(--danger-rgb), 0.22) !important;
     color: rgba(252, 165, 165, 0.78) !important;
     padding: 0.3rem 0.5rem !important;
     box-shadow: none !important;
     transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast) !important;
 }
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button.btn.btn-danger:hover {
-    background: rgba(239, 68, 68, 0.16) !important;
-    border-color: rgba(239, 68, 68, 0.42) !important;
-    color: #fca5a5 !important;
+    background: rgba(var(--danger-rgb), 0.16) !important;
+    border-color: rgba(var(--danger-rgb), 0.42) !important;
+    color: var(--danger-light) !important;
 }
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-input .input-group-append > button .svg-inline--fa {
     width: 0.85rem !important;
@@ -6545,8 +6545,8 @@ body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .s
     color: rgba(252, 165, 165, 0.72) !important;
 }
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button.btn-danger:hover {
-    background: rgba(239, 68, 68, 0.12) !important;
-    color: #fca5a5 !important;
+    background: rgba(var(--danger-rgb), 0.12) !important;
+    color: var(--danger-light) !important;
 }
 body.stash-liquid-glass .modal-content:has(> .modal-body > .dialog-container) .string-list-row .string-list-input > .form-group > .input-group > .input-group-append > button[disabled] {
     opacity: 0.3 !important;
@@ -6793,10 +6793,10 @@ body.stash-liquid-glass .job-table.card .job button.minimal.stop.btn.btn-sm {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: rgba(239, 68, 68, 0.08) !important;
-    background-color: rgba(239, 68, 68, 0.08) !important;
+    background: rgba(var(--danger-rgb), 0.08) !important;
+    background-color: rgba(var(--danger-rgb), 0.08) !important;
     background-image: none !important;
-    border: 1px solid rgba(239, 68, 68, 0.28) !important;
+    border: 1px solid rgba(var(--danger-rgb), 0.28) !important;
     border-radius: var(--radius-sm) !important;
     color: rgba(252, 165, 165, 0.85) !important;
     box-shadow: none !important;
@@ -6805,10 +6805,10 @@ body.stash-liquid-glass .job-table.card .job button.minimal.stop.btn.btn-sm {
 }
 body.stash-liquid-glass .job-table.card .job button.btn.btn-primary.stop:hover,
 body.stash-liquid-glass .job-table.card .job button.minimal.stop.btn:hover {
-    background: rgba(239, 68, 68, 0.2) !important;
-    border-color: rgba(239, 68, 68, 0.55) !important;
-    color: #fca5a5 !important;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16) !important;
+    background: rgba(var(--danger-rgb), 0.2) !important;
+    border-color: rgba(var(--danger-rgb), 0.55) !important;
+    color: var(--danger-light) !important;
+    box-shadow: 0 0 0 3px rgba(var(--danger-rgb), 0.16) !important;
 }
 body.stash-liquid-glass .job-table.card .job button.stop .svg-inline--fa {
     width: 0.85rem !important;
@@ -7653,15 +7653,15 @@ body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.delete,
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-danger {
     order: 9;
     margin-left: var(--gap-md) !important;
-    background: rgba(239, 68, 68, 0.12) !important;
-    border: 1px solid rgba(239, 68, 68, 0.32) !important;
-    color: #f87171 !important;
+    background: rgba(var(--danger-rgb), 0.12) !important;
+    border: 1px solid rgba(var(--danger-rgb), 0.32) !important;
+    color: var(--danger-bright) !important;
 }
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.delete:hover,
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-danger:hover {
-    background: rgba(239, 68, 68, 0.22) !important;
-    border-color: rgba(239, 68, 68, 0.5) !important;
-    color: #fca5a5 !important;
+    background: rgba(var(--danger-rgb), 0.22) !important;
+    border-color: rgba(var(--danger-rgb), 0.5) !important;
+    color: var(--danger-light) !important;
 }
 
 /* Row 2: what she is in this library. Injected, because none of these
@@ -8068,15 +8068,15 @@ body.stash-liquid-glass.refract-light #performer-page .refract-ph-alias__n {
    copied. */
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.delete,
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.btn-danger {
-    background: rgba(239, 68, 68, 0.1) !important;
-    border-color: rgba(185, 28, 28, 0.4) !important;
-    color: color-mix(in srgb, #ef4444 55%, #000) !important;
+    background: rgba(var(--danger-rgb), 0.1) !important;
+    border-color: color-mix(in srgb, var(--danger) 70%, #000) !important;
+    color: color-mix(in srgb, var(--danger) 55%, #000) !important;
 }
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.delete:hover,
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .details-edit > .btn.btn-danger:hover {
-    background: rgba(239, 68, 68, 0.18) !important;
-    border-color: rgba(185, 28, 28, 0.6) !important;
-    color: color-mix(in srgb, #ef4444 40%, #000) !important;
+    background: rgba(var(--danger-rgb), 0.18) !important;
+    border-color: color-mix(in srgb, var(--danger) 55%, #000) !important;
+    color: color-mix(in srgb, var(--danger) 40%, #000) !important;
 }
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .name-icons .btn,
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .name-icons .dropdown-toggle {
@@ -8411,9 +8411,9 @@ body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-gr
    -1px pull here would have eaten a pixel of the field to fix a doubled
    rim that was never there. */
 body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group-append > .btn.btn-danger:hover {
-    background: rgba(239, 68, 68, 0.16) !important;
-    border-color: rgba(239, 68, 68, 0.4) !important;
-    color: #f87171 !important;
+    background: rgba(var(--danger-rgb), 0.16) !important;
+    border-color: rgba(var(--danger-rgb), 0.4) !important;
+    color: var(--danger-bright) !important;
 }
 
 /* ── The bar ───────────────────────────────────────────────────────
@@ -8523,9 +8523,9 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit .btn.btn-dange
     color: var(--text-muted) !important;
 }
 body.stash-liquid-glass #performer-page .refract-pe .details-edit .btn.btn-danger:hover {
-    background: rgba(239, 68, 68, 0.12) !important;
-    border-color: rgba(239, 68, 68, 0.28) !important;
-    color: #f87171 !important;
+    background: rgba(var(--danger-rgb), 0.12) !important;
+    border-color: rgba(var(--danger-rgb), 0.28) !important;
+    color: var(--danger-bright) !important;
 }
 
 /* ── Field states ──────────────────────────────────────────────────
@@ -8541,8 +8541,8 @@ body.stash-liquid-glass #performer-page .refract-pe form .date-input:focus {
 }
 body.stash-liquid-glass #performer-page .refract-pe form .form-control.is-invalid,
 body.stash-liquid-glass #performer-page .refract-pe form .text-input.is-invalid {
-    border-color: rgba(239, 68, 68, 0.5) !important;
-    background: rgba(239, 68, 68, 0.10) !important;
+    border-color: rgba(var(--danger-rgb), 0.5) !important;
+    background: rgba(var(--danger-rgb), 0.10) !important;
 }
 
 @media (max-width: 1200px) {
