@@ -6000,8 +6000,23 @@
        One query per entity, cached for the session. */
     var REFRACT_EP_COUNTS = {};
     var REFRACT_EP_KINDS = {
-        studios: { kind: "studio", field: "studios", head: ".studio-head", query: "findStudio", kids: "child_studios" },
-        tags: { kind: "tag", field: "tags", head: ".tag-head", query: "findTag", kids: "children" }
+        /* Studios ask for their children's names and counts because
+           nothing on a studio page lists them: Stash puts the
+           subsidiaries behind the last tab and the header never mentions
+           they exist. Tags ask only for ids, because a tag header
+           already renders every sub-tag as a chip and a second ranked
+           run would say the same thing twice. */
+        studios: {
+            kind: "studio", field: "studios", head: ".studio-head",
+            query: "findStudio", kids: "child_studios",
+            kidFields: "id name scene_count", childTab: "childstudios",
+            kinLabel: "The network, by what each site holds",
+            kinMore: "sites", kinHref: "/studios/"
+        },
+        tags: {
+            kind: "tag", field: "tags", head: ".tag-head",
+            query: "findTag", kids: "children", kidFields: "id"
+        }
     };
 
     function refractEpContext() {
@@ -6021,17 +6036,27 @@
         var sel = ':{value:["' + ctx.id + '"], modifier:INCLUDES, depth:';
         var q = "{ own: findScenes(filter:{per_page:0}, scene_filter:{" + f + sel + '0}}){ count } ' +
                 "all: findScenes(filter:{per_page:0}, scene_filter:{" + f + sel + '-1}}){ count } ' +
-                'kids: ' + ctx.spec.query + '(id:"' + ctx.id + '"){ ' + ctx.spec.kids + ' { id } } }';
+                'kids: ' + ctx.spec.query + '(id:"' + ctx.id + '"){ ' + ctx.spec.kids +
+                ' { ' + ctx.spec.kidFields + ' } } }';
         refractGqlQuery(q).then(function (r) {
             var d = r && r.data;
             if (!d || !d.own || !d.all) { REFRACT_EP_COUNTS[ctx.key] = "failed"; return; }
-            var kids = d.kids && d.kids[ctx.spec.kids];
+            var kids = (d.kids && d.kids[ctx.spec.kids]) || [];
+            /* Ranked by what each child holds, not alphabetically. On
+               Brazzers that is the difference between reading "Baby Got
+               Boobs" first and reading "Brazzers Exxtra 561", which is
+               58% of the network in one cell. */
+            var list = kids.slice().sort(function (a, b) {
+                return (b.scene_count || 0) - (a.scene_count || 0);
+            });
             REFRACT_EP_COUNTS[ctx.key] = {
                 own: d.own.count,
                 all: d.all.count,
-                kids: kids ? kids.length : 0
+                kids: kids.length,
+                list: list
             };
             try { injectEntityScope(); } catch (e) {}
+            try { injectEntityKin(); } catch (e) {}
         }).catch(function () { REFRACT_EP_COUNTS[ctx.key] = "failed"; });
     }
 
@@ -6114,6 +6139,127 @@
             all[i].setAttribute("aria-pressed", isOn ? "true" : "false");
         }
         document.body.classList.add("refract-has-scope");
+        return true;
+    }
+
+    /* ── Entity pages: the children, ranked, in the grid slot ─────────
+       A studio page never says what is under it. The subsidiaries live
+       behind the last tab, the header does not mention them, and the
+       bar left its right half empty: measured after the composition
+       pass, the content occupied the leftmost 450px of 1,546.
+
+       The performer header settles a slot for this: a six-track grid of
+       label-over-value cells, hairlines showing through a 1px gap. On a
+       performer it holds a body. A studio has no body and, measured,
+       almost no record either (1 of 2,378 rated, 1 with details), so
+       the same grid holds the network instead, ranked by what each site
+       carries and capped, with the rest one click away on the tab that
+       already exists.
+
+       Studios only. A tag header already renders its sub-tags, so a
+       ranked grid there would duplicate them; that row keeps its cap
+       and disclosure. */
+    var REFRACT_EP_KIN_CAP = 11;
+
+    function injectEntityKin() {
+        var ctx = refractEpContext();
+        var existing = document.querySelector(".refract-eh-kin");
+        var counts = ctx ? REFRACT_EP_COUNTS[ctx.key] : null;
+        if (!ctx || !ctx.spec.childTab || !counts || typeof counts !== "object" ||
+                !counts.list || !counts.list.length) {
+            if (existing && existing.parentNode) { existing.parentNode.removeChild(existing); }
+            return false;
+        }
+        var open = existing && existing.classList.contains("refract-eh-kin-open");
+        var shown = open ? counts.list : counts.list.slice(0, REFRACT_EP_KIN_CAP);
+        var sig = ctx.key + "|" + (open ? "all" : "cap") + "|" + counts.list.length + "|" +
+                  shown.map(function (k) { return k.id + ":" + k.scene_count; }).join(",");
+        if (existing && existing.dataset.refractSig === sig && ctx.head.contains(existing)) { return true; }
+        if (existing && existing.parentNode) { existing.parentNode.removeChild(existing); }
+
+        var wrap = document.createElement("div");
+        wrap.className = "refract-eh-kin" + (open ? " refract-eh-kin-open" : "");
+        wrap.dataset.refractSig = sig;
+        var html = '<div class="refract-eh-kin-head">' +
+                       '<span class="refract-eh-kin-label"></span>' +
+                       '<button type="button" class="refract-eh-kin-more"></button>' +
+                   '</div><div class="refract-eh-kin-grid">';
+        for (var i = 0; i < shown.length; i++) {
+            html += '<a class="refract-eh-kin-cell" href="' + ctx.spec.kinHref + shown[i].id + '">' +
+                        '<span class="refract-eh-kin-name"></span>' +
+                        '<span class="refract-eh-kin-count"></span>' +
+                    '</a>';
+        }
+        html += '</div>';
+        wrap.innerHTML = html;
+
+        /* textContent for anything the user named, never innerHTML. */
+        wrap.querySelector(".refract-eh-kin-label").textContent = ctx.spec.kinLabel;
+        var cells = wrap.querySelectorAll(".refract-eh-kin-cell");
+        for (var j = 0; j < cells.length; j++) {
+            cells[j].querySelector(".refract-eh-kin-name").textContent = shown[j].name || "Untitled";
+            cells[j].querySelector(".refract-eh-kin-count").textContent =
+                refractEpNum(shown[j].scene_count || 0);
+        }
+        var more = wrap.querySelector(".refract-eh-kin-more");
+        if (counts.list.length <= REFRACT_EP_KIN_CAP) {
+            more.parentNode.removeChild(more);
+        } else {
+            more.textContent = open
+                ? ("Show the top " + REFRACT_EP_KIN_CAP)
+                : ("All " + refractEpNum(counts.list.length) + " " + ctx.spec.kinMore);
+            more.setAttribute("aria-expanded", open ? "true" : "false");
+            more.addEventListener("click", function () {
+                wrap.classList.toggle("refract-eh-kin-open");
+                try { injectEntityKin(); } catch (e) {}
+            });
+        }
+
+        var group = ctx.head.querySelector(".detail-group");
+        if (group && group.parentNode === ctx.head) {
+            ctx.head.insertBefore(wrap, group.nextSibling);
+        } else {
+            var edit = ctx.head.querySelector(".details-edit");
+            if (edit) { ctx.head.insertBefore(wrap, edit); } else { ctx.head.appendChild(wrap); }
+        }
+        return true;
+    }
+
+    /* ── Entity pages: the band ───────────────────────────────────────
+       The performer header makes its band by blurring the entity's own
+       image under a veil, with a FLOOR between the two so the band
+       never depends on what the photograph happens to contain. That
+       floor is the whole reason this transfers: a studio logo is a
+       transparent wordmark measured between 1.9:1 and 5.3:1, so
+       blurring one yields a smear rather than a colour field. The floor
+       carries the band and the logo only tints it.
+
+       No element is created and nothing is moved. The image URL becomes
+       a custom property on the header and CSS paints the floor on the
+       header itself, the blurred image on ::before and the veil on
+       ::after. Neither pseudo-element was in use.
+
+       It draws only where there is a real image. 516 of the 2,378
+       studios resolve to `default=true` and get no band, which is the
+       same rule that already stops them getting an empty logo plate. */
+    function setupEntityBand() {
+        var header = document.querySelector(".detail-header");
+        if (!header) { return false; }
+        var ctx = refractEpContext();
+        var img = ctx ? header.querySelector(".detail-header-image img") : null;
+        var src = img ? (img.currentSrc || img.getAttribute("src") || "") : "";
+        if (!ctx || !src || src.indexOf("default=true") !== -1) {
+            if (header.classList.contains("refract-eh-banded")) {
+                header.classList.remove("refract-eh-banded");
+                header.style.removeProperty("--refract-eh-img");
+            }
+            return false;
+        }
+        var want = 'url("' + src.replace(/"/g, "%22") + '")';
+        if (header.style.getPropertyValue("--refract-eh-img") !== want) {
+            header.style.setProperty("--refract-eh-img", want);
+        }
+        header.classList.add("refract-eh-banded");
         return true;
     }
 
@@ -16647,6 +16793,8 @@
             try { setupVideoFilterSwatches(); } catch (e) {}
             try { injectEntityScope(); } catch (e) {}
             try { capEntityRelationRows(); } catch (e) {}
+            try { injectEntityKin(); } catch (e) {}
+            try { setupEntityBand(); } catch (e) {}
         }
         function sched() {
             clearTimeout(_t);
