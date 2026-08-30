@@ -27,6 +27,7 @@ body.stash-liquid-glass.refract-light {
        secondary text (dates, descriptions, file paths) reads cleanly
        on white. Accent flavor goes on titles, not muted text. */
     --text-muted: rgba(0, 0, 0, 0.65);
+    --fg-rgb: 0, 0, 0;
 
     --glass-bg: rgba(255, 255, 255, 0.55);
     --glass-bg-strong: rgba(255, 255, 255, 0.70);
@@ -249,6 +250,10 @@ body.stash-liquid-glass.refract-light .filter-dialog .modal-content {
 body.stash-liquid-glass.refract-light .video-js .vjs-control-bar {
     --text: rgba(255, 255, 255, 0.92);
     --text-muted: rgba(255, 255, 255, 0.55);
+    /* --fg-rgb follows --text everywhere --text is re-pointed, or a
+       rgba(var(--fg-rgb), a) consumer inside this dark island would draw
+       black on near-black. */
+    --fg-rgb: 255, 255, 255;
 }
 /* ...except the light islands that sit inside the bar. These get a
    near-white panel on purpose, so they take the tokens back the other
@@ -260,6 +265,7 @@ body.stash-liquid-glass.refract-light .video-js .vjs-volume-panel-vertical .vjs-
 body.stash-liquid-glass.refract-light .scrubber-item-time {
     --text: rgba(0, 0, 0, 0.88);
     --text-muted: rgba(0, 0, 0, 0.65);
+    --fg-rgb: 0, 0, 0;
     background: rgba(255, 255, 255, 0.88) !important;
     color: var(--text) !important;
 }

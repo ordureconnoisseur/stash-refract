@@ -33,6 +33,17 @@ body.stash-liquid-glass {
     --bg-1: #111;
     --text: rgba(255, 255, 255, 0.92);
     --text-muted: rgba(255, 255, 255, 0.55);
+    /* Foreground CHANNELS, not a colour. Everything that used to write
+       rgba(255, 255, 255, a) for text writes rgba(var(--fg-rgb), a)
+       instead, so the alpha stays the component's decision while the ink
+       follows the mode. Dark resolves to exactly the value it replaced.
+
+       This exists because the old arrangement made light mode opt-in per
+       declaration: a hardcoded white needed a hand-written counterpart in
+       14_light, and 44 of the theme's 76 white text declarations never
+       got one. Two of them shipped as white-on-white in the rating drawer
+       on 2026-08-29. A token that flips cannot be forgotten (3.1). */
+    --fg-rgb: 255, 255, 255;
 
     --glass-bg: rgba(255, 255, 255, 0.06);
     --glass-bg-strong: rgba(255, 255, 255, 0.10);
