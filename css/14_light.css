@@ -29,6 +29,39 @@ body.stash-liquid-glass.refract-light {
     --text-muted: rgba(0, 0, 0, 0.65);
     --fg-rgb: 0, 0, 0;
 
+    /* The fill ramp, flipped for light. Dark defines it as white alphas
+       measured off the dark background histogram; on white those are
+       white on white, which is why this file grew 23 hand-rolled black
+       fills patching the surfaces anyone happened to look at. There are
+       145 consumers of var(--fill-N) in the theme, so the hand-rolled
+       ones were covering about a sixth of it.
+
+       The alphas are NOT mirrored, and that is the whole point. Matching
+       the alpha makes every light fill about 23% weaker than its dark
+       counterpart, because the L* curve is steep near black: white on a
+       near-black ground lifts more per unit alpha than black on white
+       drops. Naive mirroring gives dL* 2.65 where dark has 3.43. The
+       ramp is SEMANTIC -- resting, raised and hover are functional
+       states that must read equally in both modes -- so the invariant is
+       matched perceptual lift, not matched alpha. A 23% weaker hover is
+       a weaker affordance, not a calmer aesthetic. (3.2)
+
+       Matched on dL* against the measured grounds, dark (26,25,29) and
+       light (255,255,255):
+
+         --fill-1  white 0.03  dL* 3.43  ->  black 0.040
+         --fill-2  white 0.04  dL* 4.55  ->  black 0.053
+         --fill-3  white 0.05  dL* 5.65  ->  black 0.065
+         --fill-4  white 0.08  dL* 8.92  ->  black 0.100
+
+       RETUNING EITHER END MEANS RECOMPUTING THE OTHER FROM THE
+       INVARIANT. Do not copy an alpha across; 0.053 is not a typo for
+       0.05, it is the value that holds dL* 4.55 on a white ground. */
+    --fill-1: rgba(0, 0, 0, 0.040);
+    --fill-2: rgba(0, 0, 0, 0.053);
+    --fill-3: rgba(0, 0, 0, 0.065);
+    --fill-4: rgba(0, 0, 0, 0.100);
+
     --glass-bg: rgba(255, 255, 255, 0.55);
     --glass-bg-strong: rgba(255, 255, 255, 0.70);
     --glass-border: rgba(0, 0, 0, 0.10);
@@ -269,6 +302,13 @@ body.stash-liquid-glass.refract-light .video-js .vjs-control-bar {
        rgba(var(--fg-rgb), a) consumer inside this dark island would draw
        black on near-black. */
     --fg-rgb: 255, 255, 255;
+    /* The fill ramp comes back with them. A light-scope fill is black,
+       and black on a near-black control bar is invisible in the same way
+       white on white is. */
+    --fill-1: rgba(255, 255, 255, 0.03);
+    --fill-2: rgba(255, 255, 255, 0.04);
+    --fill-3: rgba(255, 255, 255, 0.05);
+    --fill-4: rgba(255, 255, 255, 0.08);
 }
 /* ...except the light islands that sit inside the bar. These get a
    near-white panel on purpose, so they take the tokens back the other
@@ -281,6 +321,10 @@ body.stash-liquid-glass.refract-light .scrubber-item-time {
     --text: rgba(0, 0, 0, 0.88);
     --text-muted: rgba(0, 0, 0, 0.65);
     --fg-rgb: 0, 0, 0;
+    --fill-1: rgba(0, 0, 0, 0.040);
+    --fill-2: rgba(0, 0, 0, 0.053);
+    --fill-3: rgba(0, 0, 0, 0.065);
+    --fill-4: rgba(0, 0, 0, 0.100);
     background: rgba(255, 255, 255, 0.88) !important;
     color: var(--text) !important;
 }
