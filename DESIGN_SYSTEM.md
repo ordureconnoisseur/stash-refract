@@ -11,6 +11,13 @@ newer, measured evidence wins over both.
 
 Every number here was read out of the shipped CSS or JS, not invented.
 
+Merging this file: every branch's changes are additive prose, so a wholesale
+"take my side" conflict resolution silently discards a lane's thinking - it
+happened on 2026-08-30 (dc918cb dropped rule 7.18 while the ancestry showed
+the commit that added it). This file merges hunk by hunk or not at all, and a
+rule number cited from anywhere else (CLAUDE.md, ledger rows, another lane)
+is a stable reference: repair numbering around it, never renumber it.
+
 There is a visual companion: ten artboards covering the thesis, colour, type,
 surfaces, depth, motion, the rating tiers, the modes, component law and the
 drift ledger. Sources are in `design-system/` as `.dc.html` files plus
@@ -1092,45 +1099,6 @@ bug.
    out wrong. Where a control encodes a value geometrically, measure the
    geometry at more than one value before building on it: one full star
    and one empty star both look correct under either theory.
-12. **A shorthand with `!important` erases longhands set anywhere else, at any
-   specificity.** `background: x !important` resets `background-image` too,
-   and a higher-specificity longhand without `!important` still loses. This
-   is a different failure from losing the cascade: the rule wins and your
-   longhand vanishes silently. When extending a surface where any rule sets a
-   shorthand with `!important`, every longhand you set must repeat
-   `!important`.
-13. **Changing `flex-direction` re-points every inherited alignment
-    property.** Alignment is axis-relative: a container that becomes a column
-    silently re-purposes `align-items` from vertical to horizontal, and a rule
-    written for the old axis (a modal header's `align-items: center`) starts
-    doing something else entirely. When you change an axis, re-declare both
-    alignment properties explicitly.
-14. **Collapsing something Stash sized from a grid track means zeroing the
-    MINIMUMS, not just the dimensions.** Stash sizes cards and their images
-    off the track they were laid out in, and those minimums outrank a
-    `width: 100%` set later. Twice now: collapsed performer cards stuck at
-    169px wide because `[data-perf-count="2"]` won, and then the images
-    inside the fixed 34px circles carried `min-width: 157.5px`, so
-    `object-fit: cover` scaled each photo to cover 157px and the card
-    clipped all but the leftmost 34px. Every avatar was an edge sliver of a
-    hugely zoomed picture and it looked like a bad crop rather than a
-    layout fault. Set `min-width` and `min-height` to 0 on every box down
-    to the replaced element.
-15. **Below 1200px the panel is not a column, and anything tuned to 338px
-    has to say what it does at 1060px.** Three separate things stretched
-    when the page stacked: the tab strip's `flex: 1 1 auto` turned six tabs
-    into 166 to 181px slabs around 46px of ink; the description ran the
-    full pane at about 157 characters a line; and Stash's own header
-    ordering flips at exactly 1200px, sending the studio eyebrow below the
-    title it labels. A row composed for the column needs a cap, a measure,
-    or an explicit order, and the check is to measure at 1600 AND at 1100.
-16. **Replaced-element physics.** A border or radius on an element whose
-    content does not fill its box frames the box, not the picture:
-    `object-fit: contain` plus a border produced a 168px frame around a 94px
-    portrait with 29px of dead space each side. And `max-width: 100%` on a
-    replaced element inside a content-sized flex parent is circular; remove
-    the sizing floor and it collapses, measured at 2x2. Size replaced
-    elements from a real constraint, never from each other.
 12. **CSS and JS version skew fails silently.** The body-class contract
     (section 5) and the injected scaffolds mean much of the CSS keys on
     classes that JS adds at runtime. Deploy CSS from one build over
@@ -1152,7 +1120,62 @@ bug.
     against the deployed copy before every deploy - it is the one file
     where "my committed tree" is not enough, because it must carry every
     lane's vocabulary at once.
-17. **When one selector appears more than once, the rule that wins is
+14. **A shorthand with `!important` erases longhands set anywhere else, at any
+   specificity.** `background: x !important` resets `background-image` too,
+   and a higher-specificity longhand without `!important` still loses. This
+   is a different failure from losing the cascade: the rule wins and your
+   longhand vanishes silently. When extending a surface where any rule sets a
+   shorthand with `!important`, every longhand you set must repeat
+   `!important`.
+15. **Changing `flex-direction` re-points every inherited alignment
+    property.** Alignment is axis-relative: a container that becomes a column
+    silently re-purposes `align-items` from vertical to horizontal, and a rule
+    written for the old axis (a modal header's `align-items: center`) starts
+    doing something else entirely. When you change an axis, re-declare both
+    alignment properties explicitly.
+16. **Collapsing something Stash sized from a grid track means zeroing the
+    MINIMUMS, not just the dimensions.** Stash sizes cards and their images
+    off the track they were laid out in, and those minimums outrank a
+    `width: 100%` set later. Twice now: collapsed performer cards stuck at
+    169px wide because `[data-perf-count="2"]` won, and then the images
+    inside the fixed 34px circles carried `min-width: 157.5px`, so
+    `object-fit: cover` scaled each photo to cover 157px and the card
+    clipped all but the leftmost 34px. Every avatar was an edge sliver of a
+    hugely zoomed picture and it looked like a bad crop rather than a
+    layout fault. Set `min-width` and `min-height` to 0 on every box down
+    to the replaced element.
+17. **Below 1200px the panel is not a column, and anything tuned to 338px
+    has to say what it does at 1060px.** Three separate things stretched
+    when the page stacked: the tab strip's `flex: 1 1 auto` turned six tabs
+    into 166 to 181px slabs around 46px of ink; the description ran the
+    full pane at about 157 characters a line; and Stash's own header
+    ordering flips at exactly 1200px, sending the studio eyebrow below the
+    title it labels. A row composed for the column needs a cap, a measure,
+    or an explicit order, and the check is to measure at 1600 AND at 1100.
+18. **A contrast number is only as good as the ground you measured it
+    against, and `backgroundColor` is not the ground.** Light mode paints
+    the page with `background-image` gradients over a transparent
+    `background-color`, so `getComputedStyle(document.body).backgroundColor`
+    returns `rgba(0, 0, 0, 0)`. Parsed for channels that is black, and
+    every composite built on it inverts: the panel came out mid-grey
+    (179,179,179) instead of white, and two disclosure controls were
+    reported at 2.55:1 when they actually measured between 3.30 and
+    5.38:1 depending on the accent preset. Nothing errored, and the
+    numbers looked entirely ordinary. Sample the rendered pixel instead:
+    screenshot, take the modal colour of a blank region of the surface,
+    and composite the element's computed `color` onto that. The panel's
+    real ground is 255,255,255 and the drawer's is 214,214,214, and
+    neither is derivable from a property read. The one honest tell was
+    that the arithmetic had produced a grey nobody had chosen; treat an
+    unexpected ground as a broken measurement, not a surprising result.
+19. **Replaced-element physics.** A border or radius on an element whose
+    content does not fill its box frames the box, not the picture:
+    `object-fit: contain` plus a border produced a 168px frame around a 94px
+    portrait with 29px of dead space each side. And `max-width: 100%` on a
+    replaced element inside a content-sized flex parent is circular; remove
+    the sizing floor and it collapses, measured at 2x2. Size replaced
+    elements from a real constraint, never from each other.
+20. **When one selector appears more than once, the rule that wins is
     never the one you are reading.** Three times in one pass: two
     `--ic-grid` blocks where the stale later one drew rings instead of
     squares; a `display: none` on `.count-icon` that a later
