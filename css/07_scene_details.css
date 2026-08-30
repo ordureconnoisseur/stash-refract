@@ -940,24 +940,9 @@ body.stash-liquid-glass .nav-tabs .nav-link.active {
         0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
 }
 
-/* Detail-page tab strips - bump padding + font over the compact default
-   so the tab buttons are a more comfortable hit target than the slim
-   sidebar variants on scene/gallery pages.
-   This used to name .performer-tabs only, so the tag, studio and group
-   strips kept the sidebar variant: 9.24px links 22px tall, sitting under
-   a 28px title, against 12.25px links 35.8px tall on the performer page.
-   Same markup, same job, same size. */
-body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link {
-    padding: 0.55rem 1rem !important;
-    font-size: var(--fs-base) !important;
-    border-radius: var(--radius) !important;
-    letter-spacing: 0.015em !important;
-}
-body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link .badge {
-    font-size: var(--fs-xs) !important;
-    padding: 0.18em 0.5em !important;
-}
-
+/* The entity tab strip's rules moved to 08_misc_mid.css on 2026-08-30:
+   they style performer/studio/tag/group/movie pages, which are not this
+   file's surface. Handed over by the scene lane. */
 
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .card .card-body,
 body.stash-liquid-glass .gallery-tabs .card .card-body {
