@@ -235,11 +235,25 @@ at 0.10 for panels that hold reading content. Two rims: `--glass-border` at
 **Below the glass fills sits the fill ramp** (tokenized 2026-08-28 from the
 measured background histogram): `--fill-1` 0.03 (hairline tint: rows, wells),
 `--fill-2` 0.04 (resting fill: inputs, tiles), `--fill-3` 0.05 (raised fill:
-chips, list items), `--fill-4` 0.08 (hover and active). The ramp does NOT
-retheme in light mode (14_light still overrides surfaces per-selector); the
-glass fills DO. That is why the two are separate vocabularies: never alias
-0.06 to `--glass-bg` or 0.10 to `--glass-bg-strong` in a rule that light mode
-does not override, or that surface will frost unexpectedly in light.
+chips, list items), `--fill-4` 0.08 (hover and active).
+
+**The ramp flips in light mode on matched perceptual lift, not mirrored
+alpha** (ruled 2026-08-30, landing with the scene lane's fill flip). The L*
+curve is steep near black, so a white alpha lifts a dark ground more than
+the same black alpha drops a light one; naive mirroring makes every light
+fill about 23% weaker than its dark twin (dL* 2.65 against 3.43 at step 1).
+The light values are black alphas computed to match each step's dark dL*
+against the measured grounds (dark panel 26,25,29; light pane 255,255,255):
+0.04 / 0.053 / 0.065 / 0.10 - exact matches, not rounded, because the
+number's job is the invariant, and the fills are SEMANTIC (resting vs raised
+vs hover must read equally in both modes), unlike the depth shadows, which
+light deliberately quiets. They live in `14_light` per section 5's
+token-scope pattern. Retuning either end means recomputing the other from
+the invariant, never copying the alpha across.
+
+The glass fills are a separate vocabulary from the ramp: never alias 0.06 to
+`--glass-bg` or 0.10 to `--glass-bg-strong` in a rule light mode does not
+override, or that surface will frost unexpectedly in light.
 
 **Near-opaque overlays use the surface family**: `rgba(var(--surface-rgb), A)`
 with `--surface-rgb: 20, 20, 24` (popovers, menus, floating overlay chrome;
@@ -698,9 +712,18 @@ The **minimal** variant (`.btn.minimal`) is the icon-only button: transparent
 fill, transparent border, no shadow, no blur. The glyph is the button. Used for
 the favourite heart and its peers.
 
-Destructive actions live in a menu, not in a row of peers. A counter that
-happens to be clickable is a readout, not a button, and must not dress like
-one.
+Destructive actions, ruled 2026-08-30: **inside an edit context, a
+destructive action may sit inline in a row of peers when it wears the quiet
+danger recipe** - danger tint fill, danger ink (3.1), never primary weight -
+with the performer band's Delete as built as the reference. Repeating rows
+may use compact danger remove buttons (the string-list pattern). Outside
+edit contexts the old law stands: destructive actions live in a menu, not in
+a row of peers. The distinction is the context's own contract: an edit
+surface is where the user came to change things, so a quiet red door there
+is honest; the same door in a browsing row is an ambush.
+
+A counter that happens to be clickable is a readout, not a button, and must
+not dress like one.
 
 ### 6.6 Inputs and forms
 
@@ -1292,7 +1315,7 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 | Type, second ladder | RESOLVED 2026-08-28: the panel-local scale is gone and every size in the panel is a scale token. Folded as ruled, with two corrections measurement forced. `--sp-value` had no consumers left and was deleted rather than aliased. 21px was promoted by retuning `--fs-xl` (and moving 28px to `--fs-2xl`) rather than adding an eighth step, because both top rungs had zero consumers theme-wide. Measured before and after: 13 size/weight pairs across 9 distinct sizes became 10 across 5. Logged 2026-08-27. | 3.5 |
 | Type, sub-scale literals | 31 literal font sizes sit below `--fs-xs` across 16 distinct values from 5.04 to 9.5px, 20 of them clustered in 8.12 to 9.24. The scene panel's own (9.5px tag counts) folded UP to `--fs-xs` rather than down, which removed a size instead of adding a rung, so no `--fs-2xs` was created. Whether the other 30 want one rung or none is a measured pass, not a drive-by. Logged 2026-08-28; revisit with the padding pass. | 3.5 |
 | Contrast | RULED 2026-08-30: brighten. `.st-tag-caption` and `.st-tag-n` go to alpha 0.42, clearing the 3:1 secondary floor. The scene lane is executing; this row closes when the change lands and is measured. | 3.9 |
-| Destructive actions | OPEN RULING 2026-08-30: 6.5 says destructive actions live in a menu, not in a row of peers, but the performer-band Delete and the string-list remove buttons sit inline and contradict it. The user has explicitly NOT decided; 6.5 stands as written and neither surface changes until ruled. | 6.5 |
+| Destructive actions | RULED 2026-08-30: inline delete. 6.5 revised to codify shipped practice - inline destructive actions are legal in edit contexts with the quiet danger recipe (the performer band Delete as built is the reference; string-list compact removes likewise); outside edit contexts the menu law stands. No CSS changed anywhere; the ruling codifies what shipped. | 6.5 |
 | Browser floor | RESOLVED 2026-08-30, ruled baked fallbacks: the documented Chrome 105 floor stands. Both light ink tokens now declare a literal-token fallback first (`--accent-ink: var(--accent)`, `--danger-ink: var(--danger)`, both above their floors) with the color-mix upgrade gated behind `@supports`, so 105-110 gets legible ink instead of a silent drop and 111+ gets the better shade. The performer lane mirrors the pattern for its 08 hand-roll via double declaration. | 3.1, 7.13 |
 | Tag-card heart | RESOLVED 2026-08-30, same day: no defect. The blank captures were a probe artifact - the hover reveal lives on an unclassed ancestor `<a>` at opacity 0, so the element computed visible and topmost while an ancestor kept it unpainted, and the black `fill` was the svg container's inert default (the path carries currentColor and the styled colour reaches it, both modes measured). The sweep still fixed something real: the revealed heart was white-on-white in light mode and is now legible. Method lesson recorded in 10.1. | 10.1 |
 | Em dashes | RESOLVED 2026-08-28: 1,091 swept from the shipped source in one mechanical commit (853 in the stylesheets, 236 in refract.js comments, plus two that were live UI strings, one of them a latent crash: `createElement("...")` with the dash as a TAG NAME, saved only by sitting behind a hardcoded-false flag). Zero remain; the `Edit` string-matching trap is gone with them. | 6.21, 7.8 |
@@ -1300,7 +1323,7 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px and 10px literals. 9px is removed from this row: where commented as concentric (inner = outer minus padding) it is computed, correct, and exempt per 3.4; uncommented 9px uses still need their derivation stated or a token. | 3.4 |
 | Surfaces | RESOLVED 2026-08-28: the rogue `backdrop-filter` expressions folded to ladder rungs (the 16px saturate(1.1) pair sat behind 94 to 96 percent opaque fills, so the fold is invisible; 8px went to sm). Live shader count now equals the ladder: nine. | 3.2 |
 | Z-index | Values run 0, 1 through 12, then 20, 30, 50, 90, 99, 100, 400, 1050, 1060, 1100, 9999, 10000, each chosen ad hoc. A band map now exists (3.8); nothing has migrated to it yet. | 3.8 |
-| Spacing | Gaps tokenized 2026-08-28 (`--gap-2xs` to `--gap-xl`, folds of at most 1.4px). Padding and margins remain unscaled: consolidating them moves layout, so they wait for a measured pass. Fill literals 0.02, 0.06, 0.10 and 0.12 also remain: 0.02 is below the ramp, and 0.06/0.10 must not silently become glass tokens (3.2). Revisit at the light-mode fill project. | 3.6 |
+| Spacing | Gaps tokenized 2026-08-28. Padding/margins: histogram drawn 2026-08-30 (1,420 declarations, 69 distinct rem values forming a near-continuum from 0.1 to 1.5; heaviest: 0.5 at 96, 0.85 at 77, 0.4 at 69, 0.6 at 67, 0.7 at 58, 0.55 at 52). DRAFT scale, pending measurement: nine steps sharing the gap values where they coincide (0.25, 0.4, 0.5, 0.75, 1) plus padding-only steps near 0.15, 0.65, 0.85 and 1.25, fold bands capped at 0.075rem (about 1px); sub-7px pixel paddings and negative margins stay literal (optical and layout-special). Naming (unified --space-* vs parallel --pad-*) and every fold direction are stage-2 decisions, made against the live page. BLOCKED on the deploy dir until the scene lane finishes the fill flip; two lanes cannot measure concurrently. | 3.6 |
 | Specificity | 8,268 `!important` declarations. Largely unavoidable against Bootstrap, but it means load order and class doubling are the only remaining levers. | 5.2 |
 
 If a sub-`--fs-xs` step is genuinely needed, add it to the scale once rather

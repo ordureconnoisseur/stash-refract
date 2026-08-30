@@ -889,3 +889,34 @@ body.stash-liquid-glass .detail-header:has(.group-head) .rating-stars:not(:has([
 body.stash-liquid-glass .detail-header:has(.group-head) .rating-stars:not(:has([class*="star-fill-"]:not(.star-fill-0))):focus-within {
     opacity: 1;
 }
+
+/* -------------------------------------------------------------------
+   The band in lite mode
+   -------------------------------------------------------------------
+   Lite is the theme on a machine that cannot composite, and it strips
+   backdrop-filter everywhere. It does NOT strip `filter`: the only two
+   `filter: none` rules in 15_lite are scoped to navbar icons and the
+   organized button, so the band's blur(52px) over roughly 1546 by 400
+   would have survived untouched. That is exactly the GPU work lite
+   exists to remove.
+
+   So the blurred image layer goes and the floor and veil stay. The
+   band still reads as a coloured field, because the floor was always
+   what carried it and the image only ever tinted it. That is the
+   design degrading in tiers rather than falling off a cliff (P5), and
+   it is only possible because the band is floor-led; a band made of
+   the photograph would have had nothing left.
+
+   Same treatment as prefers-reduced-transparency above, for the same
+   reason, arrived at from a different direction. */
+body.stash-liquid-glass.refract-lite .detail-header.refract-eh-banded::before {
+    display: none !important;
+}
+
+/* Without the image the floor is doing all the work, so it leans a
+   little harder on the accent to stay a band rather than a flat panel. */
+body.stash-liquid-glass.refract-lite .detail-header.refract-eh-banded {
+    background:
+        radial-gradient(58% 76% at 18% 22%, rgba(var(--accent-rgb), 0.16) 0%, rgba(var(--accent-rgb), 0) 70%),
+        var(--bg-1) !important;
+}

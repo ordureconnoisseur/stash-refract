@@ -6164,6 +6164,14 @@
     function injectEntityKin() {
         var ctx = refractEpContext();
         var existing = document.querySelector(".refract-eh-kin");
+        /* Ask for the counts here too, not only from the scope control.
+           That one bails before fetching when there is no
+           `#showSubContent` on the active tab, and the tab Stash opens
+           for a network with no scenes of its own is exactly such a
+           tab. TeamSkeet (Network) lands on childstudios with 73
+           children, and the grid was silently absent on the one page
+           where the network is the whole point. */
+        if (ctx && REFRACT_EP_COUNTS[ctx.key] === undefined) { refractEpFetchCounts(ctx); }
         var counts = ctx ? REFRACT_EP_COUNTS[ctx.key] : null;
         if (!ctx || !ctx.spec.childTab || !counts || typeof counts !== "object" ||
                 !counts.list || !counts.list.length) {
