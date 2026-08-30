@@ -1190,6 +1190,18 @@ bug.
     for the next person. A dead rule with a rationale is worse than no
     rule at all.
 
+21. **Balanced braces are not a valid CSS file.** A scripted edit that
+    appends prose without opening its comment leaves that prose in the
+    stylesheet, and the parser error-recovers to the next thing it can
+    parse - eating whatever rule FOLLOWS the fault. Exactly one rule
+    vanished that way, neighbours untouched, and the file passed the
+    brace-balance check these notes used to prescribe. From outside it
+    looks impossible: present on disk, absent from
+    `document.styleSheets`. Count `/*` against `*/` as well as `{`
+    against `}` after every scripted edit, and treat a rule present on
+    disk but missing from the parsed sheet as a syntax fault ABOVE it,
+    never as a specificity problem inside it.
+
 ---
 
 ## 8. Settled, do not re-litigate
@@ -1309,6 +1321,22 @@ Two process rules the harness sessions earned:
 - **Measure a fresh document.** A page that loaded before the edit measures
   the old CSS; two wrong conclusions in one session came from exactly this,
   including a fix declared failed that had worked. Reload, then measure.
+- **A probe that returns nothing is broken until proven otherwise.**
+  `cssRules` throws a SecurityError on a cross-origin sheet, so a try/catch
+  around the scan LOOP rather than the single access kills the whole scan at
+  the first foreign sheet: zero sheets, zero rules, no error. The same scan
+  must recurse into grouping rules or every `@supports` and `@media` body is
+  invisible. Both faults report absence, and absence reads as evidence - one
+  cost a reported gap on a surface that was styled correctly. Calibration: a
+  working scan of this app walks roughly 9,700 rules across 16 to 17 sheets;
+  far below that is the instrument, not the finding.
+- **A diff is not evidence of deletion in a file that is rewritten in
+  place.** Several lanes renumber, reword and fold this file's paragraphs
+  constantly, and a line diff calls every one of those a deletion: two lanes
+  reported nine losses from diffs in one day and eight were imaginary (the
+  ninth was 7.18). Verify a passage still exists by searching the FLATTENED
+  current file for two or three independent markers from inside it - never
+  from a diff, and never with a pattern that could span a line break.
 - **A blank capture with clean computed values means an ancestor.**
   `opacity` on an ancestor appears in none of the element's own numbers: the
   element computes visible, non-zero, unclipped, and `elementsFromPoint`
