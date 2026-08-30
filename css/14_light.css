@@ -1262,8 +1262,32 @@ body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-break
    Active takes the full ink and inactive a 70% mix of it, so the
    hierarchy runs the same direction it does in dark and both rungs
    clear the floor. */
+   Corrected once more, from the performer lane's measurement. The 70%
+   mix was applied as the BASE, and an alpha is only worth what the
+   ground under it is: on the light navbar (250,250,250) it measured
+   4.86:1, but on the performer band, a translucent veil over a blurred
+   portrait at (204,174,181), the same rule took the Edit button from
+   5.61:1 down to 3.31:1. Knocking the ink back is a reasonable call
+   against a flat panel and a bad one against a warm dark one.
+
+   So the mix is scoped to the thing it was actually for. The navbar is
+   the only surface with an inactive/active ink ladder; everywhere else
+   takes the full ink, which is both the strongest contrast and the
+   value that does not depend on what it is sitting on. The @supports
+   guard is there because color-mix in a VALUE is dropped pre-111 the
+   same way it is in a custom property. */
 body.stash-liquid-glass.refract-light.refract-light :is(a, button, .btn).btn-primary {
-    color: color-mix(in srgb, var(--accent-ink) 70%, transparent) !important;
+    color: var(--accent-ink) !important;
+}
+body.stash-liquid-glass.refract-light.refract-light nav.top-nav
+    :is(a, button, .btn).btn-primary:not(.active):not(.stash-nav-active) {
+    color: var(--accent-ink) !important;
+}
+@supports (color: color-mix(in srgb, red, blue)) {
+    body.stash-liquid-glass.refract-light.refract-light nav.top-nav
+        :is(a, button, .btn).btn-primary:not(.active):not(.stash-nav-active) {
+        color: color-mix(in srgb, var(--accent-ink) 70%, transparent) !important;
+    }
 }
 body.stash-liquid-glass.refract-light.refract-light.refract-light
     :is(a, button, .btn).btn-primary:is(.active, .stash-nav-active),
