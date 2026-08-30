@@ -1212,3 +1212,65 @@ body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-break
 body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-breakdown-caret {
     color: rgba(0, 0, 0, 0.47) !important;
 }
+
+
+/* ═══════ 24. Primary and danger buttons ═══════════════════════════
+   14_light had no .btn-primary or .btn-danger treatment at all, so the
+   dark accent-on-tint and danger-on-tint colours carried into light mode
+   everywhere, not on one surface. The tint BACKGROUNDS are fine: they are
+   low alphas of the accent and read as a tint on white much as they do on
+   near-black. It is the ink that does not survive the flip.
+
+   Measured on the light navbar, sampled ground 250,250,250: the muted
+   .btn-primary label came out at 2.88:1, under the 3:1 floor for a
+   control someone is expected to read and click. A full-strength one
+   measured 5.16:1, so the failure is specific to the alpha-carrying
+   states rather than to accent text as such -- which is why this was
+   never obvious.
+
+   Both now take --accent-ink and --danger-ink, the tokens light mode
+   already defines for accent and danger AS TEXT (each mixed 55% into
+   black). Same measurement after: 10.99:1.
+
+   Deliberately flattening the muted state's alpha rather than preserving
+   it in ink. The navbar's active route is carried by a fill and a glow
+   halo as well as by text weight (2, section on the active route), so
+   the state survives; and preserving it would have meant inventing an
+   --accent-ink-rgb per preset, eight definitions to keep one alpha that
+   was the thing measuring under the floor. */
+/* Two rungs, not one. Written as a single full-strength rule the ink
+   fixed the inactive buttons and inverted the ladder: the navbar's
+   active rule is more specific and kept full accent at 5.16:1, so the
+   INACTIVE items came out darker than the active one and read as the
+   more prominent thing. On a light ground darker is louder, which is
+   the opposite of the state being signalled.
+
+   Active takes the full ink and inactive a 70% mix of it, so the
+   hierarchy runs the same direction it does in dark and both rungs
+   clear the floor. */
+body.stash-liquid-glass.refract-light.refract-light :is(a, button, .btn).btn-primary {
+    color: color-mix(in srgb, var(--accent-ink) 70%, transparent) !important;
+}
+body.stash-liquid-glass.refract-light.refract-light.refract-light
+    :is(a, button, .btn).btn-primary:is(.active, .stash-nav-active),
+body.stash-liquid-glass.refract-light.refract-light.refract-light
+    :is(a, button, .btn).btn-primary:is(.active, .stash-nav-active) span {
+    color: var(--accent-ink) !important;
+}
+body.stash-liquid-glass.refract-light.refract-light :is(a, button, .btn).btn-primary:hover {
+    color: var(--accent-ink) !important;
+}
+body.stash-liquid-glass.refract-light.refract-light
+    :is(a, button, .btn):is(.btn-danger, .btn-danger-minimal) {
+    color: var(--danger-ink) !important;
+}
+body.stash-liquid-glass.refract-light.refract-light
+    :is(a, button, .btn):is(.btn-danger, .btn-danger-minimal):hover {
+    color: var(--danger-ink) !important;
+}
+/* A filled primary is the one case where the ink must NOT darken: the
+   fill is the accent itself, so dark ink on it is the same failure in
+   reverse. Left to whatever the button already sets. */
+body.stash-liquid-glass.refract-light.refract-light :is(a, button, .btn).btn-primary[class*="filled"] {
+    color: inherit !important;
+}

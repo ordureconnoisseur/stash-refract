@@ -809,7 +809,7 @@ body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented > b
 body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented .count-icon,
 body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented .count-value {
     background: rgba(244, 60, 60, 0.18) !important;
-    color: #fca5a5 !important;
+    color: var(--danger-light) !important;
     transition: background var(--dur-fast), color var(--dur-fast) !important;
 }
 /* `.mv-scene-page-btn` (multiview plugin) shares this size/shape rule
@@ -947,10 +947,18 @@ body.stash-liquid-glass .nav-tabs .nav-link.active {
    strips kept the sidebar variant: 9.24px links 22px tall, sitting under
    a 28px title, against 12.25px links 35.8px tall on the performer page.
    Same markup, same job, same size. */
+/* Same rung as the scene tabs above. A tab is a tab; two radii for one
+   control across sibling pages is drift, not a distinction.
+
+   OWNERSHIP: this rule styles the performer, studio, tag, group and
+   movie tabs from the scene-details sheet, which is a bleed -- those are
+   entity-page surfaces. Fixed in place rather than moved, because moving
+   it belongs to the entity lane and a radius mismatch should not wait on
+   a file reshuffle. Flagged to that lane for a proper move. */
 body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link {
     padding: 0.55rem 1rem !important;
     font-size: var(--fs-base) !important;
-    border-radius: var(--radius) !important;
+    border-radius: var(--radius-sm) !important;
     letter-spacing: 0.015em !important;
 }
 body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link .badge {
@@ -1527,7 +1535,7 @@ body.stash-liquid-glass .history-header h5 {
     font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(var(--fg-rgb), 0.38) !important;
+    color: rgba(var(--fg-rgb), 0.42) !important;
     margin: 0 !important;
     display: flex !important;
     align-items: center !important;
@@ -1544,7 +1552,7 @@ body.stash-liquid-glass .history-header h5 > span:first-child {
    of times a scene had been played the most emphatic thing on the tab. */
 body.stash-liquid-glass .history-header .badge.badge-pill.badge-secondary {
     background: none !important;
-    color: rgba(var(--fg-rgb), 0.3) !important;
+    color: rgba(var(--fg-rgb), 0.42) !important;
     border: 0 !important;
     padding: 0 !important;
     font-size: var(--fs-xs) !important;
@@ -1587,8 +1595,8 @@ body.stash-liquid-glass .scene-history .remove-date-button {
     transition: color var(--dur-fast), background var(--dur-fast) !important;
 }
 body.stash-liquid-glass .scene-history .remove-date-button:hover {
-    color: #ff6b6b !important;
-    background: rgba(255, 107, 107, 0.1) !important;
+    color: var(--danger-ink) !important;
+    background: rgba(var(--danger-rgb), 0.1) !important;
 }
 
 /* ── Filters tab ──────────────────────────────────────────────────
@@ -1602,7 +1610,7 @@ body.stash-liquid-glass .scene-video-filter h5 {
     font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(var(--fg-rgb), 0.38) !important;
+    color: rgba(var(--fg-rgb), 0.42) !important;
     margin: 0.4rem 0 0.2rem 0 !important;
 }
 body.stash-liquid-glass .scene-video-filter .btn.btn-primary,
@@ -1798,7 +1806,7 @@ body.stash-liquid-glass .scene-markers-panel:not(:has(.wall > *))::after {
     text-wrap: pretty;
     font-size: var(--fs-sm);
     line-height: 1.55;
-    color: rgba(var(--fg-rgb), 0.4);
+    color: rgba(var(--fg-rgb), 0.42);
 }
 
 /* Card grid: drop the row's negative margins, add a real gutter. */
@@ -2400,7 +2408,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: var(--track-eyebrow);
-    color: rgba(var(--fg-rgb), 0.4);
+    color: rgba(var(--fg-rgb), 0.42);
     line-height: 1.35;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .star-rating-number {
@@ -2513,7 +2521,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .date:not(:empty)::after {
     content: "\00b7";
     margin: 0 7px;
-    color: rgba(var(--fg-rgb), 0.25);
+    color: rgba(var(--fg-rgb), 0.42);
 }
 /* Stash renders the spec spans whether or not it has a value for them,
    so a scene with no date got an empty .date -- which the pill styling
@@ -2535,7 +2543,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     content: "\00b7";
     margin: 0 7px;
     font-size: var(--fs-sm);
-    color: rgba(var(--fg-rgb), 0.25);
+    color: rgba(var(--fg-rgb), 0.42);
 }
 
 /* ── State: one anchor row, one chip row ──────────────────────────── */
@@ -2889,7 +2897,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-caption {
     font-size: var(--fs-xs);
     font-weight: 500;
     letter-spacing: 0.02em;
-    color: rgba(var(--fg-rgb), 0.28);
+    color: rgba(var(--fg-rgb), 0.42);
     pointer-events: none;
 }
 
@@ -2927,7 +2935,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-
        ladder. One fewer size on the surface. */
     font-size: var(--fs-xs);
     font-weight: 600;
-    color: rgba(var(--fg-rgb), 0.3);
+    color: rgba(var(--fg-rgb), 0.42);
     font-variant-numeric: tabular-nums;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge:hover,
@@ -3010,7 +3018,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored-head {
     font-weight: 700;
     letter-spacing: var(--track-wide);
     text-transform: uppercase;
-    color: rgba(var(--fg-rgb), 0.38);
+    color: rgba(var(--fg-rgb), 0.42);
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored {
     display: flex;
@@ -3060,7 +3068,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
        the one that replaced it reached a step further out for no stated
        reason. The ladder has a rung for this job, so use it. */
     letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(var(--fg-rgb), 0.38) !important;
+    color: rgba(var(--fg-rgb), 0.42) !important;
     margin: 1.25rem 0 0 0 !important;
 }
 
@@ -3154,7 +3162,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .badge
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     font-variant-numeric: tabular-nums !important;
-    color: rgba(var(--fg-rgb), 0.4) !important;
+    color: rgba(var(--fg-rgb), 0.42) !important;
     vertical-align: baseline !important;
 }
 /* ── The activity badge ───────────────────────────────────────────────
@@ -3171,7 +3179,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-ac
     font-size: var(--fs-xs);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
-    color: rgba(var(--fg-rgb), 0.4);
+    color: rgba(var(--fg-rgb), 0.42);
     transition: color var(--dur-fast) ease;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-activity[hidden] {
