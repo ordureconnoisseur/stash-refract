@@ -1261,7 +1261,8 @@ body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-break
 
    Active takes the full ink and inactive a 70% mix of it, so the
    hierarchy runs the same direction it does in dark and both rungs
-   clear the floor. */
+   clear the floor.
+
    Corrected once more, from the performer lane's measurement. The 70%
    mix was applied as the BASE, and an alpha is only worth what the
    ground under it is: on the light navbar (250,250,250) it measured
