@@ -11,6 +11,13 @@ newer, measured evidence wins over both.
 
 Every number here was read out of the shipped CSS or JS, not invented.
 
+Merging this file: every branch's changes are additive prose, so a wholesale
+"take my side" conflict resolution silently discards a lane's thinking - it
+happened on 2026-08-30 (dc918cb dropped rule 7.18 while the ancestry showed
+the commit that added it). This file merges hunk by hunk or not at all, and a
+rule number cited from anywhere else (CLAUDE.md, ledger rows, another lane)
+is a stable reference: repair numbering around it, never renumber it.
+
 There is a visual companion: ten artboards covering the thesis, colour, type,
 surfaces, depth, motion, the rating tiers, the modes, component law and the
 drift ledger. Sources are in `design-system/` as `.dc.html` files plus
@@ -198,6 +205,16 @@ red, yellow, purple, green, teal. Everything else resolves through them.
    ones. The two-line token fallback is the floor; baking is available
    wherever the ground is known. A baked literal derived from a token
    carries a comment saying to recompute it if that token ever moves.
+
+   The corollary, proven on the performer band 2026-08-30: **a rule cannot
+   have both the token's identity and its own ground-correct fallback.**
+   The parse-time double declaration only works when the later value is
+   INVALID on the old engine, and a token with its own built-in fallback is
+   always valid, so a baked literal declared before `var(--danger-ink)` is
+   dead on every browser. A rule picks one: the token, accepting the
+   token's ground-blind fallback (2.08:1 on that band), or its own baked
+   pair (5.15:1 there). On a known surface, pick the ground and keep the
+   recompute comment; the token is for surfaces the theme does not know.
 
 ### 3.2 Surfaces
 
@@ -1082,45 +1099,6 @@ bug.
    out wrong. Where a control encodes a value geometrically, measure the
    geometry at more than one value before building on it: one full star
    and one empty star both look correct under either theory.
-12. **A shorthand with `!important` erases longhands set anywhere else, at any
-   specificity.** `background: x !important` resets `background-image` too,
-   and a higher-specificity longhand without `!important` still loses. This
-   is a different failure from losing the cascade: the rule wins and your
-   longhand vanishes silently. When extending a surface where any rule sets a
-   shorthand with `!important`, every longhand you set must repeat
-   `!important`.
-13. **Changing `flex-direction` re-points every inherited alignment
-    property.** Alignment is axis-relative: a container that becomes a column
-    silently re-purposes `align-items` from vertical to horizontal, and a rule
-    written for the old axis (a modal header's `align-items: center`) starts
-    doing something else entirely. When you change an axis, re-declare both
-    alignment properties explicitly.
-14. **Collapsing something Stash sized from a grid track means zeroing the
-    MINIMUMS, not just the dimensions.** Stash sizes cards and their images
-    off the track they were laid out in, and those minimums outrank a
-    `width: 100%` set later. Twice now: collapsed performer cards stuck at
-    169px wide because `[data-perf-count="2"]` won, and then the images
-    inside the fixed 34px circles carried `min-width: 157.5px`, so
-    `object-fit: cover` scaled each photo to cover 157px and the card
-    clipped all but the leftmost 34px. Every avatar was an edge sliver of a
-    hugely zoomed picture and it looked like a bad crop rather than a
-    layout fault. Set `min-width` and `min-height` to 0 on every box down
-    to the replaced element.
-15. **Below 1200px the panel is not a column, and anything tuned to 338px
-    has to say what it does at 1060px.** Three separate things stretched
-    when the page stacked: the tab strip's `flex: 1 1 auto` turned six tabs
-    into 166 to 181px slabs around 46px of ink; the description ran the
-    full pane at about 157 characters a line; and Stash's own header
-    ordering flips at exactly 1200px, sending the studio eyebrow below the
-    title it labels. A row composed for the column needs a cap, a measure,
-    or an explicit order, and the check is to measure at 1600 AND at 1100.
-16. **Replaced-element physics.** A border or radius on an element whose
-    content does not fill its box frames the box, not the picture:
-    `object-fit: contain` plus a border produced a 168px frame around a 94px
-    portrait with 29px of dead space each side. And `max-width: 100%` on a
-    replaced element inside a content-sized flex parent is circular; remove
-    the sizing floor and it collapses, measured at 2x2. Size replaced
-    elements from a real constraint, never from each other.
 12. **CSS and JS version skew fails silently.** The body-class contract
     (section 5) and the injected scaffolds mean much of the CSS keys on
     classes that JS adds at runtime. Deploy CSS from one build over
@@ -1142,7 +1120,62 @@ bug.
     against the deployed copy before every deploy - it is the one file
     where "my committed tree" is not enough, because it must carry every
     lane's vocabulary at once.
-17. **When one selector appears more than once, the rule that wins is
+14. **A shorthand with `!important` erases longhands set anywhere else, at any
+   specificity.** `background: x !important` resets `background-image` too,
+   and a higher-specificity longhand without `!important` still loses. This
+   is a different failure from losing the cascade: the rule wins and your
+   longhand vanishes silently. When extending a surface where any rule sets a
+   shorthand with `!important`, every longhand you set must repeat
+   `!important`.
+15. **Changing `flex-direction` re-points every inherited alignment
+    property.** Alignment is axis-relative: a container that becomes a column
+    silently re-purposes `align-items` from vertical to horizontal, and a rule
+    written for the old axis (a modal header's `align-items: center`) starts
+    doing something else entirely. When you change an axis, re-declare both
+    alignment properties explicitly.
+16. **Collapsing something Stash sized from a grid track means zeroing the
+    MINIMUMS, not just the dimensions.** Stash sizes cards and their images
+    off the track they were laid out in, and those minimums outrank a
+    `width: 100%` set later. Twice now: collapsed performer cards stuck at
+    169px wide because `[data-perf-count="2"]` won, and then the images
+    inside the fixed 34px circles carried `min-width: 157.5px`, so
+    `object-fit: cover` scaled each photo to cover 157px and the card
+    clipped all but the leftmost 34px. Every avatar was an edge sliver of a
+    hugely zoomed picture and it looked like a bad crop rather than a
+    layout fault. Set `min-width` and `min-height` to 0 on every box down
+    to the replaced element.
+17. **Below 1200px the panel is not a column, and anything tuned to 338px
+    has to say what it does at 1060px.** Three separate things stretched
+    when the page stacked: the tab strip's `flex: 1 1 auto` turned six tabs
+    into 166 to 181px slabs around 46px of ink; the description ran the
+    full pane at about 157 characters a line; and Stash's own header
+    ordering flips at exactly 1200px, sending the studio eyebrow below the
+    title it labels. A row composed for the column needs a cap, a measure,
+    or an explicit order, and the check is to measure at 1600 AND at 1100.
+18. **A contrast number is only as good as the ground you measured it
+    against, and `backgroundColor` is not the ground.** Light mode paints
+    the page with `background-image` gradients over a transparent
+    `background-color`, so `getComputedStyle(document.body).backgroundColor`
+    returns `rgba(0, 0, 0, 0)`. Parsed for channels that is black, and
+    every composite built on it inverts: the panel came out mid-grey
+    (179,179,179) instead of white, and two disclosure controls were
+    reported at 2.55:1 when they actually measured between 3.30 and
+    5.38:1 depending on the accent preset. Nothing errored, and the
+    numbers looked entirely ordinary. Sample the rendered pixel instead:
+    screenshot, take the modal colour of a blank region of the surface,
+    and composite the element's computed `color` onto that. The panel's
+    real ground is 255,255,255 and the drawer's is 214,214,214, and
+    neither is derivable from a property read. The one honest tell was
+    that the arithmetic had produced a grey nobody had chosen; treat an
+    unexpected ground as a broken measurement, not a surprising result.
+19. **Replaced-element physics.** A border or radius on an element whose
+    content does not fill its box frames the box, not the picture:
+    `object-fit: contain` plus a border produced a 168px frame around a 94px
+    portrait with 29px of dead space each side. And `max-width: 100%` on a
+    replaced element inside a content-sized flex parent is circular; remove
+    the sizing floor and it collapses, measured at 2x2. Size replaced
+    elements from a real constraint, never from each other.
+20. **When one selector appears more than once, the rule that wins is
     never the one you are reading.** Three times in one pass: two
     `--ic-grid` blocks where the stale later one drew rings instead of
     squares; a `display: none` on `.count-icon` that a later
@@ -1208,6 +1241,18 @@ bug.
     never by reading a diff and never with a pattern that could span a
     line break. Only content that fails every marker is actually gone --
     which, across both lanes and one whole day, was exactly one rule.
+
+21. **Balanced braces are not a valid CSS file.** A scripted edit that
+    appends prose without opening its comment leaves that prose in the
+    stylesheet, and the parser error-recovers to the next thing it can
+    parse - eating whatever rule FOLLOWS the fault. Exactly one rule
+    vanished that way, neighbours untouched, and the file passed the
+    brace-balance check these notes used to prescribe. From outside it
+    looks impossible: present on disk, absent from
+    `document.styleSheets`. Count `/*` against `*/` as well as `{`
+    against `}` after every scripted edit, and treat a rule present on
+    disk but missing from the parsed sheet as a syntax fault ABOVE it,
+    never as a specificity problem inside it.
 
 ---
 
@@ -1328,6 +1373,22 @@ Two process rules the harness sessions earned:
 - **Measure a fresh document.** A page that loaded before the edit measures
   the old CSS; two wrong conclusions in one session came from exactly this,
   including a fix declared failed that had worked. Reload, then measure.
+- **A probe that returns nothing is broken until proven otherwise.**
+  `cssRules` throws a SecurityError on a cross-origin sheet, so a try/catch
+  around the scan LOOP rather than the single access kills the whole scan at
+  the first foreign sheet: zero sheets, zero rules, no error. The same scan
+  must recurse into grouping rules or every `@supports` and `@media` body is
+  invisible. Both faults report absence, and absence reads as evidence - one
+  cost a reported gap on a surface that was styled correctly. Calibration: a
+  working scan of this app walks roughly 9,700 rules across 16 to 17 sheets;
+  far below that is the instrument, not the finding.
+- **A diff is not evidence of deletion in a file that is rewritten in
+  place.** Several lanes renumber, reword and fold this file's paragraphs
+  constantly, and a line diff calls every one of those a deletion: two lanes
+  reported nine losses from diffs in one day and eight were imaginary (the
+  ninth was 7.18). Verify a passage still exists by searching the FLATTENED
+  current file for two or three independent markers from inside it - never
+  from a diff, and never with a pattern that could span a line break.
 - **A blank capture with clean computed values means an ancestor.**
   `opacity` on an ancestor appears in none of the element's own numbers: the
   element computes visible, non-zero, unclipped, and `elementsFromPoint`
