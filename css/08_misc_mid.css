@@ -7492,8 +7492,9 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 > .perf
     white-space: nowrap;
 }
 /* Stash's collapse chevron. It toggles .detail-header.collapsed, which
-   this band has no design for; hiding it is a capability removed, and
-   it is on the list rather than settled. */
+   this band has no design for; the band is always expanded and the
+   subtraction is settled as deliberate, performer page only
+   (DESIGN_SYSTEM.md section 8, user-confirmed 2026-09-01). */
 body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 > .detail-expand-collapse {
     display: none !important;
 }

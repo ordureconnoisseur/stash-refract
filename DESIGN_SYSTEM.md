@@ -1326,6 +1326,12 @@ bug.
   `transform-style: flat`. The flip is faked: turn to the edge, swap faces,
   teleport to the mirror edge, finish the turn. Both faces rest at
   `rotateY(0)`.
+- The performer band is always expanded. Stash's detail-header collapse is a
+  deliberate subtraction on the performer page only (the wrapper hide at
+  `08_misc_mid.css`, taking the styled toggle with it): no collapsed-state
+  design exists for the band, and none is planned. Everywhere else the stock
+  `.expand-collapse` toggle survives, restyled not replaced, and works
+  (measured on studio and tag pages, 2026-08-31). User-confirmed 2026-09-01.
 - Light mode shipped in v1.11.0, and lite still loads last.
 - `scroll-perf` is gone and is not coming back.
 - The B5 toggle desync stays unfixed. It is cosmetic.
