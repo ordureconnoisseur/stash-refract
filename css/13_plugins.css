@@ -526,6 +526,27 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge svg:not(.refrac
 body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-score-display,
 body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-separator {
     display: none !important;
+    /* The score's own wrapper ships `display: inline-flex !important`
+       INLINE, and an inline !important cannot be beaten from a
+       stylesheet, so the hide above lands on the separator and slides
+       off the wrapper. Take it OUT OF FLOW instead, with properties
+       their inline style does not set: at width 0 it still sat in the
+       badge's flex row and earned a gap of its own, which widened the
+       read-out by 6.9px against a badge that never had a score.
+       Absolute and hidden, it costs nothing. Stripping the inline
+       styles in refract.js is the proper repair and is on the
+       post-ship list. */
+    position: absolute !important;
+    width: 0 !important;
+    height: 0 !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+}
+body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-score-display > * {
+    display: none !important;
 }
 
 /* Hide the "of <total>" suffix (.hon-rank-total): the read-out is a bare
