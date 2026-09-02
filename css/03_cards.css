@@ -2152,14 +2152,22 @@ body.stash-liquid-glass.refract-pc-country-flag .performer-card .stash-perf-coun
     display: none !important;
 }
 body.stash-liquid-glass .performer-card .stash-perf-country .refract-flag-chip {
-    /* Sized to be READ as a flag, not as a dot. The caption is 10px, and
-       a chip at its cap height came out 10.6px, where a flag is a
-       coloured speck: the stripes of the US, the cross of Denmark and
-       the disc of Japan are indistinguishable at that size. 18px is the
-       floor where those three separate at a normal viewing distance. It
-       lifts the caption line, which the card has room for -- and when the
-       flag is showing there is no name beside it to be crowded. */
-    --refract-flag-chip-size: 18px;
+    /* Sized against its neighbours, not against the caption's type. The
+       caption is 10px, and a chip at its cap height came out 10.6px,
+       where a flag is a coloured speck: the stripes of the US, the cross
+       of Denmark and the disc of Japan are one dot each. 18px made those
+       separate; it did not make any of them read AS a flag, which was
+       the actual ask.
+
+       28px does, and the ceiling is the stat pills beside it at 36.2px:
+       the pills are what the card is for, so the flag has to be
+       obviously a flag and still obviously not the headline. 28 is 78%
+       of the pill and clearly past it; 32 starts to compete.
+
+       It costs the card nothing. The chin is positioned over the image
+       rather than laid out under it, so the caption line grows upward
+       into the picture and the card stays 407px in all three states. */
+    --refract-flag-chip-size: 28px;
     margin-right: 0;
     vertical-align: -0.28em;
     /* Stash's own `.fi` rule pins the flag to the card's bottom-right
