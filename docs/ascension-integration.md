@@ -22,7 +22,7 @@ badge is the same shape as 1.3.1).
 
 ## What would help, if it is ever easy
 
-Three things, all optional, none urgent.
+Four things, all optional, none urgent.
 
 1. **A version in the package manifest.** The `version` field in
    `plugins/manifest.yml` is the constant `1.0900f916`, and it did not change
@@ -54,6 +54,23 @@ Three things, all optional, none urgent.
    day that changes: the fields simply stop being in the panel, the
    in-place presentation stops matching, and the section Ascension draws
    itself is the one people see.
+4. **The stats block's colours assume a dark theme.** `ascension.css`
+   hardcodes `#e5e7eb` for a stat value, `#9aa4b2` for its label and
+   `#22c55e` for a positive one. On a dark ground those measure 15.74:1,
+   7.73:1 and 8.55:1 and are fine. On a light one they measure 1.21:1,
+   2.46:1 and 2.23:1 against the panel Stash renders them in, so a
+   neutral value is effectively invisible and none of the three clears
+   the 4.5:1 floor for reading text.
+
+   This is not caused by anything Refract does, and it predates the
+   section work: the same values measured the same inside the old Custom
+   Fields panel. Refract has deliberately NOT patched it, because the
+   only way to reach those elements from a stylesheet is to name
+   Ascension's own classes, which is the coupling this whole document
+   exists to remove; a colour list would have to be maintained against
+   every release exactly like the badge's markup list was. `currentColor`
+   for the neutral value, or any theme-aware colour, would fix it at the
+   source for every theme rather than for this one.
 
 ## What Refract touches
 
