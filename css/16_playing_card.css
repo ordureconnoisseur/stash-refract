@@ -353,12 +353,17 @@ body.stash-liquid-glass.refract-perf-layout-card :is(.performer-card, .refract-p
     --badge-color: var(--accent-rgb);
     --badge-color-bright: 255, 255, 255;
 }
-body.stash-liquid-glass.refract-perf-layout-card .performer-card.refract-card-tier-bronze,
-body.stash-liquid-glass.refract-perf-layout-card .performer-card.refract-card-tier-silver,
-body.stash-liquid-glass.refract-perf-layout-card .performer-card.refract-card-tier-gold,
-body.stash-liquid-glass.refract-perf-layout-card .performer-card.refract-card-tier-diamond,
-body.stash-liquid-glass.refract-perf-layout-card .performer-card.refract-card-tier-legendary,
-body.stash-liquid-glass.refract-perf-layout-card .performer-card.refract-card-tier-perfect {
+/* Both card hosts, the way the default above already declares the pair.
+   Only the DEFAULT had both; these overrides named the grid card alone,
+   so the performer page's own card fell through to the accent. A
+   legendary performer's grid card was pink and her page card was
+   purple: same card, same rating, two colours, one click apart. */
+body.stash-liquid-glass.refract-perf-layout-card :is(.performer-card, .refract-ph-card).refract-card-tier-bronze,
+body.stash-liquid-glass.refract-perf-layout-card :is(.performer-card, .refract-ph-card).refract-card-tier-silver,
+body.stash-liquid-glass.refract-perf-layout-card :is(.performer-card, .refract-ph-card).refract-card-tier-gold,
+body.stash-liquid-glass.refract-perf-layout-card :is(.performer-card, .refract-ph-card).refract-card-tier-diamond,
+body.stash-liquid-glass.refract-perf-layout-card :is(.performer-card, .refract-ph-card).refract-card-tier-legendary,
+body.stash-liquid-glass.refract-perf-layout-card :is(.performer-card, .refract-ph-card).refract-card-tier-perfect {
     --badge-color: var(--tier-color);
     --badge-color-bright: var(--tier-color-bright, var(--tier-color));
 }
@@ -795,7 +800,7 @@ body.stash-liquid-glass.refract-flourish-tiers .performer-card.refract-card-tier
    gas radiating outward). Solid white text keeps every letter
    uniformly readable; the drop-shadow chain carries the tier color
    identity from inner cladding to far halo. */
-body.stash-liquid-glass.refract-perf-layout-card .performer-card.refract-card-tier-legendary .refract-pc-name-text {
+body.stash-liquid-glass.refract-perf-layout-card :is(.performer-card, .refract-ph-card).refract-card-tier-legendary .refract-pc-name-text {
     /* Styled exactly like the base tiers: solid white + base 4-layer glow. */
     color: #ffffff;
     -webkit-text-fill-color: #ffffff;
@@ -817,7 +822,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card.refract-card-ti
    light/readable while the rainbow identity is preserved (no dark
    saturated hot-pink starting stop hurting the first letters).
    Multi-layer rainbow glow chain radiates outward. */
-body.stash-liquid-glass.refract-perf-layout-card .performer-card.refract-card-tier-perfect .refract-pc-name-text {
+body.stash-liquid-glass.refract-perf-layout-card :is(.performer-card, .refract-ph-card).refract-card-tier-perfect .refract-pc-name-text {
     /* Styled exactly like the base tiers: solid white + base 4-layer glow,
        no gradient text-clip and no hue-cycle animation. */
     color: #ffffff;
