@@ -284,7 +284,12 @@ measured windows, shrinking to an alpha-only line where light's tuned alpha
 genuinely differs, deleting where it does not. And a lesson from cf's pass
 that binds every such window: **grounds under IMAGES need an eyeball in both
 modes, not just probes** - an image on a mode-flipping ground can vanish
-while every text probe passes (the logo plate defect class).
+while every text probe passes (the logo plate defect class). The scene
+lane's icon pass added the small-glyph corollary: a glyph can measure
+perfectly and still read wrong when a feature gap lands under about a
+pixel at render size (an info-i's dot antialiasing into its stem at 13px,
+resolving at 15px with a 1.2px gap). Sub-pixel feature separation is an
+eyeball check at final render size, never a geometry calculation.
 
 **Blur is a fixed ladder, not a free parameter.** Nine live expressions: five
 plain rungs (`xs` 6px, `sm` 10px, `md` 14px, `xl` 24px, `2xl` 32px) and four
