@@ -886,9 +886,19 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
    tiles came out 55px wide with the streak labels cut and 28px of
    overflow. The breakpoints are duplicated from
    `08_misc_mid.css` (.refract-ph .detail-group, 6 / 4 at 1400 / 3 at
-   1200 / 2 at 820) and they have to move together - logged as drift, and
-   the reason is that the two grids cannot share a track: this one is
-   nested two levels inside a cell of that one. */
+   1200 / 2 at 820) and they have to move together, because the two grids
+   cannot share a track: this one is nested two levels inside a cell of
+   that one.
+
+   THESE FOUR RULES ARE MEANT TO BE DELETED. DESIGN_SYSTEM section 9,
+   "Nested tracks", prescribes the remedy: the band publishes
+   `--refract-band-cols` at its own breakpoints and every nested grid
+   reads it, since custom properties inherit where tracks do not. When
+   that lands in the band, this block becomes
+   `repeat(var(--refract-band-cols, 6), minmax(0, 1fr))` on the base rule
+   alone and the three media queries go. Left duplicated until then
+   rather than half-built, because a fallback that reads a property
+   nobody publishes yet is just this code with a longer name. */
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
     display: grid !important;
     grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
