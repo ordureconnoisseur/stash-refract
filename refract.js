@@ -10778,6 +10778,75 @@
        (which disconnects before mutating), so our move doesn't re-fire
        the observer. Inert on installs without Ascension; the selector
        matches no DOM. */
+    /* ── Which Ascension is this? ─────────────────────────────────────
+       The double flame of Discourse #190 happened because the flame was
+       prepended unconditionally. 1.3.0 shipped an icon of its own, the
+       rule set knew nothing about it, and the card drew both. Hiding
+       "any svg that is not ours" cures that one, but it cures it by
+       asserting that Refract understands every badge it will ever be
+       shown, and the NEXT shape gets whatever that assertion happens to
+       do to it.
+
+       So the test runs the other way round: a badge is CLAIMED only when
+       every part of it can be named. It must carry the rank text we
+       read, its direct children must all come from the set the shipped
+       versions use, and the only icons anywhere in it may be ours and
+       the one inside Ascension's own score wrapper. Anything else is
+       left as its author drew it -- no marker class, so not one rule in
+       13_plugins.css applies, no flame, no hides -- with one console
+       note naming the unfamiliar part. Unstyled and correct beats
+       styled and wrong, and it is the one outcome that cannot repeat
+       #190 on a version nobody here has seen.
+
+       Read off both real builds rather than guessed: 1.2.6 draws
+       emoji + rank (+ total, + match stats), 1.3.1 draws score + separator
+       + rank (+ total, + match stats), each of those optional parts
+       genuinely absent on some performers, and the compact form on
+       /performers differs from the full form everywhere else. The parts
+       list is the union, so a missing part is not a strange badge. */
+    var ASCENSION_KNOWN_PARTS = {
+        "hon-rank-emoji": 1,        /* 1.2.x tier emoji, gone in 1.3 */
+        "hon-asc-score-display": 1, /* 1.3.x Ascended score, only when scored */
+        "hon-asc-separator": 1,     /* 1.3.x, rides with the score */
+        "hon-rank-text": 1,         /* every version, and the one we read */
+        "hon-rank-total": 1,        /* "of N", full badge only */
+        "hon-match-stats": 1        /* both versions, only once a match exists */
+    };
+    /* The one place an icon that is not ours is allowed to be. */
+    var ASCENSION_ICON_HOST = ".hon-asc-score-display";
+    var ascensionUnknownLogged = {};
+
+    /* Returns null when the badge is understood, else a short phrase
+       naming what was not. `class` is read with getAttribute because on
+       an SVG element `className` is an SVGAnimatedString and stringifies
+       to "[object SVGAnimatedString]", which would make the one message
+       whose whole job is to say what changed say nothing at all. */
+    function ascensionBadgeUnknownPart(badge) {
+        if (!badge.querySelector(".hon-rank-text")) { return "no .hon-rank-text to read"; }
+        var kids = badge.children;
+        for (var i = 0; i < kids.length; i++) {
+            var k = kids[i];
+            if (k.classList.contains("refract-ascension-icon")
+                || k.classList.contains("refract-ascension-score")) { continue; }
+            var named = false;
+            for (var c = 0; c < k.classList.length; c++) {
+                if (ASCENSION_KNOWN_PARTS[k.classList[c]]) { named = true; break; }
+            }
+            if (!named) {
+                return "unfamiliar child <" + k.tagName.toLowerCase()
+                    + ' class="' + (k.getAttribute("class") || "") + '">';
+            }
+        }
+        var svgs = badge.querySelectorAll("svg");
+        for (var s = 0; s < svgs.length; s++) {
+            if (svgs[s].classList.contains("refract-ascension-icon")) { continue; }
+            if (svgs[s].closest(ASCENSION_ICON_HOST)) { continue; }
+            return "an icon outside " + ASCENSION_ICON_HOST
+                + ' (class="' + (svgs[s].getAttribute("class") || "") + '")';
+        }
+        return null;
+    }
+
     function integrateAscensionBadges() {
         var badges = document.querySelectorAll(".performer-card .hon-battle-rank-badge");
         if (badges.length) {
@@ -10788,6 +10857,29 @@
            into it would hide it too, so fall back to the chin there. */
         var pcMode = document.body.classList.contains("refract-perf-layout-card");
         badges.forEach(function (badge) {
+            /* Unclaimed: strip anything a previous shape earned, say so
+               once per distinct surprise, and stop. It is still PARKED
+               below, because where the badge sits is Refract's own chin
+               layout rather than Ascension's paint -- left where the
+               plugin dropped it, it lands on the injected stat pills,
+               which is the clash the integration was written to solve.
+               Position it, do not dress it. */
+            var unknownPart = ascensionBadgeUnknownPart(badge);
+            if (unknownPart) {
+                badge.classList.remove("refract-ascension-badge");
+                badge.classList.add("refract-ascension-unknown");
+                var ours = badge.querySelector(".refract-ascension-icon");
+                if (ours) { ours.remove(); }
+                if (!ascensionUnknownLogged[unknownPart]) {
+                    ascensionUnknownLogged[unknownPart] = 1;
+                    console.warn("[Refract] Ascension's rank badge is a shape this build does not"
+                        + " know (" + unknownPart + "), so it has been left unstyled rather than"
+                        + " guessed at. See docs/ascension-integration.md.");
+                }
+                parkAscensionBadge(badge, pcMode);
+                return;
+            }
+            badge.classList.remove("refract-ascension-unknown");
             badge.classList.add("refract-ascension-badge");
             /* Ascension renders "undefinedW/L/D" when a performer has no
                recorded record yet, so sanitise so the line reads cleanly.
@@ -10829,42 +10921,53 @@
             if (!badge.querySelector(".refract-ascension-icon")) {
                 badge.insertAdjacentHTML("afterbegin", ASCENSION_FLAME_SVG);
             }
-            var card = badge.closest(".performer-card");
-            if (!card) { return; }
-            var section = card.querySelector(".card-section");
-            /* Playing-card mode: ride the country caption's line, pushed to
-               the RIGHT edge of the card. The marker class turns the caption
-               into a space-between flex row (name left, rank right), and we
-               append the badge as its last child. */
-            /* A country the user has HIDDEN is no host: the badge would die
-               with it, its visibility a side effect of an unrelated chip. */
-            var country = (pcMode && section && !document.body.classList.contains("refract-pc-hide-country"))
-                ? section.querySelector(":scope > .stash-perf-country")
-                : null;
-            if (country) {
-                country.classList.add("refract-country-with-rank");
-                if (badge.parentElement === country && country.lastElementChild === badge) {
-                    return;
-                }
-                country.appendChild(badge);
-                return;
-            }
-            /* Fallback (no country caption / non-playing-card): sit on the
-               NAME's line, at the right edge.
-
-               It stays a CHILD OF THE CHIN and is positioned there by CSS
-               rather than being appended into the name element, for two
-               reasons: the chin is a flex COLUMN, so any in-flow child costs a
-               whole extra line and makes the chin taller; and the name is
-               wrapped in an <a> to the performer, so nesting the rank inside
-               it would swallow the rank's own click target. */
-            if (!section) { return; }
-            section.classList.add("refract-chin-with-rank");
-            if (badge.parentElement === section && badge === section.lastElementChild) {
-                return;
-            }
-            section.appendChild(badge);
+            parkAscensionBadge(badge, pcMode);
         });
+    }
+
+    /* WHERE the badge sits, split out from what it is dressed in, because
+       an unrecognised badge still needs somewhere to sit. Left where
+       Ascension drops it (in place of the native rating banner) it lands
+       on the injected stat-pill row, which is the clash this integration
+       was written to fix -- and that clash is caused by Refract's own
+       pills, so declining to place it is not neutrality, it is a mess of
+       our making. Position it; the caller decides whether to dress it. */
+    function parkAscensionBadge(badge, pcMode) {
+        var card = badge.closest(".performer-card");
+        if (!card) { return; }
+        var section = card.querySelector(".card-section");
+        /* Playing-card mode: ride the country caption's line, pushed to
+           the RIGHT edge of the card. The marker class turns the caption
+           into a space-between flex row (name left, rank right), and we
+           append the badge as its last child. */
+        /* A country the user has HIDDEN is no host: the badge would die
+           with it, its visibility a side effect of an unrelated chip. */
+        var country = (pcMode && section && !document.body.classList.contains("refract-pc-hide-country"))
+            ? section.querySelector(":scope > .stash-perf-country")
+            : null;
+        if (country) {
+            country.classList.add("refract-country-with-rank");
+            if (badge.parentElement === country && country.lastElementChild === badge) {
+                return;
+            }
+            country.appendChild(badge);
+            return;
+        }
+        /* Fallback (no country caption / non-playing-card): sit on the
+           NAME's line, at the right edge.
+
+           It stays a CHILD OF THE CHIN and is positioned there by CSS
+           rather than being appended into the name element, for two
+           reasons: the chin is a flex COLUMN, so any in-flow child costs a
+           whole extra line and makes the chin taller; and the name is
+           wrapped in an <a> to the performer, so nesting the rank inside
+           it would swallow the rank's own click target. */
+        if (!section) { return; }
+        section.classList.add("refract-chin-with-rank");
+        if (badge.parentElement === section && badge === section.lastElementChild) {
+            return;
+        }
+        section.appendChild(badge);
     }
 
     function onKey(e) {

@@ -586,6 +586,52 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-match-stat
     display: none !important;
 }
 
+/* ── An Ascension whose badge we do not recognise ────────────────────
+   refract.js claims a badge only when it can name every part of it
+   (ascensionBadgeUnknownPart). A shape it cannot name gets NO
+   `.refract-ascension-badge` marker, so not one rule above applies: no
+   flame, no hides, no gradient, no capsule strip. It renders as its
+   author drew it, which is the only treatment that cannot repeat the
+   #190 double icon on a version nobody here has seen.
+
+   What it does still get is somewhere to sit, because the thing it
+   would otherwise sit on is OURS. Left where Ascension drops it, in
+   place of the native rating banner, it lands on the injected
+   `.stash-perf-stats` row. Declining to place it is not neutrality when
+   the collision is caused by an element Refract injected.
+
+   So these three rules are the whole treatment, and every one of them
+   is geometry. Nothing here sets a colour, a fill, a border, a shadow
+   or a font. If a future rule in this block needs to paint an
+   unrecognised badge, the classifier was the thing that should have
+   changed.
+   ─────────────────────────────────────────────────────────────────── */
+/* Nested in the country caption's space-between row: let it shrink, and
+   cap it so a capsule of unknown width cannot push the nationality out
+   of the card. `min-width: 0` because a flex item refuses to shrink
+   below its content otherwise. */
+body.stash-liquid-glass .performer-card .stash-perf-country > .refract-ascension-unknown {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    max-width: 60% !important;
+}
+/* Dropped into the chin instead (no country, or a non playing-card
+   rating style). In flow, not pinned: the pinned variant above works
+   because the badge's height is known, and here it is not. The chin is
+   content-sized and bottom-anchored, so it grows upward to fit rather
+   than pushing anything off the card. */
+body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank > .refract-ascension-unknown {
+    order: -1 !important;
+    align-self: flex-end !important;
+    margin: 0 0 0 auto !important;
+    max-width: 100% !important;
+}
+/* The one thing that is not negotiable whichever way it parked: it may
+   not paint outside the card. */
+body.stash-liquid-glass .performer-card .refract-ascension-unknown {
+    box-sizing: border-box !important;
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    flexibleDateInput plugin - react-datepicker theming
    ═══════════════════════════════════════════════════════════════════ */
