@@ -16,16 +16,15 @@ jobs:
 
       - name: Copy files
         run: |
+          # Allowlist, not a strip list. The old cp -r * shipped every tracked
+          # file that nobody remembered to strip: 1.22.0 delivered AUDIT.md and
+          # GRID_REBUILD_PLAN.md to every install, and the next release would
+          # have added DESIGN_SYSTEM.md and 2.7 MB of design-system artboards.
+          # Only what the plugin needs at runtime, plus licence and readme.
+          rm -rf plugins-repo/plugins/refract
           mkdir -p plugins-repo/plugins/refract
-          cp -r * plugins-repo/plugins/refract/ 2>/dev/null || true
-          # Strip dirs that ship only on GitHub (README assets, dev workflows)
-          # — keeps install zip lean.
-          rm -rf plugins-repo/plugins/refract/.github
-          # Strip the cloned plugins-repo that cp -r picked up — leaving it
-          # creates an embedded git submodule reference. Refract additionally
-          # strips screenshots/ here for install-zip size.
-          rm -rf plugins-repo/plugins/refract/plugins-repo
-          rm -rf plugins-repo/plugins/refract/screenshots
+          cp refract.yml refract.js LICENSE README.md plugins-repo/plugins/refract/
+          cp -r css fonts img plugins-repo/plugins/refract/
 
       - name: Commit and push
         run: |

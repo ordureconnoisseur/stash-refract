@@ -238,7 +238,9 @@ measured background histogram): `--fill-1` 0.03 (hairline tint: rows, wells),
 chips, list items), `--fill-4` 0.08 (hover and active).
 
 **The ramp flips in light mode on matched perceptual lift, not mirrored
-alpha** (ruled 2026-08-30, landing with the scene lane's fill flip). The L*
+alpha** (ruled 2026-08-30, live since fc90e7b; reverted for a day by an
+unmerged-branch deploy of `14_light` and restored by the d0f3d13 union
+merge, 2026-08-31 - see 7.13). The L*
 curve is steep near black, so a white alpha lifts a dark ground more than
 the same black alpha drops a light one; naive mirroring makes every light
 fill about 23% weaker than its dark twin (dL* 2.65 against 3.43 at step 1).
@@ -260,6 +262,29 @@ with `--surface-rgb: 20, 20, 24` (popovers, menus, floating overlay chrome;
 the alpha stays per use), and `--surface-solid` (`rgba(11,11,11,0.94)`) for
 the modal, which is exactly neutral on purpose (6.14). Two sanctioned surface
 colours, no third.
+
+**The light surface family, EXECUTED and measured 2026-08-30** (94bc238): the family follows the
+channels-not-colours pattern `--fg-rgb` set, so it is two token moves, not a
+new ladder. (1) `14_light` re-points `--surface-rgb` to `255, 255, 255`; the
+per-use alphas stay, and every `rgba(var(--surface-rgb), A)` consumer flips
+with it. (2) `--bg-0-rgb` is added (`10, 10, 10` dark, `255, 255, 255`
+light) for consumers that need the page floor as channels. Measured outcomes: light resolves
+the surface channel to white end-to-end (a consumer div reads
+`rgba(255,255,255,0.92)`), dark is byte-identical to before, and light-plus-
+lite resolves lite's opaque pins to near-opaque WHITE (0.96) with scrims
+staying dark, which is correct and is the P5 condition now actually looked
+at. The classification found no dark islands among the 30 consumers (the
+Lightbox is deliberately light in light mode); what it found instead were
+four ARTWORK consumers (duration pill, carousel chevrons, lite's two card
+pills), which moved onto **`--scrim-rgb`**: the mode-FIXED dark film for
+things sitting on imagery, the third ground's surface counterpart to its
+never-flipping ink. `14_light` must never re-point it. Still open, per the
+ledger: the 17 hand-written near-white overrides retire per-surface in
+measured windows, shrinking to an alpha-only line where light's tuned alpha
+genuinely differs, deleting where it does not. And a lesson from cf's pass
+that binds every such window: **grounds under IMAGES need an eyeball in both
+modes, not just probes** - an image on a mode-flipping ground can vanish
+while every text probe passes (the logo plate defect class).
 
 **Blur is a fixed ladder, not a free parameter.** Nine live expressions: five
 plain rungs (`xs` 6px, `sm` 10px, `md` 14px, `xl` 24px, `2xl` 32px) and four
@@ -1140,9 +1165,16 @@ bug.
     plausible-looking plain white text at 9.87:1. The discipline: whoever
     lands a new token deploys the token file FIRST and announces it before
     any lane migrates onto it, and the token file is superset-checked
-    against the deployed copy before every deploy - it is the one file
-    where "my committed tree" is not enough, because it must carry every
-    lane's vocabulary at once.
+    against the deployed copy before every deploy - it must carry every
+    lane's vocabulary at once, so "my committed tree" is not enough. Nor
+    is it the only such file: any mode scope two lanes both define tokens
+    in has the same property. On 2026-08-31 a deploy of `14_light.css`
+    from a branch that had not merged the scene lane's work silently
+    reverted the entire light fill flip - 145 `var(--fill-N)` consumers
+    went white-on-white while the deploy's own change measured correct.
+    The superset check (custom-property names, deployed versus candidate)
+    applies to every shared token-defining file, and a deploy of one from
+    an unmerged branch is a revert, whatever the intent.
 14. **A shorthand with `!important` erases longhands set anywhere else, at any
    specificity.** `background: x !important` resets `background-image` too,
    and a higher-specificity longhand without `!important` still loses. This
@@ -1294,6 +1326,12 @@ bug.
   `transform-style: flat`. The flip is faked: turn to the edge, swap faces,
   teleport to the mirror edge, finish the turn. Both faces rest at
   `rotateY(0)`.
+- The performer band is always expanded. Stash's detail-header collapse is a
+  deliberate subtraction on the performer page only (the wrapper hide at
+  `08_misc_mid.css`, taking the styled toggle with it): no collapsed-state
+  design exists for the band, and none is planned. Everywhere else the stock
+  `.expand-collapse` toggle survives, restyled not replaced, and works
+  (measured on studio and tag pages, 2026-08-31). User-confirmed 2026-09-01.
 - Light mode shipped in v1.11.0, and lite still loads last.
 - `scroll-perf` is gone and is not coming back.
 - The B5 toggle desync stays unfixed. It is cosmetic.
@@ -1323,6 +1361,8 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 | Radius | 17 hand-written `999px`, plus 2px, 3px, 6px, 8px and 10px literals. 9px is removed from this row: where commented as concentric (inner = outer minus padding) it is computed, correct, and exempt per 3.4; uncommented 9px uses still need their derivation stated or a token. | 3.4 |
 | Surfaces | RESOLVED 2026-08-28: the rogue `backdrop-filter` expressions folded to ladder rungs (the 16px saturate(1.1) pair sat behind 94 to 96 percent opaque fills, so the fold is invisible; 8px went to sm). Live shader count now equals the ladder: nine. | 3.2 |
 | Z-index | Values run 0, 1 through 12, then 20, 30, 50, 90, 99, 100, 400, 1050, 1060, 1100, 9999, 10000, each chosen ad hoc. A band map now exists (3.8); nothing has migrated to it yet. | 3.8 |
+| Light fill overrides | OPEN 2026-08-30: the fill flip landed (fc90e7b), was silently reverted in the deploy dir for a day by the surface-family deploy of 14_light from an unmerged branch (2026-08-30 to 08-31, the 7.13 sibling-file trap), and is live again since the d0f3d13 union merge, re-measured at all three scopes both modes. The 26 hand-rolled light fills (0.02 to 0.07 against ramp rungs 0.04 to 0.10) were deliberately NOT retired - each removal is a visible change wanting a per-surface measured look, and the selector-matching classifier is not trustworthy enough to bulk-delete on. Retire them surface by surface in measured windows. | 3.2 |
+| Light surface family | EXECUTED 2026-08-30 (94bc238), measured both modes plus light-and-lite: surface channel flips to white, dark byte-identical, scrims mode-fixed via the new --scrim-rgb, --bg-0-rgb added. Remaining: the 17 near-white overrides retire per-surface (see the fill-overrides row for the same discipline), now redundant where their alpha matches the flipped channel. | 3.2 |
 | Spacing | Gaps tokenized 2026-08-28. Padding/margins: histogram drawn 2026-08-30 (1,420 declarations, 69 distinct rem values forming a near-continuum from 0.1 to 1.5; heaviest: 0.5 at 96, 0.85 at 77, 0.4 at 69, 0.6 at 67, 0.7 at 58, 0.55 at 52). DRAFT scale, pending measurement: nine steps sharing the gap values where they coincide (0.25, 0.4, 0.5, 0.75, 1) plus padding-only steps near 0.15, 0.65, 0.85 and 1.25, fold bands capped at 0.075rem (about 1px); sub-7px pixel paddings and negative margins stay literal (optical and layout-special). Naming (unified --space-* vs parallel --pad-*) and every fold direction are stage-2 decisions, made against the live page. BLOCKED on the deploy dir until the scene lane finishes the fill flip; two lanes cannot measure concurrently. | 3.6 |
 | Specificity | 8,268 `!important` declarations. Largely unavoidable against Bootstrap, but it means load order and class doubling are the only remaining levers. | 5.2 |
 

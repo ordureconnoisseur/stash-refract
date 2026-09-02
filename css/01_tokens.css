@@ -30,6 +30,7 @@
 body.stash-liquid-glass {
     --theme-font-stack: "Albert Sans", system-ui, sans-serif;
     --bg-0: #0a0a0a;
+    --bg-0-rgb: 10, 10, 10;   /* channel form; 14_light re-points it */
     --bg-1: #111;
     --text: rgba(255, 255, 255, 0.92);
     --text-muted: rgba(255, 255, 255, 0.55);
@@ -193,6 +194,12 @@ body.stash-liquid-glass {
        Both may be re-pointed wholesale by a future light-mode pass. */
     --surface-rgb: 20, 20, 24;
     --surface-solid: rgba(11, 11, 11, 0.94);
+    /* Artwork scrim - the dark film under pills/chevrons that sit ON
+       IMAGERY (duration pill, carousel chevrons, lite card pills).
+       Deliberately MODE-FIXED: artwork is the third ground (3.1) and
+       does not change with the mode, so neither does its scrim.
+       14_light must never re-point this. */
+    --scrim-rgb: 20, 20, 24;
 
     /* Gap scale - tokenized 2026-08-28 from the measured gap histogram.
        Folds of at most 0.1rem (1.4px). Pixel-unit gaps (2/4/5px icon
