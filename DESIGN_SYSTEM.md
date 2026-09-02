@@ -284,7 +284,12 @@ measured windows, shrinking to an alpha-only line where light's tuned alpha
 genuinely differs, deleting where it does not. And a lesson from cf's pass
 that binds every such window: **grounds under IMAGES need an eyeball in both
 modes, not just probes** - an image on a mode-flipping ground can vanish
-while every text probe passes (the logo plate defect class).
+while every text probe passes (the logo plate defect class). The scene
+lane's icon pass added the small-glyph corollary: a glyph can measure
+perfectly and still read wrong when a feature gap lands under about a
+pixel at render size (an info-i's dot antialiasing into its stem at 13px,
+resolving at 15px with a 1.2px gap). Sub-pixel feature separation is an
+eyeball check at final render size, never a geometry calculation.
 
 **Blur is a fixed ladder, not a free parameter.** Nine live expressions: five
 plain rungs (`xs` 6px, `sm` 10px, `md` 14px, `xl` 24px, `2xl` 32px) and four
@@ -671,6 +676,21 @@ of a card has a `refract-sc-*` / `refract-pc-*` body class, and the keys, the
 classes and the settings chips all derive from that one table. A new card
 element that should be hideable joins the table; it does not get a bespoke
 toggle.
+
+An element may ship OFF (ruled 2026-09-02, the Ascended score being the
+first). Its roster chip is then its only control, and that is sufficient
+rather than a compromise: a hit target cannot exist for something the card
+does not draw, which is already true of Tag count on a scene with no tags
+and Country on a performer with none. The element's default belongs in the
+table beside it, so an absent stored value is no longer the same statement
+as one set off, and a look that lists only what it HIDES cannot express a
+default-off element at all. That last clause is the trap: "absent means
+shown" was encoded in four separate readers on the preset path alone,
+with a fifth reading the stored value on its own axis - each locally
+correct and invisible to the others, and missing one is silent: a look
+switches the element on, or two looks collapse to one signature. 7.20's law about the
+selector you are reading has a JS twin, and the cure is the same: one
+reader, here one helper, owns the question.
 
 ### 6.2 The playing card
 
