@@ -193,5 +193,13 @@ body.stash-liquid-glass .scene-image-container img {
    and the well is a fixed 3:4 filled by object-fit, so neither applies
    any more -- and the centring one actively fought the new caption from
    a later file. The sheet owns that modal now; the rule above stays for
-   the tagger, which is still rows. */
+   the tagger, which is still rows.
+
+   Merging main brought back an OLDER answer to the same report (799f8b8,
+   17:56 on 2026-08-27): zero the border outright, from this file. It was
+   superseded ten minutes later by the fit-the-frame version, and then by
+   the contact sheet, which sets `border: 0 !important` on the same
+   element from 05_list_views.css. Re-adding it here would be dead code
+   that also picked a fight it loses, so the merge keeps this side. The
+   bug it fixed is fixed. */
 
