@@ -7873,8 +7873,23 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.s
    the full width, the way the Stash IDs row already does, and they
    wrap inside it. The six-up rows stay one line tall. */
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.tattoos,
-body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.piercings {
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.piercings,
+/* Stash's Custom Fields block is a grid CHILD but not a detail item, so
+   it took one column of six and whatever a plugin put inside it painted
+   straight out the side: Ascension's match-history grid measured 1125px
+   in a 254px column, 881px of it over the four cells to its right. Found
+   while checking the country work, not reported. Same answer as prose:
+   it is a panel, so it gets the row. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group > .custom-fields {
     grid-column: 1 / -1;
+    /* The row alone is not enough: a plugin can put anything in here, and
+       Ascension's match timeline measured 10,231px, so it left the band
+       even at full width. The panel scrolls its own overflow rather than
+       hiding it, because the content is somebody else's and cropping it
+       would be a decision about their feature. Widths inside a grid need
+       the floor removed before a scroll container can shrink. */
+    min-width: 0;
+    overflow-x: auto;
 }
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.tattoos .detail-item-value,
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.piercings .detail-item-value {
