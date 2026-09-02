@@ -7854,6 +7854,20 @@ body.stash-liquid-glass .refract-flag-chip {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
+/* No flag in the band. The grid is a table you read, the name already
+   says the country, and a second rendering of the same fact next to it
+   earns nothing -- it was the flag, wrapping onto a second line, that
+   broke the row's geometry in the first place. It also leaves the card
+   as the ONE place a flag appears, which is what makes the card's flag
+   mode worth switching on.
+
+   Hidden rather than removed: refract.js reads the ISO code off this
+   element's class to shorten the country's name. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.country .detail-item-value .fi,
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.country .detail-item-value .flag-icon {
+    display: none !important;
+}
+
 /* Height ships both units stacked; the metric one is the value. */
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .height-imperial {
     display: none !important;
