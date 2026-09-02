@@ -8982,6 +8982,31 @@
             if (cut !== raw0) { titles[ti].textContent = cut; }
         }
 
+        /* 1b. The country chip. Stash renders the country as its name
+           followed by a flag-icons span; the band shows the flag alone,
+           as a disc. Two things CSS cannot do are done here: tag the
+           flag so the chip class is ours rather than a rule aimed at
+           somebody else's `.fi`, and put the country's NAME on the
+           tile's tooltip. The name is why this is not decoration -- a
+           flag alone does not separate Slovenia from Slovakia, or Chad
+           from Romania, and the text stays in the DOM for screen
+           readers either way. */
+        var cv = header.querySelector(".detail-group .detail-item.country .detail-item-value");
+        if (cv) {
+            var cflag = cv.querySelector(".fi, .flag-icon");
+            var cnm = (cv.textContent || "").trim();
+            if (cflag && !cflag.classList.contains("refract-flag-chip")) {
+                cflag.classList.add("refract-flag-chip");
+            }
+            /* The tooltip sits on the tile, not the chip: the chip is
+               17px and a tooltip you have to hunt for is not one. */
+            var ctile = cv.closest(".detail-item");
+            if (ctile && cnm && ctile.getAttribute("title") !== cnm) {
+                ctile.setAttribute("title", cnm);
+                ctile.setAttribute("aria-label", cnm);
+            }
+        }
+
         /* 2. Aliases. One line of chips and a count that opens the rest;
            the comma run stays in the DOM, hidden, so nothing Stash
            renders is lost. */
