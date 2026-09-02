@@ -685,9 +685,10 @@ and Country on a performer with none. The element's default belongs in the
 table beside it, so an absent stored value is no longer the same statement
 as one set off, and a look that lists only what it HIDES cannot express a
 default-off element at all. That last clause is the trap: "absent means
-shown" was encoded in four separate readers, each locally correct and
-invisible to the others, and missing one is silent - a look switches the
-element on, or two looks collapse to one signature. 7.20's law about the
+shown" was encoded in four separate readers on the preset path alone,
+with a fifth reading the stored value on its own axis - each locally
+correct and invisible to the others, and missing one is silent: a look
+switches the element on, or two looks collapse to one signature. 7.20's law about the
 selector you are reading has a JS twin, and the cure is the same: one
 reader, here one helper, owns the question.
 
