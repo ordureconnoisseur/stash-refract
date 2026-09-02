@@ -791,7 +791,13 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
 }
 body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats,
 body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-performer_record {
-    margin-top: 1rem !important;
+    /* The header hangs above the item (bottom: 100%), so this gap IS the
+       header, and it is computed rather than chosen: its 21px line box
+       plus the 0.2rem it holds off the item, 23.8px. At --gap-xl (1rem,
+       14px) the header overflowed 9.8px upward and sat on the row above
+       it - measured, not guessed. Recompute if the header line-height or
+       that margin moves. */
+    margin-top: calc(1.5rem + 0.2rem) !important;
 }
 /* ...except on the SECOND of the pair, which sits directly under the
    first and needs no second header or gap. */
