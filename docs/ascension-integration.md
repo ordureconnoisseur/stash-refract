@@ -22,7 +22,7 @@ badge is the same shape as 1.3.1).
 
 ## What would help, if it is ever easy
 
-Two things, both optional, neither urgent.
+Three things, all optional, none urgent.
 
 1. **A version in the package manifest.** The `version` field in
    `plugins/manifest.yml` is the constant `1.0900f916`, and it did not change
@@ -37,6 +37,23 @@ Two things, both optional, neither urgent.
    safely on a badge it does not recognise (see "How Refract fails safe"), so a
    surprise costs a plain badge rather than a broken one, but a note turns a
    bug report into a scheduled change.
+3. **A section of Ascension's own, instead of Stash's Custom Fields.** This
+   is the biggest one and the least urgent, because Refract now works around
+   it. Ascension stores its match record in two Stash custom fields
+   (`hotornot_stats`, `performer_record`) and `ascen-stats.js` renders the
+   stats block and the match timeline in place inside them. That works, but
+   Custom Fields is where a user's OWN fields live, and on a library where
+   320 performers carry Ascension's fields and 28 carry a field the user
+   wrote, the panel reads as plugin storage rather than as theirs. If
+   Ascension ever renders its own section on the performer page instead,
+   that is strictly better for both projects: the data can stay in custom
+   fields, only the rendering moves.
+
+   Refract does not wait for it. It presents those two fields in place as
+   an "Ascension" section, moving no nodes, so nothing here breaks on the
+   day that changes: the fields simply stop being in the panel, the
+   in-place presentation stops matching, and the section Ascension draws
+   itself is the one people see.
 
 ## What Refract touches
 
@@ -101,6 +118,7 @@ click target.
 | Performer band standing row | `refract.js` reads the badge's TEXT and matches `/#\s*(\d+)\s*(?:of\s*([\d,]+))?/i` to fill a "Ranked N of M" cell. See dependency 1 below |
 | Navbar | `#plugin_hon` is given a slot order at the end of the library row (`13_plugins.css`) and mirrored as a tile in Refract's mobile drawer. Its glyph is not redrawn |
 | Card tiering | Refract tiers a performer card once, at init, from the rating on the native banner, because Ascension replaces that banner on a 300ms timer. Anything that re-tiers later calls `applyCardTier` directly rather than waiting for the observer |
+| Custom Fields panel | `13_plugins.css` presents `.custom-field-hotornot_stats` and `.custom-field-performer_record` in place as an "Ascension" section: a generated header in the performer's tier colour, the stat row wrapped rather than cut, and a real horizontal scroll on the timeline. It keys on STASH's `.custom-field-<key>` classes and names no Ascension class at all. No node is moved. Stash's own Custom Fields header is hidden when nothing but plugin storage is left, and the collapse is forced open in the same condition so the panel cannot be shut with no handle |
 
 ### Card customiser elements
 
@@ -154,7 +172,12 @@ Three places where Refract depends on something Ascension has never promised.
    have no `.hon-rank-total` and badges everywhere else (the home page, a
    studio's or a tag's performers) do. Anything measured only on `/performers`
    has not seen the other shape.
-3. **Badges paint lazily and progressively.** Ascension fills its rank cache in
+3. **Ascension force-expands the Custom Fields collapse.** `ascen-stats.js`
+   opens `.collapse` when it finds either of its fields. Refract relies on
+   that for the common case and forces the collapse open itself in the one
+   case Ascension does not cover (a performer carrying only Refract's own
+   `refract_back`), so a panel whose header is hidden is never left shut.
+4. **Badges paint lazily and progressively.** Ascension fills its rank cache in
    the background, so a page settles with a fraction of its badges drawn: 16 of
    40 cards on `/performers`, and 111 of 195 on the home page, in one measured
    run each. Anything measuring these has to poll for a badge count rather than

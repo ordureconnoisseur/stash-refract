@@ -7905,14 +7905,23 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.s
    it is a panel, so it gets the row. */
 body.stash-liquid-glass #performer-page .refract-ph .detail-group > .custom-fields {
     grid-column: 1 / -1;
-    /* The row alone is not enough: a plugin can put anything in here, and
-       Ascension's match timeline measured 10,231px, so it left the band
-       even at full width. The panel scrolls its own overflow rather than
-       hiding it, because the content is somebody else's and cropping it
-       would be a decision about their feature. Widths inside a grid need
-       the floor removed before a scroll container can shrink. */
-    min-width: 0;
-    overflow-x: auto;
+    /* The scroll that used to be here is gone, and the reason it was
+       here turned out not to exist. It was added against a timeline
+       "measured 10,231px", but that number was a bounding rect's .right
+       -- an absolute viewport X, not a width -- and the rule was inert:
+       the panel's scrollWidth equalled its clientWidth with the
+       declarations on or off, because Ascension already clips the track
+       inside its OWN element with overflow-x: hidden. Nothing ever
+       painted out of the band at full width.
+
+       Removed while extracting Ascension out of this panel (13_plugins),
+       where the timeline gets a real scroll on the element that actually
+       overflows. Left here it would be a second answer to a question
+       asked one file away, and a dead one.
+
+       The method lesson, which is why this comment is longer than the
+       rule: rect arithmetic is not a paint test. scrollWidth against
+       clientWidth, document scroll, and a screenshot are. */
 }
 /* The tag run is the one field the band cannot size: thirty-one chips
    need three lines and the grid gives every cell one. It leaves the

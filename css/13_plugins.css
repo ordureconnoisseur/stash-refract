@@ -723,6 +723,205 @@ body.stash-liquid-glass .performer-card .refract-ascension-unknown {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   Ascension in the performer page's Custom Fields panel
+   ═══════════════════════════════════════════════════════════════════
+
+   Custom Fields is for the fields the USER wrote. Today it is mostly
+   not: Ascension keeps its match record in two Stash custom fields and
+   ascen-stats.js renders them in place, so on a library where 320
+   performers carry those fields and 28 carry one of the user's own, the
+   panel reads as another plugin's storage with the user's own note
+   buried on top of it.
+
+   Nothing here moves a node. Ascension's rows stay exactly where it put
+   them and are PRESENTED in place: re-parenting them would be the
+   coupling this whole reconcile exists to remove, and it would break the
+   day Ascension renders its own section instead (which is the ask filed
+   in docs/ascension-integration.md).
+
+   Detection keys on STASH's class, not Ascension's. Stash gives every
+   custom field a `.custom-field-<key>` container named from the field
+   key, and that is what ascen-stats.js hangs its own rendering off too.
+   So the hook is the DATA KEY, which only moves if Ascension changes
+   where it stores things - a far steadier thing to depend on than the
+   markup, which has already moved once (#190). Not one selector below
+   mentions a `hon-` or `timeline-` class.
+
+   The shape, measured: .custom-fields > div > (.collapse-header with the
+   button, then .collapse holding one .detail-item per field).
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* The section's colour is the performer's TIER, published on
+   #performer-page by refract.js (refractPhPublishTier) because
+   --tier-color is declared on the card and resolves nowhere else. An
+   untiered performer publishes nothing and the var() fallback takes the
+   accent, so the section is never uncoloured.
+
+   The ink shade is separate from the fill channel for the reason 3.1
+   rule 5 gives: a token can flip its JOB between modes. Diamond's
+   165,223,219 measures about 1.4:1 on the light panel and cannot be text
+   there. Light re-points the ink to 55% of the tier mixed toward black
+   (about 5.4:1 on that ground) exactly as --accent-ink does, and the
+   plain value is declared FIRST so an engine without color-mix keeps a
+   legible colour instead of dropping the declaration. */
+body.stash-liquid-glass #performer-page {
+    --refract-ph-tier-ink: rgb(var(--refract-ph-tier, var(--accent-rgb)));
+}
+@supports (color: color-mix(in srgb, red 50%, black)) {
+    body.stash-liquid-glass.refract-light #performer-page {
+        --refract-ph-tier-ink: color-mix(in srgb, rgb(var(--refract-ph-tier, var(--accent-rgb))) 55%, #000);
+    }
+}
+
+/* Machine storage is not user content. `refract_back` is Refract's own
+   per-performer card-back override and it is a JSON blob; nobody should
+   meet it on a performer page. Listed here rather than in 08 because it
+   is the same rule as the plugin fields beside it: this panel shows what
+   a person wrote. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-refract_back {
+    display: none !important;
+}
+
+/* ---- The Ascension section --------------------------------------- */
+
+/* Room for the header drawn below, and the anchor it hangs off. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats,
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record {
+    position: relative;
+}
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats,
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-performer_record {
+    margin-top: 1rem !important;
+}
+/* ...except on the SECOND of the pair, which sits directly under the
+   first and needs no second header or gap. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats ~ .detail-item.custom-field-performer_record {
+    margin-top: 0 !important;
+}
+
+/* The header. Drawn on whichever Ascension field comes first, so a
+   performer with a record but no stats block still gets one. Matches the
+   Custom Fields button beside it exactly - 14px, weight 600, the same
+   21px line - and differs only in colour, so it reads as a peer section
+   rather than a new kind of thing. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats::before,
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-performer_record::before {
+    content: "Ascension";
+    position: absolute;
+    left: 0;
+    bottom: 100%;
+    margin-bottom: 0.2rem;
+    font-size: var(--fs-body) !important;
+    font-weight: 600;
+    line-height: 21px;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--refract-ph-tier-ink);
+    pointer-events: none;
+}
+/* One header per section: the second field of the pair does not repeat
+   it. Written as its own override rather than folded into a :not() so
+   the rule above stays readable; the grep-before-you-add discipline in
+   7.20 applies to whoever edits either. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats ~ .detail-item.custom-field-performer_record::before {
+    content: none;
+}
+
+/* The stat row wrapped instead of cut. Measured today: the row is a
+   nowrap flex line inside an overflow-hidden value, so the last stat is
+   sliced through its own number ("LAST MATCH May 30, 2026, 11:58 P").
+   A stat cut in half is worse than a stat on the next line. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value {
+    overflow: visible !important;
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
+    flex-wrap: wrap !important;
+}
+
+/* ---- The timeline ------------------------------------------------- */
+
+/* The match track is a grid Ascension lays out at its natural width -
+   9,793px on a performer with a long record - inside its own element
+   carrying `overflow-x: hidden`. So it never escapes the panel and the
+   page never scrolls sideways: what is lost is not the layout, it is the
+   READING. Everything past the first screenful is unreachable.
+
+   This is the one place the section gives Ascension behaviour it did not
+   have, and it is deliberate: a scroll, so the record can be read. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    /* 6.10: these two INHERIT, and Chrome discards every ::-webkit rule
+       for an element with a standard scrollbar property in effect. An
+       ancestor sets them for this column, so they are handed back
+       explicitly or the bar below is never drawn. */
+    scrollbar-width: auto !important;
+    scrollbar-color: auto !important;
+    padding-bottom: 0.25rem !important;
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar {
+    height: 8px;
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar-track {
+    background: transparent;
+}
+/* Thumbed in the TIER rather than the accent, because it belongs to this
+   section rather than to the theme. The fill channel, not the ink one:
+   this is a mark on a surface, not text. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar-thumb {
+    background: rgba(var(--refract-ph-tier, var(--accent-rgb)), 0.35);
+    border-radius: var(--radius-pill);
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--refract-ph-tier, var(--accent-rgb)), 0.6);
+}
+/* The edge that says there is more. On the ITEM, not on the scrolling
+   value: an absolutely positioned child of a scroll container travels
+   with the content, so a fade drawn there slides away the moment you
+   use it. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 3rem;
+    pointer-events: none;
+    background: linear-gradient(90deg,
+        rgba(var(--bg-0-rgb), 0) 0%,
+        rgba(var(--bg-0-rgb), 0.92) 78%);
+}
+
+/* ---- What is left of Custom Fields -------------------------------- */
+
+/* "A field of the user's own" is any custom field that is not one of the
+   keys above. Stated as a subtraction because that is what it is: the
+   panel belongs to the user, and these three are the exceptions the
+   theme knows about. A fourth plugin storing a fourth key shows through,
+   which is the correct failure - it is visible, and someone can add it.
+
+   :has() is fine here per 7.2: one instance, three rows. It is the card
+   GRID where its budget is spent. */
+body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .detail-item:not(.custom-field-hotornot_stats):not(.custom-field-performer_record):not(.custom-field-refract_back))) .collapse-header {
+    display: none !important;
+}
+/* Hiding that header takes the only way to REOPEN the panel with it, so
+   the collapse is forced open in exactly the same condition. Ascension
+   force-expands it too when its own fields are present, which covers the
+   common case, but not the one where a performer has only refract_back:
+   without this, that panel could be shut with no handle. */
+body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .detail-item:not(.custom-field-hotornot_stats):not(.custom-field-performer_record):not(.custom-field-refract_back))) .collapse {
+    display: block !important;
+    height: auto !important;
+    visibility: visible !important;
+}
+/* Nothing of the user's AND nothing of Ascension's: the panel is a
+   heading over hidden storage, so it goes entirely. */
+body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .detail-item:not(.custom-field-refract_back))) {
+    display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    flexibleDateInput plugin - react-datepicker theming
    ═══════════════════════════════════════════════════════════════════ */
 

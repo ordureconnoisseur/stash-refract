@@ -8652,11 +8652,43 @@
         return el;
     }
 
+    /* The performer's tier colour, lifted off the card and published on
+       `#performer-page` so surfaces OUTSIDE the card can read it.
+
+       It has to be lifted rather than referenced. `--tier-color` is
+       declared by rules scoped to the card itself
+       (`:is(.performer-card, .refract-ph-card).refract-card-tier-*`), so
+       it resolves on the card and nowhere else; the Custom Fields panel
+       is a cousin, not a descendant, and `var(--tier-color)` there is
+       simply undefined, which per DESIGN_SYSTEM 7.13 drops the whole
+       declaration rather than falling back. Reading the computed value
+       and republishing it is the same move `--refract-hon-tier` makes on
+       the Ascension badge.
+
+       Untiered (rating below the 5.0 floor, or none) publishes NOTHING,
+       so consumers fall back to the accent through their own `var()`
+       fallback rather than to a stale colour from the last performer. */
+    function refractPhPublishTier(host) {
+        var page = document.getElementById("performer-page");
+        if (!page) { return; }
+        var tier = "";
+        try { tier = getComputedStyle(host).getPropertyValue("--tier-color").trim(); } catch (e) { tier = ""; }
+        var tiered = /refract-card-tier-/.test(host.className || "");
+        if (tiered && tier) {
+            if (page.style.getPropertyValue("--refract-ph-tier") !== tier) {
+                page.style.setProperty("--refract-ph-tier", tier);
+            }
+        } else if (page.style.getPropertyValue("--refract-ph-tier")) {
+            page.style.removeProperty("--refract-ph-tier");
+        }
+    }
+
     function refractPhBuildCard(header, host, d) {
         /* Tier first: the ribbon, the halo and every --badge-color in the
            strip below read off the class this sets. */
         var r10 = (d.rating100 != null) ? d.rating100 / 10 : 0;
         applyCardTier(host, r10);
+        refractPhPublishTier(host);
 
         var nameEl = header.querySelector(".performer-head .performer-name");
         var name = nameEl ? (nameEl.textContent || "").trim() : "";
