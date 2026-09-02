@@ -2142,16 +2142,21 @@ body.stash-liquid-glass.refract-pc-hide-stats.refract-pc-hide-stats .performer-c
    two forms, so the caption carries one of them and the Country element's
    own switch still turns the whole thing off. Name is the default, which
    is what the card showed before the flag existed. */
-body.stash-liquid-glass .performer-card .stash-perf-country .refract-flag-chip {
+body.stash-liquid-glass :is(.performer-card, .refract-ph-card) .stash-perf-country .refract-flag-chip {
     display: none !important;
 }
-body.stash-liquid-glass.refract-pc-country-flag .performer-card .stash-perf-country .refract-flag-chip {
+body.stash-liquid-glass.refract-pc-country-flag :is(.performer-card, .refract-ph-card) .stash-perf-country .refract-flag-chip {
     display: inline-block !important;
 }
-body.stash-liquid-glass.refract-pc-country-flag .performer-card .stash-perf-country .stash-perf-country-name {
+body.stash-liquid-glass.refract-pc-country-flag :is(.performer-card, .refract-ph-card) .stash-perf-country .stash-perf-country-name {
     display: none !important;
 }
-body.stash-liquid-glass .performer-card .stash-perf-country .refract-flag-chip {
+/* `:is(.performer-card, .refract-ph-card)` throughout, the pattern
+   16_playing_card.css already uses: the performer page draws the same
+   card as the grid does, and scoping this to the grid alone left that
+   one card at the default 17px with its name still showing while every
+   other card in the library had turned over to a flag. */
+body.stash-liquid-glass :is(.performer-card, .refract-ph-card) .stash-perf-country .refract-flag-chip {
     /* Sized against its neighbours, not against the caption's type. The
        caption is 10px, and a chip at its cap height came out 10.6px,
        where a flag is a coloured speck: the stripes of the US, the cross
@@ -2180,6 +2185,23 @@ body.stash-liquid-glass .performer-card .stash-perf-country .refract-flag-chip {
        the chip in name mode, which is how the card briefly carried both
        forms of the same fact. */
     position: static !important;
+    /* The ring is the CARD's accent, not the theme's. A bronze card
+       rings bronze, a gold one gold, and the ring follows the tier set
+       through diamond, legendary and perfect.
+
+       `--badge-color` rather than `--tier-color` directly, because that
+       is the token the stat pills beside it already read, and it is
+       defined as the tier colour on a tiered card and the global accent
+       on an untiered one. So the untiered card is not the odd one out,
+       and there is one answer to "what colour is this card" rather than
+       two that can drift apart.
+
+       The inner fallback is not decoration. `--badge-color` is declared
+       in playing-card mode; outside it the property is undefined, and
+       an undefined custom property does not fall back to anything, it
+       invalidates the whole declaration and the ring would simply not
+       be drawn. */
+    border-color: rgba(var(--badge-color, var(--accent-rgb)), 0.9) !important;
 }
 
 body.stash-liquid-glass.refract-pc-hide-country.refract-pc-hide-country.refract-pc-hide-country .performer-card .stash-perf-country,

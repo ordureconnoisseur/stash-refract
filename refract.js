@@ -8666,6 +8666,36 @@
         if (cItem) { cval = (cItem.textContent || "").trim(); }
         if (cname.textContent !== cval) { cname.textContent = cval; }
 
+        /* The flag chip, so this card is the same card as the ones in the
+           grid. It was not here at first, and the gap only showed in flag
+           mode: every card in the library turned over to a flag and the
+           performer's own page still read out the name. The code comes
+           off the band's flag element, which Stash renders whether or not
+           the band draws it. */
+        var phFlag = header.querySelector(".detail-item.country .fi, .detail-item.country .flag-icon");
+        var phCode = "";
+        if (phFlag && phFlag.classList) {
+            for (var fi = 0; fi < phFlag.classList.length; fi++) {
+                var fc = phFlag.classList[fi];
+                if (fc.length === 5 && fc.slice(0, 3) === "fi-") { phCode = fc.slice(3); break; }
+            }
+        }
+        var phChip = country.querySelector(".refract-flag-chip");
+        if (phCode) {
+            if (!phChip) {
+                phChip = document.createElement("span");
+                country.insertBefore(phChip, cname);
+            }
+            var phCls = "fi fi-" + phCode + " refract-flag-chip";
+            if (phChip.className !== phCls) { phChip.className = phCls; }
+            if (cval && phChip.getAttribute("title") !== cval) {
+                phChip.setAttribute("title", cval);
+                phChip.setAttribute("aria-label", cval);
+            }
+        } else if (phChip) {
+            phChip.parentNode.removeChild(phChip);
+        }
+
         var strip = chin.querySelector(".stash-perf-stats");
         if (!strip) {
             strip = document.createElement("div");
