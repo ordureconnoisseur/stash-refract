@@ -569,6 +569,97 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-text 
     filter: none !important;
 }
 
+/* The Ascended Score, when the customiser turns it on. Refract's own
+   span (refract.js injects it from Ascension's number), which is the
+   whole reason it can be styled at all: their wrapper, its value and its
+   icon each carry inline `!important`, and an inline !important cannot
+   be beaten from a stylesheet.
+
+   It does NOT wear the flame gradient, and that is the second decision
+   this rule made. Painting both numbers in it left them separated by
+   weight alone, and DESIGN_SYSTEM 3.5 rule 3 is explicit that three
+   weights at one size is not a hierarchy while muted text at the same
+   size is: two identically-coloured numbers on one line read as one
+   number with a gap in it. So the rank keeps the gradient and leads,
+   and the score is quiet ink at 600 against the rank's 800 - colour and
+   weight together, which is what a level actually costs. It also leaves
+   one bold object on the line instead of three, beside a flame that is
+   already carrying an ember halo.
+
+   The ink is INHERITED from the badge rather than declared. The badge
+   sits on the card photograph in playing-card mode and on a solid chin
+   in Classic, and those are different grounds (DESIGN_SYSTEM 3.1 rule
+   4); the badge already resolves that once for its whole read-out, and
+   a hardcoded white here would be a second answer to a question already
+   settled one element up.
+
+   Nor is Ascension's tier colour used. The tier palette in
+   DESIGN_SYSTEM 4 is Refract's one sanctioned second colour system, so
+   theirs would be a third, and two numbers in two colour languages on
+   one line is half of what #190 actually looked like. The value is
+   still lifted onto the badge as `--refract-hon-tier` for custom CSS;
+   nothing shipped reads it. */
+body.stash-liquid-glass .performer-card .refract-ascension-score {
+    flex: 0 0 auto !important;
+    font-weight: 600 !important;
+    font-size: var(--fs-sm) !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em !important;
+    /* The country caption this badge is nested inside sets a text-shadow,
+       which inherits. The badge grounds its whole read-out with one
+       container drop-shadow instead, and the rank already opts out for
+       the same reason; a second shadow here would make the score the one
+       element on the line wearing two. */
+    text-shadow: none !important;
+    /* Room for the divider drawn below, and the anchor it hangs off.
+       Padding matches the flex `gap` on the badge (--gap-md) so the rule
+       has the same air on both sides. Measured across four live badges:
+       7.22 to 7.82px from the rank's ink on the left against 7.00px to
+       the score's on the right, the difference being the rank's own
+       trailing letter-spacing. */
+    position: relative !important;
+    padding-left: var(--gap-md) !important;
+}
+
+/* The divider. A hairline rather than Ascension's "|" glyph, which is a
+   character competing with two numbers for the same row, and it earns
+   its place: the two numbers answer different questions (a position in a
+   ranking, and a score) and unseparated they read as one value.
+
+   Drawn as a pseudo-element rather than a `border-left` because a border
+   is the height of the line box, and the line box is not where the ink
+   is. Measured on the live read-out: Albert Sans at 11.2px reports 8px
+   of ascent and ZERO descent for digits inside an 11.2px line box, so
+   the digits occupy 1.6px to 9.6px and a full-height border overshot
+   them at both ends. The band is exactly centred in the box (its centre
+   and the box centre are both 5.6px), which is what makes the plain
+   50%-and-translate honest here rather than a guess.
+
+   Quieter than either number it separates, at 0.3 against the read-out's
+   0.92: a divider that competes with its own content has stopped being
+   structure. Literal white rather than `rgba(var(--fg-rgb), A)` because
+   in playing-card mode this line sits on the card PHOTOGRAPH, the third
+   ground of DESIGN_SYSTEM 3.1 rule 4, which does not flip with the
+   mode. */
+body.stash-liquid-glass .performer-card .refract-ascension-score::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 1px !important;
+    /* 8px of digit ink at 11.2px. Recompute if --fs-sm moves. */
+    height: 0.714em !important;
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Off unless the customiser says otherwise: this is the one card element
+   that ships hidden (CARD_ELEMS `defaultHidden`). Class doubled for
+   specificity per DESIGN_SYSTEM 5 rule 4. */
+body.stash-liquid-glass.refract-pc-hide-score.refract-pc-hide-score .performer-card .refract-ascension-score {
+    display: none !important;
+}
+
 /* ── An Ascension whose badge we do not recognise ────────────────────
    refract.js claims a badge only when it can name every part of it
    (ascensionBadgeUnknownPart). A shape it cannot name gets NO

@@ -1449,7 +1449,7 @@
                 Object.keys(cardElems).forEach(function (k) { elemMap[k] = cardElems[k]; });
                 CARD_ELEMS.forEach(function (d) {
                     if (d.group !== elemGroup) { return; }
-                    var hidden = p.hide.indexOf(d.key) !== -1;
+                    var hidden = presetHidesElem(p, d);
                     try { localStorage.setItem(d.key, hidden ? "1" : "0"); } catch (e) { /* ignore */ }
                     elemMap[d.key] = hidden;
                 });
@@ -2213,7 +2213,7 @@
                pictures of the card, drawn from each preset's own flags so a
                preset can never illustrate something it does not do. */
             function presetArt(p) {
-                var hid = function (k) { return p.hide.indexOf(k) !== -1; };
+                var hid = function (k) { return presetHidesElem(p, CARD_ELEM_BY_KEY[k] || { key: k }); };
                 var scene = previewKind === "scene";
                 var ext = (p.flourish || flourish) === "extravagant";
                 var side = function (k, dflt) { return p.sides[k] || dflt; };
@@ -2275,7 +2275,7 @@
                 var hasSides = false;
                 CARD_ELEMS.forEach(function (d) {
                     if (d.group !== elemGroup || d.noop) { return; }
-                    parts.push(d.key + (p.hide.indexOf(d.key) !== -1 ? "0" : "1"));
+                    parts.push(d.key + (presetHidesElem(p, d) ? "0" : "1"));
                     /* In text mode the studio has no corner, so its side and the
                        ribbon-over-logo layer decide nothing, and looks that
                        differ only by those become the same card. */
@@ -2426,7 +2426,7 @@
                 for (i = 0; i < CARD_ELEMS.length; i++) {
                     d = CARD_ELEMS[i];
                     if (d.group !== elemGroup || d.noop) { continue; }
-                    if (!!cardElems[d.key] !== (p.hide.indexOf(d.key) !== -1)) { return false; }
+                    if (!!cardElems[d.key] !== presetHidesElem(p, d)) { return false; }
                     if (d.sideKey && elemGroup === "scene") {
                         if ((cardSides[d.key] || d.sideDefault) !== (p.sides[d.key] || d.sideDefault)) { return false; }
                     }
@@ -3397,6 +3397,19 @@
            country's. Only offered when Ascension is actually installed. */
         { key: "refract.pcHideRank",       cls: "refract-pc-hide-rank",       group: "performer", label: "Rank badge", plugin: "ascension",
           sel: ".hon-battle-rank-badge" },
+        /* Ascension's Ascended Score, the number it puts beside the rank.
+           The first element in this table that ships OFF, and the reason
+           `defaultHidden` exists. The card read-out is one number: two of
+           them in a 235px caption row is the density the rank badge was
+           moved out of the stat strip to escape, and the score is the one
+           that is not Refract's to lead with. Off it costs nothing; on, it
+           is drawn by refract.js so it wears the same gradient as the rank
+           rather than Ascension's tier colour, which would put a third
+           colour system on a single line. Offered only where Ascension is
+           installed, like the rank badge above. */
+        { key: "refract.pcHideScore",      cls: "refract-pc-hide-score",      group: "performer", label: "Ascended score",
+          plugin: "ascension", defaultHidden: true,
+          sel: ".refract-ascension-score" },
         /* The flip tab, and with it the whole back. Every OTHER thing about the
            back was configurable -- its face, its picture, its stats, its tray,
            each panel of the dossier -- except whether you wanted one. The back
@@ -3472,6 +3485,7 @@
            the front's. One band, one strip, one place to ask about it. */
         "refract.mbHideStats":      "bottom",
         "refract.pcHideRank":       "bottom",
+        "refract.pcHideScore":      "bottom",
         "refract.scHideTitle":      "bl",
         "refract.scHideDetails":    "bl",
         /* Measured on the preview: the flip tab is a 27x40 tab on the card's
@@ -3683,8 +3697,44 @@
        those reach past the cards. */
     var REFRACT_CARD_RESET_KEYS = CARD_ELEMS.map(function (d) { return d.key; }).concat(CARD_SIDE_KEYS);
 
+    /* key -> its row, for the readers that only have a key to go on. */
+    var CARD_ELEM_BY_KEY = {};
+    CARD_ELEMS.forEach(function (d) { CARD_ELEM_BY_KEY[d.key] = d; });
+
+    /* Every element in the table but one ships SHOWN, so "nothing stored"
+       has always meant "visible" and this could answer without consulting
+       the table at all. The Ascended score breaks that: it is another
+       plugin's number on Refract's card and it ships off. So the default
+       lives in the table beside the element, "0" and "1" are the only
+       values that override it, and a key that is merely ABSENT is no
+       longer the same statement as a key set to "0".
+
+       Reset comes out right for free: clearing the key returns each
+       element to its own default rather than to a hardcoded shown. */
+    function cardElemDefaultHidden(key) {
+        var d = CARD_ELEM_BY_KEY[key];
+        return !!(d && d.defaultHidden);
+    }
     function isCardElemHidden(key) {
-        try { return localStorage.getItem(key) === "1"; } catch (e) { return false; }
+        try {
+            var v = localStorage.getItem(key);
+            if (v === null) { return cardElemDefaultHidden(key); }
+            return v === "1";
+        } catch (e) { return cardElemDefaultHidden(key); }
+    }
+    /* A look lists what it HIDES, which quietly assumed every element
+       defaults to shown; four separate readers spelled that assumption
+       `p.hide.indexOf(d.key) !== -1`. A default-off element cannot be
+       expressed that way, and missing ONE of the four is a silent bug:
+       a look would switch the score on, or two looks would collapse to
+       the same signature and one of them would vanish from the row. One
+       function, four callers, so the assumption can only be changed in
+       one place. A look that wants a default-off element ON names it in
+       `show`; every existing look keeps its `hide` list untouched. */
+    function presetHidesElem(p, d) {
+        if (p.hide.indexOf(d.key) !== -1) { return true; }
+        if (d.defaultHidden) { return (p.show || []).indexOf(d.key) === -1; }
+        return false;
     }
     function cardElemSide(d) {
         if (!d.sideKey) { return null; }
@@ -10920,6 +10970,56 @@
                colour wiring is needed. */
             if (!badge.querySelector(".refract-ascension-icon")) {
                 badge.insertAdjacentHTML("afterbegin", ASCENSION_FLAME_SVG);
+            }
+            /* Ascension's tier colour, lifted onto the badge as a custom
+               property. Read from the INLINE style rather than the computed
+               one, because the computed colour is whatever our own rules
+               resolved to. `.hon-rank-text` is the source because it is the
+               one element every version has carried and the only one whose
+               inline colour is NOT !important; the score wrapper carries the
+               same value where it exists. Nothing Refract ships paints with
+               this. It is here because it is real data the theme would
+               otherwise throw away, and because a user's custom CSS has no
+               other way to reach it: the tier palette in DESIGN_SYSTEM 4 is
+               Refract's own, and a third colour system on one line is half
+               of what #190 actually looked like. */
+            if (rankText && rankText.style && rankText.style.color) {
+                if (badge.style.getPropertyValue("--refract-hon-tier") !== rankText.style.color) {
+                    badge.style.setProperty("--refract-hon-tier", rankText.style.color);
+                }
+            }
+            /* The Ascended Score, drawn as OURS rather than restyled as
+               theirs. Their wrapper, its value span and its icon all ship
+               inline `!important`, which no stylesheet can beat, so the
+               choice is to strip their attributes or to render the number
+               ourselves. Stripping works today (they never read those
+               elements back) and stops working the first time they add a
+               property nobody here has anticipated; this does not, and it
+               is the same move already made for the flame glyph and the
+               one DESIGN_SYSTEM 6.12 prescribes for a control we do not
+               own. Their elements stay untouched and out of flow.
+
+               Injected whether or not the element is switched on, because
+               the customiser hides it by a body class the way it hides
+               every other card element, and because the roster chip needs
+               something on the card to name. Absent entirely when the
+               performer has no score: Ascension omits the wrapper then, and
+               a divider with nothing after it is worse than no read-out. */
+            var theirScore = badge.querySelector(".hon-asc-score-value");
+            var scoreVal = theirScore ? (theirScore.textContent || "").trim() : "";
+            var ourScore = badge.querySelector(".refract-ascension-score");
+            if (scoreVal && rankText) {
+                if (!ourScore) {
+                    rankText.insertAdjacentHTML("afterend",
+                        '<span class="refract-ascension-score">' + escapeHtml(scoreVal) + "</span>");
+                } else if (ourScore.textContent !== scoreVal) {
+                    /* Self-heals if Ascension rewrites the number in place
+                       instead of rebuilding the badge. Only on a real
+                       change, so the common cycle mutates nothing. */
+                    ourScore.textContent = scoreVal;
+                }
+            } else if (ourScore) {
+                ourScore.remove();
             }
             parkAscensionBadge(badge, pcMode);
         });
