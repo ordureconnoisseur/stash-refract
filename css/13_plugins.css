@@ -496,8 +496,35 @@ body.stash-liquid-glass .performer-card .refract-ascension-icon {
 }
 
 /* Hide the plugin's tier emoji: the flame glyph already marks the line
-   as Ascension, and the number carries its own warm gradient. */
+   as Ascension, and the number carries its own warm gradient. Ascension
+   1.3.0 dropped this element, but 1.2.x is still widely installed, so the
+   rule stays. */
 body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-emoji {
+    display: none !important;
+}
+
+/* Any icon the badge brought with it, whatever the version calls it.
+   Ascension 1.3.0 replaced the tier emoji with an SVG of ITS OWN navbar
+   flame (`.hon-asc-icon`) - the same path we copied for our glyph - so
+   the read-out drew two identical flames, one amber and one in the tier
+   colour (Discourse #190). Matched structurally rather than by their
+   class name so the next rename does not reopen this: inside the badge,
+   the only icon that survives is ours.
+
+   It has to be a hide. Their SVG carries `style="fill: currentColor
+   !important"` inline, and an inline !important beats an author
+   !important, so recolouring their glyph from CSS is not possible. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge svg:not(.refract-ascension-icon) {
+    display: none !important;
+}
+
+/* The Ascended Score that 1.3.0 puts ahead of the rank, and its
+   separator. The card read-out is "[flame] rank": one number, uniform
+   across every performer, on a surface with no room to argue. The score
+   is not lost, it is on the badge's own tooltip and on the performer
+   page. Making it an optional card element is post-ship work. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-score-display,
+body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-separator {
     display: none !important;
 }
 

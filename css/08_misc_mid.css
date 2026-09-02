@@ -1199,7 +1199,16 @@ body.stash-liquid-glass .detail-header .detail-group {
    own vertical padding is cut to 0.2rem so the first and last rows keep
    the same 9.1px inset from the panel edge as before. */
 body.stash-liquid-glass .detail-header .detail-item {
-    display: grid !important;
+    /* NOT !important, and it must stay that way. Measured against #193.
+       Stash hides fields itself when a header is collapsed
+       (`#studio-page .collapsed .detail-item.stash_ids`, 1,3,0); an
+       !important here beat those rules and the fields stayed on screen
+       through a collapse. It also shut a user's Custom CSS out of the
+       row entirely, even with !important, which is the one escape hatch
+       a theme owes the people running it. Plain, this still outranks
+       everything Stash sets on the row itself (`.detail-item` at 0,1,0
+       and `.full-width .detail-item` at 0,2,0). */
+    display: grid;
     grid-template-columns: 7.5rem minmax(0, 1fr);
     column-gap: var(--gap-md);
     align-items: baseline;
@@ -7754,7 +7763,10 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group {
     backdrop-filter: none !important;
 }
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item {
-    display: flex !important;
+    /* Plain, for the reasons on the generic `.detail-header .detail-item`
+       rule above. At 1,4,1 it still outranks that rule's grid, so the
+       band's cells are unchanged; measured identical across 14 items. */
+    display: flex;
     flex-direction: column;
     gap: 2px;
     padding: 0.6rem 0.8rem !important;
