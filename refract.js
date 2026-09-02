@@ -10798,6 +10798,17 @@
                     s.textContent = s.textContent.replace(/undefined/gi, "0");
                 }
             });
+            /* The same defect in the badge's TOOLTIP, which the span sweep
+               above never reaches. Ascension writes the record into `title`
+               at build time, so a missing draw count hovers as "Record: 0W -
+               1L - undefinedD" -- measured on two live badges under 1.3.1.
+               Rewrite the attribute the same way the spans are rewritten,
+               and only when it needs it, so this is a no-op on every badge
+               that is already clean. */
+            var badgeTitle = badge.getAttribute("title");
+            if (badgeTitle && /undefined/i.test(badgeTitle)) {
+                badge.setAttribute("title", badgeTitle.replace(/undefined/gi, "0"));
+            }
             /* Drop both the literal "Rank " word and the "#" so the
                read-out is a bare number after the flame glyph. Only write
                when it actually changes, to avoid needless mutations. */
