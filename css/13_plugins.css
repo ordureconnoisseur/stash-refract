@@ -776,7 +776,13 @@ body.stash-liquid-glass #performer-page {
     --refract-asc-loss: #f87171;
 }
 body.stash-liquid-glass.refract-light #performer-page {
-    --refract-asc-win: #15803d;
+    /* Measured against the CHIP's own fill, not the plate behind it: the
+       chip lays --fill-2 over the panel, so light's real ground is 238
+       and not 252. #15803d clears 4.5 on the plate and misses it on the
+       chip at 4.34, which is the whole reason 3.9 says to measure the
+       ground the element actually sits on. #116534 is 6.17 there; the
+       red already passed at 5.58. */
+    --refract-asc-win: #116534;
     --refract-asc-loss: #b91c1c;
 }
 @supports (color: color-mix(in srgb, red 50%, black)) {
@@ -872,7 +878,17 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
     overflow: visible !important;
 }
 /* The band's own 6-up track, so the eighth stat lands beside the seventh
-   instead of alone on a ragged second row. */
+   instead of alone on a ragged second row.
+
+   The band changes that count at three widths and this row follows it at
+   the same three, because a stats row on six columns inside a band on
+   two is not the same object as the rows above it: measured at 420 the
+   tiles came out 55px wide with the streak labels cut and 28px of
+   overflow. The breakpoints are duplicated from
+   `08_misc_mid.css` (.refract-ph .detail-group, 6 / 4 at 1400 / 3 at
+   1200 / 2 at 820) and they have to move together - logged as drift, and
+   the reason is that the two grids cannot share a track: this one is
+   nested two levels inside a cell of that one. */
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
     display: grid !important;
     grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
@@ -880,6 +896,21 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
     background: transparent !important;
     margin: 0 !important;
     padding: 0 !important;
+}
+@media (max-width: 1400px) {
+    body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 1200px) {
+    body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 820px) {
+    body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
 }
 /* Ascension's pill chrome off. The tiles take NO ground of their own:
    the row they sit in is already the band's plate, so a background here
@@ -922,17 +953,19 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
     text-align: left !important;
     color: rgba(var(--fg-rgb), 0.92) !important;
 }
-/* Win and loss keep a colour, because it encodes data (P3). This is the
-   ONE place Ascension's own class names are read, and only to ask which
-   of two meanings a number carries - never for geometry or type. A
-   rename costs the colour and nothing else: the number stays on the
-   band's ink, legible in both modes. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .stat-positive {
-    color: var(--refract-asc-win) !important;
-}
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .stat-negative {
-    color: var(--refract-asc-loss) !important;
-}
+/* A stat NUMBER is plain ink, deliberately. Two rules painting
+   .stat-positive and .stat-negative used to sit here and never applied:
+   the structural rule above carries one more class of specificity and
+   both were !important, so every value already rendered on the band's
+   ink and Wins measured white. The outcome is the right one, so it is
+   ruled rather than repaired - the label beside the number already says
+   which stat it is, and Ascension paints EVERY positive number green,
+   which makes green mean "not zero" rather than anything about the
+   performer. Semantic colour lives in the timeline, where win or loss
+   is the datum rather than a property of the count. Deleted rather than
+   left in with the specificity nudged, because a rule that fires would
+   have changed the design, not fixed it (7.20: delete the dead rule,
+   never outvote it). */
 
 /* ---- The timeline ------------------------------------------------- */
 
@@ -954,11 +987,76 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
     grid-auto-columns: minmax(0, max-content) !important;
     justify-content: start !important;
 }
-/* Each match at its natural width, in the band's type rather than the
-   1.1rem Ascension sets on the entry. */
+/* The track's own `padding: 8px 0` goes, so the item's 2px gap carries
+   the space under PAST MATCHUPS exactly as it does under MATCH HISTORY.
+   They were 8px and 2px, which is why the two sub-rows breathed
+   differently. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * {
+    padding: 0 !important;
+}
+
+/* The match chip, on the house chip law (6.7) instead of Ascension's.
+   It arrived as a green slab: a tinted fill, a 3px left border, a 4px
+   radius, and FIVE type sizes in one object - 9.1px date, 12.88 dot,
+   11.9/700 status, 14px "vs", 13.3 name, 9.8/700 rating - so the word
+   "vs" was larger than the name it joined. Glass fill, hairline rim,
+   pill radius, and the state carried by INK rather than by a coloured
+   plate, which is also what stops a row of wins reading as a bar chart
+   of nothing.
+
+   Reached structurally, same depth discipline as the stats: the entry is
+   the track's child, and its own children are date, marker, content and
+   rating in that order. The only class read is win or loss on the entry
+   itself, which is the datum. */
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * {
-    font-size: var(--fs-md) !important;
+    --refract-asc-ink: rgba(var(--fg-rgb), 0.55);
+    display: inline-flex !important;
+    align-items: baseline !important;
+    gap: var(--gap-sm) !important;
     min-width: 0 !important;
+    padding: 0.3rem 0.7rem !important;
+    background: var(--fill-2) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-left: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    /* Two sizes in the chip, not five. Everything inside inherits this
+       one, and the two quiet ends are re-pointed below. */
+    font-size: var(--fs-md) !important;
+    color: rgba(var(--fg-rgb), 0.92) !important;
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * * {
+    font-size: inherit !important;
+    font-weight: inherit !important;
+}
+/* The date and the rating are the chip's captions: the second size, and
+   muted. `:first-child` and `:last-child` carry a pseudo-class each, so
+   they outrank the descendant rule above without an arms race. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:first-child,
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:first-child *,
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:last-child,
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:last-child * {
+    font-size: var(--fs-xs) !important;
+    color: rgba(var(--fg-rgb), 0.55) !important;
+    background: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+/* The state, and the only place in this section where a colour means
+   something: the marker dot, plus a rim tint so the chip reads at a
+   glance without becoming a coloured plate. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.win {
+    --refract-asc-ink: var(--refract-asc-win);
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.loss {
+    --refract-asc-ink: var(--refract-asc-loss);
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.win,
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.loss {
+    border-color: color-mix(in srgb, var(--refract-asc-ink) 45%, transparent) !important;
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:nth-child(2),
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:nth-child(3) > *:first-child {
+    color: var(--refract-asc-ink) !important;
 }
 
 /* The scroll, which now only engages when there are more matches than
