@@ -1106,6 +1106,15 @@
             var studioModeState = R.useState(storedStudioMode);
             var studioMode = studioModeState[0];
             var setStudioModeState = studioModeState[1];
+            var countryModeState = R.useState(countryModePref);
+            var countryMode = countryModeState[0];
+            function pickCountryMode(v) {
+                if (countryMode === v) { return; }
+                try { localStorage.setItem(COUNTRY_MODE_KEY, v); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyCountryModeClass();
+                countryModeState[1](v);
+            }
             function pickStudioMode(v) {
                 if (studioMode === v) { return; }
                 try { localStorage.setItem(STUDIO_MODE_KEY, v); } catch (e) { /* ignore */ }
@@ -1586,11 +1595,17 @@
             function elemHasMenu(d) {
                 if (!d) { return false; }
                 if (d.key === "refract.scHideStudio") { return true; }
+                /* A form question counts as a menu, the same way the studio's
+                   does. Without this the country's Name/Flag pair was built
+                   and never reachable: the hit target refuses to open a menu
+                   for an element it thinks has none. */
+                if (d.key === "refract.pcHideCountry") { return true; }
                 return !!d.sideKey;
             }
             function elemActionMenu(d) {
                 var rows = [];
                 var isStudio = d.key === "refract.scHideStudio";
+                var isCountry = d.key === "refract.pcHideCountry";
                 /* Where it sits. This is the only place placement is asked,
                    and it asks about ONE element -- the old shared chip moved
                    every top-edge element at once and could not name what it
@@ -1632,6 +1647,26 @@
                                 ? "Set the studio's name before the scene title instead"
                                 : "Put the studio back in a corner as its logo",
                             onClick: function () { pickStudioMode(o[0]); elemMenuState[1](null); }
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]));
+                    });
+                }
+                /* The country has a form too: the name, or the flag. One
+                   choice rather than two switches, because they say the same
+                   thing and a card showing both says it twice. Off is still
+                   the element's own switch, so the caption is name, flag or
+                   nothing. */
+                if (isCountry) {
+                    [["name", "Name"], ["flag", "Flag"]].forEach(function (o) {
+                        formRows.push(R.createElement("button", {
+                            key: "cmode-" + o[0],
+                            type: "button",
+                            className: "refract-cc-chip" + (countryMode === o[0] ? " is-on" : ""),
+                            role: "radio",
+                            "aria-checked": countryMode === o[0] ? "true" : "false",
+                            title: o[0] === "flag"
+                                ? "Show the country as its flag instead of its name"
+                                : "Show the country as its name",
+                            onClick: function () { pickCountryMode(o[0]); elemMenuState[1](null); }
                         }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]));
                     });
                 }
@@ -3390,12 +3425,6 @@
           sel: ".refract-pc-name-banner:not(.refract-mb-name)" },
         { key: "refract.pcHideCountry",    cls: "refract-pc-hide-country",    group: "performer", label: "Country",
           sel: ".stash-perf-country" },
-        /* Ships OFF. Every other element in this table defaults to shown,
-           because it was already on the card when the switch arrived. This
-           one is new geometry on a card people already run, so nobody's
-           library changes until they ask for it (#197). */
-        { key: "refract.pcHideCountryFlag", cls: "refract-pc-hide-country-flag", group: "performer", label: "Country flag",
-          sel: ".refract-flag-chip", defaultHidden: true },
         { key: "refract.pcHideStats",      cls: "refract-pc-hide-stats",      group: "performer", label: "Stat pills" },
         /* Ascension's rank read-out. Its visibility used to be a side effect
            of the Country chip (the badge is HOSTED inside the country caption
@@ -3466,9 +3495,6 @@
            one, and the two top corners promised controls that were not there.
            They share the bottom BAND, the way the back's strip does. */
         "refract.pcHideCountry":    "bottom",
-        /* The flag rides the country caption, so it answers to the same
-           zone: one ring round the bottom band offers both switches. */
-        "refract.pcHideCountryFlag": "bottom",
         "refract.pcHideStats":      "bottom",
         "refract.pcHideName":       "tl",
         "refract.pcHideRating":     "tl",
@@ -3499,6 +3525,10 @@
        scene title. "text" moves it out of the corner entirely, which is why it
        is a mode rather than another on/off. */
     var STUDIO_MODE_KEY = "refract.scStudioMode";
+    /* The country is ONE thing the card can say, in one of two forms. Two
+       independent switches would have let a card carry "Czechia" and the
+       Czech flag side by side, which is the same fact told twice. */
+    var COUNTRY_MODE_KEY = "refract.pcCountryMode";
     /* The card back. One anatomy: which image it uses, whether the media tray
        is on, and where the rating is drawn. There is deliberately no "style"
        key any more -- Mirror is this same face with the tray off. */
@@ -3684,7 +3714,7 @@
     var RATING_DISP_KEY = "refract.cbRating";
     var CARD_SIDE_KEYS = CARD_ELEMS.filter(function (d) { return d.sideKey; })
         .map(function (d) { return d.sideKey; })
-        .concat([TIER_LAYER_KEY, STUDIO_MODE_KEY, BACK_SRC_KEY, BACK_PILLS_KEY, FRONT_PILLS_KEY,
+        .concat([TIER_LAYER_KEY, STUDIO_MODE_KEY, COUNTRY_MODE_KEY, BACK_SRC_KEY, BACK_PILLS_KEY, FRONT_PILLS_KEY,
             FOOT_PILLS_KEY, BACK_STYLE_KEY, TRAY_KEY, TRAY_PHOTOS_KEY, TRAY_ROWS_KEY,
             RATING_DISP_KEY, CARD_BACK_EXPLICIT_KEY]);
     /* What "Reset card customiser" clears: every element, side and back key.
@@ -3750,6 +3780,16 @@
         try { return localStorage.getItem(STUDIO_MODE_KEY) === "text" ? "text" : "logo"; }
         catch (e) { return "logo"; }
     }
+    /* Name by default: it is what the card showed before the flag existed,
+       so an untouched library does not change. */
+    function countryModePref() {
+        try { return localStorage.getItem(COUNTRY_MODE_KEY) === "flag" ? "flag" : "name"; }
+        catch (e) { return "name"; }
+    }
+    function applyCountryModeClass() {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-pc-country-flag", countryModePref() === "flag");
+    }
     function applyStudioModeClass() {
         if (!document.body) { return; }
         document.body.classList.toggle("refract-sc-studio-text", studioModePref() === "text");
@@ -3760,6 +3800,7 @@
     function applyBackClasses() {
         if (!document.body) { return; }
         document.body.classList.toggle("refract-cb-tray-off", !trayOnPref());
+        applyCountryModeClass();
     }
     /* Set the studio's NAME before the scene title. The name is only available
        where Stash rendered a `.studio-overlay` (measured: 13 of 40 cards on the
@@ -4018,7 +4059,7 @@
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
         MINIMAL_CARDS_STORAGE_KEY, PERF_CARD_STYLE_KEY, FLOURISH_KEY,
         PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY,
-        SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY
+        SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY, COUNTRY_MODE_KEY
     ].concat(CARD_ELEMS.map(function (d) { return d.key; })).concat(CARD_SIDE_KEYS);
 
     function isPluginSortDisabledBottom() {

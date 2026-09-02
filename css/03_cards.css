@@ -2138,28 +2138,40 @@ body.stash-liquid-glass.refract-pc-hide-stats.refract-pc-hide-stats .performer-c
 /* Country gate TRIPLES the class: playing-card's
    .stash-perf-country.refract-country-with-rank rule ties a doubled
    gate at 5 classes and wins on file order. */
-/* The country flag chip. Its own switch rather than a part of Country,
-   because they answer different questions: whether the card names the
-   country at all, and whether it also wears the flag. Ships OFF, so the
-   triple class here is only doing what the rest of this block does --
-   outranking the layout rules that draw the caption. */
-body.stash-liquid-glass.refract-pc-hide-country-flag.refract-pc-hide-country-flag.refract-pc-hide-country-flag .performer-card .refract-flag-chip {
+/* Country: the name OR the flag, never both. They are the same fact in
+   two forms, so the caption carries one of them and the Country element's
+   own switch still turns the whole thing off. Name is the default, which
+   is what the card showed before the flag existed. */
+body.stash-liquid-glass .performer-card .stash-perf-country .refract-flag-chip {
     display: none !important;
 }
-/* On the card the chip rides the caption's own line, so it is sized in
-   `em` against that caption rather than the band's type token. */
+body.stash-liquid-glass.refract-pc-country-flag .performer-card .stash-perf-country .refract-flag-chip {
+    display: inline-block !important;
+}
+body.stash-liquid-glass.refract-pc-country-flag .performer-card .stash-perf-country .stash-perf-country-name {
+    display: none !important;
+}
 body.stash-liquid-glass .performer-card .stash-perf-country .refract-flag-chip {
-    --refract-flag-chip-size: 1.05em;
-    margin-right: 0.4em;
-    vertical-align: -0.15em;
+    /* Sized to be READ as a flag, not as a dot. The caption is 10px, and
+       a chip at its cap height came out 10.6px, where a flag is a
+       coloured speck: the stripes of the US, the cross of Denmark and
+       the disc of Japan are indistinguishable at that size. 18px is the
+       floor where those three separate at a normal viewing distance. It
+       lifts the caption line, which the card has room for -- and when the
+       flag is showing there is no name beside it to be crowded. */
+    --refract-flag-chip-size: 18px;
+    margin-right: 0;
+    vertical-align: -0.28em;
     /* Stash's own `.fi` rule pins the flag to the card's bottom-right
        corner (`position: absolute; right: 1rem; bottom: 1rem`) for the
        native overlay. Inherited, it threw the chip 238px clear of the
        caption, which has `overflow: hidden`, so it was drawn and then
        clipped away: present in the DOM, painted, and invisible. Put it
-       back in the text flow. */
+       back in the text flow. Display is deliberately NOT set here: this
+       rule sits after the name/flag pair above and would have re-shown
+       the chip in name mode, which is how the card briefly carried both
+       forms of the same fact. */
     position: static !important;
-    display: inline-block !important;
 }
 
 body.stash-liquid-glass.refract-pc-hide-country.refract-pc-hide-country.refract-pc-hide-country .performer-card .stash-perf-country,
