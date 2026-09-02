@@ -495,47 +495,34 @@ body.stash-liquid-glass .performer-card .refract-ascension-icon {
         drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55)) !important;
 }
 
-/* Hide the plugin's tier emoji: the flame glyph already marks the line
-   as Ascension, and the number carries its own warm gradient. Ascension
-   1.3.0 dropped this element, but 1.2.x is still widely installed, so the
-   rule stays. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-emoji {
-    display: none !important;
-}
+/* Inside a badge Refract has CLAIMED, the read-out is the flame and the
+   rank, and nothing else. That used to be four hides written by class
+   name (`.hon-rank-emoji` from 1.2.x, `.hon-asc-score-display` and
+   `.hon-asc-separator` from 1.3.x, `.hon-rank-total`, `.hon-match-stats`)
+   which is a list somebody has to extend every time Ascension renames or
+   adds a part, and #190 is what it costs when nobody does. Stated
+   structurally, the same intent survives a rename: the badge shows the
+   rank text and the elements refract.js injects, and takes everything
+   else out of the row.
 
-/* Any icon the badge brought with it, whatever the version calls it.
-   Ascension 1.3.0 replaced the tier emoji with an SVG of ITS OWN navbar
-   flame (`.hon-asc-icon`) - the same path we copied for our glyph - so
-   the read-out drew two identical flames, one amber and one in the tier
-   colour (Discourse #190). Matched structurally rather than by their
-   class name so the next rename does not reopen this: inside the badge,
-   the only icon that survives is ours.
+   It has to be more than `display: none`. Ascension's score wrapper
+   ships `display: inline-flex !important` INLINE, and an inline
+   !important cannot be beaten from a stylesheet, so a plain hide lands
+   on the separator and slides straight off the wrapper. Out of flow
+   instead, with properties their inline style does not set: at width 0
+   alone it still sat in the flex row and earned a gap of its own, which
+   widened the read-out by 6.9px against a badge that had no score.
+   Absolute, hidden and zero-sized it costs nothing, and the same recipe
+   covers whatever the next version puts there.
 
-   It has to be a hide. Their SVG carries `style="fill: currentColor
-   !important"` inline, and an inline !important beats an author
-   !important, so recolouring their glyph from CSS is not possible. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge svg:not(.refract-ascension-icon) {
+   This is only safe because of the classifier in refract.js
+   (`ascensionBadgeUnknownPart`). A shape this build cannot name never
+   gets the marker class, so this rule never reaches it: a future part is
+   left visible rather than swept away by a rule written before it
+   existed. Widen this selector and you are relying on that gate; do not
+   let the two drift apart. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge > *:not(.hon-rank-text):not(.refract-ascension-icon):not(.refract-ascension-score) {
     display: none !important;
-}
-
-/* The Ascended Score that 1.3.0 puts ahead of the rank, and its
-   separator. The card read-out is "[flame] rank": one number, uniform
-   across every performer, on a surface with no room to argue. The score
-   is not lost, it is on the badge's own tooltip and on the performer
-   page. Making it an optional card element is post-ship work. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-score-display,
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-separator {
-    display: none !important;
-    /* The score's own wrapper ships `display: inline-flex !important`
-       INLINE, and an inline !important cannot be beaten from a
-       stylesheet, so the hide above lands on the separator and slides
-       off the wrapper. Take it OUT OF FLOW instead, with properties
-       their inline style does not set: at width 0 it still sat in the
-       badge's flex row and earned a gap of its own, which widened the
-       read-out by 6.9px against a badge that never had a score.
-       Absolute and hidden, it costs nothing. Stripping the inline
-       styles in refract.js is the proper repair and is on the
-       post-ship list. */
     position: absolute !important;
     width: 0 !important;
     height: 0 !important;
@@ -545,15 +532,19 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-separa
     overflow: hidden !important;
     visibility: hidden !important;
 }
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-score-display > * {
+/* Their children too, in case a future part plays the same inline trick
+   one level down. The wrapper above is already zero-sized and clipped,
+   so this is belt to that rule's braces - it is here because the
+   wrapper's inline style is precisely the thing that has beaten us
+   once. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge > *:not(.hon-rank-text):not(.refract-ascension-icon):not(.refract-ascension-score) * {
     display: none !important;
 }
-
-/* Hide the "of <total>" suffix (.hon-rank-total): the read-out is a bare
-   rank number ("[flame] N"), not "N of 492". On narrow grid cards it got
-   clipped, but wider contexts (e.g. the gallery details panel) revealed
-   it trailing the badge. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-total {
+/* And the promise that made #190 a bug rather than a preference: inside
+   a claimed badge, the only icon that paints is ours. Its own rule
+   rather than folded above, because it is the one guarantee that holds
+   wherever in the badge an icon turns up. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge svg:not(.refract-ascension-icon) {
     display: none !important;
 }
 
@@ -576,14 +567,6 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-text 
     color: transparent !important;
     text-shadow: none !important;
     filter: none !important;
-}
-
-/* Declutter for the grid: the full W/L/D record, win-rate and streak
-   belong on the performer page, not a dense card. Hiding the entire
-   `.hon-match-stats` cluster keeps every read-out uniform ("flame #N")
-   regardless of how many stats a performer has. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-match-stats {
-    display: none !important;
 }
 
 /* ── An Ascension whose badge we do not recognise ────────────────────
