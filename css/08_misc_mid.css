@@ -7747,6 +7747,15 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group {
     grid-column: 1 / -1;
     display: grid !important;
     grid-template-columns: repeat(6, minmax(0, 1fr));
+    /* Every cell fills its row, whatever the tallest one in that row
+       does. The generic entity rule aligns to `start`, which is right
+       for a two-column definition list with border-top rules, and wrong
+       here: these cells carry their own plate and the 1px gaps between
+       them ARE the dividers, so a cell that stops short of its row
+       leaves the hairline broken and the plate hanging into the row
+       below. Reported on a country name that pushed its flag onto a
+       second line; the guarantee is what matters, not that one field. */
+    align-items: stretch;
     gap: 1px !important;
     column-gap: 1px !important;
     padding: 0 !important;
@@ -7797,6 +7806,56 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item-v
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+/* ── The country chip ──────────────────────────────────────────────
+   A flag clipped to a disc, ringed in the accent. Written as its own
+   class rather than a rule on the tile, because the performer card's
+   country caption is the other place a flag belongs and it should get
+   the same object rather than a second version of it.
+
+   The ring is the accent, so it follows every preset; the dark ring
+   under it is what keeps a pale flag (Japan, Poland) off a pale plate
+   in light mode. Sized from the type scale, at the value line's own
+   height, so the chip cannot change a row's height whatever the flag
+   or the country name is. */
+body.stash-liquid-glass .refract-flag-chip {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: calc(var(--fs-md) * 1.3);
+    height: calc(var(--fs-md) * 1.3);
+    margin: 0 !important;
+    border-radius: 50%;
+    /* flag-icons ships `contain`, which letterboxes a 4:3 flag inside a
+       circle. Cover fills the disc and crops top and bottom, which is
+       where flags carry the least. */
+    background-size: cover;
+    background-position: center;
+    /* The ring is a BORDER, not a box-shadow spread. A spread ring on a
+       percentage radius does not stay round: Chromium resolves the 50%
+       against the original box and then expands, so the ring came out
+       as a squircle around a circular flag. Invisible on a dark plate,
+       where the drop shadow softens the corners, and obvious in light
+       mode on a pale flag. Measured on Japan, which is the worst case
+       for both faults at once.
+
+       Border-box keeps the chip at the value line's height whatever the
+       ring costs, so the row cannot grow; padding-box stops the flag
+       painting under the ring. */
+    box-sizing: border-box;
+    border: 1.5px solid rgba(var(--accent-rgb), 0.9);
+    background-clip: padding-box;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Country: the chip IS the value. The name stays in the DOM, so screen
+   readers still read it and refract.js puts it on the tile's tooltip --
+   which matters more than usual here, because a flag alone cannot tell
+   Slovenia from Slovakia or Chad from Romania. Gated on the flag being
+   present: a country Stash cannot map to a flag keeps its text. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.country .detail-item-value:has(.refract-flag-chip) {
+    font-size: 0 !important;
+    line-height: calc(var(--fs-md) * 1.3);
+}
+
 /* Height ships both units stacked; the metric one is the value. */
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .height-imperial {
     display: none !important;
@@ -7805,6 +7864,39 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.s
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids a {
     font-size: var(--fs-sm) !important;
 }
+/* Prose in a grid of scalars. Tattoos and piercings are semicolon
+   lists, not facts: one cell of six cannot hold them, and with the
+   single line the other read-outs want, the run painted straight out
+   of its cell, across the empty cells beside it, and off the band's
+   edge (reported on Casey Kisses). They are a different kind of
+   content, so they get a different shape rather than a smaller one:
+   the full width, the way the Stash IDs row already does, and they
+   wrap inside it. The six-up rows stay one line tall. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.tattoos,
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.piercings,
+/* Stash's Custom Fields block is a grid CHILD but not a detail item, so
+   it took one column of six and whatever a plugin put inside it painted
+   straight out the side: Ascension's match-history grid measured 1125px
+   in a 254px column, 881px of it over the four cells to its right. Found
+   while checking the country work, not reported. Same answer as prose:
+   it is a panel, so it gets the row. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group > .custom-fields {
+    grid-column: 1 / -1;
+    /* The row alone is not enough: a plugin can put anything in here, and
+       Ascension's match timeline measured 10,231px, so it left the band
+       even at full width. The panel scrolls its own overflow rather than
+       hiding it, because the content is somebody else's and cropping it
+       would be a decision about their feature. Widths inside a grid need
+       the floor removed before a scroll container can shrink. */
+    min-width: 0;
+    overflow-x: auto;
+}
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.tattoos .detail-item-value,
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.piercings .detail-item-value {
+    white-space: normal;
+    text-overflow: clip;
+}
+
 /* The tag run is the one field the band cannot size: thirty-one chips
    need three lines and the grid gives every cell one. It leaves the
    grid entirely (row 4, below) rather than setting the height of the
