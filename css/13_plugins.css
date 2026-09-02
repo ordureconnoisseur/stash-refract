@@ -635,12 +635,27 @@ body.stash-liquid-glass .performer-card .refract-ascension-score {
    and the box centre are both 5.6px), which is what makes the plain
    50%-and-translate honest here rather than a guess.
 
-   Quieter than either number it separates, at 0.3 against the read-out's
+   Quieter than either number it separates, at 0.5 against the read-out's
    0.92: a divider that competes with its own content has stopped being
    structure. Literal white rather than `rgba(var(--fg-rgb), A)` because
    in playing-card mode this line sits on the card PHOTOGRAPH, the third
-   ground of DESIGN_SYSTEM 3.1 rule 4, which does not flip with the
-   mode. */
+   ground of DESIGN_SYSTEM 3.1 rule 4, which does not flip with the mode.
+
+   And it carries its own dark halo, which is the part that took a
+   measurement to find. At 0.3 with no halo the hairline measured 1.93:1
+   against a dark card image and 1.18:1 against a bright skin tone: a
+   white line over a photograph is at the mercy of the photograph, and no
+   single alpha serves both ends, because raising it enough to survive
+   the bright card makes it shout on the dark one. The halo supplies the
+   divider's own ground, which is exactly what the badge's drop-shadow
+   does for the numbers and what the country caption's text-shadow does
+   beside it, so the mark reads on artwork of any brightness instead of
+   on the average one. This is 3.9's rule doing real work: the ground is
+   the rendered pixel, not the surface the element nominally sits on.
+
+   A `box-shadow` rather than a `filter`, deliberately: the badge already
+   carries a container filter, and DESIGN_SYSTEM 3.3 forbids per-element
+   drop-shadow on anything repeated, which a divider on every card is. */
 body.stash-liquid-glass .performer-card .refract-ascension-score::before {
     content: "" !important;
     position: absolute !important;
@@ -650,7 +665,8 @@ body.stash-liquid-glass .performer-card .refract-ascension-score::before {
     width: 1px !important;
     /* 8px of digit ink at 11.2px. Recompute if --fs-sm moves. */
     height: 0.714em !important;
-    background: rgba(255, 255, 255, 0.3) !important;
+    background: rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 0 1.5px rgba(0, 0, 0, 0.85) !important;
 }
 
 /* Off unless the customiser says otherwise: this is the one card element
