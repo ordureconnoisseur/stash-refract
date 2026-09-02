@@ -677,6 +677,20 @@ classes and the settings chips all derive from that one table. A new card
 element that should be hideable joins the table; it does not get a bespoke
 toggle.
 
+An element may ship OFF (ruled 2026-09-02, the Ascended score being the
+first). Its roster chip is then its only control, and that is sufficient
+rather than a compromise: a hit target cannot exist for something the card
+does not draw, which is already true of Tag count on a scene with no tags
+and Country on a performer with none. The element's default belongs in the
+table beside it, so an absent stored value is no longer the same statement
+as one set off, and a look that lists only what it HIDES cannot express a
+default-off element at all. That last clause is the trap: "absent means
+shown" was encoded in four separate readers, each locally correct and
+invisible to the others, and missing one is silent - a look switches the
+element on, or two looks collapse to one signature. 7.20's law about the
+selector you are reading has a JS twin, and the cure is the same: one
+reader, here one helper, owns the question.
+
 ### 6.2 The playing card
 
 The signature element. When `refract-perf-layout-card` is set, a performer card
