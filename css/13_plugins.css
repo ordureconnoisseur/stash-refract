@@ -766,6 +766,18 @@ body.stash-liquid-glass .performer-card .refract-ascension-unknown {
    legible colour instead of dropping the declaration. */
 body.stash-liquid-glass #performer-page {
     --refract-ph-tier-ink: rgb(var(--refract-ph-tier, var(--accent-rgb)));
+    /* Win and loss ink for the Ascension stats. Ascension's own #22c55e
+       measures 8.55:1 on the dark plate and passes, so dark keeps it and
+       only light is re-pointed; the same for the loss red. Measured
+       against the plate they actually sit on, not the surface behind it:
+       light values are 4.88:1 and 6.36:1, both over the 4.5 floor that
+       Ascension's originals miss at 2.23:1. */
+    --refract-asc-win: #22c55e;
+    --refract-asc-loss: #f87171;
+}
+body.stash-liquid-glass.refract-light #performer-page {
+    --refract-asc-win: #15803d;
+    --refract-asc-loss: #b91c1c;
 }
 @supports (color: color-mix(in srgb, red 50%, black)) {
     body.stash-liquid-glass.refract-light #performer-page {
@@ -784,76 +796,173 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
 
 /* ---- The Ascension section --------------------------------------- */
 
-/* Room for the header drawn below, and the anchor it hangs off. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats,
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record {
-    position: relative;
-}
-body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats,
-body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-performer_record {
-    /* The header hangs above the item (bottom: 100%), so this gap IS the
-       header, and it is computed rather than chosen: its 21px line box
-       plus the 0.2rem it holds off the item, 23.8px. At --gap-xl (1rem,
-       14px) the header overflowed 9.8px upward and sat on the row above
-       it - measured, not guessed. Recompute if the header line-height or
-       that margin moves. */
-    margin-top: calc(1.5rem + 0.2rem) !important;
-}
-/* ...except on the SECOND of the pair, which sits directly under the
-   first and needs no second header or gap. */
-body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats ~ .detail-item.custom-field-performer_record {
-    margin-top: 0 !important;
+/* The section is a ROW OF THE BAND, not a widget hung off it. That is the
+   whole correction: the first build gave it a 14px sentence-case header
+   floating in a 23.8px gap at the plate's outer edge, its own pill
+   language inside, and its own spacing scheme, so it read as a stray
+   thing between two plates. Everything below puts it back on the band's
+   plate, in the band's type, on the band's track, with one accent.
+
+   Every value here is lifted off the band's own rows rather than chosen:
+   label 10.08px/500 tracked 0.6048px caps at 55%, value 12.88px/400 at
+   92%, plate padding 8.4px 11.2px, rows separated by 1px gaps that show
+   the backdrop through (the band's hairlines are the gaps, not borders -
+   sampled live at rgb(74,72,71) against a rgb(15,14,16) plate). */
+
+/* The rows stack like the band's, with the same 1px hairline between
+   them. No margins: the gap IS the separation, everywhere in this band.
+
+   Scoped to the OPEN state, and that .show is load-bearing. Without it
+   this matched a collapsed panel too and beat Bootstrap's own
+   `.collapse:not(.show) { display: none }` with !important, so Stash's
+   collapse stopped working: measured on a performer with one field, the
+   panel went 34px to 81px and could not be shut again. Making something
+   Stash could do impossible is the P6 failure, and it was mine for one
+   build. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse.show {
+    display: grid !important;
+    gap: 1px !important;
+    background: transparent !important;
 }
 
-/* The header. Drawn on whichever Ascension field comes first, so a
-   performer with a record but no stats block still gets one. Matches the
-   Custom Fields button beside it exactly - 14px, weight 600, the same
-   21px line - and differs only in colour, so it reads as a peer section
-   rather than a new kind of thing. */
+/* The header, inside the plate now and in the band's label style, so the
+   section has ONE label tier rather than three. It is the eyebrow with a
+   hairline underline, which is the house pattern 6.13 already prescribes
+   for a column label; the rule is the tier at low alpha and it is the
+   section's single accent. Static flow, not absolute: an absolutely
+   positioned header cannot be part of a stack. */
 body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats::before,
 body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-performer_record::before {
     content: "Ascension";
-    position: absolute;
-    left: 0;
-    bottom: 100%;
-    margin-bottom: 0.2rem;
-    font-size: var(--fs-body) !important;
-    font-weight: 600;
-    line-height: 21px;
-    letter-spacing: normal;
-    text-transform: none;
+    position: static;
+    display: block;
+    margin: 0 0 0.4rem 0;
+    padding-bottom: 0.3rem;
+    font-size: var(--fs-xs) !important;
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    line-height: 12.096px;
+    text-transform: uppercase;
     color: var(--refract-ph-tier-ink);
+    border-bottom: 1px solid rgba(var(--refract-ph-tier, var(--accent-rgb)), 0.35);
     pointer-events: none;
 }
 /* One header per section: the second field of the pair does not repeat
-   it. Written as its own override rather than folded into a :not() so
-   the rule above stays readable; the grep-before-you-add discipline in
-   7.20 applies to whoever edits either. */
+   it. Its own override rather than a :not() so the rule above stays
+   readable; grep both before adding a third (7.20). */
 body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats ~ .detail-item.custom-field-performer_record::before {
     content: none;
 }
+/* The 23.8px hanging gap the absolute header needed is gone with it. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats,
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-performer_record {
+    position: relative;
+    margin-top: 0 !important;
+}
 
-/* The stat row wrapped instead of cut. Measured today: the row is a
-   nowrap flex line inside an overflow-hidden value, so the last stat is
-   sliced through its own number ("LAST MATCH May 30, 2026, 11:58 P").
-   A stat cut in half is worse than a stat on the next line. */
+/* ---- The stats, as the band's tiles ------------------------------- */
+
+/* Reached STRUCTURALLY, never by Ascension's class names: inside this
+   field, the value's only child is the row, its children are the tiles,
+   and each tile's first and last child are the label and the number.
+   That holds whatever they call them, and if the structure ever changes
+   the tiles simply fall back to Ascension's own pills - visible, and
+   safe. The fixed prefix plus !important outranks their stylesheet. */
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value {
     overflow: visible !important;
 }
+/* The band's own 6-up track, so the eighth stat lands beside the seventh
+   instead of alone on a ragged second row. */
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
-    flex-wrap: wrap !important;
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 1px !important;
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+/* Ascension's pill chrome off. The tiles take NO ground of their own:
+   the row they sit in is already the band's plate, so a background here
+   would be a second plate on top of it - and the first attempt proved
+   why that matters, by hardcoding rgba(14,13,16,0.74) and shipping six
+   dark slabs onto the light panel. The ground is the parent's, which
+   flips because the band's does. 3.1 rule 4, learned twice in one
+   surface. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * > * {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+    padding: 0.6rem 0.8rem !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+/* The label: the band's, exactly. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * > * > *:first-child {
+    font-size: var(--fs-xs) !important;
+    font-weight: 500 !important;
+    letter-spacing: var(--track-label) !important;
+    line-height: 12.096px !important;
+    text-transform: uppercase !important;
+    text-align: left !important;
+    color: rgba(var(--fg-rgb), 0.55) !important;
+}
+/* The number: the band's value. This is also what fixes the light-mode
+   legibility finding without a per-release colour list - Ascension's
+   hardcoded #e5e7eb measured 1.21:1 on the light panel, and the band's
+   ink is a token that flips. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * > * > *:last-child {
+    font-size: var(--fs-md) !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.07px !important;
+    text-align: left !important;
+    color: rgba(var(--fg-rgb), 0.92) !important;
+}
+/* Win and loss keep a colour, because it encodes data (P3). This is the
+   ONE place Ascension's own class names are read, and only to ask which
+   of two meanings a number carries - never for geometry or type. A
+   rename costs the colour and nothing else: the number stays on the
+   band's ink, legible in both modes. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .stat-positive {
+    color: var(--refract-asc-win) !important;
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .stat-negative {
+    color: var(--refract-asc-loss) !important;
 }
 
 /* ---- The timeline ------------------------------------------------- */
 
-/* The match track is a grid Ascension lays out at its natural width -
-   9,793px on a performer with a long record - inside its own element
-   carrying `overflow-x: hidden`. So it never escapes the panel and the
-   page never scrolls sideways: what is lost is not the layout, it is the
-   READING. Everything past the first screenful is unreachable.
+/* Ascension sets `.match-timeline { width: 650% !important }` above
+   1200px, with five equal columns. That is correct for the layout it was
+   written against, where a custom field's value is a narrow column and
+   650% of it is a sane row of five. Refract gives the value the full
+   1092px, so the same rule computes to a 7,193px grid with 1,434px
+   columns, and a single match renders as one green bar with 160px of
+   text and 1,250px of empty. Refract changed the context, so Refract
+   neutralises it here rather than asking upstream to care.
 
-   This is the one place the section gives Ascension behaviour it did not
-   have, and it is deliberate: a scroll, so the record can be read. */
+   Reached structurally again: the value's child is Stash's TruncatedText
+   wrapper, and ITS child is the track. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * {
+    width: 100% !important;
+    grid-template-columns: none !important;
+    grid-auto-flow: column !important;
+    grid-auto-columns: minmax(0, max-content) !important;
+    justify-content: start !important;
+}
+/* Each match at its natural width, in the band's type rather than the
+   1.1rem Ascension sets on the entry. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * {
+    font-size: var(--fs-md) !important;
+    min-width: 0 !important;
+}
+
+/* The scroll, which now only engages when there are more matches than
+   the row holds. */
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value {
     overflow-x: auto !important;
     overflow-y: hidden !important;
@@ -881,23 +990,12 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar-thumb:hover {
     background: rgba(var(--refract-ph-tier, var(--accent-rgb)), 0.6);
 }
-/* The edge that says there is more. On the ITEM, not on the scrolling
-   value: an absolutely positioned child of a scroll container travels
-   with the content, so a fade drawn there slides away the moment you
-   use it. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 3rem;
-    pointer-events: none;
-    background: linear-gradient(90deg,
-        rgba(var(--bg-0-rgb), 0) 0%,
-        rgba(var(--bg-0-rgb), 0.92) 78%);
-}
-
+/* No fade edge. The first build had one, and with the track neutralised
+   it stopped earning its place: CSS cannot ask whether a scroller
+   actually overflows, so the gradient painted over empty plate on the
+   two-match performers that are most of this library. The tier-thumbed
+   bar already says "there is more" and only appears when there is. One
+   accessory removed rather than kept for the case it was drawn for. */
 /* ---- What is left of Custom Fields -------------------------------- */
 
 /* "A field of the user's own" is any custom field that is not one of the
@@ -917,7 +1015,9 @@ body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .det
    common case, but not the one where a performer has only refract_back:
    without this, that panel could be shut with no handle. */
 body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .detail-item:not(.custom-field-hotornot_stats):not(.custom-field-performer_record):not(.custom-field-refract_back))) .collapse {
-    display: block !important;
+    display: grid !important;
+    gap: 1px !important;
+    background: transparent !important;
     height: auto !important;
     visibility: visible !important;
 }
