@@ -1106,6 +1106,15 @@
             var studioModeState = R.useState(storedStudioMode);
             var studioMode = studioModeState[0];
             var setStudioModeState = studioModeState[1];
+            var countryModeState = R.useState(countryModePref);
+            var countryMode = countryModeState[0];
+            function pickCountryMode(v) {
+                if (countryMode === v) { return; }
+                try { localStorage.setItem(COUNTRY_MODE_KEY, v); } catch (e) { /* ignore */ }
+                scheduleServerSync();
+                applyCountryModeClass();
+                countryModeState[1](v);
+            }
             function pickStudioMode(v) {
                 if (studioMode === v) { return; }
                 try { localStorage.setItem(STUDIO_MODE_KEY, v); } catch (e) { /* ignore */ }
@@ -1586,11 +1595,17 @@
             function elemHasMenu(d) {
                 if (!d) { return false; }
                 if (d.key === "refract.scHideStudio") { return true; }
+                /* A form question counts as a menu, the same way the studio's
+                   does. Without this the country's Name/Flag pair was built
+                   and never reachable: the hit target refuses to open a menu
+                   for an element it thinks has none. */
+                if (d.key === "refract.pcHideCountry") { return true; }
                 return !!d.sideKey;
             }
             function elemActionMenu(d) {
                 var rows = [];
                 var isStudio = d.key === "refract.scHideStudio";
+                var isCountry = d.key === "refract.pcHideCountry";
                 /* Where it sits. This is the only place placement is asked,
                    and it asks about ONE element -- the old shared chip moved
                    every top-edge element at once and could not name what it
@@ -1632,6 +1647,26 @@
                                 ? "Set the studio's name before the scene title instead"
                                 : "Put the studio back in a corner as its logo",
                             onClick: function () { pickStudioMode(o[0]); elemMenuState[1](null); }
+                        }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]));
+                    });
+                }
+                /* The country has a form too: the name, or the flag. One
+                   choice rather than two switches, because they say the same
+                   thing and a card showing both says it twice. Off is still
+                   the element's own switch, so the caption is name, flag or
+                   nothing. */
+                if (isCountry) {
+                    [["name", "Name"], ["flag", "Flag"]].forEach(function (o) {
+                        formRows.push(R.createElement("button", {
+                            key: "cmode-" + o[0],
+                            type: "button",
+                            className: "refract-cc-chip" + (countryMode === o[0] ? " is-on" : ""),
+                            role: "radio",
+                            "aria-checked": countryMode === o[0] ? "true" : "false",
+                            title: o[0] === "flag"
+                                ? "Show the country as its flag instead of its name"
+                                : "Show the country as its name",
+                            onClick: function () { pickCountryMode(o[0]); elemMenuState[1](null); }
                         }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]));
                     });
                 }
@@ -3504,6 +3539,10 @@
        scene title. "text" moves it out of the corner entirely, which is why it
        is a mode rather than another on/off. */
     var STUDIO_MODE_KEY = "refract.scStudioMode";
+    /* The country is ONE thing the card can say, in one of two forms. Two
+       independent switches would have let a card carry "Czechia" and the
+       Czech flag side by side, which is the same fact told twice. */
+    var COUNTRY_MODE_KEY = "refract.pcCountryMode";
     /* The card back. One anatomy: which image it uses, whether the media tray
        is on, and where the rating is drawn. There is deliberately no "style"
        key any more -- Mirror is this same face with the tray off. */
@@ -3689,7 +3728,7 @@
     var RATING_DISP_KEY = "refract.cbRating";
     var CARD_SIDE_KEYS = CARD_ELEMS.filter(function (d) { return d.sideKey; })
         .map(function (d) { return d.sideKey; })
-        .concat([TIER_LAYER_KEY, STUDIO_MODE_KEY, BACK_SRC_KEY, BACK_PILLS_KEY, FRONT_PILLS_KEY,
+        .concat([TIER_LAYER_KEY, STUDIO_MODE_KEY, COUNTRY_MODE_KEY, BACK_SRC_KEY, BACK_PILLS_KEY, FRONT_PILLS_KEY,
             FOOT_PILLS_KEY, BACK_STYLE_KEY, TRAY_KEY, TRAY_PHOTOS_KEY, TRAY_ROWS_KEY,
             RATING_DISP_KEY, CARD_BACK_EXPLICIT_KEY]);
     /* What "Reset card customiser" clears: every element, side and back key.
@@ -3701,16 +3740,23 @@
     var CARD_ELEM_BY_KEY = {};
     CARD_ELEMS.forEach(function (d) { CARD_ELEM_BY_KEY[d.key] = d; });
 
-    /* Every element in the table but one ships SHOWN, so "nothing stored"
-       has always meant "visible" and this could answer without consulting
-       the table at all. The Ascended score breaks that: it is another
-       plugin's number on Refract's card and it ships off. So the default
-       lives in the table beside the element, "0" and "1" are the only
-       values that override it, and a key that is merely ABSENT is no
-       longer the same statement as a key set to "0".
+    /* An unset key means "whatever this element ships as", not "shown".
+       Everything in the table shipped shown until the Ascended score, so
+       the two used to be the same statement and this could answer without
+       consulting the table at all. The score is another plugin's number on
+       Refract's card and it ships off, so the default lives in the table
+       beside the element, "0" and "1" are the only values that override
+       it, and a key that is merely ABSENT is no longer a key set off.
 
        Reset comes out right for free: clearing the key returns each
-       element to its own default rather than to a hardcoded shown. */
+       element to its own default rather than to a hardcoded shown.
+
+       The performer lane reached this same conclusion independently for
+       the country flag chip (5887e00) and removed its consumer again when
+       the flag folded into Country as a form question (3b25c1f), leaving
+       the mechanism here with nothing using it. Both halves are kept: this
+       reader is the map version because presetHidesElem below calls it per
+       element per look, and the linear scan was the merge's other side. */
     function cardElemDefaultHidden(key) {
         var d = CARD_ELEM_BY_KEY[key];
         return !!(d && d.defaultHidden);
@@ -3730,7 +3776,12 @@
        the same signature and one of them would vanish from the row. One
        function, four callers, so the assumption can only be changed in
        one place. A look that wants a default-off element ON names it in
-       `show`; every existing look keeps its `hide` list untouched. */
+       `show`; every existing look keeps its `hide` list untouched.
+
+       This is the half the other side of the merge did NOT have. Its
+       default-off element was gone by then, so its four raw readers were
+       latent rather than wrong; the Ascended score makes them live again,
+       which is why the fold comes back rather than the mechanism alone. */
     function presetHidesElem(p, d) {
         if (p.hide.indexOf(d.key) !== -1) { return true; }
         if (d.defaultHidden) { return (p.show || []).indexOf(d.key) === -1; }
@@ -3778,6 +3829,16 @@
         try { return localStorage.getItem(STUDIO_MODE_KEY) === "text" ? "text" : "logo"; }
         catch (e) { return "logo"; }
     }
+    /* Name by default: it is what the card showed before the flag existed,
+       so an untouched library does not change. */
+    function countryModePref() {
+        try { return localStorage.getItem(COUNTRY_MODE_KEY) === "flag" ? "flag" : "name"; }
+        catch (e) { return "name"; }
+    }
+    function applyCountryModeClass() {
+        if (!document.body) { return; }
+        document.body.classList.toggle("refract-pc-country-flag", countryModePref() === "flag");
+    }
     function applyStudioModeClass() {
         if (!document.body) { return; }
         document.body.classList.toggle("refract-sc-studio-text", studioModePref() === "text");
@@ -3788,6 +3849,7 @@
     function applyBackClasses() {
         if (!document.body) { return; }
         document.body.classList.toggle("refract-cb-tray-off", !trayOnPref());
+        applyCountryModeClass();
     }
     /* Set the studio's NAME before the scene title. The name is only available
        where Stash rendered a `.studio-overlay` (measured: 13 of 40 cards on the
@@ -4046,7 +4108,7 @@
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
         MINIMAL_CARDS_STORAGE_KEY, PERF_CARD_STYLE_KEY, FLOURISH_KEY,
         PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY,
-        SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY
+        SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY, COUNTRY_MODE_KEY
     ].concat(CARD_ELEMS.map(function (d) { return d.key; })).concat(CARD_SIDE_KEYS);
 
     function isPluginSortDisabledBottom() {
@@ -8653,6 +8715,36 @@
         if (cItem) { cval = (cItem.textContent || "").trim(); }
         if (cname.textContent !== cval) { cname.textContent = cval; }
 
+        /* The flag chip, so this card is the same card as the ones in the
+           grid. It was not here at first, and the gap only showed in flag
+           mode: every card in the library turned over to a flag and the
+           performer's own page still read out the name. The code comes
+           off the band's flag element, which Stash renders whether or not
+           the band draws it. */
+        var phFlag = header.querySelector(".detail-item.country .fi, .detail-item.country .flag-icon");
+        var phCode = "";
+        if (phFlag && phFlag.classList) {
+            for (var fi = 0; fi < phFlag.classList.length; fi++) {
+                var fc = phFlag.classList[fi];
+                if (fc.length === 5 && fc.slice(0, 3) === "fi-") { phCode = fc.slice(3); break; }
+            }
+        }
+        var phChip = country.querySelector(".refract-flag-chip");
+        if (phCode) {
+            if (!phChip) {
+                phChip = document.createElement("span");
+                country.insertBefore(phChip, cname);
+            }
+            var phCls = "fi fi-" + phCode + " refract-flag-chip";
+            if (phChip.className !== phCls) { phChip.className = phCls; }
+            if (cval && phChip.getAttribute("title") !== cval) {
+                phChip.setAttribute("title", cval);
+                phChip.setAttribute("aria-label", cval);
+            }
+        } else if (phChip) {
+            phChip.parentNode.removeChild(phChip);
+        }
+
         var strip = chin.querySelector(".stash-perf-stats");
         if (!strip) {
             strip = document.createElement("div");
@@ -9032,29 +9124,116 @@
             if (cut !== raw0) { titles[ti].textContent = cut; }
         }
 
-        /* 1b. The country chip. Stash renders the country as its name
-           followed by a flag-icons span; the band shows the flag alone,
-           as a disc. Two things CSS cannot do are done here: tag the
-           flag so the chip class is ours rather than a rule aimed at
-           somebody else's `.fi`, and put the country's NAME on the
-           tile's tooltip. The name is why this is not decoration -- a
-           flag alone does not separate Slovenia from Slovakia, or Chad
-           from Romania, and the text stays in the DOM for screen
-           readers either way. */
-        var cv = header.querySelector(".detail-group .detail-item.country .detail-item-value");
-        if (cv) {
-            var cflag = cv.querySelector(".fi, .flag-icon");
-            var cnm = (cv.textContent || "").trim();
-            if (cflag && !cflag.classList.contains("refract-flag-chip")) {
-                cflag.classList.add("refract-flag-chip");
+        /* 1b. Every tile is one line, so a value too long for its cell
+           truncates. Nothing is lost: the whole of it goes on the tile's
+           tooltip. Set on the TILE rather than the value, because the
+           value is the thing being clipped and a tooltip you can only
+           reach by hovering the visible half is not one. */
+        var longOnes = header.querySelectorAll(
+            ".detail-group .detail-item.tattoos, .detail-group .detail-item.piercings," +
+            " .detail-group .detail-item.details, .detail-group .detail-item.description");
+        for (var li = 0; li < longOnes.length; li++) {
+            var lv = longOnes[li].querySelector(".detail-item-value");
+            var full = lv ? (lv.textContent || "").trim() : "";
+            if (full && longOnes[li].getAttribute("title") !== full) {
+                longOnes[li].setAttribute("title", full);
             }
-            /* The tooltip sits on the tile, not the chip: the chip is
-               17px and a tooltip you have to hunt for is not one. */
-            var ctile = cv.closest(".detail-item");
-            if (ctile && cnm && ctile.getAttribute("title") !== cnm) {
-                ctile.setAttribute("title", cnm);
-                ctile.setAttribute("aria-label", cnm);
+        }
+
+        /* 1c. Country: the short form people actually say. Stash renders
+           the official name ("United States of America", 24 characters),
+           which does not fit a sixth of the band and pushed its flag onto
+           a second line. `Intl.DisplayNames` is the browser's own
+           common-usage name for the same ISO code -- United States,
+           United Kingdom, Czechia, Russia, South Korea -- so there is no
+           hand-kept list of exceptions to fall out of date. Static, not
+           measured: the same name at every width, so nothing reflows on
+           resize. Only ever shortens; if the browser's name is longer, or
+           it has none, Stash's own text stands. The official name goes on
+           the tooltip. */
+        var ctile = header.querySelector(".detail-group .detail-item.country");
+        if (ctile) {
+            var cval = ctile.querySelector(".detail-item-value");
+            var cflag = cval ? cval.querySelector(".fi, .flag-icon") : null;
+            /* Remember the official name on the first pass. Read fresh
+               every tick it would be the SHORT one from the tick before,
+               and the tooltip would decay to whatever is already on
+               screen: a tooltip repeating its own label. */
+            var official = ctile.getAttribute("data-refract-country")
+                || (cval ? (cval.textContent || "").trim() : "");
+            if (cval && official) {
+                if (ctile.getAttribute("data-refract-country") !== official) {
+                    ctile.setAttribute("data-refract-country", official);
+                }
+                var shortName = official;
+                /* classList rather than a regex on className: this line
+                   held a literal backspace for one deploy, because the
+                   \b that writes a word boundary is also the escape for
+                   one, and nothing about a silently non-matching regex
+                   says so. There is no boundary to assert here anyway --
+                   a class IS the token. */
+                var ccode = "";
+                if (cflag && cflag.classList) {
+                    for (var ci = 0; ci < cflag.classList.length; ci++) {
+                        var cc = cflag.classList[ci];
+                        if (cc.length === 5 && cc.slice(0, 3) === "fi-") {
+                            ccode = cc.slice(3).toUpperCase(); break;
+                        }
+                    }
+                }
+                if (ccode) {
+                    try {
+                        var dn = new Intl.DisplayNames(["en"], { type: "region" })
+                            .of(ccode);
+                        if (dn && dn.length < official.length) { shortName = dn; }
+                    } catch (e) { /* keep Stash's name */ }
+                }
+                /* The name is a bare text node beside the flag span, so it
+                   is rewritten in place rather than replaced. */
+                for (var cn = 0; cn < cval.childNodes.length; cn++) {
+                    var node = cval.childNodes[cn];
+                    if (node.nodeType === 3 && node.nodeValue.trim()) {
+                        if (node.nodeValue !== shortName) { node.nodeValue = shortName; }
+                        break;
+                    }
+                }
+                if (ctile.getAttribute("title") !== official) {
+                    ctile.setAttribute("title", official);
+                }
             }
+        }
+
+        /* 1d. Stash IDs: that this performer HAS one, not what it is. A
+           36-character UUID is not something anyone reads off a page, and
+           it cost the widest tile in the band to print. The endpoint name
+           becomes the link text, so the pill says StashDB and goes there;
+           the id itself rides the tooltip and is still in the edit form,
+           which is where Stash puts it to be copied. One pill per
+           endpoint, so a second box does not disappear behind the first. */
+        var pills = header.querySelectorAll(".detail-group .detail-item.stash_ids .stash-id-pill");
+        for (var pi = 0; pi < pills.length; pi++) {
+            var pill = pills[pi];
+            var a = pill.querySelector("a");
+            if (!a) { continue; }
+            var endpoint = pill.getAttribute("data-endpoint") || "";
+            var lbl = pill.querySelector("span");
+            if (!endpoint && lbl) { endpoint = (lbl.textContent || "").trim(); }
+            if (!endpoint) { continue; }
+            /* Same trap as the country name: after the first pass the
+               anchor says "StashDB", so re-reading it would put that on
+               the tooltip in place of the id. */
+            var sid = a.getAttribute("data-refract-sid") || (a.textContent || "").trim();
+            if (sid && sid !== endpoint) {
+                if (a.getAttribute("data-refract-sid") !== sid) { a.setAttribute("data-refract-sid", sid); }
+                if (a.getAttribute("title") !== sid) { a.setAttribute("title", sid); }
+                a.textContent = endpoint;
+            }
+            /* The pill's own label would repeat the endpoint beside it.
+               Marked for CSS rather than hidden here: `[hidden]` is a
+               display:none of the lowest possible weight, and the pill's
+               own layout rule sets display on its children, so the label
+               went on painting and the chip read "StashDB StashDB". */
+            if (lbl && lbl !== a) { lbl.classList.add("refract-sid-endpoint"); }
         }
 
         /* 2. Aliases. One line of chips and a count that opens the rest;
@@ -10656,6 +10835,19 @@
                        read-out can sit on the SAME line, pushed to the
                        right edge, while the name still ellipsis-truncates
                        if it's long (see integrateAscensionBadges). */
+                    /* The flag chip leads the caption. Drawn on every
+                       card whether or not it is switched on, the way the
+                       rest of this table works: CSS gates it, so the
+                       customiser always has something to point its hit
+                       target at. `fi fi-XX` carries the artwork as a
+                       background image; the chip class makes it a disc. */
+                    var chip = document.createElement("span");
+                    chip.className = "fi fi-" + code.toLowerCase() + " refract-flag-chip";
+                    /* A flag alone does not separate Slovenia from
+                       Slovakia, or Chad from Romania. */
+                    chip.setAttribute("title", countryName);
+                    chip.setAttribute("aria-label", countryName);
+                    countryWrap.appendChild(chip);
                     var countryNameSpan = document.createElement("span");
                     countryNameSpan.className = "stash-perf-country-name";
                     countryNameSpan.textContent = countryName;
