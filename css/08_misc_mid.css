@@ -8420,20 +8420,31 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
    The floor is 600, below. Between here and there the head is about
    500px wide, which is enough for the name, a wrapping action row and a
    two-up read-out. */
-@media (max-width: 820px) {
-    /* The card stops hanging off the band's bottom edge here, so its top
-       edge becomes the one that shows: it needs the same inset the sides
-       have, and the head's own top padding has to go or the name would
-       start 17px below a card it is supposed to line up with. The gap
-       stays the 2.25rem the 1200 step measured -- Bootstrap's -15px row
-       gutter eats most of it, and 1.5rem left 6px of daylight against
-       the card's tilted corner. */
-    body.stash-liquid-glass #performer-page .refract-ph .detail-container {
+/* A card that is not hanging shows its TOP edge, and a top edge needs
+   the same inset the sides have. Where it hangs, the composition is the
+   bottom edge and the top is wherever the card's height puts it, so the
+   band keeps its zero top padding and the head keeps the padding that
+   sets the name below the card's shoulder.
+
+   This used to be stated at 820 only, which is where the card first
+   stopped hanging on the performers that were tested. It is not a width
+   -- it is the anchor decision refract.js makes -- so it belongs on the
+   class: at 1200 to 1095 a non-hanging card sat ON the band's top edge,
+   16.7px above the name, while the same card at 807 was inset 17.5 and
+   level with it. Same state, two placements. */
+@media (max-width: 1400px) {
+    body.stash-liquid-glass #performer-page .refract-ph:not(.refract-ph-hang) .detail-container {
         padding-top: 1.25rem;
     }
-    body.stash-liquid-glass #performer-page .refract-ph .performer-head {
-        padding: 0 !important;
+    body.stash-liquid-glass #performer-page .refract-ph:not(.refract-ph-hang) .performer-head {
+        padding-top: 0 !important;
     }
+}
+
+@media (max-width: 820px) {
+    /* The gap stays the 2.25rem the 1200 step measured -- Bootstrap's
+       -15px row gutter eats most of it, and 1.5rem left 6px of daylight
+       against the card's tilted corner. */
     /* No align-self or margin override here any more: the base rule's
        flex-start plus its negative margin already give this width the
        right answer, because the head is always the taller side once the
@@ -9208,6 +9219,17 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-suc
     border-color: var(--glass-border) !important;
     color: rgba(var(--fg-rgb), 0.3) !important;
 }
+/* Bootstrap's col-xl-9 was never overridden on either action bar, so
+   both sat at 75% of a row they are supposed to span: 870.8 wide under
+   a 1161 form at 1600, 831.8 under 1109 at 1200. A toolbar that stops
+   three quarters of the way across the thing it acts on has a right
+   edge nobody chose, and it wrapped a line earlier than it needed to
+   for the same reason. One right edge with the form. */
+body.stash-liquid-glass #performer-page .refract-pe .details-edit {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+}
+
 /* The pair gets the last line to itself, at every width.
 
    The bar wraps -- seven controls and a status block, which did not fit
@@ -9325,12 +9347,24 @@ body.stash-liquid-glass #performer-page .refract-pe form .text-input.is-invalid 
 }
 
 @media (max-width: 1200px) {
-    body.stash-liquid-glass #performer-page .refract-pe .detail-container {
-        flex-direction: column;
-    }
+    /* The card stays BESIDE the head, the way the view band's does.
+
+       Stacking it here meant clicking Edit re-laid the page: the
+       portrait jumped from the left column to the top and opened an
+       869 x 273 void beside it at 1200, 476 wide at 807. Nothing about
+       the edit form asked for that -- the head's own rows measure 205px
+       against a 273px card, so they fit beside it with room over.
+
+       The form shares the head's column rather than taking the page's
+       full width. Getting the form out from under the head would mean
+       `display: contents` on two of Bootstrap's wrappers to promote it
+       into the container's grid, which is a real technique and a bigger
+       change than the fault warrants tonight; the form is a
+       twelve-track grid that already goes two-up at this width, and it
+       has 878px at 1200 and 540 at 807. Noted rather than smuggled in. */
     body.stash-liquid-glass #performer-page .refract-pe .detail-header-image {
         width: 240px;
-        flex: 0 0 auto;
+        flex: 0 0 240px;
         max-width: 240px !important;
     }
     /* The form keeps its twelve tracks at EVERY width and only the spans
