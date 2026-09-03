@@ -219,111 +219,297 @@ body.stash-liquid-glass .refract-mobile-drawer {
         transform: rotate(-45deg);
     }
 
-    /* ── Bottom dock - iOS-style pill bar with the essential routes ──
-       Scenes / Performers / Studios / Tags / Settings one tap away,
-       burger tile at the end opening the full drawer. Sits above the
-       scrim (z 110 > 99) so the burger doubles as the close control
-       while the drawer is open. */
-    /* Edge-to-edge native tab bar, sized like binge mobile's bottom
-       nav (3.5rem content height, near-black, hairline top border,
-       12px blur, safe-area folded INSIDE the bar so it reads as part
-       of the device chrome rather than a floating element). */
+    /* ── Bottom dock: the desktop navbar's floating glass, in capsule form ──
+       Slice 1 of the 2026-09-03 mobile overhaul (brief: scratchpad
+       mobile-overhaul/BRIEF.md, board "Dock: states"). This replaces the
+       edge-to-edge opaque tab bar that DESIGN_SYSTEM 6.11 settled as
+       "imitate the platform's chrome"; the user re-opened that trade on
+       the strength of binge-ios, whose geometry and scroll rule are
+       lifted here exactly. One visual language for chrome on every width.
+
+       Geometry (binge-ios BingeBottomNav, measured at 3px/pt then rounded):
+                     expanded   contracted
+         side inset     23         44
+         height         58         49
+         above bottom   23         28
+         icon           26         22
+         active pill  74 x 50    63 x 41
+         end padding     9          8
+
+       The capsule FLOATS over content. Content pads by a FIXED footprint
+       (23 + 58 = 81, plus the safe area) so the bar shrinking can never
+       reflow a feed. The capsule sits IN the home-indicator zone:
+       bottom is max(23px, safe-area-inset-bottom), never 23 + inset.
+
+       State classes live on the DOCK ELEMENT, not on body: a body class
+       toggled on scroll is exactly the document-wide effect 3.7 rule 1
+       forbids. refract.js toggles .refract-dock-contracted on the dock
+       (and on the floating pager, which rides with it) from a passive
+       scroll listener: down past a 5px deadzone contracts; up, y < 80,
+       a tap on the dock, or the drawer opening expands. Reduced motion
+       never contracts.
+
+       PROPOSED TOKENS (defined locally, flagged for promotion to
+       01_tokens.css by the foundations lane):
+         --refract-dock-bottom     max(23px, env(safe-area-inset-bottom))
+         --refract-dock-footprint  calc(var(--refract-dock-bottom) + 58px)
+       Everything below the dock's own box reads the footprint, never 58
+       or 81 literally. */
+    body.stash-liquid-glass {
+        --refract-dock-bottom: max(23px, env(safe-area-inset-bottom, 0px));
+        --refract-dock-footprint: calc(var(--refract-dock-bottom) + 58px);
+    }
     body.stash-liquid-glass .refract-mobile-dock {
+        /* Per-state geometry as custom properties so the contracted
+           rule changes six numbers and nothing else. */
+        --dock-inset: 23px;
+        --dock-h: 58px;
+        --dock-lift: 0px;
+        --dock-pad: 9px;
+        --dock-icon: 26px;
+        --dock-pill-w: 74px;
+        --dock-pill-h: 50px;
+        /* Slot pitch: the padding box minus the end padding, split by the
+           slot count refract.js writes as --dock-count (items + More). */
+        --dock-slot: calc((100% - 2 * var(--dock-pad)) / var(--dock-count, 5));
+
         display: flex !important;
         position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        left: var(--dock-inset);
+        right: var(--dock-inset);
+        bottom: calc(var(--refract-dock-bottom) + var(--dock-lift));
+        height: var(--dock-h);
         z-index: var(--z-dock);
-        height: calc(4.6rem + env(safe-area-inset-bottom, 0px));
         box-sizing: border-box;
-        align-items: center;
-        justify-content: space-around;
+        align-items: stretch;
+        justify-content: space-between;
         gap: 0;
-        padding: 0 0.5rem env(safe-area-inset-bottom, 0px);
-        border-radius: 0;
-        /* Refract's own tab-bar material (the approved variant-A look);
-           only the SIZE comes from binge mobile. */
-        background: rgb(28, 26, 33);
-        border: none;
-        border-top: 1px solid rgba(255, 255, 255, 0.09);
-        -webkit-backdrop-filter: none;
-        backdrop-filter: none;
-        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+        padding: 0 var(--dock-pad);
+        /* Rim, radius, shadow and blur are the canonical glass recipe
+           (3.2) and the navbar's shadow (6.3). The FILL is not --glass-bg:
+           the board drew the desktop navbar's 0.06 white, and measured on
+           the rendered ground it failed. The dock is the one piece of
+           chrome that sits permanently over artwork, and 0.06 over the
+           performer grid left the capsule at rgb(196,148,136) with the
+           icons at 1.69 to 2.71:1 (390, dark). So the fill is the surface
+           family (3.2: near-opaque overlays, floating overlay chrome) at
+           0.72, the drawer's colour at a lower alpha: worst case pure
+           white behind it composites to rgb(86) and the 0.80 icon reads
+           at 5.9:1; light flips the channels to white and black ink reads
+           at 7.5:1 over black artwork. Proposed ledger row; see the
+           BUILD_LOG. */
+        --refract-dock-fill: rgba(var(--surface-rgb), 0.72);
+        background: var(--refract-dock-fill);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-pill);
+        box-shadow: var(--shadow-navbar);
+        -webkit-backdrop-filter: var(--glass-blur-xl-sat);
+        backdrop-filter: var(--glass-blur-xl-sat);
+        /* Resize: binge's spring 0.34 / 0.82 (near-critical damping)
+           maps onto --dur-settle with the glide curve. Contracting is a
+           thing leaving, so no overshoot (3.7). */
+        transition:
+            left var(--dur-settle) var(--ease-glide),
+            right var(--dur-settle) var(--ease-glide),
+            bottom var(--dur-settle) var(--ease-glide),
+            height var(--dur-settle) var(--ease-glide),
+            padding var(--dur-settle) var(--ease-glide);
     }
+    /* Contracted: the same object seen smaller, rising 5px toward its
+       own centre. */
+    body.stash-liquid-glass .refract-mobile-dock.refract-dock-contracted {
+        --dock-inset: 44px;
+        --dock-h: 49px;
+        --dock-lift: 5px;
+        --dock-pad: 8px;
+        --dock-icon: 22px;
+        --dock-pill-w: 63px;
+        --dock-pill-h: 41px;
+    }
+    /* Expanding is a thing arriving: it may spring. */
+    body.stash-liquid-glass .refract-mobile-dock:not(.refract-dock-contracted) {
+        transition:
+            left var(--dur-settle) var(--ease-spring),
+            right var(--dur-settle) var(--ease-spring),
+            bottom var(--dur-settle) var(--ease-spring),
+            height var(--dur-settle) var(--ease-spring),
+            padding var(--dur-settle) var(--ease-spring);
+    }
+
+    /* The active pill: ONE element that slides between slots. Five (or
+       seven) conditional highlights never animated; a single element
+       whose left changes cannot fail. Position is pure arithmetic on
+       --dock-active (the slot index refract.js writes) so the CSS never
+       needs to know which item is current. Pill = --accent-tint with a
+       1px accent inner rim and the 14px glow the old dock already had. */
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-pill {
+        position: absolute;
+        top: 50%;
+        /* binge's pill (74) is 9px WIDER than its slot (65.2): it laps
+           the neighbours. A 6- or 7-slot dock keeps that same 9px lap
+           over its narrower slot instead of a fixed 74. One expression
+           for width and for the centring term, so they cannot disagree. */
+        --dock-pw: min(var(--dock-pill-w), calc(var(--dock-slot) + 9px));
+        left: calc(
+            var(--dock-pad)
+            + var(--dock-slot) * var(--dock-active, 0)
+            + (var(--dock-slot) - var(--dock-pw)) / 2
+        );
+        width: var(--dock-pw);
+        height: var(--dock-pill-h);
+        transform: translateY(-50%);
+        border-radius: var(--radius-pill);
+        background: var(--accent-tint);
+        box-shadow:
+            inset 0 0 0 1px rgba(var(--accent-rgb), 0.22),
+            0 0 14px rgba(var(--accent-rgb), 0.30);
+        pointer-events: none;
+        opacity: 1;
+        /* Travel: binge's 0.42 / 0.78 spring is --dur-slow + --ease-spring
+           (the System board's motion table). Size settles with the bar. */
+        transition:
+            left var(--dur-slow) var(--ease-spring),
+            width var(--dur-settle) var(--ease-glide),
+            height var(--dur-settle) var(--ease-glide),
+            opacity var(--dur-fast) ease;
+    }
+    /* No route in the dock matches the page (home, a plugin page): the
+       pill fades rather than parking on a wrong slot. */
+    body.stash-liquid-glass .refract-mobile-dock:not(.refract-dock-has-active) .refract-dock-pill {
+        opacity: 0;
+    }
+
+    /* Slots: icons only, no labels; each slot is the full capsule height
+       so the whole 65 x 58 column is the tap target (44px floor met on
+       both axes even contracted: 60 x 49). */
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item {
         flex: 1 1 0;
+        min-width: 0;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        height: 3.1rem;
-        min-width: 3.1rem;
-        align-self: center;
-        /* Nudge the icons slightly ABOVE true centre - the bar reads
-           better with the visual weight sitting a touch high (margin
-           trick rather than transform, which :active's press-scale
-           would overwrite). */
-        margin-bottom: 10px;
+        align-self: stretch;
+        height: auto;
+        margin: 0;
         border: none;
         background: transparent;
-        color: var(--text-muted);
+        /* !important: 04_filters' global anchor rule is (0,6,1) and
+           painted every route slot rgba(255,255,255,0.85) in BOTH modes
+           (white on the white light capsule, measured 1.3:1), and its
+           :hover twin would leave a tapped slot accent-coloured until
+           the next tap on touch. The slot's colour is the dock's, not
+           the page's. */
+        color: rgba(var(--fg-rgb), 0.80) !important;
         padding: 0;
         cursor: pointer;
         text-decoration: none;
         position: relative;
-        isolation: isolate;
+        z-index: 1;
+        -webkit-tap-highlight-color: transparent;
         transition: color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-spring);
     }
-    /* Active/open highlight lives on a fixed-size CIRCLE centred behind
-       the icon - the item box itself is flex-stretched wide, so painting
-       the tint/glow on it produced a stretched rectangle pill. */
+    /* The old circle highlight behind each item is retired; the pill
+       carries the active state alone. */
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item::before {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 3.1rem;
-        height: 3.1rem;
-        transform: translate(-50%, -50%);
-        border-radius: 50%;
-        z-index: -1;
-        background: transparent;
-        transition: background var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+        content: none;
     }
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item svg {
-        width: 1.3rem;
-        height: 1.3rem;
+        width: var(--dock-icon);
+        height: var(--dock-icon);
+        transition: width var(--dur-settle) var(--ease-glide), height var(--dur-settle) var(--ease-glide);
     }
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item:active {
-        transform: scale(0.9);
+        transform: scale(0.92);
     }
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item.is-active {
-        color: var(--accent-bright);
-    }
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item.is-active::before {
-        background: var(--accent-tint);
-        box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.3);
-    }
+    /* Active icon takes --accent-ink so the light board passes too
+       (light re-points it to the deeper mix). */
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item.is-active,
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger.is-open {
-        color: var(--accent);
+        color: var(--accent-ink) !important;
     }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item.is-active::before,
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger.is-open::before {
-        background: var(--accent-tint);
-        box-shadow:
-            0 0 18px rgba(var(--accent-rgb), 0.45),
-            inset 0 0 0 1px rgba(var(--accent-rgb), 0.18);
+        content: none;
+        background: transparent;
+        box-shadow: none;
+    }
+    /* Focus ring (6.6 house ring as an outline: the capsule clips box
+       shadows on its children through the pill radius). */
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item:focus-visible {
+        outline: 2px solid rgba(var(--accent-rgb), 0.7);
+        outline-offset: -6px;
+        border-radius: var(--radius-pill);
+    }
+    /* The More glyph: the shared three-line burger scaled to the 26px
+       icon grid (22 wide, 2px lines at 0 / 7 / 14) so it carries the
+       same weight as the stroke-2 route glyphs; contracted it follows
+       the icon down to 18 x 13. Its X morph is the existing shared rule. */
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-icon {
+        width: calc(var(--dock-icon) - 4px);
+        height: calc(var(--dock-icon) * 0.62);
+        transition: width var(--dur-settle) var(--ease-glide), height var(--dur-settle) var(--ease-glide);
+    }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-line {
+        height: 2px;
+        opacity: 1;
+    }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-line:nth-child(1) { top: 0; }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-line:nth-child(2) { top: calc(50% - 1px); }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-line:nth-child(3) { top: calc(100% - 2px); }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger.is-open .refract-burger-line:nth-child(1),
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger.is-open .refract-burger-line:nth-child(3) {
+        top: calc(50% - 1px);
     }
 
-    /* Clear the dock: give the app's scroll content bottom breathing
-       room so the last row of cards isn't parked under the pill. */
-    body.stash-liquid-glass .main.container-fluid,
-    body.stash-liquid-glass main.container-fluid {
-        padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
+    /* Reduced motion: the bar never resizes (refract.js does not toggle
+       the class at all); the pill jumps and cross-fades instead of
+       travelling. */
+    @media (prefers-reduced-motion: reduce) {
+        body.stash-liquid-glass .refract-mobile-dock,
+        body.stash-liquid-glass .refract-mobile-dock .refract-dock-item svg,
+        body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-icon {
+            transition: none;
+        }
+        body.stash-liquid-glass .refract-mobile-dock .refract-dock-pill {
+            transition: opacity var(--dur-fast) ease;
+        }
     }
-    /* Floating pager (09_buttons.css pins it at bottom: 1.5rem) would
-       sit behind the dock; lift it above the bar. */
+    /* Reduced transparency: the fill goes opaque and the blur drops, the
+       same way 01_tokens treats the named glass surfaces. */
+    @media (prefers-reduced-transparency: reduce) {
+        body.stash-liquid-glass .refract-mobile-dock {
+            --refract-dock-fill: rgba(var(--surface-rgb), 0.97);
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+        }
+    }
+    /* Lite mode pins every floating glass platform opaque (15_lite
+       section 4); the dock joined that family with this slice. */
+    body.stash-liquid-glass.refract-lite .refract-mobile-dock {
+        background: rgb(35, 35, 35) !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Content runs UNDER the dock and pads by the fixed footprint plus
+       one --gap-md of air so a last row's bottom rim never kisses the
+       capsule. The :has() twin outranks the pager reservation in
+       09_buttons (0,4,1), which otherwise wins on specificity and leaves
+       the last row under the glass. */
+    body.stash-liquid-glass .main.container-fluid,
+    body.stash-liquid-glass main.container-fluid,
+    body.stash-liquid-glass:has([data-pager-row="float"]) .main.container-fluid {
+        padding-bottom: calc(var(--refract-dock-footprint) + var(--gap-md)) !important;
+    }
+    /* Floating pager (09_buttons.css pins it at bottom: 1.5rem) rides
+       above the dock and follows its contraction; slice 6 folds it into
+       the dock on list pages. */
     body.stash-liquid-glass [data-pager-row="float"] {
-        bottom: calc(5.3rem + env(safe-area-inset-bottom, 0px)) !important;
+        bottom: calc(var(--refract-dock-footprint) + 10px) !important;
+        transition: bottom var(--dur-settle) var(--ease-glide), opacity var(--dur-fast) ease;
+    }
+    body.stash-liquid-glass [data-pager-row="float"].refract-dock-contracted {
+        bottom: calc(var(--refract-dock-footprint) + 1px) !important;
     }
     /* multiView's floating picking launcher: hidden on mobile for now
        (fights the dock for the bottom edge; a proper mobile placement
@@ -426,7 +612,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         /* Anchored ABOVE the bottom dock (the drawer's opener) and
            rising from it - not dropping from the retired top bar. */
         top: auto;
-        bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px));
+        bottom: calc(var(--refract-dock-footprint) + 10px);
         left: 12px;
         right: 12px;
         background: rgba(var(--surface-rgb), 0.92);
