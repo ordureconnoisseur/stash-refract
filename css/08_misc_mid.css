@@ -8996,12 +8996,18 @@ body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-gr
    One fill, one rim: every segment takes the input's own ground, top
    and bottom borders run the length of the group, and the only vertical
    line is the seam on each segment's left. The last segment closes the
-   rim on the right and carries the group's outer radius. */
+   rim on the right and carries the group's outer radius.
+
+   --fill-2 by name rather than the 0.04 it resolves to, because the two
+   modes do not agree on the number: it is 0.04 white in dark and 0.053
+   black in light, and a literal matched the input in one mode and
+   missed it by 0.015 in the other. The token's whole job is "resting
+   fill: inputs, tiles", which is what this is. */
 body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group > .form-control {
     border-right-width: 0 !important;
 }
 body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group-append > .btn {
-    background: rgba(var(--fg-rgb), 0.04) !important;
+    background: var(--fill-2) !important;
     border-style: solid !important;
     border-color: var(--glass-border) !important;
     border-width: 1px 0 1px 1px !important;
@@ -9032,7 +9038,7 @@ body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-gr
     /* The group's own ground, not --fill-3. This rule is one class more
        specific than the group rule above, so it was quietly holding the
        fourth of the four fills that made one control read as three. */
-    background: rgba(var(--fg-rgb), 0.04) !important;
+    background: var(--fill-2) !important;
     border-color: var(--glass-border) !important;
     color: var(--text-muted) !important;
     transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
