@@ -10466,6 +10466,44 @@
         }).catch(function () { /* the placeholders stay as dashes */ });
     }
 
+    /* Re-fit every built card once Concert One resolves.
+
+       The face is `font-display: swap` (16_playing_card.css says why: with
+       `block` the name painted NOTHING for the browser's three-second block
+       period, and since a performer card is the only thing that uses the
+       face, the fetch begins when you first reach a card view and every name
+       on screen is blank until it lands). Swap fixes the blank, and creates
+       a smaller problem in its place: refit()'s size ladder measures the
+       name, so a card built before the face arrives is measured in the Segoe
+       UI fallback, which is narrower than Concert One. Left alone the swap
+       would silently push long names past the banner and into the card's
+       overflow clip.
+
+       So the cards re-fit when the face is ready. Asking for it also FETCHES
+       it, at boot, on every page rather than at the first card -- 14KB, and
+       it is most of the cure: by the time a card view is reached the face is
+       usually already in memory and there is nothing to swap. The flush is
+       the backstop for the slow case, and it is a walk rather than a list of
+       callbacks because `_rfxRefit` is already on every card for the batched
+       stat fill, so nothing is retained after it runs. Failure is fine: the
+       fallback stays, which is the state swap already put on screen. */
+    var pcFaceFlushed = false;
+    function pcFlushFaceRefits() {
+        if (pcFaceFlushed) { return; }
+        pcFaceFlushed = true;
+        var cards = document.querySelectorAll(".performer-card[data-stash-pc], .refract-ph-card");
+        for (var i = 0; i < cards.length; i++) {
+            if (cards[i]._rfxRefit) {
+                try { cards[i]._rfxRefit(); } catch (e) { /* one card is not the pass */ }
+            }
+        }
+    }
+    if (document.fonts && document.fonts.load) {
+        document.fonts.load('1rem "Concert One"').then(pcFlushFaceRefits, pcFlushFaceRefits);
+    } else {
+        pcFaceFlushed = true;
+    }
+
     function initPerformerCards() {
         document.querySelectorAll(".performer-card:not([data-stash-pc])").forEach(function (card) {
             card.setAttribute("data-stash-pc", "1");
