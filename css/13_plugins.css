@@ -832,7 +832,13 @@ body.stash-liquid-glass #performer-page .custom-fields .collapse.show {
 }
 
 /* The header, inside the plate now and in the band's label style, so the
-   section has ONE label tier rather than three. It is the eyebrow with a
+   section has ONE label tier rather than three. That style is 6.13's
+   eyebrow - 600 with --track-eyebrow - since F9 fixed the band at its
+   source: the generic rule that pinned every band label to 500
+   !important is gone, so the band renders the spec it always declared.
+   This header copied the 500 deliberately while that was live, and
+   copies 600 now for the same reason: what matters is that the section
+   and the rows above it are one spec, not which spec. It is the eyebrow with a
    hairline underline, which is the house pattern 6.13 already prescribes
    for a column label; the rule is the tier at low alpha and it is the
    section's single accent. Static flow, not absolute: an absolutely
@@ -845,8 +851,8 @@ body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.
     margin: 0 0 0.4rem 0;
     padding-bottom: 0.3rem;
     font-size: var(--fs-xs) !important;
-    font-weight: 500;
-    letter-spacing: var(--track-label);
+    font-weight: 600;
+    letter-spacing: var(--track-eyebrow);
     line-height: 12.096px;
     text-transform: uppercase;
     color: var(--refract-ph-tier-ink);
@@ -985,8 +991,8 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
 /* The label: the band's, exactly. */
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * > * > *:first-child {
     font-size: var(--fs-xs) !important;
-    font-weight: 500 !important;
-    letter-spacing: var(--track-label) !important;
+    font-weight: 600 !important;
+    letter-spacing: var(--track-eyebrow) !important;
     line-height: 12.096px !important;
     text-transform: uppercase !important;
     text-align: left !important;
