@@ -2058,8 +2058,9 @@ body.stash-liquid-glass .refract-mobile-drawer {
    contract as every other setting and writes body.refract-mobile-onecol;
    the only thing that changes is the grid's track count. Cards untouched.
    ─────────────────────────────────────────────────────────────────── */
-body.stash-liquid-glass .refract-cols-toggle {
-    display: none;
+body.stash-liquid-glass .refract-cols-toggle,
+body.stash-liquid-glass .filtered-list-toolbar .refract-cols-toggle {
+    display: none !important;
 }
 @media (max-width: 768px) {
     body.stash-liquid-glass.refract-mobile-onecol .row.justify-content-center {
