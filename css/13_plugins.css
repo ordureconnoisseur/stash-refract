@@ -865,6 +865,46 @@ body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.
     position: relative;
     margin-top: 0 !important;
 }
+/* The stats row spans the plate edge to edge, because its tiles carry the
+   band's padding themselves. Left as it was, the row's 11.2px and each
+   tile's 11.2px stacked: the stat keys sat at 448.9 while every other
+   label in the stack - the tiles above, ASCENSION, PAST MATCHUPS - sat at
+   437.7, and the row had 1106.6px to divide instead of 1129, which put
+   the pitch at 184.6 against the band's 188.3. Two rows of six drifting
+   apart by 3.7px a column, so the sixth stat started 18px left of the
+   tile directly above it.
+
+   Zeroing the ROW rather than the tiles is what fixes both at once: the
+   tiles keep the padding that puts their labels on the band's line, and
+   the track gets the band's own width to divide. The header below adds
+   the inset back for itself, since it is the one thing in here that is
+   not inside a tile. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    /* The row is a column flex that inherits align-items: baseline, and in
+       a column container that aligns the children on their INLINE start
+       rather than stretching them. A margin on the header was enough to
+       carry the whole group with it: the track came out 1129 wide but
+       starting at 437.7, so it overhung the plate by 11.2px instead of
+       filling it. Stretch is what a column of blocks wants, and it is
+       declared rather than inherited so the next rule that touches this
+       item cannot move the track by accident. */
+    align-items: stretch !important;
+}
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats::before {
+    padding-left: 0.8rem !important;
+    padding-right: 0.8rem !important;
+}
+/* Two stacked eyebrows with nothing between them - ASCENSION in the tier
+   colour, then MATCH HISTORY muted - were one label tier too many for a
+   row that labels itself: every tile under it already says TOTAL MATCHES,
+   WINS, LOSSES. The section header names the section and the tiles name
+   their own numbers, so Stash's field title goes. PAST MATCHUPS stays,
+   because the chips below it do NOT say what they are. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats > .detail-item-title {
+    display: none !important;
+}
 
 /* ---- The stats, as the band's tiles ------------------------------- */
 
@@ -1025,6 +1065,12 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
     gap: var(--gap-sm) !important;
     min-width: 0 !important;
     padding: 0.3rem 0.7rem !important;
+    /* Ascension sets min-height: 45px on the entry, which is right for the
+       tall bar it draws by default and wrong for a chip: it stood 45px
+       among a band whose other pills measure 24 to 26. Released, so the
+       chip is the height of its own content and its 0.3rem padding, which
+       is what every pill around it is. */
+    min-height: 0 !important;
     background: var(--fill-2) !important;
     border: 1px solid var(--glass-border) !important;
     border-left: 1px solid var(--glass-border) !important;
@@ -1515,9 +1561,23 @@ body.stash-liquid-glass .adv-rating-btn:hover > span[style*="color"] {
 /* Unrated-count: instead of a detached chunky pill, render it inline after
    the ★ behind a hairline divider - "★ | 4" - so the button reads as one
    cohesive unit, matching the toolbar's other icon+number controls. */
+/* The number is the ONLY carrier of that rating, so it answers to the
+   4.5 reading floor rather than the 3.0 one. On --accent-bright it
+   measured 4.03 against a gold-tier band and 5.37 against a cooler one:
+   the ink was fine and the GROUND was the variable, because the badge is
+   transparent by design (it reads as "star | 4", not as a detached pill)
+   and its ground is therefore whatever the portrait and the tier veil
+   happen to be.
+
+   So the ink takes the lift rather than the badge taking a plate, which
+   would undo that decision. --accent-light is what 3.1 rule 5 calls the
+   high-key TEXT shade in dark - the same token that is a pale FILL tint
+   in light, which is why the light half of this lives in 14_light on
+   --accent-ink instead. Two tokens, each doing the job its own mode
+   gives it, and no new colour. */
 body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge {
     background: transparent !important;
-    color: var(--accent-bright) !important;
+    color: var(--accent-light) !important;
     border: 0 !important;
     border-radius: 0 !important;
     display: inline-flex !important;

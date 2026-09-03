@@ -767,7 +767,12 @@ body.stash-liquid-glass.refract-light .grid-card .stash-o-count:hover {
    any other badge the plugin paints. */
 body.stash-liquid-glass.refract-light .adv-rating-btn-badge {
     background: var(--accent-tint) !important;
-    color: var(--accent-bright) !important;
+    /* --accent-bright is a FILL shade, and using it as ink here measured
+       2.31:1 and 2.46:1 on the pale pill - the 3.1 rule 5 trap exactly,
+       a token whose job differs by mode. This number is the only carrier
+       of the rating, so it owes the 4.5 reading floor, and --accent-ink
+       is the token light mode defines for precisely this. */
+    color: var(--accent-ink) !important;
     border: 1px solid var(--accent-glow) !important;
 }
 
