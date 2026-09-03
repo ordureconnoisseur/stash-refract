@@ -1720,7 +1720,10 @@ body.stash-liquid-glass .refract-mobile-drawer {
         gap: 0 !important;
         margin: 4px auto 0 !important;
         overflow: visible !important;
-        top: 6px !important;
+        /* Stuck, the controls sit 12px below the viewport top (plus the
+           safe area on notched phones); the plate's 6px padding is inside
+           that. The user's phone showed the pills hard against the edge. */
+        top: calc(12px + env(safe-area-inset-top, 0px)) !important;
         transition: none !important;
     }
     /* The plate: the chrome material, painted only while stuck, 6px
@@ -1869,6 +1872,9 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .filtered-list-toolbar > .list-operations,
     body.stash-liquid-glass .filtered-list-toolbar > .btn-group:not(:has(> .saved-filter-dropdown)):not(.sort-by-select),
     body.stash-liquid-glass .filtered-list-toolbar .mv-picking-toggle-btn,
+    body.stash-liquid-glass.mv-picking-mode .filtered-list-toolbar #mv-filter-add-btn,
+    body.stash-liquid-glass.mv-picking-mode .filtered-list-toolbar .mv-filter-add-btn,
+    body.stash-liquid-glass .filtered-list-toolbar .mv-filter-add-btn,
     body.stash-liquid-glass .filtered-list-toolbar .refract-cols-toggle {
         display: none !important;
     }

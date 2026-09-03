@@ -4186,6 +4186,7 @@
         }
         if (action === "saved") { refractCloseListSheet(); refractSheetProxy(".saved-filter-dropdown .dropdown-toggle"); return; }
         if (action === "ops") { refractCloseListSheet(); refractSheetProxy(".list-operations .dropdown-toggle"); return; }
+        if (action === "mv-add") { refractCloseListSheet(); refractSheetProxy("#mv-filter-add-btn, .mv-filter-add-btn"); return; }
         if (action === "per-page") {
             var sel = tb && tb.querySelector(".page-size-selector select, select.form-control");
             if (sel && sel.value !== value) {
@@ -4233,6 +4234,7 @@
         }
         var hasSaved = !!tb.querySelector(".saved-filter-dropdown .dropdown-toggle");
         var hasOps = !!tb.querySelector(".list-operations .dropdown-toggle");
+        var mvAdd = tb.querySelector("#mv-filter-add-btn, .mv-filter-add-btn");
         var oneCol = isMobileOneCol();
         var seg = function (items, current, action) {
             var h = '<span class="refract-seg" role="group">';
@@ -4263,9 +4265,17 @@
         }
         html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Cards per row</span>' +
             seg([{ v: "2", l: "Two cards per row", icon: REFRACT_SHEET_ICONS.cols2 }, { v: "1", l: "One card per row", icon: REFRACT_SHEET_ICONS.cols1 }], oneCol ? "1" : "2", "cols") + '</div>';
-        if (hasOps) {
-            html += '<div class="refract-sheet-group">Actions</div>' +
-                '<button type="button" class="refract-sheet-row" data-sheet-action="ops"><span class="refract-sheet-label">Select, export, edit, delete</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+        if (hasOps || mvAdd) {
+            html += '<div class="refract-sheet-group">Actions</div>';
+            if (hasOps) {
+                html += '<button type="button" class="refract-sheet-row" data-sheet-action="ops"><span class="refract-sheet-label">Select, export, edit, delete</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+            }
+            if (mvAdd) {
+                /* multiview picking mode's "+" (add this filter as a
+                   slot): a bare glyph in the bar on the user's phone; it
+                   is a demoted control like the rest. */
+                html += '<button type="button" class="refract-sheet-row" data-sheet-action="mv-add"><span class="refract-sheet-label">Add this filter to multiview</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+            }
         }
         if (sheet.innerHTML !== html) { sheet.innerHTML = html; }
     }
