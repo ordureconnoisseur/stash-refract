@@ -4133,30 +4133,212 @@
         applyMobileColsClass(on);
         scheduleServerSync();
     }
-    /* The toggle lives in every list toolbar (list pages and the entity
-       pages' tabs). Injected, never moved: Stash's toolbar keeps its own
-       children; ours is appended and 12_mobile.css orders it onto the
-       second tier. Idempotent per toolbar. */
-    var REFRACT_COLS_TOGGLE_SVG =
-        '<svg class="refract-cols-two" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/></svg>' +
-        '<svg class="refract-cols-one" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/></svg>';
-    function injectMobileColsToggle() {
-        var bars = document.querySelectorAll(".filtered-list-toolbar");
-        var added = false;
-        for (var i = 0; i < bars.length; i++) {
-            if (bars[i].querySelector(".refract-cols-toggle")) { continue; }
-            var btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "btn btn-secondary refract-cols-toggle";
-            btn.innerHTML = REFRACT_COLS_TOGGLE_SVG;
-            btn.addEventListener("click", function (e) {
-                e.preventDefault();
-                setMobileOneCol(!isMobileOneCol());
-            });
-            bars[i].appendChild(btn);
-            added = true;
+    /* ── List pages on phones: the sort sheet and the caption ──────────
+       The toolbar keeps ONE tier on phones (search, filter | sort); the
+       demoted controls live in a sheet that refract injects once at body
+       level and rebuilds from the LIVE toolbar each time it opens. Every
+       row is a proxy: sort field and saved filters open Stash's own
+       dropdowns (rendered as modals by the existing mobile rules), the
+       direction segment clicks Stash's direction button, per page sets
+       Stash's select through the native setter plus a change event, and
+       cards per row is refract's own setting. No Stash node moves.
+       Stash's menus are rendered lazily (empty until opened), so the sort
+       field list is one tap deeper than the board drew it. */
+    var refractListSheetBypass = false;
+    function refractListToolbar() {
+        return document.querySelector(".filtered-list-toolbar");
+    }
+    function refractInjectListSheet() {
+        if (document.querySelector(".refract-list-sheet")) { return true; }
+        if (!document.body) { return false; }
+        var sheet = document.createElement("div");
+        sheet.className = "refract-list-sheet";
+        sheet.setAttribute("role", "dialog");
+        sheet.setAttribute("aria-label", "Sort and view");
+        sheet.addEventListener("click", function (e) {
+            var t = e.target;
+            if (!t || !t.closest) { return; }
+            var act = t.closest("[data-sheet-action]");
+            if (!act) { return; }
+            e.preventDefault();
+            refractListSheetAction(act.getAttribute("data-sheet-action"), act.getAttribute("data-sheet-value"));
+        });
+        document.body.appendChild(sheet);
+        return true;
+    }
+    function refractSheetProxy(sel) {
+        var tb = refractListToolbar();
+        var el = tb && tb.querySelector(sel);
+        if (!el) { return false; }
+        refractListSheetBypass = true;
+        try { el.click(); } finally { refractListSheetBypass = false; }
+        return true;
+    }
+    function refractListSheetAction(action, value) {
+        var tb = refractListToolbar();
+        if (action === "close") { refractCloseListSheet(); return; }
+        if (action === "sort-field") { refractCloseListSheet(); refractSheetProxy(".sort-by-select .dropdown-toggle"); return; }
+        if (action === "sort-dir") {
+            var cur = refractSortDirection(tb);
+            if (cur && cur !== value) { refractSheetProxy(".sort-by-select .input-group-prepend + button, .sort-by-select > button:not(.dropdown-toggle)"); }
+            setTimeout(refractRenderListSheet, 80);
+            return;
         }
-        if (added) { applyMobileColsClass(isMobileOneCol()); }
+        if (action === "saved") { refractCloseListSheet(); refractSheetProxy(".saved-filter-dropdown .dropdown-toggle"); return; }
+        if (action === "ops") { refractCloseListSheet(); refractSheetProxy(".list-operations .dropdown-toggle"); return; }
+        if (action === "per-page") {
+            var sel = tb && tb.querySelector(".page-size-selector select, select.form-control");
+            if (sel && sel.value !== value) {
+                try {
+                    var setter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value").set;
+                    setter.call(sel, value);
+                    sel.dispatchEvent(new Event("change", { bubbles: true }));
+                } catch (e) { sel.value = value; }
+            }
+            setTimeout(refractRenderListSheet, 80);
+            return;
+        }
+        if (action === "cols") { setMobileOneCol(value === "1"); refractRenderListSheet(); return; }
+    }
+    function refractSortDirection(tb) {
+        var b = tb && (tb.querySelector(".sort-by-select .input-group-prepend + button") || tb.querySelector(".sort-by-select > button:not(.dropdown-toggle)"));
+        var svg = b && b.querySelector("svg");
+        var icon = svg && (svg.getAttribute("data-icon") || "");
+        if (!icon) { return null; }
+        return /up/.test(icon) ? "asc" : "desc";
+    }
+    var REFRACT_SHEET_ICONS = {
+        close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+        asc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+        desc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>',
+        cols2: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/></svg>',
+        cols1: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/></svg>'
+    };
+    function refractRenderListSheet() {
+        var sheet = document.querySelector(".refract-list-sheet");
+        var tb = refractListToolbar();
+        if (!sheet || !tb) { return; }
+        var esc = refractAttrEscape;
+        var sortToggle = tb.querySelector(".sort-by-select .dropdown-toggle");
+        var sortLabel = sortToggle ? (sortToggle.textContent || "").trim() : "";
+        var dir = refractSortDirection(tb);
+        var sel = tb.querySelector(".page-size-selector select, select.form-control");
+        var perOpts = [];
+        if (sel) {
+            for (var o = 0; o < sel.options.length; o++) {
+                var v = sel.options[o].value;
+                if (/^\d+$/.test(v) && (perOpts.length < 4 || v === sel.value)) { perOpts.push(v); }
+            }
+            if (perOpts.indexOf(sel.value) === -1 && /^\d+$/.test(sel.value)) { perOpts.push(sel.value); }
+        }
+        var hasSaved = !!tb.querySelector(".saved-filter-dropdown .dropdown-toggle");
+        var hasOps = !!tb.querySelector(".list-operations .dropdown-toggle");
+        var oneCol = isMobileOneCol();
+        var seg = function (items, current, action) {
+            var h = '<span class="refract-seg" role="group">';
+            for (var i = 0; i < items.length; i++) {
+                h += '<button type="button" class="' + (items[i].v === current ? "is-on" : "") + '" data-sheet-action="' + action + '" data-sheet-value="' + esc(items[i].v) + '" aria-pressed="' + (items[i].v === current ? "true" : "false") + '" aria-label="' + esc(items[i].l) + '">' + (items[i].icon || esc(items[i].l)) + '</button>';
+            }
+            return h + '</span>';
+        };
+        var html =
+            '<div class="refract-sheet-head"><span class="refract-sheet-title">Sort and view</span>' +
+            '<button type="button" class="refract-sheet-close" data-sheet-action="close" aria-label="Close">' + REFRACT_SHEET_ICONS.close + '</button></div>';
+        if (sortToggle) {
+            html += '<div class="refract-sheet-group">Sort by</div>' +
+                '<button type="button" class="refract-sheet-row" data-sheet-action="sort-field"><span class="refract-sheet-label">' + esc(sortLabel || "Sort") + '</span><span class="refract-sheet-value">Change</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+            if (dir) {
+                html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Direction</span>' +
+                    seg([{ v: "asc", l: "Ascending", icon: REFRACT_SHEET_ICONS.asc }, { v: "desc", l: "Descending", icon: REFRACT_SHEET_ICONS.desc }], dir, "sort-dir") + '</div>';
+            }
+        }
+        if (hasSaved) {
+            html += '<div class="refract-sheet-group">Saved filters</div>' +
+                '<button type="button" class="refract-sheet-row" data-sheet-action="saved"><span class="refract-sheet-label">Saved filters</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+        }
+        html += '<div class="refract-sheet-group">View</div>';
+        if (sel && perOpts.length) {
+            html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Per page</span>' +
+                seg(perOpts.map(function (v) { return { v: v, l: v }; }), sel.value, "per-page") + '</div>';
+        }
+        html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Cards per row</span>' +
+            seg([{ v: "2", l: "Two cards per row", icon: REFRACT_SHEET_ICONS.cols2 }, { v: "1", l: "One card per row", icon: REFRACT_SHEET_ICONS.cols1 }], oneCol ? "1" : "2", "cols") + '</div>';
+        if (hasOps) {
+            html += '<div class="refract-sheet-group">Actions</div>' +
+                '<button type="button" class="refract-sheet-row" data-sheet-action="ops"><span class="refract-sheet-label">Select, export, edit, delete</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+        }
+        if (sheet.innerHTML !== html) { sheet.innerHTML = html; }
+    }
+    function refractOpenListSheet() {
+        refractInjectListSheet();
+        refractCloseBurger();
+        refractRenderListSheet();
+        refractSetDockContracted(false);
+        refractSetClass(document.body, "refract-list-sheet-open", true);
+    }
+    function refractCloseListSheet() {
+        refractSetClass(document.body, "refract-list-sheet-open", false);
+    }
+    /* On phones the sort half of the group opens the sheet instead of
+       Stash's dropdown; the sheet's own "Change" row reaches the dropdown
+       through the bypass. Bound once, capture phase, so React never sees
+       the intercepted tap. */
+    function refractBindListSheet() {
+        if (window.__refractListSheetBound) { return; }
+        window.__refractListSheetBound = true;
+        document.addEventListener("click", function (e) {
+            var t = e.target;
+            if (!t || !t.closest) { return; }
+            if (!refractDockIsMobile()) { return; }
+            var open = document.body.classList.contains("refract-list-sheet-open");
+            if (open && !t.closest(".refract-list-sheet")) {
+                refractCloseListSheet();
+                if (t.closest(".refract-burger-scrim")) { e.preventDefault(); e.stopPropagation(); return; }
+            }
+            if (refractListSheetBypass) { return; }
+            if (t.closest(".filtered-list-toolbar .sort-by-select .dropdown-toggle")) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (open) { refractCloseListSheet(); } else { refractOpenListSheet(); }
+                return;
+            }
+            /* The caption is the link to the in-flow pager. */
+            var cap = t.closest(".pagination-index-container[data-pager-row=\"hide\"]");
+            if (cap) {
+                var pager = document.querySelector('[data-pager-row="float"]');
+                if (pager && pager.scrollIntoView) { pager.scrollIntoView({ block: "center", behavior: "smooth" }); }
+            }
+        }, true);
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && document.body.classList.contains("refract-list-sheet-open")) { refractCloseListSheet(); }
+        });
+    }
+    /* Per pass: the caption's "N per page" and the search placeholder's
+       noun. Both are attributes React does not own on those nodes (it
+       set placeholder once; it never changes the prop, so it never
+       rewrites it). Read before write. */
+    var REFRACT_SEARCH_NOUNS = { scenes: "scenes", performers: "performers", studios: "studios", tags: "tags", galleries: "galleries", images: "images", groups: "groups", movies: "movies", markers: "markers" };
+    function injectMobileColsToggle() {
+        refractInjectListSheet();
+        refractBindListSheet();
+        var tb = refractListToolbar();
+        if (!tb) { return true; }
+        var sel = tb.querySelector(".page-size-selector select, select.form-control");
+        var cap = document.querySelector('.pagination-index-container[data-pager-row="hide"]');
+        if (cap && sel && /^\d+$/.test(sel.value)) {
+            var txt = sel.value + " per page";
+            if (cap.getAttribute("data-per-page") !== txt) { cap.setAttribute("data-per-page", txt); }
+        }
+        var input = tb.querySelector('input[placeholder*="Search"]');
+        if (input && refractDockIsMobile()) {
+            var seg = refractPathFromLocation().split("/").filter(Boolean);
+            var noun = REFRACT_SEARCH_NOUNS[seg[seg.length - 1]] || (seg.length === 1 ? REFRACT_SEARCH_NOUNS[seg[0]] : null);
+            if (noun) {
+                var ph = "Search " + noun;
+                if (input.getAttribute("placeholder") !== ph) { input.setAttribute("placeholder", ph); }
+            }
+        }
+        if (document.body.classList.contains("refract-list-sheet-open")) { refractRenderListSheet(); }
         return true;
     }
 
@@ -5509,6 +5691,12 @@
         }
         return !!(refractDockMq && refractDockMq.matches);
     }
+    /* The list toolbar takes the chrome material while stuck (past 80px);
+       the class lives on the toolbar element, never on body. */
+    function refractSetToolbarStuck(on) {
+        var bars = document.querySelectorAll(".filtered-list-toolbar");
+        for (var i = 0; i < bars.length; i++) { refractSetClass(bars[i], "refract-stuck", !!on); }
+    }
     function refractSetDockContracted(on) {
         var dock = document.querySelector(".refract-mobile-dock");
         if (!dock) { return; }
@@ -5524,13 +5712,19 @@
         window.__refractDockScrollBound = true;
         var reduceMotion = window.matchMedia
             && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (reduceMotion) { return; }
+        if (reduceMotion) {
+            window.addEventListener("scroll", function () {
+                if (refractDockIsMobile()) { refractSetToolbarStuck((window.scrollY || 0) >= REFRACT_DOCK_NEAR_TOP); }
+            }, { passive: true });
+            return;
+        }
         var anchorY = window.scrollY || 0;
         var pending = false;
         function tick() {
             pending = false;
             if (!refractDockIsMobile()) { return; }
             var y = window.scrollY || 0;
+            refractSetToolbarStuck(y >= REFRACT_DOCK_NEAR_TOP);
             if (document.body.classList.contains("refract-burger-open")
                     || document.fullscreenElement
                     || document.querySelector(".Lightbox")) {
@@ -6151,6 +6345,8 @@
             refractMarkActiveDrawerTile();
             refractMarkActiveDockItem();
             refractSetDockContracted(false);
+            refractSetToolbarStuck(false);
+            refractCloseListSheet();
         }
         refractBindDockScroll();
         if (typeof PluginApi !== "undefined" && PluginApi && PluginApi.Event && PluginApi.Event.addEventListener) {
