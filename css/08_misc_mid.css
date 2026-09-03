@@ -8021,8 +8021,15 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.s
     margin: 0;
 }
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids .stash-id-pill {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    /* The pill is a box around the chip and has no text of its own, so it
+       measures the chip. This did NOT close the last 1.9px between this
+       tile and a text one -- 49.5 against 47.6 -- and that residue is
+       somewhere else in Stash's own list chrome. It is a constant now
+       rather than a variable, which was the finding: the row no longer
+       changes height with the number of endpoints. */
+    line-height: 1;
 }
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids a {
     font-size: var(--fs-xs) !important;
@@ -8797,7 +8804,14 @@ body.stash-liquid-glass #performer-page .refract-pe-sec.is-tags       { order: 7
 body.stash-liquid-glass #performer-page .refract-pe-sec.is-options    { order: 80; }
 
 /* Every field sized to what it holds, where the live form gave all
-   twenty-six of them 1134px. */
+   twenty-six of them 1134px -- and every row filling all twelve of its
+   tracks, which is the part that was wrong. Appearance row 2 was Hair 3
+   + Eye 3 + Height 2 + Weight 2 = 10, leaving 188px of nothing at the
+   right, and row 3 was Measurements 4 + Fake Tits 4 = 8, under a first
+   row that filled its twelve: a ragged right edge with no rule behind
+   it. A twelve-track grid whose rows stop at ten and eight is not a
+   grid, it is three measures. Height and Weight take 3 each so the
+   appearance row closes, and every remaining pair goes 6 + 6. */
 body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="name"]            { order: 11; grid-column: span 6; }
 body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="disambiguation"]  { order: 12; grid-column: span 3; }
 body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="gender"]          { order: 13; grid-column: span 3; }
@@ -8809,19 +8823,19 @@ body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="cou
 body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="ethnicity"]       { order: 24; grid-column: span 3; }
 body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="hair-color"]      { order: 25; grid-column: span 3; }
 body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="eye-color"]       { order: 26; grid-column: span 3; }
-body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="height-cm"]       { order: 27; grid-column: span 2; }
-body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="weight-kg"]       { order: 28; grid-column: span 2; }
-body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="measurements"]    { order: 29; grid-column: span 4; }
-body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="fake-tits"]       { order: 30; grid-column: span 4; }
-body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="penis-length-cm"] { order: 31; grid-column: span 3; }
-body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="circumcised"]     { order: 32; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="height-cm"]       { order: 27; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="weight-kg"]       { order: 28; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="measurements"]    { order: 29; grid-column: span 6; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="fake-tits"]       { order: 30; grid-column: span 6; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="penis-length-cm"] { order: 31; grid-column: span 6; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="circumcised"]     { order: 32; grid-column: span 6; }
 
 body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="tattoos"]         { order: 41; grid-column: span 6; }
 body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="piercings"]       { order: 42; grid-column: span 6; }
 body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="details"]         { order: 43; grid-column: span 12; }
 
-body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="career-start"]    { order: 51; grid-column: span 3; }
-body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="career-end"]      { order: 52; grid-column: span 3; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="career-start"]    { order: 51; grid-column: span 6; }
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="career-end"]      { order: 52; grid-column: span 6; }
 
 body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="urls"]            { order: 61; grid-column: span 12; }
 body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="stash-ids"]       { order: 62; grid-column: span 12; }
@@ -9069,6 +9083,56 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit .btn.btn-dange
     background: rgba(var(--danger-rgb), 0.12) !important;
     border-color: rgba(var(--danger-rgb), 0.28) !important;
     color: var(--danger-bright) !important;
+}
+
+/* ── One control height in this column ──────────────────────────────
+   Measured down the form: text inputs 33.5, the react-select Country
+   control 38 (which put its group's bottom edge 4.5px below Ethnicity's
+   beside it), the URL and alias list inputs 30.9 inside 33.5 button
+   groups so every list row had a 2.6px step at its seam, the empty alias
+   row's remove button 35.8 against 30.9 for the filled one, and the
+   Stash ID add and remove at 23. Five heights in one column, none of
+   them a decision.
+
+   33.5 is the one the form already has most of, so everything else comes
+   to it. Textareas are excluded by name -- Tattoos, Piercings and
+   Details are meant to be tall -- and so is anything inside the action
+   bar, which is a toolbar rather than a field. */
+body.stash-liquid-glass #performer-page .refract-pe form :is(
+    .form-control,
+    .text-input,
+    .react-select__control,
+    .input-group-append > .btn,
+    .input-group-prepend > .btn
+):not(textarea):not(.details-edit *) {
+    min-height: 2.4rem !important;
+    height: 2.4rem !important;
+}
+/* The date fields put a button beside the input inside the same group;
+   both come to the height above, and the group stops being 2.6px taller
+   than what it holds. */
+body.stash-liquid-glass #performer-page .refract-pe form .input-group {
+    min-height: 2.4rem;
+}
+/* react-select draws its own inner rows and will otherwise centre them
+   against its old 38. */
+body.stash-liquid-glass #performer-page .refract-pe form .react-select__value-container,
+body.stash-liquid-glass #performer-page .refract-pe form .react-select__indicators {
+    height: 2.4rem !important;
+}
+
+/* The Stash ID row is the one place the form still ran off its own
+   scale: Bootstrap's `py-0` on the delete and add buttons made them 23px
+   against the column's 33.6, and the hash itself renders at 9.24px,
+   which is below --fs-xs and so below anything the type scale offers.
+   A hash is not decoration -- it is the identifier you check against a
+   stash-box -- so it reads at the scale's own floor. */
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="stash-ids"] .btn {
+    min-height: 2.4rem !important;
+    height: 2.4rem !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="stash-ids"] li a {
+    font-size: var(--fs-xs) !important;
 }
 
 /* ── Field states ──────────────────────────────────────────────────
