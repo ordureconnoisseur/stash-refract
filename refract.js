@@ -5680,11 +5680,7 @@
                 for (var hc = 0; hc < hcands.length; hc++) {
                     if (hcands[hc] && knownPresent[hcands[hc]]) { enabled = true; break; }
                 }
-                if (enabled) {
-                    htile.classList.remove("refract-drawer-tile-off");
-                } else {
-                    htile.classList.add("refract-drawer-tile-off");
-                }
+                refractSetClass(htile, "refract-drawer-tile-off", !enabled);
             }
         }
 
