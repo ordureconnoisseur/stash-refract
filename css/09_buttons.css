@@ -910,6 +910,37 @@ body.stash-liquid-glass .adv-rating-btn--active {
    column, so when the strip's tier chip opens the drawer the two become
    one 16px shell with a hairline seam. Nothing inside is rounded, which
    is also why there is no concentric-radius problem to solve (3.4). */
+/* Both halves have to agree before the drawer paints.
+
+   The plugin owns the panel's open state and restores it on EVERY scene
+   load: restoreScenePanel() re-opens whenever localStorage asrInlineOpen
+   is "1", and that flag is written on every open and close. Refract only
+   learns about an open drawer through the tier chip's own click handler,
+   which is the one place `st-rating-open` is set. So a panel the plugin
+   reopened left the toolbar without the class, the weld rule below did
+   not match, and the panel painted as a loose bordered card between the
+   strip and the tab bar - reported from the thread, reproduced at 1600
+   and 1100 alike. Stacked, that card is a full-width slab that pushes
+   the tab strip and the whole Details tab below the fold.
+
+   Hiding the unreconciled state is the fix rather than a plaster,
+   because refract hides the plugin's own trigger in this strip
+   (07, .adv-rating-btn display:none), so the chip is the ONLY way a user
+   can open this drawer: an open panel the toolbar knows nothing about
+   can only have come from the restore, never from an action. The chip's
+   handler already reconciles the pair - it toggles `st-rating-open` and
+   then clicks the plugin's trigger ONLY when the two disagree - so the
+   first click on a restored-open panel reveals it welded instead of
+   re-closing it, and the second closes it properly.
+
+   Same sibling shape as the weld it guards, deliberately: the two rules
+   are one pair and should be read together. If the plugin ever stops
+   mounting the panel as the toolbar's next sibling, both break together
+   and visibly, rather than this one failing open and silently. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar):not(.st-rating-open) + .adv-rating-inline-panel.open {
+    display: none !important;
+}
+
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open + .adv-rating-inline-panel.open {
     /* The plugin insets the panel from the column; the strip bleeds out
        of it by 10px. Both edges are stated here so the two boxes are the
