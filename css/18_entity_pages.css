@@ -953,3 +953,50 @@ body.stash-liquid-glass.refract-lite .detail-header.refract-eh-banded {
         display: none;
     }
 }
+
+/* -------------------------------------------------------------------
+   Narrow: the identity head centres, the record does not
+   -------------------------------------------------------------------
+   The same ruling the performer band takes below its stack point
+   (08_misc_mid, 2026-09-03), applied here because the user asked for it
+   everywhere and these headers are the same object: a picture, a name,
+   and a table of facts under them.
+
+   These containers are block layout rather than the performer band's
+   flex, so the logo is a 112px box sitting at the left with a
+   full-width title under it -- the same unresolved left-ragged stack,
+   arrived at a different way. The logo centres as a box and the title
+   block centres its inline content.
+
+   Everything below stays exactly where it was. The read-out grid, the
+   kin grid, the relation rows and the tag lists are data: they are read
+   by scanning a left edge, and text-align is inherited, so each is told
+   to keep its own. That reset is the rule, not a detail -- without it
+   this becomes the centred-everything page the ruling is trying to
+   avoid. */
+@media (max-width: 600px) {
+    /* The logo is FLOATED here -- that is how the title wraps beside it at
+       full width -- and a float cannot be centred by auto margins, so the
+       first version of this rule declared the centring and moved nothing.
+       The float comes off at this width, which is also what makes the
+       title sit under the logo rather than beside it. */
+    body.stash-liquid-glass .detail-header:has(.studio-head) .detail-header-image,
+    body.stash-liquid-glass .detail-header:has(.tag-head) .detail-header-image,
+    body.stash-liquid-glass .detail-header:has(.group-head) .detail-header-image {
+        float: none !important;
+        margin: 0 auto var(--gap-md) !important;
+    }
+    body.stash-liquid-glass .detail-header:has(.studio-head) .studio-head,
+    body.stash-liquid-glass .detail-header:has(.tag-head) .tag-head,
+    body.stash-liquid-glass .detail-header:has(.group-head) .group-head {
+        text-align: center;
+    }
+    body.stash-liquid-glass .detail-header:has(.studio-head) .detail-group,
+    body.stash-liquid-glass .detail-header:has(.tag-head) .detail-group,
+    body.stash-liquid-glass .detail-header:has(.group-head) .detail-group,
+    body.stash-liquid-glass .detail-header .refract-eh-kin,
+    body.stash-liquid-glass .detail-header .refract-eh-kin-grid,
+    body.stash-liquid-glass .detail-header .detail-item {
+        text-align: left;
+    }
+}

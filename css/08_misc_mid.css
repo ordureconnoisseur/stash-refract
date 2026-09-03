@@ -8507,6 +8507,54 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
         margin-left: 1.25rem;
         margin-right: 1.25rem;
     }
+
+    /* ── The identity head centres; the record does not ──────────────
+       Ruled 2026-09-03. Once the card loses its column the head is a
+       stack, and a stack of five blocks of five different widths ragged
+       against one edge reads as unresolved even though every block is
+       correct on its own: the card at the left with two thirds of the
+       band empty beside it, then a name, then two rows of buttons, then
+       two rows of figures, each ending somewhere different.
+
+       Centred, the stack has one axis and the ragged edge becomes a
+       symmetry. What keeps that from being the other kind of wrong --
+       the everything-centred page that reads as having no structure --
+       is the scope: this is the IDENTITY, and it stops at the read-out.
+       The tile grid, the categories, the tags and the Ascension section
+       stay full width and left-aligned, so the centred block above them
+       is a deliberate contrast rather than a global default. Data and
+       inputs are read by scanning a left edge; who this is, is not.
+
+       Each block centres its own contents rather than being shrunk and
+       centred as a box, so a wrapping action row wraps symmetrically
+       instead of hanging off one end of a centred pile. */
+    body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
+        align-self: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph-alias {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .details-edit {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph-standing {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .quality-group {
+        justify-self: center;
+        justify-content: center;
+    }
+    /* The record keeps its own left edge, which is the whole point. */
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group,
+    body.stash-liquid-glass #performer-page .refract-ph-cats,
+    body.stash-liquid-glass #performer-page .refract-ph-tags {
+        justify-self: stretch;
+        text-align: left;
+    }
+
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -9343,6 +9391,58 @@ body.stash-liquid-glass #performer-page .refract-pe form .text-input.is-invalid 
         order: 2;
         flex: 0 0 100%;
         height: 0;
+    }
+}
+
+/* Placed here, after the edit form's own rules, rather than beside its
+   twin in the view band's 600 block: those rules and these name the
+   same element at the same specificity, so source order decides and the
+   edit section is later. Written up there it declared the right thing
+   and changed nothing -- measured, the card still sat 134.5px left of
+   the axis at 600 with the rule apparently applying. */
+@media (max-width: 600px) {
+    /* ── The edit head follows, the form does not ────────────────────
+       Same rule one mode across: the picture, the name and the rating
+       are identity and centre with it; every field below is an input and
+       keeps its left edge. The action plate sits between the two and
+       goes with the identity, since at this width it is three stacked
+       lines of its own -- what is being edited, what you can do, how you
+       leave -- and a left-ragged toolbar under a centred name would
+       reopen exactly what this ruling closes. Its two auto margins come
+       off, or they would fight the centring they are inside. */
+    body.stash-liquid-glass #performer-page .refract-pe .detail-header-image {
+        align-self: center;
+    }
+    /* The edit head is a block, not the view band's grid, so
+       justify-content lands on nothing: its h2 is `display: block` at
+       full width and its rating group is an inline-flex box sitting at
+       the left. Measured with the rule "applying": name 163.9 and rating
+       54.5 left of the axis. text-align does the work in block layout,
+       and the rating group becomes a real flex row so its own contents
+       centre inside it. */
+    body.stash-liquid-glass #performer-page .refract-pe .performer-head {
+        text-align: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .performer-head > h2 {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .quality-group {
+        display: flex !important;
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .details-edit {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .details-edit > .refract-pe-state {
+        margin-right: 0 !important;
+        align-items: center;
+        text-align: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-primary {
+        margin-left: 0 !important;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe form {
+        text-align: left;
     }
 }
 
