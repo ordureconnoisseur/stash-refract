@@ -1458,7 +1458,7 @@
                 Object.keys(cardElems).forEach(function (k) { elemMap[k] = cardElems[k]; });
                 CARD_ELEMS.forEach(function (d) {
                     if (d.group !== elemGroup) { return; }
-                    var hidden = p.hide.indexOf(d.key) !== -1;
+                    var hidden = presetHidesElem(p, d);
                     try { localStorage.setItem(d.key, hidden ? "1" : "0"); } catch (e) { /* ignore */ }
                     elemMap[d.key] = hidden;
                 });
@@ -2248,7 +2248,7 @@
                pictures of the card, drawn from each preset's own flags so a
                preset can never illustrate something it does not do. */
             function presetArt(p) {
-                var hid = function (k) { return p.hide.indexOf(k) !== -1; };
+                var hid = function (k) { return presetHidesElem(p, CARD_ELEM_BY_KEY[k] || { key: k }); };
                 var scene = previewKind === "scene";
                 var ext = (p.flourish || flourish) === "extravagant";
                 var side = function (k, dflt) { return p.sides[k] || dflt; };
@@ -2310,7 +2310,7 @@
                 var hasSides = false;
                 CARD_ELEMS.forEach(function (d) {
                     if (d.group !== elemGroup || d.noop) { return; }
-                    parts.push(d.key + (p.hide.indexOf(d.key) !== -1 ? "0" : "1"));
+                    parts.push(d.key + (presetHidesElem(p, d) ? "0" : "1"));
                     /* In text mode the studio has no corner, so its side and the
                        ribbon-over-logo layer decide nothing, and looks that
                        differ only by those become the same card. */
@@ -2461,7 +2461,7 @@
                 for (i = 0; i < CARD_ELEMS.length; i++) {
                     d = CARD_ELEMS[i];
                     if (d.group !== elemGroup || d.noop) { continue; }
-                    if (!!cardElems[d.key] !== (p.hide.indexOf(d.key) !== -1)) { return false; }
+                    if (!!cardElems[d.key] !== presetHidesElem(p, d)) { return false; }
                     if (d.sideKey && elemGroup === "scene") {
                         if ((cardSides[d.key] || d.sideDefault) !== (p.sides[d.key] || d.sideDefault)) { return false; }
                     }
@@ -3432,6 +3432,19 @@
            country's. Only offered when Ascension is actually installed. */
         { key: "refract.pcHideRank",       cls: "refract-pc-hide-rank",       group: "performer", label: "Rank badge", plugin: "ascension",
           sel: ".hon-battle-rank-badge" },
+        /* Ascension's Ascended Score, the number it puts beside the rank.
+           The first element in this table that ships OFF, and the reason
+           `defaultHidden` exists. The card read-out is one number: two of
+           them in a 235px caption row is the density the rank badge was
+           moved out of the stat strip to escape, and the score is the one
+           that is not Refract's to lead with. Off it costs nothing; on, it
+           is drawn by refract.js so it wears the same gradient as the rank
+           rather than Ascension's tier colour, which would put a third
+           colour system on a single line. Offered only where Ascension is
+           installed, like the rank badge above. */
+        { key: "refract.pcHideScore",      cls: "refract-pc-hide-score",      group: "performer", label: "Ascended score",
+          plugin: "ascension", defaultHidden: true,
+          sel: ".refract-ascension-score" },
         /* The flip tab, and with it the whole back. Every OTHER thing about the
            back was configurable -- its face, its picture, its stats, its tray,
            each panel of the dossier -- except whether you wanted one. The back
@@ -3507,6 +3520,7 @@
            the front's. One band, one strip, one place to ask about it. */
         "refract.mbHideStats":      "bottom",
         "refract.pcHideRank":       "bottom",
+        "refract.pcHideScore":      "bottom",
         "refract.scHideTitle":      "bl",
         "refract.scHideDetails":    "bl",
         /* Measured on the preview: the flip tab is a 27x40 tab on the card's
@@ -3722,21 +3736,56 @@
        those reach past the cards. */
     var REFRACT_CARD_RESET_KEYS = CARD_ELEMS.map(function (d) { return d.key; }).concat(CARD_SIDE_KEYS);
 
-    function cardElemDefaultHidden(key) {
-        for (var i = 0; i < CARD_ELEMS.length; i++) {
-            if (CARD_ELEMS[i].key === key) { return !!CARD_ELEMS[i].defaultHidden; }
-        }
-        return false;
-    }
+    /* key -> its row, for the readers that only have a key to go on. */
+    var CARD_ELEM_BY_KEY = {};
+    CARD_ELEMS.forEach(function (d) { CARD_ELEM_BY_KEY[d.key] = d; });
+
     /* An unset key means "whatever this element ships as", not "shown".
-       Everything here shipped shown until the country flag, which is new
-       geometry on a card people already run. */
+       Everything in the table shipped shown until the Ascended score, so
+       the two used to be the same statement and this could answer without
+       consulting the table at all. The score is another plugin's number on
+       Refract's card and it ships off, so the default lives in the table
+       beside the element, "0" and "1" are the only values that override
+       it, and a key that is merely ABSENT is no longer a key set off.
+
+       Reset comes out right for free: clearing the key returns each
+       element to its own default rather than to a hardcoded shown.
+
+       The performer lane reached this same conclusion independently for
+       the country flag chip (5887e00) and removed its consumer again when
+       the flag folded into Country as a form question (3b25c1f), leaving
+       the mechanism here with nothing using it. Both halves are kept: this
+       reader is the map version because presetHidesElem below calls it per
+       element per look, and the linear scan was the merge's other side. */
+    function cardElemDefaultHidden(key) {
+        var d = CARD_ELEM_BY_KEY[key];
+        return !!(d && d.defaultHidden);
+    }
     function isCardElemHidden(key) {
         try {
             var v = localStorage.getItem(key);
             if (v === null) { return cardElemDefaultHidden(key); }
             return v === "1";
         } catch (e) { return cardElemDefaultHidden(key); }
+    }
+    /* A look lists what it HIDES, which quietly assumed every element
+       defaults to shown; four separate readers spelled that assumption
+       `p.hide.indexOf(d.key) !== -1`. A default-off element cannot be
+       expressed that way, and missing ONE of the four is a silent bug:
+       a look would switch the score on, or two looks would collapse to
+       the same signature and one of them would vanish from the row. One
+       function, four callers, so the assumption can only be changed in
+       one place. A look that wants a default-off element ON names it in
+       `show`; every existing look keeps its `hide` list untouched.
+
+       This is the half the other side of the merge did NOT have. Its
+       default-off element was gone by then, so its four raw readers were
+       latent rather than wrong; the Ascended score makes them live again,
+       which is why the fold comes back rather than the mechanism alone. */
+    function presetHidesElem(p, d) {
+        if (p.hide.indexOf(d.key) !== -1) { return true; }
+        if (d.defaultHidden) { return (p.show || []).indexOf(d.key) === -1; }
+        return false;
     }
     function cardElemSide(d) {
         if (!d.sideKey) { return null; }
@@ -8626,11 +8675,43 @@
         return el;
     }
 
+    /* The performer's tier colour, lifted off the card and published on
+       `#performer-page` so surfaces OUTSIDE the card can read it.
+
+       It has to be lifted rather than referenced. `--tier-color` is
+       declared by rules scoped to the card itself
+       (`:is(.performer-card, .refract-ph-card).refract-card-tier-*`), so
+       it resolves on the card and nowhere else; the Custom Fields panel
+       is a cousin, not a descendant, and `var(--tier-color)` there is
+       simply undefined, which per DESIGN_SYSTEM 7.13 drops the whole
+       declaration rather than falling back. Reading the computed value
+       and republishing it is the same move `--refract-hon-tier` makes on
+       the Ascension badge.
+
+       Untiered (rating below the 5.0 floor, or none) publishes NOTHING,
+       so consumers fall back to the accent through their own `var()`
+       fallback rather than to a stale colour from the last performer. */
+    function refractPhPublishTier(host) {
+        var page = document.getElementById("performer-page");
+        if (!page) { return; }
+        var tier = "";
+        try { tier = getComputedStyle(host).getPropertyValue("--tier-color").trim(); } catch (e) { tier = ""; }
+        var tiered = /refract-card-tier-/.test(host.className || "");
+        if (tiered && tier) {
+            if (page.style.getPropertyValue("--refract-ph-tier") !== tier) {
+                page.style.setProperty("--refract-ph-tier", tier);
+            }
+        } else if (page.style.getPropertyValue("--refract-ph-tier")) {
+            page.style.removeProperty("--refract-ph-tier");
+        }
+    }
+
     function refractPhBuildCard(header, host, d) {
         /* Tier first: the ribbon, the halo and every --badge-color in the
            strip below read off the class this sets. */
         var r10 = (d.rating100 != null) ? d.rating100 / 10 : 0;
         applyCardTier(host, r10);
+        refractPhPublishTier(host);
 
         var nameEl = header.querySelector(".performer-head .performer-name");
         var name = nameEl ? (nameEl.textContent || "").trim() : "";
@@ -11124,17 +11205,137 @@
        (which disconnects before mutating), so our move doesn't re-fire
        the observer. Inert on installs without Ascension; the selector
        matches no DOM. */
+    /* Set a class only when it is not already in the state asked for.
+
+       This is not a micro-optimisation, it is a correctness fix for a
+       document-wide repaint. Chromium invalidates style when the class
+       ATTRIBUTE IS SET, not when its value changes, and classList.add and
+       .remove run the token list's update steps unconditionally - so
+       adding a class an element already carries costs exactly what a real
+       change costs. On a home page of cards with shadow chains and
+       backdrop-filter that is a full re-raster: the shadows drop for a
+       frame and snap back, on every pass, for writes that changed
+       nothing.
+
+       Measured before this guard: one hover produced 1,133 attribute
+       writes across the document, 1,131 of them redundant, and 684 of
+       those were this file re-asserting three classes that were already
+       there on every badge, caption and chin it had already processed.
+
+       Not findable by patching className or setAttribute or DOMTokenList,
+       because the cost is in the token list's internal update step; a
+       DOMDebugger attribute-modified breakpoint on a card the pointer is
+       nowhere near is what shows it. */
+    function setClassIfChanged(el, name, on) {
+        if (!el) { return; }
+        var has = el.classList.contains(name);
+        if (on && !has) { el.classList.add(name); }
+        else if (!on && has) { el.classList.remove(name); }
+    }
+
+    /* ── Which Ascension is this? ─────────────────────────────────────
+       The double flame of Discourse #190 happened because the flame was
+       prepended unconditionally. 1.3.0 shipped an icon of its own, the
+       rule set knew nothing about it, and the card drew both. Hiding
+       "any svg that is not ours" cures that one, but it cures it by
+       asserting that Refract understands every badge it will ever be
+       shown, and the NEXT shape gets whatever that assertion happens to
+       do to it.
+
+       So the test runs the other way round: a badge is CLAIMED only when
+       every part of it can be named. It must carry the rank text we
+       read, its direct children must all come from the set the shipped
+       versions use, and the only icons anywhere in it may be ours and
+       the one inside Ascension's own score wrapper. Anything else is
+       left as its author drew it -- no marker class, so not one rule in
+       13_plugins.css applies, no flame, no hides -- with one console
+       note naming the unfamiliar part. Unstyled and correct beats
+       styled and wrong, and it is the one outcome that cannot repeat
+       #190 on a version nobody here has seen.
+
+       Read off both real builds rather than guessed: 1.2.6 draws
+       emoji + rank (+ total, + match stats), 1.3.1 draws score + separator
+       + rank (+ total, + match stats), each of those optional parts
+       genuinely absent on some performers, and the compact form on
+       /performers differs from the full form everywhere else. The parts
+       list is the union, so a missing part is not a strange badge. */
+    var ASCENSION_KNOWN_PARTS = {
+        "hon-rank-emoji": 1,        /* 1.2.x tier emoji, gone in 1.3 */
+        "hon-asc-score-display": 1, /* 1.3.x Ascended score, only when scored */
+        "hon-asc-separator": 1,     /* 1.3.x, rides with the score */
+        "hon-rank-text": 1,         /* every version, and the one we read */
+        "hon-rank-total": 1,        /* "of N", full badge only */
+        "hon-match-stats": 1        /* both versions, only once a match exists */
+    };
+    /* The one place an icon that is not ours is allowed to be. */
+    var ASCENSION_ICON_HOST = ".hon-asc-score-display";
+    var ascensionUnknownLogged = {};
+
+    /* Returns null when the badge is understood, else a short phrase
+       naming what was not. `class` is read with getAttribute because on
+       an SVG element `className` is an SVGAnimatedString and stringifies
+       to "[object SVGAnimatedString]", which would make the one message
+       whose whole job is to say what changed say nothing at all. */
+    function ascensionBadgeUnknownPart(badge) {
+        if (!badge.querySelector(".hon-rank-text")) { return "no .hon-rank-text to read"; }
+        var kids = badge.children;
+        for (var i = 0; i < kids.length; i++) {
+            var k = kids[i];
+            if (k.classList.contains("refract-ascension-icon")
+                || k.classList.contains("refract-ascension-score")) { continue; }
+            var named = false;
+            for (var c = 0; c < k.classList.length; c++) {
+                if (ASCENSION_KNOWN_PARTS[k.classList[c]]) { named = true; break; }
+            }
+            if (!named) {
+                return "unfamiliar child <" + k.tagName.toLowerCase()
+                    + ' class="' + (k.getAttribute("class") || "") + '">';
+            }
+        }
+        var svgs = badge.querySelectorAll("svg");
+        for (var s = 0; s < svgs.length; s++) {
+            if (svgs[s].classList.contains("refract-ascension-icon")) { continue; }
+            if (svgs[s].closest(ASCENSION_ICON_HOST)) { continue; }
+            return "an icon outside " + ASCENSION_ICON_HOST
+                + ' (class="' + (svgs[s].getAttribute("class") || "") + '")';
+        }
+        return null;
+    }
+
     function integrateAscensionBadges() {
         var badges = document.querySelectorAll(".performer-card .hon-battle-rank-badge");
         if (badges.length) {
-            document.body.classList.add("refract-has-ascension");
+            setClassIfChanged(document.body, "refract-has-ascension", true);
         }
         /* Only playing-card mode shows the `.stash-perf-country` caption;
            in other rating styles it's CSS-hidden, so nesting the rank
            into it would hide it too, so fall back to the chin there. */
         var pcMode = document.body.classList.contains("refract-perf-layout-card");
         badges.forEach(function (badge) {
-            badge.classList.add("refract-ascension-badge");
+            /* Unclaimed: strip anything a previous shape earned, say so
+               once per distinct surprise, and stop. It is still PARKED
+               below, because where the badge sits is Refract's own chin
+               layout rather than Ascension's paint -- left where the
+               plugin dropped it, it lands on the injected stat pills,
+               which is the clash the integration was written to solve.
+               Position it, do not dress it. */
+            var unknownPart = ascensionBadgeUnknownPart(badge);
+            if (unknownPart) {
+                setClassIfChanged(badge, "refract-ascension-badge", false);
+                setClassIfChanged(badge, "refract-ascension-unknown", true);
+                var ours = badge.querySelector(".refract-ascension-icon");
+                if (ours) { ours.remove(); }
+                if (!ascensionUnknownLogged[unknownPart]) {
+                    ascensionUnknownLogged[unknownPart] = 1;
+                    console.warn("[Refract] Ascension's rank badge is a shape this build does not"
+                        + " know (" + unknownPart + "), so it has been left unstyled rather than"
+                        + " guessed at. See docs/ascension-integration.md.");
+                }
+                parkAscensionBadge(badge, pcMode);
+                return;
+            }
+            setClassIfChanged(badge, "refract-ascension-unknown", false);
+            setClassIfChanged(badge, "refract-ascension-badge", true);
             /* Ascension renders "undefinedW/L/D" when a performer has no
                recorded record yet, so sanitise so the line reads cleanly.
                Re-runs each cycle, so it self-heals if Ascension rebuilds
@@ -11144,6 +11345,17 @@
                     s.textContent = s.textContent.replace(/undefined/gi, "0");
                 }
             });
+            /* The same defect in the badge's TOOLTIP, which the span sweep
+               above never reaches. Ascension writes the record into `title`
+               at build time, so a missing draw count hovers as "Record: 0W -
+               1L - undefinedD" -- measured on two live badges under 1.3.1.
+               Rewrite the attribute the same way the spans are rewritten,
+               and only when it needs it, so this is a no-op on every badge
+               that is already clean. */
+            var badgeTitle = badge.getAttribute("title");
+            if (badgeTitle && /undefined/i.test(badgeTitle)) {
+                badge.setAttribute("title", badgeTitle.replace(/undefined/gi, "0"));
+            }
             /* Drop both the literal "Rank " word and the "#" so the
                read-out is a bare number after the flame glyph. Only write
                when it actually changes, to avoid needless mutations. */
@@ -11164,42 +11376,103 @@
             if (!badge.querySelector(".refract-ascension-icon")) {
                 badge.insertAdjacentHTML("afterbegin", ASCENSION_FLAME_SVG);
             }
-            var card = badge.closest(".performer-card");
-            if (!card) { return; }
-            var section = card.querySelector(".card-section");
-            /* Playing-card mode: ride the country caption's line, pushed to
-               the RIGHT edge of the card. The marker class turns the caption
-               into a space-between flex row (name left, rank right), and we
-               append the badge as its last child. */
-            /* A country the user has HIDDEN is no host: the badge would die
-               with it, its visibility a side effect of an unrelated chip. */
-            var country = (pcMode && section && !document.body.classList.contains("refract-pc-hide-country"))
-                ? section.querySelector(":scope > .stash-perf-country")
-                : null;
-            if (country) {
-                country.classList.add("refract-country-with-rank");
-                if (badge.parentElement === country && country.lastElementChild === badge) {
-                    return;
+            /* Ascension's tier colour, lifted onto the badge as a custom
+               property. Read from the INLINE style rather than the computed
+               one, because the computed colour is whatever our own rules
+               resolved to. `.hon-rank-text` is the source because it is the
+               one element every version has carried and the only one whose
+               inline colour is NOT !important; the score wrapper carries the
+               same value where it exists. Nothing Refract ships paints with
+               this. It is here because it is real data the theme would
+               otherwise throw away, and because a user's custom CSS has no
+               other way to reach it: the tier palette in DESIGN_SYSTEM 4 is
+               Refract's own, and a third colour system on one line is half
+               of what #190 actually looked like. */
+            if (rankText && rankText.style && rankText.style.color) {
+                if (badge.style.getPropertyValue("--refract-hon-tier") !== rankText.style.color) {
+                    badge.style.setProperty("--refract-hon-tier", rankText.style.color);
                 }
-                country.appendChild(badge);
-                return;
             }
-            /* Fallback (no country caption / non-playing-card): sit on the
-               NAME's line, at the right edge.
+            /* The Ascended Score, drawn as OURS rather than restyled as
+               theirs. Their wrapper, its value span and its icon all ship
+               inline `!important`, which no stylesheet can beat, so the
+               choice is to strip their attributes or to render the number
+               ourselves. Stripping works today (they never read those
+               elements back) and stops working the first time they add a
+               property nobody here has anticipated; this does not, and it
+               is the same move already made for the flame glyph and the
+               one DESIGN_SYSTEM 6.12 prescribes for a control we do not
+               own. Their elements stay untouched and out of flow.
 
-               It stays a CHILD OF THE CHIN and is positioned there by CSS
-               rather than being appended into the name element, for two
-               reasons: the chin is a flex COLUMN, so any in-flow child costs a
-               whole extra line and makes the chin taller; and the name is
-               wrapped in an <a> to the performer, so nesting the rank inside
-               it would swallow the rank's own click target. */
-            if (!section) { return; }
-            section.classList.add("refract-chin-with-rank");
-            if (badge.parentElement === section && badge === section.lastElementChild) {
+               Injected whether or not the element is switched on, because
+               the customiser hides it by a body class the way it hides
+               every other card element, and because the roster chip needs
+               something on the card to name. Absent entirely when the
+               performer has no score: Ascension omits the wrapper then, and
+               a divider with nothing after it is worse than no read-out. */
+            var theirScore = badge.querySelector(".hon-asc-score-value");
+            var scoreVal = theirScore ? (theirScore.textContent || "").trim() : "";
+            var ourScore = badge.querySelector(".refract-ascension-score");
+            if (scoreVal && rankText) {
+                if (!ourScore) {
+                    rankText.insertAdjacentHTML("afterend",
+                        '<span class="refract-ascension-score">' + escapeHtml(scoreVal) + "</span>");
+                } else if (ourScore.textContent !== scoreVal) {
+                    /* Self-heals if Ascension rewrites the number in place
+                       instead of rebuilding the badge. Only on a real
+                       change, so the common cycle mutates nothing. */
+                    ourScore.textContent = scoreVal;
+                }
+            } else if (ourScore) {
+                ourScore.remove();
+            }
+            parkAscensionBadge(badge, pcMode);
+        });
+    }
+
+    /* WHERE the badge sits, split out from what it is dressed in, because
+       an unrecognised badge still needs somewhere to sit. Left where
+       Ascension drops it (in place of the native rating banner) it lands
+       on the injected stat-pill row, which is the clash this integration
+       was written to fix -- and that clash is caused by Refract's own
+       pills, so declining to place it is not neutrality, it is a mess of
+       our making. Position it; the caller decides whether to dress it. */
+    function parkAscensionBadge(badge, pcMode) {
+        var card = badge.closest(".performer-card");
+        if (!card) { return; }
+        var section = card.querySelector(".card-section");
+        /* Playing-card mode: ride the country caption's line, pushed to
+           the RIGHT edge of the card. The marker class turns the caption
+           into a space-between flex row (name left, rank right), and we
+           append the badge as its last child. */
+        /* A country the user has HIDDEN is no host: the badge would die
+           with it, its visibility a side effect of an unrelated chip. */
+        var country = (pcMode && section && !document.body.classList.contains("refract-pc-hide-country"))
+            ? section.querySelector(":scope > .stash-perf-country")
+            : null;
+        if (country) {
+            setClassIfChanged(country, "refract-country-with-rank", true);
+            if (badge.parentElement === country && country.lastElementChild === badge) {
                 return;
             }
-            section.appendChild(badge);
-        });
+            country.appendChild(badge);
+            return;
+        }
+        /* Fallback (no country caption / non-playing-card): sit on the
+           NAME's line, at the right edge.
+
+           It stays a CHILD OF THE CHIN and is positioned there by CSS
+           rather than being appended into the name element, for two
+           reasons: the chin is a flex COLUMN, so any in-flow child costs a
+           whole extra line and makes the chin taller; and the name is
+           wrapped in an <a> to the performer, so nesting the rank inside
+           it would swallow the rank's own click target. */
+        if (!section) { return; }
+        setClassIfChanged(section, "refract-chin-with-rank", true);
+        if (badge.parentElement === section && badge === section.lastElementChild) {
+            return;
+        }
+        section.appendChild(badge);
     }
 
     function onKey(e) {

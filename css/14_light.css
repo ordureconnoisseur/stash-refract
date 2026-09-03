@@ -767,7 +767,12 @@ body.stash-liquid-glass.refract-light .grid-card .stash-o-count:hover {
    any other badge the plugin paints. */
 body.stash-liquid-glass.refract-light .adv-rating-btn-badge {
     background: var(--accent-tint) !important;
-    color: var(--accent-bright) !important;
+    /* --accent-bright is a FILL shade, and using it as ink here measured
+       2.31:1 and 2.46:1 on the pale pill - the 3.1 rule 5 trap exactly,
+       a token whose job differs by mode. This number is the only carrier
+       of the rating, so it owes the 4.5 reading floor, and --accent-ink
+       is the token light mode defines for precisely this. */
+    color: var(--accent-ink) !important;
     border: 1px solid var(--accent-glow) !important;
 }
 
@@ -1258,8 +1263,10 @@ body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-row:hover
 body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-label {
     color: rgba(0, 0, 0, 0.78) !important;
 }
+/* The icon has no border any more: it is a currentColor mask of the
+   supplied glyph (09_buttons), so `color` alone paints it. The
+   border-colour that used to sit here died with the ring. */
 body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-info-icon {
-    border-color: rgba(0, 0, 0, 0.3) !important;
     color: rgba(0, 0, 0, 0.5) !important;
 }
 body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-clear {
