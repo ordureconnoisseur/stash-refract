@@ -9444,7 +9444,19 @@ body.stash-liquid-glass #performer-page .refract-pe form .text-input.is-invalid 
        leave -- and a left-ragged toolbar under a centred name would
        reopen exactly what this ruling closes. Its two auto margins come
        off, or they would fight the centring they are inside. */
+    /* The card stops being a column here, at the same width the view
+       band's does. Keeping it beside the head is right down to this
+       point and wrong past it: with a 240px card and the page's own
+       padding the form measured 241px at 600, 228 at 560 and 101 at 430,
+       which is not a form. Caught by measuring the deployed commit
+       rather than by reasoning about it -- the fix that stopped Edit
+       re-laying the page took the stack away at every width, including
+       the ones that need it. */
+    body.stash-liquid-glass #performer-page .refract-pe .detail-container {
+        flex-direction: column;
+    }
     body.stash-liquid-glass #performer-page .refract-pe .detail-header-image {
+        flex: 0 0 auto;
         align-self: center;
     }
     /* The edit head is a block, not the view band's grid, so
