@@ -11198,6 +11198,34 @@
        (which disconnects before mutating), so our move doesn't re-fire
        the observer. Inert on installs without Ascension; the selector
        matches no DOM. */
+    /* Set a class only when it is not already in the state asked for.
+
+       This is not a micro-optimisation, it is a correctness fix for a
+       document-wide repaint. Chromium invalidates style when the class
+       ATTRIBUTE IS SET, not when its value changes, and classList.add and
+       .remove run the token list's update steps unconditionally - so
+       adding a class an element already carries costs exactly what a real
+       change costs. On a home page of cards with shadow chains and
+       backdrop-filter that is a full re-raster: the shadows drop for a
+       frame and snap back, on every pass, for writes that changed
+       nothing.
+
+       Measured before this guard: one hover produced 1,133 attribute
+       writes across the document, 1,131 of them redundant, and 684 of
+       those were this file re-asserting three classes that were already
+       there on every badge, caption and chin it had already processed.
+
+       Not findable by patching className or setAttribute or DOMTokenList,
+       because the cost is in the token list's internal update step; a
+       DOMDebugger attribute-modified breakpoint on a card the pointer is
+       nowhere near is what shows it. */
+    function setClassIfChanged(el, name, on) {
+        if (!el) { return; }
+        var has = el.classList.contains(name);
+        if (on && !has) { el.classList.add(name); }
+        else if (!on && has) { el.classList.remove(name); }
+    }
+
     /* ── Which Ascension is this? ─────────────────────────────────────
        The double flame of Discourse #190 happened because the flame was
        prepended unconditionally. 1.3.0 shipped an icon of its own, the
@@ -11270,7 +11298,7 @@
     function integrateAscensionBadges() {
         var badges = document.querySelectorAll(".performer-card .hon-battle-rank-badge");
         if (badges.length) {
-            document.body.classList.add("refract-has-ascension");
+            setClassIfChanged(document.body, "refract-has-ascension", true);
         }
         /* Only playing-card mode shows the `.stash-perf-country` caption;
            in other rating styles it's CSS-hidden, so nesting the rank
@@ -11286,8 +11314,8 @@
                Position it, do not dress it. */
             var unknownPart = ascensionBadgeUnknownPart(badge);
             if (unknownPart) {
-                badge.classList.remove("refract-ascension-badge");
-                badge.classList.add("refract-ascension-unknown");
+                setClassIfChanged(badge, "refract-ascension-badge", false);
+                setClassIfChanged(badge, "refract-ascension-unknown", true);
                 var ours = badge.querySelector(".refract-ascension-icon");
                 if (ours) { ours.remove(); }
                 if (!ascensionUnknownLogged[unknownPart]) {
@@ -11299,8 +11327,8 @@
                 parkAscensionBadge(badge, pcMode);
                 return;
             }
-            badge.classList.remove("refract-ascension-unknown");
-            badge.classList.add("refract-ascension-badge");
+            setClassIfChanged(badge, "refract-ascension-unknown", false);
+            setClassIfChanged(badge, "refract-ascension-badge", true);
             /* Ascension renders "undefinedW/L/D" when a performer has no
                recorded record yet, so sanitise so the line reads cleanly.
                Re-runs each cycle, so it self-heals if Ascension rebuilds
@@ -11416,7 +11444,7 @@
             ? section.querySelector(":scope > .stash-perf-country")
             : null;
         if (country) {
-            country.classList.add("refract-country-with-rank");
+            setClassIfChanged(country, "refract-country-with-rank", true);
             if (badge.parentElement === country && country.lastElementChild === badge) {
                 return;
             }
@@ -11433,7 +11461,7 @@
            wrapped in an <a> to the performer, so nesting the rank inside
            it would swallow the rank's own click target. */
         if (!section) { return; }
-        section.classList.add("refract-chin-with-rank");
+        setClassIfChanged(section, "refract-chin-with-rank", true);
         if (badge.parentElement === section && badge === section.lastElementChild) {
             return;
         }
