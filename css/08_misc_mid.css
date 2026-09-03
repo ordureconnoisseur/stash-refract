@@ -7649,6 +7649,69 @@ body.stash-liquid-glass #performer-page .refract-ph .details-edit .btn {
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.edit {
     order: 1;
 }
+
+/* ── The primary buttons own their ground ───────────────────────────
+   --accent-tint is 0.12 of the accent, which is a glaze rather than a
+   fill: on this band the thing behind it is a photograph under a veil,
+   so the button's real ground was whatever the portrait happened to be
+   and its contrast moved with it. Measured on the rendered pixels: Edit
+   3.75:1 on Kesha at 1300 (2.99 against the warm decile), Submit 3.78 on
+   Scarlet at 1600, Edit 4.48 on Ai, 5.40 on Kesha at 1600. The same
+   button, four grounds, one of them a third of the way under the floor.
+
+   More accent does not fix it and would make it worse: the accent is
+   LIGHTER than the veil, so a heavier tint raises the ground toward the
+   ink -- 0.3 of it computes to 2.87:1 on the warm case, against 3.72
+   for the 0.12 it replaces. What the button needs is a ground of its
+   own, so a half-black base carries the accent as a glaze over it. The
+   accent still reads and the number stops depending on the picture.
+
+   Band only. The generic `.details-edit .btn-primary` rule this
+   overrides belongs to the buttons file and serves surfaces that have a
+   ground already. Delete keeps its 3.70, which is a ruling of
+   2026-08-30, not an oversight. */
+/* Two selectors, not a descendant one: Edit is a direct child of the bar
+   and Submit to Stash-Box is wrapped in a div of Stash's own, so a `>`
+   rule reached the first and missed the second -- caught by measuring
+   both rather than one (Edit 5.69, Submit still 3.79 on the same
+   performer, same fill declared). A bare descendant selector would also
+   reach the primaries inside any dropdown the bar opens, and those have
+   an opaque surface already. */
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-primary,
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > div > .btn.btn-primary {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    background-image: linear-gradient(0deg, rgba(var(--accent-rgb), 0.18), rgba(var(--accent-rgb), 0.18)) !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-primary:hover,
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > div > .btn.btn-primary:hover {
+    background-color: rgba(0, 0, 0, 0.42) !important;
+    background-image: linear-gradient(0deg, rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;
+}
+
+/* ── The house focus ring, on a band that had none ───────────────────
+   Nineteen controls here and not one of them showed a ring: measured on
+   every .btn the only thing focus changed was `outline-width` going 3px
+   to 0, the five rating stars changed nothing at all, and the rating
+   pill and the Stash ID chip fell through to the UA's own `outline: auto
+   1px rgb(16,16,16)` -- a near-black ring on a dark band, which is worse
+   than none because it looks deliberate.
+
+   An outline rather than a box-shadow because the buttons file pins
+   box-shadow on these, and the same 2px/offset-2 accent ring
+   .refract-cap-toggle already uses two hundred lines up (6.6). It has to
+   beat the `outline: 0` that put the count at zero, hence !important on
+   the width. */
+body.stash-liquid-glass #performer-page .detail-header :is(
+    .btn,
+    button,
+    .adv-rating-btn,
+    .rating-stars button,
+    .refract-sid-endpoint
+):focus-visible {
+    outline: 2px solid var(--accent-glow) !important;
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
 body.stash-liquid-glass #performer-page .refract-ph .psrc-wrap {
     order: 8;
     display: flex !important;
