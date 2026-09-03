@@ -1582,3 +1582,89 @@ body.stash-liquid-glass .refract-mobile-drawer {
         }
     }
 }
+
+
+/* ───────────────────────────────────────────────────────────────────
+   Detail-page tab strips on phones (slices 4 and 5 of the mobile
+   overhaul; boards "Performer page, scrolled" and "Scene page"): ONE
+   scrolling row, never two.
+
+   The 2026-07 forum fix above lets every .nav-tabs wrap, which on the
+   performer page at 390 measured six tabs on two rows (y 1302.8 and
+   1342.7) with no visible current-tab logic across the break. 6.23 rules
+   a tab strip is a row of rounded-rect doors; a row scrolls. This rule
+   is scoped to the entity and scene strips (08 and 07 own their tabs'
+   type, height and radius; this is placement only). Settings' sidebar
+   tabs keep the generic wrap. Left-aligned so the first tab is always
+   reachable when the row overflows; the peek of a clipped tab is the
+   scroll affordance, as on the home carousels.
+   ─────────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs, .scene-tabs, .gallery-tabs, .image-tabs) .nav-tabs {
+        flex-wrap: nowrap !important;
+        justify-content: flex-start !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+        scroll-padding-inline: 12px;
+    }
+    body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs, .scene-tabs, .gallery-tabs, .image-tabs) .nav-tabs::-webkit-scrollbar {
+        display: none !important;
+    }
+    body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs, .scene-tabs, .gallery-tabs, .image-tabs) .nav-tabs > .nav-item,
+    body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs, .scene-tabs, .gallery-tabs, .image-tabs) .nav-tabs .nav-link {
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        scroll-snap-align: start;
+    }
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   Scene page on phones (slice 5): the player goes edge to edge and the
+   details run in the page, not in a glass box.
+
+   Measured at 390 before this block: the stacked row padded 52px at the
+   top for a navbar that has been display:none on phones since
+   2026-07-28, so the player started at y80; the player sat inside the
+   12px gutter with 16px corners (24px of picture lost for nothing on a
+   366px-wide frame); and the details panel kept its desktop glass
+   (border, blur, 16px radius, 12.6px padding) as a box inside a box,
+   costing another 25px of measure on every line of the description.
+
+   What the panel's CONTENT does (title type, meta row, rating row) is
+   07_scene_details.css's and is proposed there, not overridden here.
+   ─────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    body.stash-liquid-glass .main.container-fluid > .row:has(> :is(.scene-tabs, .image-tabs)) {
+        padding: 0 0 12px !important;
+        gap: 0 !important;
+    }
+    body.stash-liquid-glass .main.container-fluid:has(:is(.scene-tabs, .image-tabs)) {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    body.stash-liquid-glass .scene-player-container,
+    body.stash-liquid-glass .scene-player-container .VideoPlayer,
+    body.stash-liquid-glass .scene-player-container .video-wrapper,
+    body.stash-liquid-glass .scene-player-container .video-js {
+        border-radius: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    body.stash-liquid-glass .scene-player-container .video-js {
+        width: 100% !important;
+    }
+    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        border-radius: 0 !important;
+        padding: var(--gap-xl) 12px 0 !important;
+        margin: 0 !important;
+    }
+}
