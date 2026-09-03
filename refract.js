@@ -5132,11 +5132,14 @@
         document.body.classList.add("refract-burger-open");
         refractSetBurgerState(true);
         refractMarkActiveDrawerTile();
+        refractSetDockContracted(false);
+        refractMarkActiveDockItem();
     }
     function refractCloseBurger() {
         if (!document.body.classList.contains("refract-burger-open")) { return; }
         refractSetBurgerState(false);
         document.body.classList.remove("refract-burger-open");
+        refractMarkActiveDockItem();
     }
 
     /* Mobile drawer - body-level overlay built from a hardcoded item
@@ -5269,8 +5272,11 @@
         dock.className = "refract-mobile-dock";
         dock.setAttribute("aria-label", "Quick navigation");
         dock.setAttribute("data-sig", sig);
+        /* Slot count (items + More) drives the pill arithmetic in
+           12_mobile.css; the pill itself is ONE element that slides. */
+        dock.style.setProperty("--dock-count", String(items.length + 1));
 
-        var html = "";
+        var html = '<span class="refract-dock-pill" aria-hidden="true"></span>';
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
             if (item.actionSelector) {
@@ -5301,6 +5307,9 @@
 
         dock.addEventListener("click", function (e) {
             if (!e.target || !e.target.closest) { return; }
+            /* A tap on the capsule expands it (binge NavChrome: a tap is
+               one of the three ways back to the expanded state). */
+            refractSetDockContracted(false);
             var burger = e.target.closest(".refract-dock-burger");
             if (burger) {
                 if (document.body.classList.contains("refract-burger-open")) {
@@ -5354,6 +5363,7 @@
         if (!dock) { return; }
         var path = window.location.pathname;
         var tiles = dock.querySelectorAll(".refract-dock-item[data-href]");
+        var activeIdx = -1;
         for (var i = 0; i < tiles.length; i++) {
             var t = tiles[i];
             var routes = [t.getAttribute("data-href")]
@@ -5366,8 +5376,102 @@
                     break;
                 }
             }
-            t.classList.toggle("is-active", active);
+            if (t.classList.contains("is-active") !== active) { t.classList.toggle("is-active", active); }
+            if (active && activeIdx < 0) { activeIdx = refractDockSlotIndex(dock, t); }
         }
+        /* The pill: one element, positioned from the active slot index
+           (12_mobile.css does the arithmetic). While the drawer is open
+           the pill parks on More; with no matching route it fades out
+           rather than sitting on a wrong slot. Read-before-write, like
+           every class writer here (zero redundant writes per pass). */
+        if (document.body.classList.contains("refract-burger-open")) {
+            var burger = dock.querySelector(".refract-dock-burger");
+            if (burger) { activeIdx = refractDockSlotIndex(dock, burger); }
+        }
+        var has = activeIdx >= 0;
+        if (dock.classList.contains("refract-dock-has-active") !== has) {
+            dock.classList.toggle("refract-dock-has-active", has);
+        }
+        if (has && dock.style.getPropertyValue("--dock-active") !== String(activeIdx)) {
+            dock.style.setProperty("--dock-active", String(activeIdx));
+        }
+    }
+
+    /* Slot index of a dock item = its position among the .refract-dock-item
+       children (the pill span is not a slot). */
+    function refractDockSlotIndex(dock, el) {
+        var slots = dock.querySelectorAll(".refract-dock-item");
+        for (var i = 0; i < slots.length; i++) { if (slots[i] === el) { return i; } }
+        return -1;
+    }
+
+    /* Dock contraction (binge NavChrome, ported): direction, not activity.
+       Scrolling DOWN past a 5px deadzone contracts the capsule; scrolling
+       up, being within 80px of the top, a tap on the dock, or the drawer
+       opening expands it. The class goes on the dock (and on the floating
+       pager, which rides above it), never on body: a body class toggled on
+       scroll is the document-wide effect DESIGN_SYSTEM 3.7 rule 1 forbids.
+       Under prefers-reduced-motion the bar never resizes. Never contracts
+       while the drawer is open, the lightbox is up, or something is
+       fullscreen (those surfaces own the viewport). Desktop widths are a
+       no-op: the dock is display:none there and the class would be noise. */
+    var REFRACT_DOCK_DEADZONE = 5;
+    var REFRACT_DOCK_NEAR_TOP = 80;
+    var refractDockMq = null;
+    function refractDockIsMobile() {
+        if (!refractDockMq && window.matchMedia) {
+            refractDockMq = window.matchMedia("(max-width: 900px)");
+        }
+        return !!(refractDockMq && refractDockMq.matches);
+    }
+    function refractSetDockContracted(on) {
+        var dock = document.querySelector(".refract-mobile-dock");
+        if (!dock) { return; }
+        if (dock.classList.contains("refract-dock-contracted") === on) { return; }
+        dock.classList.toggle("refract-dock-contracted", on);
+        var pagers = document.querySelectorAll('[data-pager-row="float"]');
+        for (var i = 0; i < pagers.length; i++) {
+            pagers[i].classList.toggle("refract-dock-contracted", on);
+        }
+    }
+    function refractBindDockScroll() {
+        if (window.__refractDockScrollBound) { return; }
+        window.__refractDockScrollBound = true;
+        var reduceMotion = window.matchMedia
+            && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduceMotion) { return; }
+        var anchorY = window.scrollY || 0;
+        var pending = false;
+        function tick() {
+            pending = false;
+            if (!refractDockIsMobile()) { return; }
+            var y = window.scrollY || 0;
+            if (document.body.classList.contains("refract-burger-open")
+                    || document.fullscreenElement
+                    || document.querySelector(".Lightbox")) {
+                anchorY = y;
+                refractSetDockContracted(false);
+                return;
+            }
+            if (y < REFRACT_DOCK_NEAR_TOP) {
+                anchorY = y;
+                refractSetDockContracted(false);
+                return;
+            }
+            var dy = y - anchorY;
+            if (dy > REFRACT_DOCK_DEADZONE) {
+                anchorY = y;
+                refractSetDockContracted(true);
+            } else if (dy < -REFRACT_DOCK_DEADZONE) {
+                anchorY = y;
+                refractSetDockContracted(false);
+            }
+        }
+        window.addEventListener("scroll", function () {
+            if (pending) { return; }
+            pending = true;
+            window.requestAnimationFrame(tick);
+        }, { passive: true });
     }
 
     function injectMobileDrawer() {
@@ -5923,7 +6027,9 @@
             refractCloseBurger();
             refractMarkActiveDrawerTile();
             refractMarkActiveDockItem();
+            refractSetDockContracted(false);
         }
+        refractBindDockScroll();
         if (typeof PluginApi !== "undefined" && PluginApi && PluginApi.Event && PluginApi.Event.addEventListener) {
             PluginApi.Event.addEventListener("stash:location", onLocationChange);
         }
