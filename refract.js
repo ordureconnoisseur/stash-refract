@@ -9075,7 +9075,7 @@
         if (standing.querySelector('[data-ph-rank]')) { return; }
         for (var i = 0; i < standing.children.length; i++) {
             var lab = standing.children[i].querySelector(".refract-ph-standing__label");
-            if (lab && lab.textContent === "Ranked") { return; }
+            if (lab && (lab.textContent === "Ranked" || lab.textContent === "Ranking")) { return; }
         }
         var cell = document.createElement("div");
         cell.className = "refract-ph-standing__cell";
@@ -9541,12 +9541,29 @@
                 break;
             }
         }
+        /* The rank is Ascension's number, read off its badge and reprinted
+           in Refract's voice -- which means an incoherent one becomes ours.
+           It said "Ranked 493 of 492": the place and the total are counted
+           over different populations, because an unrated performer is
+           sorted after all 492 rated ones and then numbered from the
+           whole library. Refract cannot fix that arithmetic, it is a
+           plugin's, but it can decline to repeat a position past the end
+           of the set it names. Past the end IS the fact -- not ranked -- so
+           that is what the cell says, and the label becomes RANKING so
+           the pair reads in both states rather than announcing "Ranked:
+           Unranked". */
         var rankEl = header.querySelector(".hon-battle-rank-badge");
         if (rankEl) {
             var rk = (rankEl.textContent || "").replace(/\s+/g, " ");
             var rm = rk.match(/#\s*(\d+)\s*(?:of\s*([\d,]+))?/i);
             if (rm && rm[1] !== "0") {
-                cells.push({ label: "Ranked", value: rm[1], tail: rm[2] ? " of " + rm[2] : "" });
+                var rkPlace = parseInt(rm[1], 10);
+                var rkTotal = rm[2] ? parseInt(String(rm[2]).replace(/,/g, ""), 10) : 0;
+                if (rkTotal && rkPlace > rkTotal) {
+                    cells.push({ label: "Ranking", value: "Unranked", tail: "" });
+                } else {
+                    cells.push({ label: "Ranking", value: rm[1], tail: rm[2] ? " of " + rm[2] : "" });
+                }
             }
         }
         var career = header.querySelector(".detail-item.career_length .detail-item-value");

@@ -8708,6 +8708,23 @@ body.stash-liquid-glass #performer-page .refract-pe-shot {
 
 /* ── The form ──────────────────────────────────────────────────── */
 
+/* The row the form sits in has to grow, the same way the view band's
+   does. Bootstrap leaves `.row` at `flex: 0 1 auto`, so as a flex item
+   beside the image it was sized by its own content and simply stopped:
+   measured at 1600, a container of 1509 with a 320px image and a 28px
+   gap leaves 1161 for the form, and the form took 917 of it, parking
+   244px of empty page to the right of every field. The sticky action
+   plate is a Bootstrap 75% column of that row, so it inherited the
+   error at three quarters of it and wrapped a line earlier than it
+   needed to.
+
+   The view band has carried `flex: 1 1 auto` on this exact selector
+   since it was built; only the edit side was missed, which is why it
+   never showed up as a difference between two modes of one page. */
+body.stash-liquid-glass #performer-page .refract-pe .detail-container > .row {
+    flex: 1 1 auto;
+    min-width: 0;
+}
 body.stash-liquid-glass #performer-page .refract-pe .performer-head {
     flex: 1 1 auto;
     min-width: 0;
