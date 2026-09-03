@@ -8096,9 +8096,12 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group {
         grid-row: 5;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     body.stash-liquid-glass #performer-page .refract-ph-cats {
         grid-row: 6;
+        flex-wrap: wrap;
+        row-gap: var(--gap-md);
     }
     /* Left, not the desktop right: the actions hold a row of their own
        now, so they start where the name, the aliases and the grid start
@@ -8106,13 +8109,6 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     body.stash-liquid-glass #performer-page .refract-ph .details-edit {
         flex-wrap: wrap;
         justify-content: flex-start;
-    }
-    body.stash-liquid-glass #performer-page .refract-ph .detail-group {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-    body.stash-liquid-glass #performer-page .refract-ph-cats {
-        flex-wrap: wrap;
-        row-gap: var(--gap-md);
     }
     body.stash-liquid-glass #performer-page .refract-ph-cats__cell {
         flex: 1 1 8rem;
@@ -8137,9 +8133,18 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
    500px wide, which is enough for the name, a wrapping action row and a
    two-up read-out. */
 @media (max-width: 820px) {
+    /* The card stops hanging off the band's bottom edge here, so its top
+       edge becomes the one that shows: it needs the same inset the sides
+       have, and the head's own top padding has to go or the name would
+       start 17px below a card it is supposed to line up with. The gap
+       stays the 2.25rem the 1200 step measured -- Bootstrap's -15px row
+       gutter eats most of it, and 1.5rem left 6px of daylight against
+       the card's tilted corner. */
     body.stash-liquid-glass #performer-page .refract-ph .detail-container {
-        padding: 0 1.25rem 1.2rem;
-        gap: 1.5rem;
+        padding-top: 1.25rem;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head {
+        padding: 0 !important;
     }
     body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
         width: 200px;
@@ -8157,8 +8162,30 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     body.stash-liquid-glass #performer-page .detail-header.refract-ph {
         margin-bottom: 0.85rem;
     }
+    /* The rating leaves the standing row for one of its own. The pairing
+       works while both are short and stops the moment the head is not:
+       at 807 the standing row ended at 566 against stars starting at
+       576, ten pixels of daylight, and by 601 the cells had broken
+       "493" from "of 492" and the stars sat against the wrap. The
+       columns stay `1fr auto` rather than dropping to a single track,
+       because one track plus the `grid-column: 2` above would grow an
+       implicit column instead of clamping -- the same trap that
+       scattered the edit form. With every child spanning 1 / -1 the
+       auto track simply resolves to zero. */
+    body.stash-liquid-glass #performer-page .refract-ph-standing {
+        grid-column: 1 / -1;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .quality-group {
+        grid-row: 5;
+        grid-column: 1 / -1;
+        justify-self: start;
+    }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group {
+        grid-row: 6;
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    body.stash-liquid-glass #performer-page .refract-ph-cats {
+        grid-row: 7;
     }
     body.stash-liquid-glass #performer-page .refract-ph-tags {
         margin-left: calc(200px + 2.5rem);
@@ -8172,9 +8199,12 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     }
 }
 
-/* Only now does a column beside the text stop fitting: 600 less a
-   200px card, a 1.5rem gap and 1.25rem of padding either side leaves
-   340px of head, which is under the two-up read-out's floor. */
+/* Only now does a column beside the text stop fitting. The head is the
+   viewport less 315px -- 54 of page margin, 40 of band padding, the
+   200px card, the 2.25rem gap, plus the 15px Bootstrap takes back --
+   so it is 285px at 600, and a two-up read-out at 142px a cell is the
+   last one where MEASUREMENTS and 36F-23-36 both still fit whole.
+   Below that the card goes above the text. */
 @media (max-width: 600px) {
     body.stash-liquid-glass #performer-page .detail-header.refract-ph,
     body.stash-liquid-glass #performer-page .refract-ph .detail-container {
@@ -8189,26 +8219,6 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     }
     body.stash-liquid-glass #performer-page .refract-ph .performer-head {
         padding: 0 !important;
-    }
-    /* The rating leaves the standing row for one of its own. The columns
-       stay `1fr auto` rather than dropping to one, because a single-track
-       template plus the `grid-column: 2` above would grow an implicit
-       column instead of clamping -- the same trap that scattered the
-       edit form. With every child spanning 1 / -1 the auto track simply
-       resolves to zero. */
-    body.stash-liquid-glass #performer-page .refract-ph-standing {
-        grid-column: 1 / -1;
-    }
-    body.stash-liquid-glass #performer-page .refract-ph .quality-group {
-        grid-row: 5;
-        grid-column: 1 / -1;
-        justify-self: start;
-    }
-    body.stash-liquid-glass #performer-page .refract-ph .detail-group {
-        grid-row: 6;
-    }
-    body.stash-liquid-glass #performer-page .refract-ph-cats {
-        grid-row: 7;
     }
     body.stash-liquid-glass #performer-page .refract-ph-tags {
         margin-left: 1.25rem;
@@ -8675,7 +8685,14 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit .btn {
     border-radius: var(--radius-sm) !important;
     white-space: nowrap;
 }
-body.stash-liquid-glass #performer-page .refract-pe-state {
+/* Scoped through .details-edit, not named on its own: at two classes
+   this rule lost `order` to `.details-edit > *`'s three, so the block
+   has been order 4 since it was written and only rendered first because
+   it is also the first child. Measured -- computed order 4 against a
+   declared 1. Nothing moved when it was fixed, which is exactly why it
+   survived; what it broke was the ::after break below, which counts on
+   the declared order being the real one. */
+body.stash-liquid-glass #performer-page .refract-pe .details-edit > .refract-pe-state {
     order: 1;
     display: flex;
     flex-direction: column;
@@ -8698,9 +8715,12 @@ body.stash-liquid-glass #performer-page .refract-pe-state.is-dirty .refract-pe-s
     color: var(--accent-ink);
     font-weight: 600;
 }
-/* Cancel is the quiet way out, not a second primary. */
+/* Cancel is the quiet way out, not a second primary. The auto margin
+   is what carries the pair to the right of the line the ::before below
+   gives them; it lives here so the selector is written once. */
 body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-primary {
     order: 8;
+    margin-left: auto !important;
     background: transparent !important;
     border-color: transparent !important;
     color: var(--text-muted) !important;
@@ -8722,6 +8742,31 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-suc
     background: var(--fill-2) !important;
     border-color: var(--glass-border) !important;
     color: rgba(var(--fg-rgb), 0.3) !important;
+}
+/* The pair gets the last line to itself, at every width.
+
+   The bar wraps -- seven controls and a status block, which did not fit
+   on one line at any width tested -- and where it broke was left to
+   whatever the buttons happened to measure. At 968 that put Save over
+   the edge ALONE, the one control in the row that cannot be a stray; at
+   1600 the pair landed together but hard against the left, under the
+   tools. Both are the same absence of a decision.
+
+   So the break is placed rather than found, and it needs no node: a
+   flex container's own ::before IS a flex item and `order` moves it. At
+   order 8 it sits between the tools (4 to 7) and Cancel (8), ahead of
+   Cancel on the tie because a pseudo-element precedes every real child
+   in document order. Zero height, full basis, invisible.
+
+   What it buys is not only tidiness: the utilities and the destructive
+   Clear Image finish above, and the two controls that END the edit sit
+   alone on the last line at the right edge, which is where a form's
+   commit pair belongs. */
+body.stash-liquid-glass #performer-page .refract-pe .details-edit::before {
+    content: "";
+    order: 8;
+    flex: 0 0 100%;
+    height: 0;
 }
 /* The image controls belong with the image, and Clear Image is
    destructive, so it stops sitting between them and Save. */
@@ -8813,23 +8858,24 @@ body.stash-liquid-glass #performer-page .refract-pe form .text-input.is-invalid 
     body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="career-end"] {
         grid-column: span 6;
     }
-    /* The bar wraps here and Save went over the edge alone, which is the
-       one control in the row that cannot be a stray. A zero-height item
-       spanning the full width forces the break where WE choose, and it
-       needs no node: a flex container's own ::before IS a flex item, and
-       `order` moves it -- ordered with Cancel, and ahead of it on ties
-       because a pseudo-element precedes every real child, it lands
-       between the tools and the pair. So the tools finish line one and
-       Cancel and Save cross together onto line two, at the same right
-       edge Save holds at full width. */
-    body.stash-liquid-glass #performer-page .refract-pe .details-edit::before {
+}
+
+/* Below 820 the status block takes a line of its own as well. Measured
+   at 807: the bar's content box is 718px and the five tools want 674 of
+   it, so the 77px "Editing Kesha Ortega" was enough on its own to push
+   Clear Image onto a line by itself. ::after is the last flex item in
+   document order, so at order 2 -- past the status block at 1, short of
+   the tools at 4 -- it breaks exactly there. Three lines, each of them
+   one group: what is being edited, what you can do to it, how you
+   leave. Not applied above 820, where the state and the tools share a
+   line with room to spare and a third line would be 40px of a sticky
+   bar spent on nothing. */
+@media (max-width: 820px) {
+    body.stash-liquid-glass #performer-page .refract-pe .details-edit::after {
         content: "";
-        order: 8;
+        order: 2;
         flex: 0 0 100%;
         height: 0;
-    }
-    body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-primary {
-        margin-left: auto !important;
     }
 }
 
