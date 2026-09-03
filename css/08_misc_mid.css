@@ -7649,6 +7649,69 @@ body.stash-liquid-glass #performer-page .refract-ph .details-edit .btn {
 body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.edit {
     order: 1;
 }
+
+/* ── The primary buttons own their ground ───────────────────────────
+   --accent-tint is 0.12 of the accent, which is a glaze rather than a
+   fill: on this band the thing behind it is a photograph under a veil,
+   so the button's real ground was whatever the portrait happened to be
+   and its contrast moved with it. Measured on the rendered pixels: Edit
+   3.75:1 on Kesha at 1300 (2.99 against the warm decile), Submit 3.78 on
+   Scarlet at 1600, Edit 4.48 on Ai, 5.40 on Kesha at 1600. The same
+   button, four grounds, one of them a third of the way under the floor.
+
+   More accent does not fix it and would make it worse: the accent is
+   LIGHTER than the veil, so a heavier tint raises the ground toward the
+   ink -- 0.3 of it computes to 2.87:1 on the warm case, against 3.72
+   for the 0.12 it replaces. What the button needs is a ground of its
+   own, so a half-black base carries the accent as a glaze over it. The
+   accent still reads and the number stops depending on the picture.
+
+   Band only. The generic `.details-edit .btn-primary` rule this
+   overrides belongs to the buttons file and serves surfaces that have a
+   ground already. Delete keeps its 3.70, which is a ruling of
+   2026-08-30, not an oversight. */
+/* Two selectors, not a descendant one: Edit is a direct child of the bar
+   and Submit to Stash-Box is wrapped in a div of Stash's own, so a `>`
+   rule reached the first and missed the second -- caught by measuring
+   both rather than one (Edit 5.69, Submit still 3.79 on the same
+   performer, same fill declared). A bare descendant selector would also
+   reach the primaries inside any dropdown the bar opens, and those have
+   an opaque surface already. */
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-primary,
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > div > .btn.btn-primary {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    background-image: linear-gradient(0deg, rgba(var(--accent-rgb), 0.18), rgba(var(--accent-rgb), 0.18)) !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > .btn.btn-primary:hover,
+body.stash-liquid-glass #performer-page .refract-ph .details-edit > div > .btn.btn-primary:hover {
+    background-color: rgba(0, 0, 0, 0.42) !important;
+    background-image: linear-gradient(0deg, rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;
+}
+
+/* ── The house focus ring, on a band that had none ───────────────────
+   Nineteen controls here and not one of them showed a ring: measured on
+   every .btn the only thing focus changed was `outline-width` going 3px
+   to 0, the five rating stars changed nothing at all, and the rating
+   pill and the Stash ID chip fell through to the UA's own `outline: auto
+   1px rgb(16,16,16)` -- a near-black ring on a dark band, which is worse
+   than none because it looks deliberate.
+
+   An outline rather than a box-shadow because the buttons file pins
+   box-shadow on these, and the same 2px/offset-2 accent ring
+   .refract-cap-toggle already uses two hundred lines up (6.6). It has to
+   beat the `outline: 0` that put the count at zero, hence !important on
+   the width. */
+body.stash-liquid-glass #performer-page .detail-header :is(
+    .btn,
+    button,
+    .adv-rating-btn,
+    .rating-stars button,
+    .refract-sid-endpoint
+):focus-visible {
+    outline: 2px solid var(--accent-glow) !important;
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
 body.stash-liquid-glass #performer-page .refract-ph .psrc-wrap {
     order: 8;
     display: flex !important;
@@ -8063,39 +8126,7 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     body.stash-liquid-glass #performer-page .refract-ph .detail-group {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
-}
-@media (max-width: 1200px) {
-    body.stash-liquid-glass #performer-page .detail-header.refract-ph,
-    body.stash-liquid-glass #performer-page .refract-ph .detail-container {
-        min-height: 380px;
-    }
-    /* The gap has to clear two things that are not the gap: Bootstrap's
-       -15px row gutter on the readout column, and the ~5px the card's
-       rendered box gains from the Legendary tilt. --gap-xl is 14px, so
-       14 - 15 - 5 left the text 5px INSIDE the card at 1024 and 900.
-       Measured, both widths. 2.25rem leaves about 11px of real
-       daylight, which is the same arithmetic the desktop 3rem does. */
-    body.stash-liquid-glass #performer-page .refract-ph .detail-container {
-        padding: 0 1.25rem 1.2rem;
-        gap: 2.25rem;
-    }
-    body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
-        width: 240px;
-        flex: 0 0 240px;
-        max-width: 240px !important;
-        margin-bottom: -72px;
-    }
-    /* The strip is sized for a 340px card. At 240 the fourth pill runs
-       off the edge, which on a grid card is what initPerformerCards's
-       refit() prevents; here the card has one known width per step, so
-       the step sets the scale. */
-    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-card .stash-perf-stats {
-        --pc-badge-scale: 0.78;
-    }
-    body.stash-liquid-glass #performer-page .detail-header.refract-ph {
-        margin-bottom: 5.75rem;
-    }
-    /* Below 1200 the head is ONE column, and every block holds a row of
+    /* Below 1400 the head is ONE column, and every block holds a row of
        its own.
 
        The two-column arrangement this replaces could not work anywhere
@@ -8106,6 +8137,18 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
        on the reporter's machine, where the third line left a hole under
        the name. A block whose own height sets the row's height cannot
        share that row with a one-line title.
+
+       The step was 1200 first, which fixed the wrap and left the band
+       just above it broken in a worse way: between 1201 and about 1362
+       the two columns still fit the LAYOUT and stopped fitting the
+       CONTENT, so the action bar painted straight over the name's own
+       icons. Measured at 1300, the link icon at x 637.3 and twitter at
+       670.9 against Edit at 635.3; at 1250 Edit covers all three and
+       stops 8px from the end of the name. The bar's left edge tracks
+       vw - 665 and the icons end at 697.5, which is the whole window.
+       1400 is the first existing step clear of it -- 38px of daylight
+       there -- and it is the step the read-out grid already uses, so the
+       head and the grid change shape together instead of 200px apart.
 
        Reading order: name, aliases, actions, standing, the read-out.
        The rating is the one pairing that still fits, because both it and
@@ -8163,7 +8206,6 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     body.stash-liquid-glass #performer-page .refract-ph .detail-group {
         order: 6;
         grid-row: auto;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     body.stash-liquid-glass #performer-page .refract-ph-cats {
         order: 7;
@@ -8175,6 +8217,58 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     body.stash-liquid-glass #performer-page .refract-ph .details-edit {
         flex-wrap: wrap;
         justify-content: flex-start;
+    }
+}
+@media (max-width: 1200px) {
+    body.stash-liquid-glass #performer-page .detail-header.refract-ph,
+    body.stash-liquid-glass #performer-page .refract-ph .detail-container {
+        min-height: 380px;
+    }
+    /* Bootstrap's row gutter stops being free money.
+
+       `.row` carries `margin: 0 -15px` and the head is a `.col` whose
+       15px of horizontal padding normally cancels it -- but this band
+       zeroes that padding to get the text off Bootstrap's gutter, so the
+       -15px was left uncancelled and ate the band's side inset. At 1600
+       that is 31.5 - 15 = 16.5px and reads as deliberate. Below 1200 the
+       container's own padding drops to 17.5 and the same 15 takes it to
+       2.5px: measured at 968 the grid's right edge at 938.5 against a
+       band edge of 941, at 807 777.5 against 780, at 600 the same on
+       both sides while the top and bottom kept their 17.5. The tiles
+       touched the band's rounded corner.
+
+       So the row's margin goes rather than the padding coming back --
+       restoring the padding would put the 15px back between the card and
+       the text, where it is not wanted. With the gutter gone the gap
+       needs 15px less to keep the same daylight: 1.25rem against the
+       card's ~5px of tilt leaves about 12px, which is the 11 the 2.25rem
+       was measured for. */
+    body.stash-liquid-glass #performer-page .refract-ph .detail-container {
+        padding: 0 1.25rem 1.2rem;
+        gap: 1.25rem;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-container > .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
+        width: 240px;
+        flex: 0 0 240px;
+        max-width: 240px !important;
+        margin-bottom: -72px;
+    }
+    /* The strip is sized for a 340px card. At 240 the fourth pill runs
+       off the edge, which on a grid card is what initPerformerCards's
+       refit() prevents; here the card has one known width per step, so
+       the step sets the scale. */
+    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-card .stash-perf-stats {
+        --pc-badge-scale: 0.78;
+    }
+    body.stash-liquid-glass #performer-page .detail-header.refract-ph {
+        margin-bottom: 5.75rem;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     /* The cell's flex basis is gone with the flex row it belonged to. The
        track count is the strip's own, from one measured minmax, so it
@@ -8368,6 +8462,41 @@ body.stash-liquid-glass.refract-light #performer-page .refract-ph-cats__track {
 }
 body.stash-liquid-glass.refract-light #performer-page .refract-ph-cats__fill {
     background: rgba(0, 0, 0, 0.45);
+}
+
+/* ── Two islands in the edit form, answered differently ─────────────
+
+   Both painted the page's dark ink on their own dark ground in light
+   mode. They are not the same problem, so they do not get the same fix.
+
+   The ACTION PLATE was only an island by accident. It is a sticky
+   toolbar over a form that is otherwise light, and nothing about it
+   wants to be dark -- it was dark because it was written in dark mode
+   and 14_light does not reach it. Measured before: plate
+   rgba(14,13,16,0.92) in both modes with an inherited rgba(0,0,0,0.88),
+   Cancel at 1.26:1, and "EDITING", Clear Image and Save with no ink the
+   pixel pass could separate from the plate at all. Re-pinning four
+   tokens would have kept a dark bar floating in a white form; giving it
+   the light surface family removes the island instead, and every token
+   inside it then resolves the way it does everywhere else in the form.
+   Same formula as the band's own light plate above.
+
+   The CROP GUIDE is a real island and stays one: a pill and two dashed
+   edges on a 0.62 black scrim over the photograph, which is dark in
+   both modes because the photograph is. Only its ink was wrong -- 1.72:1
+   in light against 4.99 in dark. --accent-ink cannot serve it, because
+   light re-pegs the whole accent family DOWN for a white page (the
+   purple preset's --accent-bright in light is the dark mode's --accent).
+   --accent-light is the pale end of the family in both modes and is the
+   token drawn for exactly this: a scrim. */
+body.stash-liquid-glass.refract-light #performer-page .refract-pe .performer-head > .details-edit,
+body.stash-liquid-glass.refract-light #performer-page .refract-pe form > .details-edit {
+    background: rgba(252, 252, 252, 0.92) !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
+}
+body.stash-liquid-glass.refract-light #performer-page .refract-pe-crop__label,
+body.stash-liquid-glass.refract-light #performer-page .refract-pe-crop__side {
+    --accent-ink: var(--accent-light);
 }
 /* The card keeps its own floor: the chin scrim and the neon strip are
    the card's, and the card does not change with the page mode. */
