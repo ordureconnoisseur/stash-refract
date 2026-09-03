@@ -19,12 +19,34 @@
    `/plugin/refract/assets/<path>` (the `ui.assets./: .` mapping in
    refract.yml). Two unicode-range subsets keep the latin-ext (accented)
    payload as a separate face so browsers still skip it when not
-   needed (saves a couple KB of memory). */
+   needed (saves a couple KB of memory).
+
+   `swap`, not `block`, and the difference is a bug report. `block` gives
+   the face an invisible block period -- about three seconds in Chrome --
+   during which text set in it paints NOTHING. A browser fetches a face
+   the first time something rendered actually uses it, and the only thing
+   that uses this one is a performer card, so the fetch starts when you
+   first reach a card view and every name on screen is blank until it
+   lands. The glyph is inline SVG, the pills and the country caption are
+   in the theme face, the tier ribbon has its own: all of them paint, and
+   the name alone is missing. That is exactly what was reported -- a card
+   "with the name banner GONE" -- and reproduced by holding this request
+   in Fetch.requestPaused while the page rendered: every name vanished,
+   nothing else moved. It happens once per browser session, which is why
+   it read as "not always, not reliably".
+
+   `swap` paints the fallback immediately and exchanges it when the face
+   arrives. The cost is that the name is measured in the wrong metrics
+   for those few seconds -- Concert One is wider than the Segoe UI
+   fallback, so refit()'s size ladder would pick a step that overflows
+   once the swap happens. refract.js re-fits every built card when the
+   face resolves, which is what makes swap safe here rather than a
+   different bug. */
 @font-face {
     font-family: 'Concert One';
     font-style: normal;
     font-weight: 400;
-    font-display: block;
+    font-display: swap;
     src: url("/plugin/refract/assets/fonts/ConcertOne-Regular.latin.woff2") format('woff2');
     unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
@@ -32,7 +54,7 @@
     font-family: 'Concert One';
     font-style: normal;
     font-weight: 400;
-    font-display: block;
+    font-display: swap;
     src: url("/plugin/refract/assets/fonts/ConcertOne-Regular.latin-ext.woff2") format('woff2');
     unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
