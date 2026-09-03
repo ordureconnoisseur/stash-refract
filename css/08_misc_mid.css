@@ -7932,20 +7932,43 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.c
    scores sitting in a list of descriptions, so they read as scores.
    Built by refract.js from the tag chips; absent when the plugin is
    not in use, and the row simply does not appear. */
+/* A grid, not a wrapping flex row, and the difference is the whole bug.
+
+   A flex line shares ITS OWN free space, so the moment the strip wrapped
+   the last line stretched: measured at 1200 with eight categories, seven
+   cells of 115px on line one and Technique alone at 826 on line two, and
+   at 1087 six of 117 against two of 351. The same eight numbers, drawn at
+   three widths in one read-out. Grid columns are shared down the whole
+   strip, so a wrapped row is the same width as the row above it and the
+   thing only ever loses cells off the end.
+
+   7.5rem is measured, not chosen: the longest single word in a category
+   name is Sluttiness at 65px in this face at --fs-xs, the value column is
+   32px at its widest ("4 of 5"), and the head's own gap is 5.6px. 102.6
+   is the floor at which a label can always break somewhere and never be
+   cut, and 105 is the round number above it. At 1600 that gives nine
+   tracks and one row for eight categories plus the tags link; at 1087,
+   six; at 390, three. */
 body.stash-liquid-glass #performer-page .refract-ph-cats {
     grid-row: 5;
     grid-column: 1 / -1;
-    display: flex;
-    align-items: flex-end;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+    align-items: stretch;
     gap: var(--gap-lg);
     min-width: 0;
 }
 body.stash-liquid-glass #performer-page .refract-ph-cats__cell {
-    flex: 1 1 0;
     display: flex;
     flex-direction: column;
     gap: var(--gap-xs);
     min-width: 0;
+}
+/* The bars are the read, so they align across a row whatever the labels
+   above them did. A one-line label and a two-line label start at the same
+   top and their tracks finish at the same bottom. */
+body.stash-liquid-glass #performer-page .refract-ph-cats__track {
+    margin-top: auto;
 }
 body.stash-liquid-glass #performer-page .refract-ph-cats__head {
     display: flex;
@@ -7953,15 +7976,20 @@ body.stash-liquid-glass #performer-page .refract-ph-cats__head {
     gap: var(--gap-sm);
     min-width: 0;
 }
+/* It wraps rather than truncating. ENERGY & PR... and BODY OVERA... were
+   the report, and they were not a narrow-window problem: the full label
+   is 116px against 94.6px of room even at 1600, so it was cut at every
+   width the theme has. A category whose name you cannot read is not a
+   read-out. break-word is the floor under the 7.5rem track for a word
+   longer than any of these. */
 body.stash-liquid-glass #performer-page .refract-ph-cats__label {
     font-size: var(--fs-xs);
     font-weight: 600;
     letter-spacing: var(--track-label);
     text-transform: uppercase;
     color: var(--text-muted);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    min-width: 0;
+    overflow-wrap: break-word;
 }
 body.stash-liquid-glass #performer-page .refract-ph-cats__value {
     font-size: var(--fs-sm);
@@ -7987,8 +8015,15 @@ body.stash-liquid-glass #performer-page .refract-ph-cats__fill {
 body.stash-liquid-glass #performer-page .refract-ph-cats__cell.is-full .refract-ph-cats__fill {
     background: var(--accent-ink);
 }
+/* The tags link is a cell of the strip, not a flex item competing with
+   it. As a flex item it rode the end of whatever line it landed on and
+   was pushed to the band's far edge -- at 1087 that put it at x=1025,
+   hard against the end of a stretched Technique bar and reading as a
+   collision. In the grid it takes one track like everything else, sits on
+   the bars' own baseline, and is where the thing it opens is. */
 body.stash-liquid-glass #performer-page .refract-ph-tags-toggle {
-    flex: none;
+    align-self: end;
+    justify-self: start;
     padding: 0 0 1px;
     font-size: var(--fs-sm);
     font-weight: 600;
@@ -8066,42 +8101,64 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
        Reading order: name, aliases, actions, standing, the read-out.
        The rating is the one pairing that still fits, because both it and
        the standing row are short, so it keeps the right of that row. */
+    /* Rows are placed by `order`, not numbered.
+
+       Numbered rows reserve their slot whether or not anything occupies
+       it, and the aliases are the row that is often empty: a performer
+       with none still cost the two row-gaps either side of a zero-height
+       track, measured at 21px of nothing between the name and the action
+       row on Gia Derza. Auto-placement skips a row that has no item, so
+       the hole closes itself and nothing has to know in advance how many
+       blocks this performer has. Grid places by order-modified document
+       order, which is what makes this a re-ordering and not a re-parenting.
+
+       The desktop rules number their rows, so each item's number is reset
+       to auto here or it would outrank the flow. */
     body.stash-liquid-glass #performer-page .refract-ph .performer-head {
         grid-template-columns: minmax(0, 1fr) auto;
-        grid-template-rows: auto auto auto auto auto auto;
+        grid-template-rows: none;
+        grid-auto-flow: row;
         padding: 1.2rem 0 0 !important;
     }
     body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 {
-        grid-row: 1;
+        order: 1;
+        grid-row: auto;
         grid-column: 1 / -1;
     }
     body.stash-liquid-glass #performer-page .refract-ph .performer-head > div:has(> .alias-head) {
-        grid-row: 2;
+        order: 2;
+        grid-row: auto;
         grid-column: 1 / -1;
     }
     /* Stretch, not the desktop `end`: the row wraps, and a content-sized
        box has nothing to wrap inside. */
     body.stash-liquid-glass #performer-page .refract-ph .performer-head > .col {
-        grid-row: 3;
+        order: 3;
+        grid-row: auto;
         grid-column: 1 / -1;
         justify-self: stretch;
     }
+    /* These two share a row: standing takes column 1, the rating takes
+       column 2, and sparse auto-placement puts the second beside the
+       first rather than under it. */
     body.stash-liquid-glass #performer-page .refract-ph-standing {
-        grid-row: 4;
+        order: 4;
+        grid-row: auto;
         grid-column: 1;
     }
     body.stash-liquid-glass #performer-page .refract-ph .quality-group {
-        grid-row: 4;
+        order: 5;
+        grid-row: auto;
         grid-column: 2;
     }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group {
-        grid-row: 5;
+        order: 6;
+        grid-row: auto;
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     body.stash-liquid-glass #performer-page .refract-ph-cats {
-        grid-row: 6;
-        flex-wrap: wrap;
-        row-gap: var(--gap-md);
+        order: 7;
+        grid-row: auto;
     }
     /* Left, not the desktop right: the actions hold a row of their own
        now, so they start where the name, the aliases and the grid start
@@ -8110,9 +8167,10 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
         flex-wrap: wrap;
         justify-content: flex-start;
     }
-    body.stash-liquid-glass #performer-page .refract-ph-cats__cell {
-        flex: 1 1 8rem;
-    }
+    /* The cell's flex basis is gone with the flex row it belonged to. The
+       track count is the strip's own, from one measured minmax, so it
+       needs no breakpoint of its own at all -- it already answers to the
+       width it is given. */
     body.stash-liquid-glass #performer-page .refract-ph-tags {
         margin-left: calc(240px + 2.5rem);
     }
@@ -8176,16 +8234,11 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
         grid-column: 1 / -1;
     }
     body.stash-liquid-glass #performer-page .refract-ph .quality-group {
-        grid-row: 5;
         grid-column: 1 / -1;
         justify-self: start;
     }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group {
-        grid-row: 6;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    body.stash-liquid-glass #performer-page .refract-ph-cats {
-        grid-row: 7;
     }
     body.stash-liquid-glass #performer-page .refract-ph-tags {
         margin-left: calc(200px + 2.5rem);
