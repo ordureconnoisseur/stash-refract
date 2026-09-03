@@ -4338,6 +4338,9 @@
                 if (input.getAttribute("placeholder") !== ph) { input.setAttribute("placeholder", ph); }
             }
         }
+        /* A re-rendered toolbar loses its stuck class between scroll
+           events; re-derive it every pass. */
+        if (refractDockIsMobile()) { refractSetToolbarStuck((window.scrollY || 0) >= REFRACT_DOCK_NEAR_TOP); }
         if (document.body.classList.contains("refract-list-sheet-open")) { refractRenderListSheet(); }
         return true;
     }

@@ -1876,7 +1876,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
        zeroes the other items); nothing else remains to collapse. */
 
     /* ── The caption ──────────────────────────────────────────────── */
-    body.stash-liquid-glass:not(.stash-route-scenes) .pagination-index-container[data-pager-row="hide"] {
+    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] {
         display: flex !important;
         align-items: center;
         justify-content: space-between;
@@ -1901,7 +1901,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         font-variant-numeric: tabular-nums;
         text-align: left;
     }
-    body.stash-liquid-glass:not(.stash-route-scenes) .pagination-index-container[data-pager-row="hide"][data-per-page]::after {
+    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"][data-per-page]::after {
         content: attr(data-per-page);
         font-size: var(--fs-sm);
         color: var(--text-muted);
@@ -1915,6 +1915,16 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
 
     /* ── The pager, in flow ───────────────────────────────────────── */
+    /* Stash gives .pagination-footer-container position:relative and a
+       48.75px bottom offset, which lifted the row 39px into the last
+       cards once it was in flow. Static: it follows the grid. */
+    body.stash-liquid-glass .pagination-footer-container {
+        position: static !important;
+        bottom: auto !important;
+        top: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
     body.stash-liquid-glass [data-pager-row="float"] {
         position: static !important;
         left: auto !important;
@@ -1961,7 +1971,9 @@ body.stash-liquid-glass .refract-mobile-drawer {
         display: none !important;
     }
     body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Previous"],
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"] {
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"],
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Previous"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle),
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Next"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle) {
         position: relative !important;
         flex: 0 0 44px !important;
         width: 44px !important;
@@ -1997,8 +2009,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn:disabled {
         opacity: 0.35 !important;
     }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Previous"]:active,
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"]:active {
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Previous"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle):active,
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Next"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle):active {
         background: var(--fill-4) !important;
     }
     body.stash-liquid-glass [data-pager-row="float"] .pagination > .page-count-container,
@@ -2013,7 +2025,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
         padding: 0 !important;
         width: auto !important;
     }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count {
+    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count,
+    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count.btn.btn-secondary:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle) {
         height: 44px !important;
         min-height: 44px !important;
         width: auto !important;
@@ -2035,7 +2048,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         border-radius: var(--radius-pill) !important;
         box-shadow: none !important;
     }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count:active {
+    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count.btn.btn-secondary:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle):active {
         background: var(--fill-4) !important;
     }
     /* Stash's page-jump popover: a tappable field on phones. */
