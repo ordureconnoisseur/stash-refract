@@ -1797,7 +1797,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
         max-width: none !important;
         max-height: 44px !important;
     }
-    body.stash-liquid-glass .filtered-list-toolbar .filter-button {
+    body.stash-liquid-glass .filtered-list-toolbar .filter-button,
+    body.stash-liquid-glass .filtered-list-toolbar > .btn-group .filter-button.btn.btn-secondary {
         order: 2;
         flex: 0 0 44px !important;
         width: 44px !important;
@@ -1824,7 +1825,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         margin: 0 !important;
     }
     body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .dropdown-toggle,
-    body.stash-liquid-glass .filtered-list-toolbar > *:not(.search-term-input) .sort-by-select .dropdown-toggle {
+    body.stash-liquid-glass .filtered-list-toolbar > .sort-by-select .input-group-prepend .dropdown-toggle.btn.btn-secondary {
         position: relative !important;
         display: inline-flex !important;
         align-items: center !important;
