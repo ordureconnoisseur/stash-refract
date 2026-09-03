@@ -1784,10 +1784,17 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .filtered-list-toolbar > .page-size-selector,
     body.stash-liquid-glass .filtered-list-toolbar > select.form-control,
     body.stash-liquid-glass .filtered-list-toolbar > .list-operations,
-    body.stash-liquid-glass .filtered-list-toolbar > .btn-group:not(:has(> .saved-filter-dropdown)),
+    body.stash-liquid-glass .filtered-list-toolbar > .btn-group:not(:has(> .saved-filter-dropdown)):not(.sort-by-select),
     body.stash-liquid-glass .filtered-list-toolbar > .mv-picking-toggle-btn,
     body.stash-liquid-glass .filtered-list-toolbar > .btn:not(.filter-button) {
         order: 11;
+    }
+    /* multiview's picking toggle goes on phones: its launcher
+       (#mv-launcher) is already hidden here, so the toggle would switch
+       on a mode with nothing to launch from. Restored with the launcher
+       when multiview gets a phone placement. */
+    body.stash-liquid-glass .filtered-list-toolbar .mv-picking-toggle-btn {
+        display: none !important;
     }
     /* The first tier-2 control pushes the line to the right edge. */
     body.stash-liquid-glass .filtered-list-toolbar .saved-filter-dropdown {
@@ -1885,7 +1892,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         align-items: center !important;
         gap: 2px !important;
         margin: 0 !important;
-        padding: 4px 6px 18px !important;
+        padding: 3px 6px 17px !important;
         background: rgba(var(--surface-rgb), 0.72) !important;
         border: 1px solid var(--glass-border) !important;
         border-bottom: none !important;
@@ -1896,9 +1903,9 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
     body.stash-liquid-glass [data-pager-row="float"] .pagination > *,
     body.stash-liquid-glass [data-pager-row="float"].pagination > * {
-        height: 36px !important;
-        min-height: 36px !important;
-        min-width: 36px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        min-width: 40px !important;
         margin: 0 !important;
         white-space: nowrap !important;
         background: transparent !important;
