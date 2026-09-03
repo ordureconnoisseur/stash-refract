@@ -285,8 +285,21 @@ body.stash-liquid-glass .refract-mobile-drawer {
         justify-content: space-between;
         gap: 0;
         padding: 0 var(--dock-pad);
-        /* The canonical glass recipe (3.2), navbar shadow (6.3). */
-        background: var(--glass-bg);
+        /* Rim, radius, shadow and blur are the canonical glass recipe
+           (3.2) and the navbar's shadow (6.3). The FILL is not --glass-bg:
+           the board drew the desktop navbar's 0.06 white, and measured on
+           the rendered ground it failed. The dock is the one piece of
+           chrome that sits permanently over artwork, and 0.06 over the
+           performer grid left the capsule at rgb(196,148,136) with the
+           icons at 1.69 to 2.71:1 (390, dark). So the fill is the surface
+           family (3.2: near-opaque overlays, floating overlay chrome) at
+           0.72, the drawer's colour at a lower alpha: worst case pure
+           white behind it composites to rgb(86) and the 0.80 icon reads
+           at 5.9:1; light flips the channels to white and black ink reads
+           at 7.5:1 over black artwork. Proposed ledger row; see the
+           BUILD_LOG. */
+        --refract-dock-fill: rgba(var(--surface-rgb), 0.72);
+        background: var(--refract-dock-fill);
         border: 1px solid var(--glass-border);
         border-radius: var(--radius-pill);
         box-shadow: var(--shadow-navbar);
@@ -332,15 +345,17 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-pill {
         position: absolute;
         top: 50%;
+        /* binge's pill (74) is 9px WIDER than its slot (65.2): it laps
+           the neighbours. A 6- or 7-slot dock keeps that same 9px lap
+           over its narrower slot instead of a fixed 74. One expression
+           for width and for the centring term, so they cannot disagree. */
+        --dock-pw: min(var(--dock-pill-w), calc(var(--dock-slot) + 9px));
         left: calc(
             var(--dock-pad)
             + var(--dock-slot) * var(--dock-active, 0)
-            + (var(--dock-slot) - var(--dock-pill-w)) / 2
+            + (var(--dock-slot) - var(--dock-pw)) / 2
         );
-        width: var(--dock-pill-w);
-        /* A 6- or 7-slot dock has slots narrower than the 74px pill;
-           the pill yields to the slot, keeping a 4px air gap. */
-        max-width: calc(var(--dock-slot) - 4px);
+        width: var(--dock-pw);
         height: var(--dock-pill-h);
         transform: translateY(-50%);
         border-radius: var(--radius-pill);
@@ -355,7 +370,6 @@ body.stash-liquid-glass .refract-mobile-drawer {
         transition:
             left var(--dur-slow) var(--ease-spring),
             width var(--dur-settle) var(--ease-glide),
-            max-width var(--dur-settle) var(--ease-glide),
             height var(--dur-settle) var(--ease-glide),
             opacity var(--dur-fast) ease;
     }
@@ -379,7 +393,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
         margin: 0;
         border: none;
         background: transparent;
-        color: rgba(var(--fg-rgb), 0.80);
+        /* !important: 04_filters' global anchor rule is (0,6,1) and
+           painted every route slot rgba(255,255,255,0.85) in BOTH modes
+           (white on the white light capsule, measured 1.3:1), and its
+           :hover twin would leave a tapped slot accent-coloured until
+           the next tap on touch. The slot's colour is the dock's, not
+           the page's. */
+        color: rgba(var(--fg-rgb), 0.80) !important;
         padding: 0;
         cursor: pointer;
         text-decoration: none;
@@ -405,7 +425,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
        (light re-points it to the deeper mix). */
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item.is-active,
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger.is-open {
-        color: var(--accent-ink);
+        color: var(--accent-ink) !important;
     }
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item.is-active::before,
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger.is-open::before {
@@ -454,10 +474,11 @@ body.stash-liquid-glass .refract-mobile-drawer {
             transition: opacity var(--dur-fast) ease;
         }
     }
-    /* Reduced transparency: --glass-bg already goes opaque in 01_tokens;
-       drop the blur here too (the token file's list predates this dock). */
+    /* Reduced transparency: the fill goes opaque and the blur drops, the
+       same way 01_tokens treats the named glass surfaces. */
     @media (prefers-reduced-transparency: reduce) {
         body.stash-liquid-glass .refract-mobile-dock {
+            --refract-dock-fill: rgba(var(--surface-rgb), 0.97);
             -webkit-backdrop-filter: none;
             backdrop-filter: none;
         }
