@@ -598,19 +598,42 @@ body.stash-liquid-glass .refract-mobile-drawer {
         height: 1.1rem;
     }
 
-    /* ── Mobile drawer (body-level overlay, built ground-up) ───────── */
+    /* ── The More sheet (slice 2 of the mobile overhaul; board "Dock: More
+       sheet"). The body-level .refract-mobile-drawer keeps its DOM (the
+       tiles are the registry the dock is configured from, P4: no new
+       state) and becomes a sheet of LABELLED ROWS in three groups, rising
+       from the dock over the scrimmed page:
+
+         More                                   [pencil] Edit dock
+         LIBRARY
+         [icon]  Images                                        >
+         [icon]  Galleries                                     >
+         PLUGINS
+         [icon]  Forage                                        >
+         STASH
+         [icon]  Stats                                         >
+
+       Rows whose route already sits in the dock are hidden (refract.js
+       stamps data-in-dock from the same selection the dock is built
+       from), so the sheet is "everything else", never a duplicate. The
+       label is the tile's own aria-label painted by ::after, the chevron
+       is a masked ::before; nothing about a row exists twice. Groups are
+       flex order on data-group (hardcoded routes carry it; plugin and
+       action tiles default to the Plugins band); a group label whose
+       band is empty hides via .is-empty, toggled by refract.js.
+
+       Material: the surface family at 0.92 (3.2), the accent inset rim
+       the drawer already carried, md-sat blur. Type: title --fs-lg 600,
+       rows --fs-body 600, group labels the house eyebrow (6.13). Rows are
+       48px, the icon tile 36 (a 44 hit area is the row itself). */
     body.stash-liquid-glass .refract-mobile-drawer {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        /* Fixed px values for gap + padding - iOS "Larger Text"
-           accessibility scaling inflates rem-based values, causing the
-           tile spacing to look wildly different on real phones vs
-           desktop RDM. px decouples from root font-size drift. */
-        gap: 9px;
-        padding: 13px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        /* px, not rem: iOS Larger Text inflates rem and the sheet's
+           rhythm must not drift with it. */
+        padding: 6px 6px 8px;
         position: fixed;
-        /* Anchored ABOVE the bottom dock (the drawer's opener) and
-           rising from it - not dropping from the retired top bar. */
         top: auto;
         bottom: calc(var(--refract-dock-footprint) + 10px);
         left: 12px;
@@ -624,10 +647,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
             var(--shadow-xl),
             inset 0 0 0 1px rgba(var(--accent-rgb), 0.08);
         z-index: 100;
-        max-height: calc(100vh - 7rem);
+        box-sizing: border-box;
+        max-height: calc(100vh - var(--refract-dock-footprint) - 22px - env(safe-area-inset-top, 0px));
         overflow-y: auto;
-        /* Closed state - invisible, non-interactive; slides UP from the
-           dock on open. */
+        overscroll-behavior: contain;
+        /* Closed: invisible and inert; opens by rising from the dock as
+           ONE surface (no per-row stagger: one orchestrated entrance). */
         opacity: 0;
         transform: translateY(12px) scale(0.96);
         transform-origin: bottom center;
@@ -642,107 +667,183 @@ body.stash-liquid-glass .refract-mobile-drawer {
         pointer-events: auto;
     }
 
-    /* ── Drawer tiles ─────────────────────────────────────────────── */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile {
+    /* Header: the sheet's name and the one action that belongs to the
+       whole sheet. "Edit dock" is where people are when they want a row
+       in the bar (P8), and it opens the existing setting. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-head {
+        order: -1;
         display: flex;
         align-items: center;
-        justify-content: center;
-        aspect-ratio: 1 / 1;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: var(--radius);
-        color: var(--text);
-        text-decoration: none;
-        position: relative;
-        overflow: hidden;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-        transition:
-            background var(--dur-move) ease,
-            border-color var(--dur-move) ease,
-            color var(--dur-move) ease,
-            transform var(--dur-fast) var(--ease-spring),
-            box-shadow var(--dur-move) ease;
+        justify-content: space-between;
+        height: 44px;
+        flex: 0 0 44px;
+        padding: 0 6px 0 12px;
     }
-    /* Count badge on drawer tiles (currently the multiview tile's
-       combined picks+filters number). Accent dot, top-right corner. */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-badge {
-        position: absolute;
-        top: 6px;
-        right: 6px;
-        min-width: 16px;
-        height: 16px;
-        padding: 0 4px;
-        border-radius: 999px;
-        background: rgb(var(--accent-rgb));
-        color: #fff;
-        font-size: 0.6rem;
-        font-weight: 700;
-        line-height: 16px;
-        text-align: center;
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-title {
+        font-size: var(--fs-lg);
+        font-weight: 600;
+        letter-spacing: -0.005em;
+        color: var(--text);
+    }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-edit {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 44px;
+        padding: 0 8px;
+        border-radius: var(--radius-sm);
+        font-size: var(--fs-base);
+        font-weight: 600;
+        color: var(--accent-ink) !important;
+        text-decoration: none;
+    }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-edit svg {
+        width: 14px;
+        height: 14px;
+    }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-edit:active {
+        background: var(--accent-tint);
     }
 
-    /* Hardcoded tile for a menu item the user disabled in Stash's
-       Interface settings. refract.js adds this class when the route is
-       absent from the live navbar (Stash omits disabled items from the
-       navbar DOM). Hidden, not removed, so re-enabling restores it. */
+    /* Group labels: the house eyebrow, never brighter than the rows. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-group {
+        font-size: var(--fs-xs);
+        font-weight: 600;
+        letter-spacing: var(--track-eyebrow);
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 10px 12px 4px;
+        flex: 0 0 auto;
+    }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-group[data-group="library"] { order: 0; }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-group[data-group="plugins"] { order: 10; }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-group[data-group="stash"]   { order: 20; }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-group.is-empty {
+        display: none;
+    }
+
+    /* Rows. Plugin and action tiles carry no data-group and land in the
+       Plugins band by default; the hardcoded routes are stamped. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile {
+        order: 11;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        flex: 0 0 48px;
+        height: 48px;
+        aspect-ratio: auto;
+        padding: 0 8px 0 6px;
+        background: transparent;
+        border: none;
+        border-radius: var(--radius-sm);
+        color: var(--text) !important;
+        text-decoration: none;
+        position: relative;
+        overflow: visible;
+        box-shadow: none;
+        transition:
+            background var(--dur-move) ease,
+            color var(--dur-move) ease;
+    }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile[data-group="library"] { order: 1; }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile[data-group="stash"]   { order: 21; }
+    /* Already in the dock, or disabled in Stash's menu settings. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile[data-in-dock],
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.refract-drawer-tile-off {
         display: none !important;
     }
+    /* The label: the tile's own accessible name, painted once. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile::after {
+        content: attr(aria-label);
+        order: 2;
+        flex: 1 1 auto;
+        min-width: 0;
+        font-size: var(--fs-body);
+        font-weight: 600;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    /* The chevron: a masked box painted in the muted ink, at the row end. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile::before {
+        content: "";
+        order: 3;
+        flex: 0 0 18px;
+        width: 18px;
+        height: 18px;
+        background: var(--text-muted);
+        -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
+        mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
+    }
+    /* Launchers that open a new tab say so: the chevron becomes an
+       outward arrow. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile[target="_blank"]::before {
+        -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M7 17L17 7M9 7h8v8'/></svg>") center / contain no-repeat;
+        mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M7 17L17 7M9 7h8v8'/></svg>") center / contain no-repeat;
+    }
+    /* Icon tile: 36px, the resting fill, hairline rim, 10px radius (the
+       12px row radius minus the 2px it sits inside). */
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-icon {
+        order: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        /* px-pinned so icon size doesn't drift with iOS font scaling. */
-        width: 28px;
-        height: 28px;
+        flex: 0 0 36px;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--fill-2);
+        border: 1px solid var(--glass-border);
+        box-sizing: border-box;
+        color: var(--text);
+        transition: background var(--dur-move) ease, border-color var(--dur-move) ease;
     }
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-icon svg {
-        width: 100% !important;
-        height: 100% !important;
+        width: 20px !important;
+        height: 20px !important;
         max-width: none !important;
         max-height: none !important;
         display: block;
     }
-    /* :active tap feedback */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile:active {
-        background: var(--accent-tint);
-        border-color: var(--accent-glow);
-        color: var(--accent);
-        transform: scale(0.94);
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.08),
-            0 0 18px rgba(var(--accent-rgb), 0.3),
-            inset 0 0 0 1px rgba(var(--accent-rgb), 0.18);
+    /* Count badge (multiview's combined picks): sits before the chevron
+       instead of on a tile corner. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-badge {
+        position: static;
+        order: 2;
+        flex: 0 0 auto;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 6px;
+        border-radius: var(--radius-pill);
+        background: rgb(var(--accent-rgb));
+        color: #fff;
+        font-size: var(--fs-xs);
+        font-weight: 700;
+        line-height: 18px;
+        text-align: center;
     }
-    /* Active route halo */
+    /* Press and current-route states: the fill ramp and the accent tint;
+       no glow, no drop-shadow on a repeated element (10.3). */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile:active {
+        background: var(--fill-4);
+    }
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.is-active {
         background: var(--accent-tint);
-        border-color: var(--accent-glow);
-        color: var(--accent);
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.06),
-            0 0 16px rgba(var(--accent-rgb), 0.32),
-            inset 0 0 0 1px rgba(var(--accent-rgb), 0.18);
+        color: var(--accent-ink) !important;
+    }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.is-active .refract-drawer-tile-icon {
+        color: var(--accent-ink);
+        border-color: rgba(var(--accent-rgb), 0.22);
     }
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.is-active svg {
-        filter:
-            drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.55))
-            drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.4));
+        filter: none;
     }
-
-    /* Stagger fade-in on open */
-    body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer .refract-drawer-tile {
-        animation: refract-drawer-tile-in var(--dur-settle) var(--ease-spring) both;
-    }
-    body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer .refract-drawer-tile:nth-child(3n+2) {
-        animation-delay: 30ms;
-    }
-    body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer .refract-drawer-tile:nth-child(3n+3) {
-        animation-delay: 60ms;
-    }
-    @keyframes refract-drawer-tile-in {
-        from { opacity: 0; transform: translateY(-6px); }
-        to   { opacity: 1; transform: translateY(0); }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile:focus-visible,
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-edit:focus-visible {
+        outline: 2px solid rgba(var(--accent-rgb), 0.7);
+        outline-offset: -2px;
     }
 }
 

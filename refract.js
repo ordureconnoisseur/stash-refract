@@ -5257,11 +5257,45 @@
         return items;
     }
 
+    /* The More sheet shows everything that is NOT in the dock. Stamp
+       data-in-dock on the drawer rows whose key the dock carries, then
+       hide any group label whose band has no visible row. Reads before
+       it writes; runs every dock pass (13-odd rows). */
+    function refractSyncDrawerRows(dockItems) {
+        var drawer = document.querySelector(".refract-mobile-drawer");
+        if (!drawer) { return; }
+        var inDock = {};
+        for (var i = 0; i < dockItems.length; i++) { inDock[dockItems[i].key] = true; }
+        var tiles = drawer.querySelectorAll(".refract-drawer-tile");
+        var counts = { library: 0, plugins: 0, stash: 0 };
+        for (var t = 0; t < tiles.length; t++) {
+            var tile = tiles[t];
+            var actionKey = tile.getAttribute("data-action");
+            var key = actionKey ? ("action:" + actionKey) : tile.getAttribute("data-href");
+            var on = !!(key && inDock[key]);
+            if (tile.hasAttribute("data-in-dock") !== on) {
+                if (on) { tile.setAttribute("data-in-dock", "1"); } else { tile.removeAttribute("data-in-dock"); }
+            }
+            if (!on && !tile.classList.contains("refract-drawer-tile-off")) {
+                var g = tile.getAttribute("data-group") || "plugins";
+                if (counts.hasOwnProperty(g)) { counts[g]++; }
+            }
+        }
+        var labels = drawer.querySelectorAll(".refract-drawer-group");
+        for (var l = 0; l < labels.length; l++) {
+            var empty = !counts[labels[l].getAttribute("data-group")];
+            if (labels[l].classList.contains("is-empty") !== empty) {
+                labels[l].classList.toggle("is-empty", empty);
+            }
+        }
+    }
+
     function injectMobileDock() {
         if (!document.body) { return false; }
         var items = refractDockItemsFromSelection();
         var sig = items.map(function (x) { return x.key; }).join("|");
         var existing = document.querySelector(".refract-mobile-dock");
+        refractSyncDrawerRows(items);
         if (existing) {
             /* Idempotent per configuration: rebuild only when the item
                set changed (selection edited, or plugin tiles arrived). */
@@ -5480,13 +5514,30 @@
         drawer.className = "refract-mobile-drawer";
         drawer.setAttribute("aria-label", "Mobile navigation");
 
-        var html = "";
+        /* The More sheet (12_mobile.css): a header with the sheet's name
+           and the one whole-sheet action, three group labels, then the
+           tiles as rows. Groups are flex order on data-group; plugin and
+           action tiles carry none and land in the Plugins band. Stats and
+           Settings are Stash's own, everything else hardcoded is Library. */
+        var html =
+            '<div class="refract-drawer-head">' +
+                '<span class="refract-drawer-title">More</span>' +
+                '<a class="refract-drawer-edit" href="/settings?tab=interface#plugin-refract-dock-config" aria-label="Edit dock">' +
+                    '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg>' +
+                    'Edit dock' +
+                '</a>' +
+            '</div>' +
+            '<div class="refract-drawer-group is-empty" data-group="library">Library</div>' +
+            '<div class="refract-drawer-group is-empty" data-group="plugins">Plugins</div>' +
+            '<div class="refract-drawer-group is-empty" data-group="stash">Stash</div>';
         for (var i = 0; i < MOBILE_NAV_ITEMS.length; i++) {
             var item = MOBILE_NAV_ITEMS[i];
             var icon = MOBILE_NAV_ICONS[item.icon] || "";
+            var group = (item.href === "/stats" || item.href === "/settings") ? "stash" : "library";
             html +=
                 '<a class="refract-drawer-tile" href="' + item.href + '" data-href="' + item.href + '"' +
                     ((item.aliases && item.aliases.length) ? ' data-aliases="' + item.aliases.join(" ") + '"' : '') +
+                    ' data-group="' + group + '"' +
                     ' aria-label="' + item.label + '">' +
                     '<span class="refract-drawer-tile-icon">' + icon + '</span>' +
                 '</a>';
@@ -5496,6 +5547,27 @@
         drawer.addEventListener("click", function (e) {
             var t = e.target;
             if (!t || !t.closest) { return; }
+            if (t.closest(".refract-drawer-edit")) {
+                /* SPA-navigate to Settings > Interface and bring the Mobile
+                   dock setting into view once the portal has rendered it
+                   (the router ignores the hash; we scroll ourselves). */
+                e.preventDefault();
+                refractCloseBurger();
+                if (window.location.pathname !== "/settings" || window.location.search.indexOf("tab=interface") === -1) {
+                    window.history.pushState(null, "", "/settings?tab=interface");
+                    window.dispatchEvent(new PopStateEvent("popstate"));
+                }
+                var tries = 0;
+                (function seek() {
+                    var target = document.getElementById("plugin-refract-dock-config");
+                    if (target) {
+                        target.scrollIntoView({ block: "start", behavior: "smooth" });
+                        return;
+                    }
+                    if (++tries < 40) { setTimeout(seek, 100); }
+                })();
+                return;
+            }
             var tile = t.closest(".refract-drawer-tile");
             if (!tile) { return; }
             /* Action tiles (DiceR roll, SFWSwitch toggle) mirror a plugin's
