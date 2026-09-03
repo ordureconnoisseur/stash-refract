@@ -495,47 +495,34 @@ body.stash-liquid-glass .performer-card .refract-ascension-icon {
         drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55)) !important;
 }
 
-/* Hide the plugin's tier emoji: the flame glyph already marks the line
-   as Ascension, and the number carries its own warm gradient. Ascension
-   1.3.0 dropped this element, but 1.2.x is still widely installed, so the
-   rule stays. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-emoji {
-    display: none !important;
-}
+/* Inside a badge Refract has CLAIMED, the read-out is the flame and the
+   rank, and nothing else. That used to be four hides written by class
+   name (`.hon-rank-emoji` from 1.2.x, `.hon-asc-score-display` and
+   `.hon-asc-separator` from 1.3.x, `.hon-rank-total`, `.hon-match-stats`)
+   which is a list somebody has to extend every time Ascension renames or
+   adds a part, and #190 is what it costs when nobody does. Stated
+   structurally, the same intent survives a rename: the badge shows the
+   rank text and the elements refract.js injects, and takes everything
+   else out of the row.
 
-/* Any icon the badge brought with it, whatever the version calls it.
-   Ascension 1.3.0 replaced the tier emoji with an SVG of ITS OWN navbar
-   flame (`.hon-asc-icon`) - the same path we copied for our glyph - so
-   the read-out drew two identical flames, one amber and one in the tier
-   colour (Discourse #190). Matched structurally rather than by their
-   class name so the next rename does not reopen this: inside the badge,
-   the only icon that survives is ours.
+   It has to be more than `display: none`. Ascension's score wrapper
+   ships `display: inline-flex !important` INLINE, and an inline
+   !important cannot be beaten from a stylesheet, so a plain hide lands
+   on the separator and slides straight off the wrapper. Out of flow
+   instead, with properties their inline style does not set: at width 0
+   alone it still sat in the flex row and earned a gap of its own, which
+   widened the read-out by 6.9px against a badge that had no score.
+   Absolute, hidden and zero-sized it costs nothing, and the same recipe
+   covers whatever the next version puts there.
 
-   It has to be a hide. Their SVG carries `style="fill: currentColor
-   !important"` inline, and an inline !important beats an author
-   !important, so recolouring their glyph from CSS is not possible. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge svg:not(.refract-ascension-icon) {
+   This is only safe because of the classifier in refract.js
+   (`ascensionBadgeUnknownPart`). A shape this build cannot name never
+   gets the marker class, so this rule never reaches it: a future part is
+   left visible rather than swept away by a rule written before it
+   existed. Widen this selector and you are relying on that gate; do not
+   let the two drift apart. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge > *:not(.hon-rank-text):not(.refract-ascension-icon):not(.refract-ascension-score) {
     display: none !important;
-}
-
-/* The Ascended Score that 1.3.0 puts ahead of the rank, and its
-   separator. The card read-out is "[flame] rank": one number, uniform
-   across every performer, on a surface with no room to argue. The score
-   is not lost, it is on the badge's own tooltip and on the performer
-   page. Making it an optional card element is post-ship work. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-score-display,
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-separator {
-    display: none !important;
-    /* The score's own wrapper ships `display: inline-flex !important`
-       INLINE, and an inline !important cannot be beaten from a
-       stylesheet, so the hide above lands on the separator and slides
-       off the wrapper. Take it OUT OF FLOW instead, with properties
-       their inline style does not set: at width 0 it still sat in the
-       badge's flex row and earned a gap of its own, which widened the
-       read-out by 6.9px against a badge that never had a score.
-       Absolute and hidden, it costs nothing. Stripping the inline
-       styles in refract.js is the proper repair and is on the
-       post-ship list. */
     position: absolute !important;
     width: 0 !important;
     height: 0 !important;
@@ -545,15 +532,19 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-separa
     overflow: hidden !important;
     visibility: hidden !important;
 }
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-asc-score-display > * {
+/* Their children too, in case a future part plays the same inline trick
+   one level down. The wrapper above is already zero-sized and clipped,
+   so this is belt to that rule's braces - it is here because the
+   wrapper's inline style is precisely the thing that has beaten us
+   once. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge > *:not(.hon-rank-text):not(.refract-ascension-icon):not(.refract-ascension-score) * {
     display: none !important;
 }
-
-/* Hide the "of <total>" suffix (.hon-rank-total): the read-out is a bare
-   rank number ("[flame] N"), not "N of 492". On narrow grid cards it got
-   clipped, but wider contexts (e.g. the gallery details panel) revealed
-   it trailing the badge. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-total {
+/* And the promise that made #190 a bug rather than a preference: inside
+   a claimed badge, the only icon that paints is ours. Its own rule
+   rather than folded above, because it is the one guarantee that holds
+   wherever in the badge an icon turns up. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge svg:not(.refract-ascension-icon) {
     display: none !important;
 }
 
@@ -578,11 +569,615 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-text 
     filter: none !important;
 }
 
-/* Declutter for the grid: the full W/L/D record, win-rate and streak
-   belong on the performer page, not a dense card. Hiding the entire
-   `.hon-match-stats` cluster keeps every read-out uniform ("flame #N")
-   regardless of how many stats a performer has. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-match-stats {
+/* The Ascended Score, when the customiser turns it on. Refract's own
+   span (refract.js injects it from Ascension's number), which is the
+   whole reason it can be styled at all: their wrapper, its value and its
+   icon each carry inline `!important`, and an inline !important cannot
+   be beaten from a stylesheet.
+
+   It does NOT wear the flame gradient, and that is the second decision
+   this rule made. Painting both numbers in it left them separated by
+   weight alone, and DESIGN_SYSTEM 3.5 rule 3 is explicit that three
+   weights at one size is not a hierarchy while muted text at the same
+   size is: two identically-coloured numbers on one line read as one
+   number with a gap in it. So the rank keeps the gradient and leads,
+   and the score is quiet ink at 600 against the rank's 800 - colour and
+   weight together, which is what a level actually costs. It also leaves
+   one bold object on the line instead of three, beside a flame that is
+   already carrying an ember halo.
+
+   The ink is INHERITED from the badge rather than declared. The badge
+   sits on the card photograph in playing-card mode and on a solid chin
+   in Classic, and those are different grounds (DESIGN_SYSTEM 3.1 rule
+   4); the badge already resolves that once for its whole read-out, and
+   a hardcoded white here would be a second answer to a question already
+   settled one element up.
+
+   Nor is Ascension's tier colour used. The tier palette in
+   DESIGN_SYSTEM 4 is Refract's one sanctioned second colour system, so
+   theirs would be a third, and two numbers in two colour languages on
+   one line is half of what #190 actually looked like. The value is
+   still lifted onto the badge as `--refract-hon-tier` for custom CSS;
+   nothing shipped reads it. */
+body.stash-liquid-glass .performer-card .refract-ascension-score {
+    flex: 0 0 auto !important;
+    font-weight: 600 !important;
+    font-size: var(--fs-sm) !important;
+    line-height: 1 !important;
+    letter-spacing: 0.01em !important;
+    /* The country caption this badge is nested inside sets a text-shadow,
+       which inherits. The badge grounds its whole read-out with one
+       container drop-shadow instead, and the rank already opts out for
+       the same reason; a second shadow here would make the score the one
+       element on the line wearing two. */
+    text-shadow: none !important;
+    /* Room for the divider drawn below, and the anchor it hangs off.
+       Padding matches the flex `gap` on the badge (--gap-md) so the rule
+       has the same air on both sides. Measured across four live badges:
+       7.22 to 7.82px from the rank's ink on the left against 7.00px to
+       the score's on the right, the difference being the rank's own
+       trailing letter-spacing. */
+    position: relative !important;
+    padding-left: var(--gap-md) !important;
+}
+
+/* The divider. A hairline rather than Ascension's "|" glyph, which is a
+   character competing with two numbers for the same row, and it earns
+   its place: the two numbers answer different questions (a position in a
+   ranking, and a score) and unseparated they read as one value.
+
+   Drawn as a pseudo-element rather than a `border-left` because a border
+   is the height of the line box, and the line box is not where the ink
+   is. Measured on the live read-out: Albert Sans at 11.2px reports 8px
+   of ascent and ZERO descent for digits inside an 11.2px line box, so
+   the digits occupy 1.6px to 9.6px and a full-height border overshot
+   them at both ends. The band is exactly centred in the box (its centre
+   and the box centre are both 5.6px), which is what makes the plain
+   50%-and-translate honest here rather than a guess.
+
+   Quieter than either number it separates, at 0.5 against the read-out's
+   0.92: a divider that competes with its own content has stopped being
+   structure. Literal white rather than `rgba(var(--fg-rgb), A)` because
+   in playing-card mode this line sits on the card PHOTOGRAPH, the third
+   ground of DESIGN_SYSTEM 3.1 rule 4, which does not flip with the mode.
+
+   And it carries its own dark halo, which is the part that took a
+   measurement to find. At 0.3 with no halo the hairline measured 1.93:1
+   against a dark card image and 1.18:1 against a bright skin tone: a
+   white line over a photograph is at the mercy of the photograph, and no
+   single alpha serves both ends, because raising it enough to survive
+   the bright card makes it shout on the dark one. The halo supplies the
+   divider's own ground, which is exactly what the badge's drop-shadow
+   does for the numbers and what the country caption's text-shadow does
+   beside it, so the mark reads on artwork of any brightness instead of
+   on the average one. This is 3.9's rule doing real work: the ground is
+   the rendered pixel, not the surface the element nominally sits on.
+
+   A `box-shadow` rather than a `filter`, deliberately: the badge already
+   carries a container filter, and DESIGN_SYSTEM 3.3 forbids per-element
+   drop-shadow on anything repeated, which a divider on every card is. */
+body.stash-liquid-glass .performer-card .refract-ascension-score::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 1px !important;
+    /* 8px of digit ink at 11.2px. Recompute if --fs-sm moves. */
+    height: 0.714em !important;
+    background: rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 0 1.5px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Off unless the customiser says otherwise: this is the one card element
+   that ships hidden (CARD_ELEMS `defaultHidden`). Class doubled for
+   specificity per DESIGN_SYSTEM 5 rule 4. */
+body.stash-liquid-glass.refract-pc-hide-score.refract-pc-hide-score .performer-card .refract-ascension-score {
+    display: none !important;
+}
+
+/* ── An Ascension whose badge we do not recognise ────────────────────
+   refract.js claims a badge only when it can name every part of it
+   (ascensionBadgeUnknownPart). A shape it cannot name gets NO
+   `.refract-ascension-badge` marker, so not one rule above applies: no
+   flame, no hides, no gradient, no capsule strip. It renders as its
+   author drew it, which is the only treatment that cannot repeat the
+   #190 double icon on a version nobody here has seen.
+
+   What it does still get is somewhere to sit, because the thing it
+   would otherwise sit on is OURS. Left where Ascension drops it, in
+   place of the native rating banner, it lands on the injected
+   `.stash-perf-stats` row. Declining to place it is not neutrality when
+   the collision is caused by an element Refract injected.
+
+   So these three rules are the whole treatment, and every one of them
+   is geometry. Nothing here sets a colour, a fill, a border, a shadow
+   or a font. If a future rule in this block needs to paint an
+   unrecognised badge, the classifier was the thing that should have
+   changed.
+   ─────────────────────────────────────────────────────────────────── */
+/* Nested in the country caption's space-between row: let it shrink, and
+   cap it so a capsule of unknown width cannot push the nationality out
+   of the card. `min-width: 0` because a flex item refuses to shrink
+   below its content otherwise. */
+body.stash-liquid-glass .performer-card .stash-perf-country > .refract-ascension-unknown {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    max-width: 60% !important;
+}
+/* Dropped into the chin instead (no country, or a non playing-card
+   rating style). In flow, not pinned: the pinned variant above works
+   because the badge's height is known, and here it is not. The chin is
+   content-sized and bottom-anchored, so it grows upward to fit rather
+   than pushing anything off the card. */
+body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank > .refract-ascension-unknown {
+    order: -1 !important;
+    align-self: flex-end !important;
+    margin: 0 0 0 auto !important;
+    max-width: 100% !important;
+}
+/* The one thing that is not negotiable whichever way it parked: it may
+   not paint outside the card. */
+body.stash-liquid-glass .performer-card .refract-ascension-unknown {
+    box-sizing: border-box !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Ascension in the performer page's Custom Fields panel
+   ═══════════════════════════════════════════════════════════════════
+
+   Custom Fields is for the fields the USER wrote. Today it is mostly
+   not: Ascension keeps its match record in two Stash custom fields and
+   ascen-stats.js renders them in place, so on a library where 320
+   performers carry those fields and 28 carry one of the user's own, the
+   panel reads as another plugin's storage with the user's own note
+   buried on top of it.
+
+   Nothing here moves a node. Ascension's rows stay exactly where it put
+   them and are PRESENTED in place: re-parenting them would be the
+   coupling this whole reconcile exists to remove, and it would break the
+   day Ascension renders its own section instead (which is the ask filed
+   in docs/ascension-integration.md).
+
+   Detection keys on STASH's class, not Ascension's. Stash gives every
+   custom field a `.custom-field-<key>` container named from the field
+   key, and that is what ascen-stats.js hangs its own rendering off too.
+   So the hook is the DATA KEY, which only moves if Ascension changes
+   where it stores things - a far steadier thing to depend on than the
+   markup, which has already moved once (#190). Not one selector below
+   mentions a `hon-` or `timeline-` class.
+
+   The shape, measured: .custom-fields > div > (.collapse-header with the
+   button, then .collapse holding one .detail-item per field).
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* The section's colour is the performer's TIER, published on
+   #performer-page by refract.js (refractPhPublishTier) because
+   --tier-color is declared on the card and resolves nowhere else. An
+   untiered performer publishes nothing and the var() fallback takes the
+   accent, so the section is never uncoloured.
+
+   The ink shade is separate from the fill channel for the reason 3.1
+   rule 5 gives: a token can flip its JOB between modes. Diamond's
+   165,223,219 measures about 1.4:1 on the light panel and cannot be text
+   there. Light re-points the ink to 55% of the tier mixed toward black
+   (about 5.4:1 on that ground) exactly as --accent-ink does, and the
+   plain value is declared FIRST so an engine without color-mix keeps a
+   legible colour instead of dropping the declaration. */
+body.stash-liquid-glass #performer-page {
+    --refract-ph-tier-ink: rgb(var(--refract-ph-tier, var(--accent-rgb)));
+    /* Win and loss ink for the Ascension stats. Ascension's own #22c55e
+       measures 8.55:1 on the dark plate and passes, so dark keeps it and
+       only light is re-pointed; the same for the loss red. Measured
+       against the plate they actually sit on, not the surface behind it:
+       light values are 4.88:1 and 6.36:1, both over the 4.5 floor that
+       Ascension's originals miss at 2.23:1. */
+    --refract-asc-win: #22c55e;
+    --refract-asc-loss: #f87171;
+}
+body.stash-liquid-glass.refract-light #performer-page {
+    /* Measured against the CHIP's own fill, not the plate behind it: the
+       chip lays --fill-2 over the panel, so light's real ground is 238
+       and not 252. #15803d clears 4.5 on the plate and misses it on the
+       chip at 4.34, which is the whole reason 3.9 says to measure the
+       ground the element actually sits on. #116534 is 6.17 there; the
+       red already passed at 5.58. */
+    --refract-asc-win: #116534;
+    --refract-asc-loss: #b91c1c;
+}
+@supports (color: color-mix(in srgb, red 50%, black)) {
+    body.stash-liquid-glass.refract-light #performer-page {
+        --refract-ph-tier-ink: color-mix(in srgb, rgb(var(--refract-ph-tier, var(--accent-rgb))) 55%, #000);
+    }
+}
+
+/* Machine storage is not user content. `refract_back` is Refract's own
+   per-performer card-back override and it is a JSON blob; nobody should
+   meet it on a performer page. Listed here rather than in 08 because it
+   is the same rule as the plugin fields beside it: this panel shows what
+   a person wrote. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-refract_back {
+    display: none !important;
+}
+
+/* ---- The Ascension section --------------------------------------- */
+
+/* The section is a ROW OF THE BAND, not a widget hung off it. That is the
+   whole correction: the first build gave it a 14px sentence-case header
+   floating in a 23.8px gap at the plate's outer edge, its own pill
+   language inside, and its own spacing scheme, so it read as a stray
+   thing between two plates. Everything below puts it back on the band's
+   plate, in the band's type, on the band's track, with one accent.
+
+   Every value here is lifted off the band's own rows rather than chosen:
+   label 10.08px/500 tracked 0.6048px caps at 55%, value 12.88px/400 at
+   92%, plate padding 8.4px 11.2px, rows separated by 1px gaps that show
+   the backdrop through (the band's hairlines are the gaps, not borders -
+   sampled live at rgb(74,72,71) against a rgb(15,14,16) plate). */
+
+/* The rows stack like the band's, with the same 1px hairline between
+   them. No margins: the gap IS the separation, everywhere in this band.
+
+   Scoped to the OPEN state, and that .show is load-bearing. Without it
+   this matched a collapsed panel too and beat Bootstrap's own
+   `.collapse:not(.show) { display: none }` with !important, so Stash's
+   collapse stopped working: measured on a performer with one field, the
+   panel went 34px to 81px and could not be shut again. Making something
+   Stash could do impossible is the P6 failure, and it was mine for one
+   build. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse.show {
+    display: grid !important;
+    gap: 1px !important;
+    background: transparent !important;
+}
+
+/* The header, inside the plate now and in the band's label style, so the
+   section has ONE label tier rather than three. It is the eyebrow with a
+   hairline underline, which is the house pattern 6.13 already prescribes
+   for a column label; the rule is the tier at low alpha and it is the
+   section's single accent. Static flow, not absolute: an absolutely
+   positioned header cannot be part of a stack. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats::before,
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-performer_record::before {
+    content: "Ascension";
+    position: static;
+    display: block;
+    margin: 0 0 0.4rem 0;
+    padding-bottom: 0.3rem;
+    font-size: var(--fs-xs) !important;
+    font-weight: 500;
+    letter-spacing: var(--track-label);
+    line-height: 12.096px;
+    text-transform: uppercase;
+    color: var(--refract-ph-tier-ink);
+    border-bottom: 1px solid rgba(var(--refract-ph-tier, var(--accent-rgb)), 0.35);
+    pointer-events: none;
+}
+/* One header per section: the second field of the pair does not repeat
+   it. Its own override rather than a :not() so the rule above stays
+   readable; grep both before adding a third (7.20). */
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats ~ .detail-item.custom-field-performer_record::before {
+    content: none;
+}
+/* The 23.8px hanging gap the absolute header needed is gone with it. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats,
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-performer_record {
+    position: relative;
+    margin-top: 0 !important;
+}
+/* The stats row spans the plate edge to edge, because its tiles carry the
+   band's padding themselves. Left as it was, the row's 11.2px and each
+   tile's 11.2px stacked: the stat keys sat at 448.9 while every other
+   label in the stack - the tiles above, ASCENSION, PAST MATCHUPS - sat at
+   437.7, and the row had 1106.6px to divide instead of 1129, which put
+   the pitch at 184.6 against the band's 188.3. Two rows of six drifting
+   apart by 3.7px a column, so the sixth stat started 18px left of the
+   tile directly above it.
+
+   Zeroing the ROW rather than the tiles is what fixes both at once: the
+   tiles keep the padding that puts their labels on the band's line, and
+   the track gets the band's own width to divide. The header below adds
+   the inset back for itself, since it is the one thing in here that is
+   not inside a tile. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    /* The row is a column flex that inherits align-items: baseline, and in
+       a column container that aligns the children on their INLINE start
+       rather than stretching them. A margin on the header was enough to
+       carry the whole group with it: the track came out 1129 wide but
+       starting at 437.7, so it overhung the plate by 11.2px instead of
+       filling it. Stretch is what a column of blocks wants, and it is
+       declared rather than inherited so the next rule that touches this
+       item cannot move the track by accident. */
+    align-items: stretch !important;
+}
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats::before {
+    padding-left: 0.8rem !important;
+    padding-right: 0.8rem !important;
+}
+/* Two stacked eyebrows with nothing between them - ASCENSION in the tier
+   colour, then MATCH HISTORY muted - were one label tier too many for a
+   row that labels itself: every tile under it already says TOTAL MATCHES,
+   WINS, LOSSES. The section header names the section and the tiles name
+   their own numbers, so Stash's field title goes. PAST MATCHUPS stays,
+   because the chips below it do NOT say what they are. */
+body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats > .detail-item-title {
+    display: none !important;
+}
+
+/* ---- The stats, as the band's tiles ------------------------------- */
+
+/* Reached STRUCTURALLY, never by Ascension's class names: inside this
+   field, the value's only child is the row, its children are the tiles,
+   and each tile's first and last child are the label and the number.
+   That holds whatever they call them, and if the structure ever changes
+   the tiles simply fall back to Ascension's own pills - visible, and
+   safe. The fixed prefix plus !important outranks their stylesheet. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value {
+    overflow: visible !important;
+}
+/* The band's own 6-up track, so the eighth stat lands beside the seventh
+   instead of alone on a ragged second row.
+
+   The band changes that count at three widths and this row follows it at
+   the same three, because a stats row on six columns inside a band on
+   two is not the same object as the rows above it: measured at 420 the
+   tiles came out 55px wide with the streak labels cut and 28px of
+   overflow. The breakpoints are duplicated from
+   `08_misc_mid.css` (.refract-ph .detail-group, 6 / 4 at 1400 / 3 at
+   1200 / 2 at 820) and they have to move together, because the two grids
+   cannot share a track: this one is nested two levels inside a cell of
+   that one.
+
+   THESE FOUR RULES ARE MEANT TO BE DELETED. DESIGN_SYSTEM section 9,
+   "Nested tracks", prescribes the remedy: the band publishes
+   `--refract-band-cols` at its own breakpoints and every nested grid
+   reads it, since custom properties inherit where tracks do not. When
+   that lands in the band, this block becomes
+   `repeat(var(--refract-band-cols, 6), minmax(0, 1fr))` on the base rule
+   alone and the three media queries go. Left duplicated until then
+   rather than half-built, because a fallback that reads a property
+   nobody publishes yet is just this code with a longer name. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 1px !important;
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+@media (max-width: 1400px) {
+    body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 1200px) {
+    body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+@media (max-width: 820px) {
+    body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+/* Ascension's pill chrome off. The tiles take NO ground of their own:
+   the row they sit in is already the band's plate, so a background here
+   would be a second plate on top of it - and the first attempt proved
+   why that matters, by hardcoding rgba(14,13,16,0.74) and shipping six
+   dark slabs onto the light panel. The ground is the parent's, which
+   flips because the band's does. 3.1 rule 4, learned twice in one
+   surface. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * > * {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+    padding: 0.6rem 0.8rem !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+/* The label: the band's, exactly. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * > * > *:first-child {
+    font-size: var(--fs-xs) !important;
+    font-weight: 500 !important;
+    letter-spacing: var(--track-label) !important;
+    line-height: 12.096px !important;
+    text-transform: uppercase !important;
+    text-align: left !important;
+    color: rgba(var(--fg-rgb), 0.55) !important;
+}
+/* The number: the band's value. This is also what fixes the light-mode
+   legibility finding without a per-release colour list - Ascension's
+   hardcoded #e5e7eb measured 1.21:1 on the light panel, and the band's
+   ink is a token that flips. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * > * > *:last-child {
+    font-size: var(--fs-md) !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.07px !important;
+    text-align: left !important;
+    color: rgba(var(--fg-rgb), 0.92) !important;
+}
+/* A stat NUMBER is plain ink, deliberately. Two rules painting
+   .stat-positive and .stat-negative used to sit here and never applied:
+   the structural rule above carries one more class of specificity and
+   both were !important, so every value already rendered on the band's
+   ink and Wins measured white. The outcome is the right one, so it is
+   ruled rather than repaired - the label beside the number already says
+   which stat it is, and Ascension paints EVERY positive number green,
+   which makes green mean "not zero" rather than anything about the
+   performer. Semantic colour lives in the timeline, where win or loss
+   is the datum rather than a property of the count. Deleted rather than
+   left in with the specificity nudged, because a rule that fires would
+   have changed the design, not fixed it (7.20: delete the dead rule,
+   never outvote it). */
+
+/* ---- The timeline ------------------------------------------------- */
+
+/* Ascension sets `.match-timeline { width: 650% !important }` above
+   1200px, with five equal columns. That is correct for the layout it was
+   written against, where a custom field's value is a narrow column and
+   650% of it is a sane row of five. Refract gives the value the full
+   1092px, so the same rule computes to a 7,193px grid with 1,434px
+   columns, and a single match renders as one green bar with 160px of
+   text and 1,250px of empty. Refract changed the context, so Refract
+   neutralises it here rather than asking upstream to care.
+
+   Reached structurally again: the value's child is Stash's TruncatedText
+   wrapper, and ITS child is the track. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * {
+    width: 100% !important;
+    grid-template-columns: none !important;
+    grid-auto-flow: column !important;
+    grid-auto-columns: minmax(0, max-content) !important;
+    justify-content: start !important;
+}
+/* The track's own `padding: 8px 0` goes, so the item's 2px gap carries
+   the space under PAST MATCHUPS exactly as it does under MATCH HISTORY.
+   They were 8px and 2px, which is why the two sub-rows breathed
+   differently. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * {
+    padding: 0 !important;
+}
+
+/* The match chip, on the house chip law (6.7) instead of Ascension's.
+   It arrived as a green slab: a tinted fill, a 3px left border, a 4px
+   radius, and FIVE type sizes in one object - 9.1px date, 12.88 dot,
+   11.9/700 status, 14px "vs", 13.3 name, 9.8/700 rating - so the word
+   "vs" was larger than the name it joined. Glass fill, hairline rim,
+   pill radius, and the state carried by INK rather than by a coloured
+   plate, which is also what stops a row of wins reading as a bar chart
+   of nothing.
+
+   Reached structurally, same depth discipline as the stats: the entry is
+   the track's child, and its own children are date, marker, content and
+   rating in that order. The only class read is win or loss on the entry
+   itself, which is the datum. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * {
+    --refract-asc-ink: rgba(var(--fg-rgb), 0.55);
+    display: inline-flex !important;
+    align-items: baseline !important;
+    gap: var(--gap-sm) !important;
+    min-width: 0 !important;
+    padding: 0.3rem 0.7rem !important;
+    /* Ascension sets min-height: 45px on the entry, which is right for the
+       tall bar it draws by default and wrong for a chip: it stood 45px
+       among a band whose other pills measure 24 to 26. Released, so the
+       chip is the height of its own content and its 0.3rem padding, which
+       is what every pill around it is. */
+    min-height: 0 !important;
+    background: var(--fill-2) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-left: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    /* Two sizes in the chip, not five. Everything inside inherits this
+       one, and the two quiet ends are re-pointed below. */
+    font-size: var(--fs-md) !important;
+    color: rgba(var(--fg-rgb), 0.92) !important;
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * * {
+    font-size: inherit !important;
+    font-weight: inherit !important;
+}
+/* The date and the rating are the chip's captions: the second size, and
+   muted. `:first-child` and `:last-child` carry a pseudo-class each, so
+   they outrank the descendant rule above without an arms race. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:first-child,
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:first-child *,
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:last-child,
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:last-child * {
+    font-size: var(--fs-xs) !important;
+    color: rgba(var(--fg-rgb), 0.55) !important;
+    background: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+/* The state, and the only place in this section where a colour means
+   something: the marker dot, plus a rim tint so the chip reads at a
+   glance without becoming a coloured plate. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.win {
+    --refract-asc-ink: var(--refract-asc-win);
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.loss {
+    --refract-asc-ink: var(--refract-asc-loss);
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.win,
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.loss {
+    border-color: color-mix(in srgb, var(--refract-asc-ink) 45%, transparent) !important;
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:nth-child(2),
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:nth-child(3) > *:first-child {
+    color: var(--refract-asc-ink) !important;
+}
+
+/* The scroll, which now only engages when there are more matches than
+   the row holds. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    /* 6.10: these two INHERIT, and Chrome discards every ::-webkit rule
+       for an element with a standard scrollbar property in effect. An
+       ancestor sets them for this column, so they are handed back
+       explicitly or the bar below is never drawn. */
+    scrollbar-width: auto !important;
+    scrollbar-color: auto !important;
+    padding-bottom: 0.25rem !important;
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar {
+    height: 8px;
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar-track {
+    background: transparent;
+}
+/* Thumbed in the TIER rather than the accent, because it belongs to this
+   section rather than to the theme. The fill channel, not the ink one:
+   this is a mark on a surface, not text. */
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar-thumb {
+    background: rgba(var(--refract-ph-tier, var(--accent-rgb)), 0.35);
+    border-radius: var(--radius-pill);
+}
+body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--refract-ph-tier, var(--accent-rgb)), 0.6);
+}
+/* No fade edge. The first build had one, and with the track neutralised
+   it stopped earning its place: CSS cannot ask whether a scroller
+   actually overflows, so the gradient painted over empty plate on the
+   two-match performers that are most of this library. The tier-thumbed
+   bar already says "there is more" and only appears when there is. One
+   accessory removed rather than kept for the case it was drawn for. */
+/* ---- What is left of Custom Fields -------------------------------- */
+
+/* "A field of the user's own" is any custom field that is not one of the
+   keys above. Stated as a subtraction because that is what it is: the
+   panel belongs to the user, and these three are the exceptions the
+   theme knows about. A fourth plugin storing a fourth key shows through,
+   which is the correct failure - it is visible, and someone can add it.
+
+   :has() is fine here per 7.2: one instance, three rows. It is the card
+   GRID where its budget is spent. */
+body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .detail-item:not(.custom-field-hotornot_stats):not(.custom-field-performer_record):not(.custom-field-refract_back))) .collapse-header {
+    display: none !important;
+}
+/* Hiding that header takes the only way to REOPEN the panel with it, so
+   the collapse is forced open in exactly the same condition. Ascension
+   force-expands it too when its own fields are present, which covers the
+   common case, but not the one where a performer has only refract_back:
+   without this, that panel could be shut with no handle. */
+body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .detail-item:not(.custom-field-hotornot_stats):not(.custom-field-performer_record):not(.custom-field-refract_back))) .collapse {
+    display: grid !important;
+    gap: 1px !important;
+    background: transparent !important;
+    height: auto !important;
+    visibility: visible !important;
+}
+/* Nothing of the user's AND nothing of Ascension's: the panel is a
+   heading over hidden storage, so it goes entirely. */
+body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .detail-item:not(.custom-field-refract_back))) {
     display: none !important;
 }
 
@@ -966,9 +1561,23 @@ body.stash-liquid-glass .adv-rating-btn:hover > span[style*="color"] {
 /* Unrated-count: instead of a detached chunky pill, render it inline after
    the ★ behind a hairline divider - "★ | 4" - so the button reads as one
    cohesive unit, matching the toolbar's other icon+number controls. */
+/* The number is the ONLY carrier of that rating, so it answers to the
+   4.5 reading floor rather than the 3.0 one. On --accent-bright it
+   measured 4.03 against a gold-tier band and 5.37 against a cooler one:
+   the ink was fine and the GROUND was the variable, because the badge is
+   transparent by design (it reads as "star | 4", not as a detached pill)
+   and its ground is therefore whatever the portrait and the tier veil
+   happen to be.
+
+   So the ink takes the lift rather than the badge taking a plate, which
+   would undo that decision. --accent-light is what 3.1 rule 5 calls the
+   high-key TEXT shade in dark - the same token that is a pale FILL tint
+   in light, which is why the light half of this lives in 14_light on
+   --accent-ink instead. Two tokens, each doing the job its own mode
+   gives it, and no new colour. */
 body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge {
     background: transparent !important;
-    color: var(--accent-bright) !important;
+    color: var(--accent-light) !important;
     border: 0 !important;
     border-radius: 0 !important;
     display: inline-flex !important;

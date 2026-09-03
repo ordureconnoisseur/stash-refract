@@ -2138,6 +2138,122 @@ body.stash-liquid-glass.refract-pc-hide-stats.refract-pc-hide-stats .performer-c
 /* Country gate TRIPLES the class: playing-card's
    .stash-perf-country.refract-country-with-rank rule ties a doubled
    gate at 5 classes and wins on file order. */
+/* Country: the name OR the flag, never both. They are the same fact in
+   two forms, so the caption carries one of them and the Country element's
+   own switch still turns the whole thing off. Name is the default, which
+   is what the card showed before the flag existed. */
+body.stash-liquid-glass :is(.performer-card, .refract-ph-card) .stash-perf-country .refract-flag-chip {
+    display: none !important;
+}
+body.stash-liquid-glass.refract-pc-country-flag :is(.performer-card, .refract-ph-card) .stash-perf-country .refract-flag-chip {
+    display: inline-block !important;
+}
+body.stash-liquid-glass.refract-pc-country-flag :is(.performer-card, .refract-ph-card) .stash-perf-country .stash-perf-country-name {
+    display: none !important;
+}
+/* The caption clips, so that a long country name ellipsises rather than
+   running into the rank at the other end. In flag mode there is no name
+   to clip, and the clip was cutting the chip's glow to the caption's own
+   box: a round chip in a hard-edged rectangle of colour, which is what
+   made the ring read as flat and stuck-on rather than lit. */
+body.stash-liquid-glass.refract-pc-country-flag.refract-pc-country-flag :is(.performer-card, .refract-ph-card) .stash-perf-country {
+    /* The class is doubled, the way the hide gates in this file already
+       double theirs. 16_playing_card.css sets `overflow: hidden` on this
+       caption at the same specificity and also !important, and it loads
+       after this file, so an evenly matched rule here loses on source
+       order alone. One repeated class settles it without reaching for a
+       heavier selector or splitting the chip's rules across two files. */
+    overflow: visible !important;
+}
+/* `:is(.performer-card, .refract-ph-card)` throughout, the pattern
+   16_playing_card.css already uses: the performer page draws the same
+   card as the grid does, and scoping this to the grid alone left that
+   one card at the default 17px with its name still showing while every
+   other card in the library had turned over to a flag. */
+body.stash-liquid-glass :is(.performer-card, .refract-ph-card) .stash-perf-country .refract-flag-chip {
+    /* Sized against its neighbours, not against the caption's type. The
+       caption is 10px, and a chip at its cap height came out 10.6px,
+       where a flag is a coloured speck: the stripes of the US, the cross
+       of Denmark and the disc of Japan are one dot each. 18px made those
+       separate; it did not make any of them read AS a flag, which was
+       the actual ask.
+
+       28px does, and the ceiling is the stat pills beside it at 36.2px:
+       the pills are what the card is for, so the flag has to be
+       obviously a flag and still obviously not the headline. 28 is 78%
+       of the pill and clearly past it; 32 starts to compete.
+
+       It costs the card nothing. The chin is positioned over the image
+       rather than laid out under it, so the caption line grows upward
+       into the picture and the card stays 407px in all three states. */
+    --refract-flag-chip-size: 28px;
+    margin-right: 0;
+    vertical-align: -0.28em;
+    /* Stash's own `.fi` rule pins the flag to the card's bottom-right
+       corner (`position: absolute; right: 1rem; bottom: 1rem`) for the
+       native overlay. Inherited, it threw the chip 238px clear of the
+       caption, which has `overflow: hidden`, so it was drawn and then
+       clipped away: present in the DOM, painted, and invisible. Put it
+       back in the text flow. Display is deliberately NOT set here: this
+       rule sits after the name/flag pair above and would have re-shown
+       the chip in name mode, which is how the card briefly carried both
+       forms of the same fact.
+
+       The same Stash rule also carries `filter: drop-shadow(...)`, for
+       legibility over a photograph, and a filter rasterises the element
+       into its own layer. The layer is sized to the box plus the
+       FILTER's margin, not the box-shadow's, so the glow below was cut
+       off square a few pixels out: a round chip in a hard-edged purple
+       box. Its job is done here by the 2px edge and the ground shadow,
+       so it goes. */
+    position: static !important;
+    filter: none !important;
+    /* Struck from the same die as the stat pills, in the same tokens.
+       The hue alone was not enough: a flat 1px border in the base
+       colour read as a sticker sitting on a card whose every other
+       object is neon. Measured off the pill beside it and rebuilt at
+       disc scale.
+
+       The pill:  2px border in the BRIGHT variant, an inset white
+       hairline for the lit inner edge, an inset bloom, then three
+       glow layers at 14 / 32 / 64px of blur in the base colour, and a
+       ground shadow to lift it off the photograph.
+
+       Scaled for 28px rather than copied: the pill is 67x37, so its
+       64px far halo on a 28px disc would be a lamp with a flag in the
+       middle of it. Three quarters, which is the ratio of the two
+       shortest sides, puts the chain at 10 / 22 / 40.
+
+       No tint over the artwork. The pill fills itself with a 0.42
+       gradient of its colour because it is a container for a number;
+       the chip's content IS the picture, and pink-washing a flag makes
+       it a worse flag. The material cue is the edge and the light
+       around it, which is where the pill's identity actually lives.
+
+       Every layer is blur-only except the inset hairline. An OUTSET
+       spread on a 50% radius does not stay round in Chromium: it
+       resolves the percentage against the original box and then
+       expands, which drew a squircle around a circular flag the first
+       time. Blur does not deform, and an inset spread follows the
+       padding box, so both are safe here. Verified at 14x.
+
+       `--badge-color` rather than `--tier-color`, because that is the
+       token the pills read: the tier colour on a tiered card and the
+       global accent on an untiered one. The inner fallback is not
+       decoration -- `--badge-color` is declared in playing-card mode,
+       and outside it an undefined custom property does not fall back,
+       it invalidates the declaration and nothing would be drawn. */
+    border-width: 2px !important;
+    border-color: rgba(var(--badge-color-bright, var(--badge-color, var(--accent-rgb))), 0.95) !important;
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.35),
+        inset 0 0 6px rgba(255, 255, 255, 0.18),
+        0 0 10px rgba(var(--badge-color, var(--accent-rgb)), 1),
+        0 0 22px rgba(var(--badge-color, var(--accent-rgb)), 0.6),
+        0 0 40px rgba(var(--badge-color, var(--accent-rgb)), 0.28),
+        0 4px 12px rgba(0, 0, 0, 0.6) !important;
+}
+
 body.stash-liquid-glass.refract-pc-hide-country.refract-pc-hide-country.refract-pc-hide-country .performer-card .stash-perf-country,
 body.stash-liquid-glass.refract-pc-hide-country.refract-pc-hide-country.refract-pc-hide-country .performer-card .performer-card__country-flag,
 body.stash-liquid-glass.refract-pc-hide-country.refract-pc-hide-country.refract-pc-hide-country .performer-card .performer-card__country-string {

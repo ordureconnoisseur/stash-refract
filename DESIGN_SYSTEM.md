@@ -284,7 +284,12 @@ measured windows, shrinking to an alpha-only line where light's tuned alpha
 genuinely differs, deleting where it does not. And a lesson from cf's pass
 that binds every such window: **grounds under IMAGES need an eyeball in both
 modes, not just probes** - an image on a mode-flipping ground can vanish
-while every text probe passes (the logo plate defect class).
+while every text probe passes (the logo plate defect class). The scene
+lane's icon pass added the small-glyph corollary: a glyph can measure
+perfectly and still read wrong when a feature gap lands under about a
+pixel at render size (an info-i's dot antialiasing into its stem at 13px,
+resolving at 15px with a 1.2px gap). Sub-pixel feature separation is an
+eyeball check at final render size, never a geometry calculation.
 
 **Blur is a fixed ladder, not a free parameter.** Nine live expressions: five
 plain rungs (`xs` 6px, `sm` 10px, `md` 14px, `xl` 24px, `2xl` 32px) and four
@@ -671,6 +676,21 @@ of a card has a `refract-sc-*` / `refract-pc-*` body class, and the keys, the
 classes and the settings chips all derive from that one table. A new card
 element that should be hideable joins the table; it does not get a bespoke
 toggle.
+
+An element may ship OFF (ruled 2026-09-02, the Ascended score being the
+first). Its roster chip is then its only control, and that is sufficient
+rather than a compromise: a hit target cannot exist for something the card
+does not draw, which is already true of Tag count on a scene with no tags
+and Country on a performer with none. The element's default belongs in the
+table beside it, so an absent stored value is no longer the same statement
+as one set off, and a look that lists only what it HIDES cannot express a
+default-off element at all. That last clause is the trap: "absent means
+shown" was encoded in four separate readers on the preset path alone,
+with a fifth reading the stored value on its own axis - each locally
+correct and invisible to the others, and missing one is silent: a look
+switches the element on, or two looks collapse to one signature. 7.20's law about the
+selector you are reading has a JS twin, and the cure is the same: one
+reader, here one helper, owns the question.
 
 ### 6.2 The playing card
 
@@ -1365,6 +1385,8 @@ an explicit date were logged at the ledger's creation, 2026-08-27.
 | Light surface family | EXECUTED 2026-08-30 (94bc238), measured both modes plus light-and-lite: surface channel flips to white, dark byte-identical, scrims mode-fixed via the new --scrim-rgb, --bg-0-rgb added. Remaining: the 17 near-white overrides retire per-surface (see the fill-overrides row for the same discipline), now redundant where their alpha matches the flipped channel. | 3.2 |
 | Spacing | Gaps tokenized 2026-08-28. Padding/margins: histogram drawn 2026-08-30 (1,420 declarations, 69 distinct rem values forming a near-continuum from 0.1 to 1.5; heaviest: 0.5 at 96, 0.85 at 77, 0.4 at 69, 0.6 at 67, 0.7 at 58, 0.55 at 52). DRAFT scale, pending measurement: nine steps sharing the gap values where they coincide (0.25, 0.4, 0.5, 0.75, 1) plus padding-only steps near 0.15, 0.65, 0.85 and 1.25, fold bands capped at 0.075rem (about 1px); sub-7px pixel paddings and negative margins stay literal (optical and layout-special). Naming (unified --space-* vs parallel --pad-*) and every fold direction are stage-2 decisions, made against the live page. BLOCKED on the deploy dir until the scene lane finishes the fill flip; two lanes cannot measure concurrently. | 3.6 |
 | Specificity | 8,268 `!important` declarations. Largely unavoidable against Bootstrap, but it means load order and class doubling are the only remaining levers. | 5.2 |
+| Type, band labels | The performer band's label rule intends weight 600 (`08_misc_mid` ~7793) but an earlier `font-weight: 500 !important` on `.detail-header .detail-item-title` (~1270) wins, so the whole band runs at 500 - a live 7.20 instance, found when a copied rule and the measured pixels disagreed. The Ascension section header (13_plugins, ascension-reconcile) copies 500 DELIBERATELY to match what is on screen. Fixing the band's weight must take that header with it, or it becomes the only label in the band at a different weight. Logged 2026-09-02. | 3.5, 7.20 |
+| Nested tracks | The Ascension stats row (13_plugins, ascension-reconcile) duplicates the performer band's three column-count breakpoints (`08_misc_mid`: 4 at 1400, 3 at 1200, 2 at 820) because a grid nested inside a cell cannot inherit its parent's track. The two must move together: at 420 with them out of step the tiles measured 55px with streak labels clipped and 28px of overflow. Prescribed remedy when either next moves, or at latest when a third consumer appears: the band publishes `--refract-band-cols` at its breakpoints and every nested grid reads it - custom properties inherit where tracks do not, which retires the class, not the instance. The band is the performer lane's; the property lands there. Logged 2026-09-02. | 3.6 |
 
 If a sub-`--fs-xs` step is genuinely needed, add it to the scale once rather
 than writing `0.62rem` a sixth time.
