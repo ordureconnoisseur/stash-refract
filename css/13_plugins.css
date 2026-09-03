@@ -723,6 +723,70 @@ body.stash-liquid-glass .performer-card .refract-ascension-unknown {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   Ascension's rank pill in the performer page's EDIT head
+   ═══════════════════════════════════════════════════════════════════
+
+   The view band hides this pill entirely (08_misc_mid) because the
+   standing row states the rank in words. Edit mode has no standing
+   row, so the pill is the only place the rank appears and it stays -
+   which means its ink has to answer for itself.
+
+   It is a DARK ISLAND: a near-black pill that does not change with the
+   mode, so 3.1 rule 4 says its ink is re-pinned locally rather than
+   taken from the flipping token. Ascension paints it in its own tier
+   colour, which measured 1.78:1 for the rank and 1.71:1 for the score
+   on a bronze performer, identical in light because the pill stays
+   dark; untiered it is a flat grey at 4.08 and 3.83, under the 4.5 the
+   rank owes as the sole carrier of that number.
+
+   The ink is plain bright, NOT a tier colour, and that is the one real
+   decision here. Refract has a tier palette of its own and it would be
+   easy to reach for - --refract-ph-tier is published on this very
+   page. But Refract's tier comes from the RATING and Ascension's comes
+   from its BATTLES: two different facts that happen to share a word.
+   Painting their rank in our tier would assert they are the same. The
+   card's read-out makes the same choice, wearing Refract's own flame
+   rather than either palette.
+   ═══════════════════════════════════════════════════════════════════ */
+body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-rank-text {
+    color: rgba(255, 255, 255, 0.92) !important;
+}
+/* The Ascended score cannot be recoloured here and is therefore not kept.
+   Its span ships `style="color: TIER !important"` INLINE, and an inline
+   !important beats an author one, so the 1.71:1 it measured is not a
+   number any stylesheet can move - the same wall the card read-out hit,
+   where the answer was to render our own copy of the number. Doing that
+   again for a surface someone passes through on the way to an edit form
+   would be machinery for its own sake, so here the unreadable thing goes
+   instead of being reprinted. The score is still on the badge's own
+   tooltip, and on the card as an element the customiser can switch on.
+
+   The separator goes with it: a divider with one thing left to divide is
+   just a stray glyph. */
+body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-asc-score-display,
+body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-asc-separator {
+    display: none !important;
+    position: absolute !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+}
+/* The count that follows it is support, not the number: muted, and on
+   the ladder. It arrived at 10.41px, a size reached by multiplication
+   that belongs to no scale (3.5 rule 1). */
+body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-rank-total {
+    color: rgba(255, 255, 255, 0.55) !important;
+    font-size: var(--fs-xs) !important;
+}
+/* An unranked performer has no total to be out of, so the "of 492"
+   goes with the number refract.js just replaced. What is left reads
+   "Unranked", which is what the band says one row away. */
+body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge.refract-ascension-unranked .hon-rank-total {
+    display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    Ascension in the performer page's Custom Fields panel
    ═══════════════════════════════════════════════════════════════════
 
