@@ -7310,8 +7310,34 @@ body.stash-liquid-glass #performer-page .detail-header.refract-ph {
        Legendary halo is 100px and 160px of glow, so it washed straight
        over the tab labels. The box clears by 50; the glow fades across
        it instead of landing on text. */
-    margin-bottom: 9rem;
+    /* The default is the no-overhang case, and the hanging case asks for
+       its clearance below. */
+    margin-bottom: 1.75rem;
     overflow: visible;
+}
+/* ── Which side sets the band's height ──────────────────────────────
+   The overhang is a composition for one case: the CARD is the taller
+   side, so the band's foot is the card's, the picture hangs 96px past
+   the plate, and it reads as an object on the page rather than one
+   inside it. The band then owes that 96 plus air before the tab strip,
+   which is what 9rem is: at 4.25 the pills sat 3px off the tabs, at 7.5
+   a Legendary halo washed over the tab labels.
+
+   When the HEAD is the taller side the same instruction produces the
+   opposite composition. `align-self: flex-end` still sticks the card's
+   margin edge to the container's foot, so the picture sinks 96px below
+   the plate and leaves a void above it: measured on Kitty Lynn at 1095,
+   a 780px band with the card starting at y=405, its top level with the
+   Height row and 385px of nothing above. The clearance below is then
+   dead space too.
+
+   Which side is taller is a measured relationship, not a width -- the
+   same 1095 flips between the two depending on whether the performer
+   has an Ascension section -- so refract.js measures the two boxes and
+   sets `refract-ph-hang`. CSS cannot compare siblings, and a breakpoint
+   would be a guess about content. */
+body.stash-liquid-glass #performer-page .detail-header.refract-ph.refract-ph-hang {
+    margin-bottom: 9rem;
 }
 
 /* The blur wants clipping and the card wants to overhang, and one
@@ -7397,12 +7423,16 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
     width: 340px;
     flex: 0 0 340px;
     max-width: 340px !important;
-    align-self: flex-end;
-    /* Overhangs the band by 96px, which is what makes it read as an
-       object sitting on the page rather than a picture inside a panel. */
-    margin-bottom: -96px;
+    /* Top of its column by default; the hang is the exception and is
+       measured, not assumed. See the band rule above. */
+    align-self: flex-start;
+    margin-bottom: 0;
     padding: 0;
     z-index: 2;
+}
+body.stash-liquid-glass #performer-page .refract-ph.refract-ph-hang .detail-header-image {
+    align-self: flex-end;
+    margin-bottom: -96px;
 }
 body.stash-liquid-glass #performer-page .refract-ph .detail-header-image > button.btn-link {
     display: block;
@@ -8350,6 +8380,8 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
         width: 240px;
         flex: 0 0 240px;
         max-width: 240px !important;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph.refract-ph-hang .detail-header-image {
         margin-bottom: -72px;
     }
     /* The strip is sized for a 340px card. At 240 the fourth pill runs
@@ -8359,7 +8391,7 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     body.stash-liquid-glass #performer-page .refract-ph .refract-ph-card .stash-perf-stats {
         --pc-badge-scale: 0.78;
     }
-    body.stash-liquid-glass #performer-page .detail-header.refract-ph {
+    body.stash-liquid-glass #performer-page .detail-header.refract-ph.refract-ph-hang {
         margin-bottom: 5.75rem;
     }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group {
@@ -8402,15 +8434,15 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     body.stash-liquid-glass #performer-page .refract-ph .performer-head {
         padding: 0 !important;
     }
+    /* No align-self or margin override here any more: the base rule's
+       flex-start plus its negative margin already give this width the
+       right answer, because the head is always the taller side once the
+       card is 200px. This block used to state that outcome as a special
+       case; it is the general rule now. */
     body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
         width: 200px;
         flex: 0 0 200px;
         max-width: 200px !important;
-        align-self: flex-start;
-        /* No overhang: at this width the head is taller than the card,
-           so the card no longer sets the band's height and pulling it
-           down would only crop it against the tabs. */
-        margin-bottom: 0;
     }
     body.stash-liquid-glass #performer-page .refract-ph .refract-ph-card .stash-perf-stats {
         --pc-badge-scale: 0.62;
@@ -8708,21 +8740,39 @@ body.stash-liquid-glass #performer-page .refract-pe-shot {
 
 /* ── The form ──────────────────────────────────────────────────── */
 
-/* The row the form sits in has to grow, the same way the view band's
-   does. Bootstrap leaves `.row` at `flex: 0 1 auto`, so as a flex item
-   beside the image it was sized by its own content and simply stopped:
-   measured at 1600, a container of 1509 with a 320px image and a 28px
-   gap leaves 1161 for the form, and the form took 917 of it, parking
-   244px of empty page to the right of every field. The sticky action
-   plate is a Bootstrap 75% column of that row, so it inherited the
-   error at three quarters of it and wrapped a line earlier than it
-   needed to.
+/* The row the form sits in has to grow, and to start where the picture
+   starts. Three separate things were stopping it, all of them Bootstrap
+   defaults this band never cancelled.
 
-   The view band has carried `flex: 1 1 auto` on this exact selector
-   since it was built; only the edit side was missed, which is why it
-   never showed up as a difference between two modes of one page. */
+   FLEX. `.row` is `flex: 0 1 auto`, so beside the image it was sized by
+   its own content and stopped: at 1600 a container of 1509 with a 320px
+   image and a 28px gap leaves 1161, and the form took 917, parking 244px
+   of empty page to the right of every field. The view band has carried
+   `flex: 1 1 auto` on this exact selector since it was built; only the
+   edit side was missed, which is why it read as a difference between two
+   modes rather than a fault in either.
+
+   CROSS AXIS. Below 1200 the container turns to a column, and `flex`
+   then governs HEIGHT -- the width comes from `align-items`, which is
+   `flex-start`, so the row went back to being content-sized. It measured
+   917.2 at 1150, at 1100 and at 1064 alike, in bands of 1096, 1046 and
+   1010: the same number three times, because it was the form's own
+   max-content and had nothing to do with the page. `align-self:
+   stretch` is the cross-axis half of the same instruction.
+
+   GUTTER. `.row` also carries `margin: 0 -15px`, and the head is a
+   `.col` whose padding would cancel it if this band did not zero that
+   padding to get the text off Bootstrap's gutter. Uncancelled, it put
+   the name, the icons, the rating row, the action plate and every field
+   15px to the LEFT of the image they sit under -- measured at 1064, the
+   image at 45.5 and everything else at 30.5, hard against the band's
+   edge. This is exactly the fault F3 fixed for the view band; the edit
+   side has the same rule and never got the same answer. */
 body.stash-liquid-glass #performer-page .refract-pe .detail-container > .row {
     flex: 1 1 auto;
+    align-self: stretch;
+    margin-left: 0;
+    margin-right: 0;
     min-width: 0;
 }
 body.stash-liquid-glass #performer-page .refract-pe .performer-head {
@@ -8928,6 +8978,51 @@ body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-gr
     min-width: 0;
     font-size: var(--fs-base) !important;
 }
+/* ── The list row is ONE control ────────────────────────────────────
+   The radii were never the fault, which is worth saying because they
+   are what the report saw: the input carries 12px on its left corners
+   only, the two middle buttons are square, and the end button carries
+   12px on its right corners only. That IS a single continuous shape by
+   the numbers, and it still read as three because of what fills it.
+
+   Measured across one URL row: the input at 0.04 white, the scrape
+   button at 0.06, the drag handle at 0.06 and the remove at 0.05 --
+   four fills for one control -- and, worse, the scrape and remove buttons
+   each carried a border on all four sides while the drag handle carried
+   only a left seam. Two of the three segments were drawing a complete
+   box around themselves INSIDE the group, which is what made the end
+   cap look like a separate pill stuck on the end.
+
+   One fill, one rim: every segment takes the input's own ground, top
+   and bottom borders run the length of the group, and the only vertical
+   line is the seam on each segment's left. The last segment closes the
+   rim on the right and carries the group's outer radius.
+
+   --fill-2 by name rather than the 0.04 it resolves to, because the two
+   modes do not agree on the number: it is 0.04 white in dark and 0.053
+   black in light, and a literal matched the input in one mode and
+   missed it by 0.015 in the other. The token's whole job is "resting
+   fill: inputs, tiles", which is what this is. */
+body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group > .form-control {
+    border-right-width: 0 !important;
+}
+body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group-append > .btn {
+    background: var(--fill-2) !important;
+    border-style: solid !important;
+    border-color: var(--glass-border) !important;
+    border-width: 1px 0 1px 1px !important;
+    border-radius: 0 !important;
+}
+/* --radius-sm, because that is what the input at the other end of the
+   same control is drawn with. The cap was --radius: 16px against the
+   input's 12 -- the "large radius" in the report, and the one part of it
+   that was genuinely a radius fault. One control, one corner. */
+body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-group-append > .btn:last-child {
+    border-right-width: 1px !important;
+    border-top-right-radius: var(--radius-sm) !important;
+    border-bottom-right-radius: var(--radius-sm) !important;
+}
+
 /* The delete button was a full-height red block on every row. It is a
    quiet glyph that colours on hover: twenty-six of them shouting at
    once is a row of alarms, not a form. */
@@ -8940,7 +9035,10 @@ body.stash-liquid-glass #performer-page .refract-pe .string-list-input .input-gr
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
-    background: var(--fill-3) !important;
+    /* The group's own ground, not --fill-3. This rule is one class more
+       specific than the group rule above, so it was quietly holding the
+       fourth of the four fills that made one control read as three. */
+    background: var(--fill-2) !important;
     border-color: var(--glass-border) !important;
     color: var(--text-muted) !important;
     transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
@@ -8967,6 +9065,11 @@ body.stash-liquid-glass #performer-page .refract-pe form > .details-edit {
     position: static;
     margin-top: var(--gap-xl) !important;
 }
+/* The plate had no space above it at any width: measured 0px between the
+   rating read-out's bottom edge and the plate's top, at 1600, 1300, 1100
+   and 968 alike, so a floating toolbar sat directly on the row above as
+   though it were welded to it. It takes the head's own row gap, which is
+   what every other pair of blocks in this band is separated by. */
 body.stash-liquid-glass #performer-page .refract-pe .performer-head > .details-edit {
     position: sticky;
     top: 4.5rem;
@@ -8975,7 +9078,11 @@ body.stash-liquid-glass #performer-page .refract-pe .performer-head > .details-e
     flex-wrap: wrap;
     align-items: center;
     gap: var(--gap-sm);
-    margin: 0 0 var(--gap-xl) !important;
+    /* The top is the change: it was `0` in this shorthand, so the plate
+       sat directly on the rating row with 0px between them, measured at
+       1600, 1300, 1100 and 968 alike. A shorthand, not a separate
+       margin-top, because it is the shorthand that was setting it. */
+    margin: var(--gap-lg) 0 var(--gap-xl) !important;
     padding: var(--gap-md) var(--gap-lg);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);

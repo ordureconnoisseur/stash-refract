@@ -9264,6 +9264,98 @@
         return !!document.querySelector(".rating-stars");
     }
 
+    /* Which side sets the band's height, measured rather than assumed.
+
+       The card overhangs the band's foot by 96px when the CARD is the
+       taller of the two columns -- that is the composition, and 08 spells
+       out what it costs and buys. When the HEAD is taller the same
+       instruction sinks the picture below the plate and leaves a void
+       above it: Kitty Lynn at 1095 had a 780px band with the card
+       starting 385px down, its top level with the Height row.
+
+       CSS cannot compare two siblings' heights, and a breakpoint would
+       be a guess about content rather than a fact about it: the same
+       1095 flips between the two cases depending on whether a performer
+       carries an Ascension section. So the two boxes are measured and
+       the band gets a class.
+
+       Neither measurement depends on the class, so this cannot oscillate:
+       the card's own height is its picture's and the head's is its
+       content's; only the CONTAINER's height and the card's margin change
+       when the class flips. The 8px margin is for the case where they
+       are within a pixel of each other, so a fractional layout change
+       cannot flap the composition. */
+    /* The head's BOX is no answer: it is a flex item that stretches to
+       the container, so once the card is the taller side the head's
+       offsetHeight simply equals the card's and the comparison always
+       ties. Its CONTENT height is the question, and with a 1fr row in
+       the grid absorbing the slack (08's F7 composition) the box tells
+       you nothing about it.
+
+       So the rows are measured instead: group the children by the top
+       they sit at, take the tallest in each row, and add the gaps and
+       the padding back. Every item is `align-items: start`, so a row
+       inflated by the 1fr still reports its own content height -- the
+       inflation moves the rows apart, it does not make any of them
+       taller. */
+    function refractPhHeadContent(headEl) {
+        var cs = window.getComputedStyle(headEl);
+        var gap = parseFloat(cs.rowGap) || 0;
+        var rows = {};
+        var kids = headEl.children;
+        for (var i = 0; i < kids.length; i++) {
+            var r = kids[i].getBoundingClientRect();
+            if (r.height < 1) { continue; }
+            var key = Math.round(r.top);
+            rows[key] = Math.max(rows[key] || 0, r.height);
+        }
+        var total = 0;
+        var n = 0;
+        for (var k in rows) {
+            if (Object.prototype.hasOwnProperty.call(rows, k)) { total += rows[k]; n++; }
+        }
+        if (n > 1) { total += gap * (n - 1); }
+        return total + (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+    }
+
+    function refractPhAnchorCard(header) {
+        if (!header) { return; }
+        var host = header.querySelector(".detail-header-image");
+        var headEl = header.querySelector(".performer-head");
+        if (!host || !headEl) { return; }
+        /* The head is not the only other claimant on the band's height:
+           the container carries a min-height (480 at desktop, 380 below
+           1200) so the band never collapses on a sparse performer, and
+           that floor can be the tallest thing in the room. Kesha at 1200
+           is the case -- a 360px card against a 284px head and a 380px
+           floor -- where comparing only the two columns said "the card is
+           taller, hang it" and the floor then pushed a 75px void above
+           it anyway. The card hangs when it beats BOTH. */
+        var cont = host.parentElement;
+        var floor = cont ? (parseFloat(window.getComputedStyle(cont).minHeight) || 0) : 0;
+        var others = Math.max(refractPhHeadContent(headEl), floor);
+        var hangs = host.offsetHeight > others + 8;
+        if (header.classList.contains("refract-ph-hang") !== hangs) {
+            header.classList.toggle("refract-ph-hang", hangs);
+        }
+    }
+
+    /* The head's height moves with the window and with what the page has
+       finished loading, so the question is asked again whenever either
+       box changes rather than once at build time. */
+    function refractPhWatchAnchor(header) {
+        if (!header || header._rfxAnchorRo || !window.ResizeObserver) { return; }
+        var host = header.querySelector(".detail-header-image");
+        var headEl = header.querySelector(".performer-head");
+        if (!host || !headEl) { return; }
+        var ro = new ResizeObserver(function () {
+            safeRun(function () { refractPhAnchorCard(header); });
+        });
+        ro.observe(host);
+        ro.observe(headEl);
+        header._rfxAnchorRo = ro;
+    }
+
     function refractPhCard(header, head, page) {
         var host = header.querySelector(".detail-header-image");
         if (!host) { return; }
@@ -9852,6 +9944,14 @@
         /* 5. The card itself. Last, because the rank cell it may add
            slots into the standing row built just above. */
         refractPhCard(header, head, page);
+
+        /* 6. Which of the two columns sets the band's height, which
+           decides whether the card hangs off its foot or sits at its
+           top. Asked after everything above has been built, because it
+           is the head's finished height that answers it, and watched
+           from then on because the window can change the answer. */
+        safeRun(function () { refractPhAnchorCard(header); });
+        safeRun(function () { refractPhWatchAnchor(header); });
 
         /* 4. The category scores, and the tag run they were buried in.
            Advanced Ratings writes each category as a tag whose name ends
