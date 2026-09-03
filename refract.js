@@ -4799,7 +4799,7 @@
             btn.setAttribute("aria-label", "Home");
             aria = "Home";
         }
-        btn.setAttribute("title", aria);
+        if (btn.getAttribute("title") !== aria) { btn.setAttribute("title", aria); }
         return true;
     }
 
@@ -6146,8 +6146,14 @@
        caught during the carousel's shadow flash. Read first. */
     function refractBodyClass(name, on) {
         if (!document.body) { return; }
-        if (document.body.classList.contains(name) !== !!on) {
-            document.body.classList.toggle(name, !!on);
+        refractSetClass(document.body, name, on);
+    }
+    /* The same read-before-write for any element. Cheap enough to use
+       everywhere a pass re-asserts a class it has already asserted. */
+    function refractSetClass(el, name, on) {
+        if (!el || !el.classList) { return; }
+        if (el.classList.contains(name) !== !!on) {
+            el.classList.toggle(name, !!on);
         }
     }
 
@@ -8033,18 +8039,24 @@
             var p = refractPathFromHref(link.getAttribute("href") || "");
             if (p && p !== "/") { leftNavHrefs.push(p); }
         });
+        /* Every branch below goes through refractSetClass, because this
+           function runs on every pass over the document and there are
+           fifty-two links between the nav and the drawer. Re-asserting a
+           class that is already there sets the attribute, and setting the
+           attribute invalidates the element's style: measured at 54
+           redundant writes per pass, which was all of them. */
         links.forEach(function (link) {
             var rawHref = link.getAttribute("href") || "";
-            if (!rawHref) { link.classList.remove("stash-nav-active"); return; }
+            if (!rawHref) { refractSetClass(link, "stash-nav-active", false); return; }
             if (rawHref.indexOf("http://") === 0 || rawHref.indexOf("https://") === 0 || rawHref.indexOf("//") === 0) {
                 try {
                     var abs = rawHref.indexOf("//") === 0 ? "https:" + rawHref : rawHref;
                     var u = new URL(abs, window.location.href);
-                    if (u.origin !== window.location.origin) { link.classList.remove("stash-nav-active"); return; }
-                } catch (e) { link.classList.remove("stash-nav-active"); return; }
+                    if (u.origin !== window.location.origin) { refractSetClass(link, "stash-nav-active", false); return; }
+                } catch (e) { refractSetClass(link, "stash-nav-active", false); return; }
             }
             var hrefPath = refractPathFromHref(rawHref);
-            if (!hrefPath || hrefPath === "/") { link.classList.remove("stash-nav-active"); return; }
+            if (!hrefPath || hrefPath === "/") { refractSetClass(link, "stash-nav-active", false); return; }
             /* Left-side route links use prefix match (e.g. /scenes active on /scenes/123).
                Utility links (.nav-utility) use exact match. */
             var isLeftNav = !link.classList.contains("nav-utility");
@@ -8067,8 +8079,7 @@
             } else {
                 isActive = (currentPath === hrefPath);
             }
-            if (isActive) { link.classList.add("stash-nav-active"); }
-            else { link.classList.remove("stash-nav-active"); }
+            refractSetClass(link, "stash-nav-active", isActive);
         });
     }
 
