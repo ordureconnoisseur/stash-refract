@@ -7997,14 +7997,25 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .refract-sid-e
    Two endpoints now cost the same height as one, and the same as a word. */
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids .detail-item-value ul {
     display: flex;
+    /* Stated, because something upstream sets `column` on this list and a
+       flex container that stacks is just a block with extra steps: with
+       it inherited, two 71.7 and 58px chips still took two lines inside
+       165px of room. Measured with it forced: the list goes 43.3 tall to
+       18.6. */
+    flex-direction: row;
     flex-wrap: wrap;
     gap: 6px;
     margin: 0;
     padding: 0;
     list-style: none;
 }
+/* flex rather than block, so the row has no inline line box under the
+   chip: as a block the item measured 18.6 against the chip's own 16.6,
+   and those 2px were the whole of what still made this tile taller than
+   a text one. */
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids .detail-item-value li {
-    display: block;
+    display: flex;
+    align-items: center;
     flex: 0 0 auto;
     width: auto;
     margin: 0;
