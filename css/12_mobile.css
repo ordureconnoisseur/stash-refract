@@ -1642,9 +1642,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
         padding: 0 0 12px !important;
         gap: 0 !important;
     }
-    body.stash-liquid-glass .main.container-fluid:has(:is(.scene-tabs, .image-tabs)) {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
+    /* Same :has() shape as 01_tokens' scene-page rule (> .row > ...), so
+       this ties its (0,5,1) and wins on order; the shorter :has() lost
+       and the page kept 21px of navbar clearance for a navbar that is
+       not there. */
+    body.stash-liquid-glass .main.container-fluid:has(> .row > :is(.scene-tabs, .image-tabs)) {
+        padding: 0 !important;
     }
     body.stash-liquid-glass .scene-player-container,
     body.stash-liquid-glass .scene-player-container .VideoPlayer,
@@ -1666,5 +1669,243 @@ body.stash-liquid-glass .refract-mobile-drawer {
         border-radius: 0 !important;
         padding: var(--gap-xl) 12px 0 !important;
         margin: 0 !important;
+    }
+}
+
+
+/* ───────────────────────────────────────────────────────────────────
+   List pages on phones (slice 6 of the mobile overhaul; board
+   "Performers grid"): the filter toolbar and the pager.
+
+   Measured at 390 before this block: the toolbar pill was 345x42 with
+   EIGHT controls at 30px (search as a 30px icon, saved filters, filter,
+   sort label + direction, per-page select, list operations, multiview
+   toggle, plus the hidden view group), every one under the 44px tap
+   floor; the floating pager was a 213x56 capsule whose "1 of 32" button
+   wrapped onto three lines, parked over the last row of cards.
+
+   The toolbar becomes two tiers inside one sticky element: the pill
+   holds the three controls people reach for (search as a real field,
+   filter, sort with its direction), all 44px; the secondary controls
+   (saved filters, per-page, list operations, plugin toggles) sit on a
+   quiet second line under the pill at the same 44px hit size with no
+   plate, right-aligned. The count ("1-40 of 1,245", Stash's own text)
+   is re-shown as a muted caption under the toolbar; on /scenes 04_filters
+   already relocates its richer stats and this rule leaves that alone.
+
+   The pager FOLDS INTO THE DOCK (user ruling on the brief's question 3):
+   the live pagination row (React's nodes, never moved) is restyled as a
+   tier that rises out of the capsule's top edge, in the dock's own
+   material, and drops behind the capsule when the dock contracts. First
+   and last page and the page-jump popover stay live.
+   ─────────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    /* ── Toolbar: two tiers ─────────────────────────────────────── */
+    body.stash-liquid-glass .filtered-list-toolbar {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding: 6px 6px 0 !important;
+        gap: 6px !important;
+        row-gap: 2px !important;
+        overflow: visible !important;
+    }
+    /* The pill paints behind the FIRST tier only (6 + 44 + 6). */
+    body.stash-liquid-glass .filtered-list-toolbar::before {
+        top: 0 !important;
+        bottom: auto !important;
+        height: 56px !important;
+    }
+    /* Row break after the primary controls. */
+    body.stash-liquid-glass .filtered-list-toolbar::after {
+        content: "";
+        order: 10;
+        flex: 0 0 100%;
+        height: 0;
+    }
+    /* Stash groups saved filters with the filter button; dissolve the
+       group so the two can sit on different tiers. */
+    body.stash-liquid-glass .filtered-list-toolbar > .btn-group:has(> .saved-filter-dropdown) {
+        display: contents !important;
+    }
+    /* Tier 1: search, filter, sort. */
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input,
+    body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group {
+        order: 1;
+        flex: 1 1 120px !important;
+        width: auto !important;
+        min-width: 120px !important;
+        height: 44px !important;
+        max-height: 44px !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input input,
+    body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group input {
+        height: 44px !important;
+        padding: 0 14px 0 40px !important;
+        color: var(--text) !important;
+        -webkit-text-fill-color: var(--text) !important;
+        caret-color: var(--text) !important;
+        cursor: text !important;
+        font-size: var(--fs-body) !important;
+        border-radius: var(--radius-pill) !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input::after {
+        left: 14px !important;
+        transform: translateY(-50%) !important;
+        width: 18px !important;
+        height: 18px !important;
+        opacity: 1 !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within::after {
+        opacity: 1 !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"]:not(:focus)::placeholder {
+        color: var(--text-muted) !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:not(:focus-within) .clearable-text-field-clear {
+        display: flex !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .filter-button {
+        order: 2;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar > .sort-by-select {
+        order: 3;
+    }
+    /* Tier 2: everything else, right-aligned, no plate. */
+    body.stash-liquid-glass .filtered-list-toolbar > .saved-filter-dropdown,
+    body.stash-liquid-glass .filtered-list-toolbar > .page-size-selector,
+    body.stash-liquid-glass .filtered-list-toolbar > select.form-control,
+    body.stash-liquid-glass .filtered-list-toolbar > .list-operations,
+    body.stash-liquid-glass .filtered-list-toolbar > .btn-group:not(:has(> .saved-filter-dropdown)),
+    body.stash-liquid-glass .filtered-list-toolbar > .mv-picking-toggle-btn,
+    body.stash-liquid-glass .filtered-list-toolbar > .btn:not(.filter-button) {
+        order: 11;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar > .saved-filter-dropdown {
+        margin-left: auto !important;
+    }
+    /* The 44px floor on every control in the toolbar, both tiers; the
+       search-collapse rule above capped items at 30px tall. */
+    body.stash-liquid-glass .filtered-list-toolbar > *:not(.search-term-input) {
+        max-height: 44px;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .btn,
+    body.stash-liquid-glass .filtered-list-toolbar .dropdown-toggle,
+    body.stash-liquid-glass .filtered-list-toolbar .page-size-selector select,
+    body.stash-liquid-glass .filtered-list-toolbar > select.form-control {
+        height: 44px !important;
+        min-height: 44px !important;
+        min-width: 44px !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .page-size-selector select,
+    body.stash-liquid-glass .filtered-list-toolbar > select.form-control {
+        width: 44px !important;
+        max-width: 44px !important;
+        padding: 0 !important;
+        text-align: center !important;
+        text-align-last: center !important;
+    }
+    /* Tier 2 controls carry no plate; the glyph is the affordance. */
+    body.stash-liquid-glass .filtered-list-toolbar > .saved-filter-dropdown .btn,
+    body.stash-liquid-glass .filtered-list-toolbar > .page-size-selector select,
+    body.stash-liquid-glass .filtered-list-toolbar > select.form-control,
+    body.stash-liquid-glass .filtered-list-toolbar > .list-operations .btn,
+    body.stash-liquid-glass .filtered-list-toolbar > .mv-picking-toggle-btn {
+        background: transparent !important;
+        border-color: transparent !important;
+        box-shadow: none !important;
+    }
+    /* Typing hides the other controls (the existing collapse); with a
+       permanent field the tier-2 line collapses too, which is right. */
+    body.stash-liquid-glass .filtered-list-toolbar:has(.search-term-input:focus-within)::after {
+        display: none;
+    }
+
+    /* The count as a quiet caption under the toolbar. The container is
+       the top pager's row, hidden by 09_buttons; show the container, keep
+       its page buttons hidden (04_filters does that globally), style the
+       text. /scenes has its own relocated stats block in 04_filters. */
+    body.stash-liquid-glass:not(.stash-route-scenes) .pagination-index-container[data-pager-row="hide"] {
+        display: block !important;
+        margin: 0 0 var(--gap-xs) !important;
+        padding: 0 !important;
+        text-align: center;
+    }
+    body.stash-liquid-glass:not(.stash-route-scenes) .pagination-index-container[data-pager-row="hide"] .paginationIndex {
+        display: inline-block !important;
+        font-size: var(--fs-sm) !important;
+        color: var(--text-muted) !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* ── The pager folds into the dock ──────────────────────────── */
+    body.stash-liquid-glass [data-pager-row="float"] {
+        left: 43px !important;
+        right: 43px !important;
+        width: auto !important;
+        max-width: none !important;
+        transform: none !important;
+        /* Its bottom edge sits 14px under the capsule's top edge, so the
+           capsule's curve occludes the join and the tier reads as growing
+           out of the dock. Below the dock in z, above the page. */
+        bottom: calc(var(--refract-dock-footprint) - 14px) !important;
+        z-index: calc(var(--z-dock) - 1) !important;
+        justify-content: center !important;
+        transition:
+            bottom var(--dur-settle) var(--ease-glide),
+            opacity var(--dur-fast) ease,
+            transform var(--dur-settle) var(--ease-glide) !important;
+    }
+    body.stash-liquid-glass [data-pager-row="float"] .pagination,
+    body.stash-liquid-glass [data-pager-row="float"].pagination {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 2px !important;
+        margin: 0 !important;
+        padding: 3px 6px 17px !important;
+        background: rgba(var(--surface-rgb), 0.72) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-bottom: none !important;
+        border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
+        backdrop-filter: var(--glass-blur-xl-sat) !important;
+    }
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > *,
+    body.stash-liquid-glass [data-pager-row="float"].pagination > * {
+        height: 36px !important;
+        min-height: 36px !important;
+        min-width: 36px !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+        background: transparent !important;
+        border-color: transparent !important;
+        box-shadow: none !important;
+        font-size: var(--fs-sm) !important;
+        font-weight: 600 !important;
+    }
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .page-count,
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > button:not(:first-child):not(:last-child):not([class*="prev"]):not([class*="next"]) {
+        padding: 0 10px !important;
+        width: auto !important;
+    }
+    /* Contracted dock: the tier drops behind the capsule. */
+    body.stash-liquid-glass [data-pager-row="float"].refract-dock-contracted {
+        bottom: calc(var(--refract-dock-footprint) - 14px) !important;
+        transform: translateY(40px) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
 }
