@@ -1513,3 +1513,72 @@ body.stash-liquid-glass .refract-mobile-drawer {
         padding-bottom: 6rem !important;
     }
 }
+
+
+/* ───────────────────────────────────────────────────────────────────
+   Home on phones (slice 3 of the mobile overhaul; boards "Home" and
+   "Home, light"). Only the carousels' SURROUNDINGS change here: the
+   cards themselves are today's cards (03_cards / 16_playing_card are
+   out of scope for this lane), so card widths, the description clamp
+   and the stat footer the board drew are NOT built; see the BUILD_LOG.
+
+   What changes: the section head drops the desktop eyebrow treatment
+   (--fs-sm 700 uppercase tracked muted, under a hairline) for a
+   44px row at --fs-lg 600 in the text ink with a 44px chevron, the
+   head text aligned to the card edge (the slide's 5px inner pad); rows
+   are separated by one --gap-lg instead of the head's 15px top pad;
+   and on TOUCH devices the slick arrows go, because the next card's
+   peek is the scroll affordance and two 32px circles over the artwork
+   were noise. Pointer devices at phone width (a narrow desktop window,
+   iPad with a trackpad) keep their arrows: the layout is width-driven,
+   the arrows are input-driven.
+   ─────────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    body.stash-liquid-glass .recommendation-row-head {
+        min-height: 44px;
+        padding: 0 0 0 5px !important;
+        border-bottom: none !important;
+        margin-bottom: var(--gap-xs) !important;
+        gap: var(--gap-md);
+    }
+    body.stash-liquid-glass .recommendation-row-head h2 {
+        font-size: var(--fs-lg) !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.005em !important;
+        text-transform: none !important;
+        color: var(--text) !important;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    /* The view-all chevron: a 44px hit area, no plate; the glyph alone
+       (18px, muted) is the affordance, like the More sheet's rows. */
+    body.stash-liquid-glass .recommendation-row-head a.st-view-all.st-view-all,
+    body.stash-liquid-glass .recommendation-row-head a[href*="?sortby="][href*="perPage=25"]:not([href*="page="]) {
+        width: 44px !important;
+        height: 44px !important;
+        flex: 0 0 44px;
+        background: transparent !important;
+        border-color: transparent !important;
+    }
+    body.stash-liquid-glass .recommendation-row-head a.st-view-all.st-view-all::after,
+    body.stash-liquid-glass .recommendation-row-head a[href*="?sortby="][href*="perPage=25"]:not([href*="page="])::after {
+        width: 18px;
+        height: 18px;
+    }
+    body.stash-liquid-glass .recommendation-row-head a.st-view-all.st-view-all:active,
+    body.stash-liquid-glass .recommendation-row-head a[href*="?sortby="][href*="perPage=25"]:not([href*="page="]):active {
+        background: var(--accent-tint) !important;
+    }
+    body.stash-liquid-glass .recommendations-container .recommendation-row + .recommendation-row {
+        margin-top: var(--gap-lg);
+    }
+    @media (hover: none) and (pointer: coarse) {
+        body.stash-liquid-glass .recommendation-row .slick-arrow,
+        body.stash-liquid-glass .recommendation-row .slick-prev,
+        body.stash-liquid-glass .recommendation-row .slick-next {
+            display: none !important;
+        }
+    }
+}
