@@ -6184,6 +6184,22 @@
         return ["This tag", n === 1 ? "With its 1 sub-tag" : "With all " + refractEpNum(n) + " sub-tags"];
     }
 
+    /* Writing a class onto BODY is the most expensive write on the page:
+       every rule in the theme is keyed off a body class, so setting the
+       attribute invalidates style for the whole document even when the value
+       is identical. classList.add and .remove run the token list's update
+       steps unconditionally, so `remove` of an absent class costs exactly as
+       much as a real one. injectEntityScope early-returns on every page that
+       is not an entity page -- the home page included -- and used to pay that
+       toll on the way out, twice per observer tick, which a DOM breakpoint
+       caught during the carousel's shadow flash. Read first. */
+    function refractBodyClass(name, on) {
+        if (!document.body) { return; }
+        if (document.body.classList.contains(name) !== !!on) {
+            document.body.classList.toggle(name, !!on);
+        }
+    }
+
     function injectEntityScope() {
         var ctx = refractEpContext();
         var cb = document.querySelector("#showSubContent");
@@ -6193,14 +6209,14 @@
            not draw and the body class comes off with it. */
         if (!ctx || !cb) {
             if (existing) { existing.parentNode.removeChild(existing); }
-            document.body.classList.remove("refract-has-scope");
+            refractBodyClass("refract-has-scope", false);
             return false;
         }
         if (REFRACT_EP_COUNTS[ctx.key] === undefined) { refractEpFetchCounts(ctx); }
         var counts = REFRACT_EP_COUNTS[ctx.key];
         if (!counts || typeof counts !== "object" || !counts.kids) {
             if (existing) { existing.parentNode.removeChild(existing); }
-            document.body.classList.remove("refract-has-scope");
+            refractBodyClass("refract-has-scope", false);
             return false;
         }
 
@@ -6250,7 +6266,7 @@
             var isOn = (all[i].getAttribute("data-seg") === "all") === on;
             all[i].setAttribute("aria-pressed", isOn ? "true" : "false");
         }
-        document.body.classList.add("refract-has-scope");
+        refractBodyClass("refract-has-scope", true);
         return true;
     }
 
@@ -9772,8 +9788,65 @@
         list.classList.add("refract-src-hidden");
     }
 
+    /* Does this batch of mutations consist of nothing but nodes Refract
+       put there itself?
+
+       It matters because the observer below re-runs thirty-five passes over
+       the whole document on ANY childList change under body, and several of
+       those passes write class attributes unconditionally. Measured on the
+       home page: hovering ONE carousel card builds its flip back, that single
+       append wakes the observer, and 1,133 attribute writes follow -- 1,131 of
+       them setting a value identical to the one already there, across every
+       performer card, every Ascension badge, every country caption and the
+       whole nav. Chromium invalidates style for each of those elements
+       whether or not the value changed, and on this page each one carries
+       drop-shadow chains, multi-layer box-shadows and backdrop-filter. That
+       is the reported symptom exactly: every shadow and neon effect drops out
+       for a beat on hover and snaps back. Sweeping five cards cost 4,534
+       writes.
+
+       So a batch that is only ours does not wake the passes. Conservative on
+       every edge: an unrecognised element, a node removed from a parent we no
+       longer have, a bare text node whose parent is not ours -- any of those
+       and the batch runs as before. Nothing here changes WHAT the passes do,
+       only whether an insertion Refract made itself is a reason to redo them,
+       and it cannot be: they all run in one sequence, so a pass that needs to
+       see a node another pass created already saw it in the run that created
+       it.
+
+       This is a guard on the trigger, not a cure for the writes. The passes
+       still storm whenever Stash itself re-renders, which is often. The
+       standing fix is for each pass to read before it writes, the way
+       syncPerformerCardHearts does below. */
+    var REFRACT_OWN_CLASS = /(^|\s)(refract-|stash-perf-|stash-tilt-)/;
+    function refractOwnNode(n) {
+        if (!n) { return false; }
+        if (n.nodeType !== 1) {
+            var par = n.parentNode;
+            return !!(par && par.nodeType === 1 && par.getAttribute
+                && REFRACT_OWN_CLASS.test(par.getAttribute("class") || ""));
+        }
+        if (!n.getAttribute) { return false; }
+        return REFRACT_OWN_CLASS.test(n.getAttribute("class") || "");
+    }
+    function refractOwnsBatch(records) {
+        if (!records || !records.length) { return false; }
+        for (var i = 0; i < records.length; i++) {
+            var r = records[i];
+            if (r.type !== "childList") { return false; }
+            for (var a = 0; a < r.addedNodes.length; a++) {
+                if (!refractOwnNode(r.addedNodes[a])) { return false; }
+            }
+            for (var d = 0; d < r.removedNodes.length; d++) {
+                if (!refractOwnNode(r.removedNodes[d])) { return false; }
+            }
+        }
+        return true;
+    }
+
     function watchForReinjection() {
-        var observer = new MutationObserver(function () {
+        var observer = new MutationObserver(function (records) {
+            if (refractOwnsBatch(records)) { return; }
             /* Disconnect while mutating so our DOM updates do not synchronously re-trigger this observer
                (can freeze the tab / block Stash from finishing load). */
             observer.disconnect();
@@ -11075,14 +11148,24 @@
         document.querySelectorAll(".performer-card").forEach(function (card) {
             var isFav = !!card.querySelector(".favorite-button.favorite");
             var existing = card.querySelector(":scope > .refract-heart-particles");
-            if (inPlayingCard && isFav) {
-                card.classList.add("refract-favourite");
+            var want = inPlayingCard && isFav;
+            /* Read before writing. classList.add and .remove run the token
+               list's update steps whether or not the set changed, which sets
+               the attribute, which invalidates the element's style -- so the
+               unconditional pair this replaces cost one style invalidation per
+               card per pass on cards that were not favourited and never would
+               be. 195 cards on the home page, twice per observer cycle: 390 of
+               the 1,131 needless writes that made the shadows flash. contains()
+               touches nothing. */
+            if (card.classList.contains("refract-favourite") !== want) {
+                card.classList.toggle("refract-favourite", want);
+            }
+            if (want) {
                 if (!existing) {
                     card.appendChild(refractBuildHearts());
                 }
-            } else {
-                card.classList.remove("refract-favourite");
-                if (existing) { existing.remove(); }
+            } else if (existing) {
+                existing.remove();
             }
         });
     }
