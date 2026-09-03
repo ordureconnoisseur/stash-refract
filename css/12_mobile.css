@@ -1905,7 +1905,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass [data-pager-row="float"].pagination > * {
         height: 44px !important;
         min-height: 44px !important;
-        min-width: 40px !important;
+        min-width: 44px !important;
         margin: 0 !important;
         white-space: nowrap !important;
         background: transparent !important;
