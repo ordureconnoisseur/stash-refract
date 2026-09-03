@@ -1266,9 +1266,18 @@ body.stash-liquid-glass #performer-page .detail-header.collapsed .detail-header-
     min-height: 20rem;
 }
 
+/* 600, not 500. The band's own rule has always DECLARED 600 and never
+   got it: this selector is one class more specific and carries
+   !important, so every entity header has run at 500 since it was
+   written -- a drift-ledger row of 2026-09-02, found when a copied rule
+   and the measured pixels disagreed. 6.13 names stat captions at the
+   house eyebrow, so 500 was the drift and 600 is the spec. Changed here
+   rather than by adding !important to the band, so the studio, tag,
+   group and movie headers come with it instead of the performer page
+   becoming the only one at the right weight. Ruled 2026-09-03. */
 body.stash-liquid-glass .detail-header .detail-item-title {
     color: var(--text-muted) !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
 }
 
 body.stash-liquid-glass .detail-header .detail-item-value,
@@ -7455,12 +7464,33 @@ body.stash-liquid-glass #performer-page .refract-ph .refract-pp-stage .refract-c
 body.stash-liquid-glass #performer-page .refract-ph .performer-head {
     display: grid !important;
     grid-template-columns: auto auto 1fr auto;
-    /* Every row sized to its content, and the slack shared between them
-       by align-content. A 1fr row here gave ALL of it to one track and
-       centred the read-out grid in a 255px band with 90px of nothing
-       above it -- the same hole the design was drawn to close. */
-    grid-template-rows: auto auto auto auto auto;
-    align-content: space-between;
+    /* The band's height is the card's, always -- the card overhangs by a
+       fixed 96 -- so the head is handed a fixed box and a variable amount
+       of content, and the only question is where the leftover goes.
+
+       It used to go everywhere. `align-content: space-between` over five
+       auto rows shared the slack between all four gaps, so the same DOM
+       measured 68 / 58 / 58px between blocks on a sparse performer and
+       21 / 10.6 / 10.4 on a dense one, with 77px of dead band under the
+       read-out as well. Six times the spacing for one design, and the
+       sparse case spread its emptiness over four places so that none of
+       them could read as intentional.
+
+       Now the slack has one home: row 3 is the `1fr`, so the identity
+       packs to the top, the read-out and the categories sit at the
+       band's foot, and the air is a single field between them. A grid
+       `1fr` row is `minmax(auto, 1fr)`, so with no slack to take it is
+       exactly its content height and the dense case does not move.
+
+       This reverses a note that stood here: a 1fr row was tried before
+       and reverted for "centring the read-out with 90px of nothing above
+       it". The pixels were read right and the conclusion went the other
+       way -- that field IS the composition, and a header with air under
+       it beats four gaps that are each slightly wrong. Ruled 2026-09-03
+       against a measured review; the old note is replaced rather than
+       left to argue with the code. */
+    grid-template-rows: auto auto 1fr auto auto;
+    align-content: start;
     align-items: start;
     column-gap: var(--gap-lg);
     row-gap: var(--gap-lg);
@@ -7794,7 +7824,10 @@ body.stash-liquid-glass #performer-page .refract-ph .quality-group {
     align-items: center;
     gap: var(--gap-lg);
     justify-self: end;
-    align-self: flex-end;
+    /* Start, not end: this row carries the slack now, so an end-aligned
+       rating would ride the bottom of the air instead of staying beside
+       the standing figures it belongs to. */
+    align-self: start;
     margin: 0 !important;
     padding: 0 !important;
 }
@@ -7851,10 +7884,16 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item {
     box-shadow: 0 0 0 1px var(--glass-border);
     min-width: 0;
 }
+/* One eyebrow in this band, not two. The standing row's RANKED / ACTIVE
+   / SCENES ran 600 at --track-eyebrow (0.08em) while these labels and
+   the Ascension keys ran 500 at --track-label (0.06em), and the two rows
+   sit 55px apart, so the band read as two materials. The weight half was
+   already in the drift ledger; the tracking half was not, and it is the
+   half you can see. Both resolve upward to the bible's eyebrow. */
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item-title {
     font-size: var(--fs-xs) !important;
     font-weight: 600;
-    letter-spacing: var(--track-label);
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     line-height: 1.2;
     color: var(--text-muted) !important;
@@ -7940,9 +7979,47 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .height-imperi
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .refract-sid-endpoint {
     display: none !important;
 }
-body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids .stash-id-pill,
+/* The endpoint chips sit on the value's own line, side by side.
+
+   They were the tallest thing in the grid and so they set the height of
+   whatever row they landed in: a text tile measures 47.6, a tile with
+   one chip 52.5, and a tile with two 79.6, because Stash renders each
+   stash id as its own <li class="row"> and they stacked. On Scarlet
+   Chase that row also holds Tattoos and Piercings, which then truncated
+   452px and 200px of text into 165 with 32px of empty tile underneath --
+   a value cut short directly above the space it needed, which is the
+   failure this grid was built to avoid.
+
+   So the list becomes a wrapping row of chips at the value's line box:
+   --fs-xs at 1.65 is 16.6px against the value's 16.7, weight 500 rather
+   than 700, and the value's own ink rather than a muted bold that read
+   as a disabled control beside every other value in the grid at 0.92.
+   Two endpoints now cost the same height as one, and the same as a word. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids .detail-item-value ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids .detail-item-value li {
+    display: block;
+    flex: 0 0 auto;
+    width: auto;
+    margin: 0;
+}
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids .stash-id-pill {
+    display: inline-flex;
+    align-items: center;
+}
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids a {
-    font-size: var(--fs-sm) !important;
+    font-size: var(--fs-xs) !important;
+    line-height: 1.65 !important;
+    padding: 0 8px !important;
+    min-height: 0 !important;
+    font-weight: 500 !important;
+    color: var(--text) !important;
 }
 /* The grid is a uniform six-up of one-line tiles, and nothing in it
    gets to change that shape. A value too long for its cell truncates
@@ -8057,7 +8134,7 @@ body.stash-liquid-glass #performer-page .refract-ph-cats__head {
 body.stash-liquid-glass #performer-page .refract-ph-cats__label {
     font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: var(--track-label);
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--text-muted);
     min-width: 0;
