@@ -1741,6 +1741,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         height: 44px !important;
         max-height: 44px !important;
     }
+    body.stash-liquid-glass .filtered-list-toolbar .search-term-input input.form-control.clearable-text-field,
     body.stash-liquid-glass .filtered-list-toolbar .search-term-input input,
     body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group input {
         height: 44px !important;
@@ -1770,12 +1771,16 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
     body.stash-liquid-glass .filtered-list-toolbar .filter-button {
         order: 2;
+        flex: 0 0 44px !important;
+        width: 44px !important;
+        max-width: 44px !important;
+        padding: 0 !important;
     }
     body.stash-liquid-glass .filtered-list-toolbar > .sort-by-select {
         order: 3;
     }
     /* Tier 2: everything else, right-aligned, no plate. */
-    body.stash-liquid-glass .filtered-list-toolbar > .saved-filter-dropdown,
+    body.stash-liquid-glass .filtered-list-toolbar .saved-filter-dropdown,
     body.stash-liquid-glass .filtered-list-toolbar > .page-size-selector,
     body.stash-liquid-glass .filtered-list-toolbar > select.form-control,
     body.stash-liquid-glass .filtered-list-toolbar > .list-operations,
@@ -1784,7 +1789,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .filtered-list-toolbar > .btn:not(.filter-button) {
         order: 11;
     }
-    body.stash-liquid-glass .filtered-list-toolbar > .saved-filter-dropdown {
+    /* The first tier-2 control pushes the line to the right edge. */
+    body.stash-liquid-glass .filtered-list-toolbar .saved-filter-dropdown {
         margin-left: auto !important;
     }
     /* The 44px floor on every control in the toolbar, both tiers; the
@@ -1794,6 +1800,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
     body.stash-liquid-glass .filtered-list-toolbar .btn,
     body.stash-liquid-glass .filtered-list-toolbar .dropdown-toggle,
+    body.stash-liquid-glass .filtered-list-toolbar > *:not(.search-term-input) .btn,
+    body.stash-liquid-glass .filtered-list-toolbar > *:not(.search-term-input) .dropdown-toggle,
     body.stash-liquid-glass .filtered-list-toolbar .page-size-selector select,
     body.stash-liquid-glass .filtered-list-toolbar > select.form-control {
         height: 44px !important;
@@ -1834,7 +1842,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
         padding: 0 !important;
         text-align: center;
     }
-    body.stash-liquid-glass:not(.stash-route-scenes) .pagination-index-container[data-pager-row="hide"] .paginationIndex {
+    body.stash-liquid-glass:not(.stash-route-scenes) .pagination-index-container[data-pager-row="hide"] .paginationIndex,
+    body.stash-liquid-glass:not(.stash-route-scenes) .pagination-index-container[data-pager-row="hide"] .filter-container.text-muted.paginationIndex.center-text {
         display: inline-block !important;
         font-size: var(--fs-sm) !important;
         color: var(--text-muted) !important;
@@ -1854,6 +1863,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         right: 43px !important;
         width: auto !important;
         max-width: none !important;
+        padding: 0 !important;
         transform: none !important;
         /* Its bottom edge sits 14px under the capsule's top edge, so the
            capsule's curve occludes the join and the tier reads as growing
@@ -1867,6 +1877,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
             transform var(--dur-settle) var(--ease-glide) !important;
     }
     body.stash-liquid-glass [data-pager-row="float"] .pagination,
+    body.stash-liquid-glass [data-pager-row="float"] .pagination.btn-group,
     body.stash-liquid-glass [data-pager-row="float"].pagination {
         display: flex !important;
         flex-direction: row !important;
@@ -1874,7 +1885,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         align-items: center !important;
         gap: 2px !important;
         margin: 0 !important;
-        padding: 3px 6px 17px !important;
+        padding: 4px 6px 18px !important;
         background: rgba(var(--surface-rgb), 0.72) !important;
         border: 1px solid var(--glass-border) !important;
         border-bottom: none !important;
