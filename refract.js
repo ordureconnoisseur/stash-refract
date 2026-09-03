@@ -3154,6 +3154,9 @@
        default off (overlay shown). */
     var HIDE_CENTER_CONTROLS_KEY = "refract.hideCenterControls";
     var SHOW_FILTER_TAGS_KEY = "refract.showFilterTags";
+    /* Phone card grid: "2" two-up (default) or "1" one card per row.
+       Toggled from the list toolbar's second tier; forum request #203. */
+    var MOBILE_COLS_KEY = "refract.mobileCols";
 
     /* Gender glyph for the mock name banner - the real banner CLONES the
        native .gender-icon svg from the card title, which the mocks don't
@@ -4108,8 +4111,54 @@
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
         MINIMAL_CARDS_STORAGE_KEY, PERF_CARD_STYLE_KEY, FLOURISH_KEY,
         PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY,
-        SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY, COUNTRY_MODE_KEY
+        SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY, COUNTRY_MODE_KEY, MOBILE_COLS_KEY
     ].concat(CARD_ELEMS.map(function (d) { return d.key; })).concat(CARD_SIDE_KEYS);
+
+    function isMobileOneCol() {
+        try { return localStorage.getItem(MOBILE_COLS_KEY) === "1"; } catch (e) { return false; }
+    }
+    function applyMobileColsClass(on) {
+        if (!document.body) { return; }
+        refractSetClass(document.body, "refract-mobile-onecol", !!on);
+        var toggles = document.querySelectorAll(".refract-cols-toggle");
+        for (var i = 0; i < toggles.length; i++) {
+            var pressed = on ? "true" : "false";
+            if (toggles[i].getAttribute("aria-pressed") !== pressed) { toggles[i].setAttribute("aria-pressed", pressed); }
+            var label = on ? "Two cards per row" : "One card per row";
+            if (toggles[i].getAttribute("aria-label") !== label) { toggles[i].setAttribute("aria-label", label); }
+        }
+    }
+    function setMobileOneCol(on) {
+        try { localStorage.setItem(MOBILE_COLS_KEY, on ? "1" : "2"); } catch (e) { /* ignore */ }
+        applyMobileColsClass(on);
+        scheduleServerSync();
+    }
+    /* The toggle lives in every list toolbar (list pages and the entity
+       pages' tabs). Injected, never moved: Stash's toolbar keeps its own
+       children; ours is appended and 12_mobile.css orders it onto the
+       second tier. Idempotent per toolbar. */
+    var REFRACT_COLS_TOGGLE_SVG =
+        '<svg class="refract-cols-two" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/></svg>' +
+        '<svg class="refract-cols-one" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/></svg>';
+    function injectMobileColsToggle() {
+        var bars = document.querySelectorAll(".filtered-list-toolbar");
+        var added = false;
+        for (var i = 0; i < bars.length; i++) {
+            if (bars[i].querySelector(".refract-cols-toggle")) { continue; }
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "btn btn-secondary refract-cols-toggle";
+            btn.innerHTML = REFRACT_COLS_TOGGLE_SVG;
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                setMobileOneCol(!isMobileOneCol());
+            });
+            bars[i].appendChild(btn);
+            added = true;
+        }
+        if (added) { applyMobileColsClass(isMobileOneCol()); }
+        return true;
+    }
 
     function isPluginSortDisabledBottom() {
         try {
@@ -4222,6 +4271,7 @@
         refractApplyThemeColorMeta(!!on);
     }
     applyLightModeClass(isLightModeEnabled());
+    applyMobileColsClass(isMobileOneCol());
 
     /* Light-mode navbar toggle visibility. Defaults to ON so users can
        discover light mode without digging into plugin settings. Stash
@@ -4557,6 +4607,7 @@
             applyAccentClass(getStoredAccent());
             applyLiteModeClass(isLiteModeEnabled());
             applyLightModeClass(isLightModeEnabled());
+            applyMobileColsClass(isMobileOneCol());
             applyLightToggleNavbarClass(isLightToggleNavbarVisible());
             applyHelpButtonClass(isHelpButtonVisible());
             applyStudioBannerClass(isStudioBannerVisible());
@@ -10063,6 +10114,7 @@
                 safeRun(injectToolbarDropdownScrim);
                 safeRun(injectMobileDrawer);
                 safeRun(injectMobileDock);
+                safeRun(injectMobileColsToggle);
                 safeRun(refractApplyNavIcons);
                 safeRun(refractifyCardPopoverIcons);
                 safeRun(refractAppendPluginDrawerTiles);
@@ -12372,6 +12424,7 @@
                 injectToolbarDropdownScrim();
                 injectMobileDrawer();
                 injectMobileDock();
+                injectMobileColsToggle();
                 refractApplyNavIcons();
                 refractAppendPluginDrawerTiles();
                 normalizeSettingsSidebarNavItems();
@@ -12407,6 +12460,7 @@
         injectToolbarDropdownScrim();
         injectMobileDrawer();
         injectMobileDock();
+        injectMobileColsToggle();
         refractApplyNavIcons();
         refractAppendPluginDrawerTiles();
         normalizeSettingsSidebarNavItems();

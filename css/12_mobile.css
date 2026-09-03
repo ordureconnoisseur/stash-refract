@@ -1864,66 +1864,237 @@ body.stash-liquid-glass .refract-mobile-drawer {
         font-variant-numeric: tabular-nums;
     }
 
-    /* ── The pager folds into the dock ──────────────────────────── */
+    /* ── The pager folds into the dock ──────────────────────────────
+       Executed literally (coordinator, 2026-09-03 polish): when a list
+       page has a pager, the capsule becomes TWO TIERS. The page tier
+       (Stash's live pagination row, never moved) sits directly on the
+       nav tier at the same 23px inset and 344 width, in the same
+       material, and the two share ONE outline: the tier's rim has no
+       bottom edge, the capsule's rim has no top edge and its top corners
+       square off (body:has() below), so the pair reads as a single
+       344 x 102 rounded object with the pill's own 29px corners. A
+       hairline inside divides the tiers. Both carry
+       .refract-dock-contracted from refract.js and move together.
+
+       Controls: prev, the page-jump label, next. First and Last stay in
+       the DOM (Stash's handlers, desktop unchanged) but are hidden on
+       phones: rarely meant, often hit, and the page-jump reaches the last
+       page by number. Every control is 44px tall; the arrows are masked
+       chevrons at the dock's 22px icon size in the dock's icon ink; the
+       label is --fs-md 600 sized from its content with a minimum for
+       "999 of 9,999", never a fixed width. */
     body.stash-liquid-glass [data-pager-row="float"] {
-        left: 43px !important;
-        right: 43px !important;
+        left: 23px !important;
+        right: 23px !important;
         width: auto !important;
         max-width: none !important;
+        height: 44px !important;
         padding: 0 !important;
+        margin: 0 !important;
         transform: none !important;
-        /* Its bottom edge sits 14px under the capsule's top edge, so the
-           capsule's curve occludes the join and the tier reads as growing
-           out of the dock. Below the dock in z, above the page. */
-        bottom: calc(var(--refract-dock-footprint) - 14px) !important;
-        z-index: calc(var(--z-dock) - 1) !important;
-        justify-content: center !important;
+        bottom: var(--refract-dock-footprint) !important;
+        /* Above the capsule so the capsule's directional shadow does not
+           paint across the join; the tier itself casts only the glow. */
+        z-index: calc(var(--z-dock) + 1) !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: stretch !important;
+        justify-content: stretch !important;
+        opacity: 1 !important;
+        pointer-events: none !important;
         transition:
-            bottom var(--dur-settle) var(--ease-glide),
-            opacity var(--dur-fast) ease,
-            transform var(--dur-settle) var(--ease-glide) !important;
+            left var(--dur-settle) var(--ease-glide),
+            right var(--dur-settle) var(--ease-glide),
+            bottom var(--dur-settle) var(--ease-glide) !important;
+    }
+    body.stash-liquid-glass [data-pager-row="float"].refract-dock-contracted {
+        left: 44px !important;
+        right: 44px !important;
+        /* The contracted capsule is 49 tall and sits 5 higher. */
+        bottom: calc(var(--refract-dock-bottom) + 54px) !important;
     }
     body.stash-liquid-glass [data-pager-row="float"] .pagination,
     body.stash-liquid-glass [data-pager-row="float"] .pagination.btn-group,
     body.stash-liquid-glass [data-pager-row="float"].pagination {
+        flex: 1 1 100% !important;
+        width: 100% !important;
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
-        gap: 2px !important;
+        justify-content: center !important;
+        gap: 4px !important;
         margin: 0 !important;
-        padding: 2px 6px 17px !important;
+        padding: 0 8px !important;
+        box-sizing: border-box !important;
+        pointer-events: auto !important;
         background: rgba(var(--surface-rgb), 0.72) !important;
         border: 1px solid var(--glass-border) !important;
         border-bottom: none !important;
-        border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
-        box-shadow: none !important;
+        border-radius: 29px 29px 0 0 !important;
+        box-shadow:
+            inset 0 -1px 0 var(--glass-border),
+            0 0 18px rgba(var(--accent-rgb), 0.28) !important;
         -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
         backdrop-filter: var(--glass-blur-xl-sat) !important;
     }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > *,
-    body.stash-liquid-glass [data-pager-row="float"].pagination > * {
+    /* First and Last: hidden on phones, nodes kept. */
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="First"],
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Last"] {
+        display: none !important;
+    }
+    /* Prev and Next: 44 squares, glyph text hidden, a masked 22px
+       chevron in the dock's icon ink. */
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Previous"],
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"] {
+        position: relative !important;
+        flex: 0 0 44px !important;
+        width: 44px !important;
         height: 44px !important;
-        min-height: 44px !important;
         min-width: 44px !important;
+        min-height: 44px !important;
         margin: 0 !important;
-        white-space: nowrap !important;
+        padding: 0 !important;
+        font-size: 0 !important;
+        color: transparent !important;
         background: transparent !important;
         border-color: transparent !important;
         box-shadow: none !important;
-        font-size: var(--fs-sm) !important;
-        font-weight: 600 !important;
+        -webkit-tap-highlight-color: transparent;
     }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .page-count,
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > button:not(:first-child):not(:last-child):not([class*="prev"]):not([class*="next"]) {
-        padding: 0 10px !important;
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Previous"]::before,
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"]::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        width: 22px;
+        height: 22px;
+        background: rgba(var(--fg-rgb), 0.80);
+        -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M15 6l-6 6 6 6'/></svg>") center / contain no-repeat;
+        mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M15 6l-6 6 6 6'/></svg>") center / contain no-repeat;
+    }
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"]::before {
+        -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
+        mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
+    }
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Previous"]:disabled::before,
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"]:disabled::before {
+        opacity: 0.35;
+    }
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Previous"]:active::before,
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"]:active::before {
+        background: var(--accent-ink);
+    }
+    /* The page-jump label: one control, 44 tall, content-sized, the
+       freed width is its. Stash nests it two groups deep. */
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .page-count-container,
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .page-count-container > .btn-group {
+        flex: 0 1 auto !important;
+        display: flex !important;
+        align-items: center !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
         width: auto !important;
     }
-    /* Contracted dock: the tier drops behind the capsule. */
-    body.stash-liquid-glass [data-pager-row="float"].refract-dock-contracted {
-        bottom: calc(var(--refract-dock-footprint) - 14px) !important;
-        transform: translateY(40px) !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
+    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count {
+        height: 44px !important;
+        min-height: 44px !important;
+        width: auto !important;
+        min-width: 112px !important;
+        max-width: none !important;
+        flex: 0 1 auto !important;
+        margin: 0 !important;
+        padding: 0 16px !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        font-size: var(--fs-md) !important;
+        font-weight: 600 !important;
+        font-variant-numeric: tabular-nums;
+        line-height: 1 !important;
+        color: var(--text) !important;
+        background: var(--fill-2) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: var(--radius-pill) !important;
+        box-shadow: none !important;
+    }
+    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count:active {
+        background: var(--fill-4) !important;
+    }
+    /* The capsule, when a pager tier sits on it: no top edge, square top
+       corners, so the two rims are one outline. */
+    body.stash-liquid-glass:has([data-pager-row="float"]) .refract-mobile-dock {
+        border-top-color: transparent;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+    /* The More sheet clears the taller two-tier capsule. */
+    body.stash-liquid-glass:has([data-pager-row="float"]) .refract-mobile-drawer {
+        bottom: calc(var(--refract-dock-footprint) + 44px + 10px);
+        max-height: calc(100vh - var(--refract-dock-footprint) - 66px - env(safe-area-inset-top, 0px));
+    }
+    /* Content pads by the two-tier footprint on list pages. */
+    body.stash-liquid-glass:has([data-pager-row="float"]) .main.container-fluid {
+        padding-bottom: calc(var(--refract-dock-footprint) + 44px + var(--gap-md)) !important;
+    }
+    /* Stash's page-jump popover (its own node, untouched in the DOM):
+       a tappable field on phones. */
+    body.stash-liquid-glass #select_page_popover input,
+    body.stash-liquid-glass #select_page_popover .btn {
+        min-height: 44px !important;
+        font-size: var(--fs-body) !important;
+    }
+}
+
+/* ───────────────────────────────────────────────────────────────────
+   One card per row (forum request #203; polish 2026-09-03). A two-state
+   control in the toolbar's second tier switches the phone grid between
+   two-up (default) and one wide. refract.js persists it as
+   refract.mobileCols through the same localStorage + server-mirror
+   contract as every other setting and writes body.refract-mobile-onecol;
+   the only thing that changes is the grid's track count. Cards untouched.
+   ─────────────────────────────────────────────────────────────────── */
+body.stash-liquid-glass .refract-cols-toggle {
+    display: none;
+}
+@media (max-width: 768px) {
+    body.stash-liquid-glass.refract-mobile-onecol .row.justify-content-center {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .refract-cols-toggle {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        order: 11;
+        flex: 0 0 44px !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border-color: transparent !important;
+        box-shadow: none !important;
+        color: var(--text-muted);
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .refract-cols-toggle svg {
+        width: 20px;
+        height: 20px;
+        display: none;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .refract-cols-toggle .refract-cols-two {
+        display: block;
+    }
+    body.stash-liquid-glass.refract-mobile-onecol .filtered-list-toolbar .refract-cols-toggle .refract-cols-two {
+        display: none;
+    }
+    body.stash-liquid-glass.refract-mobile-onecol .filtered-list-toolbar .refract-cols-toggle .refract-cols-one {
+        display: block;
+    }
+    body.stash-liquid-glass .filtered-list-toolbar .refract-cols-toggle:active {
+        color: var(--accent-ink);
     }
 }
