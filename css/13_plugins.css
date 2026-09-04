@@ -1162,9 +1162,14 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
        beats the recipe's height whatever the order, so it is released
        here or the chip stays 45px inside a 24px recipe. */
     min-height: 0 !important;
-    /* Two sizes in the chip, not five. Everything inside inherits this
-       one, and the two quiet ends are re-pointed below. */
-    font-size: var(--fs-md) !important;
+    /* The SIZE is the recipe's, and it was not until this was measured:
+       this rule kept font-size: var(--fs-md) with !important through an
+       ID-weighted selector, so the chip rendered 12.88px beside
+       reference chips at 11.2 and the recipe's own !important lost.
+       Joining a recipe means giving up the size as well as the fill; a
+       deviation nobody declared is drift wearing the word deviation.
+       The two quiet ends keep --fs-xs below, which is a stated caption
+       step rather than a second body size. */
     color: rgba(var(--fg-rgb), 0.92) !important;
 }
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * * {
