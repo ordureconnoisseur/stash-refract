@@ -139,11 +139,31 @@ body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn) {
    wording exists to stop being read as drift.
 
    They join the item and active rules above and NOT the well rule, which
-   is what keeps them free-standing. */
+   is what keeps them free-standing.
+
+   The customiser's two segmented controls were briefly listed here and
+   are not: they DO have wells, so their items are concentric at 9px like
+   every other welled strip. Whether a strip has a well is the only
+   question this deviation asks, and it is worth asking of the markup
+   rather than of the handover note. */
 body.stash-liquid-glass
-:is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link,
-body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn) {
+:is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link {
     border-radius: var(--radius-sm) !important;
+}
+
+/* Segments built from <button> need a reset that <a class="nav-link">
+   never did. The rules above were written for Stash's anchor tabs, which
+   have no UA background or border; a button brings both, so a joining
+   button paints the UA grey under the anatomy and looks like the join
+   failed. Caught on a screenshot rather than in any measurement, which
+   is the point - computed style said the anatomy had applied, and it
+   had. Every button-based joiner takes this; anchors are unaffected. */
+body.stash-liquid-glass .refract-list-sheet .refract-seg button,
+body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn) {
+    background: none !important;
+    border: 1px solid transparent !important;
+    -webkit-appearance: none !important;
+            appearance: none !important;
 }
 
 body.stash-liquid-glass
