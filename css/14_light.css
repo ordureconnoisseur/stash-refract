@@ -1203,11 +1203,19 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-t
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="legendary"] { --tier-color: 176, 24, 101; --tier-color-bright: 176, 24, 101; }
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] { --tier-color: 74, 58, 128; --tier-color-bright: 74, 58, 128; }
 
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip {
+/* Unrated only. This used to match every chip, and because it is
+   !important it beat 07's tier consumption whatever the specificity - so
+   the six --tier-color values defined directly above were set and then
+   used ZERO times, and a Diamond scene rendered the same neutral grey as
+   an unrated one. Measured: light chip 0.04 fill / 0.14 rim on a Diamond
+   scene where dark gave the tier's teal. Defining six light-specific
+   tier palettes and never consuming one of them is not a thing anyone
+   intended; the neutral is the unrated resting state and now says so. */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip:is(:not([data-tier]), [data-tier=""]) {
     background: rgba(0, 0, 0, 0.04) !important;
     border-color: rgba(0, 0, 0, 0.14) !important;
 }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip:hover {
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip:is(:not([data-tier]), [data-tier=""]):hover {
     background: rgba(0, 0, 0, 0.07) !important;
     border-color: rgba(0, 0, 0, 0.22) !important;
 }

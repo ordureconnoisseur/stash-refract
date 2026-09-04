@@ -724,6 +724,29 @@ body.stash-liquid-glass [data-stash-filter] .badge {
    Safe to include without the plugin - selectors simply don't match.
    ─────────────────────────────────────────────────────────────────── */
 
+/* The pill's RESTING MATERIAL is the chip recipe's (10), not this
+   file's. It is in the recipe's control list, so it takes the accent
+   tint, the accent rim and no resting shadow; the glass fill, the
+   --glass-border rim and the --shadow-sm drop that used to be declared
+   here were the last thing keeping it off the recipe (audit item 4).
+
+   Why it beat the recipe, since two other explanations were tried
+   first and neither holds. It is not !important: none of the three
+   declarations carried it. It is not the recipe loading earlier: both
+   rules are in the same concatenated sheet and the recipe is later.
+   It is the ID branch in the selector list below. A comma list is
+   evaluated per branch, and the element on the performer page is
+   `#perf-rating-trigger` carrying `.adv-rating-btn`, so THAT branch
+   matched it at (1,1,1) and outranked the recipe's (0,2,1). Per-branch
+   evaluation is not a reason the ID is harmless; it is the reason the
+   ID wins. Measured: the pill computed the glass fill 0.1, the 0.12
+   rim and the 0 2px 10px 0.25 shadow, all three this rule's.
+
+   So do not re-add material here, and do not "fix" it by wrapping the
+   list in :where() either - that would drop the ID branch's weight but
+   the declarations should not be in this file at all. Border WIDTH and
+   STYLE still come from the recipe's box rule, which the pill is also
+   in; only the colour is the control rule's. */
 body.stash-liquid-glass .adv-rating-btn,
 body.stash-liquid-glass #perf-rating-trigger {
     display: inline-flex !important;
@@ -732,14 +755,11 @@ body.stash-liquid-glass #perf-rating-trigger {
     gap: var(--gap-xs);
     padding: 0.35rem 0.85rem;
     border-radius: var(--radius-pill);
-    background: var(--glass-bg-strong);
-    border: 1px solid var(--glass-border);
     color: var(--text) !important;
     font-size: var(--fs-sm);
     font-weight: 600;
     line-height: 1 !important;
     cursor: pointer;
-    box-shadow: var(--shadow-sm);
     transition: background var(--dur-fast), border-color var(--dur-fast), box-shadow var(--dur-fast);
     vertical-align: middle;
 }
