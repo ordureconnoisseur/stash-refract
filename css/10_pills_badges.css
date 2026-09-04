@@ -21,6 +21,20 @@
    rim, which is what the advanced-rating pill and the card counters
    already do, so it reads as pressable next to a read-out that does not.
 
+   EVERY ID SEGMENT IN THESE LISTS IS WRAPPED IN :where(), AND IT HAS TO
+   BE. An :is() takes the specificity of its strongest branch, so a
+   single `#performer-page ...` branch lifted the WHOLE read-out rule to
+   (1,5,2) while the control rule, all classes, sat at (0,2,1). Both
+   match a control chip, and the read-out won regardless of source
+   order: measured on the advanced-rating pill, the fill stayed
+   --fill-3, the accent never landed, and `box-shadow: none` never
+   landed either, so the pill kept a shadow from a generic button rule.
+   The same weight also beat every per-chip deviation written in a
+   lane's own file, including the tab badge's height, which is how the
+   entity strips came out 36 tall against the scene panel's 28.8 after
+   joining. :where() contributes zero, so the ID branches keep their
+   reach and lose their weight (7.9).
+
    HOW TO JOIN. Add your selector to the :is() list on the matching rule
    below; do not restate the recipe in your own file. That is the whole
    point of it being here rather than five times over. A chip that needs
@@ -34,9 +48,9 @@ body.stash-liquid-glass :is(
     .refract-chip,
 
     /* performer lane -- read-out */
-    #performer-page .refract-ph-alias__n,
-    #performer-page .refract-ph .detail-group .detail-item.stash_ids a,
-    #performer-page .refract-ph-tags .tag-item,
+    :where(#performer-page) .refract-ph-alias__n,
+    :where(#performer-page) .refract-ph .detail-group .detail-item.stash_ids a,
+    :where(#performer-page) .refract-ph-tags .tag-item,
 
     /* mobile lane -- read-out: the More sheet's multiview count badge */
     .refract-mobile-drawer .refract-drawer-tile-badge,
@@ -48,7 +62,7 @@ body.stash-liquid-glass :is(
        rim it used to wear; win and loss stay in the ink, measured 7.6:1
        dark and 6.4:1 light, which is where a read-out's meaning belongs
        anyway. */
-    #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *,
+    :where(#performer-page) .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *,
 
     /* ascension lane -- read-out silhouette, control material below: the
        advanced-rating pill. Joining removes its resting box-shadow glow,
@@ -97,8 +111,8 @@ body.stash-liquid-glass :is(
    than every other chip on the page. */
 body.stash-liquid-glass :is(
     .refract-chip,
-    #performer-page .refract-ph-alias__n,
-    #performer-page .refract-ph-tags .tag-item
+    :where(#performer-page) .refract-ph-alias__n,
+    :where(#performer-page) .refract-ph-tags .tag-item
 ):hover {
     border-color: var(--glass-border-bright);
     background: var(--fill-4);
