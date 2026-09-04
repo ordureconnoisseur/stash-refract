@@ -6225,7 +6225,7 @@
             label: "Xenith",
             /* Xenith's navbar control is a <button> that opens a modal (no
                route), so the a[href] drawer mirror above can't reach it.
-               No spec icon — the source button carries a clean
+               No spec icon - the source button carries a clean
                currentColor volcano svg that the clone fallback below
                mirrors faithfully, same as #plugin_hon above. */
             selector: "#hon-floating-btn"
