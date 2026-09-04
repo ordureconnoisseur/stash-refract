@@ -1616,17 +1616,24 @@ body.stash-liquid-glass .gs-see-all:hover {
    !important and would have kept winning from the earlier file. */
 body.stash-liquid-glass .adv-rating-btn {
     color: var(--accent-bright) !important;
-    /* Force explicit flex centering - the ★ glyph in most fonts sits
-       below the visual line center because the star's bottom points
-       hang at the baseline while the top point pokes up. Flex centering
-       + line-height:1 + a tiny -1px nudge on the star puts it on the
-       true geometric centre of the pill. */
-    display: inline-flex !important;
-    align-items: center !important;
+    /* display, align-items, line-height and font-size used to be here,
+       to centre the star glyph: it sits below the visual line centre
+       because its bottom points hang at the baseline while the top
+       point pokes up. The recipe supplies all four now, and the -1px
+       nudge that finishes the job is on the star's own rule below;
+       measured, the star centres at 0.00px offset without them.
+
+       font-size was the one of the four that CONFLICTED: --fs-base
+       with !important at equal specificity, in a file loading after
+       the recipe's, so the pill measured 12.25 beside chips at 11.2
+       and the recipe's own !important lost. The other three merely
+       agreed, which is worse than it sounds - a redundant !important
+       is how a conflicting one hides. This was attributed to the band
+       override in 08 for an hour, because the sweep of this rule
+       filtered on paint properties and never looked at the type.
+       What stays below is only what the recipe does not say. */
     justify-content: center !important;
     gap: 8px;
-    line-height: 1 !important;
-    font-size: var(--fs-base) !important;
     transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
                 color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
 }
