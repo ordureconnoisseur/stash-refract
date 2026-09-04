@@ -641,7 +641,7 @@ body.stash-liquid-glass .detail-header:has(.group-head) .detail-header-image {
    fills, so they do NOT belong to the fill ramp (3.2). */
 body.stash-liquid-glass {
     --refract-eh-veil: 10, 10, 10;
-    --refract-eh-grid: rgba(14, 13, 16, 0.74);
+    --refract-eh-grid: rgba(var(--surface-rgb), 0.74);
     --refract-eh-grid-hover: rgba(24, 22, 28, 0.86);
 }
 

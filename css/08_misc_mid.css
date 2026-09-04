@@ -7868,7 +7868,15 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group {
        what shows where a row runs out of fields, so it is the cell
        colour rather than the rim colour, and a short last row reads as
        empty surface instead of a lit block. */
-    background: rgba(14, 13, 16, 0.74) !important;
+    /* The plate colour is a token, not a literal. 3.2 sanctions two surface
+       colours and the source carried four near-black families; 14,13,16 and
+       the mobile lane's 20,20,24 are three RGB points apart and invisible
+       under a portrait, but the ALPHAS were what read as different rooms
+       when this plate shared a phone screen with the dock's 0.72 and a
+       sheet's 0.92. --surface-rgb also flips in light (255,255,255), which
+       retires the hand-written rgba(252,252,252, A) twin below rather than
+       leaving two rules that have to be kept in step by hand. */
+    background: rgba(var(--surface-rgb), 0.74) !important;
     overflow: hidden;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
@@ -7886,7 +7894,7 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item {
     /* Opaque, not a fill: these sit over a blurred photograph, and a
        0.03 white on top of that is a lighter band rather than a
        surface (3.2, glass stacking). */
-    background: rgba(14, 13, 16, 0.74);
+    background: rgba(var(--surface-rgb), 0.74);
     box-shadow: 0 0 0 1px var(--glass-border);
     min-width: 0;
 }
@@ -8584,11 +8592,9 @@ body.stash-liquid-glass.refract-light #performer-page .refract-ph-veil {
     background: linear-gradient(0deg, var(--bg-0) 1%, rgba(255, 255, 255, 0.82) 46%, rgba(255, 255, 255, 0.42) 100%);
 }
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .detail-group {
-    background: rgba(252, 252, 252, 0.9) !important;
     border-color: rgba(0, 0, 0, 0.12) !important;
 }
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .detail-group .detail-item {
-    background: rgba(252, 252, 252, 0.9);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 /* The danger red is a dark-mode red: #f87171 on this band measures
@@ -8667,7 +8673,6 @@ body.stash-liquid-glass.refract-light #performer-page .refract-ph-cats__fill {
    token drawn for exactly this: a scrim. */
 body.stash-liquid-glass.refract-light #performer-page .refract-pe .performer-head > .details-edit,
 body.stash-liquid-glass.refract-light #performer-page .refract-pe form > .details-edit {
-    background: rgba(252, 252, 252, 0.92) !important;
     border-color: rgba(0, 0, 0, 0.12) !important;
 }
 body.stash-liquid-glass.refract-light #performer-page .refract-pe-crop__label,
@@ -9135,7 +9140,7 @@ body.stash-liquid-glass #performer-page .refract-pe .performer-head > .details-e
     padding: var(--gap-md) var(--gap-lg);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
-    background: rgba(14, 13, 16, 0.92);
+    background: rgba(var(--surface-rgb), 0.92);
     -webkit-backdrop-filter: var(--glass-blur-md);
     backdrop-filter: var(--glass-blur-md);
     box-shadow: var(--shadow-lg);
