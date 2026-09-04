@@ -73,6 +73,65 @@ body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass
     box-shadow: none !important;
 }
 
+/* ── Tabs and segmented controls: the house anatomy ─────────────
+   Cohesion audit item 2. Three anatomies existed: the scene panel's
+   strip in a well, the entity strips free on a hairline, the
+   customiser's 8px black well, and the phone sheet's segments. 6.23
+   rules the RADIUS (a tab takes --radius-sm, because a tab is a
+   rectangular door into a rectangular panel) and is silent on
+   everything else, so the ruling is made here and 6.23 gains the
+   wording: the well-with-concentric-items anatomy is the house one for
+   a chooser that sits inside a panel. The scene panel and the phone
+   sort sheet arrived at it independently, which is the strongest
+   evidence available that it is the right shape.
+
+   The concentric pair is the point, and it is why the two radii differ
+   on purpose: a 12px well with 3px of vertical padding holds 9px items,
+   because 12 minus 3 is what keeps the two curves parallel. An entity
+   strip that stands free of any well has nothing to be concentric with
+   and takes --radius-sm flat. Same token, two geometries, and neither
+   is drift.
+
+   To join, add a strip to the :is() lists below rather than restating
+   any of this. Deviations are fine when they are geometry - a strip
+   that bleeds into a gutter owns its horizontal padding and margins -
+   but the fill, the rim, the type pair and the active treatment are the
+   anatomy and belong here.
+
+   The active state is --accent-glow for the rim everywhere, which is
+   what every other active state in the theme uses; the phone sheet's
+   solid accent-bright rim was the outlier and goes. */
+body.stash-liquid-glass
+:is(.scene-tabs, .image-tabs) .nav-tabs {
+    border-radius: var(--radius-sm) !important;
+    background: var(--fill-1) !important;
+    /* The measured rim is 0.08, not --glass-border's 0.12: keeping the
+       value the strip actually had, but expressed against --fg-rgb so it
+       flips in light instead of staying a white hairline on a white
+       plate (3.3, D8). */
+    border: 1px solid rgba(var(--fg-rgb), 0.08) !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    gap: 3px !important;
+}
+body.stash-liquid-glass
+:is(.scene-tabs, .image-tabs) .nav-tabs .nav-link {
+    border-radius: 9px !important;
+    font-size: var(--fs-sm) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+    color: var(--text-muted) !important;
+}
+body.stash-liquid-glass
+:is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active {
+    color: var(--accent-bright) !important;
+    background: var(--accent-tint) !important;
+    border-color: var(--accent-glow) !important;
+    box-shadow:
+        0 0 14px rgba(var(--accent-rgb), 0.35),
+        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
+}
+
 /* ── .btn-primary: glass orange button ─────────────────────────────
    No backdrop-filter - this rule hits every primary button on the page,
    which can be 30-50+ on heavy pages. Each blurred button is a GPU

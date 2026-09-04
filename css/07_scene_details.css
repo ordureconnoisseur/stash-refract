@@ -15,10 +15,15 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
+    /* 3.3: the drop comes from the token so light is free, and the two
+       layers that are this panel's own compose on top. Hand-written, the
+       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
+       fill, beside a navbar carrying the token's 0.08. The inset takes
+       --fg-rgb for the same reason. */
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
+        var(--shadow-lg),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
     padding: 1.25rem !important;
 }
 
@@ -520,10 +525,15 @@ body.stash-liquid-glass .gallery-tabs {
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
+    /* 3.3: the drop comes from the token so light is free, and the two
+       layers that are this panel's own compose on top. Hand-written, the
+       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
+       fill, beside a navbar carrying the token's 0.08. The inset takes
+       --fg-rgb for the same reason. */
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
+        var(--shadow-lg),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
     padding: 1.25rem !important;
 }
 
@@ -929,7 +939,9 @@ body.stash-liquid-glass .nav-tabs .nav-link:hover {
     background: var(--fill-4) !important;
     border-color: var(--glass-border) !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active,
+/* The scene strip's own active treatment moved to 09 as the house
+   anatomy (2026-09-04, audit item 2); what is left here is the strips
+   this file styles that are NOT in that list. */
 body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-link.active,
 body.stash-liquid-glass .nav-tabs .nav-link.active {
     color: var(--accent-bright) !important;
@@ -2067,10 +2079,15 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    /* 3.3: the drop comes from the token so light is free, and the two
+       layers that are this panel's own compose on top. Hand-written, the
+       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
+       fill, beside a navbar carrying the token's 0.08. The inset takes
+       --fg-rgb for the same reason. */
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
+        var(--shadow-lg),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
 }
 body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image-container > img.image-image {
     max-width: 100% !important;
@@ -3066,11 +3083,11 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs {
        the 40.8px it needs, and the 3px vertical is load-bearing: the
        links' 9px radius is concentric with the container's 12px across
        that gap. */
-    padding: 3px 9px !important;
-    gap: 3px !important;
-    border-radius: var(--radius-sm) !important;
-    background: var(--fill-1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    /* Horizontal only: the 9px pays for the bleed. The vertical padding,
+       the radius, the fill and the rim are the house anatomy and live in
+       09 now (audit item 2). */
+    padding-left: 9px !important;
+    padding-right: 9px !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     scrollbar-width: none !important;
