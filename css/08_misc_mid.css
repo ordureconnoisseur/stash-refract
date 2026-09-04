@@ -8854,6 +8854,21 @@ body.stash-liquid-glass #performer-page .refract-pe-shot {
     color: var(--text-muted);
 }
 
+/* The name is the same name in both modes and has to be set the same
+   way. In view it is stated at -0.02em; in edit no rule reaches it at
+   all, so it INHERITS +0.02em from an ancestor and the tracking flips
+   sign -- measured -0.56px against +0.56px at the same 28px and 600, a
+   1.12px swing per letter, so the name visibly changes width when you
+   click Edit. The line box moved with it, 29.4 against 33.6.
+
+   Stated rather than inherited, which is the actual fix: an inherited
+   value is not a decision, and this one was nobody's. */
+body.stash-liquid-glass #performer-page .refract-pe .performer-head h2 .performer-name,
+body.stash-liquid-glass #performer-page .refract-pe .performer-head h2 {
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+}
+
 /* ── The form ──────────────────────────────────────────────────── */
 
 /* The row the form sits in has to grow, and to start where the picture
