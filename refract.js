@@ -9370,6 +9370,29 @@
         header._rfxAnchorRo = ro;
     }
 
+    /* HOW REFRACT TOUCHES THE PERFORMER HEADER. This is React's subtree,
+       and two blockers came out of forgetting it in one day.
+
+       1. Refract's own nodes are APPENDED after React's children. Never
+          inserted first, never between them. React reconciles by inserting
+          before its own next child, so a stranger in the middle of that
+          list makes the reference stale and the header dies with
+          "insertBefore: Child to insert before is not a child of this
+          node". Visual order is CSS -- `order` on a flex parent -- which
+          moves nothing in the tree.
+       2. Refract inserts into REFRACT-OWNED containers wherever it can.
+          A container we built is ours to arrange however we like.
+       3. Refract never MOVES a React-managed node. Re-parenting one
+          desyncs its fiber: entering edit mode destroyed the rating
+          control and React never rebuilt it, because it still believed it
+          owned a node that was somewhere else.
+       4. Refract never rewrites a React text node. Relabelling Stash's
+          "Set image…" button in place was the same fault wearing a
+          smaller hat, in the same subtree that crashed.
+
+       When a native control has to appear somewhere else, the pattern is
+       the one CLAUDE.md gives: leave it where it is, hide it, and proxy
+       it from a container of ours. */
     function refractPhCard(header, head, page) {
         var host = header.querySelector(".detail-header-image");
         if (!host) { return; }
@@ -10019,7 +10042,11 @@
         var dgroup = header.querySelector(".detail-group");
         if (dgroup) {
             var nItems = dgroup.querySelectorAll(".detail-item").length;
-            var wanted = nItems ? String(Math.min(6, Math.ceil(nItems / 2))) : "";
+            /* clamp(3, ceil(n/2), 6). The ceiling stops a full performer
+               drawing six then three; the FLOOR of three stops a very
+               sparse one drawing two slabs 760px wide holding one word
+               each, which is what four items did. */
+            var wanted = nItems ? String(Math.min(6, Math.max(3, Math.ceil(nItems / 2)))) : "";
             if (wanted && dgroup.getAttribute("data-refract-cols") !== wanted) {
                 dgroup.setAttribute("data-refract-cols", wanted);
             }

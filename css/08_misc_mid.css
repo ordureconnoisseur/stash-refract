@@ -7460,7 +7460,12 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
 body.stash-liquid-glass #performer-page .refract-ph.refract-ph-hang .detail-header-image {
     align-self: flex-start;
     margin-top: 46px;
-    margin-bottom: calc(340px * -0.75);
+    /* 40%, ruled. At 50 the card cleared the tab strip's own rule line by
+       -21.7px, which is to say it crossed it and read as a card that had
+       fallen off the band rather than one hanging from it. At 40 it
+       clears by 12.3. Measured identically on a four-item band and a
+       nine-item one, because for both the band is card-driven. */
+    margin-bottom: calc(340px * -0.4);
 }
 /* Nothing may impose a floor on the band any more, or the shrink above
    cannot happen: 480px of min-height was the other half of why a sparse
@@ -7567,7 +7572,18 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head {
     align-content: start;
     align-items: start;
     column-gap: var(--gap-lg);
-    row-gap: var(--gap-lg);
+    /* The head's rows are the band's SECTIONS -- identity, aliases, the
+       standing figures, the record -- and --gap-lg is the value for
+       groups INSIDE one of those. At 10.5 all four read as a single
+       cluster, which is what "the stat grid and the ratings and the
+       aliases all crammed close together" was describing once the slack
+       row was gone. The slack used to separate them by accident.
+
+       A section step, from the scale rather than a new number: 1.5x the
+       token whose own note says "between sections". Measured 21px, equal
+       between every pair of rows and equal across a four-item band and a
+       fifteen-item one. */
+    row-gap: calc(var(--gap-xl) * 1.5);
     padding: 1.6rem 0 0 !important;
     min-width: 0;
 }
@@ -7884,8 +7900,6 @@ body.stash-liquid-glass #performer-page .refract-ph-standing__tail {
    doing exactly that before this gate. Below 1200 the existing
    breakpoints own the grid, and they know more than a count does. */
 @media (min-width: 1201px) {
-    body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="1"] { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
