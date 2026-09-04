@@ -9950,7 +9950,15 @@
            clicks is the same element it always was. */
         var ratingNum = header.querySelector(".quality-group .star-rating-number");
         var ratingTxt = ratingNum ? (ratingNum.textContent || "").trim() : "";
-        cells.push({ label: "Rating", value: ratingTxt || "–", tail: "", rating: true });
+        /* No placeholder when there is no rating. A dash was tried and is
+           wrong twice over: it renders low and thin beside five solid
+           stars, so it reads as debris rather than as a value, and it
+           says a second time what five empty stars already say -- with
+           the difference that the stars are also the control you click to
+           set one, so the empty state is the invitation to act. Dropping
+           it moves nothing: stars, pill, cell height and label all
+           measure identically with and without. */
+        cells.push({ label: "Rating", value: ratingTxt, tail: "", rating: true });
         var sig = cells.map(function (c) { return c.label + c.value + c.tail; }).join("|");
         /* The controls live in the row now, so the row is no longer ours to
            wipe. Park the group back at its own home BEFORE the rebuild:
