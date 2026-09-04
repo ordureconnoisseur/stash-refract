@@ -57,7 +57,23 @@ body.stash-liquid-glass :is(
        control chip is told apart by its accent tint and rim, not by a
        halo, and a halo at rest is the same mistake the alias chip was
        making with its hover rim. */
-    .adv-rating-btn
+    .adv-rating-btn,
+
+    /* scene lane -- read-out: the duplicate checker's spec pills
+       (duration, filesize, resolution, bitrate, codec), the tab count
+       badges and the activity counter. The badges and the counter are
+       counters rather than controls under 6.5, which is why they take
+       the read-out material even though they sit inside things you
+       click. */
+    .refract-dup-spec,
+    .nav-tabs .nav-link .badge,
+    .st-activity,
+
+    /* scene lane -- read-out silhouette, control material below: the
+       favourite and count buttons, and the tier chip. */
+    .adv-favourite-btn,
+    .count-button,
+    .st-tier-chip
 ) {
     display: inline-flex;
     align-items: center;
@@ -94,11 +110,29 @@ body.stash-liquid-glass :is(
 
     /* ascension lane: the advanced-rating pill opens the rating drawer,
        so it takes the control material over the read-out box above. */
-    .adv-rating-btn
+    .adv-rating-btn,
+
+    /* scene lane: all three mutate something -- favourite, o-count, and
+       the tier chip, which is the rating drawer's trigger. */
+    .adv-favourite-btn,
+    .count-button,
+    .st-tier-chip
 ) {
     box-shadow: none;
     border-color: rgba(var(--accent-rgb), 0.28);
     background: rgba(var(--accent-rgb), 0.12);
+}
+
+/* ── The one ledgered deviation ──────────────────────────────────────
+   The scene lane's tier chip keeps its own height and its two-line
+   internal layout -- tier name over score, with data-tier driving eight
+   tier treatments -- and wears the recipe's rim and radius over them.
+   It is a control chip whose CONTENT is two lines of different type;
+   forcing it to 24px and one line would not make it more like the other
+   chips, it would make it not the thing it is. Everything else about it
+   is the recipe. Ruled 2026-09-04, scene lane's to maintain. */
+body.stash-liquid-glass .st-tier-chip {
+    height: auto;
 }
 
 /* ── O-Count / increment-only button group ────────────────────────────── */
