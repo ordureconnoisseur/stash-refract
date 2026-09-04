@@ -8064,12 +8064,20 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.s
    is the fault F8 fixed (47.6 for a text tile against 52.5 with one of
    these and 79.6 with two). Fill, rim, weight, ink and no-blur all come
    from the recipe; only the box is the tile's. */
-body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids a {
+/* Class doubled: the recipe in 10 names this same element at the same
+   specificity and loads later, so an evenly matched deviation loses on
+   source order -- measured, the chip came back at --fs-sm and 11.2px
+   tall with this rule apparently applying. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids.stash_ids a {
     height: auto !important;
     font-size: var(--fs-xs) !important;
     line-height: 1.65 !important;
     padding: 0 8px !important;
     min-height: 0 !important;
+    background: var(--fill-3) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text) !important;
+    font-weight: 500 !important;
 }
 /* The grid is a uniform six-up of one-line tiles, and nothing in it
    gets to change that shape. A value too long for its cell truncates
