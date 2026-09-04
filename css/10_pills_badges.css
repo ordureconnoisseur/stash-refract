@@ -146,10 +146,10 @@ body.stash-liquid-glass :is(
    The tab count badge sits in a 28.8px tab item whose text line is
    16.8. At 24 it became the tallest thing in the item and pushed the
    entity strips to 36 against the scene panel's 28.8 -- which is the gap
-   D2 exists to close, reopened by the fix for D4. 18px fits the item
+   D2 exists to close, reopened by the fix for D4. 16.8px, the tab's own text line, fits the item
    and leaves the strips identical. */
 body.stash-liquid-glass .nav-tabs .nav-link .badge {
-    height: 18px !important;
+    height: 16.8px !important;
     padding: 0 7px !important;
 }
 
