@@ -7460,7 +7460,12 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
 body.stash-liquid-glass #performer-page .refract-ph.refract-ph-hang .detail-header-image {
     align-self: flex-start;
     margin-top: 46px;
-    margin-bottom: calc(340px * -0.75);
+    /* 40%, ruled. At 50 the card cleared the tab strip's own rule line by
+       -21.7px, which is to say it crossed it and read as a card that had
+       fallen off the band rather than one hanging from it. At 40 it
+       clears by 12.3. Measured identically on a four-item band and a
+       nine-item one, because for both the band is card-driven. */
+    margin-bottom: calc(340px * -0.4);
 }
 /* Nothing may impose a floor on the band any more, or the shrink above
    cannot happen: 480px of min-height was the other half of why a sparse
@@ -7567,9 +7572,37 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head {
     align-content: start;
     align-items: start;
     column-gap: var(--gap-lg);
-    row-gap: var(--gap-lg);
+    /* The head's rows are the band's SECTIONS -- identity, aliases, the
+       standing figures, the record -- and --gap-lg is the value for
+       groups INSIDE one of those. At 10.5 all four read as a single
+       cluster, which is what "the stat grid and the ratings and the
+       aliases all crammed close together" was describing once the slack
+       row was gone. The slack used to separate them by accident.
+
+       A section step, from the scale rather than a new number: 1.5x the
+       token whose own note says "between sections".
+
+       Carried by the ROWS, not by row-gap, and that is not a style
+       preference. The head's five rows are placed explicitly, so a
+       performer without aliases still HAS row 2 -- empty, zero-tall, and
+       still collecting a gap on each side. Gated across six performers,
+       two of them measured 42 between name and standing where everyone
+       else measured 21: one gap for the missing row and one for the row
+       after it. A margin belongs to an element that exists; a gap
+       belongs to a track that may not. */
+    row-gap: 0;
     padding: 1.6rem 0 0 !important;
     min-width: 0;
+}
+
+/* The section step itself. Every head row takes it above; the name is
+   row 1 and always present, so it takes none. Rows that do not exist
+   for a given performer contribute nothing, which is the whole point. */
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > * {
+    margin-top: calc(var(--gap-xl) * 1.5);
+}
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 {
+    margin-top: 0;
 }
 
 /* Row 1: the name, then the icons Stash puts beside it.
@@ -7884,113 +7917,38 @@ body.stash-liquid-glass #performer-page .refract-ph-standing__tail {
    doing exactly that before this gate. Below 1200 the existing
    breakpoints own the grid, and they know more than a count does. */
 @media (min-width: 1201px) {
-    body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="1"] { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-    body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 
-/* THE RATING CELL.
+/* THE RATING GROUP keeps Stash's own place in the head.
 
-   The rating is the same class of fact as Scenes, Ranking and Active --
-   what she is in this library -- and it was the only one of the four
-   rendered at chip scale and right-ragged to the far end of the band,
-   which is precisely what made it read as an afterthought. It is a cell
-   of the standing row now: the row's eyebrow, the row's numeral size,
-   left-anchored on the row's own pitch with its peers.
+   It was briefly re-parented into a cell of the standing row, which is
+   the shape the design wanted and the wrong way to get it: moving a
+   React-managed node out of its parent desynced its fiber, so entering
+   edit mode destroyed the control and React never rebuilt it. Measured
+   after Edit then Cancel: zero stars, zero pill, rating gone until a
+   reload. See the note in refract.js beside the standing row's cells.
 
-   The numeral carries the datum and the stars are its scale, not the
-   other way round, which is why the numeral takes --fs-xl (the row's
-   size, shared with every other cell) and the stars come down to its
-   CAP height. Measured, that cap is 14.88px, so the stars are 15 and
-   not the 24 a headline-scale reading of "make it bigger" would
-   suggest: at 24 they out-shout the number they qualify.
-
-   refract.js re-parents Stash's own control group in here rather than
-   redrawing it, so the stars and the pill a user clicks are the same
-   live elements they always were. */
-body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--rating .refract-ph-standing__value {
-    display: flex;
-    /* Centre, on a line that is exactly one numeral tall.
-
-       Centring was tried first and rejected, correctly, because the line
-       was then as tall as the controls and the numeral floated in the
-       middle of it. With the line pinned to 1em below, the numeral's box
-       IS the line, so centring cannot displace it -- and everything else
-       centres on the numeral's own box, which is what "share one line"
-       means.
-
-       Baseline alignment was the intermediate answer and it does not
-       survive the line being constrained: measured, it put the rated
-       numeral's baseline 9.5px off its peers' while the cell height was
-       right. Centre gives both at zero. It also retires a measured 2.5px
-       nudge that existed only to correct what baseline alignment did to
-       the stars and pill; under centring they land on the numeral's box
-       centre with nothing added. */
-    align-items: center;
-    gap: var(--gap-sm);
-    /* The line keeps its peers' height, and this is the rule that makes
-       the ROW line up rather than just the numerals.
-
-       The standing row is bottom-aligned, so a taller cell does not hang
-       below its neighbours -- it starts higher, and takes its eyebrow up
-       with it. This cell's controls made its value line 30.5 against a
-       peer's 21, so the cell measured 49.11 against 39.61 and the RATING
-       label floated 9.5px above SCENES and ACTIVE. The value baselines
-       were identical the whole time, which is exactly why measuring only
-       the values missed it: the fault was one row up.
-
-       1em of --fs-xl is the peers' value line by construction, not a
-       literal copied from a measurement. The stars and the pill overflow
-       it and are not clipped, which is what keeps them their own size
-       while the cell stays its peers' size. */
-    height: 1em;
-}
+   What survives from that round, because none of it depended on the
+   move: the numeral is Stash's own span rather than a copy, it sits
+   AFTER the stars, and it has a reserved width -- which together are
+   what stopped the stars moving out from under the pointer on hover. */
 body.stash-liquid-glass #performer-page .refract-ph .quality-group {
+    grid-row: 3;
+    grid-column: 4;
     display: flex !important;
     align-items: center;
     gap: var(--gap-sm);
-    /* It lives inside the row now, so the grid placement that used to put
-       it at the band's right is gone rather than overridden. */
+    justify-self: end;
+    /* End, not start: with the band fitting its content there is no slack
+       in this row to ride the bottom of, so the rating sits on the
+       standing figures' own line rather than above them. */
+    align-self: end;
     margin: 0 !important;
     padding: 0 !important;
 }
-/* The stars at the numeral's cap height. The artwork is masked onto the
-   BUTTON (see the star block above), so the button's box is the star's
-   size and there is nothing to set on the svg. */
-body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars button {
-    width: 15px !important;
-    height: 15px !important;
-    padding: 0 !important;
-}
-body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars {
-    gap: 2px;
-    align-items: center;
-}
-
-/* The house glow, on the filled layer only -- the same move the accent
-   makes on an active segment, in the star's own colour. An empty star
-   gets none of it, so the glow reads as the rating rather than as
-   decoration on the control. */
-body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars button::after {
-    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--star) 55%, transparent));
-}
-/* Stash's own numeral, shown rather than hidden and reprinted, in a slot
-   whose width does not depend on what it holds.
-
-   It keeps Stash's position, AFTER the stars, and that is the load-
-   bearing half of the fix: nothing to the left of the numeral can move
-   when the numeral appears, so the star under the pointer stays under
-   the pointer. The reserved width holds the pill still as well, so the
-   whole group is fixed whether the value is set, previewed on hover, or
-   absent.
-
-   3ch of tabular figures covers every value either rating system
-   produces -- "5.0" in stars, "10" in decimal -- and tabular is what
-   makes 3ch a promise rather than an average. Empty on an unrated
-   performer, which costs a small reserved gap between the stars and the
-   pill and buys a control you can actually click. */
 body.stash-liquid-glass #performer-page .refract-ph .quality-group .star-rating-number {
     display: block !important;
     min-width: 3ch;
@@ -8013,18 +7971,7 @@ body.stash-liquid-glass #performer-page .refract-ph .quality-group .star-rating-
    stacks: eyebrow, then the numeral with its stars and pill on a line of
    their own. Same anatomy as its peers, and no pretending to fit a line
    it cannot fit. */
-@media (max-width: 820px) {
-    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing {
-        flex-wrap: wrap;
-    }
-    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--rating {
-        flex: 1 0 100%;
-    }
-    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--rating .refract-ph-standing__value {
-        flex-wrap: wrap;
-        row-gap: var(--gap-sm);
-    }
-}
+
 body.stash-liquid-glass #performer-page .refract-ph .quality-group .hon-battle-rank-badge {
     display: none !important;
 }
@@ -8915,8 +8862,8 @@ body.stash-liquid-glass.refract-light #performer-page .refract-pe .performer-hea
 body.stash-liquid-glass.refract-light #performer-page .refract-pe form > .details-edit {
     border-color: rgba(0, 0, 0, 0.12) !important;
 }
-body.stash-liquid-glass.refract-light #performer-page .refract-pe-crop__label,
-body.stash-liquid-glass.refract-light #performer-page .refract-pe-crop__side {
+body.stash-liquid-glass.refract-light #performer-page .refract-pe .refract-pe-crop__label,
+body.stash-liquid-glass.refract-light #performer-page .refract-pe .refract-pe-crop__side {
     --accent-ink: var(--accent-light);
 }
 /* The card keeps its own floor: the chin scrim and the neon strip are
@@ -8984,7 +8931,11 @@ body.stash-liquid-glass #performer-page .refract-pe .detail-header-image img.per
     border-radius: var(--radius-sm);
     border: 1px solid var(--glass-border);
 }
-body.stash-liquid-glass #performer-page .refract-pe-crop {
+/* Every rule for the guide is gated on .refract-pe, the edit-mode class,
+   as well as the node being removed on the way out. Belt and braces on
+   purpose: the JS removal is the fix, and this is what stops a guide
+   that somehow survives from painting over the card in view mode. */
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-crop {
     position: absolute;
     inset: 0;
     /* Above the flip stage, which is z-index 3 and paints the picture:
@@ -8994,16 +8945,16 @@ body.stash-liquid-glass #performer-page .refract-pe-crop {
     border-radius: var(--radius-sm);
     overflow: hidden;
 }
-body.stash-liquid-glass #performer-page .refract-pe-crop__side {
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-crop__side {
     position: absolute;
     top: 0;
     bottom: 0;
     width: var(--refract-pe-gutter, 0%);
     background: rgba(0, 0, 0, 0.55);
 }
-body.stash-liquid-glass #performer-page .refract-pe-crop__side.is-left { left: 0; border-right: 1px dashed var(--accent-ink); }
-body.stash-liquid-glass #performer-page .refract-pe-crop__side.is-right { right: 0; border-left: 1px dashed var(--accent-ink); }
-body.stash-liquid-glass #performer-page .refract-pe-crop__label {
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-crop__side.is-left { left: 0; border-right: 1px dashed var(--accent-ink); }
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-crop__side.is-right { right: 0; border-left: 1px dashed var(--accent-ink); }
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-crop__label {
     position: absolute;
     left: 50%;
     bottom: 8px;
@@ -9018,7 +8969,7 @@ body.stash-liquid-glass #performer-page .refract-pe-crop__label {
     color: var(--accent-ink);
     white-space: nowrap;
 }
-body.stash-liquid-glass #performer-page .refract-pe-shot {
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-shot {
     position: absolute;
     left: 0;
     right: 0;
@@ -9419,7 +9370,13 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit .btn {
    survived; what it broke was the ::after break below, which counts on
    the declared order being the real one. */
 body.stash-liquid-glass #performer-page .refract-pe .details-edit > .refract-pe-state {
-    order: 1;
+    /* Negative now, because the pill is APPENDED to this bar rather than
+       inserted at its front: nothing of Refract's goes between React's
+       children any more (that is what crashed the header on save). Its
+       DOM position is last and its visual position is first, which is
+       what order is for. The back-image button follows it at -1, so
+       Refract's own chrome reads as a group ahead of Stash's buttons. */
+    order: -2;
     display: flex;
     flex-direction: column;
     gap: 1px;
@@ -9508,6 +9465,9 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit::before {
 /* The image controls belong with the image, and Clear Image is
    destructive, so it stops sitting between them and Save. */
 body.stash-liquid-glass #performer-page .refract-pe .details-edit .psrc-wrap,
+body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.refract-set-back-btn {
+    order: -1;
+}
 body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.refract-set-back-btn,
 body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-secondary {
     order: 5;

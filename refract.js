@@ -7604,12 +7604,12 @@
                 if (own && own.parentNode) { own.parentNode.removeChild(own); }
                 continue;
             }
-            if (stashBtn.firstChild.nodeValue !== "Set image (front)…") {
-                stashBtn.firstChild.nodeValue = "Set image (front)…";
-            }
-            if (own && own.previousElementSibling !== stashBtn) {
-                own.parentNode.removeChild(own); own = null;
-            }
+            /* Stash's own button is left exactly as Stash rendered it. It
+               used to be relabelled "Set image (front)…" by writing to its
+               text node -- React's text node, in React's subtree. Rewriting
+               a framework's DOM under it is the same class of fault as
+               moving its nodes, and this one sat in the subtree that
+               crashed. The clarification is not worth a crash. */
             if (!own) {
                 own = document.createElement("button");
                 own.type = "button";
@@ -7623,7 +7623,11 @@
                     var r2 = document.querySelector(".refract-pp[data-pid]");
                     if (r2 && r2._rfx) { refractOpenBackPopover(me, r2._rfx); }
                 });
-                stashBtn.parentNode.insertBefore(own, stashBtn.nextSibling);
+                /* Appended to the end of the bar rather than dropped in
+                   beside Stash's button, for the same reason as the state
+                   pill above: nothing of ours goes between React's children.
+                   CSS puts it back beside the button it belongs to. */
+                toolbars[i].appendChild(own);
             }
         }
     }
@@ -9376,6 +9380,29 @@
         header._rfxAnchorRo = ro;
     }
 
+    /* HOW REFRACT TOUCHES THE PERFORMER HEADER. This is React's subtree,
+       and two blockers came out of forgetting it in one day.
+
+       1. Refract's own nodes are APPENDED after React's children. Never
+          inserted first, never between them. React reconciles by inserting
+          before its own next child, so a stranger in the middle of that
+          list makes the reference stale and the header dies with
+          "insertBefore: Child to insert before is not a child of this
+          node". Visual order is CSS -- `order` on a flex parent -- which
+          moves nothing in the tree.
+       2. Refract inserts into REFRACT-OWNED containers wherever it can.
+          A container we built is ours to arrange however we like.
+       3. Refract never MOVES a React-managed node. Re-parenting one
+          desyncs its fiber: entering edit mode destroyed the rating
+          control and React never rebuilt it, because it still believed it
+          owned a node that was somewhere else.
+       4. Refract never rewrites a React text node. Relabelling Stash's
+          "Set image…" button in place was the same fault wearing a
+          smaller hat, in the same subtree that crashed.
+
+       When a native control has to appear somewhere else, the pattern is
+       the one CLAUDE.md gives: leave it where it is, hide it, and proxy
+       it from a container of ours. */
     function refractPhCard(header, head, page) {
         var host = header.querySelector(".detail-header-image");
         if (!host) { return; }
@@ -9490,6 +9517,19 @@
         if (!header) { return; }
         if (!header.classList.contains("edit")) {
             header.classList.remove("refract-pe");
+            /* The crop guide is built into the CARD, not into the form, so
+               leaving edit mode does not take it with it. It was appended
+               and never removed: measured, closing edit left .refract-pe-crop
+               in the DOM, visible, z-index 5 over the whole card, with its
+               label sitting on the pill band -- which is the ghost text a
+               user asked about ("the card says card keeps front or
+               something"). Its side panels were also still painting black
+               at 0.55 over 6.6% of each edge of the card.
+
+               Removed rather than hidden, because a hidden node here is a
+               node that comes back the moment a rule moves. */
+            var stale = header.querySelectorAll(".refract-pe-crop, .refract-pe-shot");
+            for (var q = 0; q < stale.length; q++) { stale[q].parentNode.removeChild(stale[q]); }
             return;
         }
         var form = header.querySelector("form");
@@ -9618,7 +9658,16 @@
                 state.innerHTML =
                     '<span class="refract-pe-state__eyebrow">Editing</span>' +
                     '<span class="refract-pe-state__line"></span>';
-                bar.insertBefore(state, bar.firstChild);
+                /* Appended, NEVER inserted at the front. This bar is React's,
+                   and a foreign node placed between its children is how the
+                   header crashed on save: React reconciles by inserting
+                   before its own next child, and a stranger in the middle of
+                   that list makes the reference stale --
+                   "insertBefore: Child to insert before is not a child of
+                   this node". Trailing is safe because React's own nodes stay
+                   contiguous. It is put back in visual order with order: -1,
+                   which is CSS and touches nobody's tree. */
+                bar.appendChild(state);
             }
             var nameEl = form.querySelector('[data-refract-pe="name"] input');
             var who = nameEl ? (nameEl.value || "").trim() : "";
@@ -9694,7 +9743,12 @@
             fill = document.createElement("div");
             fill.className = "refract-ph-fill";
             fill.innerHTML = '<div class="refract-ph-blur"></div><div class="refract-ph-veil"></div>';
-            header.insertBefore(fill, header.firstChild);
+            /* Appended, not put first. The header is React's; nothing of
+               ours belongs between its children (see the state pill). The
+               layering does not depend on DOM order anyway -- the fill is
+               z-index 0 and .detail-container is an explicit z-index 1, so
+               it paints behind wherever it sits in the list. */
+            header.appendChild(fill);
         }
         var pimg = header.querySelector(".detail-header-image img.performer");
         var psrc = pimg ? (pimg.getAttribute("src") || "") : "";
@@ -9948,32 +10002,24 @@
            pill are Stash's live controls and are NOT redrawn here: the
            group is re-parented into the cell below, so what the user
            clicks is the same element it always was. */
-        /* The rating cell prints NO value of its own, deliberately, and
-           this is a bug fix rather than a simplification.
+        /* The rating does NOT become a cell of this row, and the reason
+           is worth keeping so nobody tries it again the same way.
 
-           It used to read Stash's .star-rating-number and reprint it.
-           That span is the same one Stash's hover preview writes into,
-           so hovering a star changed this row's signature, rebuilt it,
-           and inserted a text node ahead of the stars: measured, star
-           five moved 694.27 to 712.48 on hover. It is 15px wide, so it
-           moved further than its own width out from under the pointer,
-           which dropped the hover, which removed the number, which moved
-           it back. That loop is why the fifth star could not be clicked.
-           The previewed value also did not revert on mouseleave, so the
-           cell could sit showing a rating nobody had set.
+           It was one, briefly, by re-parenting Stash's own .quality-group
+           into a cell built here. That is moving a React-managed node out
+           of its parent, which CLAUDE.md warns about and which broke
+           exactly as described: entering edit mode tears down the view
+           head, destroying the control inside our row, and React never
+           rebuilds it because its fiber still points at the node it
+           believes it owns. Measured after Edit then Cancel -- zero
+           .quality-group, zero stars, zero pill, and the rating gone
+           until a reload.
 
-           So Stash's own span is the numeral now -- styled in place,
-           never copied. It updates itself, it previews on hover without
-           any rebuild here, and it commits when clicked. */
-        cells.push({ label: "Rating", value: "", tail: "", rating: true });
+           Putting it in the row needs the control to STAY in Stash's
+           tree: either a proxy that forwards clicks to a hidden native
+           control, or absolute placement driven by a measured offset.
+           Until one of those is built, the group keeps its own place. */
         var sig = cells.map(function (c) { return c.label + c.value + c.tail; }).join("|");
-        /* The controls live in the row now, so the row is no longer ours to
-           wipe. Park the group back at its own home BEFORE the rebuild:
-           innerHTML on a container holding somebody else's live nodes
-           destroys them, and these are Stash's. It is re-parented, never
-           recreated, so its React handlers come with it. */
-        var qgroup = header.querySelector(".quality-group");
-        if (qgroup && standing.contains(qgroup)) { head.appendChild(qgroup); }
         if (standing.getAttribute("data-sig") !== sig) {
             standing.setAttribute("data-sig", sig);
             standing.innerHTML = "";
@@ -9994,16 +10040,8 @@
                 }
                 cell.appendChild(lab);
                 cell.appendChild(val);
-                if (cells[c2].rating) { cell.className += " refract-ph-standing__cell--rating"; }
                 standing.appendChild(cell);
             }
-        }
-        /* Re-home the live controls into the rating cell's value line, every
-           pass, so a rebuild or a re-injection puts them back rather than
-           leaving them behind at the band's right. */
-        if (qgroup) {
-            var rcell = standing.querySelector(".refract-ph-standing__cell--rating .refract-ph-standing__value");
-            if (rcell && qgroup.parentElement !== rcell) { rcell.appendChild(qgroup); }
         }
 
         /* 4. How wide the read-out grid should run. CSS cannot count
@@ -10014,7 +10052,11 @@
         var dgroup = header.querySelector(".detail-group");
         if (dgroup) {
             var nItems = dgroup.querySelectorAll(".detail-item").length;
-            var wanted = nItems ? String(Math.min(6, Math.ceil(nItems / 2))) : "";
+            /* clamp(3, ceil(n/2), 6). The ceiling stops a full performer
+               drawing six then three; the FLOOR of three stops a very
+               sparse one drawing two slabs 760px wide holding one word
+               each, which is what four items did. */
+            var wanted = nItems ? String(Math.min(6, Math.max(3, Math.ceil(nItems / 2)))) : "";
             if (wanted && dgroup.getAttribute("data-refract-cols") !== wanted) {
                 dgroup.setAttribute("data-refract-cols", wanted);
             }
