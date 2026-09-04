@@ -9948,17 +9948,24 @@
            pill are Stash's live controls and are NOT redrawn here: the
            group is re-parented into the cell below, so what the user
            clicks is the same element it always was. */
-        var ratingNum = header.querySelector(".quality-group .star-rating-number");
-        var ratingTxt = ratingNum ? (ratingNum.textContent || "").trim() : "";
-        /* No placeholder when there is no rating. A dash was tried and is
-           wrong twice over: it renders low and thin beside five solid
-           stars, so it reads as debris rather than as a value, and it
-           says a second time what five empty stars already say -- with
-           the difference that the stars are also the control you click to
-           set one, so the empty state is the invitation to act. Dropping
-           it moves nothing: stars, pill, cell height and label all
-           measure identically with and without. */
-        cells.push({ label: "Rating", value: ratingTxt, tail: "", rating: true });
+        /* The rating cell prints NO value of its own, deliberately, and
+           this is a bug fix rather than a simplification.
+
+           It used to read Stash's .star-rating-number and reprint it.
+           That span is the same one Stash's hover preview writes into,
+           so hovering a star changed this row's signature, rebuilt it,
+           and inserted a text node ahead of the stars: measured, star
+           five moved 694.27 to 712.48 on hover. It is 15px wide, so it
+           moved further than its own width out from under the pointer,
+           which dropped the hover, which removed the number, which moved
+           it back. That loop is why the fifth star could not be clicked.
+           The previewed value also did not revert on mouseleave, so the
+           cell could sit showing a rating nobody had set.
+
+           So Stash's own span is the numeral now -- styled in place,
+           never copied. It updates itself, it previews on hover without
+           any rebuild here, and it commits when clicked. */
+        cells.push({ label: "Rating", value: "", tail: "", rating: true });
         var sig = cells.map(function (c) { return c.label + c.value + c.tail; }).join("|");
         /* The controls live in the row now, so the row is no longer ours to
            wipe. Park the group back at its own home BEFORE the rebuild:
