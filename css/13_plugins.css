@@ -1147,21 +1147,21 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
    itself, which is the datum. */
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * {
     --refract-asc-ink: rgba(var(--fg-rgb), 0.55);
-    display: inline-flex !important;
+    /* The silhouette is the chip recipe's (10_pills_badges), where this
+       selector is listed by name. Only what the recipe does not say is
+       stated here, and the declarations it DOES say were removed rather
+       than left agreeing with it: 10 loads after 13, but these carried
+       !important, which beats source order, so leaving them would have
+       kept 13 winning and joining the list would have changed nothing.
+       Joining means giving the properties up. */
     align-items: baseline !important;
     gap: var(--gap-sm) !important;
     min-width: 0 !important;
-    padding: 0.3rem 0.7rem !important;
-    /* Ascension sets min-height: 45px on the entry, which is right for the
-       tall bar it draws by default and wrong for a chip: it stood 45px
-       among a band whose other pills measure 24 to 26. Released, so the
-       chip is the height of its own content and its 0.3rem padding, which
-       is what every pill around it is. */
+    /* Ascension sets min-height: 45px on the entry, which is right for
+       the tall bar it draws by default and wrong for a chip. A min-height
+       beats the recipe's height whatever the order, so it is released
+       here or the chip stays 45px inside a 24px recipe. */
     min-height: 0 !important;
-    background: var(--fill-2) !important;
-    border: 1px solid var(--glass-border) !important;
-    border-left: 1px solid var(--glass-border) !important;
-    border-radius: var(--radius-pill) !important;
     /* Two sizes in the chip, not five. Everything inside inherits this
        one, and the two quiet ends are re-pointed below. */
     font-size: var(--fs-md) !important;
@@ -1193,10 +1193,11 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.loss {
     --refract-asc-ink: var(--refract-asc-loss);
 }
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.win,
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.loss {
-    border-color: color-mix(in srgb, var(--refract-asc-ink) 45%, transparent) !important;
-}
+/* The rim used to carry win and loss as well as the ink. It takes the
+   recipe's hairline now: a chip whose rim changes colour is a sixth rim
+   in a theme that has just agreed on one. The state is not lost, it is
+   in the marker dot and the status word, measured at 7.6:1 dark and
+   6.4:1 light against the chip's own fill. */
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:nth-child(2),
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:nth-child(3) > *:first-child {
     color: var(--refract-asc-ink) !important;
@@ -1596,14 +1597,13 @@ body.stash-liquid-glass .gs-see-all:hover {
    ═══════════════════════════════════════════════════════════════════ */
 
 /* ── Rating ★+ trigger ─────────────────────────────────────────── */
+/* Silhouette and accent both come from the chip recipe, where this
+   selector is in both lists: a read-out shape that mutates something.
+   Fill, rim, radius, height, padding and the resting glow were removed
+   here rather than left restating the recipe, because they carried
+   !important and would have kept winning from the earlier file. */
 body.stash-liquid-glass .adv-rating-btn {
-    background: var(--accent-tint) !important;
-    border: 1px solid var(--accent-glow) !important;
     color: var(--accent-bright) !important;
-    border-radius: var(--radius-pill) !important;
-    height: 26px !important;
-    padding: 0 10px !important;
-    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
     /* Force explicit flex centering - the ★ glyph in most fonts sits
        below the visual line center because the star's bottom points
        hang at the baseline while the top point pokes up. Flex centering
