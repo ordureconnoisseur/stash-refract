@@ -15,10 +15,15 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
+    /* 3.3: the drop comes from the token so light is free, and the two
+       layers that are this panel's own compose on top. Hand-written, the
+       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
+       fill, beside a navbar carrying the token's 0.08. The inset takes
+       --fg-rgb for the same reason. */
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
+        var(--shadow-lg),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
     padding: 1.25rem !important;
 }
 
@@ -520,10 +525,15 @@ body.stash-liquid-glass .gallery-tabs {
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
+    /* 3.3: the drop comes from the token so light is free, and the two
+       layers that are this panel's own compose on top. Hand-written, the
+       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
+       fill, beside a navbar carrying the token's 0.08. The inset takes
+       --fg-rgb for the same reason. */
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
+        var(--shadow-lg),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
     padding: 1.25rem !important;
 }
 
@@ -2069,10 +2079,15 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    /* 3.3: the drop comes from the token so light is free, and the two
+       layers that are this panel's own compose on top. Hand-written, the
+       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
+       fill, beside a navbar carrying the token's 0.08. The inset takes
+       --fg-rgb for the same reason. */
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
+        var(--shadow-lg),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
 }
 body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image-container > img.image-image {
     max-width: 100% !important;
