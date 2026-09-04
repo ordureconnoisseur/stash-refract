@@ -21,8 +21,24 @@
    rim, which is what the advanced-rating pill and the card counters
    already do, so it reads as pressable next to a read-out that does not.
 
-   EVERY ID SEGMENT IN THESE LISTS IS WRAPPED IN :where(), AND IT HAS TO
-   BE. An :is() takes the specificity of its strongest branch, so a
+   NO BRANCH IN THESE LISTS MAY CARRY MORE WEIGHT THAN THE CONTROL RULE
+   CAN BEAT. That is the whole discipline of this file, it was got wrong
+   twice, and both times the symptom was a control chip silently wearing
+   read-out material.
+
+   An :is() takes the specificity of its STRONGEST branch, and there are
+   two ways to inflate one. IDs: a single `#performer-page ...` branch
+   lifted the read-out rule to (1,5,2) against the control rule's
+   (0,2,1). DEPTH: with the IDs wrapped, `.refract-ph .detail-group
+   .detail-item.stash_ids a` -- four classes and an element -- still put
+   it at (0,5,2). Same fault, no ID in sight.
+
+   So every branch is wrapped down to its last compound, which leaves
+   every branch at one class and both rules at (0,2,1). They tie, the
+   control rule is written second, and source order decides it -- which
+   is the intended reading of the file rather than an accident of
+   arithmetic. When you add a selector here, wrap everything but its
+   final compound in :where() whatever it looks like. An :is() takes the specificity of its strongest branch, so a
    single `#performer-page ...` branch lifted the WHOLE read-out rule to
    (1,5,2) while the control rule, all classes, sat at (0,2,1). Both
    match a control chip, and the read-out won regardless of source
@@ -49,11 +65,11 @@ body.stash-liquid-glass :is(
 
     /* performer lane -- read-out */
     :where(#performer-page) .refract-ph-alias__n,
-    :where(#performer-page) .refract-ph .detail-group .detail-item.stash_ids a,
-    :where(#performer-page) .refract-ph-tags .tag-item,
+    :where(#performer-page .refract-ph .detail-group .detail-item.stash_ids) a,
+    :where(#performer-page .refract-ph-tags) .tag-item,
 
     /* mobile lane -- read-out: the More sheet's multiview count badge */
-    .refract-mobile-drawer .refract-drawer-tile-badge,
+    :where(.refract-mobile-drawer) .refract-drawer-tile-badge,
 
     /* ascension lane -- read-out. The match chip is addressed
        structurally on purpose: it names no Ascension class, so the
@@ -62,7 +78,7 @@ body.stash-liquid-glass :is(
        rim it used to wear; win and loss stay in the ink, measured 7.6:1
        dark and 6.4:1 light, which is where a read-out's meaning belongs
        anyway. */
-    :where(#performer-page) .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *,
+    :where(#performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > *) > *,
 
     /* ascension lane -- read-out silhouette, control material below: the
        advanced-rating pill. Joining removes its resting box-shadow glow,
@@ -80,7 +96,7 @@ body.stash-liquid-glass :is(
        the read-out material even though they sit inside things you
        click. */
     .refract-dup-spec,
-    .nav-tabs .nav-link .badge,
+    :where(.nav-tabs .nav-link) .badge,
     .st-activity,
 
     /* scene lane -- read-out silhouette, control material below: the
@@ -112,7 +128,7 @@ body.stash-liquid-glass :is(
 body.stash-liquid-glass :is(
     .refract-chip,
     :where(#performer-page) .refract-ph-alias__n,
-    :where(#performer-page) .refract-ph-tags .tag-item
+    :where(#performer-page .refract-ph-tags) .tag-item
 ):hover {
     border-color: var(--glass-border-bright);
     background: var(--fill-4);
@@ -149,21 +165,16 @@ body.stash-liquid-glass :is(
    D2 exists to close, reopened by the fix for D4. 16.8px, the tab's own text line, fits the item
    and leaves the strips identical. */
 body.stash-liquid-glass .nav-tabs .nav-link .badge {
-    height: 16.8px !important;
-    padding: 0 7px !important;
+    height: 16.8px;
+    padding: 0 7px;
 }
 
-/* ── The one ledgered deviation ──────────────────────────────────────
-   The scene lane's tier chip keeps its own height and its two-line
-   internal layout -- tier name over score, with data-tier driving eight
-   tier treatments -- and wears the recipe's rim and radius over them.
-   It is a control chip whose CONTENT is two lines of different type;
-   forcing it to 24px and one line would not make it more like the other
-   chips, it would make it not the thing it is. Everything else about it
-   is the recipe. Ruled 2026-09-04, scene lane's to maintain. */
-body.stash-liquid-glass .st-tier-chip {
-    height: auto;
-}
+/* The tier chip's height deviation was WITHDRAWN on measurement: it is a
+   single row of two spans, not two lines, and it renders DIAMOND | 4.5
+   inside the recipe's 24px cleanly. It takes the 24. Its data-tier
+   colour treatments are its own and stay. Filed as a deviation on a
+   description of the markup and closed once someone looked at the
+   markup; ruled 2026-09-04. */
 
 /* ── O-Count / increment-only button group ────────────────────────────── */
 body.stash-liquid-glass .count-button.increment-only {
