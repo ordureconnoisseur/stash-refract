@@ -9951,32 +9951,24 @@
            pill are Stash's live controls and are NOT redrawn here: the
            group is re-parented into the cell below, so what the user
            clicks is the same element it always was. */
-        /* The rating cell prints NO value of its own, deliberately, and
-           this is a bug fix rather than a simplification.
+        /* The rating does NOT become a cell of this row, and the reason
+           is worth keeping so nobody tries it again the same way.
 
-           It used to read Stash's .star-rating-number and reprint it.
-           That span is the same one Stash's hover preview writes into,
-           so hovering a star changed this row's signature, rebuilt it,
-           and inserted a text node ahead of the stars: measured, star
-           five moved 694.27 to 712.48 on hover. It is 15px wide, so it
-           moved further than its own width out from under the pointer,
-           which dropped the hover, which removed the number, which moved
-           it back. That loop is why the fifth star could not be clicked.
-           The previewed value also did not revert on mouseleave, so the
-           cell could sit showing a rating nobody had set.
+           It was one, briefly, by re-parenting Stash's own .quality-group
+           into a cell built here. That is moving a React-managed node out
+           of its parent, which CLAUDE.md warns about and which broke
+           exactly as described: entering edit mode tears down the view
+           head, destroying the control inside our row, and React never
+           rebuilds it because its fiber still points at the node it
+           believes it owns. Measured after Edit then Cancel -- zero
+           .quality-group, zero stars, zero pill, and the rating gone
+           until a reload.
 
-           So Stash's own span is the numeral now -- styled in place,
-           never copied. It updates itself, it previews on hover without
-           any rebuild here, and it commits when clicked. */
-        cells.push({ label: "Rating", value: "", tail: "", rating: true });
+           Putting it in the row needs the control to STAY in Stash's
+           tree: either a proxy that forwards clicks to a hidden native
+           control, or absolute placement driven by a measured offset.
+           Until one of those is built, the group keeps its own place. */
         var sig = cells.map(function (c) { return c.label + c.value + c.tail; }).join("|");
-        /* The controls live in the row now, so the row is no longer ours to
-           wipe. Park the group back at its own home BEFORE the rebuild:
-           innerHTML on a container holding somebody else's live nodes
-           destroys them, and these are Stash's. It is re-parented, never
-           recreated, so its React handlers come with it. */
-        var qgroup = header.querySelector(".quality-group");
-        if (qgroup && standing.contains(qgroup)) { head.appendChild(qgroup); }
         if (standing.getAttribute("data-sig") !== sig) {
             standing.setAttribute("data-sig", sig);
             standing.innerHTML = "";
@@ -9997,16 +9989,8 @@
                 }
                 cell.appendChild(lab);
                 cell.appendChild(val);
-                if (cells[c2].rating) { cell.className += " refract-ph-standing__cell--rating"; }
                 standing.appendChild(cell);
             }
-        }
-        /* Re-home the live controls into the rating cell's value line, every
-           pass, so a rebuild or a re-injection puts them back rather than
-           leaving them behind at the band's right. */
-        if (qgroup) {
-            var rcell = standing.querySelector(".refract-ph-standing__cell--rating .refract-ph-standing__value");
-            if (rcell && qgroup.parentElement !== rcell) { rcell.appendChild(qgroup); }
         }
 
         /* 4. How wide the read-out grid should run. CSS cannot count

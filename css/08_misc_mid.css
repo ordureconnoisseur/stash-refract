@@ -7891,106 +7891,33 @@ body.stash-liquid-glass #performer-page .refract-ph-standing__tail {
     body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
 
-/* THE RATING CELL.
+/* THE RATING GROUP keeps Stash's own place in the head.
 
-   The rating is the same class of fact as Scenes, Ranking and Active --
-   what she is in this library -- and it was the only one of the four
-   rendered at chip scale and right-ragged to the far end of the band,
-   which is precisely what made it read as an afterthought. It is a cell
-   of the standing row now: the row's eyebrow, the row's numeral size,
-   left-anchored on the row's own pitch with its peers.
+   It was briefly re-parented into a cell of the standing row, which is
+   the shape the design wanted and the wrong way to get it: moving a
+   React-managed node out of its parent desynced its fiber, so entering
+   edit mode destroyed the control and React never rebuilt it. Measured
+   after Edit then Cancel: zero stars, zero pill, rating gone until a
+   reload. See the note in refract.js beside the standing row's cells.
 
-   The numeral carries the datum and the stars are its scale, not the
-   other way round, which is why the numeral takes --fs-xl (the row's
-   size, shared with every other cell) and the stars come down to its
-   CAP height. Measured, that cap is 14.88px, so the stars are 15 and
-   not the 24 a headline-scale reading of "make it bigger" would
-   suggest: at 24 they out-shout the number they qualify.
-
-   refract.js re-parents Stash's own control group in here rather than
-   redrawing it, so the stars and the pill a user clicks are the same
-   live elements they always were. */
-body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--rating .refract-ph-standing__value {
-    display: flex;
-    /* Centre, on a line that is exactly one numeral tall.
-
-       Centring was tried first and rejected, correctly, because the line
-       was then as tall as the controls and the numeral floated in the
-       middle of it. With the line pinned to 1em below, the numeral's box
-       IS the line, so centring cannot displace it -- and everything else
-       centres on the numeral's own box, which is what "share one line"
-       means.
-
-       Baseline alignment was the intermediate answer and it does not
-       survive the line being constrained: measured, it put the rated
-       numeral's baseline 9.5px off its peers' while the cell height was
-       right. Centre gives both at zero. It also retires a measured 2.5px
-       nudge that existed only to correct what baseline alignment did to
-       the stars and pill; under centring they land on the numeral's box
-       centre with nothing added. */
-    align-items: center;
-    gap: var(--gap-sm);
-    /* The line keeps its peers' height, and this is the rule that makes
-       the ROW line up rather than just the numerals.
-
-       The standing row is bottom-aligned, so a taller cell does not hang
-       below its neighbours -- it starts higher, and takes its eyebrow up
-       with it. This cell's controls made its value line 30.5 against a
-       peer's 21, so the cell measured 49.11 against 39.61 and the RATING
-       label floated 9.5px above SCENES and ACTIVE. The value baselines
-       were identical the whole time, which is exactly why measuring only
-       the values missed it: the fault was one row up.
-
-       1em of --fs-xl is the peers' value line by construction, not a
-       literal copied from a measurement. The stars and the pill overflow
-       it and are not clipped, which is what keeps them their own size
-       while the cell stays its peers' size. */
-    height: 1em;
-}
+   What survives from that round, because none of it depended on the
+   move: the numeral is Stash's own span rather than a copy, it sits
+   AFTER the stars, and it has a reserved width -- which together are
+   what stopped the stars moving out from under the pointer on hover. */
 body.stash-liquid-glass #performer-page .refract-ph .quality-group {
+    grid-row: 3;
+    grid-column: 4;
     display: flex !important;
     align-items: center;
     gap: var(--gap-sm);
-    /* It lives inside the row now, so the grid placement that used to put
-       it at the band's right is gone rather than overridden. */
+    justify-self: end;
+    /* End, not start: with the band fitting its content there is no slack
+       in this row to ride the bottom of, so the rating sits on the
+       standing figures' own line rather than above them. */
+    align-self: end;
     margin: 0 !important;
     padding: 0 !important;
 }
-/* The stars at the numeral's cap height. The artwork is masked onto the
-   BUTTON (see the star block above), so the button's box is the star's
-   size and there is nothing to set on the svg. */
-body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars button {
-    width: 15px !important;
-    height: 15px !important;
-    padding: 0 !important;
-}
-body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars {
-    gap: 2px;
-    align-items: center;
-}
-
-/* The house glow, on the filled layer only -- the same move the accent
-   makes on an active segment, in the star's own colour. An empty star
-   gets none of it, so the glow reads as the rating rather than as
-   decoration on the control. */
-body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars button::after {
-    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--star) 55%, transparent));
-}
-/* Stash's own numeral, shown rather than hidden and reprinted, in a slot
-   whose width does not depend on what it holds.
-
-   It keeps Stash's position, AFTER the stars, and that is the load-
-   bearing half of the fix: nothing to the left of the numeral can move
-   when the numeral appears, so the star under the pointer stays under
-   the pointer. The reserved width holds the pill still as well, so the
-   whole group is fixed whether the value is set, previewed on hover, or
-   absent.
-
-   3ch of tabular figures covers every value either rating system
-   produces -- "5.0" in stars, "10" in decimal -- and tabular is what
-   makes 3ch a promise rather than an average. Empty on an unrated
-   performer, which costs a small reserved gap between the stars and the
-   pill and buys a control you can actually click. */
 body.stash-liquid-glass #performer-page .refract-ph .quality-group .star-rating-number {
     display: block !important;
     min-width: 3ch;
@@ -8013,18 +7940,7 @@ body.stash-liquid-glass #performer-page .refract-ph .quality-group .star-rating-
    stacks: eyebrow, then the numeral with its stars and pill on a line of
    their own. Same anatomy as its peers, and no pretending to fit a line
    it cannot fit. */
-@media (max-width: 820px) {
-    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing {
-        flex-wrap: wrap;
-    }
-    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--rating {
-        flex: 1 0 100%;
-    }
-    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--rating .refract-ph-standing__value {
-        flex-wrap: wrap;
-        row-gap: var(--gap-sm);
-    }
-}
+
 body.stash-liquid-glass #performer-page .refract-ph .quality-group .hon-battle-rank-badge {
     display: none !important;
 }
