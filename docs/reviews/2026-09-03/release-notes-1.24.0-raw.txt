@@ -1,0 +1,151 @@
+REFRACT 1.24.0 - commit subjects since main (799f8b8), newest first, all lanes
+
+09-03  The card's name stops disappearing while its font is on the way
+09-03  The rating takes its own row below 820, and three selectors stop repeating
+09-03  The band keeps its column below 820, and the form keeps its twelve tracks
+09-02  The duplicated breakpoints say they are meant to be deleted
+09-02  ledger: band labels run at 500 against a 600 rule, and two grids that cannot share a track
+09-02  The section answers to the band at every width, and the chip joins 6.7
+09-02  The Ascension section becomes a row of the band
+09-02  docs: Ascension's stats colours are dark-theme-only, measured
+09-02  The section header's gap is the header, so compute it
+09-02  Custom Fields is the user's again, and Ascension gets its own section
+09-02  The flag chip is struck from the same die as the stat pills
+09-02  The performer page's card wears its own tier
+09-02  The flag's ring is the card's colour, not the theme's
+09-02  The card's flag is sized against the pills, not against the caption
+09-02  No flag in the band, so the card's flag means something
+09-02  The card says the country once, and the flag is big enough to read
+09-02  The band's grid is six across and one line deep, and the flag moves to the card
+09-02  The divider gets its own ground, because the card image is not one
+09-02  Custom Fields is a panel, so give it the row
+09-02  The band's grid holds its line, and country becomes a chip
+09-02  6.1: the reader count survives a recount
+09-02  6.1: an element may ship OFF, and the default lives in the table
+09-02  docs: the small-glyph corollary joins the eyeball law
+09-02  docs: the whole Ascension contract, in one file the creator can read
+09-02  The Ascended score becomes a card element, drawn by us and off by default
+09-02  Criterion info icon takes the supplied glyph
+09-02  Five hides by class name become one statement of intent
+09-02  A badge is styled only when every part of it can be named
+09-02  The install zip ships only what the plugin runs
+09-02  The tooltip gets the same repair the spans got
+09-02  The Ascended Score leaves the flex row, not just the paint
+09-02  The band stops shouting over Stash and over the user
+09-01  The chevron subtraction is settled: the performer band is always expanded
+09-01  v1.24.0: the union merge, and the sibling-file trap becomes law
+08-30  docs: light surface family marked executed, with the measurements
+08-30  The light surface family: surface channel flips, artwork scrims do not
+08-30  The five-condition pass: light erased half the logos, phones got six rows
+08-30  docs: light surface family designed from source; fill-override row opened
+08-30  The fill ramp flips for light, matched on lift rather than alpha
+08-30  Lite would have kept the band's 52px blur, which is the one thing lite is for
+08-30  The narrow-width header had the same gap fault the desktop one had
+08-30  docs: the fill ramp flips on matched perceptual lift, ruled
+08-30  The network grid was missing on the page that is only a network
+08-30  docs: padding/margin histogram and draft scale, recorded as PROPOSED
+08-30  docs: destructive actions ruled - inline delete in edit contexts
+08-30  docs: the scene lane's three instrument laws, placed by kind
+08-30  Restore rule 7.18, repair the merge's numbering, state the merge law
+08-30  A diff is not evidence of deletion, either
+08-30  Rule 18 was lost in a merge; two more rules from the day
+08-30  docs: rule 6 corollary - token identity and baked fallback are exclusive
+08-30  An unterminated comment ate the rule it was explaining
+08-30  The entity tab strip moves to the lane that owns the pages it styles
+08-30  Light button ink: pre-111 fallback, and the alpha stops being global
+08-30  The contrast floor, the entity tab radius, and light-mode buttons
+08-30  docs: the fallback law and the actual-ground clause
+08-30  Light-mode Delete gets a pre-111 fallback that renders identically, not merely legibly
+08-30  Light ink tokens get pre-111 fallbacks; the floor stays at 105
+08-30  Two full rows, and the rating stops shouting when there is nothing to say
+08-30  docs: the heart row closes as a probe artifact; the ancestor-opacity trap stays
+08-30  The studio header says what is under it, and the band gets a floor
+08-30  docs: the three grounds of ink, and two rows from the performer sweep
+08-30  08: text ink follows the mode, except where the mode is not what is behind it
+08-30  The playing card's back was painting black on a dark card in light mode
+08-30  danger-ink token, and the atomic-deploy law the incident earned
+08-30  08: every red in the file moves onto the danger family
+08-30  Port --fg-rgb to the foundations tree, all three flips, verbatim
+08-30  Danger family, the fg-rgb ink law, the tabs ruling, and two ledger rows
+08-29  docs: CSS/JS version skew is silent physics; measure only committed builds
+08-29  Logos come in every shape, so the plate stops assuming one
+08-29  Text colour follows the mode instead of being written white
+08-29  Performer header: give the band a legibility floor that does not depend on the photograph
+08-29  Two labels in the light drawer were white on white
+08-29  Performer header: give the red Delete a light-mode ink
+08-29  Light mode's two disclosures were accent-as-text, and unreadable
+08-29  Performer header: let the readout column fill the band
+08-29  Rating stars: draw both layers with the same mask; Delete goes back to red
+08-29  The tag fold happens where the panel runs out, not at eight
+08-29  Give the studio logo its size back
+08-29  Performer header: size the band for the tier's motion, not its still frame
+08-29  The page has to say whose page it is
+08-29  The entity header had a dead zone and two left edges
+08-29  The scope control says what it costs, and the sub-tag row gets a budget
+08-29  The control that reveals the hidden aliases was itself hidden
+08-29  The entity pages stop printing what they already say, and empty tabs stop drawing
+08-29  Performer page: the edit form gets its sections
+08-29  Scene panel: cap the criteria list at 7.5 rows
+08-29  The marquee was landing on the edit form too
+08-29  Performer page: the header card IS the card
+08-29  Lite: rating drawer's tertiary labels for the darker ground
+08-29  Design system: duplicate selectors decide on source order alone
+08-29  Scene panel: light mode for the rating drawer, and three alignment fixes
+08-29  Performer page: the header becomes a marquee
+08-29  The chip's separator was as tall as its container
+08-29  A hairline between the tier and its number
+08-29  The rating drawer and the advanced-rating panel become one control
+08-29  The scene rating reads as its Refract tier, and the stars move behind it
+08-28  The counts leave the strip for the History tab, and the trigger stops being a sixth star
+08-28  Review pass: two levels that were one, and a screen that said nothing
+08-28  docs: the accent as ink, and the group specificity :is() hides
+08-28  The scene scrape results become a contact sheet too
+08-28  docs: read a control's mechanism off the DOM, not off its name
+08-28  Partial stars: Stash windows the fill, it does not clip it from the left
+08-28  One icon family in the strip, and the row stops moving under the pointer
+08-28  One star shape, and the rating stars stop hanging 2px low
+08-28  The panel had three left edges; now it has one
+08-28  docs: a rule that defers to a feature has to name the feature
+08-28  The other five tabs join the vocabulary the Details pane uses
+08-28  Direction B: the control stack becomes one strip and a subtitle
+08-28  Trim the tag caption, and stop File Info breaking words in half
+08-28  docs: group specificity, and how to measure focus at all
+08-28  Delete the rules that lost, especially the ones still arguing their case
+08-28  In light mode the rating stars conveyed nothing at all
+08-28  The panel's only scrollbar was the one thing on it Refract never themed
+08-28  Every control in the panel now has a focus ring; none of them had one
+08-28  The counter numbers sat 1.5px above their own icons
+08-28  The counter pills were insetting their two halves differently
+08-28  docs: two laws the review pass earned
+08-28  Scene panel: the credit row was showing slivers, not faces
+08-28  Sweep every em dash out of the shipped source
+08-28  docs: contrast law (3.9), the gap the panel pass exposed
+08-28  A token can change its job between modes, not just its value
+08-28  The bible's lint reads the ladder instead of keeping a copy of it
+08-28  docs: the panel landed, so the type ledger closes and 10.1 grows
+08-28  Scene panel: the loudest thing in it is the one piece of state it has
+08-28  Scene panel: split the toolbar by what a control is, not by what fits
+08-28  Scene panel: fold the local type scale onto the global ladder
+08-28  docs: the bible catches up with the full token vocabulary
+08-28  Tokenize fills, surfaces, gaps, tracking and z layers; fold the duration residue
+08-28  Fold the blur ladder to nine expressions, fold near-duplicate durations
+08-28  docs: fold in the second review, and make the bible lint itself
+08-28  Tokenize the motion scale
+08-28  docs: fold in the scene-panel instance's review, assessed point by point
+08-28  docs: free user text never sets a panel's height, promoted to law
+08-28  docs: close the remaining surface gaps in the design system
+08-27  docs: second pass on the design system, component law in full
+08-27  docs: add the design-system canvas artboards
+08-27  Close three of the gaps between the mockup and the modal
+08-27  docs: add DESIGN_SYSTEM.md, the governing design rulebook
+08-27  Keep the local measuring harness out of the published plugin
+08-27  Scene panel: optically centre the tab labels, and one rhythm for the chips
+08-27  Dress the scrape modal, not just its results
+08-27  Scene panel: the tab strip becomes a segmented control
+08-27  v1.23.0: the performer scrape results become a contact sheet
+08-27  Scene panel: make the row read as one composition
+08-27  Scene panel: fix what shipping blind got wrong
+08-27  Scene panel: the performer card becomes a credit row
+08-27  Even out the performer scrape row: left gutter and vertical balance
+08-27  Scene panel: the tags stop being 33 equal objects
+08-27  The performer scrape results framed the box, not the photo
