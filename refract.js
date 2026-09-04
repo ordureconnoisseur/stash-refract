@@ -7594,12 +7594,12 @@
                 if (own && own.parentNode) { own.parentNode.removeChild(own); }
                 continue;
             }
-            if (stashBtn.firstChild.nodeValue !== "Set image (front)…") {
-                stashBtn.firstChild.nodeValue = "Set image (front)…";
-            }
-            if (own && own.previousElementSibling !== stashBtn) {
-                own.parentNode.removeChild(own); own = null;
-            }
+            /* Stash's own button is left exactly as Stash rendered it. It
+               used to be relabelled "Set image (front)…" by writing to its
+               text node -- React's text node, in React's subtree. Rewriting
+               a framework's DOM under it is the same class of fault as
+               moving its nodes, and this one sat in the subtree that
+               crashed. The clarification is not worth a crash. */
             if (!own) {
                 own = document.createElement("button");
                 own.type = "button";
@@ -7613,7 +7613,11 @@
                     var r2 = document.querySelector(".refract-pp[data-pid]");
                     if (r2 && r2._rfx) { refractOpenBackPopover(me, r2._rfx); }
                 });
-                stashBtn.parentNode.insertBefore(own, stashBtn.nextSibling);
+                /* Appended to the end of the bar rather than dropped in
+                   beside Stash's button, for the same reason as the state
+                   pill above: nothing of ours goes between React's children.
+                   CSS puts it back beside the button it belongs to. */
+                toolbars[i].appendChild(own);
             }
         }
     }
@@ -9621,7 +9625,16 @@
                 state.innerHTML =
                     '<span class="refract-pe-state__eyebrow">Editing</span>' +
                     '<span class="refract-pe-state__line"></span>';
-                bar.insertBefore(state, bar.firstChild);
+                /* Appended, NEVER inserted at the front. This bar is React's,
+                   and a foreign node placed between its children is how the
+                   header crashed on save: React reconciles by inserting
+                   before its own next child, and a stranger in the middle of
+                   that list makes the reference stale --
+                   "insertBefore: Child to insert before is not a child of
+                   this node". Trailing is safe because React's own nodes stay
+                   contiguous. It is put back in visual order with order: -1,
+                   which is CSS and touches nobody's tree. */
+                bar.appendChild(state);
             }
             var nameEl = form.querySelector('[data-refract-pe="name"] input');
             var who = nameEl ? (nameEl.value || "").trim() : "";
@@ -9697,7 +9710,12 @@
             fill = document.createElement("div");
             fill.className = "refract-ph-fill";
             fill.innerHTML = '<div class="refract-ph-blur"></div><div class="refract-ph-veil"></div>';
-            header.insertBefore(fill, header.firstChild);
+            /* Appended, not put first. The header is React's; nothing of
+               ours belongs between its children (see the state pill). The
+               layering does not depend on DOM order anyway -- the fill is
+               z-index 0 and .detail-container is an explicit z-index 1, so
+               it paints behind wherever it sits in the list. */
+            header.appendChild(fill);
         }
         var pimg = header.querySelector(".detail-header-image img.performer");
         var psrc = pimg ? (pimg.getAttribute("src") || "") : "";

@@ -9339,7 +9339,13 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit .btn {
    survived; what it broke was the ::after break below, which counts on
    the declared order being the real one. */
 body.stash-liquid-glass #performer-page .refract-pe .details-edit > .refract-pe-state {
-    order: 1;
+    /* Negative now, because the pill is APPENDED to this bar rather than
+       inserted at its front: nothing of Refract's goes between React's
+       children any more (that is what crashed the header on save). Its
+       DOM position is last and its visual position is first, which is
+       what order is for. The back-image button follows it at -1, so
+       Refract's own chrome reads as a group ahead of Stash's buttons. */
+    order: -2;
     display: flex;
     flex-direction: column;
     gap: 1px;
@@ -9428,6 +9434,9 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit::before {
 /* The image controls belong with the image, and Clear Image is
    destructive, so it stops sitting between them and Save. */
 body.stash-liquid-glass #performer-page .refract-pe .details-edit .psrc-wrap,
+body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.refract-set-back-btn {
+    order: -1;
+}
 body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.refract-set-back-btn,
 body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-secondary {
     order: 5;
