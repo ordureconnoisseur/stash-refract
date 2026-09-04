@@ -149,8 +149,8 @@ body.stash-liquid-glass :is(
    D2 exists to close, reopened by the fix for D4. 18px fits the item
    and leaves the strips identical. */
 body.stash-liquid-glass .nav-tabs .nav-link .badge {
-    height: 18px;
-    padding: 0 7px;
+    height: 18px !important;
+    padding: 0 7px !important;
 }
 
 /* ── The one ledgered deviation ──────────────────────────────────────
