@@ -1,3 +1,78 @@
+/* ═══════════════════════════════════════════════════════════════════
+   THE CHIP RECIPE (6.7)
+   ═══════════════════════════════════════════════════════════════════
+   One silhouette, one recipe. The cohesion audit of 2026-09-03 found
+   twelve chips sharing --radius-pill and agreeing on nothing else: five
+   fills (0.04, 0.05, 0.06, 0.08, 0.10), three rims (0.12, 0.14, 0.22),
+   four type weights (400, 500, 600, 700) and a backdrop blur on three
+   of them, against 6.5's "never blur the many small ones". The one a
+   user actually catches is the band's alias chip wearing its HOVER rim
+   at rest, 60px from the scene panel's chips on a performer-to-scene
+   click.
+
+   There are two kinds and the difference is what the chip does, not
+   where it lives:
+
+   READ-OUT chip -- it states a fact and does nothing. Glass fill, hairline
+   rim, --fs-sm at 500, no blur, 24px tall. Aliases, endpoints, tags,
+   summaries, counts.
+
+   CONTROL chip -- clicking it changes something. Accent tint and an accent
+   rim, which is what the advanced-rating pill and the card counters
+   already do, so it reads as pressable next to a read-out that does not.
+
+   HOW TO JOIN. Add your selector to the :is() list on the matching rule
+   below; do not restate the recipe in your own file. That is the whole
+   point of it being here rather than five times over. A chip that needs
+   to differ states WHY at its own selector, after this rule, and takes
+   the ledger row with it.
+
+   Every lane's chips are listed by name so the list itself is the
+   inventory: if a chip is not here it is either not a chip or it is
+   drift. */
+body.stash-liquid-glass :is(
+    .refract-chip,
+    #performer-page .refract-ph-alias__n,
+    #performer-page .refract-ph .detail-group .detail-item.stash_ids a,
+    #performer-page .refract-ph-tags .tag-item
+) {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--glass-border);
+    background: var(--fill-3);
+    font-size: var(--fs-sm) !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    color: var(--text);
+    /* No blur. 6.5: the many small ones are the wrong place for it, and
+       three chip kinds were each paying for a backdrop pass. */
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    transition: border-color var(--dur-fast) ease, background-color var(--dur-fast) ease;
+}
+/* The bright rim is what hover is FOR. It was the alias chip's resting
+   state, which left hover with nothing to say and made one chip louder
+   than every other chip on the page. */
+body.stash-liquid-glass :is(
+    .refract-chip,
+    #performer-page .refract-ph-alias__n,
+    #performer-page .refract-ph-tags .tag-item
+):hover {
+    border-color: var(--glass-border-bright);
+    background: var(--fill-4);
+}
+/* A chip that mutates something wears the accent, so pressable and
+   not-pressable are told apart by material rather than by memory. */
+body.stash-liquid-glass :is(
+    .refract-chip-control
+) {
+    border-color: rgba(var(--accent-rgb), 0.28);
+    background: rgba(var(--accent-rgb), 0.12);
+}
+
 /* ── O-Count / increment-only button group ────────────────────────────── */
 body.stash-liquid-glass .count-button.increment-only {
     border-radius: var(--radius-pill) !important;
