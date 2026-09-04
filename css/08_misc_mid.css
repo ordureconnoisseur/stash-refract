@@ -7580,12 +7580,29 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head {
        row was gone. The slack used to separate them by accident.
 
        A section step, from the scale rather than a new number: 1.5x the
-       token whose own note says "between sections". Measured 21px, equal
-       between every pair of rows and equal across a four-item band and a
-       fifteen-item one. */
-    row-gap: calc(var(--gap-xl) * 1.5);
+       token whose own note says "between sections".
+
+       Carried by the ROWS, not by row-gap, and that is not a style
+       preference. The head's five rows are placed explicitly, so a
+       performer without aliases still HAS row 2 -- empty, zero-tall, and
+       still collecting a gap on each side. Gated across six performers,
+       two of them measured 42 between name and standing where everyone
+       else measured 21: one gap for the missing row and one for the row
+       after it. A margin belongs to an element that exists; a gap
+       belongs to a track that may not. */
+    row-gap: 0;
     padding: 1.6rem 0 0 !important;
     min-width: 0;
+}
+
+/* The section step itself. Every head row takes it above; the name is
+   row 1 and always present, so it takes none. Rows that do not exist
+   for a given performer contribute nothing, which is the whole point. */
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > * {
+    margin-top: calc(var(--gap-xl) * 1.5);
+}
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 {
+    margin-top: 0;
 }
 
 /* Row 1: the name, then the icons Stash puts beside it.
