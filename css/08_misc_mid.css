@@ -7927,6 +7927,22 @@ body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--
        by a nudge that would need re-measuring whenever the type moved. */
     align-items: baseline;
     gap: var(--gap-sm);
+    /* The line keeps its peers' height, and this is the rule that makes
+       the ROW line up rather than just the numerals.
+
+       The standing row is bottom-aligned, so a taller cell does not hang
+       below its neighbours -- it starts higher, and takes its eyebrow up
+       with it. This cell's controls made its value line 30.5 against a
+       peer's 21, so the cell measured 49.11 against 39.61 and the RATING
+       label floated 9.5px above SCENES and ACTIVE. The value baselines
+       were identical the whole time, which is exactly why measuring only
+       the values missed it: the fault was one row up.
+
+       1em of --fs-xl is the peers' value line by construction, not a
+       literal copied from a measurement. The stars and the pill overflow
+       it and are not clipped, which is what keeps them their own size
+       while the cell stays its peers' size. */
+    height: 1em;
 }
 body.stash-liquid-glass #performer-page .refract-ph .quality-group {
     display: flex !important;
