@@ -121,16 +121,34 @@ body.stash-liquid-glass .refract-list-sheet .refract-seg {
 }
 body.stash-liquid-glass
 :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link,
-body.stash-liquid-glass .refract-list-sheet .refract-seg button {
+body.stash-liquid-glass .refract-list-sheet .refract-seg button,
+body.stash-liquid-glass
+:is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link {
     border-radius: 9px !important;
     font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
     letter-spacing: 0 !important;
     color: var(--text-muted) !important;
 }
+/* The entity strips' one ruled deviation, and it is the concentric rule
+   doing its job rather than an exception to it. These strips stand free
+   on a hairline with no well to be concentric WITH, so their items keep
+   --radius-sm flat; 9px is only correct inside a 12px well with 3px of
+   padding. Same token, two geometries - the thing 6.23's proposed
+   wording exists to stop being read as drift.
+
+   They join the item and active rules above and NOT the well rule, which
+   is what keeps them free-standing. */
+body.stash-liquid-glass
+:is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link {
+    border-radius: var(--radius-sm) !important;
+}
+
 body.stash-liquid-glass
 :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active,
-body.stash-liquid-glass .refract-list-sheet .refract-seg button.is-on {
+body.stash-liquid-glass .refract-list-sheet .refract-seg button.is-on,
+body.stash-liquid-glass
+:is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link.active {
     color: var(--accent-bright) !important;
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
