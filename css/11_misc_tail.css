@@ -1046,6 +1046,15 @@ body.stash-liquid-glass .refract-segmented-btn {
    well, and 09 draws that pair. */
 body.stash-liquid-glass .refract-segmented-btn {
     appearance: none;
+    /* A <button>'s UA background and border are not a design decision,
+       and the anatomy in 09 does not clear them because it was written
+       for <a class="nav-link">, which has neither. Stripping these on
+       the way to the anatomy left both of this panel's segment rows
+       painting the UA button grey, rgb(240,240,240) with a black rim,
+       in both modes. Reset, not restatement: the anatomy still owns the
+       fill, the rim, the type and the active state. */
+    background: none;
+    border: 1px solid transparent;
     padding: 0.3rem 0.75rem;
     cursor: pointer;
 }
@@ -2599,6 +2608,9 @@ body.stash-liquid-glass .refract-cc-seg {
 }
 body.stash-liquid-glass .refract-cc-seg-btn {
     appearance: none;
+    /* See the reset above: a button brings its own grey. */
+    background: none;
+    border: 1px solid transparent;
     padding: 5px 12px;
     cursor: pointer;
     white-space: nowrap;
