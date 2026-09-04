@@ -304,6 +304,10 @@ body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plu
    the end of the library row; with no explicit order it defaults to 0 and
    jumps in front of Scenes. */
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #StashGifsButton                      { order: 93; }
+/* Xenith (Elo head-to-head ranking) — modal launcher, same shape as the
+   other launcher nav-links. Slot it at the end of the launcher cluster;
+   with no explicit order it defaults to 0 and jumps in front of Scenes. */
+body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #hon-floating-btn-wrapper              { order: 94; }
 /* SFWSwitch + DiceR live in the right-hand .navbar-buttons cluster. Both
    default to order 0 (ahead of Stats); slot them just after Stats(1) and
    ahead of url-switcher(80)/Settings(90). :has() picks each out by its
