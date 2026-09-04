@@ -929,7 +929,9 @@ body.stash-liquid-glass .nav-tabs .nav-link:hover {
     background: var(--fill-4) !important;
     border-color: var(--glass-border) !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active,
+/* The scene strip's own active treatment moved to 09 as the house
+   anatomy (2026-09-04, audit item 2); what is left here is the strips
+   this file styles that are NOT in that list. */
 body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-link.active,
 body.stash-liquid-glass .nav-tabs .nav-link.active {
     color: var(--accent-bright) !important;
@@ -3066,11 +3068,11 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs {
        the 40.8px it needs, and the 3px vertical is load-bearing: the
        links' 9px radius is concentric with the container's 12px across
        that gap. */
-    padding: 3px 9px !important;
-    gap: 3px !important;
-    border-radius: var(--radius-sm) !important;
-    background: var(--fill-1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    /* Horizontal only: the 9px pays for the bleed. The vertical padding,
+       the radius, the fill and the rim are the house anatomy and live in
+       09 now (audit item 2). */
+    padding-left: 9px !important;
+    padding-right: 9px !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     scrollbar-width: none !important;
