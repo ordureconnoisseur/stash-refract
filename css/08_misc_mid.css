@@ -7440,9 +7440,37 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
     padding: 0;
     z-index: 2;
 }
+/* The hang, re-anchored. It used to be bottom-anchored with a fixed
+   -96px, which pinned the overhang at 76px whatever the band did -- so a
+   band with nothing in it stayed tall and the card stayed politely
+   inside it. Anchoring to the TOP and hanging by a fraction of the
+   card's own height inverts that: the band is free to shrink to its
+   content and the card takes up the difference by hanging further.
+
+   The cap needs no rule of its own. The band ends up as max(the text
+   column, the card's inset plus its height minus the hang), so a sparse
+   band stops at the cap and a dense one simply outgrows it and the card
+   goes back to hanging by almost nothing. Measured: a one-scene
+   performer 480 -> 323 with the card hanging 46%, a full one 480 -> 455
+   hanging 20%, and the dense case is identical at a 40% cap and a 50%
+   one because its content, not the card, sets the height.
+
+   Half, expressed against the card's declared width: the card is 340
+   wide at 2:3, so 0.75 of the width is half the height. */
 body.stash-liquid-glass #performer-page .refract-ph.refract-ph-hang .detail-header-image {
-    align-self: flex-end;
-    margin-bottom: -96px;
+    align-self: flex-start;
+    margin-top: 46px;
+    margin-bottom: calc(340px * -0.75);
+}
+/* Nothing may impose a floor on the band any more, or the shrink above
+   cannot happen: 480px of min-height was the other half of why a sparse
+   band stayed tall. The foot takes the same air as the head's top. */
+body.stash-liquid-glass #performer-page .detail-header.refract-ph,
+body.stash-liquid-glass #performer-page .refract-ph .detail-container {
+    min-height: 0 !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .detail-container {
+    padding-bottom: 1.6rem;
 }
 body.stash-liquid-glass #performer-page .refract-ph .detail-header-image > button.btn-link {
     display: block;
@@ -7529,7 +7557,13 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head {
        it beats four gaps that are each slightly wrong. Ruled 2026-09-03
        against a measured review; the old note is replaced rather than
        left to argue with the code. */
-    grid-template-rows: auto auto 1fr auto auto;
+    /* No slack row. It was `auto auto 1fr auto auto`, and on a sparse
+       performer at a wide window that 1fr measured 232px of nothing
+       between the standing figures and the read-out beneath them -- the
+       band was card-tall whatever it held, and the field the ruling
+       called "the composition" was, for a one-scene performer, just a
+       hole. See the ledger row for F7, rewritten. */
+    grid-template-rows: repeat(5, auto);
     align-content: start;
     align-items: start;
     column-gap: var(--gap-lg);
@@ -7833,19 +7867,77 @@ body.stash-liquid-glass #performer-page .refract-ph-standing__tail {
    button and the O counter are the only interactive things in this
    column and they keep working. The rank badge is hidden because the
    standing row above already states it, in words. */
+/* The read-out grid packs to its content.
+
+   Six fixed columns whatever the performer holds is the second half of
+   what "why does it look so empty" was pointing at: nine read-outs fill
+   six cells and then three, leaving a blank rectangle the width of half
+   the band beside the last row. Balancing the columns to ceil(n/2),
+   capped at the six the dense case wants, turns that into two even rows.
+
+   The count is refract.js's, set as an attribute when it builds the head,
+   because CSS cannot count children. Capped at six so a full performer is
+   untouched: fifteen items still ask for six. */
+body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="1"] { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+/* THE RATING CELL.
+
+   The rating is the same class of fact as Scenes, Ranking and Active --
+   what she is in this library -- and it was the only one of the four
+   rendered at chip scale and right-ragged to the far end of the band,
+   which is precisely what made it read as an afterthought. It is a cell
+   of the standing row now: the row's eyebrow, the row's numeral size,
+   left-anchored on the row's own pitch with its peers.
+
+   The numeral carries the datum and the stars are its scale, not the
+   other way round, which is why the numeral takes --fs-xl (the row's
+   size, shared with every other cell) and the stars come down to its
+   CAP height. Measured, that cap is 14.88px, so the stars are 15 and
+   not the 24 a headline-scale reading of "make it bigger" would
+   suggest: at 24 they out-shout the number they qualify.
+
+   refract.js re-parents Stash's own control group in here rather than
+   redrawing it, so the stars and the pill a user clicks are the same
+   live elements they always were. */
+body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--rating .refract-ph-standing__value {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+}
 body.stash-liquid-glass #performer-page .refract-ph .quality-group {
-    grid-row: 3;
-    grid-column: 4;
     display: flex !important;
     align-items: center;
-    gap: var(--gap-lg);
-    justify-self: end;
-    /* Start, not end: this row carries the slack now, so an end-aligned
-       rating would ride the bottom of the air instead of staying beside
-       the standing figures it belongs to. */
-    align-self: start;
+    gap: var(--gap-sm);
+    /* It lives inside the row now, so the grid placement that used to put
+       it at the band's right is gone rather than overridden. */
     margin: 0 !important;
     padding: 0 !important;
+}
+/* The stars at the numeral's cap height. The artwork is masked onto the
+   BUTTON (see the star block above), so the button's box is the star's
+   size and there is nothing to set on the svg. */
+body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars button {
+    width: 15px !important;
+    height: 15px !important;
+    padding: 0 !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars {
+    gap: 2px;
+    align-items: center;
+}
+/* The house glow, on the filled layer only -- the same move the accent
+   makes on an active segment, in the star's own colour. An empty star
+   gets none of it, so the glow reads as the rating rather than as
+   decoration on the control. */
+body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars button::after {
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--star) 55%, transparent));
+}
+body.stash-liquid-glass #performer-page .refract-ph .quality-group .star-rating-number {
+    display: none !important;
 }
 body.stash-liquid-glass #performer-page .refract-ph .quality-group .hon-battle-rank-badge {
     display: none !important;

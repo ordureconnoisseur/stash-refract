@@ -9926,7 +9926,29 @@
                 cells.push({ label: "Active", value: cm[1], tail: /-\s*$/.test(cv) ? " to now" : cv.replace(/^\d{4}\s*-?\s*/, " to ") });
             }
         }
+        /* The rating is the same class of fact as the three above -- what
+           she is in this library -- and it was the only one of them
+           rendered at chip scale, right-ragged away from its peers, which
+           is what made it read as chrome rather than data. It joins them
+           as a cell.
+
+           Its value is Stash's own number, and a dash when there is none,
+           so the pair reads in both states the way RANKING does rather
+           than leaving the cell blank. The stars and the advanced-rating
+           pill are Stash's live controls and are NOT redrawn here: the
+           group is re-parented into the cell below, so what the user
+           clicks is the same element it always was. */
+        var ratingNum = header.querySelector(".quality-group .star-rating-number");
+        var ratingTxt = ratingNum ? (ratingNum.textContent || "").trim() : "";
+        cells.push({ label: "Rating", value: ratingTxt || "–", tail: "", rating: true });
         var sig = cells.map(function (c) { return c.label + c.value + c.tail; }).join("|");
+        /* The controls live in the row now, so the row is no longer ours to
+           wipe. Park the group back at its own home BEFORE the rebuild:
+           innerHTML on a container holding somebody else's live nodes
+           destroys them, and these are Stash's. It is re-parented, never
+           recreated, so its React handlers come with it. */
+        var qgroup = header.querySelector(".quality-group");
+        if (qgroup && standing.contains(qgroup)) { head.appendChild(qgroup); }
         if (standing.getAttribute("data-sig") !== sig) {
             standing.setAttribute("data-sig", sig);
             standing.innerHTML = "";
@@ -9947,7 +9969,29 @@
                 }
                 cell.appendChild(lab);
                 cell.appendChild(val);
+                if (cells[c2].rating) { cell.className += " refract-ph-standing__cell--rating"; }
                 standing.appendChild(cell);
+            }
+        }
+        /* Re-home the live controls into the rating cell's value line, every
+           pass, so a rebuild or a re-injection puts them back rather than
+           leaving them behind at the band's right. */
+        if (qgroup) {
+            var rcell = standing.querySelector(".refract-ph-standing__cell--rating .refract-ph-standing__value");
+            if (rcell && qgroup.parentElement !== rcell) { rcell.appendChild(qgroup); }
+        }
+
+        /* 4. How wide the read-out grid should run. CSS cannot count
+           children, so the count comes from here: balanced to ceil(n/2)
+           and capped at six, which leaves a full performer on six and
+           stops a sparse one drawing six cells and then three with a
+           blank half-band beside the short row. */
+        var dgroup = header.querySelector(".detail-group");
+        if (dgroup) {
+            var nItems = dgroup.querySelectorAll(".detail-item").length;
+            var wanted = nItems ? String(Math.min(6, Math.ceil(nItems / 2))) : "";
+            if (wanted && dgroup.getAttribute("data-refract-cols") !== wanted) {
+                dgroup.setAttribute("data-refract-cols", wanted);
             }
         }
 
