@@ -7976,8 +7976,31 @@ body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars
 body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars button::after {
     filter: drop-shadow(0 0 4px color-mix(in srgb, var(--star) 55%, transparent));
 }
+/* Stash's own numeral, shown rather than hidden and reprinted, in a slot
+   whose width does not depend on what it holds.
+
+   It keeps Stash's position, AFTER the stars, and that is the load-
+   bearing half of the fix: nothing to the left of the numeral can move
+   when the numeral appears, so the star under the pointer stays under
+   the pointer. The reserved width holds the pill still as well, so the
+   whole group is fixed whether the value is set, previewed on hover, or
+   absent.
+
+   3ch of tabular figures covers every value either rating system
+   produces -- "5.0" in stars, "10" in decimal -- and tabular is what
+   makes 3ch a promise rather than an average. Empty on an unrated
+   performer, which costs a small reserved gap between the stars and the
+   pill and buys a control you can actually click. */
 body.stash-liquid-glass #performer-page .refract-ph .quality-group .star-rating-number {
-    display: none !important;
+    display: block !important;
+    min-width: 3ch;
+    font-variant-numeric: tabular-nums;
+    font-size: var(--fs-xl) !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    letter-spacing: -0.02em;
+    color: var(--text) !important;
+    text-align: right;
 }
 /* At 820 and below the stars are 44px, because that is the touch floor
    and a target you tap is not negotiable. Five of them plus the pill do
