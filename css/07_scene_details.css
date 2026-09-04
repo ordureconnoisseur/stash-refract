@@ -15,10 +15,15 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
+    /* 3.3: the drop comes from the token so light is free, and the two
+       layers that are this panel's own compose on top. Hand-written, the
+       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
+       fill, beside a navbar carrying the token's 0.08. The inset takes
+       --fg-rgb for the same reason. */
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
+        var(--shadow-lg),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
     padding: 1.25rem !important;
 }
 
@@ -520,10 +525,15 @@ body.stash-liquid-glass .gallery-tabs {
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
+    /* 3.3: the drop comes from the token so light is free, and the two
+       layers that are this panel's own compose on top. Hand-written, the
+       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
+       fill, beside a navbar carrying the token's 0.08. The inset takes
+       --fg-rgb for the same reason. */
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
+        var(--shadow-lg),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
     padding: 1.25rem !important;
 }
 
@@ -599,9 +609,9 @@ body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1
     color: var(--text-muted) !important;
     text-decoration: none !important;
     text-transform: uppercase;
-    letter-spacing: var(--track-label);
+    letter-spacing: var(--track-eyebrow);
     font-size: var(--fs-xs) !important;
-    font-weight: 700;
+    font-weight: 600;
     transition: color var(--dur-fast) ease;
 }
 body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1.studio-logo > a:hover {
@@ -1511,7 +1521,7 @@ body.stash-liquid-glass .history-header {
    one that read as a heading instead of a label. */
 body.stash-liquid-glass .history-header h5 {
     font-size: var(--fs-xs) !important;
-    font-weight: 700 !important;
+    font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: var(--track-eyebrow) !important;
     color: rgba(var(--fg-rgb), 0.42) !important;
@@ -1586,7 +1596,7 @@ body.stash-liquid-glass .scene-history .remove-date-button:hover {
    than earned (P3). */
 body.stash-liquid-glass .scene-video-filter h5 {
     font-size: var(--fs-xs) !important;
-    font-weight: 700 !important;
+    font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: var(--track-eyebrow) !important;
     color: rgba(var(--fg-rgb), 0.42) !important;
@@ -1806,8 +1816,8 @@ body.stash-liquid-glass .scene-markers-panel .primary-tag::before {
     content: "Categories";
     grid-column: 1 / -1;
     font-size: var(--fs-xs);
-    font-weight: 700;
-    letter-spacing: var(--track-display);
+    font-weight: 600;
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--text-muted);
 }
@@ -1967,8 +1977,8 @@ body.stash-liquid-glass .scene-markers-panel .wall:has(.wall-item)::before {
     content: "Previews";
     grid-column: 1 / -1;
     font-size: var(--fs-xs);
-    font-weight: 700;
-    letter-spacing: var(--track-display);
+    font-weight: 600;
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--text-muted);
 }
@@ -2069,10 +2079,15 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    /* 3.3: the drop comes from the token so light is free, and the two
+       layers that are this panel's own compose on top. Hand-written, the
+       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
+       fill, beside a navbar carrying the token's 0.08. The inset takes
+       --fg-rgb for the same reason. */
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.35),
+        var(--shadow-lg),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
 }
 body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image-container > img.image-image {
     max-width: 100% !important;
@@ -2219,6 +2234,13 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     cursor: pointer;
     transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease;
 }
+/* The one eyebrow in this panel that stays at 700, and the reason is
+   what the text is doing rather than how it looks: this is a CONTROL's
+   own label, not a label introducing content. The chip is the drawer's
+   trigger (ruled a control 2026-09-04), so it takes the control-label
+   weight while every section label in the panel folded to the 6.13
+   pair - --fs-xs / 600 / --track-eyebrow. Listed as the exemption it is,
+   per the audit, rather than left looking like the eighth spec. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-name {
     font-size: var(--fs-xs);
     font-weight: 700;
@@ -2371,7 +2393,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     content: "Overall";
     flex: 0 0 auto;
     font-size: var(--fs-xs);
-    font-weight: 700;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: var(--track-eyebrow);
     color: rgba(var(--fg-rgb), 0.42);
@@ -2981,8 +3003,8 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-more[hidden] {
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored-head {
     margin: 1.25rem 0 0 0;
     font-size: var(--fs-xs);
-    font-weight: 700;
-    letter-spacing: var(--track-wide);
+    font-weight: 600;
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: rgba(var(--fg-rgb), 0.42);
 }

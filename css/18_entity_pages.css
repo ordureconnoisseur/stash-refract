@@ -191,13 +191,12 @@ body.stash-liquid-glass .group-tabs .item-list-header:has(#showSubContent:checke
    Bootstrap, so the ring has to be drawn on the platform. The house
    ring is a box-shadow (6.6); nothing here sets `box-shadow: none` on
    the wrapper, so it works as written. */
-body.stash-liquid-glass .studio-tabs .item-list-header:has(#showSubContent:focus-visible),
-body.stash-liquid-glass .tag-tabs .item-list-header:has(#showSubContent:focus-visible),
-body.stash-liquid-glass .group-tabs .item-list-header:has(#showSubContent:focus-visible) {
-    border-color: var(--accent-glow);
-    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.15);
-    outline: none;
-}
+/* The wrapper's own ring is gone with every other per-surface one: 09
+   states a single :focus-visible rule and the checkbox inside takes it
+   directly. This rule was also the last `outline: none` on a focusable
+   thing in this file, which is the shape of the fault the audit found
+   here -- a surface that suppressed the house ring and drew a quieter
+   one of its own. */
 
 /* -------------------------------------------------------------------
    Narrow
@@ -304,15 +303,6 @@ body.stash-liquid-glass .refract-scope[data-scope="own"] .refract-scope-seg[data
 body.stash-liquid-glass .refract-scope[data-scope="all"] .refract-scope-seg[data-seg="all"] .refract-scope-value {
     color: var(--text);
 }
-
-/* The house focus ring (6.6). These are real buttons, so they are in
-   the tab order and must show it. */
-body.stash-liquid-glass .refract-scope-seg:focus-visible {
-    border-color: var(--accent-glow);
-    box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.15);
-    outline: none;
-}
-
 /* The native switch stands down only once the proxy is genuinely up.
    `refract-has-scope` is added by the injector and removed the moment
    it cannot draw, so any failure leaves Stash's own control on screen
@@ -371,13 +361,6 @@ body.stash-liquid-glass .detail-header .detail-item.sub_tags .refract-cap-toggle
     color: var(--accent-bright);
     text-decoration: underline;
 }
-
-body.stash-liquid-glass .detail-header .detail-item.sub_tags .refract-cap-toggle:focus-visible {
-    outline: 2px solid var(--accent-glow);
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
-}
-
 @media (max-width: 1200px) {
     body.stash-liquid-glass .refract-scope-seg {
         flex: 1 1 auto;
@@ -658,7 +641,7 @@ body.stash-liquid-glass .detail-header:has(.group-head) .detail-header-image {
    fills, so they do NOT belong to the fill ramp (3.2). */
 body.stash-liquid-glass {
     --refract-eh-veil: 10, 10, 10;
-    --refract-eh-grid: rgba(14, 13, 16, 0.74);
+    --refract-eh-grid: rgba(var(--surface-rgb), 0.74);
     --refract-eh-grid-hover: rgba(24, 22, 28, 0.86);
 }
 
@@ -817,13 +800,6 @@ body.stash-liquid-glass .refract-eh-kin-more:hover {
     color: var(--accent-bright);
     text-decoration: underline;
 }
-
-body.stash-liquid-glass .refract-eh-kin-more:focus-visible {
-    outline: 2px solid var(--accent-glow);
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
-}
-
 body.stash-liquid-glass .refract-eh-kin-grid {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -847,12 +823,6 @@ body.stash-liquid-glass .refract-eh-kin-cell {
 body.stash-liquid-glass .refract-eh-kin-cell:hover {
     background: var(--refract-eh-grid-hover);
 }
-
-body.stash-liquid-glass .refract-eh-kin-cell:focus-visible {
-    outline: 2px solid var(--accent-glow);
-    outline-offset: -2px;
-}
-
 body.stash-liquid-glass .refract-eh-kin-name {
     font-size: var(--fs-xs);
     font-weight: 500;

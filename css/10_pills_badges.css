@@ -21,6 +21,20 @@
    rim, which is what the advanced-rating pill and the card counters
    already do, so it reads as pressable next to a read-out that does not.
 
+   EVERY ID SEGMENT IN THESE LISTS IS WRAPPED IN :where(), AND IT HAS TO
+   BE. An :is() takes the specificity of its strongest branch, so a
+   single `#performer-page ...` branch lifted the WHOLE read-out rule to
+   (1,5,2) while the control rule, all classes, sat at (0,2,1). Both
+   match a control chip, and the read-out won regardless of source
+   order: measured on the advanced-rating pill, the fill stayed
+   --fill-3, the accent never landed, and `box-shadow: none` never
+   landed either, so the pill kept a shadow from a generic button rule.
+   The same weight also beat every per-chip deviation written in a
+   lane's own file, including the tab badge's height, which is how the
+   entity strips came out 36 tall against the scene panel's 28.8 after
+   joining. :where() contributes zero, so the ID branches keep their
+   reach and lose their weight (7.9).
+
    HOW TO JOIN. Add your selector to the :is() list on the matching rule
    below; do not restate the recipe in your own file. That is the whole
    point of it being here rather than five times over. A chip that needs
@@ -34,9 +48,9 @@ body.stash-liquid-glass :is(
     .refract-chip,
 
     /* performer lane -- read-out */
-    #performer-page .refract-ph-alias__n,
-    #performer-page .refract-ph .detail-group .detail-item.stash_ids a,
-    #performer-page .refract-ph-tags .tag-item,
+    :where(#performer-page) .refract-ph-alias__n,
+    :where(#performer-page) .refract-ph .detail-group .detail-item.stash_ids a,
+    :where(#performer-page) .refract-ph-tags .tag-item,
 
     /* mobile lane -- read-out: the More sheet's multiview count badge */
     .refract-mobile-drawer .refract-drawer-tile-badge,
@@ -48,7 +62,7 @@ body.stash-liquid-glass :is(
        rim it used to wear; win and loss stay in the ink, measured 7.6:1
        dark and 6.4:1 light, which is where a read-out's meaning belongs
        anyway. */
-    #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *,
+    :where(#performer-page) .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *,
 
     /* ascension lane -- read-out silhouette, control material below: the
        advanced-rating pill. Joining removes its resting box-shadow glow,
@@ -57,7 +71,23 @@ body.stash-liquid-glass :is(
        control chip is told apart by its accent tint and rim, not by a
        halo, and a halo at rest is the same mistake the alias chip was
        making with its hover rim. */
-    .adv-rating-btn
+    .adv-rating-btn,
+
+    /* scene lane -- read-out: the duplicate checker's spec pills
+       (duration, filesize, resolution, bitrate, codec), the tab count
+       badges and the activity counter. The badges and the counter are
+       counters rather than controls under 6.5, which is why they take
+       the read-out material even though they sit inside things you
+       click. */
+    .refract-dup-spec,
+    .nav-tabs .nav-link .badge,
+    .st-activity,
+
+    /* scene lane -- read-out silhouette, control material below: the
+       favourite and count buttons, and the tier chip. */
+    .adv-favourite-btn,
+    .count-button,
+    .st-tier-chip
 ) {
     display: inline-flex;
     align-items: center;
@@ -81,8 +111,8 @@ body.stash-liquid-glass :is(
    than every other chip on the page. */
 body.stash-liquid-glass :is(
     .refract-chip,
-    #performer-page .refract-ph-alias__n,
-    #performer-page .refract-ph-tags .tag-item
+    :where(#performer-page) .refract-ph-alias__n,
+    :where(#performer-page) .refract-ph-tags .tag-item
 ):hover {
     border-color: var(--glass-border-bright);
     background: var(--fill-4);
@@ -94,11 +124,45 @@ body.stash-liquid-glass :is(
 
     /* ascension lane: the advanced-rating pill opens the rating drawer,
        so it takes the control material over the read-out box above. */
-    .adv-rating-btn
+    .adv-rating-btn,
+
+    /* scene lane: all three mutate something -- favourite, o-count, and
+       the tier chip, which is the rating drawer's trigger. */
+    .adv-favourite-btn,
+    .count-button,
+    .st-tier-chip
 ) {
     box-shadow: none;
     border-color: rgba(var(--accent-rgb), 0.28);
     background: rgba(var(--accent-rgb), 0.12);
+}
+
+/* ── Deviations, each with the box it has to fit ────────────────────
+   Both of these are the same shape and worth stating together: a chip
+   whose CONTAINER has a height, where the recipe's 24px would set that
+   height instead of fitting inside it. The material is the recipe's in
+   both cases; only the box is the container's.
+
+   The tab count badge sits in a 28.8px tab item whose text line is
+   16.8. At 24 it became the tallest thing in the item and pushed the
+   entity strips to 36 against the scene panel's 28.8 -- which is the gap
+   D2 exists to close, reopened by the fix for D4. 18px fits the item
+   and leaves the strips identical. */
+body.stash-liquid-glass .nav-tabs .nav-link .badge {
+    height: 18px;
+    padding: 0 7px;
+}
+
+/* ── The one ledgered deviation ──────────────────────────────────────
+   The scene lane's tier chip keeps its own height and its two-line
+   internal layout -- tier name over score, with data-tier driving eight
+   tier treatments -- and wears the recipe's rim and radius over them.
+   It is a control chip whose CONTENT is two lines of different type;
+   forcing it to 24px and one line would not make it more like the other
+   chips, it would make it not the thing it is. Everything else about it
+   is the recipe. Ruled 2026-09-04, scene lane's to maintain. */
+body.stash-liquid-glass .st-tier-chip {
+    height: auto;
 }
 
 /* ── O-Count / increment-only button group ────────────────────────────── */
