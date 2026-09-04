@@ -1570,18 +1570,6 @@ body.stash-liquid-glass .refract-seg .refract-segmented-btn {
     padding: 0.16rem 0.5rem;
     font-size: var(--fs-xs);
 }
-
-/* Keyboard focus. The segmented buttons are the panel's most-used control
-   and had NO focus style anywhere - tabbing through Card style, Rating
-   flourish, Left/Right, the layering row and the rating-system mirror gave
-   no visible position. Offset inward so the ring sits inside the pill's
-   track rather than colliding with the neighbouring button. */
-body.stash-liquid-glass .refract-segmented-btn:focus-visible {
-    outline: 2px solid var(--accent-bright);
-    outline-offset: -1px;
-    border-radius: var(--radius-pill);
-}
-
 @media (max-width: 800px) {
     }
 
@@ -1860,15 +1848,6 @@ body.stash-liquid-glass .refract-cc-face-btn.is-active {
     color: var(--accent-bright);
     font-weight: 600;
 }
-body.stash-liquid-glass .refract-cc-face-btn:focus-visible,
-body.stash-liquid-glass .refract-cc-kind-btn:focus-visible,
-body.stash-liquid-glass .refract-cc-shuffle:focus-visible,
-body.stash-liquid-glass .refract-cc-seg-btn:focus-visible,
-body.stash-liquid-glass .refract-cc-chip:focus-visible,
-body.stash-liquid-glass .refract-cc-preset:focus-visible {
-    outline: 2px solid var(--accent-bright);
-    outline-offset: 2px;
-}
 body.stash-liquid-glass .refract-cc-rail-right {
     display: flex;
     align-items: center;
@@ -2061,14 +2040,6 @@ body.stash-liquid-glass .refract-cc-ring {
     background: rgba(var(--accent-rgb), 0.1);
     pointer-events: none;
 }
-/* Focus on a band. SOLID, where the armed ring is dashed: focusing also arms
-   the band, so a dashed focus outline drew a second dashed accent rectangle
-   concentric with the first and the two read as one muddled intent. */
-body.stash-liquid-glass .refract-cc-hit:focus-visible {
-    outline: 2px solid var(--accent-bright);
-    outline-offset: -2px;
-    border-radius: 9px;
-}
 /* The intro: one pulse per band, staggered from the JS, then gone. The
    preview stays exactly as it was; only the rings breathe. */
 body.stash-liquid-glass .refract-cc-ring.is-intro {
@@ -2199,10 +2170,6 @@ body.stash-liquid-glass .refract-cc-elem-hit:hover {
 body.stash-liquid-glass .refract-cc-elem-hit.is-plain {
     cursor: default;
 }
-body.stash-liquid-glass .refract-cc-elem-hit:focus-visible {
-    outline: 2px solid var(--accent-bright);
-    outline-offset: 2px;
-}
 body.stash-liquid-glass .refract-cc-elem-hit.is-open {
     border-color: var(--accent-bright);
     background: rgba(var(--accent-rgb), 0.2);
@@ -2256,10 +2223,6 @@ body.stash-liquid-glass .refract-cc-pill-hit {
 body.stash-liquid-glass .refract-cc-pill-hit:hover {
     border-color: rgba(var(--accent-rgb), 0.75);
     background: rgba(var(--accent-rgb), 0.14);
-}
-body.stash-liquid-glass .refract-cc-pill-hit:focus-visible {
-    outline: 2px solid var(--accent-bright);
-    outline-offset: 2px;
 }
 /* The pill under the open menu. Lit from inside the scrim, so the eye goes
    menu -> pill without a leader line. */
@@ -2621,10 +2584,6 @@ body.stash-liquid-glass .refract-cc-reset:hover {
     color: var(--text);
     border-color: rgba(255, 120, 120, 0.55);
     background: rgba(255, 120, 120, 0.08);
-}
-body.stash-liquid-glass .refract-cc-reset:focus-visible {
-    outline: 2px solid var(--accent-bright);
-    outline-offset: 2px;
 }
 body.stash-liquid-glass .refract-cc-seg {
     display: flex;
