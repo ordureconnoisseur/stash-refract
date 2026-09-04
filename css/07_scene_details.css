@@ -3172,7 +3172,24 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .badge
    browser's tooltip: the panel has a voice and a native tooltip is not
    in it. The text comes from --st-activity-tip, which the JS sets, so
    the markup stays one empty element. */
+/* The counter's BOX, not just its type. The chip recipe gives every
+   read-out chip a 24px height, and this one lives inside a 28.8px tab:
+   at 24 it became the tallest thing in its nav-link, took that tab to
+   36, and because the strip stretches its items, took every other tab
+   and the strip itself from 36.8 to 44. Measured - the History tab at
+   36 with five 28.8 siblings all stretched to match it.
+
+   That is the same failure 10 already documents for the tab count badge,
+   one element over: both are counters that sit inside a tab, both joined
+   the recipe, and only the badge was given back its box. 16.8px is the
+   tab's own text line, which is what the badge took for the same reason.
+
+   It also reopened D2 on this strip while the audit's fix for D4 was
+   being verified, which is worth knowing: the two items can undo each
+   other, and neither lane's own measurement would show it. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-activity {
+    height: 16.8px !important;
+    padding: 0 6px !important;
     margin-left: 4px;
     font-size: var(--fs-xs);
     font-weight: 700;
