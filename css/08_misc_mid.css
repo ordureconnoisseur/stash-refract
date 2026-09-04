@@ -8494,12 +8494,56 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     body.stash-liquid-glass #performer-page .refract-ph-tags {
         margin-left: calc(200px + 2.5rem);
     }
-    /* 44px is the floor for a touch target (appropriate scales). */
+    /* ── The 44px floor, in pixels, because it is a finger ───────────
+       This rule has always SAID 44 and never delivered it: 2.75rem
+       against this theme's 14px root is 38.5, so every control it names
+       has been 5.5px under the floor since it was written, and the
+       comment agreeing with the intent is most of why nobody checked. A
+       touch target is a physical size and does not scale with the type
+       ramp; it is the one measurement in the theme that belongs in px.
+
+       Measured at 700 before: band buttons 38.5, the name icons 38.5 x
+       39, the advanced-rating pill 24 x 60, the rating stars 21 x 18,
+       the entity tabs 29 and the edit form's fields 33.6 -- all under a
+       mobile chrome whose dock slots are 56 and whose every control is
+       44 (6.11, the audit's D6).
+
+       The control chips take 44 here and the recipe's 24 stays a desktop
+       decision: a chip you press is a control before it is a chip, and
+       the recipe's own escape is that a chip fits the box it is in.
+       Read-out chips keep 24 -- nobody taps an alias. */
     body.stash-liquid-glass #performer-page .refract-ph .details-edit .btn,
     body.stash-liquid-glass #performer-page .refract-ph .name-icons .btn,
-    body.stash-liquid-glass #performer-page .refract-ph .name-icons .dropdown-toggle {
-        height: 2.75rem !important;
-        min-width: 2.75rem !important;
+    body.stash-liquid-glass #performer-page .refract-ph .name-icons .dropdown-toggle,
+    body.stash-liquid-glass #performer-page .refract-ph .rating-stars button,
+    body.stash-liquid-glass #performer-page .refract-ph .adv-rating-btn,
+    body.stash-liquid-glass #performer-page .refract-pe .details-edit .btn,
+    body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link,
+    body.stash-liquid-glass .detail-header:has(.studio-head) .btn,
+    body.stash-liquid-glass .detail-header:has(.tag-head) .btn,
+    body.stash-liquid-glass .detail-header:has(.group-head) .btn {
+        min-height: 44px !important;
+        min-width: 44px !important;
+    }
+    /* The form's fields are controls too, and the one height they share
+       is 33.6 by a rule of this lane's own making. Textareas excluded by
+       name: they are already taller and a floor says nothing to them. */
+    body.stash-liquid-glass #performer-page .refract-pe form :is(
+        .form-control,
+        .text-input,
+        .react-select__control,
+        .input-group-append > .btn,
+        .input-group-prepend > .btn
+    ):not(textarea) {
+        min-height: 44px !important;
+        height: 44px !important;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe form .input-group {
+        min-height: 44px;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe form .react-select__value-container,
+    body.stash-liquid-glass #performer-page .refract-pe form .react-select__indicators {
+        height: 44px !important;
     }
 }
 
