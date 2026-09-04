@@ -109,6 +109,18 @@ body.stash-liquid-glass :is(
     align-items: center;
     height: 24px;
     padding: 0 10px;
+    /* A chip in a gapped container never carries its own margin. The
+       recipe owned every box property of a chip except this one, which
+       is how Stash's own `.tag-item { margin: 5px 0 }` walked straight
+       through it: the performer tags row measured 34 tall on a single
+       row of 24px chips, and 15.6 between wrapped rows against a
+       declared 5.6 gap. Fixing the instance was already done once in
+       07; this closes the class instead.
+
+       A chip whose container is NOT gapped keeps its margin as a stated
+       deviation - see the tab count badge below, which is the only one
+       on any surface measured. */
+    margin: 0;
     border-radius: var(--radius-pill);
     border: 1px solid var(--glass-border);
     background: var(--fill-3);
@@ -151,6 +163,9 @@ body.stash-liquid-glass :is(
     box-shadow: none;
     border-color: rgba(var(--accent-rgb), 0.28);
     background: rgba(var(--accent-rgb), 0.12);
+    /* Restated for a control chip that does not also carry .refract-chip
+       and so takes no box from the read-out rule above. */
+    margin: 0;
 }
 
 /* ── Deviations, each with the box it has to fit ────────────────────
@@ -167,6 +182,15 @@ body.stash-liquid-glass :is(
 body.stash-liquid-glass .nav-tabs .nav-link .badge {
     height: 16.8px;
     padding: 0 7px;
+    /* The one margin the recipe does not zero, and it is the ruling's own
+       test that keeps it: "a chip in a GAPPED container". This container
+       is not gapped. The link is display:block holding a bare text node
+       and the badge, so Bootstrap's .left-spacing margin is the only
+       thing between "Scenes" and "325" - at margin 0 they touch. Stated
+       here rather than fixed by giving the link a flex gap, because the
+       link's display belongs to the tab anatomy in 09 and this is one
+       declaration in the file that already owns the badge's box. */
+    margin-left: 5.6px;
 }
 
 /* The tier chip's height deviation was WITHDRAWN on measurement: it is a

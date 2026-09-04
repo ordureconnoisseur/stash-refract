@@ -329,6 +329,20 @@ body.stash-liquid-glass.refract-has-scope .item-list-header:has(#showSubContent)
    and any viewport, and it takes the class off again when the row
    fits. The fade is a mask rather than a painted gradient: the bar is
    a glass surface, and a solid fade over it reads as a band (3.2). */
+/* The sub-tag row spaces its chips by a real gap, because from this
+   commit the chips have no margins of their own. It was a flex row with
+   NO gap relying entirely on Stash's .tag-item { margin: 5px }, so the
+   recipe zeroing that margin would have left eight chips touching.
+
+   10px horizontal is the daylight the margins were already producing
+   (5 + 5), so the row looks the same; the vertical gap is not optional
+   because this row wraps, and it also stops the old margins inflating
+   the row box - 36.58 tall for a 24px chip, against 34 once the spacing
+   is the container's job. */
+body.stash-liquid-glass .detail-header .detail-item.sub_tags .detail-item-value {
+    gap: 10px;
+}
+
 body.stash-liquid-glass .detail-header .detail-item.sub_tags.refract-capped .detail-item-value {
     max-height: 10rem;
     overflow: hidden;

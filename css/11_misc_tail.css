@@ -1790,8 +1790,13 @@ body.stash-liquid-glass .refract-cc-kind {
        radii. Every structural test for a segmented strip passes here:
        a well, 3px of padding, a gap, mutually exclusive buttons, one
        active. */
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
     background: var(--fill-1);
+    /* The rim is the last 2px between this well and its twin: without it
+       the pair measured 34.8 and 36.8 after the type joined. A literal
+       12px next to a twin wearing the token is the same drift one level
+       down, so both are the token now. */
+    border: 1px solid rgba(var(--fg-rgb), 0.08);
 }
 body.stash-liquid-glass .refract-cc-kind-btn {
     appearance: none;
@@ -2620,10 +2625,9 @@ body.stash-liquid-glass .refract-cc-seg {
     margin-top: auto;
 }
 body.stash-liquid-glass .refract-cc-seg-btn {
-    appearance: none;
-    /* See the reset above: a button brings its own grey. */
-    background: none;
-    border: 1px solid transparent;
+    /* appearance, background and border live in 09's button reset now,
+       which carries them for every joined segment with !important. What
+       is left here is the geometry the anatomy does not set. */
     padding: 5px 12px;
     cursor: pointer;
     white-space: nowrap;
