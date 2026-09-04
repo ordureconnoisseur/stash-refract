@@ -7637,15 +7637,11 @@ body.stash-liquid-glass #performer-page .refract-ph-alias__list {
 body.stash-liquid-glass #performer-page .refract-ph-alias.is-open .refract-ph-alias__list {
     max-height: none;
 }
-body.stash-liquid-glass #performer-page .refract-ph-alias__n {
-    padding: 3px 9px;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--glass-border-bright);
-    background: var(--fill-4);
-    font-size: var(--fs-sm);
-    line-height: 1.45;
-    color: var(--text);
-}
+/* The alias chip's own recipe is gone: it is the house chip now, drawn
+   by the one rule in 10_pills_badges. It used to carry --glass-border-
+   bright and --fill-4 AT REST -- the hover state, worn permanently -- which
+   is why it read louder than every other chip on the page and 60px from
+   the scene panel's. Nothing left to say here. */
 body.stash-liquid-glass #performer-page .refract-ph-alias__more {
     flex: none;
     /* On the first row, not centred against the block: expanded to two
@@ -8061,13 +8057,19 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.s
        changes height with the number of endpoints. */
     line-height: 1;
 }
+/* The one documented deviation from the chip recipe, and the reason is
+   the cell it lives in rather than the chip itself. The house chip is
+   24px tall; this one sits INSIDE a read-out tile whose value line box
+   is 16.7px, and at 24 it sets the height of the whole grid row -- which
+   is the fault F8 fixed (47.6 for a text tile against 52.5 with one of
+   these and 79.6 with two). Fill, rim, weight, ink and no-blur all come
+   from the recipe; only the box is the tile's. */
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids a {
+    height: auto !important;
     font-size: var(--fs-xs) !important;
     line-height: 1.65 !important;
     padding: 0 8px !important;
     min-height: 0 !important;
-    font-weight: 500 !important;
-    color: var(--text) !important;
 }
 /* The grid is a uniform six-up of one-line tiles, and nothing in it
    gets to change that shape. A value too long for its cell truncates
@@ -8596,10 +8598,6 @@ body.stash-liquid-glass.refract-light #performer-page .refract-ph .detail-group 
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .detail-group .detail-item {
     background: rgba(252, 252, 252, 0.9);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-}
-body.stash-liquid-glass.refract-light #performer-page .refract-ph-alias__n {
-    border-color: rgba(0, 0, 0, 0.12);
-    background: rgba(0, 0, 0, 0.05);
 }
 /* The danger red is a dark-mode red: #f87171 on this band measures
    1.48:1 in light, which is worse than the muted grey it replaced, so
