@@ -7265,15 +7265,17 @@
             '</div>';
         host.appendChild(root);
 
-        /* The stage sits on the photo's box. Showing the front, it IS the
-           photo's box. Showing the back, it keeps the width and takes the BACK
-           photo's own height -- the back is not cropped to the front's shape,
-           it is its own picture at its own aspect. The frame changes shape at
-           the edge-on moment of the flip, where nothing is visible. */
+        /* The stage sits on the photo's box, on BOTH faces. It used to take
+           the back photo's own aspect while turned over, on the argument that
+           the back was its own picture at its own shape. On a card that is a
+           fixed 2:3 frame that meant a 944x2048 portrait ran 228px past the
+           bottom and started at its own top edge instead of the front's crop,
+           and a 16:9 scene screenshot stopped 228px down with the chin and
+           pills floating over nothing. The frame is the front's; the back is
+           cropped and anchored exactly as the front is, so a flip moves
+           nothing but the picture's content. */
         var stage = root.querySelector(".refract-pp-stage");
         var frontCopy = root.querySelector(".refract-pp-front");
-        var backRatio = null;   /* height / width of the back photo, once known */
-        var showingBack = false;
         var lastSrc = img.getAttribute("src") || "";
         /* React owns the <img> and replaces it -- Stash's own "Set image
            (front)" swaps the node. fit() re-resolves it every pass instead of
@@ -7298,13 +7300,14 @@
                 lastSrc = src;
                 frontCopy.style.backgroundImage = "url('" + src.replace(/'/g, "%27") + "')";
             }
-            var h = (showingBack && backRatio) ? Math.round(ib.width * backRatio) : ib.height;
+            /* The anchor travels with the box: the front copy and the back
+               read it from the stage. */
+            refractPublishFaceAnchor(stage, im);
             stage.style.left = (ib.left - hb.left) + "px";
             stage.style.top = (ib.top - hb.top) + "px";
             stage.style.width = ib.width + "px";
-            stage.style.height = h + "px";
+            stage.style.height = ib.height + "px";
         };
-        root._rfxSetBack = function (on, ratio) { showingBack = on; if (ratio) { backRatio = ratio; } fit(); };
         var ro = null;
         fit();
         requestAnimationFrame(fit);
@@ -7347,7 +7350,6 @@
         function backPhotoUrl() {
             return refractBackImageUrl(img.getAttribute("src") || "", d);
         }
-        var backRatioKnown = null;
         function buildBack(done) {
             var el = stage.querySelector(".refract-pp-backimg");
             if (!el) {
@@ -7357,22 +7359,20 @@
             }
             var url = String(backPhotoUrl());
             el.style.backgroundImage = "url('" + url.replace(/'/g, "%27") + "')";
-            /* Its natural shape decides the frame's height on the back. The
-               probe is bounded: a request that neither loads nor errors used
-               to leave busy=true forever, a dead flip button. */
+            /* The photo is fetched before the turn starts, so the back does
+               not land blank and fill in. Bounded: a request that neither
+               loads nor errors used to leave busy=true forever, a dead flip
+               button. */
             var settled = false;
-            var finish = function (ratio) {
+            var finish = function () {
                 if (settled) { return; }
                 settled = true;
-                backRatioKnown = ratio;
                 if (done) { done(); }
             };
             var probe = new Image();
-            probe.onload = function () {
-                finish(probe.naturalWidth ? (probe.naturalHeight / probe.naturalWidth) : null);
-            };
-            probe.onerror = function () { finish(null); };
-            setTimeout(function () { finish(backRatioKnown); }, 5000);
+            probe.onload = finish;
+            probe.onerror = finish;
+            setTimeout(finish, 5000);
             probe.src = url;
         }
         function labelFlip() {
@@ -7389,7 +7389,6 @@
                 if (refractPrefersReducedMotion()) {
                     face = toBack ? "back" : "front";
                     stage.classList.toggle("is-back", toBack);
-                    root._rfxSetBack(toBack, backRatioKnown);
                     busy = false;
                     labelFlip();
                     return;
@@ -7399,8 +7398,6 @@
                 setTimeout(function () {
                     face = toBack ? "back" : "front";
                     stage.classList.toggle("is-back", toBack);
-                    /* Edge-on: the frame takes the new photo's shape unseen. */
-                    root._rfxSetBack(toBack, backRatioKnown);
                     labelFlip();
                     stage.style.transition = "none";
                     stage.style.transform = "perspective(1200px) rotateY(90deg)";
@@ -7414,8 +7411,8 @@
                     }, 250);
                 }, 235);
             };
-            /* Going to the back, the photo's shape must be known before the
-               turn starts, or the frame would resize after landing. */
+            /* Going to the back, the photo is fetched before the turn starts,
+               or the back would land blank and fill in. */
             if (toBack) { buildBack(go); } else { go(); }
         }
         flipBtn.addEventListener("click", function (e) {
@@ -7435,7 +7432,7 @@
                 var b = c && c.querySelector(".refract-card-back");
                 if (b && b.parentNode) { b.parentNode.removeChild(b); }
             }
-            if (face === "back") { buildBack(function () { root._rfxSetBack(true, backRatioKnown); }); }
+            if (face === "back") { buildBack(); }
             return p;
         }
 
@@ -7448,6 +7445,9 @@
             wrap.className = "refract-pb-backdrop";
             var pick = document.createElement("div");
             pick.className = "refract-pb-picker";
+            /* The cells crop as the card does: the front's anchor, so what
+               you pick is what you get. */
+            refractPublishFaceAnchor(pick, host.querySelector("img.performer") || img);
             pick.setAttribute("role", "dialog");
             pick.setAttribute("aria-label", "Pick this performer’s back photo");
             var cells = "";
@@ -7819,6 +7819,7 @@
         var back = document.createElement("div");
         back.className = "refract-card-back refract-mirror-back";
         var img = card.querySelector("img.performer-card-image");
+        refractPublishFaceAnchor(back, img);
         var portrait = img ? (img.getAttribute("src") || "") : "";
         var nameEl = card.querySelector(".performer-name");
         var name = nameEl ? (nameEl.textContent || "").trim() : "";
@@ -7955,6 +7956,30 @@
         /* Asked for a scene by a performer with none, or a photo from an empty
            library: the portrait, which is the one picture that always exists. */
         return portrait;
+    }
+    /* WHERE THE PICTURE SITS. One answer, read off the front.
+
+       The front is an <img>, cropped by object-fit and object-position.
+       Every other picture on the card -- the page's front copy, the mirror
+       back, the dossier's wash and portrait cell, the picker's cells -- is a
+       background div, and each one anchored itself at centre. Measured on
+       Anna Beggion's page card (944x2048 in a 340x510 frame): the front
+       <img> painted its top at 72.67, the copy the reader actually sees at
+       8.94, and the back at 122.75, so one photo sat at three heights and
+       the flip read as a jump. Rather than a fourth literal, the anchor is
+       PUBLISHED from the front's computed style as a custom property and the
+       CSS carries no number of its own: whoever moves the front's crop moves
+       every face with it. The property lives on the element passed in, so a
+       card, a stage or a dialog each carry their own. */
+    var REFRACT_FACE_ANCHOR = "--refract-face-anchor";
+    function refractPublishFaceAnchor(target, img) {
+        if (!target) { return; }
+        var pos = "";
+        if (img) {
+            try { pos = window.getComputedStyle(img).objectPosition || ""; } catch (e) { pos = ""; }
+        }
+        if (pos) { target.style.setProperty(REFRACT_FACE_ANCHOR, pos); }
+        else { target.style.removeProperty(REFRACT_FACE_ANCHOR); }
     }
     function refractCssBgUrl(url) {
         return "url('" + String(url).replace(/'/g, "%27") + "')";
@@ -8109,6 +8134,7 @@
         var back = document.createElement("div");
         back.className = "refract-card-back";
         var img = card.querySelector("img.performer-card-image");
+        refractPublishFaceAnchor(back, img);
         var imgSrc = img ? (img.getAttribute("src") || "") : "";
         var nameEl = card.querySelector(".performer-name");
         var name = nameEl ? (nameEl.textContent || "").trim() : "";
