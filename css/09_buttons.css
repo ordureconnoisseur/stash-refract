@@ -1,3 +1,78 @@
+/* ── The focus ring, for the whole theme ──────────────────────────────
+   ONE ring. The 2026-09-03 cohesion audit found six of them - four lanes
+   had each written their own outline at their own alpha (0.90, 0.70,
+   0.28, solid) - and two surfaces with no visible focus at all: the
+   studio head, where every control measured outline 0 and Stash's own
+   unthemed Bootstrap ring showed through, and the list toolbar, where
+   twelve buttons changed nothing on focus.
+
+   An OUTLINE, not 6.6's box-shadow ring. The shadow ring cannot survive
+   this file: `box-shadow: none !important` is set on .btn.minimal:focus
+   below and on every .rating-stars button in 08, both of which would
+   erase it. An outline also stays out of layout and follows each
+   control's own radius for free.
+
+   Specificity is the whole battle. Thirty-nine `outline: none !important`
+   declarations across twelve files sit between this rule and the screen,
+   and the most specific of them reaches (0,5,1) - 08's rating-stars
+   group, whose FIRST selector is what counts and is the reason the stars
+   measured ringless the last time this was fixed. The body class is
+   tripled to clear that: cheap, and the documented remedy in this
+   codebase. Verified by focusing every control and reading computed
+   style, not by reading selectors.
+
+   `:focus-visible`, never `:focus`, so the ring answers the keyboard and
+   never a mouse click. The companion rule below removes any ring a
+   mouse click would otherwise leave.
+
+   Colour: `--accent-bright` in dark, `--accent-ink` in light (3.1 rule 4;
+   the light partner lives in 14_light). Measured against sampled grounds
+   per 3.9, all eight presets, worst case of four grounds each:
+     dark   --accent-bright   4.50:1  (red on the scene toolbar strip)
+     light  --accent-ink      7.28:1  (green on the same strip)
+   Both clear the 3:1 non-text floor. One cell does not, and it is a
+   token matter rather than this rule's: on Chrome 105-110, where
+   color-mix is unsupported, --accent-ink falls back to --accent and the
+   green preset lands 2.87:1 in light. Logged for foundations; shipping
+   the ring anyway is the right trade, because the alternative on those
+   browsers is the no-focus state this rule exists to end. */
+body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass
+:is(a[href], button, input, select, textarea, summary,
+    [tabindex]:not([tabindex="-1"]),
+    .btn, .nav-link, .page-link, .card-check,
+    [role="button"], [role="tab"], [role="checkbox"], [role="switch"]):focus-visible {
+    outline: 2px solid var(--accent-bright) !important;
+    outline-offset: 2px !important;
+}
+
+/* react-select hides the real input inside a styled box, so the ring has
+   to be worn by the box. `:has()` is affordable here - filter bars and
+   toolbars hold a handful of these - but it must never be widened to the
+   card grid, which has already spent that budget (7.2). */
+body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass
+.react-select__control:has(input:focus-visible) {
+    outline: 2px solid var(--accent-bright) !important;
+    outline-offset: 2px !important;
+}
+
+/* A mouse click must not leave a ring. Chrome already withholds
+   :focus-visible from most pointer focus, but Stash's own rules and
+   Bootstrap's both paint on plain :focus, so the state is stated here
+   rather than left to the browser. */
+body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass
+:is(a[href], button, input, select, textarea, .btn, .nav-link, .page-link):focus:not(:focus-visible) {
+    outline: none !important;
+}
+
+/* Bootstrap's unthemed blue-grey ring, measured leaking through the
+   studio head's organised button as `0 0 0 2.8px rgba(87,102,114,0.5)`.
+   Scoped to the button families that carry no refract shadow of their
+   own, so .btn-primary's accent glow below is untouched. */
+body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass
+:is(.btn-secondary, .btn-light, .btn-dark, .btn-link, .btn.minimal):focus {
+    box-shadow: none !important;
+}
+
 /* ── .btn-primary: glass orange button ─────────────────────────────
    No backdrop-filter - this rule hits every primary button on the page,
    which can be 30-50+ on heavy pages. Each blurred button is a GPU
