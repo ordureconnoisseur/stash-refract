@@ -1135,12 +1135,15 @@ body.stash-liquid-glass .refract-mirror-back {
     container-type: inline-size;
     overflow: hidden;
 }
+/* Anchored where the front's <img> is anchored (`--refract-face-anchor`,
+   published onto the back by the builder from the img's computed
+   object-position), so the same photo does not move when the card turns. */
 body.stash-liquid-glass .refract-mb-img {
     position: absolute;
     inset: 0;
     background-color: #15151a;
     background-size: cover;
-    background-position: center;
+    background-position: var(--refract-face-anchor, 50% 50%);
 }
 /* Scrims, not blur: the image IS the backdrop, so lite mode loses nothing
    here. That is a deliberate property of this face. */
@@ -1372,7 +1375,7 @@ body.stash-liquid-glass .refract-back-photo {
     position: absolute;
     inset: -22px;
     background-size: cover;
-    background-position: center;
+    background-position: var(--refract-face-anchor, 50% 50%);
     transform: scaleX(-1);
     filter: blur(20px) saturate(1.25) brightness(0.58);
 }
@@ -1489,7 +1492,7 @@ body.stash-liquid-glass .refract-cb-portrait {
     flex: 0 0 auto;
     border-radius: 9px;
     background-size: cover;
-    background-position: center top;
+    background-position: var(--refract-face-anchor, 50% 0%);
     background-color: var(--fill-2);
     border: 1px solid rgba(var(--seal-rgb), 0.4);
     box-shadow:
@@ -1991,22 +1994,29 @@ body.stash-liquid-glass .refract-pp-stage {
     overflow: hidden;
     will-change: transform;
 }
+/* Both photos crop as the hidden <img> does: cover, anchored where it is
+   anchored. `--refract-face-anchor` is the img's computed object-position,
+   published onto the stage by fit() in refract.js, so there is no second
+   literal here to drift from the front's rule. The copy used to sit at
+   centre while the img sat at 50% 22%: 63.7px apart on a 340x510 frame, and
+   nobody saw it because the img is invisible. */
 body.stash-liquid-glass .refract-pp-front {
     position: absolute;
     inset: 0;
     background-size: cover;
-    background-position: center;
+    background-position: var(--refract-face-anchor, 50% 50%);
     cursor: zoom-in;
 }
-/* The back photo. The stage takes this photo's own aspect while it is up, so
-   cover crops nothing here; it only absorbs a rounding pixel. Hidden until the
-   stage is turned over. */
+/* The back photo, in the SAME frame as the front with the SAME crop. The
+   stage used to take this photo's own aspect while it was up; the frame is
+   now the front's on both faces, so a flip moves nothing but the picture's
+   content. Hidden until the stage is turned over. */
 body.stash-liquid-glass .refract-pp-backimg {
     position: absolute;
     inset: 0;
     background-color: #15151a;
     background-size: cover;
-    background-position: center;
+    background-position: var(--refract-face-anchor, 50% 50%);
     visibility: hidden;
     z-index: 2;
 }
@@ -2198,7 +2208,7 @@ body.stash-liquid-glass .refract-pb-cell-art {
     width: 100%;
     aspect-ratio: 2 / 3;
     background-size: cover;
-    background-position: center;
+    background-position: var(--refract-face-anchor, 50% 50%);
 }
 body.stash-liquid-glass .refract-pb-cell-tag {
     position: absolute;
