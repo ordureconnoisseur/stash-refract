@@ -1799,14 +1799,10 @@ body.stash-liquid-glass .refract-cc-kind {
     border: 1px solid rgba(var(--fg-rgb), 0.08);
 }
 body.stash-liquid-glass .refract-cc-kind-btn {
-    appearance: none;
+    /* Joined to the segment anatomy in 09: radius, type, colour, the
+       button reset and the active treatment all come from there. What is
+       left is the geometry the anatomy does not set. */
     padding: 5px 13px;
-    border-radius: 9px;
-    border: 1px solid transparent;
-    background: none;
-    font-size: var(--fs-xs);
-    font-weight: 500;
-    color: var(--text-muted);
     cursor: pointer;
     white-space: nowrap;
     transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast);
@@ -1814,12 +1810,9 @@ body.stash-liquid-glass .refract-cc-kind-btn {
 body.stash-liquid-glass .refract-cc-kind-btn:hover {
     color: var(--text);
 }
-body.stash-liquid-glass .refract-cc-kind-btn.is-active {
-    background: rgba(var(--accent-rgb), 0.2);
-    border-color: rgba(var(--accent-rgb), 0.42);
-    color: var(--accent-bright);
-    font-weight: 600;
-}
+/* The active state is 09's now, the same accent-tint and accent-glow
+   every other segment wears. Its old 0.2 fill and 0.42 rim were the
+   louder half of the two-controls-two-treatments problem. */
 /* The face segment: nested in the tab strip after "Performer card", split
    from the tabs by a hairline. Front|Back are radios; the glyph turns with
    the card. */
