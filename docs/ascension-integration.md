@@ -72,6 +72,41 @@ Four things, all optional, none urgent.
    for the neutral value, or any theme-aware colour, would fix it at the
    source for every theme rather than for this one.
 
+## Going the other way: Refract's card in Ascension's matchmaking
+
+Ascension's author has asked whether the matchmaking screen could use
+Refract's performer card, with the flip button and the back image. It can,
+and there is a way to do it that couples neither project to the other.
+
+**The route we would propose: render Stash's own `PerformerCard`.** Stash
+exposes its components to plugins, and Refract themes that component
+rather than a card of its own. If matchmaking renders it, three things
+happen at once: a Refract user gets the Refract card, flip and back with
+no work on either side; a vanilla user gets the vanilla card, which is the
+correct outcome rather than a degraded one; and neither project learns
+anything about the other's markup. Nothing in this document would need a
+new row.
+
+**The fallback, if the component is not usable there**, is Refract
+attaching the flip to Ascension's own markup, and the requirement is more
+specific than "the card carries a performer id". `injectPerformerCardFlip`
+needs exactly three things:
+
+1. `body` carrying `refract-perf-layout-card` (the playing-card rating
+   style). The flip does not exist in the other card styles at all, so on
+   a library set to Minimal or Extravagant there is nothing to attach and
+   that is by design, not a gap.
+2. The card container to match `.performer-card`.
+3. An anchor inside it whose `href` matches `/performers/<digits>`. The id
+   is read from that link, not from a data attribute, so a card that links
+   to the performer already satisfies it and one that does not cannot be
+   made to work without a change on Refract's side.
+
+The fallback is worth stating because it is cheap, but the component route
+is better for both projects and is the one to try first. This is a
+post-1.24.0 item; it is written down now because it is a decision with a
+reason attached, and reasons are what get lost between sessions.
+
 ## What Refract touches
 
 ### The performer card badge

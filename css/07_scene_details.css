@@ -2224,12 +2224,18 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
        top edge. */
     align-items: center;
     gap: 6px;
-    height: 22px;
-    padding: 0 10px;
-    border-radius: var(--radius-pill);
-    background: var(--fill-3);
-    border: 1px solid var(--glass-border);
-    box-shadow: none;
+    /* Box and resting material are the chip recipe's (10), not this
+       file's. They used to be declared here - height 22, --fill-3 fill,
+       --glass-border rim - and while the recipe's shared :is() was
+       inflated to (0,5,2) by one four-class branch, this rule at (0,4,1)
+       lost and nobody noticed. Wrapping those branches in :where()
+       dropped the recipe to (0,2,1), at which point this rule started
+       WINNING and the chip measured its old 22px instead of the ruled
+       24px: the same declarations, the same file, opposite outcomes, one
+       specificity fix apart. Removed rather than re-tuned.
+       What stays below the comment is layout that is genuinely this
+       chip's, plus the data-tier treatments further down, which are
+       !important and unaffected either way. */
     font-family: inherit;
     cursor: pointer;
     transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease;
