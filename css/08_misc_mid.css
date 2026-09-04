@@ -7595,25 +7595,6 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head {
     min-width: 0;
 }
 
-/* The section step itself. Every head row takes it above; the name is
-   row 1 and always present, so it takes none. Rows that do not exist
-   for a given performer contribute nothing, which is the whole point. */
-body.stash-liquid-glass #performer-page .refract-ph .performer-head > * {
-    /* !important because several of these rows carry `margin: 0 !important`
-       of their own, written when the spacing was the track's job. Measured
-       without it: only the standing row took the step and the read-out sat
-       flush against it at 0. */
-    margin-top: calc(var(--gap-xl) * 1.5) !important;
-}
-body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 {
-    margin-top: 0 !important;
-}
-/* The rating group shares the standing row's grid line, so it takes the
-   same step and stays level with it rather than being pushed below. */
-body.stash-liquid-glass #performer-page .refract-ph .performer-head > .quality-group {
-    margin-top: calc(var(--gap-xl) * 1.5) !important;
-}
-
 /* Row 1: the name, then the icons Stash puts beside it.
 
    The name was hidden here at first, on the reasoning that the card
@@ -8387,6 +8368,31 @@ body.stash-liquid-glass #performer-page .refract-ph-tags {
 body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     display: flex;
 }
+
+/* The section step itself. Every head row takes it above; the name is
+   row 1 and always present, so it takes none. Rows that do not exist
+   for a given performer contribute nothing, which is the whole point. */
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > * {
+    /* !important because several of these rows carry `margin: 0 !important`
+       of their own, written when the spacing was the track's job. Measured
+       without it: only the standing row took the step and the read-out sat
+       flush against it at 0. */
+    margin-top: calc(var(--gap-xl) * 1.5) !important;
+}
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 {
+    margin-top: 0 !important;
+}
+/* The rating group shares the standing row's grid line, so it takes the
+   same step and stays level with it rather than being pushed below. */
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > .quality-group {
+    margin-top: calc(var(--gap-xl) * 1.5) !important;
+}
+
+/* Placed here, after every row's own rules, on purpose. The step ties on
+   specificity with rules like `.refract-ph .detail-group { margin: 0 }`,
+   and a tie is decided by source order -- measured with it written
+   earlier: the alias row and the read-out both stayed at margin-top 0
+   and only the standing row moved. */
 
 /* Below 1400 the read-outs step down. The band keeps its shape well
    below that: stacking the card above the head leaves the right half
