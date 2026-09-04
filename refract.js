@@ -11984,6 +11984,41 @@
             }
             parkAscensionBadge(badge, pcMode);
         });
+        sanitiseAscensionHeadRank();
+    }
+
+    /* Ascension's own pill in the performer page's EDIT head prints a rank
+       for a performer who has none. Its rank is a position in a sorted
+       list, so an unrated performer lands one past the end and the pill
+       reads "Rank #493 of 492" - a number larger than the set it claims
+       to be a position in, which is not a rank at all.
+
+       Refract's band already says "Unranked" for the same performer
+       (the F10 ruling), so the page states two different things about one
+       fact, and the wrong one is the plugin's. P8 is the rule: the theme
+       does not claim knowledge it does not have, and here it is removing
+       a claim rather than adding one. The test is theirs and needs no
+       list of versions - a rank past the total is self-evidently not a
+       rank, whatever the markup is called.
+
+       Only the two nodes' text changes; the badge, its handlers and its
+       tooltip are untouched. Idempotent, and re-run every cycle so it
+       survives Ascension rebuilding the pill. */
+    function sanitiseAscensionHeadRank() {
+        var badges = document.querySelectorAll("#performer-page .quality-group .hon-battle-rank-badge");
+        badges.forEach(function (badge) {
+            var rankEl = badge.querySelector(".hon-rank-text");
+            var totalEl = badge.querySelector(".hon-rank-total");
+            if (!rankEl || !totalEl) { return; }
+            var rank = (rankEl.textContent || "").match(/(\d[\d,]*)/);
+            var total = (totalEl.textContent || "").match(/(\d[\d,]*)/);
+            if (!rank || !total) { return; }
+            var r = parseInt(rank[1].replace(/,/g, ""), 10);
+            var t = parseInt(total[1].replace(/,/g, ""), 10);
+            if (!isFinite(r) || !isFinite(t) || r <= t) { return; }
+            if (rankEl.textContent !== "Unranked") { rankEl.textContent = "Unranked"; }
+            setClassIfChanged(badge, "refract-ascension-unranked", true);
+        });
     }
 
     /* WHERE the badge sits, split out from what it is dressed in, because
