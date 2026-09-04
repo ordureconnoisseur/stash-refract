@@ -8788,7 +8788,7 @@ body.stash-liquid-glass #performer-page .refract-pe-crop__label {
     background: rgba(0, 0, 0, 0.62);
     font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: var(--track-label);
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--accent-ink);
     white-space: nowrap;
@@ -9189,7 +9189,7 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit > .refract-pe-
 body.stash-liquid-glass #performer-page .refract-pe-state__eyebrow {
     font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: var(--track-label);
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--text-muted);
 }

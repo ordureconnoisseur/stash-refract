@@ -274,7 +274,7 @@ body.stash-liquid-glass .refract-scope-seg:hover {
 body.stash-liquid-glass .refract-scope-label {
     font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: var(--track-label);
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--text-muted);
 }

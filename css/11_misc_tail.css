@@ -2221,9 +2221,9 @@ body.stash-liquid-glass .refract-cc-slot-menu.is-elem {
    answering a different question from picking "Left". */
 body.stash-liquid-glass .refract-cc-menu-sub {
     grid-column: 1 / -1;
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: var(--track-display);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.42);
     padding: 3px 2px 0;
@@ -2405,7 +2405,7 @@ body.stash-liquid-glass .refract-cc-slot-menu-head {
     text-align: center;
     font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: var(--track-label);
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--text-muted);
     padding: 2px 0 1px;
@@ -2671,7 +2671,7 @@ body.stash-liquid-glass .refract-cc-looks-head,
 body.stash-liquid-glass .refract-cc-group-head > span {
     font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: 0.16em;
+    letter-spacing: var(--track-eyebrow);
     text-transform: uppercase;
     color: var(--text-muted);
 }
