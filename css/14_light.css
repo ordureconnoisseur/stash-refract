@@ -913,10 +913,11 @@ body.stash-liquid-glass.refract-light .refract-cc-preset-inner {
         rgba(20, 22, 34, 0.07) 0 5px,
         rgba(20, 22, 34, 0.035) 5px 10px);
 }
-body.stash-liquid-glass.refract-light .refract-cc-kind,
-body.stash-liquid-glass.refract-light .refract-cc-seg {
-    background: rgba(20, 22, 34, 0.08);
-}
+/* The kind and segment wells' light background is gone: both now take
+   --fill-1 in 11_misc_tail, which flips on its own, so this override
+   was the second half of a pair that had to be kept in step by hand.
+   Deleted in the same commit as the base rules, deliberately -- either
+   half alone ships a wrong well in one mode. */
 body.stash-liquid-glass.refract-light .refract-cc-chip,
 body.stash-liquid-glass.refract-light .refract-cc-chip-slot {
     background: rgba(255, 255, 255, 0.88);

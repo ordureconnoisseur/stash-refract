@@ -1773,12 +1773,18 @@ body.stash-liquid-glass .refract-cc-rail {
     gap: var(--gap-xl);
     min-height: 30px;
 }
+/* The kind well is a plate and takes a token, the same as the segment
+   well beside it. It was a literal rgba(0,0,0,0.3) with a hand-written
+   light twin in 14_light, which is the pair E exists to retire: the
+   token flips and the twin cannot be forgotten because it is not there.
+   Its own geometry stays -- it holds kind buttons, which are not in the
+   tab anatomy, so this is E's rule and not C's. */
 body.stash-liquid-glass .refract-cc-kind {
     display: flex;
     gap: 3px;
     padding: 3px;
     border-radius: 8px;
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--fill-1);
 }
 body.stash-liquid-glass .refract-cc-kind-btn {
     appearance: none;
