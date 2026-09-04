@@ -34,7 +34,9 @@ body.stash-liquid-glass :is(
     .refract-chip,
     #performer-page .refract-ph-alias__n,
     #performer-page .refract-ph .detail-group .detail-item.stash_ids a,
-    #performer-page .refract-ph-tags .tag-item
+    #performer-page .refract-ph-tags .tag-item,
+    /* mobile lane: the More sheet's multiview count badge (read-out) */
+    .refract-mobile-drawer .refract-drawer-tile-badge
 ) {
     display: inline-flex;
     align-items: center;

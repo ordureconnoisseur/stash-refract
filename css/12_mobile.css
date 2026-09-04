@@ -778,7 +778,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     /* The chevron: a masked box painted in the muted ink, at the row end. */
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile::before {
         content: "";
-        order: 3;
+        order: 4;
         flex: 0 0 18px;
         width: 18px;
         height: 18px;
@@ -820,7 +820,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
        instead of on a tile corner. */
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-badge {
         position: static;
-        order: 2;
+        order: 3;
         flex: 0 0 auto;
         /* A read-out chip: it carries .refract-chip and takes the ONE
            recipe in 10_pills_badges (6.7); nothing about its material is
