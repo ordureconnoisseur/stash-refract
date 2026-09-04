@@ -6290,7 +6290,7 @@
             if (mvTotal > 0) {
                 if (!mvBadge) {
                     mvBadge = document.createElement("span");
-                    mvBadge.className = "refract-drawer-tile-badge";
+                    mvBadge.className = "refract-drawer-tile-badge refract-chip";
                     mvTile.appendChild(mvBadge);
                 }
                 if (mvBadge.textContent !== String(mvTotal)) {
