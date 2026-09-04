@@ -3154,6 +3154,9 @@
        default off (overlay shown). */
     var HIDE_CENTER_CONTROLS_KEY = "refract.hideCenterControls";
     var SHOW_FILTER_TAGS_KEY = "refract.showFilterTags";
+    /* Phone card grid: "2" two-up (default) or "1" one card per row.
+       Toggled from the list toolbar's second tier; forum request #203. */
+    var MOBILE_COLS_KEY = "refract.mobileCols";
 
     /* Gender glyph for the mock name banner - the real banner CLONES the
        native .gender-icon svg from the card title, which the mocks don't
@@ -4108,8 +4111,249 @@
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
         MINIMAL_CARDS_STORAGE_KEY, PERF_CARD_STYLE_KEY, FLOURISH_KEY,
         PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY,
-        SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY, COUNTRY_MODE_KEY
+        SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY, COUNTRY_MODE_KEY, MOBILE_COLS_KEY
     ].concat(CARD_ELEMS.map(function (d) { return d.key; })).concat(CARD_SIDE_KEYS);
+
+    function isMobileOneCol() {
+        try { return localStorage.getItem(MOBILE_COLS_KEY) === "1"; } catch (e) { return false; }
+    }
+    function applyMobileColsClass(on) {
+        if (!document.body) { return; }
+        refractSetClass(document.body, "refract-mobile-onecol", !!on);
+        var toggles = document.querySelectorAll(".refract-cols-toggle");
+        for (var i = 0; i < toggles.length; i++) {
+            var pressed = on ? "true" : "false";
+            if (toggles[i].getAttribute("aria-pressed") !== pressed) { toggles[i].setAttribute("aria-pressed", pressed); }
+            var label = on ? "Two cards per row" : "One card per row";
+            if (toggles[i].getAttribute("aria-label") !== label) { toggles[i].setAttribute("aria-label", label); }
+        }
+    }
+    function setMobileOneCol(on) {
+        try { localStorage.setItem(MOBILE_COLS_KEY, on ? "1" : "2"); } catch (e) { /* ignore */ }
+        applyMobileColsClass(on);
+        scheduleServerSync();
+    }
+    /* ── List pages on phones: the sort sheet and the caption ──────────
+       The toolbar keeps ONE tier on phones (search, filter | sort); the
+       demoted controls live in a sheet that refract injects once at body
+       level and rebuilds from the LIVE toolbar each time it opens. Every
+       row is a proxy: sort field and saved filters open Stash's own
+       dropdowns (rendered as modals by the existing mobile rules), the
+       direction segment clicks Stash's direction button, per page sets
+       Stash's select through the native setter plus a change event, and
+       cards per row is refract's own setting. No Stash node moves.
+       Stash's menus are rendered lazily (empty until opened), so the sort
+       field list is one tap deeper than the board drew it. */
+    var refractListSheetBypass = false;
+    function refractListToolbar() {
+        return document.querySelector(".filtered-list-toolbar");
+    }
+    function refractInjectListSheet() {
+        if (document.querySelector(".refract-list-sheet")) { return true; }
+        if (!document.body) { return false; }
+        var sheet = document.createElement("div");
+        sheet.className = "refract-list-sheet";
+        sheet.setAttribute("role", "dialog");
+        sheet.setAttribute("aria-label", "Sort and view");
+        sheet.addEventListener("click", function (e) {
+            var t = e.target;
+            if (!t || !t.closest) { return; }
+            var act = t.closest("[data-sheet-action]");
+            if (!act) { return; }
+            e.preventDefault();
+            refractListSheetAction(act.getAttribute("data-sheet-action"), act.getAttribute("data-sheet-value"));
+        });
+        document.body.appendChild(sheet);
+        return true;
+    }
+    function refractSheetProxy(sel) {
+        var tb = refractListToolbar();
+        var el = tb && tb.querySelector(sel);
+        if (!el) { return false; }
+        refractListSheetBypass = true;
+        try { el.click(); } finally { refractListSheetBypass = false; }
+        return true;
+    }
+    function refractListSheetAction(action, value) {
+        var tb = refractListToolbar();
+        if (action === "close") { refractCloseListSheet(); return; }
+        if (action === "sort-field") { refractCloseListSheet(); refractSheetProxy(".sort-by-select .dropdown-toggle"); return; }
+        if (action === "sort-dir") {
+            var cur = refractSortDirection(tb);
+            if (cur && cur !== value) { refractSheetProxy(".sort-by-select .input-group-prepend + button, .sort-by-select > button:not(.dropdown-toggle)"); }
+            setTimeout(refractRenderListSheet, 80);
+            return;
+        }
+        if (action === "saved") { refractCloseListSheet(); refractSheetProxy(".saved-filter-dropdown .dropdown-toggle"); return; }
+        if (action === "ops") { refractCloseListSheet(); refractSheetProxy(".list-operations .dropdown-toggle"); return; }
+        if (action === "mv-add") { refractCloseListSheet(); refractSheetProxy("#mv-filter-add-btn, .mv-filter-add-btn"); return; }
+        if (action === "per-page") {
+            var sel = tb && tb.querySelector(".page-size-selector select, select.form-control");
+            if (sel && sel.value !== value) {
+                try {
+                    var setter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value").set;
+                    setter.call(sel, value);
+                    sel.dispatchEvent(new Event("change", { bubbles: true }));
+                } catch (e) { sel.value = value; }
+            }
+            setTimeout(refractRenderListSheet, 80);
+            return;
+        }
+        if (action === "cols") { setMobileOneCol(value === "1"); refractRenderListSheet(); return; }
+    }
+    function refractSortDirection(tb) {
+        var b = tb && (tb.querySelector(".sort-by-select .input-group-prepend + button") || tb.querySelector(".sort-by-select > button:not(.dropdown-toggle)"));
+        var svg = b && b.querySelector("svg");
+        var icon = svg && (svg.getAttribute("data-icon") || "");
+        if (!icon) { return null; }
+        return /up/.test(icon) ? "asc" : "desc";
+    }
+    var REFRACT_SHEET_ICONS = {
+        close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+        asc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+        desc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>',
+        cols2: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/></svg>',
+        cols1: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/></svg>'
+    };
+    function refractRenderListSheet() {
+        var sheet = document.querySelector(".refract-list-sheet");
+        var tb = refractListToolbar();
+        if (!sheet || !tb) { return; }
+        var esc = refractAttrEscape;
+        var sortToggle = tb.querySelector(".sort-by-select .dropdown-toggle");
+        var sortLabel = sortToggle ? (sortToggle.textContent || "").trim() : "";
+        var dir = refractSortDirection(tb);
+        var sel = tb.querySelector(".page-size-selector select, select.form-control");
+        var perOpts = [];
+        if (sel) {
+            for (var o = 0; o < sel.options.length; o++) {
+                var v = sel.options[o].value;
+                if (/^\d+$/.test(v) && (perOpts.length < 4 || v === sel.value)) { perOpts.push(v); }
+            }
+            if (perOpts.indexOf(sel.value) === -1 && /^\d+$/.test(sel.value)) { perOpts.push(sel.value); }
+        }
+        var hasSaved = !!tb.querySelector(".saved-filter-dropdown .dropdown-toggle");
+        var hasOps = !!tb.querySelector(".list-operations .dropdown-toggle");
+        var mvAdd = tb.querySelector("#mv-filter-add-btn, .mv-filter-add-btn");
+        var oneCol = isMobileOneCol();
+        var seg = function (items, current, action) {
+            var h = '<span class="refract-seg" role="group">';
+            for (var i = 0; i < items.length; i++) {
+                h += '<button type="button" class="' + (items[i].v === current ? "is-on" : "") + '" data-sheet-action="' + action + '" data-sheet-value="' + esc(items[i].v) + '" aria-pressed="' + (items[i].v === current ? "true" : "false") + '" aria-label="' + esc(items[i].l) + '">' + (items[i].icon || esc(items[i].l)) + '</button>';
+            }
+            return h + '</span>';
+        };
+        var html =
+            '<div class="refract-sheet-head"><span class="refract-sheet-title">Sort and view</span>' +
+            '<button type="button" class="refract-sheet-close" data-sheet-action="close" aria-label="Close">' + REFRACT_SHEET_ICONS.close + '</button></div>';
+        if (sortToggle) {
+            html += '<div class="refract-sheet-group">Sort by</div>' +
+                '<button type="button" class="refract-sheet-row" data-sheet-action="sort-field"><span class="refract-sheet-label">' + esc(sortLabel || "Sort") + '</span><span class="refract-sheet-value">Change</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+            if (dir) {
+                html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Direction</span>' +
+                    seg([{ v: "asc", l: "Ascending", icon: REFRACT_SHEET_ICONS.asc }, { v: "desc", l: "Descending", icon: REFRACT_SHEET_ICONS.desc }], dir, "sort-dir") + '</div>';
+            }
+        }
+        if (hasSaved) {
+            html += '<div class="refract-sheet-group">Saved filters</div>' +
+                '<button type="button" class="refract-sheet-row" data-sheet-action="saved"><span class="refract-sheet-label">Saved filters</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+        }
+        html += '<div class="refract-sheet-group">View</div>';
+        if (sel && perOpts.length) {
+            html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Per page</span>' +
+                seg(perOpts.map(function (v) { return { v: v, l: v }; }), sel.value, "per-page") + '</div>';
+        }
+        html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Cards per row</span>' +
+            seg([{ v: "2", l: "Two cards per row", icon: REFRACT_SHEET_ICONS.cols2 }, { v: "1", l: "One card per row", icon: REFRACT_SHEET_ICONS.cols1 }], oneCol ? "1" : "2", "cols") + '</div>';
+        if (hasOps || mvAdd) {
+            html += '<div class="refract-sheet-group">Actions</div>';
+            if (hasOps) {
+                html += '<button type="button" class="refract-sheet-row" data-sheet-action="ops"><span class="refract-sheet-label">Select, export, edit, delete</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+            }
+            if (mvAdd) {
+                /* multiview picking mode's "+" (add this filter as a
+                   slot): a bare glyph in the bar on the user's phone; it
+                   is a demoted control like the rest. */
+                html += '<button type="button" class="refract-sheet-row" data-sheet-action="mv-add"><span class="refract-sheet-label">Add this filter to multiview</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+            }
+        }
+        if (sheet.innerHTML !== html) { sheet.innerHTML = html; }
+    }
+    function refractOpenListSheet() {
+        refractInjectListSheet();
+        refractCloseBurger();
+        refractRenderListSheet();
+        refractSetDockContracted(false);
+        refractSetClass(document.body, "refract-list-sheet-open", true);
+    }
+    function refractCloseListSheet() {
+        refractSetClass(document.body, "refract-list-sheet-open", false);
+    }
+    /* On phones the sort half of the group opens the sheet instead of
+       Stash's dropdown; the sheet's own "Change" row reaches the dropdown
+       through the bypass. Bound once, capture phase, so React never sees
+       the intercepted tap. */
+    function refractBindListSheet() {
+        if (window.__refractListSheetBound) { return; }
+        window.__refractListSheetBound = true;
+        document.addEventListener("click", function (e) {
+            var t = e.target;
+            if (!t || !t.closest) { return; }
+            if (!refractDockIsMobile()) { return; }
+            var open = document.body.classList.contains("refract-list-sheet-open");
+            if (open && !t.closest(".refract-list-sheet")) {
+                refractCloseListSheet();
+                if (t.closest(".refract-burger-scrim")) { e.preventDefault(); e.stopPropagation(); return; }
+            }
+            if (refractListSheetBypass) { return; }
+            if (t.closest(".filtered-list-toolbar .sort-by-select .dropdown-toggle")) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (open) { refractCloseListSheet(); } else { refractOpenListSheet(); }
+                return;
+            }
+            /* The caption is the link to the in-flow pager. */
+            var cap = t.closest(".pagination-index-container[data-pager-row=\"hide\"]");
+            if (cap) {
+                var pager = document.querySelector('[data-pager-row="float"]');
+                if (pager && pager.scrollIntoView) { pager.scrollIntoView({ block: "center", behavior: "smooth" }); }
+            }
+        }, true);
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && document.body.classList.contains("refract-list-sheet-open")) { refractCloseListSheet(); }
+        });
+    }
+    /* Per pass: the caption's "N per page" and the search placeholder's
+       noun. Both are attributes React does not own on those nodes (it
+       set placeholder once; it never changes the prop, so it never
+       rewrites it). Read before write. */
+    var REFRACT_SEARCH_NOUNS = { scenes: "scenes", performers: "performers", studios: "studios", tags: "tags", galleries: "galleries", images: "images", groups: "groups", movies: "movies", markers: "markers" };
+    function injectMobileColsToggle() {
+        refractInjectListSheet();
+        refractBindListSheet();
+        var tb = refractListToolbar();
+        if (!tb) { return true; }
+        var sel = tb.querySelector(".page-size-selector select, select.form-control");
+        var cap = document.querySelector('.pagination-index-container[data-pager-row="hide"]');
+        if (cap && sel && /^\d+$/.test(sel.value)) {
+            var txt = sel.value + " per page";
+            if (cap.getAttribute("data-per-page") !== txt) { cap.setAttribute("data-per-page", txt); }
+        }
+        var input = tb.querySelector('input[placeholder*="Search"]');
+        if (input && refractDockIsMobile()) {
+            var seg = refractPathFromLocation().split("/").filter(Boolean);
+            var noun = REFRACT_SEARCH_NOUNS[seg[seg.length - 1]] || (seg.length === 1 ? REFRACT_SEARCH_NOUNS[seg[0]] : null);
+            if (noun) {
+                var ph = "Search " + noun;
+                if (input.getAttribute("placeholder") !== ph) { input.setAttribute("placeholder", ph); }
+            }
+        }
+        /* A re-rendered toolbar loses its stuck class between scroll
+           events; re-derive it every pass. */
+        if (refractDockIsMobile()) { refractSetToolbarStuck((window.scrollY || 0) >= REFRACT_DOCK_NEAR_TOP); }
+        if (document.body.classList.contains("refract-list-sheet-open")) { refractRenderListSheet(); }
+        return true;
+    }
 
     function isPluginSortDisabledBottom() {
         try {
@@ -4222,6 +4466,7 @@
         refractApplyThemeColorMeta(!!on);
     }
     applyLightModeClass(isLightModeEnabled());
+    applyMobileColsClass(isMobileOneCol());
 
     /* Light-mode navbar toggle visibility. Defaults to ON so users can
        discover light mode without digging into plugin settings. Stash
@@ -4557,6 +4802,7 @@
             applyAccentClass(getStoredAccent());
             applyLiteModeClass(isLiteModeEnabled());
             applyLightModeClass(isLightModeEnabled());
+            applyMobileColsClass(isMobileOneCol());
             applyLightToggleNavbarClass(isLightToggleNavbarVisible());
             applyHelpButtonClass(isHelpButtonVisible());
             applyStudioBannerClass(isStudioBannerVisible());
@@ -5132,11 +5378,14 @@
         document.body.classList.add("refract-burger-open");
         refractSetBurgerState(true);
         refractMarkActiveDrawerTile();
+        refractSetDockContracted(false);
+        refractMarkActiveDockItem();
     }
     function refractCloseBurger() {
         if (!document.body.classList.contains("refract-burger-open")) { return; }
         refractSetBurgerState(false);
         document.body.classList.remove("refract-burger-open");
+        refractMarkActiveDockItem();
     }
 
     /* Mobile drawer - body-level overlay built from a hardcoded item
@@ -5254,11 +5503,45 @@
         return items;
     }
 
+    /* The More sheet shows everything that is NOT in the dock. Stamp
+       data-in-dock on the drawer rows whose key the dock carries, then
+       hide any group label whose band has no visible row. Reads before
+       it writes; runs every dock pass (13-odd rows). */
+    function refractSyncDrawerRows(dockItems) {
+        var drawer = document.querySelector(".refract-mobile-drawer");
+        if (!drawer) { return; }
+        var inDock = {};
+        for (var i = 0; i < dockItems.length; i++) { inDock[dockItems[i].key] = true; }
+        var tiles = drawer.querySelectorAll(".refract-drawer-tile");
+        var counts = { library: 0, plugins: 0, stash: 0 };
+        for (var t = 0; t < tiles.length; t++) {
+            var tile = tiles[t];
+            var actionKey = tile.getAttribute("data-action");
+            var key = actionKey ? ("action:" + actionKey) : tile.getAttribute("data-href");
+            var on = !!(key && inDock[key]);
+            if (tile.hasAttribute("data-in-dock") !== on) {
+                if (on) { tile.setAttribute("data-in-dock", "1"); } else { tile.removeAttribute("data-in-dock"); }
+            }
+            if (!on && !tile.classList.contains("refract-drawer-tile-off")) {
+                var g = tile.getAttribute("data-group") || "plugins";
+                if (counts.hasOwnProperty(g)) { counts[g]++; }
+            }
+        }
+        var labels = drawer.querySelectorAll(".refract-drawer-group");
+        for (var l = 0; l < labels.length; l++) {
+            var empty = !counts[labels[l].getAttribute("data-group")];
+            if (labels[l].classList.contains("is-empty") !== empty) {
+                labels[l].classList.toggle("is-empty", empty);
+            }
+        }
+    }
+
     function injectMobileDock() {
         if (!document.body) { return false; }
         var items = refractDockItemsFromSelection();
         var sig = items.map(function (x) { return x.key; }).join("|");
         var existing = document.querySelector(".refract-mobile-dock");
+        refractSyncDrawerRows(items);
         if (existing) {
             /* Idempotent per configuration: rebuild only when the item
                set changed (selection edited, or plugin tiles arrived). */
@@ -5269,8 +5552,11 @@
         dock.className = "refract-mobile-dock";
         dock.setAttribute("aria-label", "Quick navigation");
         dock.setAttribute("data-sig", sig);
+        /* Slot count (items + More) drives the pill arithmetic in
+           12_mobile.css; the pill itself is ONE element that slides. */
+        dock.style.setProperty("--dock-count", String(items.length + 1));
 
-        var html = "";
+        var html = '<span class="refract-dock-pill" aria-hidden="true"></span>';
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
             if (item.actionSelector) {
@@ -5301,6 +5587,9 @@
 
         dock.addEventListener("click", function (e) {
             if (!e.target || !e.target.closest) { return; }
+            /* A tap on the capsule expands it (binge NavChrome: a tap is
+               one of the three ways back to the expanded state). */
+            refractSetDockContracted(false);
             var burger = e.target.closest(".refract-dock-burger");
             if (burger) {
                 if (document.body.classList.contains("refract-burger-open")) {
@@ -5354,6 +5643,7 @@
         if (!dock) { return; }
         var path = window.location.pathname;
         var tiles = dock.querySelectorAll(".refract-dock-item[data-href]");
+        var activeIdx = -1;
         for (var i = 0; i < tiles.length; i++) {
             var t = tiles[i];
             var routes = [t.getAttribute("data-href")]
@@ -5366,8 +5656,114 @@
                     break;
                 }
             }
-            t.classList.toggle("is-active", active);
+            if (t.classList.contains("is-active") !== active) { t.classList.toggle("is-active", active); }
+            if (active && activeIdx < 0) { activeIdx = refractDockSlotIndex(dock, t); }
         }
+        /* The pill: one element, positioned from the active slot index
+           (12_mobile.css does the arithmetic). While the drawer is open
+           the pill parks on More; with no matching route it fades out
+           rather than sitting on a wrong slot. Read-before-write, like
+           every class writer here (zero redundant writes per pass). */
+        if (document.body.classList.contains("refract-burger-open")) {
+            var burger = dock.querySelector(".refract-dock-burger");
+            if (burger) { activeIdx = refractDockSlotIndex(dock, burger); }
+        }
+        var has = activeIdx >= 0;
+        if (dock.classList.contains("refract-dock-has-active") !== has) {
+            dock.classList.toggle("refract-dock-has-active", has);
+        }
+        if (has && dock.style.getPropertyValue("--dock-active") !== String(activeIdx)) {
+            dock.style.setProperty("--dock-active", String(activeIdx));
+        }
+    }
+
+    /* Slot index of a dock item = its position among the .refract-dock-item
+       children (the pill span is not a slot). */
+    function refractDockSlotIndex(dock, el) {
+        var slots = dock.querySelectorAll(".refract-dock-item");
+        for (var i = 0; i < slots.length; i++) { if (slots[i] === el) { return i; } }
+        return -1;
+    }
+
+    /* Dock contraction (binge NavChrome, ported): direction, not activity.
+       Scrolling DOWN past a 5px deadzone contracts the capsule; scrolling
+       up, being within 80px of the top, a tap on the dock, or the drawer
+       opening expands it. The class goes on the dock (and on the floating
+       pager, which rides above it), never on body: a body class toggled on
+       scroll is the document-wide effect DESIGN_SYSTEM 3.7 rule 1 forbids.
+       Under prefers-reduced-motion the bar never resizes. Never contracts
+       while the drawer is open, the lightbox is up, or something is
+       fullscreen (those surfaces own the viewport). Desktop widths are a
+       no-op: the dock is display:none there and the class would be noise. */
+    var REFRACT_DOCK_DEADZONE = 5;
+    var REFRACT_DOCK_NEAR_TOP = 80;
+    var refractDockMq = null;
+    function refractDockIsMobile() {
+        if (!refractDockMq && window.matchMedia) {
+            refractDockMq = window.matchMedia("(max-width: 900px)");
+        }
+        return !!(refractDockMq && refractDockMq.matches);
+    }
+    /* The list toolbar takes the chrome material while stuck (past 80px);
+       the class lives on the toolbar element, never on body. */
+    function refractSetToolbarStuck(on) {
+        var bars = document.querySelectorAll(".filtered-list-toolbar");
+        for (var i = 0; i < bars.length; i++) { refractSetClass(bars[i], "refract-stuck", !!on); }
+    }
+    function refractSetDockContracted(on) {
+        var dock = document.querySelector(".refract-mobile-dock");
+        if (!dock) { return; }
+        if (dock.classList.contains("refract-dock-contracted") === on) { return; }
+        dock.classList.toggle("refract-dock-contracted", on);
+        var pagers = document.querySelectorAll('[data-pager-row="float"]');
+        for (var i = 0; i < pagers.length; i++) {
+            pagers[i].classList.toggle("refract-dock-contracted", on);
+        }
+    }
+    function refractBindDockScroll() {
+        if (window.__refractDockScrollBound) { return; }
+        window.__refractDockScrollBound = true;
+        var reduceMotion = window.matchMedia
+            && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduceMotion) {
+            window.addEventListener("scroll", function () {
+                if (refractDockIsMobile()) { refractSetToolbarStuck((window.scrollY || 0) >= REFRACT_DOCK_NEAR_TOP); }
+            }, { passive: true });
+            return;
+        }
+        var anchorY = window.scrollY || 0;
+        var pending = false;
+        function tick() {
+            pending = false;
+            if (!refractDockIsMobile()) { return; }
+            var y = window.scrollY || 0;
+            refractSetToolbarStuck(y >= REFRACT_DOCK_NEAR_TOP);
+            if (document.body.classList.contains("refract-burger-open")
+                    || document.fullscreenElement
+                    || document.querySelector(".Lightbox")) {
+                anchorY = y;
+                refractSetDockContracted(false);
+                return;
+            }
+            if (y < REFRACT_DOCK_NEAR_TOP) {
+                anchorY = y;
+                refractSetDockContracted(false);
+                return;
+            }
+            var dy = y - anchorY;
+            if (dy > REFRACT_DOCK_DEADZONE) {
+                anchorY = y;
+                refractSetDockContracted(true);
+            } else if (dy < -REFRACT_DOCK_DEADZONE) {
+                anchorY = y;
+                refractSetDockContracted(false);
+            }
+        }
+        window.addEventListener("scroll", function () {
+            if (pending) { return; }
+            pending = true;
+            window.requestAnimationFrame(tick);
+        }, { passive: true });
     }
 
     function injectMobileDrawer() {
@@ -5376,13 +5772,30 @@
         drawer.className = "refract-mobile-drawer";
         drawer.setAttribute("aria-label", "Mobile navigation");
 
-        var html = "";
+        /* The More sheet (12_mobile.css): a header with the sheet's name
+           and the one whole-sheet action, three group labels, then the
+           tiles as rows. Groups are flex order on data-group; plugin and
+           action tiles carry none and land in the Plugins band. Stats and
+           Settings are Stash's own, everything else hardcoded is Library. */
+        var html =
+            '<div class="refract-drawer-head">' +
+                '<span class="refract-drawer-title">More</span>' +
+                '<a class="refract-drawer-edit" href="/settings?tab=interface#plugin-refract-dock-config" aria-label="Edit dock">' +
+                    '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg>' +
+                    'Edit dock' +
+                '</a>' +
+            '</div>' +
+            '<div class="refract-drawer-group is-empty" data-group="library">Library</div>' +
+            '<div class="refract-drawer-group is-empty" data-group="plugins">Plugins</div>' +
+            '<div class="refract-drawer-group is-empty" data-group="stash">Stash</div>';
         for (var i = 0; i < MOBILE_NAV_ITEMS.length; i++) {
             var item = MOBILE_NAV_ITEMS[i];
             var icon = MOBILE_NAV_ICONS[item.icon] || "";
+            var group = (item.href === "/stats" || item.href === "/settings") ? "stash" : "library";
             html +=
                 '<a class="refract-drawer-tile" href="' + item.href + '" data-href="' + item.href + '"' +
                     ((item.aliases && item.aliases.length) ? ' data-aliases="' + item.aliases.join(" ") + '"' : '') +
+                    ' data-group="' + group + '"' +
                     ' aria-label="' + item.label + '">' +
                     '<span class="refract-drawer-tile-icon">' + icon + '</span>' +
                 '</a>';
@@ -5392,6 +5805,27 @@
         drawer.addEventListener("click", function (e) {
             var t = e.target;
             if (!t || !t.closest) { return; }
+            if (t.closest(".refract-drawer-edit")) {
+                /* SPA-navigate to Settings > Interface and bring the Mobile
+                   dock setting into view once the portal has rendered it
+                   (the router ignores the hash; we scroll ourselves). */
+                e.preventDefault();
+                refractCloseBurger();
+                if (window.location.pathname !== "/settings" || window.location.search.indexOf("tab=interface") === -1) {
+                    window.history.pushState(null, "", "/settings?tab=interface");
+                    window.dispatchEvent(new PopStateEvent("popstate"));
+                }
+                var tries = 0;
+                (function seek() {
+                    var target = document.getElementById("plugin-refract-dock-config");
+                    if (target) {
+                        target.scrollIntoView({ block: "start", behavior: "smooth" });
+                        return;
+                    }
+                    if (++tries < 40) { setTimeout(seek, 100); }
+                })();
+                return;
+            }
             var tile = t.closest(".refract-drawer-tile");
             if (!tile) { return; }
             /* Action tiles (DiceR roll, SFWSwitch toggle) mirror a plugin's
@@ -5856,7 +6290,7 @@
             if (mvTotal > 0) {
                 if (!mvBadge) {
                     mvBadge = document.createElement("span");
-                    mvBadge.className = "refract-drawer-tile-badge";
+                    mvBadge.className = "refract-drawer-tile-badge refract-chip";
                     mvTile.appendChild(mvBadge);
                 }
                 if (mvBadge.textContent !== String(mvTotal)) {
@@ -5923,7 +6357,11 @@
             refractCloseBurger();
             refractMarkActiveDrawerTile();
             refractMarkActiveDockItem();
+            refractSetDockContracted(false);
+            refractSetToolbarStuck(false);
+            refractCloseListSheet();
         }
+        refractBindDockScroll();
         if (typeof PluginApi !== "undefined" && PluginApi && PluginApi.Event && PluginApi.Event.addEventListener) {
             PluginApi.Event.addEventListener("stash:location", onLocationChange);
         }
@@ -8836,6 +9274,98 @@
         return !!document.querySelector(".rating-stars");
     }
 
+    /* Which side sets the band's height, measured rather than assumed.
+
+       The card overhangs the band's foot by 96px when the CARD is the
+       taller of the two columns -- that is the composition, and 08 spells
+       out what it costs and buys. When the HEAD is taller the same
+       instruction sinks the picture below the plate and leaves a void
+       above it: Kitty Lynn at 1095 had a 780px band with the card
+       starting 385px down, its top level with the Height row.
+
+       CSS cannot compare two siblings' heights, and a breakpoint would
+       be a guess about content rather than a fact about it: the same
+       1095 flips between the two cases depending on whether a performer
+       carries an Ascension section. So the two boxes are measured and
+       the band gets a class.
+
+       Neither measurement depends on the class, so this cannot oscillate:
+       the card's own height is its picture's and the head's is its
+       content's; only the CONTAINER's height and the card's margin change
+       when the class flips. The 8px margin is for the case where they
+       are within a pixel of each other, so a fractional layout change
+       cannot flap the composition. */
+    /* The head's BOX is no answer: it is a flex item that stretches to
+       the container, so once the card is the taller side the head's
+       offsetHeight simply equals the card's and the comparison always
+       ties. Its CONTENT height is the question, and with a 1fr row in
+       the grid absorbing the slack (08's F7 composition) the box tells
+       you nothing about it.
+
+       So the rows are measured instead: group the children by the top
+       they sit at, take the tallest in each row, and add the gaps and
+       the padding back. Every item is `align-items: start`, so a row
+       inflated by the 1fr still reports its own content height -- the
+       inflation moves the rows apart, it does not make any of them
+       taller. */
+    function refractPhHeadContent(headEl) {
+        var cs = window.getComputedStyle(headEl);
+        var gap = parseFloat(cs.rowGap) || 0;
+        var rows = {};
+        var kids = headEl.children;
+        for (var i = 0; i < kids.length; i++) {
+            var r = kids[i].getBoundingClientRect();
+            if (r.height < 1) { continue; }
+            var key = Math.round(r.top);
+            rows[key] = Math.max(rows[key] || 0, r.height);
+        }
+        var total = 0;
+        var n = 0;
+        for (var k in rows) {
+            if (Object.prototype.hasOwnProperty.call(rows, k)) { total += rows[k]; n++; }
+        }
+        if (n > 1) { total += gap * (n - 1); }
+        return total + (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+    }
+
+    function refractPhAnchorCard(header) {
+        if (!header) { return; }
+        var host = header.querySelector(".detail-header-image");
+        var headEl = header.querySelector(".performer-head");
+        if (!host || !headEl) { return; }
+        /* The head is not the only other claimant on the band's height:
+           the container carries a min-height (480 at desktop, 380 below
+           1200) so the band never collapses on a sparse performer, and
+           that floor can be the tallest thing in the room. Kesha at 1200
+           is the case -- a 360px card against a 284px head and a 380px
+           floor -- where comparing only the two columns said "the card is
+           taller, hang it" and the floor then pushed a 75px void above
+           it anyway. The card hangs when it beats BOTH. */
+        var cont = host.parentElement;
+        var floor = cont ? (parseFloat(window.getComputedStyle(cont).minHeight) || 0) : 0;
+        var others = Math.max(refractPhHeadContent(headEl), floor);
+        var hangs = host.offsetHeight > others + 8;
+        if (header.classList.contains("refract-ph-hang") !== hangs) {
+            header.classList.toggle("refract-ph-hang", hangs);
+        }
+    }
+
+    /* The head's height moves with the window and with what the page has
+       finished loading, so the question is asked again whenever either
+       box changes rather than once at build time. */
+    function refractPhWatchAnchor(header) {
+        if (!header || header._rfxAnchorRo || !window.ResizeObserver) { return; }
+        var host = header.querySelector(".detail-header-image");
+        var headEl = header.querySelector(".performer-head");
+        if (!host || !headEl) { return; }
+        var ro = new ResizeObserver(function () {
+            safeRun(function () { refractPhAnchorCard(header); });
+        });
+        ro.observe(host);
+        ro.observe(headEl);
+        header._rfxAnchorRo = ro;
+    }
+
     function refractPhCard(header, head, page) {
         var host = header.querySelector(".detail-header-image");
         if (!host) { return; }
@@ -8897,7 +9427,7 @@
         if (standing.querySelector('[data-ph-rank]')) { return; }
         for (var i = 0; i < standing.children.length; i++) {
             var lab = standing.children[i].querySelector(".refract-ph-standing__label");
-            if (lab && lab.textContent === "Ranked") { return; }
+            if (lab && (lab.textContent === "Ranked" || lab.textContent === "Ranking")) { return; }
         }
         var cell = document.createElement("div");
         cell.className = "refract-ph-standing__cell";
@@ -9363,12 +9893,29 @@
                 break;
             }
         }
+        /* The rank is Ascension's number, read off its badge and reprinted
+           in Refract's voice -- which means an incoherent one becomes ours.
+           It said "Ranked 493 of 492": the place and the total are counted
+           over different populations, because an unrated performer is
+           sorted after all 492 rated ones and then numbered from the
+           whole library. Refract cannot fix that arithmetic, it is a
+           plugin's, but it can decline to repeat a position past the end
+           of the set it names. Past the end IS the fact -- not ranked -- so
+           that is what the cell says, and the label becomes RANKING so
+           the pair reads in both states rather than announcing "Ranked:
+           Unranked". */
         var rankEl = header.querySelector(".hon-battle-rank-badge");
         if (rankEl) {
             var rk = (rankEl.textContent || "").replace(/\s+/g, " ");
             var rm = rk.match(/#\s*(\d+)\s*(?:of\s*([\d,]+))?/i);
             if (rm && rm[1] !== "0") {
-                cells.push({ label: "Ranked", value: rm[1], tail: rm[2] ? " of " + rm[2] : "" });
+                var rkPlace = parseInt(rm[1], 10);
+                var rkTotal = rm[2] ? parseInt(String(rm[2]).replace(/,/g, ""), 10) : 0;
+                if (rkTotal && rkPlace > rkTotal) {
+                    cells.push({ label: "Ranking", value: "Unranked", tail: "" });
+                } else {
+                    cells.push({ label: "Ranking", value: rm[1], tail: rm[2] ? " of " + rm[2] : "" });
+                }
             }
         }
         var career = header.querySelector(".detail-item.career_length .detail-item-value");
@@ -9407,6 +9954,14 @@
         /* 5. The card itself. Last, because the rank cell it may add
            slots into the standing row built just above. */
         refractPhCard(header, head, page);
+
+        /* 6. Which of the two columns sets the band's height, which
+           decides whether the card hangs off its foot or sits at its
+           top. Asked after everything above has been built, because it
+           is the head's finished height that answers it, and watched
+           from then on because the window can change the answer. */
+        safeRun(function () { refractPhAnchorCard(header); });
+        safeRun(function () { refractPhWatchAnchor(header); });
 
         /* 4. The category scores, and the tag run they were buried in.
            Advanced Ratings writes each category as a tag whose name ends
@@ -9868,6 +10423,7 @@
                 safeRun(injectToolbarDropdownScrim);
                 safeRun(injectMobileDrawer);
                 safeRun(injectMobileDock);
+                safeRun(injectMobileColsToggle);
                 safeRun(refractApplyNavIcons);
                 safeRun(refractifyCardPopoverIcons);
                 safeRun(refractAppendPluginDrawerTiles);
@@ -11428,6 +11984,41 @@
             }
             parkAscensionBadge(badge, pcMode);
         });
+        sanitiseAscensionHeadRank();
+    }
+
+    /* Ascension's own pill in the performer page's EDIT head prints a rank
+       for a performer who has none. Its rank is a position in a sorted
+       list, so an unrated performer lands one past the end and the pill
+       reads "Rank #493 of 492" - a number larger than the set it claims
+       to be a position in, which is not a rank at all.
+
+       Refract's band already says "Unranked" for the same performer
+       (the F10 ruling), so the page states two different things about one
+       fact, and the wrong one is the plugin's. P8 is the rule: the theme
+       does not claim knowledge it does not have, and here it is removing
+       a claim rather than adding one. The test is theirs and needs no
+       list of versions - a rank past the total is self-evidently not a
+       rank, whatever the markup is called.
+
+       Only the two nodes' text changes; the badge, its handlers and its
+       tooltip are untouched. Idempotent, and re-run every cycle so it
+       survives Ascension rebuilding the pill. */
+    function sanitiseAscensionHeadRank() {
+        var badges = document.querySelectorAll("#performer-page .quality-group .hon-battle-rank-badge");
+        badges.forEach(function (badge) {
+            var rankEl = badge.querySelector(".hon-rank-text");
+            var totalEl = badge.querySelector(".hon-rank-total");
+            if (!rankEl || !totalEl) { return; }
+            var rank = (rankEl.textContent || "").match(/(\d[\d,]*)/);
+            var total = (totalEl.textContent || "").match(/(\d[\d,]*)/);
+            if (!rank || !total) { return; }
+            var r = parseInt(rank[1].replace(/,/g, ""), 10);
+            var t = parseInt(total[1].replace(/,/g, ""), 10);
+            if (!isFinite(r) || !isFinite(t) || r <= t) { return; }
+            if (rankEl.textContent !== "Unranked") { rankEl.textContent = "Unranked"; }
+            setClassIfChanged(badge, "refract-ascension-unranked", true);
+        });
     }
 
     /* WHERE the badge sits, split out from what it is dressed in, because
@@ -12177,6 +12768,7 @@
                 injectToolbarDropdownScrim();
                 injectMobileDrawer();
                 injectMobileDock();
+                injectMobileColsToggle();
                 refractApplyNavIcons();
                 refractAppendPluginDrawerTiles();
                 normalizeSettingsSidebarNavItems();
@@ -12212,6 +12804,7 @@
         injectToolbarDropdownScrim();
         injectMobileDrawer();
         injectMobileDock();
+        injectMobileColsToggle();
         refractApplyNavIcons();
         refractAppendPluginDrawerTiles();
         normalizeSettingsSidebarNavItems();
