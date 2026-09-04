@@ -7744,30 +7744,10 @@ body.stash-liquid-glass #performer-page .refract-ph .details-edit > div > .btn.b
     background-image: linear-gradient(0deg, rgba(var(--accent-rgb), 0.3), rgba(var(--accent-rgb), 0.3)) !important;
 }
 
-/* ── The house focus ring, on a band that had none ───────────────────
-   Nineteen controls here and not one of them showed a ring: measured on
-   every .btn the only thing focus changed was `outline-width` going 3px
-   to 0, the five rating stars changed nothing at all, and the rating
-   pill and the Stash ID chip fell through to the UA's own `outline: auto
-   1px rgb(16,16,16)` -- a near-black ring on a dark band, which is worse
-   than none because it looks deliberate.
-
-   An outline rather than a box-shadow because the buttons file pins
-   box-shadow on these, and the same 2px/offset-2 accent ring
-   .refract-cap-toggle already uses two hundred lines up (6.6). It has to
-   beat the `outline: 0` that put the count at zero, hence !important on
-   the width. */
-body.stash-liquid-glass #performer-page .detail-header :is(
-    .btn,
-    button,
-    .adv-rating-btn,
-    .rating-stars button,
-    .refract-sid-endpoint
-):focus-visible {
-    outline: 2px solid var(--accent-glow) !important;
-    outline-offset: 2px;
-    border-radius: var(--radius-sm);
-}
+/* The band's own focus ring is gone: 09 states one :focus-visible rule
+   for the whole theme and this surface takes it like every other. It was
+   right to add it when the band had none and wrong to keep it once there
+   was a house rule -- a second ring is drift even when it agrees. */
 body.stash-liquid-glass #performer-page .refract-ph .psrc-wrap {
     order: 8;
     display: flex !important;
@@ -9345,8 +9325,6 @@ body.stash-liquid-glass #performer-page .refract-pe form > [data-refract-pe="sta
 body.stash-liquid-glass #performer-page .refract-pe form .form-control:focus,
 body.stash-liquid-glass #performer-page .refract-pe form .text-input:focus,
 body.stash-liquid-glass #performer-page .refract-pe form .date-input:focus {
-    outline: 2px solid var(--accent-glow) !important;
-    outline-offset: 1px;
     border-color: var(--accent-glow) !important;
     background: var(--fill-4) !important;
 }
