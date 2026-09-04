@@ -123,6 +123,22 @@ body.stash-liquid-glass :is(
     background: rgba(var(--accent-rgb), 0.12);
 }
 
+/* ── Deviations, each with the box it has to fit ────────────────────
+   Both of these are the same shape and worth stating together: a chip
+   whose CONTAINER has a height, where the recipe's 24px would set that
+   height instead of fitting inside it. The material is the recipe's in
+   both cases; only the box is the container's.
+
+   The tab count badge sits in a 28.8px tab item whose text line is
+   16.8. At 24 it became the tallest thing in the item and pushed the
+   entity strips to 36 against the scene panel's 28.8 -- which is the gap
+   D2 exists to close, reopened by the fix for D4. 18px fits the item
+   and leaves the strips identical. */
+body.stash-liquid-glass .nav-tabs .nav-link .badge {
+    height: 18px;
+    padding: 0 7px;
+}
+
 /* ── The one ledgered deviation ──────────────────────────────────────
    The scene lane's tier chip keeps its own height and its two-line
    internal layout -- tier name over score, with data-tier driving eight
