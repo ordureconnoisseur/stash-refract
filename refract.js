@@ -4186,6 +4186,7 @@
         }
         if (action === "saved") { refractCloseListSheet(); refractSheetProxy(".saved-filter-dropdown .dropdown-toggle"); return; }
         if (action === "ops") { refractCloseListSheet(); refractSheetProxy(".list-operations .dropdown-toggle"); return; }
+        if (action === "mv-add") { refractCloseListSheet(); refractSheetProxy("#mv-filter-add-btn, .mv-filter-add-btn"); return; }
         if (action === "per-page") {
             var sel = tb && tb.querySelector(".page-size-selector select, select.form-control");
             if (sel && sel.value !== value) {
@@ -4233,6 +4234,7 @@
         }
         var hasSaved = !!tb.querySelector(".saved-filter-dropdown .dropdown-toggle");
         var hasOps = !!tb.querySelector(".list-operations .dropdown-toggle");
+        var mvAdd = tb.querySelector("#mv-filter-add-btn, .mv-filter-add-btn");
         var oneCol = isMobileOneCol();
         var seg = function (items, current, action) {
             var h = '<span class="refract-seg" role="group">';
@@ -4263,9 +4265,17 @@
         }
         html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Cards per row</span>' +
             seg([{ v: "2", l: "Two cards per row", icon: REFRACT_SHEET_ICONS.cols2 }, { v: "1", l: "One card per row", icon: REFRACT_SHEET_ICONS.cols1 }], oneCol ? "1" : "2", "cols") + '</div>';
-        if (hasOps) {
-            html += '<div class="refract-sheet-group">Actions</div>' +
-                '<button type="button" class="refract-sheet-row" data-sheet-action="ops"><span class="refract-sheet-label">Select, export, edit, delete</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+        if (hasOps || mvAdd) {
+            html += '<div class="refract-sheet-group">Actions</div>';
+            if (hasOps) {
+                html += '<button type="button" class="refract-sheet-row" data-sheet-action="ops"><span class="refract-sheet-label">Select, export, edit, delete</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+            }
+            if (mvAdd) {
+                /* multiview picking mode's "+" (add this filter as a
+                   slot): a bare glyph in the bar on the user's phone; it
+                   is a demoted control like the rest. */
+                html += '<button type="button" class="refract-sheet-row" data-sheet-action="mv-add"><span class="refract-sheet-label">Add this filter to multiview</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+            }
         }
         if (sheet.innerHTML !== html) { sheet.innerHTML = html; }
     }
@@ -4338,6 +4348,9 @@
                 if (input.getAttribute("placeholder") !== ph) { input.setAttribute("placeholder", ph); }
             }
         }
+        /* A re-rendered toolbar loses its stuck class between scroll
+           events; re-derive it every pass. */
+        if (refractDockIsMobile()) { refractSetToolbarStuck((window.scrollY || 0) >= REFRACT_DOCK_NEAR_TOP); }
         if (document.body.classList.contains("refract-list-sheet-open")) { refractRenderListSheet(); }
         return true;
     }
@@ -6277,7 +6290,7 @@
             if (mvTotal > 0) {
                 if (!mvBadge) {
                     mvBadge = document.createElement("span");
-                    mvBadge.className = "refract-drawer-tile-badge";
+                    mvBadge.className = "refract-drawer-tile-badge refract-chip";
                     mvTile.appendChild(mvBadge);
                 }
                 if (mvBadge.textContent !== String(mvTotal)) {
@@ -11970,6 +11983,41 @@
                 ourScore.remove();
             }
             parkAscensionBadge(badge, pcMode);
+        });
+        sanitiseAscensionHeadRank();
+    }
+
+    /* Ascension's own pill in the performer page's EDIT head prints a rank
+       for a performer who has none. Its rank is a position in a sorted
+       list, so an unrated performer lands one past the end and the pill
+       reads "Rank #493 of 492" - a number larger than the set it claims
+       to be a position in, which is not a rank at all.
+
+       Refract's band already says "Unranked" for the same performer
+       (the F10 ruling), so the page states two different things about one
+       fact, and the wrong one is the plugin's. P8 is the rule: the theme
+       does not claim knowledge it does not have, and here it is removing
+       a claim rather than adding one. The test is theirs and needs no
+       list of versions - a rank past the total is self-evidently not a
+       rank, whatever the markup is called.
+
+       Only the two nodes' text changes; the badge, its handlers and its
+       tooltip are untouched. Idempotent, and re-run every cycle so it
+       survives Ascension rebuilding the pill. */
+    function sanitiseAscensionHeadRank() {
+        var badges = document.querySelectorAll("#performer-page .quality-group .hon-battle-rank-badge");
+        badges.forEach(function (badge) {
+            var rankEl = badge.querySelector(".hon-rank-text");
+            var totalEl = badge.querySelector(".hon-rank-total");
+            if (!rankEl || !totalEl) { return; }
+            var rank = (rankEl.textContent || "").match(/(\d[\d,]*)/);
+            var total = (totalEl.textContent || "").match(/(\d[\d,]*)/);
+            if (!rank || !total) { return; }
+            var r = parseInt(rank[1].replace(/,/g, ""), 10);
+            var t = parseInt(total[1].replace(/,/g, ""), 10);
+            if (!isFinite(r) || !isFinite(t) || r <= t) { return; }
+            if (rankEl.textContent !== "Unranked") { rankEl.textContent = "Unranked"; }
+            setClassIfChanged(badge, "refract-ascension-unranked", true);
         });
     }
 

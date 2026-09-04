@@ -130,6 +130,22 @@ body.stash-liquid-glass.refract-light {
     background-attachment: fixed;
 }
 
+/* The focus ring's light partner (09 holds the ring itself). Dark uses
+   --accent-bright; on a white plate that shade reaches only 1.39-2.51:1
+   and would fail 3.9's 3:1 non-text floor, so light takes --accent-ink,
+   measured 7.28:1 at worst across the eight presets on the four grounds
+   a ring actually sits on. Same specificity as the rule it partners, so
+   it wins on load order alone. */
+body.stash-liquid-glass.refract-light.refract-light.refract-light
+:is(a[href], button, input, select, textarea, summary,
+    [tabindex]:not([tabindex="-1"]),
+    .btn, .nav-link, .page-link, .card-check,
+    [role="button"], [role="tab"], [role="checkbox"], [role="switch"]):focus-visible,
+body.stash-liquid-glass.refract-light.refract-light.refract-light
+.react-select__control:has(input:focus-visible) {
+    outline-color: var(--accent-ink) !important;
+}
+
 /* color-mix ink upgrade - Chrome 111+. See the fallback comment above. */
 @supports (color: color-mix(in srgb, red, blue)) {
     body.stash-liquid-glass.refract-light {

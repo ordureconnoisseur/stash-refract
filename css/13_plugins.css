@@ -16,6 +16,23 @@
    ─────────────────────────────────────────────────────────────────── */
 
 
+/* Eyebrows in this file answer to ONE spec: --fs-xs, weight 600,
+   --track-eyebrow. The cohesion audit of 2026-09-04 measured eight
+   specs across the theme and eleven uppercase labels in this file
+   alone, at four tracking steps, three weights and one size
+   (0.66rem) that is on no ladder at all. 6.13 gives a RANGE, which is
+   how eight of them happened: every lane picked a different point in
+   it and each was locally defensible.
+
+   Folded here rather than argued per label. Two of these are
+   arguably control labels rather than section eyebrows - the tag
+   sidebar's segmented label and the tags-overhaul panel button - and
+   a case could be made for keeping their weight. The case is not
+   worth a second spec: a reader moving between a datepicker, a tag
+   sidebar and a performer band should meet one label voice, and an
+   exception that is genuinely wanted belongs in the ledger with a
+   date rather than in eight files as a difference nobody chose. */
+
 /* ═══════════════════════════════════════════════════════════════════
    stash-multiview
    ═══════════════════════════════════════════════════════════════════ */
@@ -723,6 +740,70 @@ body.stash-liquid-glass .performer-card .refract-ascension-unknown {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   Ascension's rank pill in the performer page's EDIT head
+   ═══════════════════════════════════════════════════════════════════
+
+   The view band hides this pill entirely (08_misc_mid) because the
+   standing row states the rank in words. Edit mode has no standing
+   row, so the pill is the only place the rank appears and it stays -
+   which means its ink has to answer for itself.
+
+   It is a DARK ISLAND: a near-black pill that does not change with the
+   mode, so 3.1 rule 4 says its ink is re-pinned locally rather than
+   taken from the flipping token. Ascension paints it in its own tier
+   colour, which measured 1.78:1 for the rank and 1.71:1 for the score
+   on a bronze performer, identical in light because the pill stays
+   dark; untiered it is a flat grey at 4.08 and 3.83, under the 4.5 the
+   rank owes as the sole carrier of that number.
+
+   The ink is plain bright, NOT a tier colour, and that is the one real
+   decision here. Refract has a tier palette of its own and it would be
+   easy to reach for - --refract-ph-tier is published on this very
+   page. But Refract's tier comes from the RATING and Ascension's comes
+   from its BATTLES: two different facts that happen to share a word.
+   Painting their rank in our tier would assert they are the same. The
+   card's read-out makes the same choice, wearing Refract's own flame
+   rather than either palette.
+   ═══════════════════════════════════════════════════════════════════ */
+body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-rank-text {
+    color: rgba(255, 255, 255, 0.92) !important;
+}
+/* The Ascended score cannot be recoloured here and is therefore not kept.
+   Its span ships `style="color: TIER !important"` INLINE, and an inline
+   !important beats an author one, so the 1.71:1 it measured is not a
+   number any stylesheet can move - the same wall the card read-out hit,
+   where the answer was to render our own copy of the number. Doing that
+   again for a surface someone passes through on the way to an edit form
+   would be machinery for its own sake, so here the unreadable thing goes
+   instead of being reprinted. The score is still on the badge's own
+   tooltip, and on the card as an element the customiser can switch on.
+
+   The separator goes with it: a divider with one thing left to divide is
+   just a stray glyph. */
+body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-asc-score-display,
+body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-asc-separator {
+    display: none !important;
+    position: absolute !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+}
+/* The count that follows it is support, not the number: muted, and on
+   the ladder. It arrived at 10.41px, a size reached by multiplication
+   that belongs to no scale (3.5 rule 1). */
+body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-rank-total {
+    color: rgba(255, 255, 255, 0.55) !important;
+    font-size: var(--fs-xs) !important;
+}
+/* An unranked performer has no total to be out of, so the "of 492"
+   goes with the number refract.js just replaced. What is left reads
+   "Unranked", which is what the band says one row away. */
+body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge.refract-ascension-unranked .hon-rank-total {
+    display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    Ascension in the performer page's Custom Fields panel
    ═══════════════════════════════════════════════════════════════════
 
@@ -1281,7 +1362,7 @@ body.stash-liquid-glass .react-datepicker__day-name {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase;
-    letter-spacing: var(--track-tight);
+    letter-spacing: var(--track-eyebrow) !important;
     width: 2rem !important;
     line-height: 2rem !important;
     text-align: center;
@@ -1375,13 +1456,21 @@ body.stash-liquid-glass .react-datepicker__navigation:hover .react-datepicker__n
     border-color: var(--accent-bright) !important;
 }
 
+/* The plate is the surface token, not a hand-written near-black. That is
+   the cohesion fix (3.2 allows two surface colours and the source carried
+   29 families), but it also repairs something: the options inside are
+   `color: var(--text)`, which FLIPS, over a plate that did not. Computed
+   from the token values as 10.3 prescribes for light, black ink at 0.88
+   on rgb(14,14,18) is about 1.05:1 - this dropdown has been unreadable in
+   light mode, not merely off-palette. 14,14,18 to 20,20,24 is invisible
+   in dark. */
 /* Month + year dropdown panels (when user clicks the read-view pills).
    Opaque dark background so options are readable; max-height + scroll
    so a 100-year list doesn't extend off-screen; high z-index so it
    sits over the rest of the calendar. */
 body.stash-liquid-glass .react-datepicker__month-dropdown,
 body.stash-liquid-glass .react-datepicker__year-dropdown {
-    background: rgba(14, 14, 18, 0.98) !important;
+    background: rgba(var(--surface-rgb), 0.98) !important;
     -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
     backdrop-filter: var(--glass-blur-xl-sat) !important;
     border: 1px solid var(--glass-border) !important;
@@ -1868,8 +1957,11 @@ body.stash-liquid-glass .stash-scribe-modal {
     /* Match the ASR/APR modal opacity recipe (.adv-rating-modal-content
        at 09_buttons.css:559) - near-opaque dark base + heavy blur so the
        card reads as solid glass, not see-through. */
-    background: rgba(28, 28, 28, 0.97) !important;
-    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    background: rgba(var(--surface-rgb), 0.97) !important;
+    /* The rim was a hardcoded white alpha, which is the same defect one
+       property along: it cannot flip, so in light it drew a white line on
+       a white plate. --glass-border is the token that does. */
+    border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-2xl) !important;
     backdrop-filter: var(--glass-blur-2xl) !important;
@@ -1978,8 +2070,8 @@ body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn {
     border-radius: var(--radius-pill) !important;
     color: var(--accent-bright) !important;
     font-size: var(--fs-xs) !important;
-    font-weight: 700 !important;
-    letter-spacing: var(--track-label) !important;
+    font-weight: 600 !important;
+    letter-spacing: var(--track-eyebrow) !important;
     text-transform: uppercase !important;
     text-decoration: none !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
@@ -2131,12 +2223,12 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-header-info {
     min-width: 0;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-title {
-    font-size: var(--fs-sm) !important;
+    font-size: var(--fs-xs) !important;
     text-transform: uppercase;
-    letter-spacing: var(--track-label);
+    letter-spacing: var(--track-eyebrow) !important;
     color: var(--text-muted) !important;
     margin: 0 !important;
-    font-weight: 600;
+    font-weight: 600 !important;
     font-family: var(--theme-font-stack) !important;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-summary {
@@ -2157,7 +2249,7 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-btn {
     padding: 0.22rem 0.7rem;
     font-size: var(--fs-xs);
     text-transform: uppercase;
-    letter-spacing: var(--track-tight);
+    letter-spacing: var(--track-eyebrow);
     font-weight: 600;
     line-height: 1.2;
     cursor: pointer;
@@ -2616,12 +2708,12 @@ body.stash-liquid-glass .details-tags-overhaul__panel-header {
     flex-wrap: wrap;
 }
 body.stash-liquid-glass .details-tags-overhaul__panel-title {
-    font-size: var(--fs-sm) !important;
+    font-size: var(--fs-xs) !important;
     text-transform: uppercase;
-    letter-spacing: var(--track-label);
+    letter-spacing: var(--track-eyebrow) !important;
     color: var(--text-muted) !important;
     margin: 0 !important;
-    font-weight: 600;
+    font-weight: 600 !important;
     font-family: var(--theme-font-stack) !important;
 }
 body.stash-liquid-glass .details-tags-overhaul__panel-summary {
@@ -3018,7 +3110,7 @@ body.stash-liquid-glass .tag-sidebar__segmented {
 body.stash-liquid-glass .tag-sidebar__segmented-label {
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
-    letter-spacing: var(--track-label) !important;
+    letter-spacing: var(--track-eyebrow) !important;
     color: var(--text-muted) !important;
     font-weight: 600 !important;
 }
@@ -3077,7 +3169,7 @@ body.stash-liquid-glass .tag-sidebar__section-label {
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
     letter-spacing: var(--track-eyebrow) !important;
-    font-weight: 700 !important;
+    font-weight: 600 !important;
     color: var(--text-muted) !important;
     margin: 0 0 0.5rem !important;
 }
@@ -3222,9 +3314,9 @@ body.stash-liquid-glass .tag-sidebar__toggle {
     min-width: 0 !important;
     /* Slim vertical strip */
     padding: 0.7rem 0.28rem !important;
-    font-size: 0.66rem !important;
-    font-weight: 700 !important;
-    letter-spacing: var(--track-display) !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 600 !important;
+    letter-spacing: var(--track-eyebrow) !important;
     text-transform: uppercase !important;
     line-height: 1 !important;
     background: rgba(var(--surface-rgb), 0.92) !important;

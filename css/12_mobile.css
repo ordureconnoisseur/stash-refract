@@ -484,9 +484,18 @@ body.stash-liquid-glass .refract-mobile-drawer {
         }
     }
     /* Lite mode pins every floating glass platform opaque (15_lite
-       section 4); the dock joined that family with this slice. */
-    body.stash-liquid-glass.refract-lite .refract-mobile-dock {
+       section 4, which has no mobile section, so the phone chrome pins
+       here): the dock, the sort sheet, the stuck toolbar plate, the
+       scrim's blur; the More sheet is already in 15's list. */
+    body.stash-liquid-glass.refract-lite .refract-mobile-dock,
+    body.stash-liquid-glass.refract-lite .refract-list-sheet,
+    body.stash-liquid-glass.refract-lite .filtered-list-toolbar::before {
         background: rgb(35, 35, 35) !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    body.stash-liquid-glass.refract-lite.refract-burger-open .refract-burger-scrim,
+    body.stash-liquid-glass.refract-lite.refract-list-sheet-open .refract-burger-scrim {
         -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
     }
@@ -769,7 +778,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     /* The chevron: a masked box painted in the muted ink, at the row end. */
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile::before {
         content: "";
-        order: 3;
+        order: 4;
         flex: 0 0 18px;
         width: 18px;
         height: 18px;
@@ -811,17 +820,14 @@ body.stash-liquid-glass .refract-mobile-drawer {
        instead of on a tile corner. */
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-badge {
         position: static;
-        order: 2;
+        order: 3;
         flex: 0 0 auto;
-        min-width: 18px;
-        height: 18px;
-        padding: 0 6px;
-        border-radius: var(--radius-pill);
-        background: rgb(var(--accent-rgb));
-        color: #fff;
-        font-size: var(--fs-xs);
-        font-weight: 700;
-        line-height: 18px;
+        /* A read-out chip: it carries .refract-chip and takes the ONE
+           recipe in 10_pills_badges (6.7); nothing about its material is
+           restated here, only its place in the row. */
+        min-width: 24px;
+        box-sizing: border-box;
+        font-variant-numeric: tabular-nums;
         text-align: center;
     }
     /* Press and current-route states: the fill ramp and the accent tint;
@@ -1720,7 +1726,10 @@ body.stash-liquid-glass .refract-mobile-drawer {
         gap: 0 !important;
         margin: 4px auto 0 !important;
         overflow: visible !important;
-        top: 6px !important;
+        /* Stuck, the controls sit 12px below the viewport top (plus the
+           safe area on notched phones); the plate's 6px padding is inside
+           that. The user's phone showed the pills hard against the edge. */
+        top: calc(12px + env(safe-area-inset-top, 0px)) !important;
         transition: none !important;
     }
     /* The plate: the chrome material, painted only while stuck, 6px
@@ -1771,6 +1780,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
         border: 1px solid var(--glass-border) !important;
         border-radius: var(--radius-pill) !important;
         box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
     }
     body.stash-liquid-glass .filtered-list-toolbar .search-term-input::after {
         left: 14px !important;
@@ -1810,6 +1821,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
         border-right: none !important;
         border-radius: 22px 0 0 22px !important;
         box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
         color: var(--text) !important;
     }
     body.stash-liquid-glass .filtered-list-toolbar > .sort-by-select {
@@ -1845,6 +1858,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
         border-left: 1px solid var(--glass-border) !important;
         border-radius: 0 22px 22px 0 !important;
         box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
     }
     body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .dropdown-toggle::after {
         content: "" !important;
@@ -1869,6 +1884,9 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .filtered-list-toolbar > .list-operations,
     body.stash-liquid-glass .filtered-list-toolbar > .btn-group:not(:has(> .saved-filter-dropdown)):not(.sort-by-select),
     body.stash-liquid-glass .filtered-list-toolbar .mv-picking-toggle-btn,
+    body.stash-liquid-glass.mv-picking-mode .filtered-list-toolbar #mv-filter-add-btn,
+    body.stash-liquid-glass.mv-picking-mode .filtered-list-toolbar .mv-filter-add-btn,
+    body.stash-liquid-glass .filtered-list-toolbar .mv-filter-add-btn,
     body.stash-liquid-glass .filtered-list-toolbar .refract-cols-toggle {
         display: none !important;
     }
@@ -1876,7 +1894,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
        zeroes the other items); nothing else remains to collapse. */
 
     /* ── The caption ──────────────────────────────────────────────── */
-    body.stash-liquid-glass:not(.stash-route-scenes) .pagination-index-container[data-pager-row="hide"] {
+    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] {
         display: flex !important;
         align-items: center;
         justify-content: space-between;
@@ -1901,7 +1919,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         font-variant-numeric: tabular-nums;
         text-align: left;
     }
-    body.stash-liquid-glass:not(.stash-route-scenes) .pagination-index-container[data-pager-row="hide"][data-per-page]::after {
+    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"][data-per-page]::after {
         content: attr(data-per-page);
         font-size: var(--fs-sm);
         color: var(--text-muted);
@@ -1915,6 +1933,16 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
 
     /* ── The pager, in flow ───────────────────────────────────────── */
+    /* Stash gives .pagination-footer-container position:relative and a
+       48.75px bottom offset, which lifted the row 39px into the last
+       cards once it was in flow. Static: it follows the grid. */
+    body.stash-liquid-glass .pagination-footer-container {
+        position: static !important;
+        bottom: auto !important;
+        top: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
     body.stash-liquid-glass [data-pager-row="float"] {
         position: static !important;
         left: auto !important;
@@ -1961,7 +1989,9 @@ body.stash-liquid-glass .refract-mobile-drawer {
         display: none !important;
     }
     body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Previous"],
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"] {
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"],
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Previous"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle),
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Next"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle) {
         position: relative !important;
         flex: 0 0 44px !important;
         width: 44px !important;
@@ -1997,8 +2027,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn:disabled {
         opacity: 0.35 !important;
     }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Previous"]:active,
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"]:active {
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Previous"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle):active,
+    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Next"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle):active {
         background: var(--fill-4) !important;
     }
     body.stash-liquid-glass [data-pager-row="float"] .pagination > .page-count-container,
@@ -2013,7 +2043,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
         padding: 0 !important;
         width: auto !important;
     }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count {
+    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count,
+    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count.btn.btn-secondary:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle) {
         height: 44px !important;
         min-height: 44px !important;
         width: auto !important;
@@ -2035,7 +2066,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         border-radius: var(--radius-pill) !important;
         box-shadow: none !important;
     }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count:active {
+    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count.btn.btn-secondary:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle):active {
         background: var(--fill-4) !important;
     }
     /* Stash's page-jump popover: a tappable field on phones. */
@@ -2197,10 +2228,14 @@ body.stash-liquid-glass .refract-mobile-drawer {
         width: 16px;
         height: 16px;
     }
+    /* Active segment: the theme's active state (6.23 anatomy): accent
+       tint, --accent-glow rim, the 14px glow; no solid rim. */
     body.stash-liquid-glass .refract-list-sheet .refract-seg button.is-on {
         background: var(--accent-tint);
         color: var(--accent-ink);
-        box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.25);
+        box-shadow:
+            inset 0 0 0 1px var(--accent-glow),
+            0 0 14px rgba(var(--accent-rgb), 0.35);
     }
     body.stash-liquid-glass .refract-list-sheet button:focus-visible {
         outline: 2px solid rgba(var(--accent-rgb), 0.7);
