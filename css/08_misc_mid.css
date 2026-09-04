@@ -2237,8 +2237,16 @@ body.stash-liquid-glass .spinner-grow {
     color: var(--accent) !important;
 }
 
-body.stash-liquid-glass .badge,
-body.stash-liquid-glass .bg-secondary.badge {
+/* Every badge EXCEPT the ones the chip recipe owns. This blanket sets
+   --fill-4 with !important, which beats the recipe's non-important
+   --fill-3 at equal specificity, so neither source order nor :where()
+   could reach it -- the tab count badge measured 0.08 against the
+   recipe's 0.05 with everything else about it correct. The exclusion is
+   narrow on purpose: this rule still dresses every badge Refract has
+   not given a recipe, and the day one of those joins, its selector goes
+   in here too. */
+body.stash-liquid-glass .badge:not(.nav-link .badge),
+body.stash-liquid-glass .bg-secondary.badge:not(.nav-link .badge) {
     background: var(--fill-4) !important;
     color: var(--text) !important;
     border: 1px solid var(--glass-border) !important;
