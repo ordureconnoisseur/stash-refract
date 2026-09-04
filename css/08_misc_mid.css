@@ -8528,13 +8528,21 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     /* The form's fields are controls too, and the one height they share
        is 33.6 by a rule of this lane's own making. Textareas excluded by
        name: they are already taller and a floor says nothing to them. */
-    body.stash-liquid-glass #performer-page .refract-pe form :is(
+    /* The class is doubled and the :not() matched to the desktop rule's,
+       because that rule is `:not(textarea):not(.details-edit *)` and a
+       second :not() carries its argument's weight -- so the 33.6 outranked
+       a floor that was more recent, more specific in intent, and equally
+       !important. Measured: 27 fields still at 33.6 with this rule
+       apparently applying. Third time tonight that a deviation lost to a
+       rule it was written to override, which is the argument for reading
+       specificity as arithmetic rather than as intent. */
+    body.stash-liquid-glass #performer-page .refract-pe.refract-pe form :is(
         .form-control,
         .text-input,
         .react-select__control,
         .input-group-append > .btn,
         .input-group-prepend > .btn
-    ):not(textarea) {
+    ):not(textarea):not(.details-edit *) {
         min-height: 44px !important;
         height: 44px !important;
     }
