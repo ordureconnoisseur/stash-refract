@@ -1039,26 +1039,22 @@ body.stash-liquid-glass .refract-card-style-toggle {
 body.stash-liquid-glass .refract-segmented-btn {
     white-space: nowrap;
 }
+/* Geometry and behaviour only. The fill, the rim, the type pair, the
+   radius and the active treatment are the tab anatomy in 09, and both
+   of this panel's segmented controls are in its lists now. The pill
+   radius went with them: an item inside a well is concentric with the
+   well, and 09 draws that pair. */
 body.stash-liquid-glass .refract-segmented-btn {
     appearance: none;
-    background: transparent !important;
-    border: none !important;
-    color: var(--text-muted) !important;
-    font-size: var(--fs-sm);
-    font-weight: 600;
     padding: 0.3rem 0.75rem;
-    border-radius: var(--radius-pill);
     cursor: pointer;
-    transition: background var(--dur-fast), color var(--dur-fast), box-shadow var(--dur-fast);
 }
 body.stash-liquid-glass .refract-segmented-btn:hover {
     color: var(--text) !important;
 }
-body.stash-liquid-glass .refract-segmented-btn.is-active {
-    background: var(--accent-tint) !important;
-    color: var(--accent-bright) !important;
-    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.25);
-}
+/* The active treatment is the anatomy's: accent ink, accent tint, an
+   --accent-glow rim. The 8px accent halo this used to add is the same
+   thing the phone sheet's outlier was and goes with it. */
 
 /* Custom-logo URL input - glass styling matching Refract's other text
    inputs. Wider min-width so URLs are readable. */
@@ -1560,15 +1556,14 @@ body.stash-liquid-glass .refract-card-elems-setting {
 }
 body.stash-liquid-glass .refract-seg {
     display: inline-flex;
-    gap: 0.12rem;
-    padding: 0.15rem;
-    border-radius: var(--radius-pill);
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid var(--glass-border);
+    gap: 3px;
+    padding: 3px;
+    border-radius: var(--radius-sm);
+    background: var(--fill-1);
+    border: 1px solid rgba(var(--fg-rgb), 0.08);
 }
 body.stash-liquid-glass .refract-seg .refract-segmented-btn {
     padding: 0.16rem 0.5rem;
-    font-size: var(--fs-xs);
 }
 @media (max-width: 800px) {
     }
@@ -2560,7 +2555,6 @@ body.stash-liquid-glass .refract-cc-strip .refract-cc-seg-btn {
     flex: 1 1 auto;
     min-width: 0;
     padding: 5px 5px;
-    font-size: var(--fs-xs);
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2585,37 +2579,34 @@ body.stash-liquid-glass .refract-cc-reset:hover {
     border-color: rgba(255, 120, 120, 0.55);
     background: rgba(255, 120, 120, 0.08);
 }
+/* The well is the anatomy's. Both of this panel's segmented controls
+   HAD a well -- this one a 0.3 black at 8px, the other a 0.35 black
+   pill -- which is worth recording because the handover said these
+   strips were free-standing and they are not. A strip with a well takes
+   the concentric pair: a --radius-sm well with 3px of padding holding
+   9px items, so the two curves stay parallel. The fill and rim are the
+   anatomy's --fill-1 over rgba(--fg-rgb, 0.08), which also gives this
+   panel a well that flips in light instead of a literal black. */
 body.stash-liquid-glass .refract-cc-seg {
     display: flex;
     gap: 3px;
     padding: 3px;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-sm);
+    background: var(--fill-1);
+    border: 1px solid rgba(var(--fg-rgb), 0.08);
     width: fit-content;
     margin-top: auto;
 }
 body.stash-liquid-glass .refract-cc-seg-btn {
     appearance: none;
     padding: 5px 12px;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    background: none;
-    font-size: var(--fs-xs);
-    font-weight: 500;
-    color: var(--text-muted);
     cursor: pointer;
     white-space: nowrap;
-    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast);
 }
 body.stash-liquid-glass .refract-cc-seg-btn:hover {
     color: var(--text);
 }
-body.stash-liquid-glass .refract-cc-seg-btn.is-active {
-    background: rgba(var(--accent-rgb), 0.2);
-    border-color: rgba(var(--accent-rgb), 0.42);
-    color: var(--accent-bright);
-    font-weight: 600;
-}
+
 
 /* ── Looks ────────────────────────────────────────────────────────────── */
 body.stash-liquid-glass .refract-cc-looks {
