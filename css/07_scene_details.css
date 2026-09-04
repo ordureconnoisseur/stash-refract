@@ -2115,34 +2115,21 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
    ─────────────────────────────────────────────────────────────────── */
 
 /* ── Focus ────────────────────────────────────────────────────────────
-   Every interactive element in the panel was unreachable by eye: 33
-   controls measured, and focusing each one changed nothing at all. No
-   outline, no ring, no border or colour shift. The document carries 251
-   rules mentioning :focus and not one of them matched a panel control,
-   while three separate rules were actively removing the default.
+   The ring itself now lives in 09_buttons as the theme's one focus law
+   (2026-09-04, cohesion audit item 1): every interactive element the
+   theme styles takes `outline: 2px solid var(--accent-bright)` at offset
+   2, `--accent-ink` in light. What was here - this panel's own 0.90
+   outline, written when 33 controls measured no focus at all - was one
+   of the six treatments that audit found, and it is gone.
 
-   An OUTLINE, not the 6.6 box-shadow ring. The shadow ring cannot work
-   here: 09_buttons.css:32 sets box-shadow: none !important on
-   .btn.minimal:focus and 08_misc_mid.css:2663 does the same to every
-   .rating-stars button, both in files that load after this one. An
-   outline survives that, stays out of layout, and follows the pill
-   radius on its own.
+   What stays here is geometry, not colour: two exceptions this panel
+   needs because of how its controls are boxed. Both take the canonical
+   token, so a change of ring colour reaches them.
 
-   Specificity, not load order, is what wins this: :focus-visible adds a
-   class-weight, so these sit at (0,4,1) and beat 08's (0,2,2) blanket
-   `outline: none !important` from an earlier file. Verified against
-   computed style, not assumed.
-
-   :focus-visible rather than :focus, so a ring appears for the keyboard
-   and not on every mouse click. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(a, button, [tabindex="0"]):focus-visible {
-    outline: 2px solid rgba(var(--accent-rgb), 0.9) !important;
-    outline-offset: 2px !important;
-}
-/* The counter pill clips (overflow: hidden), so neither half can wear a
+   The counter pill clips (overflow: hidden), so neither half can wear a
    ring of its own; the pill wears it for them. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .count-button:has(:focus-visible) {
-    outline: 2px solid rgba(var(--accent-rgb), 0.9) !important;
+    outline: 2px solid var(--accent-bright) !important;
     outline-offset: 2px !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .count-button :is(a, button):focus-visible {
@@ -2160,7 +2147,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .count-button :is(a, butto
    This is (0,6,1). */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars .btn.minimal:focus-visible,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars button.minimal:focus-visible {
-    outline: 2px solid rgba(var(--accent-rgb), 0.9) !important;
+    outline: 2px solid var(--accent-bright) !important;
     outline-offset: 1px !important;
 }
 /* .tab-content clips horizontally (overflow-x: hidden), so a full-width
