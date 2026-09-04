@@ -7599,10 +7599,19 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head {
    row 1 and always present, so it takes none. Rows that do not exist
    for a given performer contribute nothing, which is the whole point. */
 body.stash-liquid-glass #performer-page .refract-ph .performer-head > * {
-    margin-top: calc(var(--gap-xl) * 1.5);
+    /* !important because several of these rows carry `margin: 0 !important`
+       of their own, written when the spacing was the track's job. Measured
+       without it: only the standing row took the step and the read-out sat
+       flush against it at 0. */
+    margin-top: calc(var(--gap-xl) * 1.5) !important;
 }
 body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 {
-    margin-top: 0;
+    margin-top: 0 !important;
+}
+/* The rating group shares the standing row's grid line, so it takes the
+   same step and stays level with it rather than being pushed below. */
+body.stash-liquid-glass #performer-page .refract-ph .performer-head > .quality-group {
+    margin-top: calc(var(--gap-xl) * 1.5) !important;
 }
 
 /* Row 1: the name, then the icons Stash puts beside it.
