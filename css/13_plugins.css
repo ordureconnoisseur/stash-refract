@@ -764,6 +764,18 @@ body.stash-liquid-glass .performer-card .refract-ascension-unknown {
    Painting their rank in our tier would assert they are the same. The
    card's read-out makes the same choice, wearing Refract's own flame
    rather than either palette.
+
+   AFTER, measured stamped against the pill's real ground. The fill is
+   linear-gradient(135deg, #2a2a2a, #1a1a1a) and it is byte-identical in
+   both modes, so one set of numbers covers both: the rank reads 12.37:1
+   on the light stop and 14.82:1 on the dark one, and the count that
+   follows it 5.43:1 and 6.03:1. Note the ground: a first pass walked
+   background-COLOR up the tree, found the pill transparent, landed on
+   the white page and reported 1.00:1 - a fully readable pill scored as
+   invisible ink, because the fill is a background-IMAGE. A ground walk
+   that reads only background-color will do that to any gradient, and it
+   fails toward the alarming answer rather than the reassuring one,
+   which is the only reason it was caught.
    ═══════════════════════════════════════════════════════════════════ */
 body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-rank-text {
     color: rgba(255, 255, 255, 0.92) !important;
@@ -779,7 +791,16 @@ body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .h
    tooltip, and on the card as an element the customiser can switch on.
 
    The separator goes with it: a divider with one thing left to divide is
-   just a stray glyph. */
+   just a stray glyph.
+
+   The five declarations below are NOT a belt-and-braces list, and the
+   four that look redundant are the ones doing the work. Measured, the
+   score display computes to display: flex, because Ascension ships
+   display:flex INLINE and an inline !important beats an author one -
+   the same wall as the colour. What actually hides it is visibility,
+   the zero box, the absolute position and the overflow, none of which
+   Ascension sets inline. Delete the ones that look redundant and the
+   score comes back. */
 body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-asc-score-display,
 body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-asc-separator {
     display: none !important;
@@ -1616,17 +1637,24 @@ body.stash-liquid-glass .gs-see-all:hover {
    !important and would have kept winning from the earlier file. */
 body.stash-liquid-glass .adv-rating-btn {
     color: var(--accent-bright) !important;
-    /* Force explicit flex centering - the ★ glyph in most fonts sits
-       below the visual line center because the star's bottom points
-       hang at the baseline while the top point pokes up. Flex centering
-       + line-height:1 + a tiny -1px nudge on the star puts it on the
-       true geometric centre of the pill. */
-    display: inline-flex !important;
-    align-items: center !important;
+    /* display, align-items, line-height and font-size used to be here,
+       to centre the star glyph: it sits below the visual line centre
+       because its bottom points hang at the baseline while the top
+       point pokes up. The recipe supplies all four now, and the -1px
+       nudge that finishes the job is on the star's own rule below;
+       measured, the star centres at 0.00px offset without them.
+
+       font-size was the one of the four that CONFLICTED: --fs-base
+       with !important at equal specificity, in a file loading after
+       the recipe's, so the pill measured 12.25 beside chips at 11.2
+       and the recipe's own !important lost. The other three merely
+       agreed, which is worse than it sounds - a redundant !important
+       is how a conflicting one hides. This was attributed to the band
+       override in 08 for an hour, because the sweep of this rule
+       filtered on paint properties and never looked at the type.
+       What stays below is only what the recipe does not say. */
     justify-content: center !important;
     gap: 8px;
-    line-height: 1 !important;
-    font-size: var(--fs-base) !important;
     transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
                 color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
 }
