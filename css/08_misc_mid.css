@@ -7637,15 +7637,11 @@ body.stash-liquid-glass #performer-page .refract-ph-alias__list {
 body.stash-liquid-glass #performer-page .refract-ph-alias.is-open .refract-ph-alias__list {
     max-height: none;
 }
-body.stash-liquid-glass #performer-page .refract-ph-alias__n {
-    padding: 3px 9px;
-    border-radius: var(--radius-pill);
-    border: 1px solid var(--glass-border-bright);
-    background: var(--fill-4);
-    font-size: var(--fs-sm);
-    line-height: 1.45;
-    color: var(--text);
-}
+/* The alias chip's own recipe is gone: it is the house chip now, drawn
+   by the one rule in 10_pills_badges. It used to carry --glass-border-
+   bright and --fill-4 AT REST -- the hover state, worn permanently -- which
+   is why it read louder than every other chip on the page and 60px from
+   the scene panel's. Nothing left to say here. */
 body.stash-liquid-glass #performer-page .refract-ph-alias__more {
     flex: none;
     /* On the first row, not centred against the block: expanded to two
@@ -8061,13 +8057,19 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.s
        changes height with the number of endpoints. */
     line-height: 1;
 }
+/* The one documented deviation from the chip recipe, and the reason is
+   the cell it lives in rather than the chip itself. The house chip is
+   24px tall; this one sits INSIDE a read-out tile whose value line box
+   is 16.7px, and at 24 it sets the height of the whole grid row -- which
+   is the fault F8 fixed (47.6 for a text tile against 52.5 with one of
+   these and 79.6 with two). Fill, rim, weight, ink and no-blur all come
+   from the recipe; only the box is the tile's. */
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids a {
+    height: auto !important;
     font-size: var(--fs-xs) !important;
     line-height: 1.65 !important;
     padding: 0 8px !important;
     min-height: 0 !important;
-    font-weight: 500 !important;
-    color: var(--text) !important;
 }
 /* The grid is a uniform six-up of one-line tiles, and nothing in it
    gets to change that shape. A value too long for its cell truncates
@@ -8420,20 +8422,31 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
    The floor is 600, below. Between here and there the head is about
    500px wide, which is enough for the name, a wrapping action row and a
    two-up read-out. */
-@media (max-width: 820px) {
-    /* The card stops hanging off the band's bottom edge here, so its top
-       edge becomes the one that shows: it needs the same inset the sides
-       have, and the head's own top padding has to go or the name would
-       start 17px below a card it is supposed to line up with. The gap
-       stays the 2.25rem the 1200 step measured -- Bootstrap's -15px row
-       gutter eats most of it, and 1.5rem left 6px of daylight against
-       the card's tilted corner. */
-    body.stash-liquid-glass #performer-page .refract-ph .detail-container {
+/* A card that is not hanging shows its TOP edge, and a top edge needs
+   the same inset the sides have. Where it hangs, the composition is the
+   bottom edge and the top is wherever the card's height puts it, so the
+   band keeps its zero top padding and the head keeps the padding that
+   sets the name below the card's shoulder.
+
+   This used to be stated at 820 only, which is where the card first
+   stopped hanging on the performers that were tested. It is not a width
+   -- it is the anchor decision refract.js makes -- so it belongs on the
+   class: at 1200 to 1095 a non-hanging card sat ON the band's top edge,
+   16.7px above the name, while the same card at 807 was inset 17.5 and
+   level with it. Same state, two placements. */
+@media (max-width: 1400px) {
+    body.stash-liquid-glass #performer-page .refract-ph:not(.refract-ph-hang) .detail-container {
         padding-top: 1.25rem;
     }
-    body.stash-liquid-glass #performer-page .refract-ph .performer-head {
-        padding: 0 !important;
+    body.stash-liquid-glass #performer-page .refract-ph:not(.refract-ph-hang) .performer-head {
+        padding-top: 0 !important;
     }
+}
+
+@media (max-width: 820px) {
+    /* The gap stays the 2.25rem the 1200 step measured -- Bootstrap's
+       -15px row gutter eats most of it, and 1.5rem left 6px of daylight
+       against the card's tilted corner. */
     /* No align-self or margin override here any more: the base rule's
        flex-start plus its negative margin already give this width the
        right answer, because the head is always the taller side once the
@@ -8507,6 +8520,54 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
         margin-left: 1.25rem;
         margin-right: 1.25rem;
     }
+
+    /* ── The identity head centres; the record does not ──────────────
+       Ruled 2026-09-03. Once the card loses its column the head is a
+       stack, and a stack of five blocks of five different widths ragged
+       against one edge reads as unresolved even though every block is
+       correct on its own: the card at the left with two thirds of the
+       band empty beside it, then a name, then two rows of buttons, then
+       two rows of figures, each ending somewhere different.
+
+       Centred, the stack has one axis and the ragged edge becomes a
+       symmetry. What keeps that from being the other kind of wrong --
+       the everything-centred page that reads as having no structure --
+       is the scope: this is the IDENTITY, and it stops at the read-out.
+       The tile grid, the categories, the tags and the Ascension section
+       stay full width and left-aligned, so the centred block above them
+       is a deliberate contrast rather than a global default. Data and
+       inputs are read by scanning a left edge; who this is, is not.
+
+       Each block centres its own contents rather than being shrunk and
+       centred as a box, so a wrapping action row wraps symmetrically
+       instead of hanging off one end of a centred pile. */
+    body.stash-liquid-glass #performer-page .refract-ph .detail-header-image {
+        align-self: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .performer-head > h2 {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph-alias {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .details-edit {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph-standing {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .quality-group {
+        justify-self: center;
+        justify-content: center;
+    }
+    /* The record keeps its own left edge, which is the whole point. */
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group,
+    body.stash-liquid-glass #performer-page .refract-ph-cats,
+    body.stash-liquid-glass #performer-page .refract-ph-tags {
+        justify-self: stretch;
+        text-align: left;
+    }
+
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -8537,10 +8598,6 @@ body.stash-liquid-glass.refract-light #performer-page .refract-ph .detail-group 
 body.stash-liquid-glass.refract-light #performer-page .refract-ph .detail-group .detail-item {
     background: rgba(252, 252, 252, 0.9);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-}
-body.stash-liquid-glass.refract-light #performer-page .refract-ph-alias__n {
-    border-color: rgba(0, 0, 0, 0.12);
-    background: rgba(0, 0, 0, 0.05);
 }
 /* The danger red is a dark-mode red: #f87171 on this band measures
    1.48:1 in light, which is worse than the muted grey it replaced, so
@@ -9160,6 +9217,17 @@ body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-suc
     border-color: var(--glass-border) !important;
     color: rgba(var(--fg-rgb), 0.3) !important;
 }
+/* Bootstrap's col-xl-9 was never overridden on either action bar, so
+   both sat at 75% of a row they are supposed to span: 870.8 wide under
+   a 1161 form at 1600, 831.8 under 1109 at 1200. A toolbar that stops
+   three quarters of the way across the thing it acts on has a right
+   edge nobody chose, and it wrapped a line earlier than it needed to
+   for the same reason. One right edge with the form. */
+body.stash-liquid-glass #performer-page .refract-pe .details-edit {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+}
+
 /* The pair gets the last line to itself, at every width.
 
    The bar wraps -- seven controls and a status block, which did not fit
@@ -9277,12 +9345,24 @@ body.stash-liquid-glass #performer-page .refract-pe form .text-input.is-invalid 
 }
 
 @media (max-width: 1200px) {
-    body.stash-liquid-glass #performer-page .refract-pe .detail-container {
-        flex-direction: column;
-    }
+    /* The card stays BESIDE the head, the way the view band's does.
+
+       Stacking it here meant clicking Edit re-laid the page: the
+       portrait jumped from the left column to the top and opened an
+       869 x 273 void beside it at 1200, 476 wide at 807. Nothing about
+       the edit form asked for that -- the head's own rows measure 205px
+       against a 273px card, so they fit beside it with room over.
+
+       The form shares the head's column rather than taking the page's
+       full width. Getting the form out from under the head would mean
+       `display: contents` on two of Bootstrap's wrappers to promote it
+       into the container's grid, which is a real technique and a bigger
+       change than the fault warrants tonight; the form is a
+       twelve-track grid that already goes two-up at this width, and it
+       has 878px at 1200 and 540 at 807. Noted rather than smuggled in. */
     body.stash-liquid-glass #performer-page .refract-pe .detail-header-image {
         width: 240px;
-        flex: 0 0 auto;
+        flex: 0 0 240px;
         max-width: 240px !important;
     }
     /* The form keeps its twelve tracks at EVERY width and only the spans
@@ -9343,6 +9423,70 @@ body.stash-liquid-glass #performer-page .refract-pe form .text-input.is-invalid 
         order: 2;
         flex: 0 0 100%;
         height: 0;
+    }
+}
+
+/* Placed here, after the edit form's own rules, rather than beside its
+   twin in the view band's 600 block: those rules and these name the
+   same element at the same specificity, so source order decides and the
+   edit section is later. Written up there it declared the right thing
+   and changed nothing -- measured, the card still sat 134.5px left of
+   the axis at 600 with the rule apparently applying. */
+@media (max-width: 600px) {
+    /* ── The edit head follows, the form does not ────────────────────
+       Same rule one mode across: the picture, the name and the rating
+       are identity and centre with it; every field below is an input and
+       keeps its left edge. The action plate sits between the two and
+       goes with the identity, since at this width it is three stacked
+       lines of its own -- what is being edited, what you can do, how you
+       leave -- and a left-ragged toolbar under a centred name would
+       reopen exactly what this ruling closes. Its two auto margins come
+       off, or they would fight the centring they are inside. */
+    /* The card stops being a column here, at the same width the view
+       band's does. Keeping it beside the head is right down to this
+       point and wrong past it: with a 240px card and the page's own
+       padding the form measured 241px at 600, 228 at 560 and 101 at 430,
+       which is not a form. Caught by measuring the deployed commit
+       rather than by reasoning about it -- the fix that stopped Edit
+       re-laying the page took the stack away at every width, including
+       the ones that need it. */
+    body.stash-liquid-glass #performer-page .refract-pe .detail-container {
+        flex-direction: column;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .detail-header-image {
+        flex: 0 0 auto;
+        align-self: center;
+    }
+    /* The edit head is a block, not the view band's grid, so
+       justify-content lands on nothing: its h2 is `display: block` at
+       full width and its rating group is an inline-flex box sitting at
+       the left. Measured with the rule "applying": name 163.9 and rating
+       54.5 left of the axis. text-align does the work in block layout,
+       and the rating group becomes a real flex row so its own contents
+       centre inside it. */
+    body.stash-liquid-glass #performer-page .refract-pe .performer-head {
+        text-align: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .performer-head > h2 {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .quality-group {
+        display: flex !important;
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .details-edit {
+        justify-content: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .details-edit > .refract-pe-state {
+        margin-right: 0 !important;
+        align-items: center;
+        text-align: center;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe .details-edit > .btn.btn-primary {
+        margin-left: 0 !important;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe form {
+        text-align: left;
     }
 }
 
