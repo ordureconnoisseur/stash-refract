@@ -7912,7 +7912,20 @@ body.stash-liquid-glass #performer-page .refract-ph-standing__tail {
    live elements they always were. */
 body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--rating .refract-ph-standing__value {
     display: flex;
-    align-items: center;
+    /* Baseline, not centre, and it is the difference between aligned and
+       nearly aligned. Centring puts the numeral in the middle of a line
+       that its own siblings made taller, which measured 1.88px above the
+       baseline every other cell sits on -- small, and exactly the sort of
+       small that reads as "the alignment is really bad".
+
+       Baseline also solves the stars for free. A flex item with no text
+       baselines on its bottom edge, so a star sized to the cap height
+       sits with its optical centre half a cap above the baseline, which
+       is where the numeral's cap centre already is: 15px of star puts it
+       at baseline minus 7.5 against a measured cap centre of baseline
+       minus 7.44. Within a tenth of a pixel, by construction rather than
+       by a nudge that would need re-measuring whenever the type moved. */
+    align-items: baseline;
     gap: var(--gap-sm);
 }
 body.stash-liquid-glass #performer-page .refract-ph .quality-group {
