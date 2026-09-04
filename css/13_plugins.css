@@ -16,6 +16,23 @@
    ─────────────────────────────────────────────────────────────────── */
 
 
+/* Eyebrows in this file answer to ONE spec: --fs-xs, weight 600,
+   --track-eyebrow. The cohesion audit of 2026-09-04 measured eight
+   specs across the theme and eleven uppercase labels in this file
+   alone, at four tracking steps, three weights and one size
+   (0.66rem) that is on no ladder at all. 6.13 gives a RANGE, which is
+   how eight of them happened: every lane picked a different point in
+   it and each was locally defensible.
+
+   Folded here rather than argued per label. Two of these are
+   arguably control labels rather than section eyebrows - the tag
+   sidebar's segmented label and the tags-overhaul panel button - and
+   a case could be made for keeping their weight. The case is not
+   worth a second spec: a reader moving between a datepicker, a tag
+   sidebar and a performer band should meet one label voice, and an
+   exception that is genuinely wanted belongs in the ledger with a
+   date rather than in eight files as a difference nobody chose. */
+
 /* ═══════════════════════════════════════════════════════════════════
    stash-multiview
    ═══════════════════════════════════════════════════════════════════ */
@@ -1345,7 +1362,7 @@ body.stash-liquid-glass .react-datepicker__day-name {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase;
-    letter-spacing: var(--track-tight);
+    letter-spacing: var(--track-eyebrow) !important;
     width: 2rem !important;
     line-height: 2rem !important;
     text-align: center;
@@ -2042,8 +2059,8 @@ body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn {
     border-radius: var(--radius-pill) !important;
     color: var(--accent-bright) !important;
     font-size: var(--fs-xs) !important;
-    font-weight: 700 !important;
-    letter-spacing: var(--track-label) !important;
+    font-weight: 600 !important;
+    letter-spacing: var(--track-eyebrow) !important;
     text-transform: uppercase !important;
     text-decoration: none !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
@@ -2195,12 +2212,12 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-header-info {
     min-width: 0;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-title {
-    font-size: var(--fs-sm) !important;
+    font-size: var(--fs-xs) !important;
     text-transform: uppercase;
-    letter-spacing: var(--track-label);
+    letter-spacing: var(--track-eyebrow) !important;
     color: var(--text-muted) !important;
     margin: 0 !important;
-    font-weight: 600;
+    font-weight: 600 !important;
     font-family: var(--theme-font-stack) !important;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-summary {
@@ -2221,7 +2238,7 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-btn {
     padding: 0.22rem 0.7rem;
     font-size: var(--fs-xs);
     text-transform: uppercase;
-    letter-spacing: var(--track-tight);
+    letter-spacing: var(--track-eyebrow);
     font-weight: 600;
     line-height: 1.2;
     cursor: pointer;
@@ -2680,12 +2697,12 @@ body.stash-liquid-glass .details-tags-overhaul__panel-header {
     flex-wrap: wrap;
 }
 body.stash-liquid-glass .details-tags-overhaul__panel-title {
-    font-size: var(--fs-sm) !important;
+    font-size: var(--fs-xs) !important;
     text-transform: uppercase;
-    letter-spacing: var(--track-label);
+    letter-spacing: var(--track-eyebrow) !important;
     color: var(--text-muted) !important;
     margin: 0 !important;
-    font-weight: 600;
+    font-weight: 600 !important;
     font-family: var(--theme-font-stack) !important;
 }
 body.stash-liquid-glass .details-tags-overhaul__panel-summary {
@@ -3082,7 +3099,7 @@ body.stash-liquid-glass .tag-sidebar__segmented {
 body.stash-liquid-glass .tag-sidebar__segmented-label {
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
-    letter-spacing: var(--track-label) !important;
+    letter-spacing: var(--track-eyebrow) !important;
     color: var(--text-muted) !important;
     font-weight: 600 !important;
 }
@@ -3141,7 +3158,7 @@ body.stash-liquid-glass .tag-sidebar__section-label {
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
     letter-spacing: var(--track-eyebrow) !important;
-    font-weight: 700 !important;
+    font-weight: 600 !important;
     color: var(--text-muted) !important;
     margin: 0 0 0.5rem !important;
 }
@@ -3286,9 +3303,9 @@ body.stash-liquid-glass .tag-sidebar__toggle {
     min-width: 0 !important;
     /* Slim vertical strip */
     padding: 0.7rem 0.28rem !important;
-    font-size: 0.66rem !important;
-    font-weight: 700 !important;
-    letter-spacing: var(--track-display) !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 600 !important;
+    letter-spacing: var(--track-eyebrow) !important;
     text-transform: uppercase !important;
     line-height: 1 !important;
     background: rgba(var(--surface-rgb), 0.92) !important;
