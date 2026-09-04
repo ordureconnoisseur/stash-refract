@@ -183,6 +183,23 @@ installed, and neither appears when it is not:
   off. The card read-out is one number by default, and both are available to
   anyone who wants them.
 
+### Chips next door, not yet joined
+
+Both Ascension chips this lane touched now take Refract's shared chip
+recipe rather than their own box: the match chip in the Custom Fields
+section and the advanced-rating pill beside it. The recipe lists every
+chip by name, so that list is the inventory, and a chip missing from it
+is drift rather than a decision.
+
+One neighbour is known to be outside it and is recorded here so the gap
+is a fact rather than an oversight: the tag page's tag chips, measured
+at 26.58px against the recipe's 24, with their own fill, rim and type.
+Nothing about that is an Ascension concern, and it is noted in this
+document only because this is where the recipe's inventory came up. The
+durable home for it is the inventory comment in the recipe itself; if
+that list ever gains a "known not joined" line, this paragraph should
+be deleted in favour of it.
+
 ## How Refract fails safe
 
 `ascensionBadgeUnknownPart` in `refract.js` decides whether Refract touches a
