@@ -1219,6 +1219,45 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-t
     background: rgba(0, 0, 0, 0.07) !important;
     border-color: rgba(0, 0, 0, 0.22) !important;
 }
+
+/* The tier's INK in light, which is not the tier's FILL colour.
+
+   Ruling: the label carries the tier's colour in light as it does in
+   dark, provided it clears 4.5:1 on the chip's own fill. Measured on
+   rendered pixels, all six tiers, the fill colour used as ink does NOT:
+   gold 3.52, bronze 3.83, silver 4.12, diamond 4.18, legendary 4.41,
+   and only perfect at 6.64. The reason is structural rather than a bad
+   hue - the chip's fill is that same colour at 0.13 over a near-white
+   strip, so it renders around 220-230 and an ink drawn from it lands far
+   too close to its own ground.
+
+   Applying the ruling literally would have coloured one tier out of six
+   and left five grey, which signals nothing. Darkening the ink to 70%
+   clears the floor on every tier - worst case gold at 5.68 - while
+   keeping each hue plainly itself. That is the same move --accent-ink
+   already makes for the accent in light, at 55%.
+
+   Written as six literals rather than a color-mix: the per-tier values
+   in this file are already literals, and a literal cannot be dropped at
+   the consumer on Chrome 105-110 the way an unsupported color-mix in a
+   custom property is (7.13). */
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="bronze"] { --tier-ink: 102, 63, 22; }
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="silver"] { --tier-ink: 64, 69, 78; }
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="gold"] { --tier-ink: 97, 74, 10; }
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="diamond"] { --tier-ink: 11, 75, 71; }
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="legendary"] { --tier-ink: 123, 17, 71; }
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] { --tier-ink: 52, 41, 90; }
+
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-name {
+    color: rgba(var(--tier-ink), 0.95) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-value {
+    color: rgb(var(--tier-ink)) !important;
+}
+body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-value::before {
+    background: rgba(var(--tier-ink), 0.34) !important;
+}
+
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-name {
     color: rgba(0, 0, 0, 0.55) !important;
 }
