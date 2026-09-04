@@ -7878,11 +7878,18 @@ body.stash-liquid-glass #performer-page .refract-ph-standing__tail {
    The count is refract.js's, set as an attribute when it builds the head,
    because CSS cannot count children. Capped at six so a full performer is
    untouched: fifteen items still ask for six. */
-body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="1"] { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+/* Wide only. An attribute selector outranks the plain class rules the
+   narrow breakpoints use, and a media query adds no specificity, so
+   ungated these held five columns all the way down to 600 -- measured
+   doing exactly that before this gate. Below 1200 the existing
+   breakpoints own the grid, and they know more than a count does. */
+@media (min-width: 1201px) {
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="1"] { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="4"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    body.stash-liquid-glass #performer-page .refract-ph .detail-group[data-refract-cols="5"] { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
 
 /* THE RATING CELL.
 
@@ -7938,6 +7945,29 @@ body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars
 }
 body.stash-liquid-glass #performer-page .refract-ph .quality-group .star-rating-number {
     display: none !important;
+}
+/* At 820 and below the stars are 44px, because that is the touch floor
+   and a target you tap is not negotiable. Five of them plus the pill do
+   not belong on a 21px value line, and cramming them there put the
+   RATING eyebrow out of step with the three beside it and wrapped the
+   pill under the numeral -- worse than what it replaced, at exactly the
+   widths where it matters most.
+
+   So below the floor's breakpoint the cell takes the whole row and
+   stacks: eyebrow, then the numeral with its stars and pill on a line of
+   their own. Same anatomy as its peers, and no pretending to fit a line
+   it cannot fit. */
+@media (max-width: 820px) {
+    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing {
+        flex-wrap: wrap;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--rating {
+        flex: 1 0 100%;
+    }
+    body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--rating .refract-ph-standing__value {
+        flex-wrap: wrap;
+        row-gap: var(--gap-sm);
+    }
 }
 body.stash-liquid-glass #performer-page .refract-ph .quality-group .hon-battle-rank-badge {
     display: none !important;
