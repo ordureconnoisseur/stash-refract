@@ -1456,13 +1456,21 @@ body.stash-liquid-glass .react-datepicker__navigation:hover .react-datepicker__n
     border-color: var(--accent-bright) !important;
 }
 
+/* The plate is the surface token, not a hand-written near-black. That is
+   the cohesion fix (3.2 allows two surface colours and the source carried
+   29 families), but it also repairs something: the options inside are
+   `color: var(--text)`, which FLIPS, over a plate that did not. Computed
+   from the token values as 10.3 prescribes for light, black ink at 0.88
+   on rgb(14,14,18) is about 1.05:1 - this dropdown has been unreadable in
+   light mode, not merely off-palette. 14,14,18 to 20,20,24 is invisible
+   in dark. */
 /* Month + year dropdown panels (when user clicks the read-view pills).
    Opaque dark background so options are readable; max-height + scroll
    so a 100-year list doesn't extend off-screen; high z-index so it
    sits over the rest of the calendar. */
 body.stash-liquid-glass .react-datepicker__month-dropdown,
 body.stash-liquid-glass .react-datepicker__year-dropdown {
-    background: rgba(14, 14, 18, 0.98) !important;
+    background: rgba(var(--surface-rgb), 0.98) !important;
     -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
     backdrop-filter: var(--glass-blur-xl-sat) !important;
     border: 1px solid var(--glass-border) !important;
@@ -1949,8 +1957,11 @@ body.stash-liquid-glass .stash-scribe-modal {
     /* Match the ASR/APR modal opacity recipe (.adv-rating-modal-content
        at 09_buttons.css:559) - near-opaque dark base + heavy blur so the
        card reads as solid glass, not see-through. */
-    background: rgba(28, 28, 28, 0.97) !important;
-    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    background: rgba(var(--surface-rgb), 0.97) !important;
+    /* The rim was a hardcoded white alpha, which is the same defect one
+       property along: it cannot flip, so in light it drew a white line on
+       a white plate. --glass-border is the token that does. */
+    border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-2xl) !important;
     backdrop-filter: var(--glass-blur-2xl) !important;
