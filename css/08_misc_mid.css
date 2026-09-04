@@ -9506,12 +9506,17 @@ body.stash-liquid-glass #performer-page .refract-pe form .text-input.is-invalid 
    computes 9px from a more specific segmented-control rule in 07; that
    divergence is on that side, not this one. */
 body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link {
-    padding: 0.55rem 1rem !important;
-    font-size: var(--fs-base) !important;
-    border-radius: var(--radius-sm) !important;
-    letter-spacing: 0.015em !important;
+    /* Geometry only. The fill, the rim, the type pair and the active
+       treatment are the anatomy in 09 and these strips are in its :is()
+       lists now; --fs-base, --radius-sm and the 0.015em tracking that
+       used to be here were this surface answering a question the theme
+       had already answered. What is left is the box, which the canonical
+       rule deliberately does not touch: 5px against the scene item's,
+       measured, so an entity tab and a scene tab are the same object at
+       the same size rather than 41.4 against 28.8. */
+    padding: 5px 1rem !important;
 }
-body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link .badge {
-    font-size: var(--fs-xs) !important;
-    padding: 0.18em 0.5em !important;
-}
+/* The strip's count badge is a chip and takes the recipe in
+   10_pills_badges (`.nav-tabs .nav-link .badge`, read-out list, added
+   with the scene lane's set). Its own size and padding are gone with
+   this rule. */
