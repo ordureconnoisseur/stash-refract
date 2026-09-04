@@ -124,7 +124,7 @@ body.stash-liquid-glass
 body.stash-liquid-glass .refract-list-sheet .refract-seg button,
 body.stash-liquid-glass
 :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link,
-body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn) {
+body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn, .refract-cc-kind-btn) {
     border-radius: 9px !important;
     font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
@@ -159,7 +159,7 @@ body.stash-liquid-glass
    is the point - computed style said the anatomy had applied, and it
    had. Every button-based joiner takes this; anchors are unaffected. */
 body.stash-liquid-glass .refract-list-sheet .refract-seg button,
-body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn) {
+body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn, .refract-cc-kind-btn) {
     background: none !important;
     border: 1px solid transparent !important;
     -webkit-appearance: none !important;
@@ -171,7 +171,7 @@ body.stash-liquid-glass
 body.stash-liquid-glass .refract-list-sheet .refract-seg button.is-on,
 body.stash-liquid-glass
 :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link.active,
-body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn).is-active {
+body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn, .refract-cc-kind-btn).is-active {
     color: var(--accent-bright) !important;
     background: var(--accent-tint) !important;
     border-color: var(--accent-glow) !important;
