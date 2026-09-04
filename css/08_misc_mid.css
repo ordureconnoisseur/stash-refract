@@ -923,7 +923,7 @@ body.stash-liquid-glass .name-icons .external-links-button.dropdown {
    (overrides the generic .favorite-button colour which leaks orange via
    the .btn-primary cascade in the detail-header context). */
 body.stash-liquid-glass .name-icons .favorite-button:not(.favorite) {
-    color: rgba(var(--fg-rgb), 0.85) !important;
+    color: var(--text) !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
@@ -1426,9 +1426,11 @@ body.stash-liquid-glass .detail-header .hon-battle-rank-badge {
     margin-left: 0 !important;
     font-size: var(--fs-base) !important;
 }
-body.stash-liquid-glass .detail-header .quality-group .adv-rating-btn {
-    font-size: var(--fs-base) !important;
-}
+/* The band's rating pill takes the chip recipe's type like every other
+   chip. It was --fs-base, 12.25 against the recipe's 11.2, on the
+   reasoning that this pill is the band's rating read-out -- but the
+   read-out beside it carries the headline weight and this is a control
+   you press. One recipe means one type. Ruled 2026-09-04. */
 
 /* Tab bar on detail pages: the links were edge to edge, so the active
    pill's rounded corner butted straight into the next tab's label.
@@ -1589,7 +1591,7 @@ body.stash-liquid-glass .tag-card .favorite-button {
     padding: 0 !important;
 }
 body.stash-liquid-glass .tag-card .favorite-button:not(.favorite) {
-    color: rgba(var(--fg-rgb), 0.85) !important;
+    color: var(--text) !important;
 }
 body.stash-liquid-glass .tag-card .favorite-button:not(.favorite):hover {
     color: #fff !important;
@@ -2007,7 +2009,7 @@ body.stash-liquid-glass .movie-card .thumbnail-section > a:has(> .favorite-butto
 body.stash-liquid-glass .studio-card .favorite-button:not(.favorite),
 body.stash-liquid-glass .group-card .favorite-button:not(.favorite),
 body.stash-liquid-glass .movie-card .favorite-button:not(.favorite) {
-    color: rgba(var(--fg-rgb), 0.85) !important;
+    color: var(--text) !important;
 }
 body.stash-liquid-glass .studio-card .favorite-button:not(.favorite):hover,
 body.stash-liquid-glass .group-card .favorite-button:not(.favorite):hover,
@@ -2237,8 +2239,16 @@ body.stash-liquid-glass .spinner-grow {
     color: var(--accent) !important;
 }
 
-body.stash-liquid-glass .badge,
-body.stash-liquid-glass .bg-secondary.badge {
+/* Every badge EXCEPT the ones the chip recipe owns. This blanket sets
+   --fill-4 with !important, which beats the recipe's non-important
+   --fill-3 at equal specificity, so neither source order nor :where()
+   could reach it -- the tab count badge measured 0.08 against the
+   recipe's 0.05 with everything else about it correct. The exclusion is
+   narrow on purpose: this rule still dresses every badge Refract has
+   not given a recipe, and the day one of those joins, its selector goes
+   in here too. */
+body.stash-liquid-glass .badge:not(.nav-link .badge),
+body.stash-liquid-glass .bg-secondary.badge:not(.nav-link .badge) {
     background: var(--fill-4) !important;
     color: var(--text) !important;
     border: 1px solid var(--glass-border) !important;
@@ -3192,7 +3202,7 @@ body.stash-liquid-glass code,
 body.stash-liquid-glass .CodeMirror,
 body.stash-liquid-glass .cm-editor {
     background: rgba(6, 6, 8, 0.82) !important;
-    color: rgba(var(--fg-rgb), 0.9) !important;
+    color: var(--text) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 10px !important;
 }
@@ -8486,12 +8496,64 @@ body.stash-liquid-glass #performer-page .refract-ph-tags.is-open {
     body.stash-liquid-glass #performer-page .refract-ph-tags {
         margin-left: calc(200px + 2.5rem);
     }
-    /* 44px is the floor for a touch target (appropriate scales). */
+    /* ── The 44px floor, in pixels, because it is a finger ───────────
+       This rule has always SAID 44 and never delivered it: 2.75rem
+       against this theme's 14px root is 38.5, so every control it names
+       has been 5.5px under the floor since it was written, and the
+       comment agreeing with the intent is most of why nobody checked. A
+       touch target is a physical size and does not scale with the type
+       ramp; it is the one measurement in the theme that belongs in px.
+
+       Measured at 700 before: band buttons 38.5, the name icons 38.5 x
+       39, the advanced-rating pill 24 x 60, the rating stars 21 x 18,
+       the entity tabs 29 and the edit form's fields 33.6 -- all under a
+       mobile chrome whose dock slots are 56 and whose every control is
+       44 (6.11, the audit's D6).
+
+       The control chips take 44 here and the recipe's 24 stays a desktop
+       decision: a chip you press is a control before it is a chip, and
+       the recipe's own escape is that a chip fits the box it is in.
+       Read-out chips keep 24 -- nobody taps an alias. */
     body.stash-liquid-glass #performer-page .refract-ph .details-edit .btn,
     body.stash-liquid-glass #performer-page .refract-ph .name-icons .btn,
-    body.stash-liquid-glass #performer-page .refract-ph .name-icons .dropdown-toggle {
-        height: 2.75rem !important;
-        min-width: 2.75rem !important;
+    body.stash-liquid-glass #performer-page .refract-ph .name-icons .dropdown-toggle,
+    body.stash-liquid-glass #performer-page .refract-ph .rating-stars button,
+    body.stash-liquid-glass #performer-page .refract-ph .adv-rating-btn,
+    body.stash-liquid-glass #performer-page .refract-pe .details-edit .btn,
+    body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link,
+    body.stash-liquid-glass .detail-header:has(.studio-head) .btn,
+    body.stash-liquid-glass .detail-header:has(.tag-head) .btn,
+    body.stash-liquid-glass .detail-header:has(.group-head) .btn {
+        min-height: 44px !important;
+        min-width: 44px !important;
+    }
+    /* The form's fields are controls too, and the one height they share
+       is 33.6 by a rule of this lane's own making. Textareas excluded by
+       name: they are already taller and a floor says nothing to them. */
+    /* The class is doubled and the :not() matched to the desktop rule's,
+       because that rule is `:not(textarea):not(.details-edit *)` and a
+       second :not() carries its argument's weight -- so the 33.6 outranked
+       a floor that was more recent, more specific in intent, and equally
+       !important. Measured: 27 fields still at 33.6 with this rule
+       apparently applying. Third time tonight that a deviation lost to a
+       rule it was written to override, which is the argument for reading
+       specificity as arithmetic rather than as intent. */
+    body.stash-liquid-glass #performer-page .refract-pe.refract-pe form :is(
+        .form-control,
+        .text-input,
+        .react-select__control,
+        .input-group-append > .btn,
+        .input-group-prepend > .btn
+    ):not(textarea):not(.details-edit *) {
+        min-height: 44px !important;
+        height: 44px !important;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe form .input-group {
+        min-height: 44px;
+    }
+    body.stash-liquid-glass #performer-page .refract-pe form .react-select__value-container,
+    body.stash-liquid-glass #performer-page .refract-pe form .react-select__indicators {
+        height: 44px !important;
     }
 }
 
