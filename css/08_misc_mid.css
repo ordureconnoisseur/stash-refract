@@ -7949,6 +7949,24 @@ body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars
     gap: 2px;
     align-items: center;
 }
+/* The baseline argument holds for the numeral and only PART of the way
+   for the controls. A flex item with no text baselines on its bottom
+   margin edge, which would put a cap-height star's centre 0.06px from
+   the numeral's cap centre; measured, both the stars and the pill land
+   2.5px above it instead, consistently, on both performers, both
+   widths and both modes. A <button> does not baseline on its bottom
+   edge the way an empty box does -- it takes one from its content, and
+   these carry hidden children that are still in flow.
+
+   So this is measured rather than derived, which is the honest way to
+   write it down: 2.5px, from rendered pixels, geometric ink centre
+   against the standing numerals' cap centre. Re-measure it if the
+   star's size or the row's type changes, because it will move. */
+body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars,
+body.stash-liquid-glass #performer-page .refract-ph .quality-group .adv-rating-btn {
+    position: relative;
+    top: 2.5px;
+}
 /* The house glow, on the filled layer only -- the same move the accent
    makes on an active segment, in the star's own colour. An empty star
    gets none of it, so the glow reads as the rating rather than as
