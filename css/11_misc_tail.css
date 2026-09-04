@@ -1783,13 +1783,20 @@ body.stash-liquid-glass .refract-cc-kind {
     display: flex;
     gap: 3px;
     padding: 3px;
-    border-radius: 8px;
+    /* 12/9, joining the concentric pair the segment well beside it uses.
+       The old 8/6 was not a considered deviation and was not even
+       concentric - 8 minus 3px of padding is 5, not 6 - so it was a
+       leftover, and it put two identical controls in one panel at two
+       radii. Every structural test for a segmented strip passes here:
+       a well, 3px of padding, a gap, mutually exclusive buttons, one
+       active. */
+    border-radius: 12px;
     background: var(--fill-1);
 }
 body.stash-liquid-glass .refract-cc-kind-btn {
     appearance: none;
     padding: 5px 13px;
-    border-radius: 6px;
+    border-radius: 9px;
     border: 1px solid transparent;
     background: none;
     font-size: var(--fs-xs);
