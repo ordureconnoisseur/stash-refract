@@ -433,11 +433,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
         background: transparent;
         box-shadow: none;
     }
-    /* Focus ring (6.6 house ring as an outline: the capsule clips box
-       shadows on its children through the pill radius). */
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item:focus-visible {
-        outline: 2px solid rgba(var(--accent-rgb), 0.7);
-        outline-offset: -6px;
+    /* Focus: the one house ring is 09_buttons' global :focus-visible
+       rule (cohesion audit item 1). The slot only pulls it inside the
+       capsule (the rim would clip it) and shapes it to the pill; tripled
+       body class because the rule's own offset is !important. */
+    body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass .refract-mobile-dock .refract-dock-item:focus-visible {
+        outline-offset: -6px !important;
         border-radius: var(--radius-pill);
     }
     /* The More glyph: the shared three-line burger scaled to the 26px
@@ -846,10 +847,11 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.is-active svg {
         filter: none;
     }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile:focus-visible,
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-edit:focus-visible {
-        outline: 2px solid rgba(var(--accent-rgb), 0.7);
-        outline-offset: -2px;
+    /* Focus: 09's ring; inset because the sheet scrolls (the audit's
+       one allowed exception). */
+    body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile:focus-visible,
+    body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass .refract-mobile-drawer .refract-drawer-edit:focus-visible {
+        outline-offset: -2px !important;
     }
 }
 
@@ -2196,18 +2198,28 @@ body.stash-liquid-glass .refract-mobile-drawer {
         -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
         mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
     }
-    /* Segmented control: 36 tall in the 48 row, fill-2, --radius-sm,
-       segments 9px (12 minus the 3px padding), the current one tinted. */
+    /* Segmented control: the house anatomy ruled in 09_buttons (6.23):
+       a 12px well with 3px padding holding 9px concentric items, --fill-1
+       well on an 0.08 --fg-rgb rim, items --fs-sm 600 muted, active =
+       accent tint, --accent-glow rim, the 14px glow. GEOMETRY (36 in the
+       48 row, 40 min, 0 10 padding, 2px gap) is this lane's. The material
+       below is an interim copy of 09's values, kept only until the scene
+       lane appends these three selectors to its :is() lists:
+         well   .refract-list-sheet .refract-seg
+         item   .refract-list-sheet .refract-seg button
+         active .refract-list-sheet .refract-seg button.is-on
+       When it has, delete every non-geometry declaration here. */
     body.stash-liquid-glass .refract-list-sheet .refract-seg {
         display: inline-flex;
         height: 36px;
         padding: 3px;
         gap: 2px;
-        border-radius: var(--radius-sm);
-        background: var(--fill-2);
-        border: 1px solid var(--glass-border);
         box-sizing: border-box;
         flex: 0 0 auto;
+        /* interim material (09 anatomy) */
+        border-radius: var(--radius-sm);
+        background: var(--fill-1);
+        border: 1px solid rgba(var(--fg-rgb), 0.08);
     }
     body.stash-liquid-glass .refract-list-sheet .refract-seg button {
         display: inline-flex;
@@ -2216,30 +2228,33 @@ body.stash-liquid-glass .refract-mobile-drawer {
         min-width: 40px;
         height: 28px;
         padding: 0 10px;
-        border-radius: 9px;
-        border: none;
-        background: transparent;
-        font-size: var(--fs-base);
-        font-weight: 600;
+        box-sizing: border-box;
         font-variant-numeric: tabular-nums;
+        /* interim material (09 anatomy) */
+        border-radius: 9px;
+        border: 1px solid transparent;
+        background: transparent;
+        font-size: var(--fs-sm);
+        font-weight: 600;
+        letter-spacing: 0;
         color: var(--text-muted);
     }
     body.stash-liquid-glass .refract-list-sheet .refract-seg button svg {
         width: 16px;
         height: 16px;
     }
-    /* Active segment: the theme's active state (6.23 anatomy): accent
-       tint, --accent-glow rim, the 14px glow; no solid rim. */
+    /* Active segment: 09's values verbatim (interim, see above). */
     body.stash-liquid-glass .refract-list-sheet .refract-seg button.is-on {
+        color: var(--accent-bright);
         background: var(--accent-tint);
-        color: var(--accent-ink);
+        border-color: var(--accent-glow);
         box-shadow:
-            inset 0 0 0 1px var(--accent-glow),
-            0 0 14px rgba(var(--accent-rgb), 0.35);
+            0 0 14px rgba(var(--accent-rgb), 0.35),
+            0 0 0 1px rgba(var(--accent-rgb), 0.18) inset;
     }
-    body.stash-liquid-glass .refract-list-sheet button:focus-visible {
-        outline: 2px solid rgba(var(--accent-rgb), 0.7);
-        outline-offset: -2px;
+    /* Focus: 09's ring; inset because the sheet scrolls. */
+    body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass .refract-list-sheet button:focus-visible {
+        outline-offset: -2px !important;
     }
 }
 /* The sheet does not exist above phone width; the 900 rule above is the
