@@ -923,7 +923,7 @@ body.stash-liquid-glass .name-icons .external-links-button.dropdown {
    (overrides the generic .favorite-button colour which leaks orange via
    the .btn-primary cascade in the detail-header context). */
 body.stash-liquid-glass .name-icons .favorite-button:not(.favorite) {
-    color: rgba(var(--fg-rgb), 0.85) !important;
+    color: var(--text) !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
@@ -1426,9 +1426,11 @@ body.stash-liquid-glass .detail-header .hon-battle-rank-badge {
     margin-left: 0 !important;
     font-size: var(--fs-base) !important;
 }
-body.stash-liquid-glass .detail-header .quality-group .adv-rating-btn {
-    font-size: var(--fs-base) !important;
-}
+/* The band's rating pill takes the chip recipe's type like every other
+   chip. It was --fs-base, 12.25 against the recipe's 11.2, on the
+   reasoning that this pill is the band's rating read-out -- but the
+   read-out beside it carries the headline weight and this is a control
+   you press. One recipe means one type. Ruled 2026-09-04. */
 
 /* Tab bar on detail pages: the links were edge to edge, so the active
    pill's rounded corner butted straight into the next tab's label.
@@ -1589,7 +1591,7 @@ body.stash-liquid-glass .tag-card .favorite-button {
     padding: 0 !important;
 }
 body.stash-liquid-glass .tag-card .favorite-button:not(.favorite) {
-    color: rgba(var(--fg-rgb), 0.85) !important;
+    color: var(--text) !important;
 }
 body.stash-liquid-glass .tag-card .favorite-button:not(.favorite):hover {
     color: #fff !important;
@@ -2007,7 +2009,7 @@ body.stash-liquid-glass .movie-card .thumbnail-section > a:has(> .favorite-butto
 body.stash-liquid-glass .studio-card .favorite-button:not(.favorite),
 body.stash-liquid-glass .group-card .favorite-button:not(.favorite),
 body.stash-liquid-glass .movie-card .favorite-button:not(.favorite) {
-    color: rgba(var(--fg-rgb), 0.85) !important;
+    color: var(--text) !important;
 }
 body.stash-liquid-glass .studio-card .favorite-button:not(.favorite):hover,
 body.stash-liquid-glass .group-card .favorite-button:not(.favorite):hover,
@@ -3200,7 +3202,7 @@ body.stash-liquid-glass code,
 body.stash-liquid-glass .CodeMirror,
 body.stash-liquid-glass .cm-editor {
     background: rgba(6, 6, 8, 0.82) !important;
-    color: rgba(var(--fg-rgb), 0.9) !important;
+    color: var(--text) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 10px !important;
 }
