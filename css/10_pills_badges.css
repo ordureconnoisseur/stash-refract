@@ -32,11 +32,32 @@
    drift. */
 body.stash-liquid-glass :is(
     .refract-chip,
+
+    /* performer lane -- read-out */
     #performer-page .refract-ph-alias__n,
     #performer-page .refract-ph .detail-group .detail-item.stash_ids a,
     #performer-page .refract-ph-tags .tag-item,
-    /* mobile lane: the More sheet's multiview count badge (read-out) */
-    .refract-mobile-drawer .refract-drawer-tile-badge
+
+    /* mobile lane -- read-out: the More sheet's multiview count badge */
+    .refract-mobile-drawer .refract-drawer-tile-badge,
+
+    /* ascension lane -- read-out. The match chip is addressed
+       structurally on purpose: it names no Ascension class, so the
+       selector survives that plugin renaming its own markup, which it
+       has already done once (#190). Joining costs it the state-coloured
+       rim it used to wear; win and loss stay in the ink, measured 7.6:1
+       dark and 6.4:1 light, which is where a read-out's meaning belongs
+       anyway. */
+    #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *,
+
+    /* ascension lane -- read-out silhouette, control material below: the
+       advanced-rating pill. Joining removes its resting box-shadow glow,
+       and that is a visible change worth attributing rather than
+       discovering. 6.5 is explicit and the recipe has no shadow: a
+       control chip is told apart by its accent tint and rim, not by a
+       halo, and a halo at rest is the same mistake the alias chip was
+       making with its hover rim. */
+    .adv-rating-btn
 ) {
     display: inline-flex;
     align-items: center;
@@ -69,8 +90,13 @@ body.stash-liquid-glass :is(
 /* A chip that mutates something wears the accent, so pressable and
    not-pressable are told apart by material rather than by memory. */
 body.stash-liquid-glass :is(
-    .refract-chip-control
+    .refract-chip-control,
+
+    /* ascension lane: the advanced-rating pill opens the rating drawer,
+       so it takes the control material over the read-out box above. */
+    .adv-rating-btn
 ) {
+    box-shadow: none;
     border-color: rgba(var(--accent-rgb), 0.28);
     background: rgba(var(--accent-rgb), 0.12);
 }
