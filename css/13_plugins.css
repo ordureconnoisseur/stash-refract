@@ -1071,13 +1071,20 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
 }
 /* The label: the band's, exactly. */
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * > * > *:first-child {
+    /* --text-muted and --text, not a hand-rolled rgba(var(--fg-rgb), A).
+       The channel flips either way, but the ALPHA does not: light raises
+       muted from 0.55 to 0.65 and lowers primary from 0.92 to 0.88, so a
+       hand-written alpha tracked the band in dark and drifted from it in
+       light. Measured before this: these keys sat at 0.55 beside band
+       labels at 0.65 on the same row. The token is the only thing that
+       carries both halves of the flip. */
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     letter-spacing: var(--track-eyebrow) !important;
     line-height: 12.096px !important;
     text-transform: uppercase !important;
     text-align: left !important;
-    color: rgba(var(--fg-rgb), 0.55) !important;
+    color: var(--text-muted) !important;
 }
 /* The number: the band's value. This is also what fixes the light-mode
    legibility finding without a per-release colour list - Ascension's
@@ -1088,7 +1095,7 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
     font-weight: 400 !important;
     letter-spacing: 0.07px !important;
     text-align: left !important;
-    color: rgba(var(--fg-rgb), 0.92) !important;
+    color: var(--text) !important;
 }
 /* A stat NUMBER is plain ink, deliberately. Two rules painting
    .stat-positive and .stat-negative used to sit here and never applied:
@@ -1146,7 +1153,7 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
    rating in that order. The only class read is win or loss on the entry
    itself, which is the datum. */
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * {
-    --refract-asc-ink: rgba(var(--fg-rgb), 0.55);
+    --refract-asc-ink: var(--text-muted);
     /* The silhouette is the chip recipe's (10_pills_badges), where this
        selector is listed by name. Only what the recipe does not say is
        stated here, and the declarations it DOES say were removed rather
@@ -1170,7 +1177,7 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
        deviation nobody declared is drift wearing the word deviation.
        The two quiet ends keep --fs-xs below, which is a stated caption
        step rather than a second body size. */
-    color: rgba(var(--fg-rgb), 0.92) !important;
+    color: var(--text) !important;
 }
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * * {
     font-size: inherit !important;
@@ -1184,7 +1191,7 @@ body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:last-child,
 body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:last-child * {
     font-size: var(--fs-xs) !important;
-    color: rgba(var(--fg-rgb), 0.55) !important;
+    color: var(--text-muted) !important;
     background: none !important;
     padding: 0 !important;
     border: 0 !important;
