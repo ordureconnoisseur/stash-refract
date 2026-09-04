@@ -7936,6 +7936,16 @@ body.stash-liquid-glass #performer-page .refract-ph .quality-group {
        in this row to ride the bottom of, so the rating sits on the
        standing figures' own line rather than above them. */
     align-self: end;
+    /* Bottom-aligning puts the group on the row's BOX bottom, and the box
+       is not where the text looks: a standing numeral's cap centre sits
+       above its own box centre by the descender space it reserves.
+       Measured on rendered pixels, four performers at two widths, the
+       stars and the pill landed +3.81 to +4.19 below the cap centre --
+       eight readings inside 0.4px of each other, which is what makes a
+       constant defensible rather than a guess. Lifted onto the cap line.
+       Re-measure if the row's type changes, because it moves. */
+    position: relative;
+    top: -4px;
     margin: 0 !important;
     padding: 0 !important;
 }
@@ -8393,6 +8403,35 @@ body.stash-liquid-glass #performer-page .refract-ph .performer-head > .quality-g
    and a tie is decided by source order -- measured with it written
    earlier: the alias row and the read-out both stayed at margin-top 0
    and only the standing row moved. */
+
+
+/* THE CUSTOMISER REACHES THE PAGE CARD TOO.
+
+   Every element gate for the performer card is scoped to `.performer-card`
+   -- the GRID card -- across 03, 13 and 16. The page card is
+   `.detail-header-image.refract-ph-card` and matches none of them, so it
+   has never honoured the customiser: gated by driving the real UI, the
+   body class flipped correctly for all seven elements and the page card
+   changed for none of them, while the grid card hid what it should.
+
+   Not caused by the band work; the page card has always been outside
+   those selectors. It is answered here rather than in 03/13/16 because
+   this is the performer PAGE's surface and this is its file, and because
+   the grid rules stay exactly as they are -- these add a second scope,
+   they do not touch the first.
+
+   The body class is doubled to match the specificity the originals use.
+   Rank is included for symmetry even though the page card hides that
+   badge unconditionally elsewhere. */
+body.stash-liquid-glass.refract-pc-hide-name.refract-pc-hide-name #performer-page .refract-ph-card .refract-pc-name-banner,
+body.stash-liquid-glass.refract-pc-hide-tier.refract-pc-hide-tier #performer-page .refract-ph-card .refract-pc-tier-label,
+body.stash-liquid-glass.refract-pc-hide-back.refract-pc-hide-back #performer-page .refract-ph-card .refract-card-flip-btn,
+body.stash-liquid-glass.refract-pc-hide-country.refract-pc-hide-country #performer-page .refract-ph-card .stash-perf-country,
+body.stash-liquid-glass.refract-pc-hide-stats.refract-pc-hide-stats #performer-page .refract-ph-card .stash-perf-stats,
+body.stash-liquid-glass.refract-pc-hide-rank.refract-pc-hide-rank #performer-page .refract-ph-card .hon-battle-rank-badge,
+body.stash-liquid-glass.refract-pc-hide-score.refract-pc-hide-score #performer-page .refract-ph-card .refract-ascension-score {
+    display: none !important;
+}
 
 /* Below 1400 the read-outs step down. The band keeps its shape well
    below that: stacking the card above the head leaves the right half
