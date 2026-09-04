@@ -8071,7 +8071,11 @@ body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.s
 body.stash-liquid-glass #performer-page .refract-ph .detail-group .detail-item.stash_ids.stash_ids a {
     height: auto !important;
     font-size: var(--fs-xs) !important;
-    line-height: 1.65 !important;
+    /* 1.45, not 1.65: the recipe brought a 1px rim this chip did not have
+       before, and two of those took the box from 16.6 to 18.6 and the
+       grid row from 47.6 to 51.5 -- F8 undone by a border. The line box
+       gives the rim its 2px back. */
+    line-height: 1.45 !important;
     padding: 0 8px !important;
     min-height: 0 !important;
     background: var(--fill-3) !important;
