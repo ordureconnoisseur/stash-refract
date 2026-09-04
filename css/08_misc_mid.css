@@ -7912,20 +7912,23 @@ body.stash-liquid-glass #performer-page .refract-ph-standing__tail {
    live elements they always were. */
 body.stash-liquid-glass #performer-page .refract-ph .refract-ph-standing__cell--rating .refract-ph-standing__value {
     display: flex;
-    /* Baseline, not centre, and it is the difference between aligned and
-       nearly aligned. Centring puts the numeral in the middle of a line
-       that its own siblings made taller, which measured 1.88px above the
-       baseline every other cell sits on -- small, and exactly the sort of
-       small that reads as "the alignment is really bad".
+    /* Centre, on a line that is exactly one numeral tall.
 
-       Baseline also solves the stars for free. A flex item with no text
-       baselines on its bottom edge, so a star sized to the cap height
-       sits with its optical centre half a cap above the baseline, which
-       is where the numeral's cap centre already is: 15px of star puts it
-       at baseline minus 7.5 against a measured cap centre of baseline
-       minus 7.44. Within a tenth of a pixel, by construction rather than
-       by a nudge that would need re-measuring whenever the type moved. */
-    align-items: baseline;
+       Centring was tried first and rejected, correctly, because the line
+       was then as tall as the controls and the numeral floated in the
+       middle of it. With the line pinned to 1em below, the numeral's box
+       IS the line, so centring cannot displace it -- and everything else
+       centres on the numeral's own box, which is what "share one line"
+       means.
+
+       Baseline alignment was the intermediate answer and it does not
+       survive the line being constrained: measured, it put the rated
+       numeral's baseline 9.5px off its peers' while the cell height was
+       right. Centre gives both at zero. It also retires a measured 2.5px
+       nudge that existed only to correct what baseline alignment did to
+       the stars and pill; under centring they land on the numeral's box
+       centre with nothing added. */
+    align-items: center;
     gap: var(--gap-sm);
     /* The line keeps its peers' height, and this is the rule that makes
        the ROW line up rather than just the numerals.
@@ -7965,24 +7968,7 @@ body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars
     gap: 2px;
     align-items: center;
 }
-/* The baseline argument holds for the numeral and only PART of the way
-   for the controls. A flex item with no text baselines on its bottom
-   margin edge, which would put a cap-height star's centre 0.06px from
-   the numeral's cap centre; measured, both the stars and the pill land
-   2.5px above it instead, consistently, on both performers, both
-   widths and both modes. A <button> does not baseline on its bottom
-   edge the way an empty box does -- it takes one from its content, and
-   these carry hidden children that are still in flow.
 
-   So this is measured rather than derived, which is the honest way to
-   write it down: 2.5px, from rendered pixels, geometric ink centre
-   against the standing numerals' cap centre. Re-measure it if the
-   star's size or the row's type changes, because it will move. */
-body.stash-liquid-glass #performer-page .refract-ph .quality-group .rating-stars,
-body.stash-liquid-glass #performer-page .refract-ph .quality-group .adv-rating-btn {
-    position: relative;
-    top: 2.5px;
-}
 /* The house glow, on the filled layer only -- the same move the accent
    makes on an active segment, in the star's own colour. An empty star
    gets none of it, so the glow reads as the rating rather than as
