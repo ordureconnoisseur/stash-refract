@@ -9480,6 +9480,19 @@
         if (!header) { return; }
         if (!header.classList.contains("edit")) {
             header.classList.remove("refract-pe");
+            /* The crop guide is built into the CARD, not into the form, so
+               leaving edit mode does not take it with it. It was appended
+               and never removed: measured, closing edit left .refract-pe-crop
+               in the DOM, visible, z-index 5 over the whole card, with its
+               label sitting on the pill band -- which is the ghost text a
+               user asked about ("the card says card keeps front or
+               something"). Its side panels were also still painting black
+               at 0.55 over 6.6% of each edge of the card.
+
+               Removed rather than hidden, because a hidden node here is a
+               node that comes back the moment a rule moves. */
+            var stale = header.querySelectorAll(".refract-pe-crop, .refract-pe-shot");
+            for (var q = 0; q < stale.length; q++) { stale[q].parentNode.removeChild(stale[q]); }
             return;
         }
         var form = header.querySelector("form");

@@ -8915,8 +8915,8 @@ body.stash-liquid-glass.refract-light #performer-page .refract-pe .performer-hea
 body.stash-liquid-glass.refract-light #performer-page .refract-pe form > .details-edit {
     border-color: rgba(0, 0, 0, 0.12) !important;
 }
-body.stash-liquid-glass.refract-light #performer-page .refract-pe-crop__label,
-body.stash-liquid-glass.refract-light #performer-page .refract-pe-crop__side {
+body.stash-liquid-glass.refract-light #performer-page .refract-pe .refract-pe-crop__label,
+body.stash-liquid-glass.refract-light #performer-page .refract-pe .refract-pe-crop__side {
     --accent-ink: var(--accent-light);
 }
 /* The card keeps its own floor: the chin scrim and the neon strip are
@@ -8984,7 +8984,11 @@ body.stash-liquid-glass #performer-page .refract-pe .detail-header-image img.per
     border-radius: var(--radius-sm);
     border: 1px solid var(--glass-border);
 }
-body.stash-liquid-glass #performer-page .refract-pe-crop {
+/* Every rule for the guide is gated on .refract-pe, the edit-mode class,
+   as well as the node being removed on the way out. Belt and braces on
+   purpose: the JS removal is the fix, and this is what stops a guide
+   that somehow survives from painting over the card in view mode. */
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-crop {
     position: absolute;
     inset: 0;
     /* Above the flip stage, which is z-index 3 and paints the picture:
@@ -8994,16 +8998,16 @@ body.stash-liquid-glass #performer-page .refract-pe-crop {
     border-radius: var(--radius-sm);
     overflow: hidden;
 }
-body.stash-liquid-glass #performer-page .refract-pe-crop__side {
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-crop__side {
     position: absolute;
     top: 0;
     bottom: 0;
     width: var(--refract-pe-gutter, 0%);
     background: rgba(0, 0, 0, 0.55);
 }
-body.stash-liquid-glass #performer-page .refract-pe-crop__side.is-left { left: 0; border-right: 1px dashed var(--accent-ink); }
-body.stash-liquid-glass #performer-page .refract-pe-crop__side.is-right { right: 0; border-left: 1px dashed var(--accent-ink); }
-body.stash-liquid-glass #performer-page .refract-pe-crop__label {
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-crop__side.is-left { left: 0; border-right: 1px dashed var(--accent-ink); }
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-crop__side.is-right { right: 0; border-left: 1px dashed var(--accent-ink); }
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-crop__label {
     position: absolute;
     left: 50%;
     bottom: 8px;
@@ -9018,7 +9022,7 @@ body.stash-liquid-glass #performer-page .refract-pe-crop__label {
     color: var(--accent-ink);
     white-space: nowrap;
 }
-body.stash-liquid-glass #performer-page .refract-pe-shot {
+body.stash-liquid-glass #performer-page .refract-pe .refract-pe-shot {
     position: absolute;
     left: 0;
     right: 0;
