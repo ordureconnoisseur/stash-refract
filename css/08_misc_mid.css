@@ -7936,6 +7936,16 @@ body.stash-liquid-glass #performer-page .refract-ph .quality-group {
        in this row to ride the bottom of, so the rating sits on the
        standing figures' own line rather than above them. */
     align-self: end;
+    /* Bottom-aligning puts the group on the row's BOX bottom, and the box
+       is not where the text looks: a standing numeral's cap centre sits
+       above its own box centre by the descender space it reserves.
+       Measured on rendered pixels, four performers at two widths, the
+       stars and the pill landed +3.81 to +4.19 below the cap centre --
+       eight readings inside 0.4px of each other, which is what makes a
+       constant defensible rather than a guess. Lifted onto the cap line.
+       Re-measure if the row's type changes, because it moves. */
+    position: relative;
+    top: -4px;
     margin: 0 !important;
     padding: 0 !important;
 }
