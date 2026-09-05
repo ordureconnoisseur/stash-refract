@@ -770,20 +770,21 @@ body.stash-liquid-glass [data-stash-filter] .badge {
    the declarations should not be in this file at all. Border WIDTH and
    STYLE still come from the recipe's box rule, which the pill is also
    in; only the colour is the control rule's. */
+/* Only what this file genuinely owns. Nine properties that the chip
+   recipe owns - display, align-items, padding, border-radius, colour,
+   font-size, font-weight, line-height and transition - used to be
+   declared here as well, four of them with !important. Seven of the nine
+   already agreed with the recipe or were already losing to it, and that
+   is exactly the danger: a redundant !important is where a conflicting
+   one hides, which is how this rule's font-size conflict went unnoticed
+   for an hour. Removed rather than left agreeing.
+   Kept: justify-content, gap, cursor and vertical-align, none of which
+   the recipe declares. */
 body.stash-liquid-glass .adv-rating-btn,
 body.stash-liquid-glass #perf-rating-trigger {
-    display: inline-flex !important;
-    align-items: center !important;
     justify-content: center !important;
     gap: var(--gap-xs);
-    padding: 0.35rem 0.85rem;
-    border-radius: var(--radius-pill);
-    color: var(--text) !important;
-    font-size: var(--fs-sm);
-    font-weight: 600;
-    line-height: 1 !important;
     cursor: pointer;
-    transition: background var(--dur-fast), border-color var(--dur-fast), box-shadow var(--dur-fast);
     vertical-align: middle;
 }
 body.stash-liquid-glass .adv-rating-btn:hover,
