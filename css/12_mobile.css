@@ -2204,6 +2204,20 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .refract-list-sheet button.refract-sheet-row:active {
         background: var(--fill-4);
     }
+    /* The one row that creates rather than sorts wears the control
+       language (accent tint, --accent-glow rim), so it reads as
+       pressable beside the read-out rows. */
+    body.stash-liquid-glass .refract-list-sheet button.refract-sheet-row.refract-sheet-primary {
+        background: var(--accent-tint);
+        box-shadow: inset 0 0 0 1px var(--accent-glow);
+        color: var(--accent-ink);
+    }
+    body.stash-liquid-glass .refract-list-sheet button.refract-sheet-row.refract-sheet-primary .refract-sheet-chev {
+        background: var(--accent-ink);
+    }
+    body.stash-liquid-glass .refract-list-sheet button.refract-sheet-row.refract-sheet-primary:active {
+        background: rgba(var(--accent-rgb), 0.2);
+    }
     body.stash-liquid-glass .refract-list-sheet .refract-sheet-label {
         flex: 1 1 auto;
         min-width: 0;
