@@ -193,6 +193,40 @@ body.stash-liquid-glass .nav-tabs .nav-link .badge {
     margin-left: 5.6px;
 }
 
+/* The favourite button's MATERIAL is a deviation and its GEOMETRY is
+   not, which is why the inventory listed it as a plain member and was
+   lying about half of it.
+
+   Material deviates, ruled: .adv-favourite-btn keeps its glass resting
+   plate and its red favourited state, because on this chip the COLOUR
+   IS THE DATUM. An accent tint at rest would compete with the one thing
+   the control exists to say. It is still a control -- it is in the
+   control list, and the list is the inventory -- it simply answers "is
+   she a favourite" with colour rather than with the accent every other
+   control uses to mean "pressable".
+
+   Geometry does NOT deviate: height 24, pill radius and margin 0 are
+   the recipe's and it takes them. Measured today it does not yet --
+   rgba(0,0,0,0.55) fill and a 0.14 rim, which is the ruled material,
+   but radius 12px and 28x28, which is not the ruled geometry -- because
+   thirteen overrides still hold it there. The Ascension lane is
+   removing them; this note describes the ruling, and the measurement
+   above is what it looked like on 2026-09-05 so the next person can
+   tell whether it has landed.
+
+   Also measured: the plate is rgba(0,0,0,0.55) in BOTH modes, so it
+   does not flip with the theme the way --fill tokens do. That follows
+   from the ruling rather than contradicting it -- the plate is there to
+   carry a colour, not to be a surface -- but it is worth someone
+   deciding rather than inheriting.
+
+   Before appending to either list, run the recipe audit
+   (scratchpad/recipe-audit.py, moving to tools/measure): it lists every
+   rule that redeclares a recipe property on a bare member and says
+   whether it wins by source order or by !important. The O counter's
+   plate and its light-mode twin were both exactly that, and both were
+   found by looking rather than by reading. */
+
 /* The tier chip's height deviation was WITHDRAWN on measurement: it is a
    single row of two spans, not two lines, and it renders DIAMOND | 4.5
    inside the recipe's 24px cleanly. It takes the 24. Its data-tier
