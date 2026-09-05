@@ -1954,7 +1954,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         font-variant-numeric: tabular-nums;
     }
     body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] .paginationIndex .images-stats .images-size::before {
-        content: " a0 b7 a0";
+        content: "\00a0\00b7\00a0";
         white-space: pre;
     }
     /* The grid follows the caption by one --gap-lg. */
