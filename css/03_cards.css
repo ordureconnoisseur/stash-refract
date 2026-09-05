@@ -1860,20 +1860,46 @@ body.stash-liquid-glass .card .card-popovers {
     align-items: center;
     gap: var(--gap-md);
 }
-/* The wrapper takes the row's type as well as the row's box. It paints
-   no text of its own today -- every counter's ink lives in the .btn
-   inside it, which is why the row measured right while the wrapper
-   still computed 14px/400 -- but a wrapper that inherits a different
-   size is a fault waiting for the first counter Stash renders without
-   an inner button. The row is the rule; the wrapper is part of the row. */
-body.stash-liquid-glass .card .card-popovers > div {
+
+/* THE COUNTERS ARE NAMED, and that is deliberate.
+
+   This was briefly `> div`, which held the row together by structure and
+   would have swept up whatever Stash adds to that container next. The
+   recipe's discipline applies here too: the LIST IS THE INVENTORY, and
+   an unlisted element arriving in this row should be a decision rather
+   than a surprise. Enumerated from the live pages -- image, scene,
+   gallery, studio, group and performer cards -- so the list is what
+   Stash actually renders and not what I remembered.
+
+   The boundary, stated so the next person inherits a decision:
+     IN, because each is an icon and a number and belongs to the row --
+       .count-button (with its .count-icon / .count-value halves),
+       .gallery-count, .image-count, .performer-count, .scene-count,
+       .tag-count.
+     OUT -- .other-copies.extra-scene-info, which shares this container
+       on scene cards and is not a counter; it is scene-copy
+       information, and it renders unpainted today. If it is ever shown
+       it needs its own decision, not this row's metrics.
+     Performer cards are unaffected either way: their popovers row is
+       hidden outright a few rules below.
+
+   Card kinds are NOT listed, on purpose: the invariant belongs to a card
+   footer's counter row wherever one exists, and naming the six cards
+   that existed when this was written is the failure mode this comment is
+   otherwise arguing against. */
+body.stash-liquid-glass .card .card-popovers > :is(.count-button, .gallery-count, .image-count, .performer-count, .scene-count, .tag-count) {
     display: inline-flex;
     align-items: center;
     height: 24px;
+    /* The wrapper takes the row's type as well as its box. It paints no
+       text of its own today -- every counter's ink is in the .btn inside
+       it, which is why the row measured right while the wrapper computed
+       14px/400 -- but a wrapper inheriting a different size is a fault
+       waiting for the first counter Stash renders without one. */
     font-size: var(--fs-sm);
     line-height: 1;
 }
-body.stash-liquid-glass .card .card-popovers > div > .btn {
+body.stash-liquid-glass .card .card-popovers > :is(.count-button, .gallery-count, .image-count, .performer-count, .scene-count, .tag-count) > .btn {
     display: inline-flex !important;
     align-items: center !important;
     gap: var(--gap-xs);
@@ -1883,7 +1909,7 @@ body.stash-liquid-glass .card .card-popovers > div > .btn {
     font-size: var(--fs-sm) !important;
     line-height: 1 !important;
 }
-body.stash-liquid-glass .card .card-popovers > div > .btn svg {
+body.stash-liquid-glass .card .card-popovers > :is(.count-button, .gallery-count, .image-count, .performer-count, .scene-count, .tag-count) > .btn svg {
     width: var(--fs-sm) !important;
     height: var(--fs-sm) !important;
     /* The row's gap is the row's job. Stash's own icons carry a 7px
