@@ -1833,7 +1833,27 @@ body.stash-liquid-glass .adv-favourite-btn.adv-favourite-btn--on:hover {
    glass-overlay language of stash-multiview's .mv-add-btn so the two
    read as a consistent pair when both are present on the same card.
    Empty state: dark glass + white heart. Favourited: pink-tinted
-   glass + solid pink heart (same palette as the toolbar variant). */
+   glass + solid pink heart (same palette as the toolbar variant).
+
+   WHY THE SCRIM IS A BLACK LITERAL AND NOT A FLIPPING TOKEN, which is
+   the question this comment failed to answer and which cost an audit
+   round: this button is positioned over the card's THUMBNAIL, not over
+   the card's panel. 3.1 rule 4 makes artwork a third ground that does
+   not change with the mode, so its scrim must not either. A white heart
+   on dark glass reads on a bright photograph and on a dark one;
+   swapping the plate to --glass-bg would make it near-invisible on pale
+   artwork in light mode, which is a regression that only shows on some
+   images and so survives review.
+
+   The toolbar variant twenty lines above is the opposite case and takes
+   the flipping token, because it sits on a panel. Two hearts, two
+   grounds. Measure this one against the pixels of the thumbnail beneath
+   it, never against the card: the gate does exactly that and prints the
+   panel figure beside it labelled as the wrong reference.
+
+   A non-flipping scrim token would say all this in one word, but it
+   belongs in 01_tokens and is a foundations decision; it is on the
+   post-ship list rather than invented here. */
 body.stash-liquid-glass .adv-favourite-card-btn {
     /* Position aligned to .mv-add-btn (top:6/right:6 + 28x28) so when
        both buttons are visible they sit on the same line. The plugin
