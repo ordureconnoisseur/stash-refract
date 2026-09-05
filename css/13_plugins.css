@@ -1656,7 +1656,15 @@ body.stash-liquid-glass .adv-rating-btn {
        is how a conflicting one hides. This was attributed to the band
        override in 08 for an hour, because the sweep of this rule
        filtered on paint properties and never looked at the type.
-       What stays below is only what the recipe does not say. */
+
+       What stays below is NOT "what the recipe does not say", which is
+       what this comment claimed until the audit checked it. The recipe
+       declares both colour and transition. Both are kept here on
+       purpose: the accent ink is this control's identity, and the
+       transition is longer than the recipe's because more than two
+       properties move when the drawer opens. They are deliberate
+       overrides, and calling them anything else is how the next reader
+       deletes them. */
     justify-content: center !important;
     gap: 8px;
     transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
@@ -1761,15 +1769,32 @@ body.stash-liquid-glass .adv-rating-btn:hover .adv-rating-btn-badge::before {
    heart + a hairline pink border tint), no bg change. The activated
    state is the glass-pink look - pink-tinted glass surface with a
    solid pink heart, no heavy gradient fill. */
+/* GEOMETRY comes from the chip recipe, which lists this selector: height
+   24, pill radius, margin 0. It used to force 26px, radius-sm and a 6px
+   left margin from here, so a control the recipe claims as a sibling of
+   the rating pill stood beside it at a different height and a different
+   corner. Found by audit rather than by looking: tools/measure/recipe-
+   audit.py, the third instance of one bug after the rating pill's
+   font-size and the count button's glass plate.
+
+   MATERIAL deliberately does not. The recipe gives a control chip the
+   accent tint, and that is wrong for this one: it is a two-state toggle
+   whose COLOUR is the datum, red when favourited, so an accent tint at
+   rest would compete with the only colour on it that carries meaning.
+   Glass at rest, red when on. Ruling of 2026-09-05; the deviation and
+   its reason are recorded in the recipe's own deviations block, because
+   an exception that lives only here is indistinguishable from drift.
+
+   Width is not a recipe property, so the fixed 30px stays and is not an
+   override of anything. */
 body.stash-liquid-glass .adv-favourite-btn {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text-muted) !important;
-    border-radius: var(--radius-sm) !important;
-    height: 26px !important;
     width: 30px !important;
-    margin-left: 6px !important;
-    box-shadow: none !important;
+    /* Longer and slower than the recipe's two-property transition, and
+       deliberately so: this control changes colour, fill and shadow
+       together when it activates. */
     transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
                 color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
 }
