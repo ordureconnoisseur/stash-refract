@@ -1896,9 +1896,15 @@ body.stash-liquid-glass .refract-mobile-drawer {
        zeroes the other items); nothing else remains to collapse. */
 
     /* ── The caption ──────────────────────────────────────────────── */
+    /* One caption rule for every list: the range left, "N per page" right,
+       on ONE line; a list that carries a stats string (/images: megapixels
+       and size; /scenes: 04's overlay) gets it as a second quiet line under
+       the range, left-anchored to the search field. Measured before this
+       rule on /images at 390: two centred lines, "1-40 of 393,981" over
+       "(3,500,322 Megapixels - 614.7 GiB)", no per-page. */
     body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] {
         display: flex !important;
-        align-items: center;
+        align-items: flex-start;
         justify-content: space-between;
         gap: var(--gap-md);
         min-height: 20px;
@@ -1919,14 +1925,37 @@ body.stash-liquid-glass .refract-mobile-drawer {
         padding: 0 !important;
         margin: 0 !important;
         font-variant-numeric: tabular-nums;
-        text-align: left;
+        text-align: left !important;
+        line-height: 14px !important;
     }
     body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"][data-per-page]::after {
         content: attr(data-per-page);
         font-size: var(--fs-sm);
+        line-height: 14px;
         color: var(--text-muted);
         font-variant-numeric: tabular-nums;
         white-space: nowrap;
+        flex: 0 0 auto;
+    }
+    /* /images: Stash's "(N Megapixels - S GiB)" becomes a second line
+       without its parentheses and dash: the wrapper's own text nodes
+       collapse to size 0 (the trick 04 uses for /scenes), the two values
+       keep the caption size and a middle dot joins them. */
+    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] .paginationIndex .images-stats {
+        display: block;
+        font-size: 0 !important;
+        line-height: 14px;
+        margin-top: 2px;
+    }
+    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] .paginationIndex .images-stats .images-megapixels,
+    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] .paginationIndex .images-stats .images-size {
+        font-size: var(--fs-sm) !important;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+    }
+    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] .paginationIndex .images-stats .images-size::before {
+        content: "  b7 ";
+        white-space: pre;
     }
     /* The grid follows the caption by one --gap-lg. */
     body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] + .row.justify-content-center,

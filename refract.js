@@ -4334,7 +4334,12 @@
         var tb = refractListToolbar();
         if (!tb) { return true; }
         var sel = tb.querySelector(".page-size-selector select, select.form-control");
-        var cap = document.querySelector('.pagination-index-container[data-pager-row="hide"]');
+        /* The container, not its pager-row tag: initFloatingPager tags it on
+           nextTick AFTER this pass, so on a page whose last mutation is the
+           stats arriving (/images) the tagged selector never matched and
+           the caption carried no per-page. The container is only ever the
+           top pager's row. */
+        var cap = document.querySelector(".pagination-index-container");
         if (cap && sel && /^\d+$/.test(sel.value)) {
             var txt = sel.value + " per page";
             if (cap.getAttribute("data-per-page") !== txt) { cap.setAttribute("data-per-page", txt); }
@@ -5819,7 +5824,17 @@
                 (function seek() {
                     var target = document.getElementById("plugin-refract-dock-config");
                     if (target) {
-                        target.scrollIntoView({ block: "start", behavior: "smooth" });
+                        target.scrollIntoView({ block: "start" });
+                        /* The interface tab keeps rendering above the
+                           section after the first scroll (measured: the
+                           heading landed 58.8px above the viewport), so
+                           settle once more and leave 12px of air. */
+                        setTimeout(function () {
+                            var t2 = document.getElementById("plugin-refract-dock-config");
+                            if (!t2) { return; }
+                            var top = t2.getBoundingClientRect().top;
+                            if (Math.abs(top - 12) > 2) { window.scrollBy(0, top - 12); }
+                        }, 700);
                         return;
                     }
                     if (++tries < 40) { setTimeout(seek, 100); }
