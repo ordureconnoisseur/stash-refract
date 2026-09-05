@@ -5824,7 +5824,17 @@
                 (function seek() {
                     var target = document.getElementById("plugin-refract-dock-config");
                     if (target) {
-                        target.scrollIntoView({ block: "start", behavior: "smooth" });
+                        target.scrollIntoView({ block: "start" });
+                        /* The interface tab keeps rendering above the
+                           section after the first scroll (measured: the
+                           heading landed 58.8px above the viewport), so
+                           settle once more and leave 12px of air. */
+                        setTimeout(function () {
+                            var t2 = document.getElementById("plugin-refract-dock-config");
+                            if (!t2) { return; }
+                            var top = t2.getBoundingClientRect().top;
+                            if (Math.abs(top - 12) > 2) { window.scrollBy(0, top - 12); }
+                        }, 700);
                         return;
                     }
                     if (++tries < 40) { setTimeout(seek, 100); }
