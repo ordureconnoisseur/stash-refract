@@ -1855,16 +1855,25 @@ body.stash-liquid-glass.refract-flourish-tiers .performer-card .card-section {
    first. This reaches the chip's inner halves too, deliberately: they
    are buttons in the same row and get the same zeroed padding, which is
    the other half of the fix in 10. */
-body.stash-liquid-glass :is(.image-card, .scene-card, .gallery-card, .studio-card, .group-card, .movie-card) .card-popovers {
+body.stash-liquid-glass .card .card-popovers {
     display: flex;
     align-items: center;
     gap: var(--gap-md);
 }
-body.stash-liquid-glass :is(.image-card, .scene-card, .gallery-card, .studio-card, .group-card, .movie-card) .card-popovers > div {
+/* The wrapper takes the row's type as well as the row's box. It paints
+   no text of its own today -- every counter's ink lives in the .btn
+   inside it, which is why the row measured right while the wrapper
+   still computed 14px/400 -- but a wrapper that inherits a different
+   size is a fault waiting for the first counter Stash renders without
+   an inner button. The row is the rule; the wrapper is part of the row. */
+body.stash-liquid-glass .card .card-popovers > div {
     display: inline-flex;
     align-items: center;
+    height: 24px;
+    font-size: var(--fs-sm);
+    line-height: 1;
 }
-body.stash-liquid-glass :is(.image-card, .scene-card, .gallery-card, .studio-card, .group-card, .movie-card) .card-popovers > div > .btn {
+body.stash-liquid-glass .card .card-popovers > div > .btn {
     display: inline-flex !important;
     align-items: center !important;
     gap: var(--gap-xs);
@@ -1874,7 +1883,7 @@ body.stash-liquid-glass :is(.image-card, .scene-card, .gallery-card, .studio-car
     font-size: var(--fs-sm) !important;
     line-height: 1 !important;
 }
-body.stash-liquid-glass :is(.image-card, .scene-card, .gallery-card, .studio-card, .group-card, .movie-card) .card-popovers > div > .btn svg {
+body.stash-liquid-glass .card .card-popovers > div > .btn svg {
     width: var(--fs-sm) !important;
     height: var(--fs-sm) !important;
     /* The row's gap is the row's job. Stash's own icons carry a 7px
