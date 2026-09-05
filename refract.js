@@ -4187,6 +4187,14 @@
         if (action === "saved") { refractCloseListSheet(); refractSheetProxy(".saved-filter-dropdown .dropdown-toggle"); return; }
         if (action === "ops") { refractCloseListSheet(); refractSheetProxy(".list-operations .dropdown-toggle"); return; }
         if (action === "mv-add") { refractCloseListSheet(); refractSheetProxy("#mv-filter-add-btn, .mv-filter-add-btn"); return; }
+        if (action === "new" && value) {
+            refractCloseListSheet();
+            if (window.location.pathname !== value) {
+                window.history.pushState(null, "", value);
+                window.dispatchEvent(new PopStateEvent("popstate"));
+            }
+            return;
+        }
         if (action === "per-page") {
             var sel = tb && tb.querySelector(".page-size-selector select, select.form-control");
             if (sel && sel.value !== value) {
@@ -4233,6 +4241,20 @@
             if (perOpts.indexOf(sel.value) === -1 && /^\d+$/.test(sel.value)) { perOpts.push(sel.value); }
         }
         var hasSaved = !!tb.querySelector(".saved-filter-dropdown .dropdown-toggle");
+        /* Stash's "New" lives in the top navbar, which phones retired on
+           2026-07-28, so creating a performer, studio, tag, group or
+           gallery had been impossible on a phone since then (P6). The
+           sheet's Actions group carries it as its first, primary row,
+           only when the live link exists and the route allows it (the
+           same two conditions the old navbar mirror used). */
+        var newLink = refractRouteAllowsNew() ? document.querySelector('nav.top-nav a[href$="/new"]') : null;
+        var newHref = newLink && newLink.getAttribute("href");
+        var newNoun = "";
+        if (newHref) {
+            var seg = newHref.replace(/\/new$/, "").split("/").filter(Boolean).pop() || "";
+            var nouns = { performers: "performer", studios: "studio", tags: "tag", groups: "group", movies: "group", galleries: "gallery", scenes: "scene", images: "image" };
+            newNoun = nouns[seg] || "";
+        }
         var hasOps = !!tb.querySelector(".list-operations .dropdown-toggle");
         var mvAdd = tb.querySelector("#mv-filter-add-btn, .mv-filter-add-btn");
         var oneCol = isMobileOneCol();
@@ -4265,8 +4287,11 @@
         }
         html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Cards per row</span>' +
             seg([{ v: "2", l: "Two cards per row", icon: REFRACT_SHEET_ICONS.cols2 }, { v: "1", l: "One card per row", icon: REFRACT_SHEET_ICONS.cols1 }], oneCol ? "1" : "2", "cols") + '</div>';
-        if (hasOps || mvAdd) {
+        if (hasOps || mvAdd || newHref) {
             html += '<div class="refract-sheet-group">Actions</div>';
+            if (newHref) {
+                html += '<button type="button" class="refract-sheet-row refract-sheet-primary" data-sheet-action="new" data-sheet-value="' + esc(newHref) + '"><span class="refract-sheet-label">New' + (newNoun ? " " + esc(newNoun) : "") + '</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
+            }
             if (hasOps) {
                 html += '<button type="button" class="refract-sheet-row" data-sheet-action="ops"><span class="refract-sheet-label">Select, export, edit, delete</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
             }
