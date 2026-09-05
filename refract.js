@@ -3158,15 +3158,35 @@
        Toggled from the list toolbar's second tier; forum request #203. */
     var MOBILE_COLS_KEY = "refract.mobileCols";
 
-    /* Gender glyph for the mock name banner - the real banner CLONES the
-       native .gender-icon svg from the card title, which the mocks don't
-       have, so carry a static venus copy with the same class. */
-    var REFRACT_PREVIEW_GENDER_SVG =
-        '<svg class="gender-icon" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true">' +
-        '<path d="M80 176a112 112 0 1 1 224 0A112 112 0 1 1 80 176zM224 349.1c81.9-15 144-86.8 ' +
-        '144-173.1C368 78.8 289.2 0 192 0S16 78.8 16 176c0 86.3 62.1 158.1 144 173.1V384H128' +
-        'c-17.7 0-32 14.3-32 32s14.3 32 32 32h32v32c0 17.7 14.3 32 32 32s32-14.3 32-32V448h32' +
-        'c17.7 0 32-14.3 32-32s-14.3-32-32-32H224V349.1z"/></svg>';
+    /* Gender glyphs for banners Refract draws itself (the mock preview card
+       and the performer page's header card). The list card CLONES Stash's
+       own .gender-icon svg, so it always shows the right symbol; these
+       banners have no native icon to clone and used to carry one static
+       venus for every gender, which drew a transgender female performer as
+       female on her own page while her card showed the transgender symbol.
+       Paths are Font Awesome free-solid 7.2 (the set Stash ships), mapped
+       the way Stash's GenderIcon maps them: male mars, female venus,
+       non-binary its own glyph, everything else transgender. Each viewBox
+       is the path's measured bounding box, so every glyph fills the same
+       1.35rem slot at the same optical size. */
+    var REFRACT_GENDER_GLYPHS = {
+        FEMALE: ["16 0 352 544",
+            "M80 176a112 112 0 1 1 224 0 112 112 0 1 1 -224 0zM223.9 349.1C305.9 334.1 368 262.3 368 176 368 78.8 289.2 0 192 0S16 78.8 16 176c0 86.3 62.1 158.1 144.1 173.1-.1 1-.1 1.9-.1 2.9l0 64-32 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l32 0 0 32c0 17.7 14.3 32 32 32s32-14.3 32-32l0-32 32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-32 0 0-64c0-1 0-1.9-.1-2.9z"],
+        MALE: ["32 0 480 480",
+            "M320 32c0-17.7 14.3-32 32-32L480 0c17.7 0 32 14.3 32 32l0 128c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-50.7-95 95c19.5 28.4 31 62.7 31 99.8 0 97.2-78.8 176-176 176S32 401.2 32 304 110.8 128 208 128c37 0 71.4 11.4 99.8 31l95-95-50.7 0c-17.7 0-32-14.3-32-32zM208 416a112 112 0 1 0 0-224 112 112 0 1 0 0 224z"],
+        NON_BINARY: ["16 -32 352 576",
+            "M192 544c-97.2 0-176-78.8-176-176 0-86.3 62.1-158 144-173l0-47.2-49.7 24.8-3 1.3c-15.2 5.7-32.5-.8-39.9-15.7-7.4-14.8-2.2-32.6 11.5-41.3l2.8-1.6 38.8-19.4-38.8-19.4c-15.8-7.9-22.2-27.1-14.3-42.9 7.4-14.8 24.8-21.4 40-15.6l3 1.3 49.7 24.8 0-44.2c0-17.7 14.3-32 32-32s32 14.3 32 32l0 44.2 49.7-24.8 3-1.3c15.2-5.8 32.5 .8 39.9 15.6s2.2 32.7-11.5 41.3l-2.8 1.6-38.7 19.4 38.7 19.3c15.8 7.9 22.2 27.1 14.3 42.9-7.4 14.8-24.7 21.4-39.9 15.6l-3-1.3-49.7-24.8 0 47.2c81.9 15.1 144 86.8 144 173 0 97.2-78.8 176-176 176zm0-64a112 112 0 1 0 0-224 112 112 0 1 0 0 224z"],
+        TRANSGENDER: ["0 -32 576 576",
+            "M128-32c17.7 0 32 14.3 32 32s-14.3 32-32 32L97.9 32 136 70.1 151 55c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-15 15 14.2 14.2c27.9-23.8 64.2-38.2 103.8-38.2 36.7 0 70.6 12.4 97.6 33.2L466.7 32 448 32c-17.7 0-32-14.3-32-32s14.3-32 32-32l96 0c17.7 0 32 14.3 32 32l0 96c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-18.7-84.4 84.4c13 23.1 20.4 49.9 20.4 78.3 0 77.4-55 142-128 156.8l0 35.2 32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-32 0 0 16c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-16-32 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l32 0 0-35.2c-73-14.8-128-79.4-128-156.8 0-31.4 9-60.7 24.7-85.4l-16.7-16.7-15 15c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l15-15-38.1-38.1 0 30.1c0 17.7-14.3 32-32 32S0 113.7 0 96L0 0C0-17.7 14.3-32 32-32l96 0zM288 336a96 96 0 1 0 0-192 96 96 0 1 0 0 192z"]
+    };
+    function refractGenderGlyphSvg(gender) {
+        var key = (gender === "MALE" || gender === "FEMALE" || gender === "NON_BINARY") ? gender : "TRANSGENDER";
+        var g = REFRACT_GENDER_GLYPHS[key];
+        return '<svg class="gender-icon" viewBox="' + g[0] + '" fill="currentColor" aria-hidden="true"' +
+            (gender ? ' data-gender="' + gender + '"' : '') + '><path d="' + g[1] + '"/></svg>';
+    }
+    /* The mock preview card has no gender data; it shows the female glyph. */
+    var REFRACT_PREVIEW_GENDER_SVG = refractGenderGlyphSvg("FEMALE");
 
     /* Built LAZILY (function, not a var) because it concatenates the shared
        pill icon constants (STAR_SVG, CAKE_SVG, O_ICON_SVG, PLAY_SVG,
@@ -9239,18 +9259,18 @@
             banner.className = "refract-pc-name-banner";
             host.insertBefore(banner, host.firstChild);
         }
-        var wantGender = (d.gender === "FEMALE" || d.gender === "TRANSGENDER_FEMALE");
-        var hasGender = !!banner.querySelector(".gender-icon");
-        /* Only the one glyph is drawn in this file, so only the genders
-           it actually depicts get one. The banner reserves the slot
-           either way (16_playing_card), so a performer without an icon
-           does not start their name 25px left of everyone else. */
-        if (wantGender && !hasGender) {
-            banner.insertAdjacentHTML("afterbegin", REFRACT_PREVIEW_GENDER_SVG);
-            var gi = banner.querySelector(".gender-icon");
-            if (gi) { gi.setAttribute("data-gender", d.gender); }
-        } else if (!wantGender && hasGender) {
-            banner.querySelector(".gender-icon").remove();
+        /* Same glyph the list card shows for this gender (Stash's own
+           mapping), redrawn whenever the gender changes so an edit is
+           reflected. A performer with no gender gets no icon; the banner
+           reserves the slot either way (16_playing_card), so their name
+           does not start 25px left of everyone else's. */
+        var wantGender = !!d.gender;
+        var curGender = banner.querySelector(".gender-icon");
+        if (wantGender && (!curGender || curGender.getAttribute("data-gender") !== d.gender)) {
+            if (curGender) { curGender.remove(); }
+            banner.insertAdjacentHTML("afterbegin", refractGenderGlyphSvg(d.gender));
+        } else if (!wantGender && curGender) {
+            curGender.remove();
         }
         var nameSpan = banner.querySelector(".refract-pc-name-text");
         if (!nameSpan) {
