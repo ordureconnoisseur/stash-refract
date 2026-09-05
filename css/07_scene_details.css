@@ -2755,14 +2755,33 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 /* Inside the strip the container is the strip. A glass circle around
    each control made three of the five actions read as objects and the
    other two as glyphs, on one row, for no reason a viewer could infer.
-   All five are bare now, and hover is what draws a shape. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.adv-rating-btn, #operation-menu, .mv-scene-page-btn, .dropdown-toggle) {
+   They are bare now, and hover is what draws a shape.
+
+   `.adv-rating-btn` used to be a fourth branch in these two lists and is
+   deliberately gone. `:is()` takes the HIGHEST specificity among its
+   arguments, so `#operation-menu` gave the whole list ID weight and every
+   declaration here - background, border and box-shadow, all of them
+   properties the chip recipe owns - reached the pill at (1,x,x) and
+   outranked the recipe. That is the same mechanism that let this file
+   win the pill's padding until 9923b08.
+   It was invisible rather than harmless: the pill is display:none in this
+   strip under the rule above, so nothing painted. A dead branch holding
+   an ID-weight override on a live element elsewhere is exactly the shape
+   worth deleting rather than explaining.
+
+   The ID weight that remains IS intentional, for the three controls that
+   are left: they are Stash's own buttons carrying Bootstrap's styling,
+   and none of them is a recipe chip, so there is nothing for the ID to
+   outrank that should have won. Removing `.adv-rating-btn` does not lower
+   the list's specificity - `#operation-menu` still sets it - so the other
+   three are untouched. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(#operation-menu, .mv-scene-page-btn, .dropdown-toggle) {
     background: none !important;
     background-color: transparent !important;
     border: 1px solid transparent !important;
     box-shadow: none !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.adv-rating-btn, #operation-menu, .mv-scene-page-btn, .dropdown-toggle):hover {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(#operation-menu, .mv-scene-page-btn, .dropdown-toggle):hover {
     background: var(--fill-3) !important;
     border-color: transparent !important;
     color: var(--accent-light) !important;
