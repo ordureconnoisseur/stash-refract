@@ -1877,6 +1877,11 @@ body.stash-liquid-glass :is(.image-card, .scene-card, .gallery-card, .studio-car
 body.stash-liquid-glass :is(.image-card, .scene-card, .gallery-card, .studio-card, .group-card, .movie-card) .card-popovers > div > .btn svg {
     width: var(--fs-sm) !important;
     height: var(--fs-sm) !important;
+    /* The row's gap is the row's job. Stash's own icons carry a 7px
+       right margin and 5.6 left, which put 11.2px between a bare
+       counter's icon and its number against 4.2 inside the chip --
+       same height and same type, still visibly two different rhythms. */
+    margin: 0 !important;
 }
 
 /* Belt-and-braces hide for the Stash-native popovers row + HR below
