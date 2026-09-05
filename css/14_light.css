@@ -730,16 +730,21 @@ body.stash-liquid-glass.refract-light {
 }
 
 
-/* ═══════ 22.5. Increment-only count button (external plugin) ═════
-   An external plugin paints `.count-button.increment-only` with a
-   hardcoded `box-shadow: 0 2px 10px rgba(0,0,0,0.25)` that reads as
-   a black halo behind every count button on white. Same plugin adds
-   a white inner glow that's invisible on light bg. Replace both. */
-body.stash-liquid-glass.refract-light .count-button.increment-only {
-    box-shadow: var(--shadow-sm) !important;
-    background: var(--glass-bg-strong) !important;
-    border-color: var(--glass-border) !important;
-}
+/* ═══════ 22.5. Increment-only count button ═══════════════════════
+   GONE, with the thing it was compensating for.
+
+   The note here blamed an external plugin for the hardcoded
+   `box-shadow: 0 2px 10px rgba(0,0,0,0.25)` behind every count button.
+   It was ours: a bespoke glass plate on `.count-button.increment-only`
+   in 10_pills_badges, written before the chip recipe and never retired
+   when that selector joined it. This block re-imposed the same plate in
+   light -- glass-bg-strong and a shadow -- which is why the O counter
+   still read as a white plate on a light card after the dark one was
+   fixed.
+
+   The recipe governs in both modes now: a counter you press is a
+   control chip and wears the accent tint and rim, and its ink-only
+   sibling counters stay bare. */
 
 
 /* ═══════ 22.7. Card stat counts - accent tinted (non-playing-card) ═
