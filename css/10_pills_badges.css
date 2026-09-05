@@ -258,6 +258,13 @@ body.stash-liquid-glass .nav-tabs .nav-link .badge {
    ones. This is a grid card's chip, and there can be forty on screen. */
 body.stash-liquid-glass .count-button.increment-only {
     overflow: hidden;
+    /* One gap between the icon and the number. Stash builds this as a
+       two-part btn-group, so each part carried its own padding on top of
+       the chip's -- 0 10px outside plus 4.9 9.1 inside each half, which
+       is how a chip holding an icon and a "1" came to be 72px wide with
+       its ink adrift in it. The chip's own padding is the box; the parts
+       inside it get none and are spaced by this. */
+    gap: var(--gap-xs);
     transition: border-color var(--dur-fast) ease, background-color var(--dur-fast) ease;
 }
 body.stash-liquid-glass .count-button.increment-only:hover {
@@ -273,7 +280,9 @@ body.stash-liquid-glass .count-button.increment-only .count-value {
     box-shadow: none !important;
     font-size: var(--fs-sm);
     font-weight: 600;
-    padding: 0.35rem 0.65rem !important;
+    /* Zero: the chip's own 0 10px is the box. See the gap above. */
+    padding: 0 !important;
+    margin: 0 !important;
     color: var(--text) !important;
     line-height: 1 !important;
 }

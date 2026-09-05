@@ -1835,6 +1835,50 @@ body.stash-liquid-glass.refract-flourish-tiers .performer-card .card-section {
     border-top: 1px solid rgba(var(--tier-color-bright, var(--tier-color, 255, 255, 255)), 0.55) !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
+/* ── A card footer's counters are ONE row ─────────────────────────────
+   Whether a counter is plated or bare says whether you can press it. It
+   must not also say that it is a different size.
+
+   Measured on an image card at 390: the O count sat at 24 tall in
+   11.2px type with an 11.2px icon, and the gallery count beside it at 29
+   tall in 14px type with a 14px icon -- Stash's own button metrics,
+   which the card had never overridden. Two counters on one line, two
+   heights, two type sizes, two icon sizes, centres 2.5px apart. Wearing
+   the right material did not save it; the chip's ink was smaller than
+   its neighbour's while carrying a plate, which is what "horribly off"
+   was describing.
+
+   Ruled as one row: the bare read-outs take the recipe's read-out
+   metrics -- 24 tall, --fs-sm, icon to match -- and keep no plate. The
+   recipe already defines that box, so the row is set by the thing that
+   has a definition rather than by whichever counter Stash rendered
+   first. This reaches the chip's inner halves too, deliberately: they
+   are buttons in the same row and get the same zeroed padding, which is
+   the other half of the fix in 10. */
+body.stash-liquid-glass :is(.image-card, .scene-card, .gallery-card, .studio-card, .group-card, .movie-card) .card-popovers {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-md);
+}
+body.stash-liquid-glass :is(.image-card, .scene-card, .gallery-card, .studio-card, .group-card, .movie-card) .card-popovers > div {
+    display: inline-flex;
+    align-items: center;
+}
+body.stash-liquid-glass :is(.image-card, .scene-card, .gallery-card, .studio-card, .group-card, .movie-card) .card-popovers > div > .btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: var(--gap-xs);
+    height: 24px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: var(--fs-sm) !important;
+    line-height: 1 !important;
+}
+body.stash-liquid-glass :is(.image-card, .scene-card, .gallery-card, .studio-card, .group-card, .movie-card) .card-popovers > div > .btn svg {
+    width: var(--fs-sm) !important;
+    height: var(--fs-sm) !important;
+}
+
 /* Belt-and-braces hide for the Stash-native popovers row + HR below
    the chin - initPerformerCards() in refract.js also hides these via
    inline display:none, but the CSS rule covers the brief window
