@@ -4334,7 +4334,12 @@
         var tb = refractListToolbar();
         if (!tb) { return true; }
         var sel = tb.querySelector(".page-size-selector select, select.form-control");
-        var cap = document.querySelector('.pagination-index-container[data-pager-row="hide"]');
+        /* The container, not its pager-row tag: initFloatingPager tags it on
+           nextTick AFTER this pass, so on a page whose last mutation is the
+           stats arriving (/images) the tagged selector never matched and
+           the caption carried no per-page. The container is only ever the
+           top pager's row. */
+        var cap = document.querySelector(".pagination-index-container");
         if (cap && sel && /^\d+$/.test(sel.value)) {
             var txt = sel.value + " per page";
             if (cap.getAttribute("data-per-page") !== txt) { cap.setAttribute("data-per-page", txt); }
