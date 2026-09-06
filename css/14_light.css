@@ -1,18 +1,18 @@
 /* ───────────────────────────────────────────────────────────────────
-   Refract - Light mode
+   Refract — Light mode
    Orthogonal to the accent presets. Activated by JS adding the
    `refract-light` class to <body> (with `stash-liquid-glass`).
    Any of the 8 accents pairs with light or dark (16 combinations).
 
    Loads BEFORE 15_lite.css so lite's !important shadow-strip wins
    when both modes are enabled together (lite is the final word on
-   performance - always strips effects, regardless of color scheme).
+   performance — always strips effects, regardless of color scheme).
 
    Architecture:
    - Shadow tokens (--shadow-xs..2xl, --shadow-inset-track, --shadow-navbar)
      are defined in 01_tokens.css and consumed throughout. This file
      overrides them in the .refract-light scope so every shadow flips
-     to soft-light variants automatically - no per-selector dup.
+     to soft-light variants automatically — no per-selector dup.
    - Surface backgrounds (rgba(20,20,24,...) etc.) are NOT tokenized;
      those still need per-selector overrides below.
    ─────────────────────────────────────────────────────────────────── */
@@ -23,50 +23,10 @@ body.stash-liquid-glass.refract-light {
     --bg-0: #ffffff;
     --bg-1: #fafafa;
     --text: rgba(0, 0, 0, 0.88);
-    /* Grey muted - alpha bumped from the original 0.55 to 0.65 so
+    /* Grey muted — alpha bumped from the original 0.55 to 0.65 so
        secondary text (dates, descriptions, file paths) reads cleanly
        on white. Accent flavor goes on titles, not muted text. */
     --text-muted: rgba(0, 0, 0, 0.65);
-    --fg-rgb: 0, 0, 0;
-    /* Light surface family (3.2): the overlay surface channel flips to
-       white, per-use alphas stay; --scrim-rgb deliberately does NOT
-       flip (artwork scrims are mode-fixed). Grounds and rationale in
-       DESIGN_SYSTEM 3.2. */
-    --surface-rgb: 255, 255, 255;
-    --bg-0-rgb: 255, 255, 255;
-
-    /* The fill ramp, flipped for light. Dark defines it as white alphas
-       measured off the dark background histogram; on white those are
-       white on white, which is why this file grew 23 hand-rolled black
-       fills patching the surfaces anyone happened to look at. There are
-       145 consumers of var(--fill-N) in the theme, so the hand-rolled
-       ones were covering about a sixth of it.
-
-       The alphas are NOT mirrored, and that is the whole point. Matching
-       the alpha makes every light fill about 23% weaker than its dark
-       counterpart, because the L* curve is steep near black: white on a
-       near-black ground lifts more per unit alpha than black on white
-       drops. Naive mirroring gives dL* 2.65 where dark has 3.43. The
-       ramp is SEMANTIC -- resting, raised and hover are functional
-       states that must read equally in both modes -- so the invariant is
-       matched perceptual lift, not matched alpha. A 23% weaker hover is
-       a weaker affordance, not a calmer aesthetic. (3.2)
-
-       Matched on dL* against the measured grounds, dark (26,25,29) and
-       light (255,255,255):
-
-         --fill-1  white 0.03  dL* 3.43  ->  black 0.040
-         --fill-2  white 0.04  dL* 4.55  ->  black 0.053
-         --fill-3  white 0.05  dL* 5.65  ->  black 0.065
-         --fill-4  white 0.08  dL* 8.92  ->  black 0.100
-
-       RETUNING EITHER END MEANS RECOMPUTING THE OTHER FROM THE
-       INVARIANT. Do not copy an alpha across; 0.053 is not a typo for
-       0.05, it is the value that holds dL* 4.55 on a white ground. */
-    --fill-1: rgba(0, 0, 0, 0.040);
-    --fill-2: rgba(0, 0, 0, 0.053);
-    --fill-3: rgba(0, 0, 0, 0.065);
-    --fill-4: rgba(0, 0, 0, 0.100);
 
     --glass-bg: rgba(255, 255, 255, 0.55);
     --glass-bg-strong: rgba(255, 255, 255, 0.70);
@@ -74,7 +34,7 @@ body.stash-liquid-glass.refract-light {
     --glass-border-bright: rgba(0, 0, 0, 0.18);
     --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
 
-    /* Shadow token overrides - soft variants for light backgrounds.
+    /* Shadow token overrides — soft variants for light backgrounds.
        Every var(--shadow-X) consumer across all CSS files inherits
        these automatically. */
     --shadow-xs: 0 1px 4px rgba(0, 0, 0, 0.06);
@@ -94,21 +54,6 @@ body.stash-liquid-glass.refract-light {
 
     --accent-glow: rgba(var(--accent-rgb), 0.18);
     --accent-tint: rgba(var(--accent-rgb), 0.08);
-    /* Accent as ink on a light panel. Neither authored accent shade can
-       do this job: measured on the modal card fill (#f4f4f4) across the
-       eight accents, --accent-bright lands 1.39 to 2.51:1 and --accent
-       1.74 to 3.60, with yellow, green and teal the worst in both. The
-       accent darkened to 55% lands 5.19 to 8.61, worst case yellow, so
-       every preset clears 4.5 and none of them stops being its own
-       colour. Derived from --accent, so custom accents follow. */
-    /* Ink fallbacks first: --accent is the light-mode text shade
-       (3.30-5.38:1 across presets) and --danger sits ~3.9:1 on the light
-       ground. The color-mix upgrades below need Chrome 111; on the
-       documented 105 floor an unsupported color-mix in a custom property
-       is DROPPED AT THE CONSUMER (7.13), so without these fallbacks the
-       ink vanishes silently on 105-110. @supports gates the upgrade. */
-    --accent-ink: var(--accent);
-    --danger-ink: var(--danger);
 
     /* Bootstrap re-pegs */
     --bs-link-color: rgba(0, 0, 0, 0.78);
@@ -130,30 +75,6 @@ body.stash-liquid-glass.refract-light {
     background-attachment: fixed;
 }
 
-/* The focus ring's light partner (09 holds the ring itself). Dark uses
-   --accent-bright; on a white plate that shade reaches only 1.39-2.51:1
-   and would fail 3.9's 3:1 non-text floor, so light takes --accent-ink,
-   measured 7.28:1 at worst across the eight presets on the four grounds
-   a ring actually sits on. Same specificity as the rule it partners, so
-   it wins on load order alone. */
-body.stash-liquid-glass.refract-light.refract-light.refract-light
-:is(a[href], button, input, select, textarea, summary,
-    [tabindex]:not([tabindex="-1"]),
-    .btn, .nav-link, .page-link, .card-check,
-    [role="button"], [role="tab"], [role="checkbox"], [role="switch"]):focus-visible,
-body.stash-liquid-glass.refract-light.refract-light.refract-light
-.react-select__control:has(input:focus-visible) {
-    outline-color: var(--accent-ink) !important;
-}
-
-/* color-mix ink upgrade - Chrome 111+. See the fallback comment above. */
-@supports (color: color-mix(in srgb, red, blue)) {
-    body.stash-liquid-glass.refract-light {
-        --accent-ink: color-mix(in srgb, var(--accent) 55%, #000);
-        --danger-ink: color-mix(in srgb, var(--danger) 55%, #000);
-    }
-}
-
 
 /* ═══════ 2. Accent overrides (deeper hues for contrast on white) ═ */
 body.stash-liquid-glass.refract-light:not(.refract-blue):not(.refract-pink):not(.refract-red):not(.refract-yellow):not(.refract-purple):not(.refract-green):not(.refract-teal) {
@@ -170,12 +91,12 @@ body.stash-liquid-glass.refract-light.refract-purple { --accent: #9333ea; --acce
 body.stash-liquid-glass.refract-light.refract-green  { --accent: #16a34a; --accent-bright: #22c55e; --accent-light: #86efac; --accent-rgb: 22, 163, 74; }
 body.stash-liquid-glass.refract-light.refract-teal   { --accent: #0d9488; --accent-bright: #14b8a6; --accent-light: #5eead4; --accent-rgb: 13, 148, 136; }
 
-/* Yellow and teal read weakest on white - bump halo alpha. */
+/* Yellow and teal read weakest on white — bump halo alpha. */
 body.stash-liquid-glass.refract-light.refract-yellow { --accent-glow: rgba(var(--accent-rgb), 0.24); }
 body.stash-liquid-glass.refract-light.refract-teal   { --accent-glow: rgba(var(--accent-rgb), 0.22); }
 
 
-/* ═══════ 3. Floating glass surfaces (backgrounds - not tokenized) ═ */
+/* ═══════ 3. Floating glass surfaces (backgrounds — not tokenized) ═ */
 /* Dropdowns, popovers, toasts, react-select menus. Frosted white. */
 body.stash-liquid-glass.refract-light .dropdown-menu,
 body.stash-liquid-glass.refract-light .dropdown-menu.show,
@@ -198,7 +119,7 @@ body.stash-liquid-glass.refract-light div.react-select__menu-list {
     color: var(--text) !important;
 }
 
-/* Dropdown items - restore readable hover state on white */
+/* Dropdown items — restore readable hover state on white */
 body.stash-liquid-glass.refract-light .dropdown-item {
     color: var(--text) !important;
 }
@@ -236,7 +157,7 @@ body.stash-liquid-glass.refract-light .react-datepicker {
     border-color: var(--glass-border) !important;
 }
 
-/* CodeMirror editor - keep monospace text dark on white */
+/* CodeMirror editor — keep monospace text dark on white */
 body.stash-liquid-glass.refract-light .cm-editor,
 body.stash-liquid-glass.refract-light .cm-editor .cm-content,
 body.stash-liquid-glass.refract-light .cm-editor .cm-line {
@@ -320,17 +241,6 @@ body.stash-liquid-glass.refract-light .filter-dialog .modal-content {
 body.stash-liquid-glass.refract-light .video-js .vjs-control-bar {
     --text: rgba(255, 255, 255, 0.92);
     --text-muted: rgba(255, 255, 255, 0.55);
-    /* --fg-rgb follows --text everywhere --text is re-pointed, or a
-       rgba(var(--fg-rgb), a) consumer inside this dark island would draw
-       black on near-black. */
-    --fg-rgb: 255, 255, 255;
-    /* The fill ramp comes back with them. A light-scope fill is black,
-       and black on a near-black control bar is invisible in the same way
-       white on white is. */
-    --fill-1: rgba(255, 255, 255, 0.03);
-    --fill-2: rgba(255, 255, 255, 0.04);
-    --fill-3: rgba(255, 255, 255, 0.05);
-    --fill-4: rgba(255, 255, 255, 0.08);
 }
 /* ...except the light islands that sit inside the bar. These get a
    near-white panel on purpose, so they take the tokens back the other
@@ -342,53 +252,12 @@ body.stash-liquid-glass.refract-light .video-js .vjs-volume-panel-vertical .vjs-
 body.stash-liquid-glass.refract-light .scrubber-item-time {
     --text: rgba(0, 0, 0, 0.88);
     --text-muted: rgba(0, 0, 0, 0.65);
-    --fg-rgb: 0, 0, 0;
-    --fill-1: rgba(0, 0, 0, 0.040);
-    --fill-2: rgba(0, 0, 0, 0.053);
-    --fill-3: rgba(0, 0, 0, 0.065);
-    --fill-4: rgba(0, 0, 0, 0.100);
     background: rgba(255, 255, 255, 0.88) !important;
     color: var(--text) !important;
 }
 
 
 /* ═══════ 8. Scene details / wall items ════════════════════════════ */
-/* The scene panel's two disclosure links sit on --accent-light in dark,
-   where the shade is a high-key tint on near-black and measures 13.9:1.
-   Light mode redefines --accent-light to a PALE tint meant to sit ON an
-   accent fill, and on white that is 1.32 to 1.90:1 across the seven
-   presets: present in the DOM and invisible on screen.
-
-   --accent-bright is this file's usual answer for accent text, but
-   measured across all seven it only reaches 2.28 to 3.96:1, so these
-   take --accent, the deepest of the three, at 3.30 to 5.38:1. Hover
-   underlines rather than shifting colour, because there is no darker
-   accent token to shift to and a lighter one would undo the fix.
-
-   The general rule this is an instance of: a token that flips between
-   modes can flip its JOB as well as its value. --accent-light is
-   high-key text in dark and a fill tint in light, so any new use of it
-   as text needs a light-mode partner rule or it ships invisible. */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-desc-more,
-/* The panel's two disclosures, "Read more" and "+N more", were painted
-   with --accent as TEXT. That is the same mistake the dark rule for
-   .st-tag-more documents having already fixed once, and 3.1 says plainly
-   that --accent is a fill and border token. On the light panel the two
-   measured 2.55:1, under the floor for a control anyone is expected to
-   read and click, and they are the only way to reach the rest of the
-   description or the folded tags.
-
-   Light mode already defines --accent-ink for exactly this, accent mixed
-   55% into black so it can carry text, and nothing here was using it. */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-more,
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-desc-more {
-    color: var(--accent-ink) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-desc-more:hover,
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-more:hover {
-    color: var(--accent-ink) !important;
-    text-decoration: underline !important;
-}
 body.stash-liquid-glass.refract-light .scene-wall-item-text-container {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(252, 252, 252, 0.92) 100%) !important;
     color: var(--text) !important;
@@ -401,7 +270,7 @@ body.stash-liquid-glass.refract-light .detail-header [class*="tooltip"] {
 
 
 /* ═══════ 9. Buttons ═══════════════════════════════════════════════ */
-/* Custom select option fallback - page-size, dropdown <option>s */
+/* Custom select option fallback — page-size, dropdown <option>s */
 body.stash-liquid-glass.refract-light .page-size-selector option,
 body.stash-liquid-glass.refract-light select option {
     background: rgba(252, 252, 252, 1) !important;
@@ -413,7 +282,7 @@ body.stash-liquid-glass.refract-light button.btn {
 }
 
 
-/* ═══════ 10. Misc tail - lightbox, modal markdown, side panels ═══ */
+/* ═══════ 10. Misc tail — lightbox, modal markdown, side panels ═══ */
 body.stash-liquid-glass.refract-light .Lightbox {
     background: rgba(248, 248, 250, 0.97) !important;
 }
@@ -438,7 +307,7 @@ body.stash-liquid-glass.refract-light .scene-card-preview {
 }
 
 
-/* ═══════ 12. Borders - invisible-on-white fixes ═══════════════════
+/* ═══════ 12. Borders — invisible-on-white fixes ═══════════════════
    Many subtle borders use rgba(255,255,255, 0.04-0.08) which is
    invisible on white. Re-peg them to dark low-alpha. */
 body.stash-liquid-glass.refract-light .card,
@@ -465,7 +334,7 @@ body.stash-liquid-glass.refract-light .filter-container * {
 /* ═══════ 14. Filtered-list toolbar pill platform ══════════════════
    `.filtered-list-toolbar::before` is the dark glass pill that sits
    behind the toolbar buttons. Hardcoded rgba(28,28,34,0.32) bypasses
-   tokens - re-do it as light frosted glass with subtle accent rim. */
+   tokens — re-do it as light frosted glass with subtle accent rim. */
 body.stash-liquid-glass.refract-light .filtered-list-toolbar::before {
     background: rgba(255, 255, 255, 0.55) !important;
     border-color: rgba(var(--accent-rgb), 0.18) !important;
@@ -475,7 +344,7 @@ body.stash-liquid-glass.refract-light .filtered-list-toolbar::before {
         inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
 }
 
-/* Toolbar button hover states - original uses `color: #fff` which is
+/* Toolbar button hover states — original uses `color: #fff` which is
    invisible on white. Lean into accent on hover instead. */
 body.stash-liquid-glass.refract-light .filtered-list-toolbar .btn-secondary:hover {
     background: var(--accent-tint) !important;
@@ -495,7 +364,7 @@ body.stash-liquid-glass.refract-light .filtered-list-toolbar .btn.btn-secondary:
 /* ═══════ 15. Tag count badges + popup ═════════════════════════════
    Tag-count badge itself already uses --accent-bright (works fine).
    Force it explicitly in case any rule with higher specificity wins.
-   Popup background hardcodes dark - needs full light re-skin. */
+   Popup background hardcodes dark — needs full light re-skin. */
 body.stash-liquid-glass.refract-light .stash-tag-count,
 body.stash-liquid-glass.refract-light .stash-tag-count * {
     color: var(--accent-bright) !important;
@@ -508,7 +377,7 @@ body.stash-liquid-glass.refract-light .stash-o-count * {
     color: var(--accent-bright) !important;
 }
 
-/* Tag list popup - flip dark glass to light glass */
+/* Tag list popup — flip dark glass to light glass */
 body.stash-liquid-glass.refract-light .stash-tag-popup {
     background: rgba(255, 255, 255, 0.95) !important;
     border-color: var(--glass-border) !important;
@@ -539,7 +408,7 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .tab-content
 }
 
 
-/* ═══════ 17. Navbar icons - soft accent at rest ═══════════════════
+/* ═══════ 17. Navbar icons — soft accent at rest ═══════════════════
    Dark navbar icons (var(--text) = black) read as harsh on white.
    Tint them with a transparent accent so the navbar reads as
    "subtly themed" rather than monochrome. Active route already gets
@@ -558,7 +427,7 @@ body.stash-liquid-glass.refract-light nav.top-nav a.nav-link:hover,
 body.stash-liquid-glass.refract-light nav.top-nav a.nav-utility:hover {
     color: var(--accent-bright) !important;
 }
-/* Icon hover shimmer - original uses white drop-shadow; swap to
+/* Icon hover shimmer — original uses white drop-shadow; swap to
    accent for visibility on white background. */
 body.stash-liquid-glass.refract-light nav.top-nav a.btn:hover svg,
 body.stash-liquid-glass.refract-light nav.top-nav button.btn:hover svg,
@@ -567,7 +436,7 @@ body.stash-liquid-glass.refract-light nav.top-nav .navbar-toggler:hover svg {
 }
 
 
-/* ═══════ 18. Performer circles - accent halo at rest ══════════════ */
+/* ═══════ 18. Performer circles — accent halo at rest ══════════════ */
 body.stash-liquid-glass.refract-light .stash-performer-avatar {
     border: 1.5px solid rgba(var(--accent-rgb), 0.35) !important;
     box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.18);
@@ -580,7 +449,7 @@ body.stash-liquid-glass.refract-light .stash-performer-more {
     border-color: rgba(var(--accent-rgb), 0.35) !important;
     color: var(--accent-bright) !important;
 }
-/* Performer-name tooltip - hardcoded dark bg, restyle for light */
+/* Performer-name tooltip — hardcoded dark bg, restyle for light */
 body.stash-liquid-glass.refract-light .stash-performer-link[data-performer-name]::after {
     background: rgba(255, 255, 255, 0.95) !important;
     color: var(--text) !important;
@@ -588,11 +457,11 @@ body.stash-liquid-glass.refract-light .stash-performer-link[data-performer-name]
 }
 
 
-/* ═══════ 19. Card titles - animated accent gradient + glow ══════════
+/* ═══════ 19. Card titles — animated accent gradient + glow ══════════
    A "shimmer band" of brighter accent sweeps across the title text
    continuously. background-size: 200% makes the gradient wider than
    the text, and animating background-position slides the bright
-   middle stop horizontally - read as a soft moving sheen.
+   middle stop horizontally — read as a soft moving sheen.
 
    On hover the cycle speeds up (7s → 2.5s) so the card feels alive
    when you target it. Reduced-motion users get a static mid-position
@@ -621,7 +490,7 @@ body.stash-liquid-glass.refract-light .performer-card .card-section-title {
     color: transparent !important;
     -webkit-text-fill-color: transparent;
     text-shadow: 0 0 14px rgba(var(--accent-rgb), 0.18);
-    transition: text-shadow var(--dur-move) ease;
+    transition: text-shadow 0.18s ease;
 }
 @keyframes refract-title-shimmer {
     0%   { background-position: 0% 50%; }
@@ -646,14 +515,14 @@ body.stash-liquid-glass.refract-light .performer-card:hover .card-section-title 
 
 /* ═══════ 20. Bootstrap text-muted utility override ════════════════
    `.text-muted` class is applied directly to elements (not via var)
-   in some places - make sure it picks up the accent-muted too. */
+   in some places — make sure it picks up the accent-muted too. */
 body.stash-liquid-glass.refract-light .text-muted {
     color: var(--text-muted) !important;
 }
 
 
 /* ═══════ 21. Scene detail header + toolbar ════════════════════════
-   `:is(.scene-header, .image-header)` hardcodes `color: #fff !important` - invisible on
+   `:is(.scene-header, .image-header)` hardcodes `color: #fff !important` — invisible on
    white. Toolbar buttons use rgba(255,255,255, low) backgrounds that
    vanish on light bg, leaving the dark icons looking like floating
    black silhouettes. Restore proper light-mode visibility. */
@@ -667,13 +536,13 @@ body.stash-liquid-glass.refract-light :is(.scene-header, .image-header) > div {
     color: var(--text) !important;
 }
 
-/* Toolbar button frames - flip invisible white-tint bg to dark-tint */
+/* Toolbar button frames — flip invisible white-tint bg to dark-tint */
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn,
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) {
     background: rgba(0, 0, 0, 0.04) !important;
     border-color: var(--glass-border) !important;
 }
-/* Force inner count buttons fully transparent - Bootstrap .btn-secondary
+/* Force inner count buttons fully transparent — Bootstrap .btn-secondary
    default grey was leaking through and rendering as a dark circular
    blob behind each icon. The original L539 rule sets background:
    transparent in dark mode; we re-assert with extra force in light. */
@@ -695,7 +564,7 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-t
 }
 
 /* Toolbar icons that aren't rating-stars (eye/O-count icon, organized
-   box, ellipsis menu, mv-scene-btn) - were inheriting dark text and
+   box, ellipsis menu, mv-scene-btn) — were inheriting dark text and
    reading as black silhouettes. Tint accent like navbar icons. */
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) button,
 body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button,
@@ -710,44 +579,29 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-t
 }
 
 
-/* ═══════ 22. Rating stars - visible unfilled state ════════════════
-   The comment this replaces said the filled star "stays gold (#fbbf24)
-   which works on both backgrounds". Measured, it does not: #fbbf24 is
-   1.67:1 on the light panel and the old empty star was 1.69:1, so
-   filled and empty sat at 1.01:1 of each other. In light mode the
-   rating control conveyed NOTHING: five stars, all alike, whatever the
-   score. That is the checklist's own light-mode line skipped, and the
-   line says a contrast number rather than a look.
-
-   Re-pegging the two tokens fixes every consumer at once, which is why
-   they are tokens now. Deep amber for the filled star at 5.02:1 on
-   white, and a LIGHTER empty star than before, because a paler track
-   separates further from a dark filled star even as it sits closer to
-   the page. Measured: 3.13:1 between filled and empty, up from 1.01. */
-body.stash-liquid-glass.refract-light {
-    --star: #b45309;
-    --star-empty: rgba(0, 0, 0, 0.20);
+/* ═══════ 22. Rating stars — visible unfilled state ════════════════
+   Global rule sets unfilled stars to rgba(255,255,255,0.22) — totally
+   invisible on white. Flip to a dark muted equivalent. Filled stars
+   stay gold (#fbbf24) which works on both backgrounds. */
+body.stash-liquid-glass.refract-light .rating-stars .unfilled-star {
+    color: rgba(0, 0, 0, 0.22) !important;
+    fill: rgba(0, 0, 0, 0.22) !important;
 }
 
 
-/* ═══════ 22.5. Increment-only count button ═══════════════════════
-   GONE, with the thing it was compensating for.
-
-   The note here blamed an external plugin for the hardcoded
-   `box-shadow: 0 2px 10px rgba(0,0,0,0.25)` behind every count button.
-   It was ours: a bespoke glass plate on `.count-button.increment-only`
-   in 10_pills_badges, written before the chip recipe and never retired
-   when that selector joined it. This block re-imposed the same plate in
-   light -- glass-bg-strong and a shadow -- which is why the O counter
-   still read as a white plate on a light card after the dark one was
-   fixed.
-
-   The recipe governs in both modes now: a counter you press is a
-   control chip and wears the accent tint and rim, and its ink-only
-   sibling counters stay bare. */
+/* ═══════ 22.5. Increment-only count button (external plugin) ═════
+   An external plugin paints `.count-button.increment-only` with a
+   hardcoded `box-shadow: 0 2px 10px rgba(0,0,0,0.25)` that reads as
+   a black halo behind every count button on white. Same plugin adds
+   a white inner glow that's invisible on light bg. Replace both. */
+body.stash-liquid-glass.refract-light .count-button.increment-only {
+    box-shadow: var(--shadow-sm) !important;
+    background: var(--glass-bg-strong) !important;
+    border-color: var(--glass-border) !important;
+}
 
 
-/* ═══════ 22.7. Card stat counts - accent tinted (non-playing-card) ═
+/* ═══════ 22.7. Card stat counts — accent tinted (non-playing-card) ═
    Scene count + O count on performer cards (in Minimal/Extravagant
    modes only), and O count on scene cards. Defaults to var(--text-muted)
    which renders inconsistently (some inner spans pull from a Stash-
@@ -783,24 +637,19 @@ body.stash-liquid-glass.refract-light .grid-card .stash-o-count:hover {
 
 /* ═══════ 23. Advanced ratings badge (external plugin) ════════════
    `.adv-rating-btn-badge` is styled by the Advanced Rating
-   plugin, not by Refract - its dark pill bypasses our tokens and
+   plugin, not by Refract — its dark pill bypasses our tokens and
    looks like a black blob on white. Force light styling. Same for
    any other badge the plugin paints. */
 body.stash-liquid-glass.refract-light .adv-rating-btn-badge {
     background: var(--accent-tint) !important;
-    /* --accent-bright is a FILL shade, and using it as ink here measured
-       2.31:1 and 2.46:1 on the pale pill - the 3.1 rule 5 trap exactly,
-       a token whose job differs by mode. This number is the only carrier
-       of the rating, so it owes the 4.5 reading floor, and --accent-ink
-       is the token light mode defines for precisely this. */
-    color: var(--accent-ink) !important;
+    color: var(--accent-bright) !important;
     border: 1px solid var(--accent-glow) !important;
 }
 
 
-/* ═══════ 23.5. Favorite heart - replace dark drop-shadow ═════════
+/* ═══════ 23.5. Favorite heart — replace dark drop-shadow ═════════
    Stash core paints `button.btn.favorite-button.favorite` with a
-   `filter: drop-shadow(0 0 2px rgba(0,0,0,.9))` - designed to make
+   `filter: drop-shadow(0 0 2px rgba(0,0,0,.9))` — designed to make
    the pink heart pop against busy photos. On a white card / page
    background it reads as a dark halo around the heart. Replace
    with a pink glow that works on light AND on photos. */
@@ -813,12 +662,12 @@ body.stash-liquid-glass.refract-light .favorite-button.favorite {
 /* ═══════ 24. View Transition crossfade duration ═══════════════════
    refract.js wraps the light-mode DOM change in startViewTransition.
    The browser snapshots the page, applies the change, and crossfades.
-   These pseudo-elements tune the fade - slower than the default 250ms
+   These pseudo-elements tune the fade — slower than the default 250ms
    so the eye eases into the new palette rather than getting flashed. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
     animation-duration: 0.55s;
-    animation-timing-function: var(--ease-glide);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 @media (prefers-reduced-motion: reduce) {
     ::view-transition-old(root),
@@ -844,7 +693,7 @@ body.stash-liquid-glass.refract-light .favorite-button.favorite {
    switch reads cleanly on white without the bloom that dominates the
    dark-mode look. */
 
-/* OFF state - neutral grey track, white knob with crisp shadow */
+/* OFF state — neutral grey track, white knob with crisp shadow */
 body.stash-liquid-glass.refract-light .custom-switch .custom-control-label::before {
     background: linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.10) 100%) !important;
     border: 1px solid rgba(0, 0, 0, 0.14) !important;
@@ -860,7 +709,7 @@ body.stash-liquid-glass.refract-light .custom-switch .custom-control-label::afte
         0 0 0 1px rgba(0, 0, 0, 0.06) inset !important;
 }
 
-/* ON state - accent-tinted track, accent knob, much tighter halo */
+/* ON state — accent-tinted track, accent knob, much tighter halo */
 body.stash-liquid-glass.refract-light .custom-switch .custom-control-input:checked ~ .custom-control-label::before {
     background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.16) 0%, rgba(var(--accent-rgb), 0.24) 100%) !important;
     border-color: rgba(var(--accent-rgb), 0.40) !important;
@@ -875,7 +724,7 @@ body.stash-liquid-glass.refract-light .custom-switch .custom-control-input:check
         0 0 0 1px rgba(255, 255, 255, 0.35) inset !important;
 }
 
-/* Same treatment for Bootstrap 5 .form-switch (different markup -
+/* Same treatment for Bootstrap 5 .form-switch (different markup —
    single .form-check-input with radial-gradient knob). */
 body.stash-liquid-glass.refract-light .form-switch .form-check-input {
     background-color: rgba(0, 0, 0, 0.06) !important;
@@ -918,11 +767,10 @@ body.stash-liquid-glass.refract-light .refract-cc-preset-inner {
         rgba(20, 22, 34, 0.07) 0 5px,
         rgba(20, 22, 34, 0.035) 5px 10px);
 }
-/* The kind and segment wells' light background is gone: both now take
-   --fill-1 in 11_misc_tail, which flips on its own, so this override
-   was the second half of a pair that had to be kept in step by hand.
-   Deleted in the same commit as the base rules, deliberately -- either
-   half alone ships a wrong well in one mode. */
+body.stash-liquid-glass.refract-light .refract-cc-kind,
+body.stash-liquid-glass.refract-light .refract-cc-seg {
+    background: rgba(20, 22, 34, 0.08);
+}
 body.stash-liquid-glass.refract-light .refract-cc-chip,
 body.stash-liquid-glass.refract-light .refract-cc-chip-slot {
     background: rgba(255, 255, 255, 0.88);
@@ -963,7 +811,7 @@ body.stash-liquid-glass.refract-light .refract-cc-chips .refract-cc-chip:not(.re
    "disabled / loading"; darkening reads as a spotlight in either theme. */
 body.stash-liquid-glass.refract-light .refract-cc-ring:not(.is-intro) {
     box-shadow: 0 0 0 640px rgba(20, 22, 34, 0.34);
-    animation: refract-cc-arm-light var(--dur-move) ease-out both;
+    animation: refract-cc-arm-light 0.18s ease-out both;
 }
 @keyframes refract-cc-arm-light {
     from { box-shadow: 0 0 0 640px rgba(20, 22, 34, 0); }
@@ -974,68 +822,6 @@ body.stash-liquid-glass.refract-light .refract-cc-slot-menu {
     border-color: rgba(20, 22, 34, 0.18);
     box-shadow: 0 10px 26px rgba(20, 22, 34, 0.25);
 }
-
-/* ═══════ 27. Scene panel v3 - marquee, state row, tabs ════════════
-   The v3 composition hardcodes white tints and white text with
-   !important, which is correct on the dark base and unreadable on the
-   light one. Without these overrides light mode showed empty white
-   capsules where the spec pills should be, an invisible RATING label,
-   invisible "plays" / "O" words, and a "Not favourite" chip that had
-   white text on a white background and so read as nothing at all. Each
-   rule below is the light counterpart of one v3 rule in
-   07_scene_details.css, in the same order. */
-
-/* Spec pills: white-tint fill + near-white text -> dark tint + body text */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) :is(.date, .frame-rate, .resolution) {
-    background: rgba(0, 0, 0, 0.04) !important;
-    border-color: var(--glass-border) !important;
-    color: var(--text) !important;
-}
-
-/* The "RATING" caption after the rating value */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn::after {
-    color: rgba(0, 0, 0, 0.45) !important;
-}
-
-/* Hairline between the stars and the operations pair */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) div.dropdown {
-    box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.12) !important;
-}
-
-/* Count chips, and the "plays" / "O" word each one carries */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button {
-    background: rgba(0, 0, 0, 0.04) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) .count-value::after,
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) .count-value::after {
-    color: rgba(0, 0, 0, 0.5) !important;
-}
-
-/* Off-state chips. These say "Not favourite" / "Not organised" in the
-   chip itself, so losing the text loses the whole control. */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn) {
-    background: rgba(0, 0, 0, 0.02) !important;
-    border: 1px dashed rgba(0, 0, 0, 0.18) !important;
-    color: rgba(0, 0, 0, 0.5) !important;
-}
-
-/* Tag chips */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.tag-link.badge.badge-secondary {
-    border: 1px solid rgba(0, 0, 0, 0.14) !important;
-    color: var(--text-muted) !important;
-}
-
-/* Section captions (TAGS, DETAILS) */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .col-12 > h6 {
-    color: rgba(0, 0, 0, 0.45) !important;
-}
-
-/* Tab strip trough */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .nav-tabs {
-    background: rgba(0, 0, 0, 0.03) !important;
-    border: 1px solid var(--glass-border) !important;
-}
-
 /* ═══════ 28. Card customiser segmented controls ═══════════════════
    `.is-active` paints accent-bright text on a 20% accent tint. On the
    dark base that is light-on-dark and fine; on the light base it is the
@@ -1047,395 +833,4 @@ body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .nav-tabs {
 body.stash-liquid-glass.refract-light .refract-cc-kind-btn.is-active,
 body.stash-liquid-glass.refract-light .refract-cc-seg-btn.is-active {
     color: var(--accent);
-}
-
-/* ── Scene panel: ranked tags + scored row (direction D) ───────────────
-   The dark rules hardcode white tints and near-white text with
-   !important, which is right on #0a0a0a and unreadable on the light
-   ground. Same order, same conventions as the rest of this file. */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-caption {
-    color: var(--text-muted);
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge.badge-secondary {
-    background: rgba(0, 0, 0, 0.04) !important;
-    border: 1px solid var(--glass-border) !important;
-    color: var(--text) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead .st-tag-n {
-    color: var(--text-muted);
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-rest-run {
-    color: var(--text-muted);
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-scored-head {
-    color: var(--text-muted);
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-scored .tag-item.st-scored-item.tag-link.badge.badge-secondary {
-    color: var(--text) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-scored .st-scored-value {
-    color: var(--accent);
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge:hover,
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge:hover a,
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-rest-run .tag-item.st-tag-is-rest.tag-link.badge:hover,
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-tag-rest-run .tag-item.st-tag-is-rest.tag-link.badge:hover a {
-    color: var(--accent) !important;
-}
-
-/* Performer credit row: light counterparts. */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .scene-performers:not(.st-perf-open) > .performer-card {
-    border-color: var(--glass-border) !important;
-    background: rgba(0, 0, 0, 0.04) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-perf-extra {
-    border-color: var(--glass-border);
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--text-muted);
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-perf-toggle {
-    color: var(--text-muted);
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-perf-toggle:hover {
-    color: var(--accent);
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .st-perf-names {
-    color: var(--text-muted);
-}
-
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc {
-    color: var(--text) !important;
-}
-
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
-    background: var(--accent-tint) !important;
-    border-color: rgba(var(--accent-rgb), 0.45) !important;
-    color: var(--accent) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) .scene-performers .st-perf-names {
-    color: var(--text);
-}
-
-
-/* ═══════ 29. Scrape results: the line-up ══════════════════════════
-   The contact sheet shipped with no light counterpart at all, and it
-   leans on three things that do not cross over: the fill ramp, which
-   deliberately does not retheme (3.2), --surface-rgb, which has no
-   light value at all, and the accent as text, which fails on white --
-   measured on the card fill here, --accent-bright lands 1.39 to 2.51:1
-   across the eight accents and --accent only 1.74 to 3.60 (3.1 rule
-   4). Left alone, the cards would have been invisible, the
-   empty-picture plate a charcoal block on white, and the line that
-   decides the weakest thing on the card. The third of those is not a
-   local problem, so it is fixed as a token: --accent-ink, defined in
-   01_tokens and redefined above. */
-
-/* Cards: the ramp is white-on-dark, so it needs the mirror. */
-body.stash-liquid-glass.refract-light :is(.PerformerScrapeModal, .SceneScrapeModal) .search-item {
-    background: rgba(0, 0, 0, 0.03) !important;
-    border-color: var(--glass-border) !important;
-}
-body.stash-liquid-glass.refract-light :is(.PerformerScrapeModal, .SceneScrapeModal) .search-item:hover,
-body.stash-liquid-glass.refract-light :is(.PerformerScrapeModal, .SceneScrapeModal) .search-item:focus-visible {
-    background: var(--accent-tint) !important;
-    border-color: rgba(var(--accent-rgb), 0.45) !important;
-}
-body.stash-liquid-glass.refract-light :is(.PerformerScrapeModal, .SceneScrapeModal) .search-item:focus-visible {
-    outline-color: var(--accent);
-}
-
-/* The plate. Same idea -- flat and hatched where a picture is soft --
-   drawn dark-on-light instead of light-on-dark. */
-body.stash-liquid-glass.refract-light .refract-sr-plate {
-    background:
-        repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.05) 0 6px, transparent 6px 12px),
-        rgba(0, 0, 0, 0.05);
-}
-/* Nothing came back: the same hatch, mirrored, for the same reason. */
-body.stash-liquid-glass.refract-light .refract-sr-empty {
-    background:
-        repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.03) 0 6px, transparent 6px 12px),
-        rgba(0, 0, 0, 0.03);
-}
-
-/* The line that decides and the plate's key both read var(--accent-ink),
-   which this file already redefines for the mode, so neither needs a
-   partner here. What does is the accent used as a MARK: --accent-bright
-   is a pale wash on white for half the presets. */
-body.stash-liquid-glass.refract-light .refract-sr-collide-note::before,
-body.stash-liquid-glass.refract-light .modal-dialog:has(.PerformerScrapeModal) .modal-header::before,
-body.stash-liquid-glass.refract-light .modal-dialog:has(.SceneScrapeModal) .modal-header::before {
-    background: var(--accent);
-}
-
-/* The query field and its count chip, both on the ramp. */
-body.stash-liquid-glass.refract-light .modal-body .PerformerScrapeModal .text-input {
-    background-color: rgba(0, 0, 0, 0.03) !important;
-    /* The glyph is drawn into a data URI, so it cannot inherit a colour
-       and has to be re-drawn dark. */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(0,0,0,0.5)' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") !important;
-}
-body.stash-liquid-glass.refract-light .modal-body .PerformerScrapeModal .text-input:focus {
-    background-color: rgba(0, 0, 0, 0.06) !important;
-}
-body.stash-liquid-glass.refract-light .modal-body .SceneScrapeModal .input-group > .text-input {
-    background: rgba(0, 0, 0, 0.03) !important;
-}
-body.stash-liquid-glass.refract-light .modal-body .SceneScrapeModal .input-group > .text-input:focus {
-    background: rgba(0, 0, 0, 0.06) !important;
-}
-body.stash-liquid-glass.refract-light :is(.PerformerScrapeModal-list-container, .SceneScrapeModal-list-container) > .mt-1 {
-    background: rgba(0, 0, 0, 0.06);
-}
-
-
-/* ═══════ 23. The rating chip and drawer ═══════════════════════════
-   Everything the scene panel's rating control is built from was written
-   in white alphas and dark-mode tier colours, and none of it survives a
-   light background. Measured on the light panel before this block
-   existed: every white alpha from 0.20 to 0.72 comes out at exactly
-   1.00:1, and the six tier colours land between 1.17 and 1.87:1. The
-   whole control -- chip, summary band, criteria list -- rendered blank.
-
-   The tier palette is the harder half. Section 4's colours are chosen to
-   glow on near-black; on white the bright end of each is the wrong end,
-   so light mode gets the deep end of the same hue. They keep their
-   identity (a Gold scene is still gold, a Diamond still teal) and clear
-   5:1 instead of 1.4:1. */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="bronze"] { --tier-color: 146, 90, 32; --tier-color-bright: 146, 90, 32; }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="silver"] { --tier-color: 91, 98, 112; --tier-color-bright: 91, 98, 112; }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="gold"] { --tier-color: 138, 106, 14; --tier-color-bright: 138, 106, 14; }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="diamond"] { --tier-color: 16, 107, 102; --tier-color-bright: 16, 107, 102; }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="legendary"] { --tier-color: 176, 24, 101; --tier-color-bright: 176, 24, 101; }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] { --tier-color: 74, 58, 128; --tier-color-bright: 74, 58, 128; }
-
-/* Unrated only. This used to match every chip, and because it is
-   !important it beat 07's tier consumption whatever the specificity - so
-   the six --tier-color values defined directly above were set and then
-   used ZERO times, and a Diamond scene rendered the same neutral grey as
-   an unrated one. Measured: light chip 0.04 fill / 0.14 rim on a Diamond
-   scene where dark gave the tier's teal. Defining six light-specific
-   tier palettes and never consuming one of them is not a thing anyone
-   intended; the neutral is the unrated resting state and now says so. */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip:is(:not([data-tier]), [data-tier=""]) {
-    background: rgba(0, 0, 0, 0.04) !important;
-    border-color: rgba(0, 0, 0, 0.14) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip:is(:not([data-tier]), [data-tier=""]):hover {
-    background: rgba(0, 0, 0, 0.07) !important;
-    border-color: rgba(0, 0, 0, 0.22) !important;
-}
-
-/* The tier's INK in light, which is not the tier's FILL colour.
-
-   Ruling: the label carries the tier's colour in light as it does in
-   dark, provided it clears 4.5:1 on the chip's own fill. Measured on
-   rendered pixels, all six tiers, the fill colour used as ink does NOT:
-   gold 3.52, bronze 3.83, silver 4.12, diamond 4.18, legendary 4.41,
-   and only perfect at 6.64. The reason is structural rather than a bad
-   hue - the chip's fill is that same colour at 0.13 over a near-white
-   strip, so it renders around 220-230 and an ink drawn from it lands far
-   too close to its own ground.
-
-   Applying the ruling literally would have coloured one tier out of six
-   and left five grey, which signals nothing. Darkening the ink to 70%
-   clears the floor on every tier - worst case gold at 5.68 - while
-   keeping each hue plainly itself. That is the same move --accent-ink
-   already makes for the accent in light, at 55%.
-
-   Written as six literals rather than a color-mix: the per-tier values
-   in this file are already literals, and a literal cannot be dropped at
-   the consumer on Chrome 105-110 the way an unsupported color-mix in a
-   custom property is (7.13). */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="bronze"] { --tier-ink: 102, 63, 22; }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="silver"] { --tier-ink: 64, 69, 78; }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="gold"] { --tier-ink: 97, 74, 10; }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="diamond"] { --tier-ink: 11, 75, 71; }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="legendary"] { --tier-ink: 123, 17, 71; }
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] { --tier-ink: 52, 41, 90; }
-
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-name {
-    color: rgba(var(--tier-ink), 0.95) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-value {
-    color: rgb(var(--tier-ink)) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-value::before {
-    background: rgba(var(--tier-ink), 0.34) !important;
-}
-
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-name {
-    color: rgba(0, 0, 0, 0.55) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-rated="0"] .st-tier-name {
-    color: rgba(0, 0, 0, 0.45) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value {
-    color: var(--text) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value::before {
-    background: rgba(0, 0, 0, 0.2) !important;
-}
-/* Perfect keeps its spectrum, at an alpha that reads as a tint on white
-   rather than the wash it becomes at the dark-mode value. */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] {
-    background: linear-gradient(100deg,
-        rgba(244, 114, 182, 0.14), rgba(96, 165, 250, 0.14),
-        rgba(192, 132, 252, 0.14)) !important;
-}
-
-/* The summary band and its label. */
-/* .st-rating-open is the toolbar ITSELF, not something inside it. These
-   three were written with a descendant combinator, so they looked for a
-   .st-rating-open child of the toolbar, matched nothing, and the dark
-   rules kept the surface. The band's "Overall" label stayed white on a
-   white panel and measured 1.17:1 -- invisible, not merely quiet. Same
-   mistake, same file, same session as the one 7.17 is about; the
-   difference is that a compound selector reads almost exactly like a
-   descendant one. */
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .rating-stars {
-    border-top-color: rgba(0, 0, 0, 0.08) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .rating-stars::before {
-    color: rgba(0, 0, 0, 0.5) !important;
-}
-body.stash-liquid-glass.refract-light :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open {
-    border-bottom-color: rgba(0, 0, 0, 0.10) !important;
-}
-
-/* The panel. A recessed well on near-black is a dark tint; on white it
-   has to be a light one, or the drawer reads as a hole. */
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel {
-    background: rgba(0, 0, 0, 0.028) !important;
-    border-color: rgba(0, 0, 0, 0.10) !important;
-    box-shadow: none !important;
-}
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-inline-head {
-    border-bottom-color: rgba(0, 0, 0, 0.08) !important;
-}
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-inline-title {
-    color: rgba(0, 0, 0, 0.45) !important;
-}
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-subhead,
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-summary {
-    color: rgba(0, 0, 0, 0.47) !important;
-}
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .ratings-list:not(:has(.rating-row)) {
-    color: rgba(0, 0, 0, 0.4) !important;
-}
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-row {
-    border-bottom-color: rgba(0, 0, 0, 0.07) !important;
-}
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-row:hover {
-    background: rgba(0, 0, 0, 0.03) !important;
-}
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-label {
-    color: rgba(0, 0, 0, 0.78) !important;
-}
-/* The icon has no border any more: it is a currentColor mask of the
-   supplied glyph (09_buttons), so `color` alone paints it. The
-   border-colour that used to sit here died with the ring. */
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-info-icon {
-    color: rgba(0, 0, 0, 0.5) !important;
-}
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .rating-clear {
-    color: rgba(0, 0, 0, 0.35) !important;
-}
-/* The heading and caret were given a colour; the element that actually
-   carries the text was not, so it kept the dark rule's white 0.32 and
-   measured 1.13:1 on the light panel. */
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-breakdown {
-    border-top-color: rgba(0, 0, 0, 0.08) !important;
-    color: rgba(0, 0, 0, 0.47) !important;
-}
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-breakdown-heading,
-body.stash-liquid-glass.refract-light .adv-rating-inline-panel .adv-rating-breakdown-caret {
-    color: rgba(0, 0, 0, 0.47) !important;
-}
-
-
-/* ═══════ 24. Primary and danger buttons ═══════════════════════════
-   14_light had no .btn-primary or .btn-danger treatment at all, so the
-   dark accent-on-tint and danger-on-tint colours carried into light mode
-   everywhere, not on one surface. The tint BACKGROUNDS are fine: they are
-   low alphas of the accent and read as a tint on white much as they do on
-   near-black. It is the ink that does not survive the flip.
-
-   Measured on the light navbar, sampled ground 250,250,250: the muted
-   .btn-primary label came out at 2.88:1, under the 3:1 floor for a
-   control someone is expected to read and click. A full-strength one
-   measured 5.16:1, so the failure is specific to the alpha-carrying
-   states rather than to accent text as such -- which is why this was
-   never obvious.
-
-   Both now take --accent-ink and --danger-ink, the tokens light mode
-   already defines for accent and danger AS TEXT (each mixed 55% into
-   black). Same measurement after: 10.99:1.
-
-   Deliberately flattening the muted state's alpha rather than preserving
-   it in ink. The navbar's active route is carried by a fill and a glow
-   halo as well as by text weight (2, section on the active route), so
-   the state survives; and preserving it would have meant inventing an
-   --accent-ink-rgb per preset, eight definitions to keep one alpha that
-   was the thing measuring under the floor. */
-/* Two rungs, not one. Written as a single full-strength rule the ink
-   fixed the inactive buttons and inverted the ladder: the navbar's
-   active rule is more specific and kept full accent at 5.16:1, so the
-   INACTIVE items came out darker than the active one and read as the
-   more prominent thing. On a light ground darker is louder, which is
-   the opposite of the state being signalled.
-
-   Active takes the full ink and inactive a 70% mix of it, so the
-   hierarchy runs the same direction it does in dark and both rungs
-   clear the floor.
-
-   Corrected once more, from the performer lane's measurement. The 70%
-   mix was applied as the BASE, and an alpha is only worth what the
-   ground under it is: on the light navbar (250,250,250) it measured
-   4.86:1, but on the performer band, a translucent veil over a blurred
-   portrait at (204,174,181), the same rule took the Edit button from
-   5.61:1 down to 3.31:1. Knocking the ink back is a reasonable call
-   against a flat panel and a bad one against a warm dark one.
-
-   So the mix is scoped to the thing it was actually for. The navbar is
-   the only surface with an inactive/active ink ladder; everywhere else
-   takes the full ink, which is both the strongest contrast and the
-   value that does not depend on what it is sitting on. The @supports
-   guard is there because color-mix in a VALUE is dropped pre-111 the
-   same way it is in a custom property. */
-body.stash-liquid-glass.refract-light.refract-light :is(a, button, .btn).btn-primary {
-    color: var(--accent-ink) !important;
-}
-body.stash-liquid-glass.refract-light.refract-light nav.top-nav
-    :is(a, button, .btn).btn-primary:not(.active):not(.stash-nav-active) {
-    color: var(--accent-ink) !important;
-}
-@supports (color: color-mix(in srgb, red, blue)) {
-    body.stash-liquid-glass.refract-light.refract-light nav.top-nav
-        :is(a, button, .btn).btn-primary:not(.active):not(.stash-nav-active) {
-        color: color-mix(in srgb, var(--accent-ink) 70%, transparent) !important;
-    }
-}
-body.stash-liquid-glass.refract-light.refract-light.refract-light
-    :is(a, button, .btn).btn-primary:is(.active, .stash-nav-active),
-body.stash-liquid-glass.refract-light.refract-light.refract-light
-    :is(a, button, .btn).btn-primary:is(.active, .stash-nav-active) span {
-    color: var(--accent-ink) !important;
-}
-body.stash-liquid-glass.refract-light.refract-light :is(a, button, .btn).btn-primary:hover {
-    color: var(--accent-ink) !important;
-}
-body.stash-liquid-glass.refract-light.refract-light
-    :is(a, button, .btn):is(.btn-danger, .btn-danger-minimal) {
-    color: var(--danger-ink) !important;
-}
-body.stash-liquid-glass.refract-light.refract-light
-    :is(a, button, .btn):is(.btn-danger, .btn-danger-minimal):hover {
-    color: var(--danger-ink) !important;
-}
-/* A filled primary is the one case where the ink must NOT darken: the
-   fill is the accent itself, so dark ink on it is the same failure in
-   reverse. Left to whatever the button already sets. */
-body.stash-liquid-glass.refract-light.refract-light :is(a, button, .btn).btn-primary[class*="filled"] {
-    color: inherit !important;
 }

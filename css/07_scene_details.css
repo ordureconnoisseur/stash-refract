@@ -1,13 +1,13 @@
 /* ───────────────────────────────────────────────────────────────────
    Scene-detail panel (v2.0 redesign)
    Single floating glass card containing title + toolbar + tabs +
-   tab content. Subsections inside flow flat - no nested cards.
+   tab content. Subsections inside flow flat — no nested cards.
    ─────────────────────────────────────────────────────────────────── */
 
 /* Outer panel. Transparent BORDER is the visual margin (counts inside
    box-sizing:border-box so Bootstrap's flex column sizing isn't
    disturbed); background-clip:padding-box paints the glass inside the
-   transparent border. NO overflow:hidden - would clip the lifted
+   transparent border. NO overflow:hidden — would clip the lifted
    performer-row at the bottom of the tab-pane. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
     background: var(--glass-bg-strong) !important;
@@ -15,15 +15,10 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
-    /* 3.3: the drop comes from the token so light is free, and the two
-       layers that are this panel's own compose on top. Hand-written, the
-       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
-       fill, beside a navbar carrying the token's 0.08. The inset takes
-       --fg-rgb for the same reason. */
     box-shadow:
-        var(--shadow-lg),
+        0 8px 32px rgba(0, 0, 0, 0.35),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
     padding: 1.25rem !important;
 }
 
@@ -39,7 +34,7 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> :is(.scene-tabs, .ima
     padding: 20px !important;
     /* Row top sits at ~70px below viewport top (navbar 12 + 52 + tiny
        gap). Setting height to (100vh - 70) makes the row end flush
-       against the viewport bottom - no black band below. */
+       against the viewport bottom — no black band below. */
     min-height: 0 !important;
     max-height: calc(100vh - 70px) !important;
     height: calc(100vh - 70px) !important;
@@ -65,7 +60,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs).collapsed {
    .scene-tabs and .expanded to the player). Refract used to hide it as
    dead UI; instead FLOAT its chevron over the existing seam. The divider
    is taken out of grid flow (position:absolute) so the 2-column layout and
-   its single gap are unchanged - no extra column, no doubled gap. */
+   its single gap are unchanged — no extra column, no doubled gap. */
 body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-divider) {
     position: relative !important;
 }
@@ -111,7 +106,7 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .scene-tabs.collapsed
         left: 1rem !important;
     }
 }
-/* Bare chevron - no pill, no border. The button fills the full-height
+/* Bare chevron — no pill, no border. The button fills the full-height
    strip so the entire seam (panel height) is clickable; a faint hover
    tint hints at the target without reintroducing a pill. */
 body.stash-liquid-glass .scene-divider .btn {
@@ -132,7 +127,7 @@ body.stash-liquid-glass .scene-divider .btn {
     cursor: pointer !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-    transition: color var(--dur-fast) ease, background var(--dur-fast) ease !important;
+    transition: color 0.15s ease, background 0.15s ease !important;
 }
 body.stash-liquid-glass .scene-divider .btn:hover,
 body.stash-liquid-glass .scene-divider .btn:focus,
@@ -149,14 +144,14 @@ body.stash-liquid-glass .scene-divider .btn:active {
 body.stash-liquid-glass .scene-divider .btn svg {
     width: 0.85rem !important;
     height: 0.85rem !important;
-    /* taller than wide - a stretched chevron, width unchanged */
+    /* taller than wide — a stretched chevron, width unchanged */
     transform: scaleY(2) !important;
 }
 
 /* Narrow viewports: drop the details panel entirely, leaving the
    player to fill the row. Threshold matches Stash's own 1200px
    breakpoint where its native player-container max-width rules
-   change - keeping these aligned avoids a janky in-between state
+   change — keeping these aligned avoids a janky in-between state
    where the panel takes 340px but the player gets squeezed to 0. */
 @media (max-width: 1199.98px) {
     body.stash-liquid-glass .main.container-fluid > .row:has(> :is(.scene-tabs, .image-tabs)) {
@@ -200,43 +195,15 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs)::-webkit-scrollbar-thumb {
     background: var(--glass-border) !important;
     border-radius: 3px !important;
 }
-/* The scrollbar rules above are on .scene-tabs, which does not scroll:
-   measured, the panel reports scrollHeight === clientHeight in every
-   state. .tab-content is the real scrollport (overflow-y: auto), and it
-   had no scrollbar styling at all, so expanding the disclosures produced
-   a 15px browser-default bar. The content was always reachable, but the
-   affordance was the one thing on the surface Refract had not themed,
-   and it appeared without warning: scrollbar-gutter: stable reserves the
-   space so opening a disclosure no longer reflows the column by 15px.
-
-   8px with an accent thumb, per 6.10's content-pane treatment rather
-   than the quiet --glass-border variant. It is the one affordance that
-   says the rest of the list is down there, so it should be legible. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content::-webkit-scrollbar {
-    width: 8px !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content::-webkit-scrollbar-track {
-    background: transparent !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content::-webkit-scrollbar-thumb {
-    background: rgba(var(--accent-rgb), 0.35) !important;
-    border-radius: var(--radius-pill) !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(var(--accent-rgb), 0.6) !important;
-}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content,
 body.stash-liquid-glass .gallery-container .tab-content {
-    scrollbar-width: thin !important;
-    scrollbar-color: rgba(var(--accent-rgb), 0.35) transparent !important;
-    scrollbar-gutter: stable !important;
     background: transparent !important;
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-    /* Flex column that fills the remaining panel height - required so
+    /* Flex column that fills the remaining panel height — required so
        .tab-pane.active can also flex-grow and the lifted performer row
        inside can be pushed to the bottom via margin-top: auto. */
     display: flex !important;
@@ -247,7 +214,7 @@ body.stash-liquid-glass .gallery-container .tab-content {
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane.active.show {
     display: flex !important;
     flex-direction: column !important;
-    gap: var(--gap-lg) !important;
+    gap: 0.75rem !important;
     padding: 0 !important;
     /* Fill .tab-content's height so margin-top: auto on the performer
        row pushes it to the visible bottom of the panel. */
@@ -260,7 +227,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane.active.show {
    Stash's SceneDetailPanel renders the description, tags AND performers
    into a SINGLE .col-12 (it gets the scene-performers-row class in-place,
    no node move). So putting margin-top:auto on that .col-12's .row wrapper
-   pushed the *entire* block - description included - to the panel bottom,
+   pushed the *entire* block — description included — to the panel bottom,
    leaving a big gap under the header whenever the description was short
    (long descriptions filled the panel and hid the bug). Instead:
      1. let the content row + its col fill the pane height (top-aligned),
@@ -288,7 +255,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .col-12.sce
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Gallery-detail layout - same viewport-height grid pattern as scene
+   Gallery-detail layout — same viewport-height grid pattern as scene
    detail. Row children: .gallery-tabs (left details) | .gallery-divider
    (hidden) | .gallery-container (right tabs + image grid).
    ─────────────────────────────────────────────────────────────────── */
@@ -307,7 +274,7 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .gallery-container) {
     box-sizing: border-box !important;
 }
 
-/* Hide the manual collapse divider - the < 1200px media query below
+/* Hide the manual collapse divider — the < 1200px media query below
    handles narrow widths automatically. */
 body.stash-liquid-glass .gallery-divider {
     display: none !important;
@@ -334,7 +301,7 @@ body.stash-liquid-glass .scene-performers {
     scroll-snap-type: x mandatory !important;
     scrollbar-width: thin !important;
     scrollbar-color: var(--glass-border) transparent !important;
-    gap: var(--gap-lg) !important;
+    gap: 0.75rem !important;
     padding: 0.25rem 0 0.5rem !important;
     justify-content: flex-start !important;
     margin: 0 !important;
@@ -375,7 +342,7 @@ body.stash-liquid-glass .stash-perf-next {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
     cursor: pointer;
     opacity: 0.85;
-    transition: opacity var(--dur-move), transform var(--dur-move), filter var(--dur-move);
+    transition: opacity 0.18s, transform 0.18s, filter 0.18s;
     padding: 0;
     color: transparent;
 }
@@ -414,7 +381,7 @@ body.stash-liquid-glass .st-op-menu-overlay {
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: var(--glass-blur-md-sat);
     -webkit-backdrop-filter: var(--glass-blur-md-sat);
-    animation: st-op-menu-fade-in var(--dur-fast) ease-out;
+    animation: st-op-menu-fade-in 0.15s ease-out;
 }
 @keyframes st-op-menu-fade-in {
     from { opacity: 0; }
@@ -423,7 +390,7 @@ body.stash-liquid-glass .st-op-menu-overlay {
 body.stash-liquid-glass .st-op-menu-card {
     width: calc(100% - 2.5rem);
     max-width: 320px;
-    background: rgba(var(--surface-rgb), 0.94);
+    background: rgba(20, 20, 24, 0.94);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     box-shadow:
@@ -448,7 +415,7 @@ body.stash-liquid-glass .st-op-menu-item {
     font-size: var(--fs-base);
     font-weight: 500;
     cursor: pointer;
-    transition: background var(--dur-instant), border-color var(--dur-instant), color var(--dur-instant);
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 body.stash-liquid-glass .st-op-menu-item:hover {
     background: var(--glass-bg-strong);
@@ -469,7 +436,7 @@ body.stash-liquid-glass:has(.main.container-fluid > .row > .gallery-container) .
 }
 
 /* Both panels fill their grid track and scroll internally. min-height:0
-   is critical - without it CSS Grid items default to intrinsic content
+   is critical — without it CSS Grid items default to intrinsic content
    height and break the parent's overflow:hidden clipping. width/max-width
    defeat Stash's Bootstrap col-style 50%-width rules on the container. */
 /* The container still fills its track; the details panel is sized by its
@@ -518,22 +485,17 @@ body.stash-liquid-glass .gallery-container::-webkit-scrollbar-thumb {
     border-radius: 3px !important;
 }
 
-/* Glass card styling for the details panel - matches scene-tabs. */
+/* Glass card styling for the details panel — matches scene-tabs. */
 body.stash-liquid-glass .gallery-tabs {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
-    /* 3.3: the drop comes from the token so light is free, and the two
-       layers that are this panel's own compose on top. Hand-written, the
-       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
-       fill, beside a navbar carrying the token's 0.08. The inset takes
-       --fg-rgb for the same reason. */
     box-shadow:
-        var(--shadow-lg),
+        0 8px 32px rgba(0, 0, 0, 0.35),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
     padding: 1.25rem !important;
 }
 
@@ -547,7 +509,7 @@ body.stash-liquid-glass .gallery-tabs {
     }
 }
 
-/* ── Title row - studio label stacked above the scene title ──────── */
+/* ── Title row — studio label stacked above the scene title ──────── */
 body.stash-liquid-glass :is(.scene-header-container, .image-header-container) {
     display: flex !important;
     flex-direction: column !important;
@@ -559,20 +521,6 @@ body.stash-liquid-glass :is(.scene-header-container, .image-header-container) {
     border: none !important;
     box-shadow: none !important;
 }
-/* Stash orders these two itself, and it changes its mind at 1200px:
-   above it the studio comes first, below it the title does, so the
-   eyebrow jumped from above the title to below it the moment the page
-   stacked. Refract composes this header (it injects the studio name and
-   makes the container a column), so the order is Refract's to state.
-   An eyebrow that labels the thing under it has to be above the thing
-   under it at every width. */
-body.stash-liquid-glass :is(.scene-header-container, .image-header-container) > h1.studio-logo {
-    order: 0 !important;
-}
-body.stash-liquid-glass :is(.scene-header-container, .image-header-container) > :is(.scene-header, .image-header) {
-    order: 1 !important;
-}
-
 /* Hide the studio LOGO IMAGE only. The studio NAME is injected as a
    <span class="st-studio-name"> child of the <a> by refract.js (the
    name lives only in the image's alt attribute on this Stash version). */
@@ -583,19 +531,9 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-studio img,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .studio-logo img {
     display: none !important;
 }
-/* Studio name label injected by JS, a small link sitting
-   above the scene title.
-
-   It used to be --accent-bright, which is the EMPHASIS shade, on a
-   10px uppercase tracked label above a white 21px title. Ranked by
-   chroma it came out joint-second loudest thing in the panel and the
-   first thing the eye landed on, above the title it exists to label.
-   That is P1's canonical failure by name, and 6.13's rule that an
-   eyebrow is never brighter than the content it introduces.
-
-   Muted at rest, accent on hover: it is still a link, and the colour
-   arrives when you point at it rather than competing for the title's
-   job. */
+/* Studio name label injected by JS — small accent-bright link sitting
+   above the scene title, matching the muted-label aesthetic used for
+   inline studio text elsewhere. */
 body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1.studio-logo {
     margin: 0 0 0.15rem 0 !important;
     padding: 0 !important;
@@ -606,13 +544,13 @@ body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1
     border: none !important;
 }
 body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1.studio-logo > a {
-    color: var(--text-muted) !important;
+    color: var(--accent-bright) !important;
     text-decoration: none !important;
     text-transform: uppercase;
-    letter-spacing: var(--track-eyebrow);
+    letter-spacing: 0.06em;
     font-size: var(--fs-xs) !important;
-    font-weight: 600;
-    transition: color var(--dur-fast) ease;
+    font-weight: 700;
+    transition: color 0.15s ease;
 }
 body.stash-liquid-glass :is(.scene-header-container, .image-header-container) h1.studio-logo > a:hover {
     color: var(--accent-light) !important;
@@ -698,7 +636,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     display: flex !important;
     flex-wrap: wrap !important;
     align-items: center !important;
-    gap: var(--gap-md) !important;
+    gap: 0.6rem !important;
     margin: 0 0 0.85rem 0 !important;
     font-size: var(--fs-sm) !important;
     color: var(--text-muted) !important;
@@ -711,39 +649,30 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .ima
     opacity: 0.4 !important;
 }
 
-/* ── Toolbar - strict single row of small glass-pill buttons ──────── */
+/* ── Toolbar — strict single row of small glass-pill buttons ──────── */
 /* Wraps rather than scrolls. As a strict single row this needed 409px of
    width inside a column that caps at 358px, with `overflow-x: auto` and
    `scrollbar-width: none` hiding the fact: the scene actions menu and the
    multiview button were 100% off the end, and the organised button was
    sliced at 74%, at EVERY supported width (still 51px over at 2560).
    A second row in a 385px sidebar costs 30px and reaches everything. */
-/* The toolbar container is declared once, further down, where the strip
-   is built. An identical block used to sit here too, 1,475 lines
-   earlier, losing every property the two shared to the later one --
-   including its own flex-wrap: nowrap, which the live block overrode
-   back to wrap. Its comment argued for a single row that the rule below
-   it was undoing. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    row-gap: 0.35rem !important;
+    margin: 0 0 0.65rem 0 !important;
+    overflow-x: visible !important;
+}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar)::-webkit-scrollbar {
     display: none !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) {
     display: flex !important;
     align-items: center !important;
-    gap: var(--gap-xs) !important;
+    gap: 0.3rem !important;
     flex-wrap: nowrap !important;
-    /* Size to content. Stash sets `.scene-toolbar .scene-toolbar-group
-       { width: 100% }`, so each group measured the full 338px against
-       real content of 189px and 145px. Once the toolbar was allowed to
-       wrap, that put every group on a row of its own and left the
-       multiview button orphaned on a third. */
-    width: auto !important;
-    flex: 0 0 auto !important;
-}
-
-/* Groups shrink rather than force a wrap. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > :is(.scene-toolbar-group, .image-toolbar-group) {
-    min-width: 0 !important;
 }
 /* The group's `gap` is the only spacing. It was being added to the
    Advanced Rating plugin's own `margin-left: 8px` and to refract's
@@ -755,25 +684,37 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, 
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
-/* :not(button):not(a) because `:empty` is not "looks empty" -- an element
-   whose only child is a comment node counts as empty, and that is exactly
-   what React renders for a falsy child or a portal placeholder. A plugin
-   button built that way was being hidden outright and never came back,
-   because nothing ever filled it. The classless wrapper span this rule
-   exists for is still caught; a control never is. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > :empty:not(button):not(a),
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) > :empty:not(button):not(a) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > :empty,
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group) > :empty {
     display: none !important;
 }
 /* Star rating styling lives in the global block in 08_misc_mid.css.
    Scene-tabs only needs to size the button frame to align with adjacent
    pill controls; the icon styling is inherited. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars button {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+}
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
+    height: 26px !important;
+    padding: 0 0.55rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-pill) !important;
+    color: var(--text) !important;
+    font-size: var(--fs-xs) !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.2rem !important;
+}
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) {
     height: 26px !important;
     border-radius: var(--radius-pill) !important;
     overflow: hidden !important;
     border: 1px solid var(--glass-border) !important;
-    background: var(--fill-2) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
     display: inline-flex !important;
     align-items: center !important;
 }
@@ -787,11 +728,11 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     line-height: 1 !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: var(--gap-2xs) !important;
+    gap: 0.25rem !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) button:hover {
     color: #fff !important;
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.07) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-button, .o-counter) svg {
     width: 11px !important;
@@ -799,7 +740,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
 }
 
 /* Stash renders .o-counter as a btn-group with a split-button dropdown
-   caret next to the count, but the menu is empty on image pages - kill
+   caret next to the count, but the menu is empty on image pages — kill
    both the split-button and the Bootstrap dropdown-toggle::after caret
    so the pill stays clean. Scoped to image-toolbar; scene-page .o-counter
    (if it ever uses this markup) keeps its dropdown. */
@@ -813,14 +754,14 @@ body.stash-liquid-glass .image-toolbar .o-counter .dropdown-toggle::after {
    wrapper (.count-button or .o-counter) for ~280ms when a hold fires the
    decrement mutation. Tint red briefly so the user sees the action
    registered. Regular click increments and gets no flash. Covers all
-   surfaces - detail toolbars, lightbox, scene/image card popovers. */
+   surfaces — detail toolbars, lightbox, scene/image card popovers. */
 body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented,
 body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented > button,
 body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented .count-icon,
 body.stash-liquid-glass :is(.count-button, .o-counter).refract-o-decremented .count-value {
     background: rgba(244, 60, 60, 0.18) !important;
-    color: var(--danger-light) !important;
-    transition: background var(--dur-fast), color var(--dur-fast) !important;
+    color: #fca5a5 !important;
+    transition: background 0.15s, color 0.15s !important;
 }
 /* `.mv-scene-page-btn` (multiview plugin) shares this size/shape rule
    with Stash core toolbar buttons; reference intentionally retained
@@ -836,7 +777,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     min-width: 26px !important;
     padding: 0 !important;
     border-radius: var(--radius-pill) !important;
-    background: var(--fill-2) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
     display: inline-flex !important;
@@ -851,7 +792,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     border-color: var(--accent-glow) !important;
     color: #fff !important;
 }
-/* Active (organized) state - accent fill + glow so the toggle reads as ON.
+/* Active (organized) state — accent fill + glow so the toggle reads as ON.
    Stash adds `.organized` to the button when the scene is organized. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized {
     background: var(--accent-tint) !important;
@@ -874,7 +815,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
     height: 11px !important;
 }
 
-/* ── Tabs nav - compact pill row, single line ─────────────────────── */
+/* ── Tabs nav — compact pill row, single line ─────────────────────── */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs,
 body.stash-liquid-glass .gallery-tabs .nav-tabs,
 body.stash-liquid-glass .nav-tabs {
@@ -914,12 +855,12 @@ body.stash-liquid-glass .nav-tabs .nav-link {
     white-space: nowrap !important;
     text-align: center !important;
     display: block !important;
-    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast) !important;
+    transition: color 0.15s, background 0.15s, border-color 0.15s !important;
 }
 
 /* Stretch each tab wrapper (.nav-item is the flex child of .nav-tabs,
    not .nav-link). `flex: 1 1 auto` makes tabs grow proportionally from
-   their natural content width to fill the available navbar - the panel
+   their natural content width to fill the available navbar — the panel
    width is no longer pinned to the sum of tab widths; any extra space
    is absorbed by the tabs instead of leaving a trailing gap.
 
@@ -936,12 +877,10 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:hover,
 body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-link:hover,
 body.stash-liquid-glass .nav-tabs .nav-link:hover {
     color: #fff !important;
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.07) !important;
     border-color: var(--glass-border) !important;
 }
-/* The scene strip's own active treatment moved to 09 as the house
-   anatomy (2026-09-04, audit item 2); what is left here is the strips
-   this file styles that are NOT in that list. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active,
 body.stash-liquid-glass .gallery-tabs .nav-tabs .nav-link.active,
 body.stash-liquid-glass .nav-tabs .nav-link.active {
     color: var(--accent-bright) !important;
@@ -952,9 +891,24 @@ body.stash-liquid-glass .nav-tabs .nav-link.active {
         0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
 }
 
-/* The entity tab strip's rules moved to 08_misc_mid.css on 2026-08-30:
-   they style performer/studio/tag/group/movie pages, which are not this
-   file's surface. Handed over by the scene lane. */
+/* Detail-page tab strips — bump padding + font over the compact default
+   so the tab buttons are a more comfortable hit target than the slim
+   sidebar variants on scene/gallery pages.
+   This used to name .performer-tabs only, so the tag, studio and group
+   strips kept the sidebar variant: 9.24px links 22px tall, sitting under
+   a 28px title, against 12.25px links 35.8px tall on the performer page.
+   Same markup, same job, same size. */
+body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link {
+    padding: 0.55rem 1rem !important;
+    font-size: var(--fs-base) !important;
+    border-radius: var(--radius) !important;
+    letter-spacing: 0.015em !important;
+}
+body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link .badge {
+    font-size: var(--fs-xs) !important;
+    padding: 0.18em 0.5em !important;
+}
+
 
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .card .card-body,
 body.stash-liquid-glass .gallery-tabs .card .card-body {
@@ -976,7 +930,7 @@ body.stash-liquid-glass .markers-panel .marker-card {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    transition: border-color var(--dur-fast), box-shadow var(--dur-fast) !important;
+    transition: border-color 0.15s, box-shadow 0.15s !important;
 }
 body.stash-liquid-glass .scene-markers-list .marker-card:hover,
 body.stash-liquid-glass .markers-panel .marker-card:hover {
@@ -992,20 +946,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table {
     font-size: var(--fs-sm) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table thead th {
-    background: var(--fill-2) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
     color: var(--text-muted) !important;
     border-bottom: 1px solid var(--glass-border) !important;
     font-weight: 500 !important;
     font-size: var(--fs-sm) !important;
     text-transform: uppercase !important;
-    letter-spacing: var(--track-tight) !important;
+    letter-spacing: 0.04em !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table tbody tr {
     border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
-    transition: background var(--dur-fast) !important;
+    transition: background 0.15s !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table tbody tr:hover {
-    background: var(--fill-2) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table td,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table th {
@@ -1013,16 +967,16 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .table th {
     padding: 0.55rem 0.75rem !important;
 }
 
-/* ── Details tab inner sections (flat - no nested cards) ──────────── */
+/* ── Details tab inner sections (flat — no nested cards) ──────────── */
 
-/* Metadata strip (Created At / Updated At / Studio Code) - hidden per
+/* Metadata strip (Created At / Updated At / Studio Code) — hidden per
    user preference. The full row is wrapped, so hide the row too. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12.scene-details,
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row:has(> .col-12.scene-details) {
     display: none !important;
 }
 
-/* Description+Tags column - flat content, no nested chrome.
+/* Description+Tags column — flat content, no nested chrome.
    Keep Bootstrap's column padding so the .row's -15px negative margin
    is properly compensated; only zero out chrome (bg/border/filter). */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row > .col-12:has(> p.pre) {
@@ -1033,13 +987,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .row > .col-12:has(> p.pre
     backdrop-filter: none !important;
 }
 
-/* Section labels ("Details:", "Tags"). Everything except text-transform
-   used to be set here as well and every bit of it lost to the block
-   further down -- weight, tracking, colour and margin all measured as
-   the later rule's values. Only the parts that still do something are
-   left. */
+/* Section labels (h6 "Details:", "Tags") */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
+    margin: 0.6rem 0 0.35rem 0 !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: 600 !important;
     text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: var(--text-muted) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6:first-child {
     margin-top: 0 !important;
@@ -1064,7 +1019,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > p.pre {
     font-family: inherit !important;
 }
 
-/* Tag pills - compact in scene-tabs context (full size elsewhere).
+/* Tag pills — compact in scene-tabs context (full size elsewhere).
    The selector used to be unscoped despite what this comment says, so the
    compact treatment leaked onto every detail page. On the performer header
    that rendered tag chips at 0.7rem (9.8px) beside 14px field values, with
@@ -1073,7 +1028,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > p.pre {
    04_filters.css (0.8rem, 0.22em/0.7em padding). */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.tag-link.badge.badge-secondary {
     display: inline-block !important;
-    background: var(--fill-2) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     margin: 0 0.25rem 0.25rem 0 !important;
@@ -1081,7 +1036,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.t
     font-size: var(--fs-xs) !important;
     font-weight: 500 !important;
     color: var(--text) !important;
-    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast) !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.tag-link.badge.badge-secondary:hover {
     background: var(--accent-tint) !important;
@@ -1101,13 +1056,20 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .tag-item.t
    "Tags" h6 in the scene-tabs panel. Tags wrap row-by-row left-to-right
    like the original layout; container is capped to ~5 rows of pills
    with internal vertical scroll for any overflow. */
-/* The scrolling tag box this used to be is gone: it was P7's canonical
-   failure (34 chips crushed into 98px above dead space) and the block
-   1,379 lines below supersedes its display, max-height and overflow.
-   What it did NOT supersede were the two scrollbar properties, which are
-   INHERITED, so a dead rule kept re-colouring the scrollbar of whatever
-   scrolled inside it. Deleted rather than left to lose quietly. */
-/* Subtle bottom fade - only when the strip actually overflows its
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list {
+    display: flex !important;
+    flex-flow: row wrap !important;
+    align-content: flex-start !important;
+    max-height: 7rem !important;
+    gap: 4px 6px !important;
+    margin: 0.2rem 0 0.65rem 0 !important;
+    padding: 2px 2px 4px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--glass-border) transparent !important;
+}
+/* Subtle bottom fade — only when the strip actually overflows its
    max-height (toggled by syncTagListFade in refract.js). Short tag
    lists stay sharply rendered with no half-faded last row. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list.refract-overflow {
@@ -1134,8 +1096,8 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list.st-tag-list .
     flex-shrink: 0 !important;
 }
 
-/* Performer-row - JS adds class scene-performers-row to the .col-12 that
-   directly contains .scene-performers (no node move - avoids React removeChild
+/* Performer-row — JS adds class scene-performers-row to the .col-12 that
+   directly contains .scene-performers (no node move — avoids React removeChild
    errors on scene save). The containing .row gets margin-top:auto to anchor the
    performer strip at the bottom of the .tab-pane flex column.
    In the narrow scene-tabs sidebar performers render as a count-adaptive layout
@@ -1191,8 +1153,8 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
 }
 
 /* Cards as direct children of .scene-performers (a Bootstrap .row) pick
-   up `.row > *` rules - width:100%, padding-left/right from --bs-gutter-x.
-   With gutter zeroed above, padding goes to 0 - but force the reset
+   up `.row > *` rules — width:100%, padding-left/right from --bs-gutter-x.
+   With gutter zeroed above, padding goes to 0 — but force the reset
    explicitly on the cards too in case any later rule re-introduces it. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card {
     padding-left: 0 !important;
@@ -1285,7 +1247,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
    a centred [‹][dots][›] strip. The chevrons reuse the main-column
    .stash-perf-prev/.stash-perf-next glyph + accent styling, but here we
    flip them from the absolute overlay to plain inline flex items that
-   flank the dots - more visible and self-positioning. */
+   flank the dots — more visible and self-positioning. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-nav {
     display: flex !important;
     align-items: center !important;
@@ -1314,7 +1276,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
     transform: scale(1.15) !important;
 }
 
-/* Pagination dots - only present when count="many" (JS only appends them
+/* Pagination dots — only present when count="many" (JS only appends them
    in that case). Active dot is an accent-coloured pill; inactive dots are
    subtle glass-border circles that brighten on hover. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-dots {
@@ -1335,7 +1297,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
     padding: 0 !important;
     border-radius: 999px !important;
     cursor: pointer !important;
-    transition: background var(--dur-move) ease, width var(--dur-enter) ease, opacity var(--dur-fast) ease !important;
+    transition: background 0.18s ease, width 0.22s ease, opacity 0.15s ease !important;
     opacity: 0.65 !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row .stash-perf-dots .dot:hover,
@@ -1357,7 +1319,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
 /* Stash wraps the <img> in an <a href="/performers/N">. The anchor is
    inline-level by default so it doesn't fill the thumbnail-section,
    leaving the image at its natural top-left position. Target ONLY that
-   anchor (the one containing the image) - there's a second <a> in the
+   anchor (the one containing the image) — there's a second <a> in the
    thumbnail-section for the country flag that we must not stretch. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card .thumbnail-section > a:has(> .performer-card-image) {
     display: block !important;
@@ -1372,10 +1334,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-perf
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
-    /* Portrait headshots in a 34px circle: a centred crop takes the
-       middle of the body and cuts the face off. */
-    object-position: top center !important;
-    /* Default center-center crop - matches vanilla Stash behaviour. */
+    /* Default center-center crop — matches vanilla Stash behaviour. */
     object-position: center center !important;
 }
 
@@ -1436,7 +1395,7 @@ body.stash-liquid-glass.refract-perf-layout-card :is(.scene-tabs, .image-tabs, .
     width: 7.7cqw !important;
     height: 7.7cqw !important;
 }
-/* Tier ribbon (diagonal sash) - fixed rem geometry (top 1.4 / right -3 /
+/* Tier ribbon (diagonal sash) — fixed rem geometry (top 1.4 / right -3 /
    width 11 / 0.72rem text) likewise scaled to cqw so the sash + its text
    shrink with the card. Calibrated to match the grid at ~280px. */
 body.stash-liquid-glass.refract-flourish-tiers :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers > .performer-card[class*="refract-card-tier-"] .refract-pc-tier-label {
@@ -1463,8 +1422,8 @@ body.stash-liquid-glass dl.details-list {
        being truncated (Stash IDs: scrollWidth 206 vs clientWidth 130).
        A hard cap lets the long label wrap and gives the width back. */
     grid-template-columns: minmax(0, 5.5rem) minmax(0, 1fr) !important;
-    column-gap: var(--gap-xl) !important;
-    row-gap: var(--gap-md) !important;
+    column-gap: 1rem !important;
+    row-gap: 0.5rem !important;
     align-items: baseline !important;
 }
 body.stash-liquid-glass .scene-file-info dt,
@@ -1473,18 +1432,8 @@ body.stash-liquid-glass dl.details-list dt {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: var(--track-label) !important;
+    letter-spacing: 0.06em !important;
     margin: 0 !important;
-    /* The column cap above is deliberate and stays; what it produced was
-       not. These labels inherit overflow-wrap: break-word, so capping the
-       column made "File Modification Time:" break INSIDE a word and
-       render as "FILE / MODIFICATIO / N TIME:" across three lines. A
-       label wraps between its words or not at all: break-word is for
-       unbroken strings like a path or a hash, which is the dd's job
-       below, not a caption's. */
-    overflow-wrap: normal !important;
-    word-break: normal !important;
-    hyphens: none !important;
 }
 body.stash-liquid-glass .scene-file-info dd,
 body.stash-liquid-glass dl.details-list dd {
@@ -1497,7 +1446,7 @@ body.stash-liquid-glass .scene-file-info a,
 body.stash-liquid-glass dl.details-list a {
     color: var(--accent-bright) !important;
     text-decoration: none !important;
-    transition: color var(--dur-fast) !important;
+    transition: color 0.15s !important;
 }
 body.stash-liquid-glass .scene-file-info a:hover,
 body.stash-liquid-glass dl.details-list a:hover {
@@ -1516,64 +1465,46 @@ body.stash-liquid-glass .o-history {
 body.stash-liquid-glass .history-header {
     margin-bottom: 0.5rem !important;
 }
-/* The same eyebrow the Details pane uses for Details, Scored and Tags.
-   Four section labels across the panel had four treatments; this was the
-   one that read as a heading instead of a label. */
 body.stash-liquid-glass .history-header h5 {
-    font-size: var(--fs-xs) !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(var(--fg-rgb), 0.42) !important;
+    font-size: var(--fs-md) !important;
+    color: var(--text) !important;
     margin: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: var(--gap-md) !important;
+    gap: 0.5rem !important;
 }
 body.stash-liquid-glass .history-header h5 > span:first-child {
     display: inline-flex !important;
     align-items: center !important;
-    gap: var(--gap-sm) !important;
+    gap: 0.4rem !important;
 }
-/* A count beside its label, the way the tag count sits beside TAGS on
-   the Details pane. It was an accent-tinted pill, which made the number
-   of times a scene had been played the most emphatic thing on the tab. */
 body.stash-liquid-glass .history-header .badge.badge-pill.badge-secondary {
-    background: none !important;
-    color: rgba(var(--fg-rgb), 0.42) !important;
-    border: 0 !important;
-    padding: 0 !important;
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+    border: 1px solid var(--accent-glow) !important;
+    padding: 0.15rem 0.5rem !important;
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
 }
-/* A list, not a stack of cards. Each entry shipped as its own filled,
-   rimmed, rounded box, so seven timestamps read as seven separate
-   objects and repeated the panel's own fill inside the panel. Hairline
-   rows read as one list and cost no fill at all. */
 body.stash-liquid-glass .scene-history ul {
     list-style: none !important;
     padding: 0 !important;
     margin: 0 0 0.5rem 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 0 !important;
+    gap: 0.3rem !important;
 }
 body.stash-liquid-glass .scene-history li {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 0.42rem 0 !important;
-    background: none !important;
-    border: 0 !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-    border-radius: 0 !important;
-    color: rgba(var(--fg-rgb), 0.72) !important;
+    padding: 0.4rem 0.7rem !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-sm) !important;
+    color: var(--text) !important;
     font-size: var(--fs-sm) !important;
-    font-weight: 500 !important;
-}
-body.stash-liquid-glass .scene-history li:last-child {
-    border-bottom: 0 !important;
 }
 body.stash-liquid-glass .scene-history .remove-date-button {
     background: transparent !important;
@@ -1581,63 +1512,11 @@ body.stash-liquid-glass .scene-history .remove-date-button {
     color: var(--text-muted) !important;
     padding: 0.15rem 0.35rem !important;
     border-radius: 4px !important;
-    transition: color var(--dur-fast), background var(--dur-fast) !important;
+    transition: color 0.15s, background 0.15s !important;
 }
 body.stash-liquid-glass .scene-history .remove-date-button:hover {
-    color: var(--danger-ink) !important;
-    background: rgba(var(--danger-rgb), 0.1) !important;
-}
-
-/* ── Filters tab ──────────────────────────────────────────────────
-   Section labels take the panel's one eyebrow, and the four actions take
-   one treatment instead of three accent-tinted buttons beside one glass
-   one. None of the four is the primary action of the pane -- two rotate,
-   two reset -- so accent on three of them was emphasis applied rather
-   than earned (P3). */
-body.stash-liquid-glass .scene-video-filter h5 {
-    font-size: var(--fs-xs) !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(var(--fg-rgb), 0.42) !important;
-    margin: 0.4rem 0 0.2rem 0 !important;
-}
-body.stash-liquid-glass .scene-video-filter .btn.btn-primary,
-body.stash-liquid-glass .scene-video-filter .btn.btn-secondary {
-    background: var(--fill-3) !important;
-    border: 1px solid var(--glass-border) !important;
-    color: rgba(var(--fg-rgb), 0.72) !important;
-    font-size: var(--fs-sm) !important;
-    font-weight: 600 !important;
-    box-shadow: none !important;
-}
-body.stash-liquid-glass .scene-video-filter .btn.btn-primary:hover,
-body.stash-liquid-glass .scene-video-filter .btn.btn-secondary:hover {
-    background: var(--fill-4) !important;
-    border-color: var(--glass-border-bright) !important;
-    color: var(--text) !important;
-}
-/* While the swatch feature is off (see 06_scene_player.css), the value
-   cell holds a number again, and 1.6rem does not fit "100%". The wider
-   column applies only in that case, so nothing moves when the swatch
-   comes back. */
-/* Matching 06's own selector shape, not a shorter one. That rule is a
-   GROUP whose first selector is (0,6,1); a tidier
-   `.scene-video-filter .filter-slider-value:not(...)` is (0,4,1) and
-   loses, which is exactly how the number came back truncated to "10..."
-   on the first attempt. Second time this session that counting only the
-   readable selector in a group has cost a round. */
-body.stash-liquid-glass .scene-video-filter .row.form-group > .col-sm-2.filter-slider-value:not(.refract-has-swatch),
-body.stash-liquid-glass .scene-video-filter .filter-slider-value:not(.refract-has-swatch) {
-    flex: 0 0 2.9rem !important;
-    max-width: 2.9rem !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    font-size: var(--fs-xs) !important;
-    font-weight: 600 !important;
-    font-variant-numeric: tabular-nums !important;
-    color: rgba(var(--fg-rgb), 0.45) !important;
+    color: #ff6b6b !important;
+    background: rgba(255, 107, 107, 0.1) !important;
 }
 
 /* ── Queue tab ────────────────────────────────────────────────────── */
@@ -1645,10 +1524,10 @@ body.stash-liquid-glass .queue-controls {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: var(--gap-md) !important;
+    gap: 0.5rem !important;
     padding: 0.6rem 0.85rem !important;
     margin: 0 0 0.85rem 0 !important;
-    background: var(--fill-1) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
 }
@@ -1658,15 +1537,15 @@ body.stash-liquid-glass #queue-content > ol {
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: var(--gap-sm) !important;
+    gap: 0.4rem !important;
     counter-reset: queueitem !important;
 }
 body.stash-liquid-glass #queue-content > ol > li {
     margin: 0 !important;
     border-radius: var(--radius-sm) !important;
-    background: var(--fill-1) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid var(--glass-border) !important;
-    transition: background var(--dur-fast), border-color var(--dur-fast) !important;
+    transition: background 0.15s, border-color 0.15s !important;
 }
 body.stash-liquid-glass #queue-content > ol > li:hover {
     background: rgba(255, 255, 255, 0.06) !important;
@@ -1736,7 +1615,7 @@ body.stash-liquid-glass .scene-wall-item-text-container {
 body.stash-liquid-glass .scene-markers-panel > .btn {
     display: inline-flex;
     align-items: center;
-    gap: var(--gap-sm);
+    gap: 0.4rem;
     margin-bottom: 1.25rem;
     font-weight: 600;
 }
@@ -1775,29 +1654,6 @@ body.stash-liquid-glass .scene-markers-panel > .container {
     padding: 0;
 }
 
-/* The empty state. Measured, this pane is 73px of content in a 569px
-   pane: 87 percent empty, two buttons of different weights, and nothing
-   saying what a marker is or why you would make one. 6.22 rule 3 says an
-   empty screen is an invitation to act, and 9 admits empty states are
-   not designed anywhere yet -- this is where that costs most, because
-   the tab is empty on most scenes.
-
-   Gated on the card wall having no children rather than on :empty, which
-   is true of an element whose only child is a comment node and therefore
-   true of a React placeholder. One :has() on one element, which 7.2
-   permits in a detail panel. */
-body.stash-liquid-glass .scene-markers-panel:not(:has(.wall > *))::after {
-    content: "No markers on this scene. A marker tags a moment, so you can jump straight back to it or find every scene that has one.";
-    display: block;
-    max-width: 30ch;
-    margin: 2.5rem auto 0 auto;
-    text-align: center;
-    text-wrap: pretty;
-    font-size: var(--fs-sm);
-    line-height: 1.55;
-    color: rgba(var(--fg-rgb), 0.42);
-}
-
 /* Card grid: drop the row's negative margins, add a real gutter. */
 /* Responsive card grid: each tag card needs ~260px to hold a chapter row,
    so cards stay 1-up in a narrow panel and only split to 2+ when there is
@@ -1807,7 +1663,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-tag.row {
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     align-items: start;
     margin: 0;
-    gap: var(--gap-xl);
+    gap: 1rem;
 }
 
 /* "Categories" section label (the .primary-tag wrapper only renders when the
@@ -1816,8 +1672,8 @@ body.stash-liquid-glass .scene-markers-panel .primary-tag::before {
     content: "Categories";
     grid-column: 1 / -1;
     font-size: var(--fs-xs);
-    font-weight: 600;
-    letter-spacing: var(--track-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--text-muted);
 }
@@ -1867,15 +1723,15 @@ body.stash-liquid-glass .scene-markers-panel .primary-card-body > div {
         "time main"
         ".    tags";
     column-gap: 0.7rem;
-    row-gap: var(--gap-2xs);
+    row-gap: 0.2rem;
     align-items: center;
     margin: 0 -0.4rem;
     padding: 0.4rem 0.4rem;
     border-radius: 8px;
-    transition: background var(--dur-fast) ease;
+    transition: background 0.15s ease;
 }
 body.stash-liquid-glass .scene-markers-panel .primary-card-body > div:hover {
-    background: var(--fill-2);
+    background: rgba(255, 255, 255, 0.04);
 }
 
 /* Leading timecode chip: the .d-flex wrapper occupies the "time" column. */
@@ -1902,7 +1758,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-card-body .row {
     align-items: baseline;
     justify-content: space-between;
     flex-wrap: nowrap;
-    gap: var(--gap-md);
+    gap: 0.5rem;
 }
 /* Marker title (first link) = primary content: readable, not blue. */
 body.stash-liquid-glass .scene-markers-panel .primary-card-body .row > .btn-link:first-child {
@@ -1925,7 +1781,7 @@ body.stash-liquid-glass .scene-markers-panel .primary-card-body .row > .btn-link
     line-height: 1.3;
     color: var(--text-muted) !important;
     opacity: 0;
-    transition: opacity var(--dur-fast) ease;
+    transition: opacity 0.15s ease;
 }
 body.stash-liquid-glass .scene-markers-panel .primary-card-body > div:hover .btn-link.ml-auto,
 body.stash-liquid-glass .scene-markers-panel .primary-card-body > div:focus-within .btn-link.ml-auto {
@@ -1941,7 +1797,7 @@ body.stash-liquid-glass .scene-markers-panel .card-section.centered {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
-    gap: var(--gap-xs);
+    gap: 0.3rem;
     margin: 0;
     padding: 0;
 }
@@ -1967,7 +1823,7 @@ body.stash-liquid-glass .scene-markers-panel > .row {
 body.stash-liquid-glass .scene-markers-panel .wall {
     display: grid !important;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: var(--gap-lg);
+    gap: 0.85rem;
     margin: 0;
     max-width: 100%;
 }
@@ -1977,8 +1833,8 @@ body.stash-liquid-glass .scene-markers-panel .wall:has(.wall-item)::before {
     content: "Previews";
     grid-column: 1 / -1;
     font-size: var(--fs-xs);
-    font-weight: 600;
-    letter-spacing: var(--track-eyebrow);
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--text-muted);
 }
@@ -1999,9 +1855,9 @@ body.stash-liquid-glass .scene-markers-panel .wall .wall-item-media {
    not a black box with tiny text. */
 body.stash-liquid-glass .scene-markers-panel .wall-item-missing {
     flex-direction: column;
-    gap: var(--gap-sm);
+    gap: 0.4rem;
     font-size: 0.62rem !important;
-    letter-spacing: var(--track-label);
+    letter-spacing: 0.05em;
     text-transform: lowercase;
     color: var(--text-muted) !important;
     background:
@@ -2079,15 +1935,10 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    /* 3.3: the drop comes from the token so light is free, and the two
-       layers that are this panel's own compose on top. Hand-written, the
-       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
-       fill, beside a navbar carrying the token's 0.08. The inset takes
-       --fg-rgb for the same reason. */
     box-shadow:
-        var(--shadow-lg),
+        0 8px 32px rgba(0, 0, 0, 0.35),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
 }
 body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image-container > img.image-image {
     max-width: 100% !important;
@@ -2099,1513 +1950,3 @@ body.stash-liquid-glass .main.container-fluid > .row:has(> .image-tabs) > .image
 }
 
 /* ── Wall / masonry view ────────────────────────────────────────────── */
-
-/* ───────────────────────────────────────────────────────────────────
-   Scene-detail panel - v3 composition (1b "Marquee" + 2c "Chips")
-   From the Claude Design project "Token and Stash markup", implementing
-   `Scene Panel v3.dc.html`. Supersedes the v2 one-row toolbar and the
-   v2 rating popover, both removed above rather than layered over.
-
-   Composition, top to bottom:
-     marquee   studio / title / spec pills
-     state     the five stars + rating value ..... operations, multiview
-               [3 plays] [0 O] [Not favourite] [Not organised]
-     tabs      the same six destinations
-     tags      no cap, no inner scrollbar
-
-   Four selectors in the source patch were written against an assumed
-   DOM. Checked on the live instance, three were wrong and are corrected
-   here; the fourth needed no injection at all:
-     - Both counters are `.count-button.increment-only`; there is no
-       `.o-counter` class. They are told apart by their inner button's
-       title, so `:has()` does it with no JS tagging.
-     - The favourite is `button.adv-favourite-btn` as a DIRECT child of
-       the group, not `> span > span > button`, and it carries
-       `aria-pressed`.
-     - Operations is `group > span > div.dropdown > button`, so
-       `margin-left: auto` on the BUTTON pushes against the wrong box.
-       The wrapper spans go `display: contents` and the auto margin sits
-       on `div.dropdown`, which keeps its own box so its menu still
-       positions against it.
-     - Specs are already `span.date`, `.frame-rate` and `.resolution`
-       around a `.divider`, so no `.st-spec` injection is needed.
-   ─────────────────────────────────────────────────────────────────── */
-
-/* ── Focus ────────────────────────────────────────────────────────────
-   The ring itself now lives in 09_buttons as the theme's one focus law
-   (2026-09-04, cohesion audit item 1): every interactive element the
-   theme styles takes `outline: 2px solid var(--accent-bright)` at offset
-   2, `--accent-ink` in light. What was here - this panel's own 0.90
-   outline, written when 33 controls measured no focus at all - was one
-   of the six treatments that audit found, and it is gone.
-
-   What stays here is geometry, not colour: two exceptions this panel
-   needs because of how its controls are boxed. Both take the canonical
-   token, so a change of ring colour reaches them.
-
-   The counter pill clips (overflow: hidden), so neither half can wear a
-   ring of its own; the pill wears it for them. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .count-button:has(:focus-visible) {
-    outline: 2px solid var(--accent-bright) !important;
-    outline-offset: 2px !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .count-button :is(a, button):focus-visible {
-    outline: none !important;
-}
-/* Five 17px stars with 3px between them: a 2px ring at a 2px offset
-   would touch its neighbours.
-
-   The class pile is not decoration. 08_misc_mid.css:2658 is a GROUP, and
-   its first selector (.rating-stars .btn.btn-secondary.minimal) is
-   (0,5,1), which outranks the (0,4,1) of the base rule above -- so the
-   stars, alone out of 39 controls, kept `outline: none !important` and
-   measured ringless while everything else was fixed. Counting only the
-   second selector in a group is how that was missed the first time.
-   This is (0,6,1). */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars .btn.minimal:focus-visible,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .rating-stars button.minimal:focus-visible {
-    outline: 2px solid var(--accent-bright) !important;
-    outline-offset: 1px !important;
-}
-/* .tab-content clips horizontally (overflow-x: hidden), so a full-width
-   control's ring would be shaved off at both ends. Nothing in the panel
-   needs to be full width anyway: see the disclosure width fix below. */
-
-/* ── Marquee ──────────────────────────────────────────────────────── */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-header, .image-header) {
-    font-size: var(--fs-xl) !important;
-    line-height: 1.22 !important;
-    letter-spacing: -0.015em !important;
-    margin-top: 0.7rem !important;
-}
-/* Direction B. These three are FACTS ABOUT THE FILE and nothing else:
-   they report, they never mutate, and 6.7 says a pill that reports must
-   not look like a pill that acts. As bordered pills they were three of
-   the eleven rounded objects stacked above the tab strip, and the two
-   loudest of them by contrast (11.99:1) outranked the scene description
-   they sit above.
-
-   So they stop being objects and become a subtitle: one muted run under
-   the title, separated by the divider Stash already renders between the
-   frame rate and the resolution. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) {
-    display: flex !important;
-    align-items: baseline !important;
-    gap: 0 !important;
-    margin: 0.4rem 0 0 0 !important;
-    flex-wrap: wrap !important;
-    justify-content: flex-start !important;
-    font-size: var(--fs-sm) !important;
-    font-weight: 500 !important;
-    color: rgba(var(--fg-rgb), 0.45) !important;
-}
-/* ---- The rating tier chip -------------------------------------------
-   The rating reads as its tier, which is the theme's own idea about
-   ratings and the one thing the rating control never used. Section 4
-   grants the tier palette the right to override the accent because it
-   encodes data: this chip is gold because the scene is 8.2, not because
-   gold looks good (P3).
-
-   Restrained on purpose. The cards get breathing glows, sheen sweeps and
-   rotating halos; a 22px chip in a control row gets the tier's colour on
-   its text, a tint of it behind and a rim of it, and nothing that moves.
-   Escalation stays monotonic (rule 3) because the colours carry the
-   ladder, and P1 holds because the chip is quieter than the poster it
-   sits beside. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip {
-    order: 0 !important;
-    flex: 0 0 auto;
-    display: inline-flex;
-    /* Centre, not baseline. Baseline alignment lines the two spans up
-       with each other and then places the whole line by the tallest
-       ascent above it -- with line-height: 1 on both, that pinned the
-       text to the top of the chip: measured 0px above the ink and 12px
-       below in a 22px chip, with the value's ink breaking 1px past the
-       top edge. */
-    align-items: center;
-    gap: 6px;
-    /* Box and resting material are the chip recipe's (10), not this
-       file's. They used to be declared here - height 22, --fill-3 fill,
-       --glass-border rim - and while the recipe's shared :is() was
-       inflated to (0,5,2) by one four-class branch, this rule at (0,4,1)
-       lost and nobody noticed. Wrapping those branches in :where()
-       dropped the recipe to (0,2,1), at which point this rule started
-       WINNING and the chip measured its old 22px instead of the ruled
-       24px: the same declarations, the same file, opposite outcomes, one
-       specificity fix apart. Removed rather than re-tuned.
-       What stays below the comment is layout that is genuinely this
-       chip's, plus the data-tier treatments further down, which are
-       !important and unaffected either way. */
-    font-family: inherit;
-    cursor: pointer;
-    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease;
-}
-/* The one eyebrow in this panel that stays at 700, and the reason is
-   what the text is doing rather than how it looks: this is a CONTROL's
-   own label, not a label introducing content. The chip is the drawer's
-   trigger (ruled a control 2026-09-04), so it takes the control-label
-   weight while every section label in the panel folded to the 6.13
-   pair - --fs-xs / 600 / --track-eyebrow. Listed as the exemption it is,
-   per the audit, rather than left looking like the eighth spec. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-name {
-    font-size: var(--fs-xs);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: var(--track-eyebrow);
-    color: var(--text-muted);
-    /* 6.7: the line-height has to clear ascent plus descent or the
-       half-leading goes negative and the baseline is dragged up. Both
-       spans carry the same one so their boxes are equal and the two
-       words sit on one line despite the size difference. */
-    line-height: 1.35;
-}
-/* A hairline between the tier and its number. They are two different
-   kinds of fact -- a name the ladder gives it and a value out of ten --
-   and a gap alone left them reading as one run of text. The rule takes
-   the tier's own colour so it belongs to the chip rather than sitting on
-   it, and the 6px each side matches the gap it replaces, so the chip
-   grows by exactly one pixel. It cannot appear on an unrated scene,
-   because the value it separates is not rendered.
-
-   Drawn, not bordered. A border-left spans the LINE BOX, which measured
-   16px in a 22px chip against letterforms of 13 and a cap height of 8:
-   at nearly three quarters of the chip's height it read as a divider
-   between two halves of a container rather than a separator between two
-   words. 10px sits between the cap height and the full ink, which is
-   where a rule between words belongs. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    color: var(--text);
-    line-height: 1.35;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value::before {
-    content: "";
-    flex: 0 0 auto;
-    width: 1px;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.18);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip .st-tier-value[hidden] { display: none; }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip:hover {
-    background: var(--fill-4);
-    border-color: var(--glass-border-bright);
-}
-
-/* Tiered: the chip takes the tier's own colour, from the same values the
-   cards read, so a Gold scene is the same gold in both places. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) {
-    background: rgba(var(--tier-color), 0.13);
-    border-color: rgba(var(--tier-color), 0.4);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]):hover {
-    background: rgba(var(--tier-color), 0.2);
-    border-color: rgba(var(--tier-color-bright), 0.75);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-name {
-    color: rgba(var(--tier-color-bright), 0.95);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-value {
-    color: rgba(var(--tier-color-bright), 1);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier]:not([data-tier=""]) .st-tier-value::before {
-    background: rgba(var(--tier-color-bright), 0.34);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="bronze"] { --tier-color: 215, 148, 92; --tier-color-bright: 240, 180, 130; }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="silver"] { --tier-color: 192, 196, 204; --tier-color-bright: 226, 230, 238; }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="gold"] { --tier-color: 230, 185, 78; --tier-color-bright: 255, 215, 120; }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="diamond"] { --tier-color: 165, 223, 219; --tier-color-bright: 205, 245, 242; }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="legendary"] { --tier-color: 244, 114, 182; --tier-color-bright: 255, 160, 210; }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] { --tier-color: 255, 255, 255; --tier-color-bright: 255, 255, 255; }
-
-/* Legendary and Perfect are where the ladder is meant to be felt. They
-   get a rim light rather than an animation: a chip that breathes in a
-   control row is the ambient motion 3.7 rule 2 forbids, but a static
-   halo still says this one is different. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="legendary"],
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] {
-    box-shadow: 0 0 0 1px rgba(var(--tier-color), 0.25),
-                0 0 14px rgba(var(--tier-color), 0.3);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-tier="perfect"] {
-    background: linear-gradient(100deg,
-        rgba(244, 114, 182, 0.18), rgba(96, 165, 250, 0.18), rgba(192, 132, 252, 0.18));
-}
-
-/* Unrated: an invitation, with no tier colour and no false emphasis. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .st-tier-chip[data-rated="0"] .st-tier-name {
-    color: rgba(var(--fg-rgb), 0.42);
-}
-
-
-/* ---- The rating drawer, welded to the advanced-rating panel ---------
-   The plugin ships its own inline drawer and it is the toolbar's NEXT
-   SIBLING at the same width in the same column, so the old design was
-   two disclosures for one subject sitting on top of each other. The chip
-   now drives both (refract.js) and these rules make them one object.
-
-   One 16px shell with a hairline seam, and nothing inside it is rounded
-   at all -- which is also why there is no concentric-radius problem to
-   solve (3.4). The pill only survives while the strip is closed: a
-   stadium welded to a rectangle is neither. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open {
-    /* The row wraps only while the drawer is open; closed it is a strict
-       single line. Without this the break below has nothing to break and
-       the summary band rides off the end of the row. */
-    flex-wrap: wrap !important;
-    border-radius: var(--radius) var(--radius) 0 0 !important;
-    border-bottom: 0 !important;
-    padding-bottom: 0 !important;
-}
-/* No plugin, or its panel closed: the strip is the whole drawer, so it
-   keeps all four corners. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open:not(:has(+ .adv-rating-inline-panel.open)) {
-    border-radius: var(--radius) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-
-/* The summary band. Overall was a row that looked like a criterion and
-   was not one, with a header bar between it and the list: four kinds of
-   band stacked. It is one band now -- tinted with the scene's own tier
-   colour, the score at display size -- and the criteria follow it
-   directly as a plain list. Two kinds of thing, not four. */
-/* The break that puts the summary band on its own line. Without it the
-   band is just another flex item and rides off the end of the row --
-   which is exactly what happened when the older two-drawer rules were
-   removed and this went with them. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open::after {
-    content: "" !important;
-    flex: 0 0 100%;
-    height: 0;
-    order: 19;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .rating-stars {
-    display: flex !important;
-    flex: 0 0 auto !important;
-    order: 20 !important;
-    width: calc(100% + 18px) !important;
-    align-items: center !important;
-    gap: 9px !important;
-    margin: 7px -9px 0 -9px !important;
-    padding: 8px 12px !important;
-    background: rgba(var(--st-tier-rgb, 255, 255, 255), 0.05) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .rating-stars::before {
-    content: "Overall";
-    flex: 0 0 auto;
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: var(--track-eyebrow);
-    color: rgba(var(--fg-rgb), 0.42);
-    line-height: 1.35;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open .star-rating-number {
-    /* The number is absolutely positioned into a reserved slot, so it
-       does not inherit the band's padding -- it measured flush against
-       the band's right edge. 12px matches the band's own inset and the
-       criterion rows below it. */
-    right: 12px !important;
-    font-size: var(--fs-md) !important;
-    font-weight: 700 !important;
-    color: var(--text) !important;
-}
-/* The trigger leaves the action row. The chip opens the drawer the
-   trigger used to open, so two controls for one drawer is the
-   duplication this whole pass is about. It stays in the DOM, hidden,
-   because the chip drives it.
-
-   This rule is the ONLY one left for the control. Hiding it stranded
-   two blocks that dressed it as a visible pill -- a 22px stadium up at
-   the top of the file and a 26px glass circle with a masked sliders
-   glyph, a hover, a badge and two pseudo-elements further down -- and
-   the second of those was setting display: inline-flex at the same
-   specificity from LATER in the file, so the control stayed on screen
-   and clicking it opened the panel while the strip above stayed shut.
-   The weld came apart at the one place a stray click could reach it.
-
-   The fix is deletion, not a fourth rule: three blocks with the same
-   selector is what made the display fight invisible in the first
-   place, and the loser is never the one you are reading (7). */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-rating-btn {
-    display: none !important;
-}
-
-/* ── The strip's icon set ─────────────────────────────────────────────
-   One family, one grid, one weight. The row used to mix five idioms at
-   four optical sizes: solid stars, a solid heart, a solid archive box, a
-   hairline eye, three blob droplets, three hairline dots and four tiny
-   squares. Individually each is Stash's or a plugin's own; together they
-   read as a row nobody drew. 6.12 asks for one family and matching
-   weights, and this is the only way to get it on controls the theme does
-   not own -- the mask treatment from 6.20, the same one the stars use.
-
-   Every glyph is a 24x24 box with a 1.7 stroke, round caps and joins,
-   masked into a fixed 14x14 square. Fixed, not em-sized: a mask box of
-   the same size for every icon is what makes them share an optical
-   centre, which is the thing the row never had. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
-    --ic-eye: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M2 12s3.8-6 10-6 10 6 10 6-3.8 6-10 6-10-6-10-6Z'/><circle cx='12' cy='12' r='2.6'/></svg>");
-    --ic-drop: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 2.9c0 0 5.7 5.9 5.7 9.7a5.7 5.7 0 0 1-11.4 0C6.3 8.8 12 2.9 12 2.9Z'/></svg>");
-    --ic-heart: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20.2 4.6 12.8a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9a4.6 4.6 0 0 1 6.5 6.5Z'/></svg>");
-    --ic-box: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3.2 8.6h17.6v10.2a1.6 1.6 0 0 1-1.6 1.6H4.8a1.6 1.6 0 0 1-1.6-1.6Z'/><path d='M2.4 4.8h19.2v3.8H2.4Z'/><path d='M10 12.6h4'/></svg>");
-    --ic-kebab: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='5.2' r='1.55' fill='%23000' stroke='none'/><circle cx='12' cy='12' r='1.55' fill='%23000' stroke='none'/><circle cx='12' cy='18.8' r='1.55' fill='%23000' stroke='none'/></svg>");
-    --ic-grid: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23000'><rect x='3.4' y='3.4' width='6.4' height='6.4' rx='1.1'/><rect x='14.2' y='3.4' width='6.4' height='6.4' rx='1.1'/><rect x='3.4' y='14.2' width='6.4' height='6.4' rx='1.1'/><rect x='14.2' y='14.2' width='6.4' height='6.4' rx='1.1'/></svg>");
-    --ic-sliders: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7.5h6M14 7.5h6M4 16.5h10M18 16.5h2'/><circle cx='12' cy='7.5' r='2.2'/><circle cx='16' cy='16.5' r='2.2'/></svg>");
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn) > svg,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn) > span > svg {
-    display: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.count-icon, .adv-favourite-btn, .organized-button, .dropdown-toggle, .mv-scene-page-btn)::before {
-    content: "";
-    display: block;
-    width: 14px;
-    height: 14px;
-    flex: 0 0 14px;
-    background-color: currentColor;
-    -webkit-mask: var(--ic) center / contain no-repeat;
-            mask: var(--ic) center / contain no-repeat;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="Play Count"]) .count-icon { --ic: var(--ic-eye); }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button:has([title="O Count"]) .count-icon    { --ic: var(--ic-drop); }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn                                  { --ic: var(--ic-heart); }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button                                   { --ic: var(--ic-box); }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .dropdown-toggle                                    { --ic: var(--ic-kebab); }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn                                  { --ic: var(--ic-grid); }
-
-
-/* --st-star-svg is defined in 01_tokens.css now: the advanced-rating
-   trigger and Stash's own rating stars draw the same shape as the
-   performer rating badge, so a scene page shows one star, not three. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) > span {
-    /* The flex was on the CHILDREN, not the container: the unclassed
-       wrapper span holding frame-rate + resolution stayed display:block
-       with gap:normal, so those two pills sat at 0px while the date sat
-       at the row's declared 5px. Measured 5px / 0px before, 5px / 5px
-       after. One gap value, one container.
-
-       Zero now, not 5. As a text run the separators carry their own
-       margins, so a flex gap here was ADDED to them: measured, the dot
-       after the date had 7px each side and the dot inside this wrapper
-       had 12px, which is why the subtitle read as unevenly spaced. */
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 0 !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) :is(.date, .frame-rate, .resolution) {
-    padding: 0 !important;
-    border-radius: 0 !important;
-    background: none !important;
-    border: 0 !important;
-    color: inherit !important;
-    font-size: inherit !important;
-    font-weight: inherit !important;
-    font-variant-numeric: tabular-nums !important;
-}
-/* The separator between the date and the pair that follows it. The
-   divider Stash renders sits INSIDE that pair, so it only ever
-   separates two of the three; this supplies the missing one, and only
-   when there is a date to separate from. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .date:not(:empty)::after {
-    content: "\00b7";
-    margin: 0 7px;
-    color: rgba(var(--fg-rgb), 0.42);
-}
-/* Stash renders the spec spans whether or not it has a value for them,
-   so a scene with no date got an empty .date -- which the pill styling
-   above turned into a visible 20x8 grey stub sitting where the studio
-   eyebrow should be. Scenes without a date are common, so this showed
-   up constantly. Drawing a pill is conditional on having something to
-   put in it. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) :is(.date, .frame-rate, .resolution):empty {
-    display: none !important;
-}
-/* Stash's own " | " between frame rate and resolution, which the pill
-   layout had to hide. A middle dot at a quarter alpha reads as a
-   separator rather than a rule. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .divider {
-    display: inline !important;
-    font-size: 0 !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-subheader, .image-subheader) .divider::after {
-    content: "\00b7";
-    margin: 0 7px;
-    font-size: var(--fs-sm);
-    color: rgba(var(--fg-rgb), 0.42);
-}
-
-/* ── State: one anchor row, one chip row ──────────────────────────── */
-/* The ::after is a zero-height 100%-basis flex item: a line break, so
-   both rows live in one flex container with no injected nodes. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    row-gap: 0 !important;
-    column-gap: 6px !important;
-    /* The strip itself: one pill holding the whole control row. --fill-2
-       and a hairline, the recipe the operations button already used, so
-       the container reads as one surface rather than a fourth kind of
-       chip. */
-    /* The panel had THREE left edges: every text block at 18.5px, the
-       first tab's ink at 24.5 and the strip's content at 28.5, because a
-       padded container indents what is inside it. Two bands stacked on a
-       text column, each starting somewhere different, is what read as
-       misaligned.
-
-       So the bands bleed and the CONTENT aligns: 5px of padding plus a
-       1px border is a 6px inset, and a -6px margin cancels it exactly.
-       The strip's box sits 6px outside the text column on both sides and
-       everything inside it starts at 18.5 with the title, the subtitle
-       and the description. The tab strip below takes the same treatment
-       for the same reason. */
-    /* Width auto, or the bleed only moves the bar. Something upstream
-       sets width: 100% on the toolbar, so the negative margins shifted
-       it 6px left without widening it: measured, the toolbar came out
-       338px against the tab strip's 350px, sharing a left edge and
-       missing the right one by 12px. Two stacked bars of different
-       lengths, which is what that looked like.
-
-       9px, not 5. The bar is 34.5px tall around 14px of content, so the
-       vertical inset is 10.25px; at 5px horizontal the row read as
-       cramped against its own ends. Matching the two is why the stars no
-       longer sit tight to the left edge. The bleed pays for the padding
-       exactly, so the content still starts at 18.5 and the tabs still
-       get 338px to lay out in. */
-    width: auto !important;
-    margin: 0.85rem -10px 0 -10px !important;
-    padding: 5px 9px !important;
-    border-radius: var(--radius-pill) !important;
-    background: var(--fill-2) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    overflow: visible !important;
-    position: relative !important;
-}
-/* Below 1200px the panel stops being a 338px column and becomes the
-   full page width, and the tab strip went with it: the nav items are
-   flex: 1 1 auto, which is exactly what makes six tabs read as a
-   segmented control at the design width and exactly what breaks them
-   at 1060px, where each tab measured 166 to 181px around 46px of ink.
-   The label became 28 percent of its own tab and the control read as
-   six empty slabs.
-
-   Capped, the strip keeps the proportions it has at the narrow width
-   (tabs of 72 to 101px, measured at a 600px viewport) and sits at the
-   left of the wider column instead of being stretched across it. The
-   cap is above any width the strip reaches as a column, so the design
-   width is untouched. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs {
-    max-width: 620px !important;
-}
-
-/* Direction B: the toolbar is ONE strip, and it is the only object left
-   above the tab bar.
-
-   It used to be two lines of chips split by what a control is. That
-   split was right about the taxonomy and wrong about the remedy: it
-   still drew nine bordered objects, and it still made a play count look
-   like a button. Everything that merely reports has left the row (the
-   file facts to the subtitle above, the counts to plain text inside the
-   strip), so what is left is the rating, its two numbers, and the four
-   things that act on the scene.
-
-   The line break that used to force two rows is gone with them. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar)::after {
-    content: none !important;
-}
-/* Groups AND their span wrappers dissolve, so the real controls are the
-   flex items and `order` can address them directly. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar-group, .image-toolbar-group),
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) > span > span {
-    display: contents !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) span:empty {
-    display: none !important;
-}
-
-/* Every control below is given an explicit `order`, which means anything
-   NOT listed keeps the initial `order: 0` and sorts ahead of all of them --
-   so a third-party plugin button landed at the head of the row, in front of
-   the rating stars. This catch-all puts unrecognised controls after the
-   known ones instead. Deliberately not `!important`, so all the specific
-   rules below continue to win. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(button, a, div.dropdown, div.btn-group) {
-    order: 10;
-}
-
-/* Anchor: Stash's own five stars, back at readable size. This is what
-   the v2 row lost -- something that says the row is about this scene. */
-/* The rating number is display:none on an unrated scene and appears on
-   hover to preview the value you are about to set -- INSIDE the star
-   container and ahead of the stars. Measured: every star jumped 24.47px
-   right the moment the pointer entered the row and back when it left,
-   which is the movement that made the control feel unsteady. Reserving
-   the width costs nothing and stops the row moving at all. Tabular
-   figures keep "10", "4.4" and "3" the same width as each other, so the
-   preview cannot shove even on a scene that is already rated. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .star-rating-number {
-    /* Out of the flow, into a slot the stars reserve for it. Setting a
-       min-width was not enough: something upstream keeps display: none
-       on the empty number, so the reserved width never applied and the
-       stars still moved. Absolute positioning does not care who hides
-       it -- the padding on .rating-stars holds the slot open whether the
-       number is drawn or not, so the row is identical at rest, on hover
-       and rated or unrated. */
-    position: absolute !important;
-    /* After the stars, not before them. Reserving the slot on the LEFT
-       left a 30px hole at the start of the row on any unrated scene,
-       which read as a mis-set edge. On the right the same reserved slot
-       is empty space between the stars and the advanced-rating trigger,
-       where it reads as the gap between two groups instead. */
-    right: 0 !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    margin: 0 !important;
-    width: 26px !important;
-    text-align: right !important;
-    font-variant-numeric: tabular-nums !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars {
-    order: 1 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 2px !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    background: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    transform: none !important;
-    /* Last, and stated once. This block previously declared position
-       twice (relative, then static) and padding twice (a left inset,
-       then a blanket 0) -- later-wins inside one rule, so the number's
-       slot never existed and "4.4" sat on top of the first star.
-       relative makes this the number's containing block; the left
-       padding is the slot it lives in. */
-    position: relative !important;
-    padding: 0 30px 0 0 !important;
-}
-/* 14px, not 17. Inside the strip the five stars and their gaps are the
-   single widest thing in the row, and at 17px the row measured 356.5px
-   against 338. 17px was the right size when the rating had a line to
-   itself; sharing one with six other controls, it is not. */
-/* These sit AFTER the .rating-stars block above on purpose: that block
-   sets display: inline-flex at the same specificity, so a hide rule
-   written earlier in the file loses on source order and the drawer
-   never closes. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars { display: none !important; }
-
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars button {
-    width: 14px !important;
-    height: 14px !important;
-    min-width: 14px !important;
-}
-/* The stars hung 2px below every other glyph in the strip. Scanned in
-   rendered ink: the star button's box centres correctly on the strip,
-   but the SVG inside it carries vertical-align: -1.75px -- Font Awesome
-   ships -0.125em, which at this size is 1.75px, and it is baked into
-   the icon rather than the theme. Every other glyph in the row is
-   vertical-align: middle and lands within a pixel of centre; the stars
-   alone were +2.00 against a -1.00 to 0.00 cluster.
-
-   Centring the button as a flex box and giving the SVG the same middle
-   alignment as its neighbours fixes it at the source rather than by
-   nudging the row. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars button {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .rating-stars button svg {
-    width: 14px !important;
-    height: 14px !important;
-    display: block !important;
-    vertical-align: middle !important;
-}
-
-/* Actions: right of the anchor, behind a hairline, read as a different
-   kind of object than the chips. The auto margin sits on the wrapper
-   that still has a box, so a missing plugin leaves no gap. */
-/* The auto margin moves to the first ACTION (the favourite glyph), so
-   the whole right-hand group travels together and the operations menu
-   stops carrying a divider of its own: inside one strip the gap is
-   enough. */
-/* The overflow menu goes last. It is the only control in the row whose
-   contents are unknown until you open it, so it belongs at the end,
-   after everything that says what it does. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) div.dropdown {
-    order: 10 !important;
-    display: block !important;
-    margin-left: 0 !important;
-    padding-left: 0 !important;
-    box-shadow: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .mv-scene-page-btn {
-    order: 9 !important;
-}
-/* Inside the strip the container is the strip. A glass circle around
-   each control made three of the five actions read as objects and the
-   other two as glyphs, on one row, for no reason a viewer could infer.
-   They are bare now, and hover is what draws a shape.
-
-   `.adv-rating-btn` used to be a fourth branch in these two lists and is
-   deliberately gone. `:is()` takes the HIGHEST specificity among its
-   arguments, so `#operation-menu` gave the whole list ID weight and every
-   declaration here - background, border and box-shadow, all of them
-   properties the chip recipe owns - reached the pill at (1,x,x) and
-   outranked the recipe. That is the same mechanism that let this file
-   win the pill's padding until 9923b08.
-   It was invisible rather than harmless: the pill is display:none in this
-   strip under the rule above, so nothing painted. A dead branch holding
-   an ID-weight override on a live element elsewhere is exactly the shape
-   worth deleting rather than explaining.
-
-   The ID weight that remains IS intentional, for the three controls that
-   are left: they are Stash's own buttons carrying Bootstrap's styling,
-   and none of them is a recipe chip, so there is nothing for the ID to
-   outrank that should have won. Removing `.adv-rating-btn` does not lower
-   the list's specificity - `#operation-menu` still sets it - so the other
-   three are untouched. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(#operation-menu, .mv-scene-page-btn, .dropdown-toggle) {
-    background: none !important;
-    background-color: transparent !important;
-    border: 1px solid transparent !important;
-    box-shadow: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(#operation-menu, .mv-scene-page-btn, .dropdown-toggle):hover {
-    background: var(--fill-3) !important;
-    border-color: transparent !important;
-    color: var(--accent-light) !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(#operation-menu, .mv-scene-page-btn) {
-    width: 22px !important;
-    min-width: 22px !important;
-    height: 22px !important;
-    padding: 0 !important;
-    border-radius: var(--radius-pill) !important;
-}
-
-/* Counters -> word chips. Still Stash's buttons, still incrementing; the
-   word is a pseudo-element so React never sees it. Told apart by the
-   inner button's title, because both carry the same class. */
-/* The counts leave the strip.
-
-   They were the only text in a row of glyphs and the only readouts among
-   controls, so they broke its rhythm twice over. Two ways out: give them
-   a different display, or take them off the strip. The first does not
-   fit -- as an eyebrow label with a value after it, the pair measured
-   63.9px and 40.3px against a strip that had 41px less room than that,
-   and buying the space meant shrinking the stars and every action glyph
-   past the sizes they were measured into.
-
-   So they go, and 6.6's rule is what makes that safe rather than
-   lossy: nothing Stash could do before may become impossible. The
-   History tab carries both counts in its section headings (Play History
-   5, O History 2), every play and every O with its timestamp, an "Add
-   play" and an "Add O" control, and an operations menu on each. Every
-   capability the two chips carried is there, with the numbers in
-   context instead of stranded in a control row.
-
-   Hidden, not removed: the buttons stay in the DOM with their handlers
-   (P4), so nothing about Stash's own state changes. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button {
-    display: none !important;
-}
-
-/* Toggles become the minimal icon button 6.5 already defines -- "the
-   glyph is the button", and the favourite heart is the example it names.
-   As word chips they were the two widest objects in the panel at 105px
-   and 110px, they were the only dashed things on the surface (a border
-   that conventionally reads as disabled or as a drop target), and their
-   labels measured 3.83:1 while carrying the state on their own.
-
-   Off is a dim outline glyph, on is the accent, which is how the rest of
-   the theme signals state. The words survive in the title attribute. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn) {
-    width: 22px !important;
-    min-width: 22px !important;
-    height: 22px !important;
-    padding: 0 !important;
-    gap: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: var(--radius-pill) !important;
-    background: none !important;
-    border: 1px solid transparent !important;
-    color: rgba(var(--fg-rgb), 0.42) !important;
-    box-shadow: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn):hover {
-    color: var(--accent-light) !important;
-    background: var(--fill-3) !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn {
-    order: 6 !important;
-    margin-left: auto !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button {
-    order: 7 !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn) svg {
-    width: 13px !important;
-    height: 13px !important;
-}
-/* No labels: the glyph is the button (6.5). */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) :is(.organized-button, .adv-favourite-btn)::after {
-    content: none !important;
-}
-/* On is the accent glyph itself, not a filled chip: at 22px a tinted
-   fill with a rim is a third object in the strip, and the colour alone
-   is how the rest of the theme says a state is set. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button.organized,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn[aria-pressed="true"] {
-    background: none !important;
-    border: 1px solid transparent !important;
-    color: var(--accent-bright) !important;
-    font-weight: 600 !important;
-}
-
-/* Tags: the scored ones split off, the rest ranked and folded.
-
-   The list stops being a flex bag of identical chips. It is now a block
-   with three children: a caption that rides on the heading's own line, a
-   flex row of the eight leading chips, and a BLOCK container for the
-   remainder. That last one is the point -- the earlier keyword-line
-   attempt failed because inline children inside the flex list fought its
-   flex and centring rules and every tag landed centred on a line of its
-   own. A separate block parent has no such rules, so the run flows.
-
-   Ranking is rarest-first on the library's own scene_count (refract.js,
-   stApplyTagOrder), so the tags that distinguish this scene lead. The
-   count rides beside each lead chip because it is what explains the
-   order; without it an ascending sort reads as an arbitrary one. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list {
-    display: block !important;
-    position: relative;
-    max-height: none !important;
-    min-height: 0 !important;
-    margin: 0.4rem 0 0 0 !important;
-    padding: 0 !important;
-    overflow: visible !important;
-    -webkit-mask-image: none !important;
-            mask-image: none !important;
-}
-
-/* Absolute, so the count sits on the "TAGS" heading's line and costs no
-   vertical space of its own. The heading is React's; we never touch it. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-caption {
-    position: absolute;
-    top: -1.02rem;
-    right: 0;
-    font-size: var(--fs-xs);
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    color: rgba(var(--fg-rgb), 0.42);
-    pointer-events: none;
-}
-
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-lead-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-/* Lead chips read as objects: filled, one step up in size and weight from
-   the v3 outline chip, because eight of them are carrying the whole
-   summary now. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge.badge-secondary {
-    display: inline-flex !important;
-    align-items: baseline !important;
-    gap: 5px !important;
-    font-size: var(--fs-sm) !important;
-    font-weight: 600 !important;
-    background: var(--fill-4) !important;
-    border: 1px solid rgba(255, 255, 255, 0.14) !important;
-    border-radius: var(--radius-pill) !important;
-    color: rgba(var(--fg-rgb), 0.88) !important;
-    white-space: nowrap !important;
-    transition: color var(--dur-fast) ease, border-color var(--dur-fast) ease, background var(--dur-fast) ease !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge a {
-    padding: 4px 0 4px 11px !important;
-    color: inherit !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead .st-tag-n {
-    padding-right: 11px;
-    /* Was 9.5px, which was below the scale's floor for no reason: the
-       count is secondary to an 11.2px chip label, and --fs-xs already
-       reads as secondary next to it without inventing a rung under the
-       ladder. One fewer size on the surface. */
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    color: rgba(var(--fg-rgb), 0.42);
-    font-variant-numeric: tabular-nums;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge:hover,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list .tag-item.st-tag-is-lead.tag-link.badge:hover a {
-    background: var(--accent-tint) !important;
-    border-color: rgba(var(--accent-rgb), 0.4) !important;
-    color: var(--accent-light) !important;
-}
-
-/* The remainder, as running text. Every level has to be forced inline:
-   the badge is inline-block and Stash's .TruncatedText child is a div. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-rest-run {
-    display: none;
-    margin-top: 0.6rem;
-    font-size: var(--fs-sm);
-    line-height: 1.62;
-    color: var(--text-muted);
-    text-wrap: pretty;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-list.st-tags-expanded .st-tag-rest-run {
-    display: block;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-rest-run .tag-item.st-tag-is-rest.tag-link.badge.badge-secondary,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-rest-run .tag-item.st-tag-is-rest.tag-link.badge a,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-rest-run .tag-item.st-tag-is-rest.tag-link.badge a > div {
-    display: inline !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: none !important;
-    font-size: inherit !important;
-    font-weight: 400 !important;
-    line-height: inherit !important;
-    letter-spacing: inherit !important;
-    white-space: normal !important;
-    color: inherit !important;
-    max-width: none !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-rest-run .tag-item.st-tag-is-rest.tag-link.badge:hover,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-rest-run .tag-item.st-tag-is-rest.tag-link.badge:hover a {
-    color: var(--accent-light) !important;
-}
-
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-more {
-    display: block;
-    margin-top: 0.75rem;
-    padding: 0;
-    border: 0;
-    background: none;
-    font-family: inherit;
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    letter-spacing: var(--track-tight);
-    /* --accent is a fill and border token (3.1); as TEXT it made the
-       two quietest affordances in the panel the two loudest things in
-       it, measured at chroma 162 against the active tab's 120. On the
-       light shade they read as an affordance without outranking the
-       one piece of state the panel has to communicate. The hover was
-       backwards too: --accent-bright is LESS chromatic than --accent,
-       so pointing at the link used to calm it down. */
-    color: var(--accent-light);
-    cursor: pointer;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-more:hover {
-    color: var(--accent-bright);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-tag-more[hidden] {
-    display: none;
-}
-
-/* Scored: the Advanced Rating criterion tags, lifted out of the tag run.
-   They are still tag links, so they keep their filter click; everything
-   that made them look like a chip is stripped so they read as a readout. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored-head {
-    margin: 1.25rem 0 0 0;
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    letter-spacing: var(--track-eyebrow);
-    text-transform: uppercase;
-    color: rgba(var(--fg-rgb), 0.42);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 12px;
-    row-gap: 4px;
-    margin-top: 0.4rem;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored .tag-item.st-scored-item.tag-link.badge.badge-secondary {
-    display: inline-flex !important;
-    align-items: baseline !important;
-    gap: 4px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: none !important;
-    font-size: var(--fs-sm) !important;
-    font-weight: 500 !important;
-    color: rgba(var(--fg-rgb), 0.6) !important;
-    white-space: nowrap !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored .tag-item.st-scored-item.tag-link.badge a {
-    padding: 0 !important;
-    color: inherit !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored .st-scored-value {
-    font-weight: 700;
-    color: var(--accent-light);
-    font-variant-numeric: tabular-nums;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored .tag-item.st-scored-item.tag-link.badge:hover,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-scored .tag-item.st-scored-item.tag-link.badge:hover a {
-    color: var(--accent-light) !important;
-}
-
-/* Every tag on the scene was a criterion, so there is no list to label. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6.st-tags-empty {
-    display: none !important;
-}
-
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .col-12 > h6 {
-    font-size: var(--fs-xs) !important;
-    font-weight: 700 !important;
-    /* --track-eyebrow, not --track-wide. 6.13 names 0.08em as the
-       eyebrow rung and the rule that was overridden here had it right;
-       the one that replaced it reached a step further out for no stated
-       reason. The ladder has a rung for this job, so use it. */
-    letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(var(--fg-rgb), 0.42) !important;
-    margin: 1.25rem 0 0 0 !important;
-}
-
-/* ── Tab strip - same six destinations, one step larger ───────────── */
-/* The tab strip, as a segmented control rather than a row of touching
-   pills. Three measured faults: the links sat at a 0px gap so adjacent
-   12px pills abutted with no daylight between them; the link radius
-   equalled the container's with only 2.8px of padding between, so the
-   nested corners fought each other; and the strip's bottom edge landed
-   on exactly the same pixel as the pane below it (both 327.4), giving
-   the content no air at all.
-
-   The radius is concentric now: 12px outside, 3px of padding, 9px
-   inside, so the corners are parallel. Items keep min-width: max-content
-   so six tabs share the row evenly while seven (a play queue adds a
-   Queue tab) scroll instead of squeezing the labels to breaking point. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs {
-    /* Deliberately asymmetric: the strip selects the pane beneath it, so
-       it sits closer to what it controls than to the state row above.
-       Measured 11.9 above and 10.5 below beforehand, which is near enough
-       to equal that the strip read as floating between two things
-       instead of belonging to one. */
-    margin: 1rem -10px 0.6rem -10px !important;
-    /* 9px, matching the strip above: the container's inset plus its
-       border has to equal the bleed so the first tab's ink lands on the
-       text column's 18.5px like everything else. The bleed pays for the
-       padding exactly, so the tabs still get 338px whatever the inset
-       is.
-
-       Horizontal only. 9px all round made the strip 48.8px tall against
-       the 40.8px it needs, and the 3px vertical is load-bearing: the
-       links' 9px radius is concentric with the container's 12px across
-       that gap. */
-    /* Horizontal only: the 9px pays for the bleed. The vertical padding,
-       the radius, the fill and the rim are the house anatomy and live in
-       09 now (audit item 2). */
-    padding-left: 9px !important;
-    padding-right: 9px !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    scrollbar-width: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs::-webkit-scrollbar {
-    display: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-item {
-    flex: 1 1 auto !important;
-    min-width: max-content !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link {
-    display: block !important;
-    font-size: var(--fs-sm) !important;
-    font-weight: 600 !important;
-    /* 2px horizontal is a MINIMUM, not the look: the items grow to fill
-       the row, so with six tabs the boxes stretch and the padding never
-       shows -- measured, six tabs are byte-identical at 4px and at 2px.
-       It only bites in the seven-tab play-queue case, and there the
-       comment this replaces was wrong: 4px did not fix that overflow,
-       it reduced it from 38px to 17px and Edit stayed behind a scroll.
-       Simulated across the grid, 11.2px with 2px horizontal is the
-       setting that fits seven tabs at exactly 336px, zero overflow. */
-    /* Asymmetric ON PURPOSE, and it is optical centring, not a fudge.
-       Centring the line box is not the same as centring the text: the
-       line box reserves descender space, and every tab label but History
-       is descender-free, so that reserved space sat empty below the ink
-       and the whole strip read high. Measured off the rendered pixels,
-       Markers' ink had 13px above it and 16px below inside the bar. The
-       vertical padding still sums to 10px, so the strip height is
-       unchanged; the 1px is moved from below the text to above it, which
-       centres the CAP HEIGHT and lets descenders hang as they should. */
-    padding: 6px 2px 4px !important;
-    /* 12px container minus 3px padding: concentric with the outer edge.
-       NOT drift against the entity strips, which take --radius-sm flat at
-       12px: those tabs have no container to be concentric with. Same
-       token, two geometries. Checked 2026-08-30 when the two measured 9
-       and 12 and it looked like an inconsistency. Do not "fix" to 12. */
-    border-radius: 9px !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-}
-/* Stash hangs a count off some tab labels (the file count on File Info,
-   markers on Markers) as a Bootstrap .badge, which Refract had never
-   touched. Left alone it inherits Bootstrap's font-size: 75%, so it
-   rendered at 8.4px -- a size on no scale, arrived at by multiplication
-   -- with a pill background and no separation, so the tab read as one
-   word, "File Info2". It is a counter, not a control (6.5): quiet, on
-   the scale, and spaced off the label it belongs to. Dropping the pill
-   also narrows the widest tab, which is what the seven-tab strip is
-   short of. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .badge {
-    margin-left: 3px !important;
-    padding: 0 !important;
-    background: transparent !important;
-    border: none !important;
-    font-size: var(--fs-xs) !important;
-    font-weight: 600 !important;
-    font-variant-numeric: tabular-nums !important;
-    color: rgba(var(--fg-rgb), 0.42) !important;
-    vertical-align: baseline !important;
-}
-/* ── The activity badge ───────────────────────────────────────────────
-   The play count, on the tab that owns it, in the badge idiom the strip
-   already carries on File Info. refract.js mirrors Stash's own counter
-   into it and never writes back.
-
-   Hover reveals the breakdown as a themed popover rather than the
-   browser's tooltip: the panel has a voice and a native tooltip is not
-   in it. The text comes from --st-activity-tip, which the JS sets, so
-   the markup stays one empty element. */
-/* The counter's BOX, not just its type. The chip recipe gives every
-   read-out chip a 24px height, and this one lives inside a 28.8px tab:
-   at 24 it became the tallest thing in its nav-link, took that tab to
-   36, and because the strip stretches its items, took every other tab
-   and the strip itself from 36.8 to 44. Measured - the History tab at
-   36 with five 28.8 siblings all stretched to match it.
-
-   That is the same failure 10 already documents for the tab count badge,
-   one element over: both are counters that sit inside a tab, both joined
-   the recipe, and only the badge was given back its box. 16.8px is the
-   tab's own text line, which is what the badge took for the same reason.
-
-   It also reopened D2 on this strip while the audit's fix for D4 was
-   being verified, which is worth knowing: the two items can undo each
-   other, and neither lane's own measurement would show it. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-activity {
-    height: 16.8px !important;
-    padding: 0 6px !important;
-    margin-left: 4px;
-    font-size: var(--fs-xs);
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    color: rgba(var(--fg-rgb), 0.42);
-    transition: color var(--dur-fast) ease;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-activity[hidden] {
-    display: none;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active .st-activity {
-    color: rgba(var(--accent-rgb), 0.75);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:hover .st-activity {
-    color: var(--accent-light);
-}
-
-/* The popover. Anchored to the tab, above it, so it never covers the
-   pane it describes; pointer-events off so it cannot eat the click that
-   opens the tab underneath it. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:has(.st-activity:not([hidden])) {
-    position: relative;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:has(.st-activity:not([hidden]))::after {
-    content: var(--st-activity-tip, "");
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translate(-50%, 3px);
-    z-index: var(--z-overlay, 1060);
-    padding: 5px 9px;
-    border-radius: var(--radius-sm);
-    background: rgba(var(--surface-rgb), 0.97);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-md);
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    letter-spacing: var(--track-tight);
-    color: var(--text);
-    white-space: nowrap;
-    text-transform: none;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--dur-fast) ease, transform var(--dur-fast) ease;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:has(.st-activity:not([hidden])):hover::after,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link:has(.st-activity:not([hidden])):focus-visible::after {
-    opacity: 1;
-    transform: translate(-50%, 0);
-}
-
-/* The increment. One short lift and a colour flash, so a play or an O
-   registering somewhere else in the panel is visible without stealing
-   attention. 3.7 rule 3: it is a state change, so reduced-motion keeps
-   the colour and drops the movement. */
-@keyframes st-activity-bump {
-    0%   { transform: translateY(0)     scale(1);    color: var(--accent-bright); }
-    35%  { transform: translateY(-3px)  scale(1.28); color: var(--accent-bright); }
-    100% { transform: translateY(0)     scale(1);    }
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-activity.st-activity-bump {
-    display: inline-block;
-    animation: st-activity-bump var(--dur-settle) var(--ease-spring);
-}
-@media (prefers-reduced-motion: reduce) {
-    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link .st-activity.st-activity-bump {
-        animation: none;
-        color: var(--accent-bright);
-    }
-}
-
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active .badge {
-    color: rgba(var(--accent-rgb), 0.75) !important;
-}
-
-/* Performers: the credit row.
-
-   Collapsed, each card is a 34px circle in an overlapping stack with the
-   names as text beneath, which turns a 419px block into about 60px.
-   Nothing is cloned and nothing is moved: the card box is resized and
-   everything inside it except the image is hidden.
-
-   The selectors carry [data-perf-count] because the count-adaptive rules
-   above lay the row out as a GRID and size the cards from the track
-   (`width: 100% !important` under
-   .scene-performers-row[data-perf-count="2"]). Without the attribute in
-   the selector those rules win and the cards stay 169px wide with a 34px
-   height -- measured exactly that way before this fix. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers {
-    display: flex !important;
-    grid-template-columns: none !important;
-    grid-template-rows: none !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 0 !important;
-    margin: 0.5rem 0 0 0 !important;
-    padding: 0 !important;
-    max-height: none !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    scroll-snap-type: none !important;
-}
-
-/* Carousel scaffolding belongs to the expanded layout only. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card.refract-clone,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card.st-perf-beyond,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) .stash-perf-nav,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) .stash-perf-dots,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) .stash-carousel-bar {
-    display: none !important;
-}
-
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card {
-    flex: 0 0 auto !important;
-    width: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
-    height: 34px !important;
-    min-height: 34px !important;
-    max-height: 34px !important;
-    margin: 0 0 0 -9px !important;
-    padding: 0 !important;
-    border: 1px solid var(--glass-border-bright) !important;
-    border-radius: var(--radius-pill) !important;
-    background: var(--fill-3) !important;
-    box-shadow: none !important;
-    overflow: hidden !important;
-    transform: none !important;
-    animation: none !important;
-    filter: none !important;
-    scroll-snap-align: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card.st-perf-first {
-    margin-left: 0 !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card::before,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card::after {
-    display: none !important;
-    content: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card > * {
-    display: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .performer-card > .thumbnail-section {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    aspect-ratio: auto !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers .thumbnail-section > * {
-    display: none !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers .thumbnail-section > a:first-child {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers .performer-card-image {
-    /* min-width is the load-bearing one and it was the one missing.
-       Stash sizes this image from the uncollapsed grid track, so it
-       carried min-width: 157.5px, which BEATS width: 100% and left a
-       157.5x32 image inside a 32px circle: object-fit: cover then
-       scaled the picture to cover 157px of width, and the card's
-       overflow: hidden clipped all but the leftmost 34px of it. Every
-       collapsed avatar was a sliver from the edge of a hugely zoomed
-       photo, which is why the credit row read as coloured smudges
-       rather than faces.
-
-       Exactly the failure already on record for the card box itself
-       (height applied, width did not, from the same block), one level
-       further in. When collapsing something Stash sized from a track,
-       zero the MINIMUMS on every box down to the replaced element,
-       not just the dimensions. */
-    width: 100% !important;
-    height: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    object-fit: cover !important;
-    /* Biased up rather than centred. A performer image is a photo of a
-       person, and in the ones that are taller than they are wide the
-       head is in the top third; centring puts the torso in the circle
-       and the face off the top. On the near-square images that most of
-       them are this moves the crop by a couple of pixels and costs
-       nothing. */
-    object-position: 50% 30% !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-extra {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    margin-left: -9px;
-    border: 1px solid var(--glass-border-bright);
-    border-radius: var(--radius-pill);
-    background: var(--fill-4);
-    font-size: var(--fs-xs);
-    font-weight: 700;
-    color: rgba(var(--fg-rgb), 0.6);
-    font-variant-numeric: tabular-nums;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-extra[hidden],
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-perf-is-open .st-perf-extra {
-    display: none;
-}
-
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-toggle {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    margin-left: 4px;
-    padding: 0;
-    border: 0;
-    border-radius: var(--radius-pill);
-    background: none;
-    color: rgba(var(--fg-rgb), 0.45);
-    cursor: pointer;
-    transition: color var(--dur-fast) ease, transform var(--dur-move) ease;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-perf-toggle:hover {
-    color: var(--accent-light);
-}
-/* Expanded, the row is the original grid or carousel again, so the
-   chevron cannot ride in the flow -- park it on the corner. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-perf-is-open .scene-performers {
-    position: relative !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-perf-is-open .st-perf-toggle {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 3;
-    transform: rotate(180deg);
-}
-
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row[data-perf-count]:not(.st-perf-is-open) > .scene-performers > .st-perf-names {
-    /* Inline between the stack and the chevron, so the credit reads as
-       one composed line. Measured before: avatar at x=38.5, chevron at
-       x=354.5 behind a 282px auto margin, name stranded on its own line
-       underneath -- three fragments. Two lines maximum, or a ten-name
-       list would push the panel around. */
-    flex: 1 1 auto;
-    min-width: 0;
-    margin: 0 0 0 11px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    font-size: var(--fs-sm);
-    line-height: 1.4;
-    color: rgba(var(--fg-rgb), 0.72);
-    text-wrap: pretty;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .scene-performers-row.st-perf-is-open .st-perf-names {
-    display: none;
-}
-
-/* Description: four lines, then a button.
-
-   Stash renders the scene details as <p class="pre">. Measured at
-   1,838px on scene 135947, which put the tag list at y=2246 inside an
-   890px panel -- the whole redesign below it was off the panel and the
-   description WAS the panel. */
-/* Measure, not width. In the 338px column the description runs about
-   52 characters a line; stacked, the same paragraph ran the full
-   1023px pane at about 157 characters, roughly double any readable
-   line. The clamp in 6.4 bounds the height of user text; this bounds
-   its width, and the two together are what stop a description from
-   deciding what the panel looks like. Below the cap nothing changes,
-   so the design width is untouched.
-
-   64ch, not 64 characters: ch is the advance of "0", which is wider
-   than average lowercase, so this measures out at about 80 real
-   characters a line. Set it by measuring the rendered line, not by
-   reading the number. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc {
-    max-width: 64ch !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden !important;
-    margin-bottom: 0 !important;
-    font-size: var(--fs-md) !important;
-    line-height: 1.5 !important;
-    color: rgba(var(--fg-rgb), 0.62) !important;
-    text-wrap: pretty;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane p.pre.st-desc.st-desc-open {
-    display: block !important;
-    -webkit-line-clamp: none;
-    overflow: visible !important;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more {
-    display: block;
-    /* Was a full-width block: a 338px box around 60.3px of ink, so 278px
-       of empty column silently toggled the description, and its focus
-       ring would have been shaved off by .tab-content's overflow-x.
-       fit-content keeps it left-placed and makes the target the words. */
-    width: fit-content;
-    /* The details column is centre-aligned, which the button inherits and
-       which reads as a stray link floating mid-column. */
-    text-align: left;
-    margin: 0.5rem 0 0 0;
-    padding: 0;
-    border: 0;
-    background: none;
-    font-family: inherit;
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    letter-spacing: var(--track-tight);
-    /* --accent is a fill and border token (3.1); as TEXT it made the
-       two quietest affordances in the panel the two loudest things in
-       it, measured at chroma 162 against the active tab's 120. On the
-       light shade they read as an affordance without outranking the
-       one piece of state the panel has to communicate. The hover was
-       backwards too: --accent-bright is LESS chromatic than --accent,
-       so pointing at the link used to calm it down. */
-    color: var(--accent-light);
-    cursor: pointer;
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more:hover {
-    color: var(--accent-bright);
-}
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .st-desc-more[hidden] {
-    display: none;
-}
-
-/* One vertical rhythm for the state chips.
-
-   Measured with a descender-independent metric (cap-height centre against
-   box centre) the row was 5.1px out of true with itself: "0 plays" sat
-   2.00px high because its line-height (11.5px) was SHORTER than the font
-   box Albert Sans reports at that size (ascent 11 + descent 3 = 14), so
-   the half-leading went negative and dragged the baseline up; while
-   "Not favourite" and "Not organised" sat 3.13px low because their line
-   box was never centred in the chip at all.
-
-   Centring the line box is the whole fix. A centred line box lands the
-   cap-height block within half a pixel of the box centre at these sizes,
-   which is where the tab strip and the tag chips already were -- the
-   residual is the font's own 10/3 asymmetry and it is below the
-   threshold of sight. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-value,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-icon,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .adv-favourite-btn,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .organized-button {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    /* Comfortably above the 14px font box, so the leading stays positive
-       and splits evenly above and below the baseline. */
-    line-height: 1.35 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-/* ...except the counter value, which that block leaves 1.5px high.
-
-   Scanned in rendered pixels against the pill each one sits in, every
-   other chip in the panel lands its ink at +0.50 from the pill centre:
-   both counter icons, the favourite and organised glyphs, the three
-   spec pills, and the active tab label. The counter text alone came
-   back at -1.00, so the number floated 1.5px above the icon beside it
-   and above every other chip in the row. Zero vertical padding plus a
-   centred line box is not the same as centred text: the line box
-   reserves descender space, so the cap band it contains sits about a
-   pixel above the box it is centred in.
-
-   Asymmetric vertical padding shifts a flex-centred line box down by
-   half the difference. The ink wanted 1.5px and Chrome rounds the
-   result to whole pixels at 1x, so 1px and 2px both land it and 3px
-   overshoots: the text and the icon now start on the same pixel row,
-   with the icon a row taller because its glyph is. 2px is the value
-   that still means 1.5px if the rounding differs.
-
-   Set from the ink, not from the box. By getBoundingClientRect the
-   icon and the number were already centred to 0.01px of each other,
-   and they still looked wrong, because the box model was measuring
-   the wrong thing. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button .count-value {
-    padding-top: 2px !important;
-    padding-bottom: 0 !important;
-}

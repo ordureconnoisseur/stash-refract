@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════
-   Lite mode - strips the GPU-heavy bits without the nuclear nuke the
+   Lite mode — strips the GPU-heavy bits without the nuclear nuke the
    original lite mode evolved into. What's killed:
      • backdrop-filter everywhere (the main D3D11 cost driver)
      • hover glow halos on cards, navbar buttons, scene toolbar
@@ -45,7 +45,7 @@ body.stash-liquid-glass.refract-lite .modal-content,
 body.stash-liquid-glass.refract-lite .popover,
 body.stash-liquid-glass.refract-lite #select_page_popover,
 body.stash-liquid-glass.refract-lite .dropdown-menu {
-    background: rgba(var(--surface-rgb), 0.96) !important;
+    background: rgba(18, 18, 22, 0.96) !important;
 }
 
 /* ── 4. Floating glass platforms (navbar, filter toolbar pill,
@@ -77,7 +77,7 @@ body.stash-liquid-glass.refract-lite .performer-card:hover {
 
 /* ── 6. Navbar buttons: kill hover lift + accent halo + glare, but
        paint a cheap accent tint instead. Background-color shift is
-       paint-only - no compositor cost. */
+       paint-only — no compositor cost. */
 body.stash-liquid-glass.refract-lite nav.top-nav a.btn:hover,
 body.stash-liquid-glass.refract-lite nav.top-nav button.btn:hover {
     transform: none !important;
@@ -93,9 +93,9 @@ body.stash-liquid-glass.refract-lite nav.top-nav button.gs-trigger::before {
 
 /* ── 7. ACTIVE-route navbar icons. The base rule that paints the
        accent halo on active icons uses a high-specificity :is()
-       selector chain - equal-class +1 specificity (with .refract-lite
+       selector chain — equal-class +1 specificity (with .refract-lite
        on body) is needed to win the cascade. Keep the accent COLOUR
-       on text/border so the active state is still visible - just
+       on text/border so the active state is still visible — just
        kill the glow + filter. */
 body.stash-liquid-glass.refract-lite nav.top-nav :is(a.nav-link, a.nav-utility):is(.stash-nav-active, .active) > :is(button, .btn),
 body.stash-liquid-glass.refract-lite nav.top-nav :is(a.nav-link, a.nav-utility):is(.stash-nav-active, .active).btn,
@@ -139,7 +139,7 @@ body.stash-liquid-glass.refract-lite :is(.scene-tabs, .image-tabs) :is(.scene-to
        ghost text on the thumbnail. Hover keeps a cheap colour shift
        for feedback (no glow halo). */
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .stash-performer-pill {
-    background: rgba(var(--scrim-rgb), 0.92) !important;
+    background: rgba(20, 20, 24, 0.92) !important;
 }
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .stash-performer-pill:hover {
     background: rgba(30, 30, 34, 0.92) !important;
@@ -154,7 +154,7 @@ body.stash-liquid-glass.refract-lite .stash-performer-popup {
     background: rgb(16, 16, 20) !important;
 }
 
-/* Performer hover tooltip - the "performer card on hover" portal (Suggestion
+/* Performer hover tooltip — the "performer card on hover" portal (Suggestion
    Box opt-in, body.refract-performer-card-hover). Its `--card` style overrides
    the opaque base bg with var(--glass-bg-strong) + backdrop blur; lite strips
    the blur, leaving only the low-alpha glass = see-through. Pin both the text
@@ -166,7 +166,7 @@ body.stash-liquid-glass.refract-lite .refract-perf-tip-img {
     background: rgb(16, 16, 20) !important;
 }
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .scene-specs-overlay > span {
-    background: rgba(var(--scrim-rgb), 0.92) !important;
+    background: rgba(20, 20, 24, 0.92) !important;
 }
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .scene-specs-overlay > .overlay-resolution {
     background: rgba(30, 30, 34, 0.92) !important;
@@ -175,7 +175,7 @@ body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .scene-sp
 }
 /* The studio logo is a contained image (or text with a native text-shadow),
    not small overlay text, so it doesn't need the solid legibility plate the
-   spec/resolution chips get - that plate rendered as a sharp dark box around
+   spec/resolution chips get — that plate rendered as a sharp dark box around
    the logo. Keep it transparent, matching regular (non-lite) minimal mode. */
 body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .studio-overlay {
     background: transparent !important;
@@ -191,7 +191,7 @@ body.stash-liquid-glass.refract-lite.refract-minimal-cards .scene-card .studio-o
    integrated GPU. Lite mode keeps the layout and tier COLOURS (carried by
    the ribbon/name gradients, not the glow) but drops the GPU-heavy parts:
    filters off, the ribbon halo flattened to one cheap shadow, the shimmer
-   stopped. Scoped to the FRONT scaffold (.refract-pc-*) only - the card
+   stopped. Scoped to the FRONT scaffold (.refract-pc-*) only — the card
    back's blurred photo backdrop and one-at-a-time dossier stay intact. */
 body.stash-liquid-glass.refract-lite.refract-perf-layout-card :is(.performer-card, .scene-card) .refract-pc-name-text,
 body.stash-liquid-glass.refract-lite.refract-perf-layout-card :is(.performer-card, .scene-card) .refract-pc-name-banner .gender-icon,
@@ -206,7 +206,7 @@ body.stash-liquid-glass.refract-lite.refract-flourish-tiers :is(.performer-card,
 /* The name's neon glow (filter) is stripped above, leaving light text that
    can vanish on bright / white photos. Restore legibility with a SOFT
    text-shadow (lite doesn't strip text-shadow). Diffuse, not a hard
-   outline - a quiet drop + a faint halo, so it reads as depth rather than
+   outline — a quiet drop + a faint halo, so it reads as depth rather than
    a sticker stroke. Lite-only; full mode keeps its glow untouched. */
 /* Applies to every tier now: Legendary + Perfect names are solid white
    too, so there's no background-clip text for the shadow to break. */
@@ -261,7 +261,7 @@ body.stash-liquid-glass.refract-lite.refract-perf-layout-card .performer-card .s
    infinite animations: a 7-layer box-shadow "breathe", a float/scale
    bob, a sheen sweep (::before), and sparkle / rotating-conic-border
    overlays (::after). On a full grid that is dozens of cards repainting
-   every single frame, forever - the biggest ongoing cost on weak
+   every single frame, forever — the biggest ongoing cost on weak
    hardware, and lite mode was leaving all of it running. Freeze them
    (static paints once and caches), reset the float transform so cards
    sit still, and replace the animated 7-layer glow with a cheap 3-layer
@@ -288,7 +288,7 @@ body.stash-liquid-glass.refract-lite.refract-flourish-tiers :is(.performer-card,
         0 4px 14px rgba(0, 0, 0, 0.45) !important;
 }
 /* The sheen sweep (::before) rests off-canvas at opacity 0 when frozen,
-   so it just adds a dead compositing layer - drop it entirely. */
+   so it just adds a dead compositing layer — drop it entirely. */
 body.stash-liquid-glass.refract-lite.refract-flourish-tiers :is(.performer-card, .scene-card)[class*="refract-card-tier-"]::before {
     display: none !important;
 }
@@ -325,27 +325,4 @@ body.stash-liquid-glass.refract-lite .row.justify-content-center > .group-card,
 body.stash-liquid-glass.refract-lite .row.justify-content-center > .movie-card {
     content-visibility: auto;
     contain-intrinsic-size: auto 320px;
-}
-
-
-/* ── 11. Rating drawer: tertiary labels get lite's darker backdrop ──
-   Nothing here needs the blur strip -- section 1 already takes it off
-   the panel, and the chip and summary band never had one. What lite
-   does change is the ground. In dark mode the drawer sits on a
-   translucent glass panel that is several stops off black, so the two
-   tertiary labels written at 0.30 and 0.32 white measured comfortably.
-   Lite pins the surface opaque and the ground drops to #000, where the
-   same alphas are dark grey on black: measured 2.46:1 for the criteria
-   count and 2.67:1 for the breakdown heading, both under the 3:1 floor.
-
-   Lite is a different mode over a different ground, so it gets its own
-   values rather than the dark ones being raised to satisfy it. 0.44
-   clears 4.2:1 against black and is still plainly the quietest text in
-   the panel (5). */
-body.stash-liquid-glass.refract-lite .adv-rating-inline-panel .adv-rating-subhead,
-body.stash-liquid-glass.refract-lite .adv-rating-inline-panel .adv-rating-summary,
-body.stash-liquid-glass.refract-lite .adv-rating-inline-panel .adv-rating-breakdown-heading,
-body.stash-liquid-glass.refract-lite .adv-rating-inline-panel .adv-rating-breakdown-caret,
-body.stash-liquid-glass.refract-lite .adv-rating-inline-panel .adv-rating-breakdown {
-    color: rgba(255, 255, 255, 0.44) !important;
 }

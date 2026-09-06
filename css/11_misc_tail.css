@@ -1,5 +1,5 @@
 /* ── optional-field: strip Stash's grey bubble, keep button left-pinned ── */
-/* Use display:flex (block-level) NOT inline-flex - inline-flex shrinks the   */
+/* Use display:flex (block-level) NOT inline-flex — inline-flex shrinks the   */
 /* element so a parent justify-content:center can shift it to the middle.     */
 body.stash-liquid-glass .search-result .optional-field {
     background: transparent !important;
@@ -11,7 +11,7 @@ body.stash-liquid-glass .search-result .optional-field {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: var(--gap-sm);
+    gap: 0.35rem;
     max-width: 100%;
 }
 body.stash-liquid-glass .search-result .optional-field-content {
@@ -19,7 +19,7 @@ body.stash-liquid-glass .search-result .optional-field-content {
     flex: 1 1 auto;
 }
 
-/* scene-metadata - Stash gives this its own card background; clear it */
+/* scene-metadata — Stash gives this its own card background; clear it */
 body.stash-liquid-glass .scene-metadata {
     background: transparent !important;
     border: none !important;
@@ -27,7 +27,7 @@ body.stash-liquid-glass .scene-metadata {
     padding: 0 !important;
 }
 
-/* scene-details rows inside scene tagger - cancel the global glass card rule
+/* scene-details rows inside scene tagger — cancel the global glass card rule
    (body.stash-liquid-glass .scene-details → glass-bg) and left-align content */
 body.stash-liquid-glass .search-result .scene-details {
     background: transparent !important;
@@ -50,7 +50,7 @@ body.stash-liquid-glass .search-result .scene-details .include-exclude-button {
     left: auto !important;
 }
 
-/* Include / exclude toggle - small inline checkmark, no circle chrome */
+/* Include / exclude toggle — small inline checkmark, no circle chrome */
 body.stash-liquid-glass .include-exclude-button {
     background: transparent !important;
     border: none !important;
@@ -66,7 +66,7 @@ body.stash-liquid-glass .include-exclude-button {
     justify-content: center !important;
     font-size: var(--fs-sm) !important;
     opacity: 0.38;
-    transition: opacity var(--dur-fast), color var(--dur-fast) !important;
+    transition: opacity 0.15s, color 0.15s !important;
 }
 body.stash-liquid-glass .include-exclude-button svg {
     width: 0.7rem !important;
@@ -88,7 +88,7 @@ body.stash-liquid-glass .search-result .scene-link {
     color: #fff !important;
     font-weight: 600;
     text-decoration: none;
-    transition: color var(--dur-fast);
+    transition: color 0.15s;
 }
 body.stash-liquid-glass .search-result .scene-link:hover {
     color: var(--accent-bright) !important;
@@ -117,7 +117,7 @@ body.stash-liquid-glass .scene-metadata .font-weight-bold {
 body.stash-liquid-glass .scene-details {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--gap-sm);
+    gap: 0.35rem;
     margin-bottom: 0.35rem;
     align-items: center;
 }
@@ -125,7 +125,7 @@ body.stash-liquid-glass .scene-details a {
     font-size: var(--fs-xs);
     color: var(--text-muted) !important;
     text-decoration: none;
-    transition: color var(--dur-fast);
+    transition: color 0.15s;
     word-break: break-all;
 }
 body.stash-liquid-glass .scene-details a:hover {
@@ -142,7 +142,7 @@ body.stash-liquid-glass .search-result > div > h5 {
 body.stash-liquid-glass .entity-name {
     display: flex;
     align-items: center;
-    gap: var(--gap-sm);
+    gap: 0.4rem;
     font-size: var(--fs-sm);
     font-family: inherit;
     color: var(--text-muted);
@@ -159,7 +159,7 @@ body.stash-liquid-glass .entity-name a {
     font-family: inherit !important;
     font-size: inherit !important;
     text-decoration: none !important;
-    transition: color var(--dur-fast);
+    transition: color 0.15s;
 }
 body.stash-liquid-glass .entity-name a:hover {
     color: #fff !important;
@@ -174,7 +174,7 @@ body.stash-liquid-glass .search-result .btn-group .btn {
     font-size: var(--fs-sm) !important;
     padding: 0.25rem 0.65rem !important;
     border-radius: 0 !important;
-    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast) !important;
+    transition: background 0.15s, color 0.15s, border-color 0.15s !important;
     box-shadow: none !important;
 }
 body.stash-liquid-glass .search-result .btn-group .btn:first-child {
@@ -184,7 +184,7 @@ body.stash-liquid-glass .search-result .btn-group .btn:last-child {
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
 }
 body.stash-liquid-glass .search-result .btn-group .btn:hover:not(:disabled) {
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: #fff !important;
     border-color: rgba(255, 255, 255, 0.14) !important;
 }
@@ -209,17 +209,17 @@ body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn):not
     padding: 0.3rem 1.25rem !important;
     font-size: var(--fs-sm) !important;
     font-weight: 600 !important;
-    letter-spacing: var(--track-tight) !important;
+    letter-spacing: 0.04em !important;
     margin-top: 0.5rem;
     box-shadow: 0 2px 12px rgba(var(--accent-rgb), 0.22) !important;
-    transition: background var(--dur-fast), box-shadow var(--dur-fast) !important;
+    transition: background 0.15s, box-shadow 0.15s !important;
 }
 body.stash-liquid-glass .search-result .btn.btn-primary:not(.btn-group .btn):not(.tag-item .btn):hover {
     background: var(--accent-bright) !important;
     box-shadow: 0 2px 18px rgba(var(--accent-rgb), 0.4) !important;
 }
 
-/* Create / Link icon buttons inside an unmatched tag pill - small inline glyphs
+/* Create / Link icon buttons inside an unmatched tag pill — small inline glyphs
    that match the surrounding badge instead of the big Save button. */
 body.stash-liquid-glass .search-result .tag-item.badge .btn.btn-primary {
     background: transparent !important;
@@ -231,7 +231,7 @@ body.stash-liquid-glass .search-result .tag-item.badge .btn.btn-primary {
     border-radius: var(--radius-sm) !important;
     line-height: 1 !important;
     font-size: var(--fs-xs) !important;
-    transition: color var(--dur-fast), background var(--dur-fast) !important;
+    transition: color 0.15s, background 0.15s !important;
 }
 body.stash-liquid-glass .search-result .tag-item.badge .btn.btn-primary:hover {
     color: var(--accent-bright) !important;
@@ -290,7 +290,7 @@ body.stash-liquid-glass .search-result .form-group .react-select__control {
     border-radius: var(--radius-sm) !important;
     min-height: 36px !important;
 }
-/* Studio / performer select in entity row - single-value value container */
+/* Studio / performer select in entity row — single-value value container */
 body.stash-liquid-glass .search-result .studio-select .react-select__control,
 body.stash-liquid-glass .search-result .performer-select .react-select__control {
     font-size: var(--fs-sm) !important;
@@ -298,7 +298,7 @@ body.stash-liquid-glass .search-result .performer-select .react-select__control 
     border-radius: 0 !important;
 }
 
-/* Sprite (image preview) button - no useful action in tagger context */
+/* Sprite (image preview) button — no useful action in tagger context */
 body.stash-liquid-glass .sprite-button.btn-link {
     display: none !important;
 }
@@ -312,11 +312,11 @@ body.stash-liquid-glass .search-item-check {
     min-width: 1rem !important;
     border: 1.5px solid var(--glass-border) !important;
     border-radius: 4px !important;
-    background: var(--fill-3) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
     box-shadow: none !important;
     cursor: pointer !important;
     flex-shrink: 0;
-    transition: background var(--dur-fast), border-color var(--dur-fast) !important;
+    transition: background 0.15s, border-color 0.15s !important;
     padding: 0 !important;
     vertical-align: middle;
 }
@@ -330,7 +330,7 @@ body.stash-liquid-glass .search-item-check:checked {
 }
 body.stash-liquid-glass .search-item-check:hover:not(:checked) {
     border-color: rgba(255, 255, 255, 0.3) !important;
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
 }
 body.stash-liquid-glass .search-item-check:focus {
     outline: none !important;
@@ -363,7 +363,7 @@ body.stash-liquid-glass:has(.Lightbox) .grid-card {
     animation: none !important;
 }
 
-/* Outer container - full-viewport dark backdrop. backdrop-filter is
+/* Outer container — full-viewport dark backdrop. backdrop-filter is
    intentionally omitted: Stash's Ctrl+Wheel image zoom applies
    transform:scale() to the lightbox image, and Chromium has a known
    issue where transformed children inside a backdrop-filter ancestor
@@ -386,7 +386,7 @@ body.stash-liquid-glass .Lightbox {
    slot as the footer with a transparent background. Its children
    (page indicator on the left, control buttons on the right) visually
    appear INSIDE the footer's glass slab while the footer keeps the
-   filename/link in the center. No DOM is moved - Stash's React
+   filename/link in the center. No DOM is moved — Stash's React
    lightbox stays intact, so scroll-wheel zoom doesn't blank the page. */
 body.stash-liquid-glass .Lightbox-header {
     position: fixed !important;
@@ -405,15 +405,15 @@ body.stash-liquid-glass .Lightbox-header {
     pointer-events: none !important;
     z-index: 1102 !important;
     /* Match the footer's 3-column grid so the header-right cluster
-       lands at the same right edge as the footer-right cluster - both
+       lands at the same right edge as the footer-right cluster — both
        column sets align identically over the same bar. */
     display: grid !important;
     grid-template-columns: 1fr auto 1fr !important;
     align-items: center !important;
-    gap: var(--gap-lg) !important;
+    gap: 0.85rem !important;
     margin: 0 !important;
     /* Same min-height as the footer so the header occupies the SAME
-       slab area - without this the header is shorter than the footer
+       slab area — without this the header is shorter than the footer
        and its children visually drop to the bottom edge of the bar. */
     min-height: 60px !important;
 }
@@ -423,12 +423,12 @@ body.stash-liquid-glass .Lightbox-header > * {
     align-items: center !important;
     align-self: center !important;
 }
-/* Empty Lightbox-header-left slot (Stash renders a 3-cell layout) -
+/* Empty Lightbox-header-left slot (Stash renders a 3-cell layout) —
    collapse it so the indicator becomes the leftmost visible element. */
 body.stash-liquid-glass .Lightbox-header > .Lightbox-header-left {
     display: none !important;
 }
-/* Hide the native indicator entirely - refract.js mirrors its image
+/* Hide the native indicator entirely — refract.js mirrors its image
    count text into a `.refract-lb-count` element under the filename in
    the footer center. */
 body.stash-liquid-glass .Lightbox-header > .Lightbox-header-indicator {
@@ -437,11 +437,11 @@ body.stash-liquid-glass .Lightbox-header > .Lightbox-header-indicator {
 body.stash-liquid-glass .Lightbox-header > .Lightbox-header-right {
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    gap: var(--gap-xs) !important;
+    gap: 0.3rem !important;
     justify-self: end !important;
     grid-column: 3 !important;
 }
-/* Buttons inside header-right - explicit vertical centering on every
+/* Buttons inside header-right — explicit vertical centering on every
    button regardless of native button defaults / line-height. */
 body.stash-liquid-glass .Lightbox-header-right > .btn,
 body.stash-liquid-glass .Lightbox-header-right > * > .btn {
@@ -464,9 +464,9 @@ body.stash-liquid-glass .Lightbox-header-indicator b {
     color: var(--accent-bright) !important;
 }
 
-/* Header buttons (gear, slideshow, fullscreen, close) - bare icon buttons */
+/* Header buttons (gear, slideshow, fullscreen, close) — bare icon buttons */
 /* Theme ANY button inside the header / navbuttons. Stash uses .btn,
-   .btn-link, .btn-secondary, .minimal in different combos - catch them
+   .btn-link, .btn-secondary, .minimal in different combos — catch them
    all so the gear/play/fullscreen/close icons consistently match. */
 body.stash-liquid-glass .Lightbox-header button,
 body.stash-liquid-glass .Lightbox-header .btn,
@@ -482,11 +482,11 @@ body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
     align-items: center !important;
     justify-content: center !important;
     line-height: 1 !important;
-    transition: background var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-fast) ease;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 body.stash-liquid-glass .Lightbox-header .btn.btn-link:hover,
 body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link:hover {
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: #fff !important;
 }
 body.stash-liquid-glass .Lightbox-header .btn.btn-link svg,
@@ -495,7 +495,7 @@ body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link svg {
     height: 1rem !important;
 }
 
-/* Nav buttons (chevron-left / chevron-right) - floating glass orbs, vertically
+/* Nav buttons (chevron-left / chevron-right) — floating glass orbs, vertically
    centered along the side gutters */
 body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
     position: fixed !important;
@@ -503,10 +503,10 @@ body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
     transform: translateY(-50%) !important;
     width: 3rem !important;
     height: 3rem !important;
-    background: rgba(var(--surface-rgb), 0.78) !important;
+    background: rgba(20, 20, 24, 0.78) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: 50% !important;
-    /* backdrop-filter intentionally omitted - combination of position:fixed
+    /* backdrop-filter intentionally omitted — combination of position:fixed
        + transform + backdrop-filter on a sibling-of-a-zoom-transformed-img
        causes Chromium on Windows to crash/blank the page on Ctrl+Wheel. */
     -webkit-backdrop-filter: none !important;
@@ -514,8 +514,8 @@ body.stash-liquid-glass .Lightbox-navbutton.btn.btn-link {
     box-shadow: var(--shadow-lg) !important;
     color: var(--text) !important;
     opacity: 0.55;
-    z-index: var(--z-lightbox);
-    transition: opacity var(--dur-move), background var(--dur-move), transform var(--dur-move), border-color var(--dur-move);
+    z-index: 1100;
+    transition: opacity 0.18s, background 0.18s, transform 0.18s, border-color 0.18s;
 }
 /* First navbutton in the display = chevron-left, second = chevron-right */
 body.stash-liquid-glass .Lightbox-display .Lightbox-navbutton.btn.btn-link:first-of-type {
@@ -552,12 +552,12 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
-    -webkit-backdrop-filter: var(--glass-blur-xl);
-    backdrop-filter: var(--glass-blur-xl);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
     box-shadow: var(--shadow-xl) !important;
     color: var(--text) !important;
 }
-/* Hide popper's default arrow - we're not anchored to the trigger any more */
+/* Hide popper's default arrow — we're not anchored to the trigger any more */
 body.stash-liquid-glass:has(.Lightbox) .popover.show .arrow,
 body.stash-liquid-glass:has(.Lightbox) .popover.show::before,
 body.stash-liquid-glass:has(.Lightbox) .popover.show::after {
@@ -569,7 +569,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show .popover-header {
     color: var(--accent-bright) !important;
     font-size: var(--fs-sm);
     font-weight: 700;
-    letter-spacing: var(--track-tight);
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     padding: 0.55rem 0.85rem !important;
 }
@@ -601,7 +601,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control {
     box-sizing: border-box !important;
     vertical-align: middle;
 }
-/* Native select dropdown arrow - replace with themed chevron */
+/* Native select dropdown arrow — replace with themed chevron */
 body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control {
     appearance: none !important;
     -webkit-appearance: none !important;
@@ -618,7 +618,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show select.form-control:focus {
     box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.18) !important;
     outline: none !important;
 }
-/* Custom checkbox - round glass dot, matching the table-list select-col
+/* Custom checkbox — round glass dot, matching the table-list select-col
    idiom (05_list_views.css). Default = neutral glass; checked = orange
    fill with embedded SVG check + accent glow. */
 body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-input[type="checkbox"] {
@@ -631,11 +631,11 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-input[type="che
     margin-right: 0.55rem;
     border-radius: 50% !important;
     border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
-    background: var(--fill-3) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
     box-shadow: none !important;
     cursor: pointer;
     vertical-align: middle;
-    transition: border-color var(--dur-fast), background var(--dur-fast), box-shadow var(--dur-fast);
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
     flex-shrink: 0;
 }
 body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-input[type="checkbox"]:checked {
@@ -649,7 +649,7 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show .form-check-label {
     cursor: pointer;
 }
 
-/* Number input - hide chunky native spinner; keep clean text input */
+/* Number input — hide chunky native spinner; keep clean text input */
 body.stash-liquid-glass:has(.Lightbox) .popover.show input[type="number"].form-control {
     -moz-appearance: textfield;
     appearance: textfield;
@@ -663,38 +663,38 @@ body.stash-liquid-glass:has(.Lightbox) .popover.show input[type="number"].form-c
     display: none !important;
 }
 
-/* Display area - transparent so the dark backdrop shows through. The
+/* Display area — transparent so the dark backdrop shows through. The
    parent .Lightbox owns the bottom-padding reservation; flex sizing
    here naturally honours it. */
 body.stash-liquid-glass .Lightbox-display {
     background: transparent !important;
 }
 
-/* Footer - floating glass slab, inset from bottom edge.
+/* Footer — floating glass slab, inset from bottom edge.
    Explicit horizontal flex so left/center/right groups don't stack. */
 body.stash-liquid-glass .Lightbox-footer {
     position: fixed !important;
     bottom: 12px !important;
     left: 12px !important;
     right: 12px !important;
-    background: rgba(var(--surface-rgb), 0.92) !important;
+    background: rgba(18, 18, 22, 0.92) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
-    /* backdrop-filter intentionally omitted - same Chromium/Windows zoom
+    /* backdrop-filter intentionally omitted — same Chromium/Windows zoom
        crash as .Lightbox-navbutton. Solid background compensates. */
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
     box-shadow: var(--shadow-lg) !important;
     padding: 0.4rem 0.85rem !important;
     color: var(--text) !important;
-    z-index: var(--z-lightbox);
+    z-index: 1100;
     /* 3-column grid so footer-center is TRULY centred in the bar
        regardless of left/right cluster widths. (flex space-between only
        balances when both end-clusters happen to be the same width.) */
     display: grid !important;
     grid-template-columns: 1fr auto 1fr !important;
     align-items: center !important;
-    gap: var(--gap-lg) !important;
+    gap: 0.85rem !important;
     /* Lock height so the overlaid header bar (single-row buttons) can
        match it and vertically centre its children within the same
        visual slab. */
@@ -710,7 +710,7 @@ body.stash-liquid-glass .Lightbox-footer-center .image-link {
     font-size: var(--fs-sm);
     text-decoration: none;
     margin-right: 0.6rem;
-    transition: color var(--dur-fast);
+    transition: color 0.15s;
 }
 body.stash-liquid-glass .Lightbox-footer-center .image-link:hover {
     color: var(--accent-bright) !important;
@@ -721,12 +721,12 @@ body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link {
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: var(--gap-xs);
+    gap: 0.3rem;
     padding: 0.2rem 0.6rem;
     border-radius: var(--radius-pill);
     background: var(--accent-tint);
     border: 1px solid var(--accent-glow);
-    transition: background var(--dur-fast), color var(--dur-fast);
+    transition: background 0.15s, color 0.15s;
 }
 body.stash-liquid-glass .Lightbox-footer-center .image-gallery-link:hover {
     background: rgba(var(--accent-rgb), 0.22) !important;
@@ -762,7 +762,7 @@ body.stash-liquid-glass .Lightbox-footer-center {
     display: grid !important;
     grid-template-columns: auto auto !important;
     grid-template-rows: auto auto !important;
-    column-gap: var(--gap-md) !important;
+    column-gap: 0.5rem !important;
     row-gap: 0.05rem !important;
     align-items: center !important;
     justify-items: center !important;
@@ -790,7 +790,7 @@ body.stash-liquid-glass .Lightbox-footer-center > .refract-lb-count {
     grid-row: 2 !important;
     justify-self: center !important;
 }
-/* Mirrored image count from the (hidden) header indicator - small,
+/* Mirrored image count from the (hidden) header indicator — small,
    muted, sits directly under the filename / gallery link. */
 body.stash-liquid-glass .refract-lb-count {
     font-size: var(--fs-xs) !important;
@@ -806,17 +806,17 @@ body.stash-liquid-glass .Lightbox-footer-center > *,
 body.stash-liquid-glass .Lightbox-footer-right > * {
     flex-shrink: 0;
 }
-/* O-counter on the lightbox footer - slim glass pill matching the
+/* O-counter on the lightbox footer — slim glass pill matching the
    adjacent .rating-number sizing. The native Stash markup wraps the
    icon + value in inner Bootstrap btn-group with their own paddings;
    zero those out so total height matches a single-line pill. */
 body.stash-liquid-glass .Lightbox-footer .o-counter {
     display: inline-flex !important;
     align-items: center !important;
-    gap: var(--gap-2xs) !important;
+    gap: 0.2rem !important;
     height: 26px !important;
     padding: 0 0.55rem !important;
-    background: var(--fill-3) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     color: var(--text) !important;
@@ -825,7 +825,7 @@ body.stash-liquid-glass .Lightbox-footer .o-counter {
     font-variant-numeric: tabular-nums !important;
     line-height: 1 !important;
     box-sizing: border-box !important;
-    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 body.stash-liquid-glass .Lightbox-footer .o-counter:hover {
     background: var(--accent-tint) !important;
@@ -854,7 +854,7 @@ body.stash-liquid-glass .Lightbox-footer .Lightbox-header-indicator {
     display: inline-flex !important;
     flex-direction: row !important;
     align-items: baseline !important;
-    gap: var(--gap-sm) !important;
+    gap: 0.4rem !important;
     margin-right: 0.6rem;
     padding-right: 0.6rem;
     border-right: 1px solid var(--glass-border);
@@ -887,10 +887,10 @@ body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link {
     padding: 0.35rem 0.5rem !important;
     border-radius: var(--radius-sm) !important;
     text-decoration: none !important;
-    transition: background var(--dur-fast), color var(--dur-fast);
+    transition: background 0.15s, color 0.15s;
 }
 body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link:hover {
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: #fff !important;
 }
 body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link svg {
@@ -898,7 +898,7 @@ body.stash-liquid-glass .Lightbox-footer-right .btn.btn-link svg {
     height: 0.9rem !important;
 }
 
-/* Refract Theme - accent swatch picker (replaces Stash's native input on
+/* Refract Theme — accent swatch picker (replaces Stash's native input on
    #plugin-refract-accent in Settings → Plugins → Refract Theme).
    Stash's `.setting > div:last-child` cell is sized to its content, so
    we explicitly let the swatch row expand and lock each swatch to its
@@ -925,7 +925,7 @@ body.stash-liquid-glass .refract-accent-swatch {
     border: 2px solid rgba(255, 255, 255, 0.18) !important;
     padding: 0 !important;
     cursor: pointer !important;
-    transition: transform var(--dur-fast) ease, border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease !important;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
 }
 body.stash-liquid-glass .refract-accent-swatch:hover {
@@ -937,7 +937,7 @@ body.stash-liquid-glass .refract-accent-swatch.is-active {
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5), 0 0 14px rgba(var(--accent-rgb), 0.6) !important;
 }
 
-/* Light/dark mode toggle - sun (light on) / moon (light off) icon
+/* Light/dark mode toggle — sun (light on) / moon (light off) icon
    sitting alongside the 8 accent swatches. Distinct visual: glass
    background with icon inside, warm sun-gradient when active so
    users can tell at a glance which mode is on. */
@@ -965,7 +965,7 @@ body.stash-liquid-glass .refract-light-toggle.is-active {
         0 0 14px rgba(251, 191, 36, 0.6) !important;
 }
 
-/* Navbar light-mode toggle - same sun/moon glyph as the accent-row
+/* Navbar light-mode toggle — same sun/moon glyph as the accent-row
    swatch button, sized to match the other utility buttons in the
    navbar cluster. Gated by `body.refract-show-light-nav` so users can
    hide it via the Interface settings (default: shown). */
@@ -985,7 +985,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav {
     font-size: 1rem !important;
     line-height: 1 !important;
     box-shadow: none !important;
-    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast), box-shadow var(--dur-fast) !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s !important;
 }
 body.stash-liquid-glass.refract-show-light-nav nav.top-nav .navbar-buttons > .st-light-toggle-nav {
     display: inline-flex !important;
@@ -1003,7 +1003,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons > .st-light-toggle-nav:hover
 }
 
 /* Right-align Refract's per-setting controls within their .setting
-   rows - matches the accent-swatches alignment so each control sits
+   rows — matches the accent-swatches alignment so each control sits
    next to its heading instead of dropping to a new line. */
 body.stash-liquid-glass .setting#plugin-refract-view-minimiser > .refract-setting-control,
 body.stash-liquid-glass .setting#plugin-refract-custom-logo > .refract-setting-control,
@@ -1018,14 +1018,14 @@ body.stash-liquid-glass .setting#plugin-refract-flourish > .refract-setting-cont
     margin-left: auto !important;
 }
 
-/* Refract segmented control - used by the card-style toggles (scene and
+/* Refract segmented control — used by the card-style toggles (scene and
    performer) and the rating-flourish toggle. Glass-pill buttons; the
    active one fills with accent tint. */
 body.stash-liquid-glass .refract-flourish-toggle,
 body.stash-liquid-glass .refract-card-style-toggle {
     display: inline-flex !important;
     gap: 4px !important;
-    background: var(--fill-2);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-pill);
     padding: 3px;
@@ -1039,44 +1039,39 @@ body.stash-liquid-glass .refract-card-style-toggle {
 body.stash-liquid-glass .refract-segmented-btn {
     white-space: nowrap;
 }
-/* Geometry and behaviour only. The fill, the rim, the type pair, the
-   radius and the active treatment are the tab anatomy in 09, and both
-   of this panel's segmented controls are in its lists now. The pill
-   radius went with them: an item inside a well is concentric with the
-   well, and 09 draws that pair. */
 body.stash-liquid-glass .refract-segmented-btn {
     appearance: none;
-    /* A <button>'s UA background and border are not a design decision,
-       and the anatomy in 09 does not clear them because it was written
-       for <a class="nav-link">, which has neither. Stripping these on
-       the way to the anatomy left both of this panel's segment rows
-       painting the UA button grey, rgb(240,240,240) with a black rim,
-       in both modes. Reset, not restatement: the anatomy still owns the
-       fill, the rim, the type and the active state. */
-    background: none;
-    border: 1px solid transparent;
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    font-size: var(--fs-sm);
+    font-weight: 600;
     padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-pill);
     cursor: pointer;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
 }
 body.stash-liquid-glass .refract-segmented-btn:hover {
     color: var(--text) !important;
 }
-/* The active treatment is the anatomy's: accent ink, accent tint, an
-   --accent-glow rim. The 8px accent halo this used to add is the same
-   thing the phone sheet's outlier was and goes with it. */
+body.stash-liquid-glass .refract-segmented-btn.is-active {
+    background: var(--accent-tint) !important;
+    color: var(--accent-bright) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.25);
+}
 
-/* Custom-logo URL input - glass styling matching Refract's other text
+/* Custom-logo URL input — glass styling matching Refract's other text
    inputs. Wider min-width so URLs are readable. */
 body.stash-liquid-glass .refract-logo-input {
     min-width: 18rem !important;
     max-width: 28rem !important;
-    background: var(--fill-3) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text) !important;
     border-radius: var(--radius-sm) !important;
     padding: 0.4rem 0.75rem !important;
     font-size: var(--fs-base) !important;
-    transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 body.stash-liquid-glass .refract-logo-input:focus {
     outline: none !important;
@@ -1084,7 +1079,7 @@ body.stash-liquid-glass .refract-logo-input:focus {
     box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.18) !important;
 }
 
-/* ── "The Suggestion Box" - collapsible drawer of opt-in extras in the
+/* ── "The Suggestion Box" — collapsible drawer of opt-in extras in the
    Refract plugin-settings panel (native <details>). Styled as a bordered
    card with a clickable summary header + a chevron that rotates on open. */
 body.stash-liquid-glass .refract-suggestion-box {
@@ -1108,7 +1103,7 @@ body.stash-liquid-glass .refract-suggestion-summary {
     gap: 0.15rem;
     /* extra right padding leaves room for the chevron on the right edge */
     padding: 0.85rem 2.2rem 0.85rem 1rem;
-    transition: background var(--dur-fast) ease;
+    transition: background 0.15s ease;
 }
 body.stash-liquid-glass .refract-suggestion-summary::-webkit-details-marker,
 body.stash-liquid-glass .refract-suggestion-summary::marker {
@@ -1116,7 +1111,7 @@ body.stash-liquid-glass .refract-suggestion-summary::marker {
     content: "";
 }
 body.stash-liquid-glass .refract-suggestion-summary:hover {
-    background: var(--fill-1);
+    background: rgba(255, 255, 255, 0.03);
 }
 body.stash-liquid-glass .refract-suggestion-summary h3 {
     margin: 0;
@@ -1124,7 +1119,7 @@ body.stash-liquid-glass .refract-suggestion-summary h3 {
     font-weight: 600;
     color: var(--text);
 }
-/* Disclosure chevron on the RIGHT edge - the same FontAwesome chevron-right
+/* Disclosure chevron on the RIGHT edge — the same FontAwesome chevron-right
    SVG (via mask) used by refract's other collapsible settings, rotating 90°
    and tinting accent when the drawer opens. */
 body.stash-liquid-glass .refract-suggestion-summary::after {
@@ -1145,7 +1140,7 @@ body.stash-liquid-glass .refract-suggestion-summary::after {
     mask-size: contain;
     opacity: 0.35;
     transform: translateY(-50%) rotate(0deg);
-    transition: transform var(--dur-move) ease, opacity var(--dur-fast), background-color var(--dur-fast);
+    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
 }
 body.stash-liquid-glass .refract-suggestion-summary:hover::after {
     opacity: 0.65;
@@ -1158,7 +1153,7 @@ body.stash-liquid-glass .refract-suggestion-box[open] .refract-suggestion-summar
 body.stash-liquid-glass .refract-suggestion-body {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-lg);
+    gap: 0.85rem;
     padding: 0.75rem 1rem 0.85rem;
     border-top: 1px solid var(--glass-border);
 }
@@ -1191,7 +1186,7 @@ body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards {
    shape of the cards it is previewing. Measured at zoom-1: scene 305px,
    performer 253px, i.e. the performer is ~83% of the scene's width. At 190px
    the performer card read as elongated next to a 300px scene card even though
-   its image was a correct 2:3 - it was squeezed horizontally, not stretched. */
+   its image was a correct 2:3 — it was squeezed horizontally, not stretched. */
 /* Sized to a REAL zoom level, not to whatever fits. Measured off the scenes
    page zoom slider: 236 / 285 / 359 / 482px. The preview used to sit at 292,
    effectively level 1 (second smallest), where the card's own furniture reads
@@ -1227,15 +1222,15 @@ body.stash-liquid-glass .refract-preview-shuffle {
     justify-content: center;
     padding: 0;
     border-radius: var(--radius-sm);
-    background: var(--fill-2);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--glass-border);
     color: var(--text-muted);
     cursor: pointer;
-    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast);
+    transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.15s;
 }
 body.stash-liquid-glass .refract-preview-shuffle:hover {
     color: var(--accent-bright);
-    background: var(--fill-4);
+    background: rgba(255, 255, 255, 0.07);
     border-color: rgba(var(--accent-rgb), 0.4);
 }
 body.stash-liquid-glass .refract-preview-shuffle:active {
@@ -1252,7 +1247,7 @@ body.stash-liquid-glass .refract-preview-shuffle svg {
 body.stash-liquid-glass .refract-card-elems {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--gap-sm);
+    gap: 0.4rem;
     justify-content: flex-end;
     max-width: 24rem;
 }
@@ -1270,74 +1265,12 @@ body.stash-liquid-glass .refract-settings-moved-note a:hover {
     text-decoration: underline;
 }
 
-/* The settings panel could not be mounted (refractMountSettingsFallback).
-   This is the one thing the user sees when every host has failed, so it
-   has to read as a considered state rather than as more breakage.
-
-   It draws NO surface of its own. The .card the injector builds is
-   already the panel -- same --glass-bg, same --glass-border, same 12px
-   radius, same --shadow-md -- so giving this its own repeated the lot
-   exactly 1px inside and the section came out with two concentric
-   outlines. The card has no padding of its own (the real panel brings
-   its own), so that is the one thing left to supply here, along with the
-   accent dot that marks this as a message about the theme. */
-body.stash-liquid-glass .refract-settings-unreachable {
-    display: grid;
-    gap: var(--gap-md);
-    padding: 0.95rem 1.1rem 1rem;
-}
-body.stash-liquid-glass .refract-su-head {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-md);
-}
-/* A small accent dot, not an icon: the theme has no warning glyph and
-   inventing one here would be the only one in the panel. */
-body.stash-liquid-glass .refract-su-mark {
-    width: 0.42rem;
-    height: 0.42rem;
-    flex: none;
-    border-radius: var(--radius-pill);
-    background: var(--accent-bright);
-    box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.6);
-}
-body.stash-liquid-glass .refract-su-title {
-    font-size: var(--fs-md);
-    font-weight: 600;
-    line-height: 1.3;
-    color: var(--text);
-}
-body.stash-liquid-glass .refract-su-body {
-    margin: 0;
-    /* Long-form copy, so it gets a measure. Without one it runs the full
-       width of the settings column and becomes hard to track back. */
-    max-width: 58ch;
-    font-size: var(--fs-base);
-    line-height: 1.55;
-    color: var(--text-muted);
-}
-/* !important because 08_misc_mid.css paints every `code` element as a
-   dark editor surface, with !important, which is right for a block of
-   code and wrong for one identifier sitting inside a sentence. Same
-   reason the light counterpart lives in 14_light.css: that rule does not
-   lighten, so this one has to say so itself. */
-body.stash-liquid-glass .refract-su-code {
-    padding: 0.08em 0.4em !important;
-    background: var(--glass-bg-strong) !important;
-    border: 1px solid var(--glass-border) !important;
-    border-radius: 5px !important;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 0.92em;
-    color: var(--accent-bright) !important;
-    white-space: nowrap;
-}
-
 /* ── Card preview (Suggestion Box) ───────────────────────────────────
    Two inert mock cards (REFRACT_PREVIEW_HTML in refract.js) that the
    normal card CSS paints, so every visibility toggle below shows its
    effect live. The .setting row is stacked (not the usual label/control
    split) so the cards get the full width; pointer-events:none keeps
-   links, hovers, and popovers dead - it's a picture, not a card. */
+   links, hovers, and popovers dead — it's a picture, not a card. */
 body.stash-liquid-glass .refract-card-preview-setting,
 body.stash-liquid-glass .refract-dock-config-setting {
     display: block !important;
@@ -1359,12 +1292,12 @@ body.stash-liquid-glass .refract-dock-grid-item {
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-sm);
-    background: var(--fill-2);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--glass-border);
     color: var(--text-muted);
     cursor: pointer;
     padding: 0;
-    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-instant);
+    transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.12s;
 }
 body.stash-liquid-glass .refract-dock-grid-item svg {
     width: 1.25rem;
@@ -1372,7 +1305,7 @@ body.stash-liquid-glass .refract-dock-grid-item svg {
 }
 body.stash-liquid-glass .refract-dock-grid-item:hover {
     color: var(--text);
-    background: var(--fill-4);
+    background: rgba(255, 255, 255, 0.07);
 }
 body.stash-liquid-glass .refract-dock-grid-item:active {
     transform: scale(0.92);
@@ -1411,7 +1344,7 @@ body.stash-liquid-glass .refract-card-preview .refract-preview-card .performer-c
     display: block;
 }
 
-/* Refract plugin-settings toggle - used for the view-mode minimiser
+/* Refract plugin-settings toggle — used for the view-mode minimiser
    feature. Glass track + accent-tinted thumb when enabled. */
 body.stash-liquid-glass .refract-toggle {
     display: inline-block !important;
@@ -1435,7 +1368,7 @@ body.stash-liquid-glass .refract-toggle-track {
     border-radius: 999px !important;
     background: rgba(255, 255, 255, 0.10) !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    transition: background var(--dur-move) ease, border-color var(--dur-move) ease, box-shadow var(--dur-move) ease !important;
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease !important;
 }
 body.stash-liquid-glass .refract-toggle-thumb {
     position: absolute !important;
@@ -1446,7 +1379,7 @@ body.stash-liquid-glass .refract-toggle-thumb {
     border-radius: 50% !important;
     background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(220,224,232,0.78) 100%) !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35) !important;
-    transition: left var(--dur-move) ease, background var(--dur-move) ease, box-shadow var(--dur-move) ease !important;
+    transition: left 0.2s ease, background 0.2s ease, box-shadow 0.2s ease !important;
 }
 body.stash-liquid-glass .refract-toggle.is-on .refract-toggle-track {
     background: rgba(var(--accent-rgb), 0.32) !important;
@@ -1459,7 +1392,7 @@ body.stash-liquid-glass .refract-toggle.is-on .refract-toggle-thumb {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), 0 0 8px rgba(var(--accent-rgb), 0.5) !important;
 }
 
-/* Help modal - markdown content (blockquotes, code blocks). Scoped to
+/* Help modal — markdown content (blockquotes, code blocks). Scoped to
    .modal-dialog.manual so performer bios / scene descriptions aren't
    affected. */
 body.stash-liquid-glass .modal-dialog.manual .markdown blockquote {
@@ -1538,7 +1471,7 @@ body.stash-liquid-glass .modal-dialog.manual .markdown table td {
     vertical-align: top;
 }
 body.stash-liquid-glass .modal-dialog.manual .markdown table thead th {
-    background: var(--fill-3) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
     font-weight: 600 !important;
     color: var(--text) !important;
     border-bottom: 1px solid var(--glass-border-bright) !important;
@@ -1548,7 +1481,7 @@ body.stash-liquid-glass .modal-dialog.manual .markdown table tbody tr:last-child
 }
 body.stash-liquid-glass .modal-dialog.manual .markdown table tbody tr:hover td,
 body.stash-liquid-glass .modal-dialog.manual .markdown table tbody tr:hover {
-    background: var(--fill-2) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
 }
 body.stash-liquid-glass .modal-dialog.manual .markdown table a {
     color: var(--accent-bright) !important;
@@ -1565,15 +1498,28 @@ body.stash-liquid-glass .refract-card-elems-setting {
 }
 body.stash-liquid-glass .refract-seg {
     display: inline-flex;
-    gap: 3px;
-    padding: 3px;
-    border-radius: var(--radius-sm);
-    background: var(--fill-1);
-    border: 1px solid rgba(var(--fg-rgb), 0.08);
+    gap: 0.12rem;
+    padding: 0.15rem;
+    border-radius: var(--radius-pill);
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--glass-border);
 }
 body.stash-liquid-glass .refract-seg .refract-segmented-btn {
     padding: 0.16rem 0.5rem;
+    font-size: var(--fs-xs);
 }
+
+/* Keyboard focus. The segmented buttons are the panel's most-used control
+   and had NO focus style anywhere — tabbing through Card style, Rating
+   flourish, Left/Right, the layering row and the rating-system mirror gave
+   no visible position. Offset inward so the ring sits inside the pill's
+   track rather than colliding with the neighbouring button. */
+body.stash-liquid-glass .refract-segmented-btn:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: -1px;
+    border-radius: var(--radius-pill);
+}
+
 @media (max-width: 800px) {
     }
 
@@ -1588,13 +1534,13 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
 
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CARD PREVIEW - STYLE BOUNDARY
+   CARD PREVIEW — STYLE BOUNDARY
    The preview renders REAL Stash cards inside the settings panel, so the
    panel's own styling reaches them by two separate routes:
 
-     1. INHERITANCE - text-align, colour, font and friends flow down from
+     1. INHERITANCE — text-align, colour, font and friends flow down from
         the panel's control column into the cards.
-     2. SPECIFICITY - 136 panel selectors are scoped with an ID
+     2. SPECIFICITY — 136 panel selectors are scoped with an ID
         (`:is(#settings-container, ...)`), which outranks EVERY card rule
         regardless of !important. 51 of those target buttons.
 
@@ -1637,7 +1583,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
       the overspill; the preview has open space under the card, so it shows
       as a stray bar sitting under the card's own grey progress bar.
       The preview is inert by design (pointer-events none, clicks captured),
-      so a scrub control cannot be used here at all - hide it outright. */
+      so a scrub control cannot be used here at all — hide it outright. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview .hover-scrubber {
     display: none !important;
 }
@@ -1647,7 +1593,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
       specificity. This is the ONE place to add a button when a plugin
       grows a new one on a card; values mirror the rules named beside each. */
 
-/* Stash's native heart is chrome-less - the only one with no box. */
+/* Stash's native heart is chrome-less — the only one with no box. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .favorite-button {
     background: transparent !important;
     background-color: transparent !important;
@@ -1663,7 +1609,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
    (.adv-favourite-btn, light glass) and the CARD overlay
    (.adv-favourite-card-btn, DARK glass + white heart, 13_plugins:994).
    A card carries BOTH classes, so matching on .adv-favourite-btn alone
-   painted the card overlay in the toolbar's light colours - that is the
+   painted the card overlay in the toolbar's light colours — that is the
    odd pale heart that showed up top-right on preview cards. Only the card
    variant can appear in the preview, so only it is restated here. */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .adv-favourite-card-btn {
@@ -1679,7 +1625,7 @@ body.stash-liquid-glass :is(#settings-container, .settings-container, .settings,
     color: #f472b6 !important;
     box-shadow: 0 0 12px rgba(236, 72, 153, 0.3) !important;
 }
-/* multiview's add button - dark glass box (13_plugins: .mv-add-btn) */
+/* multiview's add button — dark glass box (13_plugins: .mv-add-btn) */
 body.stash-liquid-glass :is(#settings-container, .settings-container, .settings, [id^="configuration-tabs-tabpane-"]) .refract-card-preview-real .mv-add-btn {
     background: rgba(0, 0, 0, 0.55) !important;
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
@@ -1709,7 +1655,7 @@ body.stash-liquid-glass .refract-preview-kind-toggle {
     flex: 0 0 auto;
     display: inline-flex !important;
     gap: 4px !important;
-    background: var(--fill-2);
+    background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-pill);
     padding: 3px;
@@ -1725,7 +1671,7 @@ body.stash-liquid-glass .refract-preview-kind-toggle {
    jumps. `display: none` here would take it out of layout again, and forcing
    it back with `display: block` would break the card's own flex column. */
 body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards > * {
-    animation: refractPreviewSettle var(--dur-settle) var(--ease-spring) both;
+    animation: refractPreviewSettle 0.32s cubic-bezier(0.22, 1.2, 0.36, 1) both;
 }
 @keyframes refractPreviewSettle {
     from { opacity: 0; transform: translateY(6px) scale(0.985); }
@@ -1738,7 +1684,7 @@ body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards > * {
 }
 
 /* The cards row is shrink-to-fit, so `justify-content: center` only centred
-   the card within the row's own width - with two cards that filled the
+   the card within the row's own width — with two cards that filled the
    setting and looked centred; with one it left the card hugging the left.
    Give the row the full width so the card centres in the panel. */
 body.stash-liquid-glass .refract-card-preview-real,
@@ -1747,7 +1693,7 @@ body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CARD CUSTOMISER - corner touch
+   CARD CUSTOMISER — corner touch
    The panel is a card and the things that change it, not a stack of settings
    rows. Three bands: a rail, a stage (card plus the four global settings
    riding its right edge), and the presets as pictures.
@@ -1761,7 +1707,7 @@ body.stash-liquid-glass .refract-card-preview-real .refract-preview-cards {
 body.stash-liquid-glass .refract-cc-body {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-xl);
+    gap: 1rem;
     padding: 1.1rem 1.25rem 1.25rem;
 }
 
@@ -1770,49 +1716,38 @@ body.stash-liquid-glass .refract-cc-rail {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--gap-xl);
+    gap: 1rem;
     min-height: 30px;
 }
-/* The kind well is a plate and takes a token, the same as the segment
-   well beside it. It was a literal rgba(0,0,0,0.3) with a hand-written
-   light twin in 14_light, which is the pair E exists to retire: the
-   token flips and the twin cannot be forgotten because it is not there.
-   Its own geometry stays -- it holds kind buttons, which are not in the
-   tab anatomy, so this is E's rule and not C's. */
 body.stash-liquid-glass .refract-cc-kind {
     display: flex;
     gap: 3px;
     padding: 3px;
-    /* 12/9, joining the concentric pair the segment well beside it uses.
-       The old 8/6 was not a considered deviation and was not even
-       concentric - 8 minus 3px of padding is 5, not 6 - so it was a
-       leftover, and it put two identical controls in one panel at two
-       radii. Every structural test for a segmented strip passes here:
-       a well, 3px of padding, a gap, mutually exclusive buttons, one
-       active. */
-    border-radius: var(--radius-sm);
-    background: var(--fill-1);
-    /* The rim is the last 2px between this well and its twin: without it
-       the pair measured 34.8 and 36.8 after the type joined. A literal
-       12px next to a twin wearing the token is the same drift one level
-       down, so both are the token now. */
-    border: 1px solid rgba(var(--fg-rgb), 0.08);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
 }
 body.stash-liquid-glass .refract-cc-kind-btn {
-    /* Joined to the segment anatomy in 09: radius, type, colour, the
-       button reset and the active treatment all come from there. What is
-       left is the geometry the anatomy does not set. */
+    appearance: none;
     padding: 5px 13px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: none;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--text-muted);
     cursor: pointer;
     white-space: nowrap;
-    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast);
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
 body.stash-liquid-glass .refract-cc-kind-btn:hover {
     color: var(--text);
 }
-/* The active state is 09's now, the same accent-tint and accent-glow
-   every other segment wears. Its old 0.2 fill and 0.42 rim were the
-   louder half of the two-controls-two-treatments problem. */
+body.stash-liquid-glass .refract-cc-kind-btn.is-active {
+    background: rgba(var(--accent-rgb), 0.2);
+    border-color: rgba(var(--accent-rgb), 0.42);
+    color: var(--accent-bright);
+    font-weight: 600;
+}
 /* The face segment: nested in the tab strip after "Performer card", split
    from the tabs by a hairline. Front|Back are radios; the glyph turns with
    the card. */
@@ -1828,7 +1763,7 @@ body.stash-liquid-glass .refract-cc-face-icon {
     display: flex;
     margin-right: 3px;
     color: var(--text-muted);
-    transition: transform var(--dur-settle) var(--ease-spring);
+    transition: transform 0.34s cubic-bezier(0.34, 1.3, 0.64, 1);
 }
 body.stash-liquid-glass .refract-cc-face-icon svg {
     width: 13px;
@@ -1850,7 +1785,7 @@ body.stash-liquid-glass .refract-cc-face-btn {
     color: var(--text-muted);
     cursor: pointer;
     white-space: nowrap;
-    transition: color var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast);
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
 body.stash-liquid-glass .refract-cc-face-btn:hover {
     color: var(--text);
@@ -1863,10 +1798,19 @@ body.stash-liquid-glass .refract-cc-face-btn.is-active {
     color: var(--accent-bright);
     font-weight: 600;
 }
+body.stash-liquid-glass .refract-cc-face-btn:focus-visible,
+body.stash-liquid-glass .refract-cc-kind-btn:focus-visible,
+body.stash-liquid-glass .refract-cc-shuffle:focus-visible,
+body.stash-liquid-glass .refract-cc-seg-btn:focus-visible,
+body.stash-liquid-glass .refract-cc-chip:focus-visible,
+body.stash-liquid-glass .refract-cc-preset:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
+}
 body.stash-liquid-glass .refract-cc-rail-right {
     display: flex;
     align-items: center;
-    gap: var(--gap-lg);
+    gap: 0.75rem;
 }
 body.stash-liquid-glass .refract-cc-hint {
     font-size: var(--fs-xs);
@@ -1884,7 +1828,7 @@ body.stash-liquid-glass .refract-cc-shuffle {
     font-weight: 500;
     color: var(--text-dim, var(--text-muted));
     cursor: pointer;
-    transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 /* The Plain toggle: a Shuffle-shaped button that holds its state. */
 body.stash-liquid-glass .refract-cc-plain.is-on {
@@ -2055,6 +1999,14 @@ body.stash-liquid-glass .refract-cc-ring {
     background: rgba(var(--accent-rgb), 0.1);
     pointer-events: none;
 }
+/* Focus on a band. SOLID, where the armed ring is dashed: focusing also arms
+   the band, so a dashed focus outline drew a second dashed accent rectangle
+   concentric with the first and the two read as one muddled intent. */
+body.stash-liquid-glass .refract-cc-hit:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: -2px;
+    border-radius: 9px;
+}
 /* The intro: one pulse per band, staggered from the JS, then gone. The
    preview stays exactly as it was; only the rings breathe. */
 body.stash-liquid-glass .refract-cc-ring.is-intro {
@@ -2090,8 +2042,8 @@ body.stash-liquid-glass .refract-cc-ring-br { bottom: 3px; right: 3px; }/* ─�
    actually sets are transitioned, so the band ring (which positions itself
    with right/bottom) is not asked to interpolate to `auto`. */
 body.stash-liquid-glass .refract-cc-ring.is-tight {
-    transition: left var(--dur-fast) ease, top var(--dur-fast) ease, width var(--dur-fast) ease,
-                height var(--dur-fast) ease, border-radius var(--dur-fast) ease;
+    transition: left 0.16s ease, top 0.16s ease, width 0.16s ease,
+                height 0.16s ease, border-radius 0.16s ease;
 }
 @media (prefers-reduced-motion: reduce) {
     body.stash-liquid-glass .refract-cc-ring.is-tight { transition: none; }
@@ -2100,7 +2052,7 @@ body.stash-liquid-glass .refract-cc-ring:not(.is-intro) {
     box-shadow: 0 0 0 640px rgba(7, 7, 11, 0.45);
     /* The ring element is created on arm, so without this the scrim hit full
        strength in one frame -- a hard flash across the whole card. */
-    animation: refract-cc-arm var(--dur-move) ease-out both;
+    animation: refract-cc-arm 0.18s ease-out both;
 }
 @keyframes refract-cc-arm {
     from { box-shadow: 0 0 0 640px rgba(7, 7, 11, 0); }
@@ -2126,11 +2078,11 @@ body.stash-liquid-glass .refract-cc-chips {
     /* Same recipe as the slot menu it turns into, and the same reason: a card
        is an image, and the brightest part of one will beat a 14 % scrim. */
     background: rgba(10, 10, 15, 0.94);
-    -webkit-backdrop-filter: var(--glass-blur-md-sat);
-            backdrop-filter: var(--glass-blur-md-sat);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
+            backdrop-filter: blur(16px) saturate(1.1);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
     /* The whole arm is one moment: the scrim fades in, the tray with it. */
-    animation: refract-cc-tray-in var(--dur-move) ease-out both;
+    animation: refract-cc-tray-in 0.18s ease-out both;
 }
 /* Chips share each row rather than centring it, so a wrapped tray never ends
    in one orphaned pill floating under a full row above it. */
@@ -2172,7 +2124,7 @@ body.stash-liquid-glass .refract-cc-elem-hit {
     border-radius: 8px;
     background: none;
     cursor: pointer;
-    transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+    transition: border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
 }
 body.stash-liquid-glass .refract-cc-elem-hit:hover {
     border-color: rgba(var(--accent-rgb), 0.75);
@@ -2184,6 +2136,10 @@ body.stash-liquid-glass .refract-cc-elem-hit:hover {
    pretend to be a button. */
 body.stash-liquid-glass .refract-cc-elem-hit.is-plain {
     cursor: default;
+}
+body.stash-liquid-glass .refract-cc-elem-hit:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
 }
 body.stash-liquid-glass .refract-cc-elem-hit.is-open {
     border-color: var(--accent-bright);
@@ -2203,9 +2159,9 @@ body.stash-liquid-glass .refract-cc-slot-menu.is-elem {
    answering a different question from picking "Left". */
 body.stash-liquid-glass .refract-cc-menu-sub {
     grid-column: 1 / -1;
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    letter-spacing: var(--track-eyebrow);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.42);
     padding: 3px 2px 0;
@@ -2233,11 +2189,15 @@ body.stash-liquid-glass .refract-cc-pill-hit {
     border-radius: 999px;
     background: none;
     cursor: pointer;
-    transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+    transition: border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
 }
 body.stash-liquid-glass .refract-cc-pill-hit:hover {
     border-color: rgba(var(--accent-rgb), 0.75);
     background: rgba(var(--accent-rgb), 0.14);
+}
+body.stash-liquid-glass .refract-cc-pill-hit:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
 }
 /* The pill under the open menu. Lit from inside the scrim, so the eye goes
    menu -> pill without a leader line. */
@@ -2303,7 +2263,7 @@ body.stash-liquid-glass .refract-cc-chips:has(.refract-cc-slot-menu) {
     max-width: calc(100% - 16px);
 }
 body.stash-liquid-glass .refract-cc-chips .refract-cc-chip:not(.refract-cc-chip-slot) {
-    background: var(--fill-3);
+    background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.08);
 }
 body.stash-liquid-glass .refract-cc-chips .refract-cc-chip:not(.refract-cc-chip-slot):hover {
@@ -2346,8 +2306,8 @@ body.stash-liquid-glass .refract-cc-slot-menu {
        menu. Glass is for the frame, not for the content. */
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(10, 10, 15, 0.965);
-    -webkit-backdrop-filter: var(--glass-blur-md-sat);
-            backdrop-filter: var(--glass-blur-md-sat);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
+            backdrop-filter: blur(16px) saturate(1.1);
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
 }
 body.stash-liquid-glass .refract-cc-slot-menu .refract-cc-chip {
@@ -2383,7 +2343,7 @@ body.stash-liquid-glass .refract-cc-slot-menu-head {
     text-align: center;
     font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: var(--track-eyebrow);
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--text-muted);
     padding: 2px 0 1px;
@@ -2418,7 +2378,7 @@ body.stash-liquid-glass .refract-cc-chip {
     color: var(--text-muted);
     cursor: pointer;
     white-space: nowrap;
-    transition: border-color var(--dur-fast), color var(--dur-fast), background var(--dur-fast);
+    transition: border-color 0.14s, color 0.14s, background 0.14s;
 }
 body.stash-liquid-glass .refract-cc-chip.is-on {
     border-color: rgba(var(--accent-rgb), 0.5);
@@ -2532,7 +2492,7 @@ body.stash-liquid-glass .refract-cc-strip {
 body.stash-liquid-glass .refract-cc-group {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-md);
+    gap: 0.5rem;
     min-width: 0;
 }
 body.stash-liquid-glass .refract-cc-group-both {
@@ -2544,7 +2504,7 @@ body.stash-liquid-glass .refract-cc-group-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--gap-xl);
+    gap: 1rem;
     min-height: 24px;
 }
 body.stash-liquid-glass .refract-cc-group-tiles {
@@ -2575,6 +2535,7 @@ body.stash-liquid-glass .refract-cc-strip .refract-cc-seg-btn {
     flex: 1 1 auto;
     min-width: 0;
     padding: 5px 5px;
+    font-size: var(--fs-xs);
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2592,49 +2553,54 @@ body.stash-liquid-glass .refract-cc-reset {
     text-transform: none;
     color: var(--text-muted);
     cursor: pointer;
-    transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 body.stash-liquid-glass .refract-cc-reset:hover {
     color: var(--text);
     border-color: rgba(255, 120, 120, 0.55);
     background: rgba(255, 120, 120, 0.08);
 }
-/* The well is the anatomy's. Both of this panel's segmented controls
-   HAD a well -- this one a 0.3 black at 8px, the other a 0.35 black
-   pill -- which is worth recording because the handover said these
-   strips were free-standing and they are not. A strip with a well takes
-   the concentric pair: a --radius-sm well with 3px of padding holding
-   9px items, so the two curves stay parallel. The fill and rim are the
-   anatomy's --fill-1 over rgba(--fg-rgb, 0.08), which also gives this
-   panel a well that flips in light instead of a literal black. */
+body.stash-liquid-glass .refract-cc-reset:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
+}
 body.stash-liquid-glass .refract-cc-seg {
     display: flex;
     gap: 3px;
     padding: 3px;
-    border-radius: var(--radius-sm);
-    background: var(--fill-1);
-    border: 1px solid rgba(var(--fg-rgb), 0.08);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
     width: fit-content;
     margin-top: auto;
 }
 body.stash-liquid-glass .refract-cc-seg-btn {
-    /* appearance, background and border live in 09's button reset now,
-       which carries them for every joined segment with !important. What
-       is left here is the geometry the anatomy does not set. */
+    appearance: none;
     padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: none;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--text-muted);
     cursor: pointer;
     white-space: nowrap;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
 body.stash-liquid-glass .refract-cc-seg-btn:hover {
     color: var(--text);
 }
-
+body.stash-liquid-glass .refract-cc-seg-btn.is-active {
+    background: rgba(var(--accent-rgb), 0.2);
+    border-color: rgba(var(--accent-rgb), 0.42);
+    color: var(--accent-bright);
+    font-weight: 600;
+}
 
 /* ── Looks ────────────────────────────────────────────────────────────── */
 body.stash-liquid-glass .refract-cc-looks {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-md);
+    gap: 0.6rem;
 }
 /* Section heads stay in the panel's own UI type. Concert One was tried here
    and rejected: the display face belongs to the CARD, and a settings panel
@@ -2643,12 +2609,12 @@ body.stash-liquid-glass .refract-cc-looks-head,
 body.stash-liquid-glass .refract-cc-group-head > span {
     font-size: var(--fs-xs);
     font-weight: 600;
-    letter-spacing: var(--track-eyebrow);
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--text-muted);
 }
 /* ═══════════════════════════════════════════════════════════════════════
-   LOOKS - six miniatures, drawn from each look's own flags
+   LOOKS — six miniatures, drawn from each look's own flags
    Three columns rather than four, so each picture is ~215px and its
    silhouette is legible: the whole point is that Mirrored is visibly the
    other hand and Poster is visibly empty. The miniature takes the SHAPE of
@@ -2683,11 +2649,11 @@ body.stash-liquid-glass .refract-cc-preset-art {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--glass-border);
     overflow: hidden;
-    transition: border-color var(--dur-fast), background var(--dur-fast);
+    transition: border-color 0.15s, background 0.15s;
 }
 body.stash-liquid-glass .refract-cc-preset:hover .refract-cc-preset-art {
     border-color: rgba(var(--accent-rgb), 0.55);
-    background: var(--fill-3);
+    background: rgba(255, 255, 255, 0.045);
 }
 
 /* The miniature itself. Landscape by default; the performer state swaps it
@@ -3059,7 +3025,7 @@ body.stash-liquid-glass:not(.refract-perf-layout-card) .refract-cc-cardbox .refr
    rail beside Shuffle, which read as an action or a third card; before that it
    sat on the card, where it ate the hover band underneath. */
 body.stash-liquid-glass .refract-cc-stage.is-back .refract-cc-cardbox .performer-card {
-    animation: refract-cc-turn 0.42s var(--ease-glide);
+    animation: refract-cc-turn 0.42s cubic-bezier(0.33, 1, 0.68, 1);
 }
 @keyframes refract-cc-turn {
     from { transform: perspective(1100px) rotateY(-82deg); }
@@ -3179,7 +3145,7 @@ body.stash-liquid-glass.refract-sc-studio-text .scene-card h5.card-section-title
 body.stash-liquid-glass .refract-sc-studio-name {
     font-weight: 700;
     font-size: 0.84em;
-    letter-spacing: var(--track-label);
+    letter-spacing: 0.055em;
     text-transform: uppercase;
     color: var(--text-muted);
     /* Never let a long studio name push the title out: the name gets at most

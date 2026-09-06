@@ -1,12 +1,12 @@
 /* ───────────────────────────────────────────────────────────────────
-   Scene-detail page - glassmorphism + minimalist player
+   Scene-detail page — glassmorphism + minimalist player
    Center-overlay buttons (back / play-pause / forward) appear on hover,
    bottom bar holds only progress / volume / time / settings / fullscreen.
    ─────────────────────────────────────────────────────────────────── */
 
 /* ── Player shell ────────────────────────────────────────────────── */
 /* Stash wraps the player in <div class="video-wrapper"><video-js>…</video-js></div>.
-   The chrome (border, radius, shadow, margin) lives on .video-wrapper -
+   The chrome (border, radius, shadow, margin) lives on .video-wrapper —
    applying it to <video-js> directly is flaky because it's a Web Component. */
 body.stash-liquid-glass .scene-player-container {
     height: 100% !important;
@@ -14,13 +14,13 @@ body.stash-liquid-glass .scene-player-container {
     min-height: 0 !important;
     width: 100% !important;
     /* Defeat Stash native rule at @media (min-width: 1200px):
-       max-width: calc(100% - 450px - 15px) - which would clamp the
+       max-width: calc(100% - 450px - 15px) — which would clamp the
        container to ~582px inside our wider grid track. */
     max-width: none !important;
     min-width: 0 !important;
     /* Stash native sets padding-right: 15px (and padding-left: 0 at
        ≥1200px), creating an asymmetric 15px right gap inside the
-       container. Zero it out - our row's 20px padding is the only
+       container. Zero it out — our row's 20px padding is the only
        outer spacing we want. */
     padding: 0 !important;
     align-self: stretch !important;
@@ -56,22 +56,17 @@ body.stash-liquid-glass div.video-wrapper {
     overflow: hidden !important;
     box-sizing: border-box !important;
     margin: 0 !important;
-    /* Fill the column - the <video> inside uses object-fit:contain to
+    /* Fill the column — the <video> inside uses object-fit:contain to
        letterbox the actual frame to 16:9. */
     aspect-ratio: auto !important;
     width: 100% !important;
     flex: 1 1 auto !important;
     min-height: 0 !important;
     max-height: 100% !important;
-    /* 3.3: the drop comes from the token so light is free, and the two
-       layers that are this panel's own compose on top. Hand-written, the
-       drop stayed 0.35 black in light - a heavy shadow under a 0.70 white
-       fill, beside a navbar carrying the token's 0.08. The inset takes
-       --fg-rgb for the same reason. */
     box-shadow:
-        var(--shadow-lg),
+        0 8px 32px rgba(0, 0, 0, 0.35),
         0 0 60px -10px rgba(var(--accent-rgb), 0.28),
-        inset 0 0 0 1px rgba(var(--fg-rgb), 0.04) !important;
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
     position: relative !important;
 }
 body.stash-liquid-glass .video-js,
@@ -107,7 +102,7 @@ body.stash-liquid-glass .video-js > video {
 }
 
 /* Hide the native .vjs-big-button-group that VideoJS auto-injects when
-   `vjs-skip-buttons` is enabled - duplicates our custom .st-player-overlay
+   `vjs-skip-buttons` is enabled — duplicates our custom .st-player-overlay
    and its seek buttons hover over the rounded corners getting clipped. */
 body.stash-liquid-glass .video-js .vjs-big-button-group {
     display: none !important;
@@ -131,7 +126,7 @@ body.stash-liquid-glass .video-js .vjs-tech {
        while invisible: opacity alone kept an unseen back-10 button
        hit-testable in the middle of the frame. */
     visibility: hidden !important;
-    transition: opacity var(--dur-move) ease, visibility var(--dur-move) ease !important;
+    transition: opacity 0.2s ease, visibility 0.2s ease !important;
     background: linear-gradient(
         to bottom,
         rgba(0, 0, 0, 0.32) 0%,
@@ -144,8 +139,8 @@ body.stash-liquid-glass .video-js .vjs-tech {
    user-activity for KEYBOARD input too, so gating on `.vjs-user-active`
    alone summoned the overlay for keyboard users (forum-reported as
    intrusive on short clips). `refract-pointer-active` (refract.js) marks
-   "latest activity was pointer, over the player" - set on mousemove/
-   touchstart, cleared on mouseleave/keydown, no timer of its own - and
+   "latest activity was pointer, over the player" — set on mousemove/
+   touchstart, cleared on mouseleave/keydown, no timer of its own — and
    the show gate ANDs it with vjs's own `.vjs-user-active`. That makes
    vjs's inactivity timer the single hide clock, so the overlay and the
    control bar start fading at the same instant (the bar hides via the
@@ -160,7 +155,7 @@ body.stash-liquid-glass .video-js:not(.vjs-has-started) .st-player-overlay {
 }
 /* Inactivity hides ride the same 1s fade as the stock control bar so
    the two leave together. Pointer-driven hides (mouseleave, keydown
-   handing off to the keyboard) keep the base 0.2s-class snap (--dur-move) - there the bar
+   handing off to the keyboard) keep the base 0.2s snap — there the bar
    isn't fading and a slow overlay fade would just linger. */
 body.stash-liquid-glass .video-js.vjs-user-inactive .st-player-overlay {
     transition: opacity 1s, visibility 1s !important;
@@ -179,7 +174,7 @@ body.stash-liquid-glass .video-js.vjs-user-inactive .st-player-overlay {
 body.stash-liquid-glass .video-js:is(.vjs-waiting, .vjs-seeking) .st-player-overlay {
     opacity: 0 !important;
     visibility: hidden !important;
-    transition: opacity var(--dur-instant) ease !important;
+    transition: opacity 0.12s ease !important;
 }
 /* ...and put the spinner above the overlay regardless, so it is never
    occluded even in a state that does not carry those classes. */
@@ -222,7 +217,7 @@ body.refract-hide-center-controls .st-player-overlay {
     box-shadow:
         0 4px 18px rgba(0, 0, 0, 0.45),
         inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-    transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-instant), box-shadow var(--dur-fast) !important;
+    transition: background 0.15s, border-color 0.15s, transform 0.12s, box-shadow 0.15s !important;
 }
 .st-overlay-btn:hover {
     background: var(--accent-tint) !important;
@@ -277,7 +272,7 @@ body.stash-liquid-glass .video-js .vjs-control-bar .vjs-hidden {
 }
 
 /* ── Control bar (slim glass strip) ───────────────────────────────── */
-/* Bottom corners rounded to match the .video-js parent - otherwise the
+/* Bottom corners rounded to match the .video-js parent — otherwise the
    bar's solid background masks the parent's rounded clip and the bottom
    corners read as square. Horizontal padding pushed inward so the
    leftmost/rightmost icons clear the rounded radius. */
@@ -363,7 +358,7 @@ body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-progress-control {
     min-width: 140px !important;
 }
 
-/* Bar buttons - defeat any global button reset */
+/* Bar buttons — defeat any global button reset */
 body.stash-liquid-glass .video-js .vjs-button,
 body.stash-liquid-glass .video-js .vjs-control {
     background: transparent !important;
@@ -378,7 +373,7 @@ body.stash-liquid-glass .video-js .vjs-control {
     margin: 0 !important;
     border-radius: var(--radius-sm) !important;
     cursor: pointer !important;
-    transition: color var(--dur-fast), background var(--dur-fast) !important;
+    transition: color 0.15s, background 0.15s !important;
 }
 body.stash-liquid-glass .video-js button.vjs-button {
     width: 36px !important;
@@ -399,7 +394,7 @@ body.stash-liquid-glass .video-js div.vjs-menu-button {
 body.stash-liquid-glass .video-js .vjs-button:hover,
 body.stash-liquid-glass .video-js .vjs-control > button:hover {
     color: #fff !important;
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Visually hide screen-reader-only text */
@@ -415,7 +410,7 @@ body.stash-liquid-glass .video-js .vjs-control-text {
     border: 0 !important;
 }
 
-/* Icon glyphs - force VideoJS icon font */
+/* Icon glyphs — force VideoJS icon font */
 body.stash-liquid-glass .video-js .vjs-icon-placeholder,
 body.stash-liquid-glass .video-js [class^="vjs-icon-"],
 body.stash-liquid-glass .video-js [class*=" vjs-icon-"] {
@@ -440,7 +435,7 @@ body.stash-liquid-glass .video-js [class*=" vjs-icon-"]:before {
     visibility: visible !important;
 }
 
-/* Time display (remaining-time is intentionally excluded - kept hidden) */
+/* Time display (remaining-time is intentionally excluded — kept hidden) */
 body.stash-liquid-glass .video-js .vjs-current-time,
 body.stash-liquid-glass .video-js .vjs-duration,
 body.stash-liquid-glass .video-js .vjs-time-divider {
@@ -477,7 +472,7 @@ body.stash-liquid-glass .video-js .vjs-progress-holder {
     margin: 0 !important;
     background: rgba(255, 255, 255, 0.12) !important;
     border-radius: 2px !important;
-    transition: height var(--dur-fast) !important;
+    transition: height 0.15s !important;
 }
 body.stash-liquid-glass .video-js .vjs-progress-control:hover .vjs-progress-holder {
     height: 6px !important;
@@ -512,7 +507,7 @@ body.stash-liquid-glass .video-js .vjs-mouse-display .vjs-time-tooltip {
     -webkit-backdrop-filter: var(--glass-blur-sm);
     backdrop-filter: var(--glass-blur-sm);
 }
-/* Hide the play-progress's own tooltip - the mouse-display tooltip is
+/* Hide the play-progress's own tooltip — the mouse-display tooltip is
    what tracks the hover position and is the one users actually want. */
 body.stash-liquid-glass .video-js .vjs-play-progress > .vjs-time-tooltip {
     display: none !important;
@@ -521,7 +516,7 @@ body.stash-liquid-glass .video-js .vjs-play-progress > .vjs-time-tooltip {
 /* Sprite-thumbnail preview on scrubber hover. video.js paints the
    frame as a `background-image` directly on .vjs-vtt-thumbnail-display
    (NOT inside an <img>). So overriding `background` would wipe the
-   sprite - only style the border / outline / shadow here and leave
+   sprite — only style the border / outline / shadow here and leave
    background untouched. */
 body.stash-liquid-glass .video-js .vjs-vtt-thumbnail-display {
     border: 1px solid var(--glass-border) !important;
@@ -630,11 +625,11 @@ body.stash-liquid-glass .video-js .vjs-menu-item {
     padding: 0.35rem 0.65rem !important;
     border-radius: 6px !important;
     text-transform: none !important;
-    transition: color var(--dur-fast), background var(--dur-fast) !important;
+    transition: color 0.15s, background 0.15s !important;
 }
 body.stash-liquid-glass .video-js .vjs-menu-item:hover,
 body.stash-liquid-glass .video-js .vjs-menu-item:focus {
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: #fff !important;
 }
 body.stash-liquid-glass .video-js .vjs-menu-item.vjs-selected {
@@ -643,7 +638,7 @@ body.stash-liquid-glass .video-js .vjs-menu-item.vjs-selected {
 }
 
 /* ── Stash custom scrubber row (sprite thumbnails + skip buttons) ──── */
-/* Floating glass card - detached from the video with margin on all
+/* Floating glass card — detached from the video with margin on all
    sides, fully rounded corners. Back/forward are circular buttons
    overlaid on top of the bar. */
 body.stash-liquid-glass .scrubber-wrapper {
@@ -693,7 +688,7 @@ body.stash-liquid-glass .scrubber-wrapper > .scrubber-button {
     box-shadow:
         0 2px 12px rgba(0, 0, 0, 0.4),
         inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-    transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-instant), box-shadow var(--dur-fast) !important;
+    transition: background 0.15s, border-color 0.15s, transform 0.12s, box-shadow 0.15s !important;
     cursor: pointer !important;
 }
 body.stash-liquid-glass #scrubber-back {
@@ -730,13 +725,13 @@ body.stash-liquid-glass .scrubber-content {
 /* Subtle border between thumbnail tiles + slight dim on hover */
 body.stash-liquid-glass .scrubber-item {
     border-right: 1px solid rgba(0, 0, 0, 0.25) !important;
-    transition: opacity var(--dur-fast) !important;
+    transition: opacity 0.15s !important;
 }
 body.stash-liquid-glass .scrubber-item:hover {
     opacity: 0.85 !important;
 }
 
-/* Vertical playhead position indicator - thin orange line with glow */
+/* Vertical playhead position indicator — thin orange line with glow */
 body.stash-liquid-glass #scrubber-position-indicator {
     background: var(--accent) !important;
     width: 2px !important;
@@ -744,7 +739,7 @@ body.stash-liquid-glass #scrubber-position-indicator {
     z-index: 4 !important;
 }
 
-/* Funscript heatmap - restored as a thin band along the bottom of the
+/* Funscript heatmap — restored as a thin band along the bottom of the
    sprite-scrubber strip. The marker/tag overlays stay hidden since
    they tend to be noisy on scenes without curated tag data. */
 body.stash-liquid-glass .scrubber-tags-background,
@@ -828,13 +823,13 @@ body.stash-liquid-glass .scene-video-filter h5 {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: var(--track-eyebrow) !important;
+    letter-spacing: 0.08em !important;
     margin: 0.5rem 0 0.4rem 0 !important;
     padding-bottom: 0.35rem !important;
     border-bottom: 1px solid var(--glass-border) !important;
 }
 
-/* Force horizontal row layout regardless of viewport width - Bootstrap's
+/* Force horizontal row layout regardless of viewport width — Bootstrap's
    col-sm-* only kicks in ≥576px, so at scene-tabs panel widths the rows
    stack vertically by default. Override with explicit flex row + gap. */
 body.stash-liquid-glass .scene-video-filter .row.form-group {
@@ -842,12 +837,12 @@ body.stash-liquid-glass .scene-video-filter .row.form-group {
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     align-items: center !important;
-    gap: var(--gap-md) !important;
+    gap: 0.6rem !important;
     margin: 0 0 0.5rem 0 !important;
     padding: 0 0.25rem !important;
 }
 
-/* Label column - full word visible, fixed width so labels align
+/* Label column — full word visible, fixed width so labels align
    vertically across rows. */
 body.stash-liquid-glass .scene-video-filter .row.form-group > .col-sm-3 {
     flex: 0 0 5.5rem !important;
@@ -862,7 +857,7 @@ body.stash-liquid-glass .scene-video-filter .row.form-group > .col-sm-3 {
     padding: 0 !important;
 }
 
-/* Slider column - fill remaining space */
+/* Slider column — fill remaining space */
 body.stash-liquid-glass .scene-video-filter .row.form-group > .col-sm-7 {
     flex: 1 1 auto !important;
     max-width: none !important;
@@ -875,7 +870,7 @@ body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider {
     margin: 0 !important;
 }
 
-/* Value column - fixed narrow width holding just the swatch, so every
+/* Value column — fixed narrow width holding just the swatch, so every
    chip (and the slider right-edge) lines up in a clean vertical column. */
 body.stash-liquid-glass .scene-video-filter .row.form-group > .col-sm-2.filter-slider-value,
 body.stash-liquid-glass .scene-video-filter .filter-slider-value {
@@ -891,7 +886,7 @@ body.stash-liquid-glass .scene-video-filter .filter-slider-value {
 /* ── Filter swatch ───────────────────────────────────────────────────
    refract.js swaps the numeric read-out on each colour/tonal filter slider
    for a round chip. Its colour (set inline via background-color) is that
-   slider's own vanilla-track spectrum sampled at the current value - Hue
+   slider's own vanilla-track spectrum sampled at the current value — Hue
    shows the current hue, Saturation grey→red, Brightness dark→light, R/G/B
    dark→channel, etc. The number is hidden (kept as the chip's hover title);
    clicking the chip still hits the cell's reset-to-default handler. A static
@@ -915,7 +910,7 @@ body.stash-liquid-glass .refract-swatch-chip {
     box-shadow:
         0 1px 3px rgba(0, 0, 0, 0.45),
         inset 0 0 0 1px rgba(0, 0, 0, 0.22);
-    transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+    transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
 body.stash-liquid-glass .refract-swatch-chip:hover {
     transform: scale(1.18);
@@ -924,13 +919,13 @@ body.stash-liquid-glass .refract-swatch-chip:hover {
         0 0 0 2px rgba(var(--accent-rgb), 0.4);
 }
 
-/* Header rows + button rows - let them be normal full-width rows. */
+/* Header rows + button rows — let them be normal full-width rows. */
 body.stash-liquid-glass .scene-video-filter .row.form-group:has(> .col-12),
 body.stash-liquid-glass .scene-video-filter .row.form-group:has(> .col-6) {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: wrap !important;
-    gap: var(--gap-md) !important;
+    gap: 0.5rem !important;
     padding: 0 !important;
 }
 body.stash-liquid-glass .scene-video-filter .row.form-group > .col-12 {
@@ -944,23 +939,14 @@ body.stash-liquid-glass .scene-video-filter .row.form-group > .col-6 {
     padding: 0 !important;
 }
 
-/* The numeric read-out is hidden ONLY where the swatch that replaces it
-   actually exists. It used to be hidden unconditionally, on the promise
-   of a live-preview chip -- and that chip has been switched off since
-   2026-07-28 (REFRACT_FILTER_SWATCHES_ENABLED = false, held back as
-   unfinished). The flag turned the swatch off; nothing turned the hiding
-   off with it, so all thirteen sliders in the Filters tab have had no
-   read-out of any kind since: no number, no chip, an empty 0px column.
-
-   Keyed on .refract-has-swatch, which the injection adds, the number
-   comes back while the feature is off and disappears again by itself the
-   day the flag flips. A rule that depends on a feature should name the
-   feature. */
-body.stash-liquid-glass .scene-video-filter .filter-slider-value.refract-has-swatch .TruncatedText {
+/* Numeric read-outs are removed entirely (filters show a live-preview
+   swatch instead; transforms show nothing). Hide every value cell's text
+   node — the exact value is still available as the swatch's hover title. */
+body.stash-liquid-glass .scene-video-filter .filter-slider-value .TruncatedText {
     display: none !important;
 }
 
-/* Slider input - same accent-tracking pattern as the zoom slider in
+/* Slider input — same accent-tracking pattern as the zoom slider in
    04_filters.css. Track is a thin glass channel; thumb fills the left
    side via box-shadow on webkit, ::-moz-range-progress on firefox. */
 body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider,
@@ -995,7 +981,7 @@ body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider::-
     box-shadow:
         -100vw 0 0 calc(100vw - 6px) rgba(var(--accent-rgb), 0.45),
         0 0 8px rgba(var(--accent-rgb), 0.4);
-    transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider:hover::-webkit-slider-thumb {
     transform: scale(1.15);
@@ -1023,14 +1009,14 @@ body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider::-
     background: rgba(var(--accent-rgb), 0.78);
     border: none;
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.4);
-    transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 body.stash-liquid-glass .scene-video-filter input[type="range"].filter-slider:hover::-moz-range-thumb {
     transform: scale(1.15);
     box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.55);
 }
 
-/* Action buttons row - slightly tighter than default Refract buttons */
+/* Action buttons row — slightly tighter than default Refract buttons */
 body.stash-liquid-glass .scene-video-filter .btn {
     width: 100% !important;
     font-size: 0.74rem !important;
@@ -1038,7 +1024,7 @@ body.stash-liquid-glass .scene-video-filter .btn {
 }
 
 
-/* Pause-idle hide - refract.js adds .refract-video-idle to a paused
+/* Pause-idle hide — refract.js adds .refract-video-idle to a paused
    .video-js after 2.5s without cursor activity (or immediately when
    the cursor leaves the player). Fade out everything overlaying the
    video frame so screenshots stay clean. */
@@ -1049,7 +1035,7 @@ body.stash-liquid-glass .video-js.refract-video-idle .st-player-overlay {
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
-    transition: opacity var(--dur-slow) ease, visibility var(--dur-slow) ease !important;
+    transition: opacity 0.35s ease, visibility 0.35s ease !important;
 }
 body.stash-liquid-glass .video-js.refract-video-idle {
     cursor: none !important;
@@ -1111,12 +1097,12 @@ body.stash-liquid-glass .video-js .refract-src-group {
        -2.8px and -3.6px, i.e. touching. */
     grid-template-columns: 5.4rem minmax(0, 1fr);
     align-items: start;
-    column-gap: var(--gap-md);
+    column-gap: 0.5rem;
 }
 body.stash-liquid-glass .video-js .refract-src-head {
     font-size: var(--fs-xs);
     font-weight: 700;
-    letter-spacing: var(--track-eyebrow);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.5);
     text-align: right;
@@ -1152,7 +1138,7 @@ body.stash-liquid-glass .video-js .refract-src-row > .refract-src-opt {
 body.stash-liquid-glass .video-js .refract-src-rate {
     display: flex;
     align-items: center;
-    gap: var(--gap-md);
+    gap: 0.5rem;
     min-height: 26px;
 }
 body.stash-liquid-glass .video-js .refract-src-slider {
@@ -1199,7 +1185,7 @@ body.stash-liquid-glass .video-js .refract-src-slider::-webkit-slider-thumb {
     box-shadow:
         -100vw 0 0 calc(100vw - 6px) rgba(var(--accent-rgb), 0.45),
         0 0 10px rgba(var(--accent-rgb), 0.45);
-    transition: transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 body.stash-liquid-glass .video-js .refract-src-slider:hover::-webkit-slider-thumb {
     transform: scale(1.15);
@@ -1280,7 +1266,7 @@ body.stash-liquid-glass .video-js .refract-src-direct {
     line-height: 1.2;
     text-transform: none;
     cursor: pointer;
-    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease;
+    transition: background 0.14s ease, border-color 0.14s ease;
 }
 body.stash-liquid-glass .video-js .refract-src-direct {
     width: 100%;

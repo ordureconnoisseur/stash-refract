@@ -1,187 +1,5 @@
-/* ── The focus ring, for the whole theme ──────────────────────────────
-   ONE ring. The 2026-09-03 cohesion audit found six of them - four lanes
-   had each written their own outline at their own alpha (0.90, 0.70,
-   0.28, solid) - and two surfaces with no visible focus at all: the
-   studio head, where every control measured outline 0 and Stash's own
-   unthemed Bootstrap ring showed through, and the list toolbar, where
-   twelve buttons changed nothing on focus.
-
-   An OUTLINE, not 6.6's box-shadow ring. The shadow ring cannot survive
-   this file: `box-shadow: none !important` is set on .btn.minimal:focus
-   below and on every .rating-stars button in 08, both of which would
-   erase it. An outline also stays out of layout and follows each
-   control's own radius for free.
-
-   Specificity is the whole battle. Thirty-nine `outline: none !important`
-   declarations across twelve files sit between this rule and the screen,
-   and the most specific of them reaches (0,5,1) - 08's rating-stars
-   group, whose FIRST selector is what counts and is the reason the stars
-   measured ringless the last time this was fixed. The body class is
-   tripled to clear that: cheap, and the documented remedy in this
-   codebase. Verified by focusing every control and reading computed
-   style, not by reading selectors.
-
-   `:focus-visible`, never `:focus`, so the ring answers the keyboard and
-   never a mouse click. The companion rule below removes any ring a
-   mouse click would otherwise leave.
-
-   Colour: `--accent-bright` in dark, `--accent-ink` in light (3.1 rule 4;
-   the light partner lives in 14_light). Measured against sampled grounds
-   per 3.9, all eight presets, worst case of four grounds each:
-     dark   --accent-bright   4.50:1  (red on the scene toolbar strip)
-     light  --accent-ink      7.28:1  (green on the same strip)
-   Both clear the 3:1 non-text floor. One cell does not, and it is a
-   token matter rather than this rule's: on Chrome 105-110, where
-   color-mix is unsupported, --accent-ink falls back to --accent and the
-   green preset lands 2.87:1 in light. Logged for foundations; shipping
-   the ring anyway is the right trade, because the alternative on those
-   browsers is the no-focus state this rule exists to end. */
-body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass
-:is(a[href], button, input, select, textarea, summary,
-    [tabindex]:not([tabindex="-1"]),
-    .btn, .nav-link, .page-link, .card-check,
-    [role="button"], [role="tab"], [role="checkbox"], [role="switch"]):focus-visible {
-    outline: 2px solid var(--accent-bright) !important;
-    outline-offset: 2px !important;
-}
-
-/* react-select hides the real input inside a styled box, so the ring has
-   to be worn by the box. `:has()` is affordable here - filter bars and
-   toolbars hold a handful of these - but it must never be widened to the
-   card grid, which has already spent that budget (7.2). */
-body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass
-.react-select__control:has(input:focus-visible) {
-    outline: 2px solid var(--accent-bright) !important;
-    outline-offset: 2px !important;
-}
-
-/* A mouse click must not leave a ring. Chrome already withholds
-   :focus-visible from most pointer focus, but Stash's own rules and
-   Bootstrap's both paint on plain :focus, so the state is stated here
-   rather than left to the browser. */
-body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass
-:is(a[href], button, input, select, textarea, .btn, .nav-link, .page-link):focus:not(:focus-visible) {
-    outline: none !important;
-}
-
-/* Bootstrap's unthemed blue-grey ring, measured leaking through the
-   studio head's organised button as `0 0 0 2.8px rgba(87,102,114,0.5)`.
-   Scoped to the button families that carry no refract shadow of their
-   own, so .btn-primary's accent glow below is untouched. */
-body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass
-:is(.btn-secondary, .btn-light, .btn-dark, .btn-link, .btn.minimal):focus {
-    box-shadow: none !important;
-}
-
-/* ── Tabs and segmented controls: the house anatomy ─────────────
-   Cohesion audit item 2. Three anatomies existed: the scene panel's
-   strip in a well, the entity strips free on a hairline, the
-   customiser's 8px black well, and the phone sheet's segments. 6.23
-   rules the RADIUS (a tab takes --radius-sm, because a tab is a
-   rectangular door into a rectangular panel) and is silent on
-   everything else, so the ruling is made here and 6.23 gains the
-   wording: the well-with-concentric-items anatomy is the house one for
-   a chooser that sits inside a panel. The scene panel and the phone
-   sort sheet arrived at it independently, which is the strongest
-   evidence available that it is the right shape.
-
-   The concentric pair is the point, and it is why the two radii differ
-   on purpose: a 12px well with 3px of vertical padding holds 9px items,
-   because 12 minus 3 is what keeps the two curves parallel. An entity
-   strip that stands free of any well has nothing to be concentric with
-   and takes --radius-sm flat. Same token, two geometries, and neither
-   is drift.
-
-   To join, add a whole selector to each of the three rules below rather
-   than restating any of this. It is a selector GROUP per rule, not one
-   shared :is() list, because joining strips do not share markup: the
-   scene strip is .nav-tabs/.nav-link/.active, the phone sort sheet is
-   .refract-seg/button/.is-on. The anatomy is the same; the elements
-   wearing it are not. Deviations are fine when they are geometry - a strip
-   that bleeds into a gutter owns its horizontal padding and margins -
-   but the fill, the rim, the type pair and the active treatment are the
-   anatomy and belong here.
-
-   The active state is --accent-glow for the rim everywhere, which is
-   what every other active state in the theme uses; the phone sheet's
-   solid accent-bright rim was the outlier and goes. */
-body.stash-liquid-glass
-:is(.scene-tabs, .image-tabs) .nav-tabs,
-body.stash-liquid-glass .refract-list-sheet .refract-seg {
-    border-radius: var(--radius-sm) !important;
-    background: var(--fill-1) !important;
-    /* The measured rim is 0.08, not --glass-border's 0.12: keeping the
-       value the strip actually had, but expressed against --fg-rgb so it
-       flips in light instead of staying a white hairline on a white
-       plate (3.3, D8). */
-    border: 1px solid rgba(var(--fg-rgb), 0.08) !important;
-    padding-top: 3px !important;
-    padding-bottom: 3px !important;
-    gap: 3px !important;
-}
-body.stash-liquid-glass
-:is(.scene-tabs, .image-tabs) .nav-tabs .nav-link,
-body.stash-liquid-glass .refract-list-sheet .refract-seg button,
-body.stash-liquid-glass
-:is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link,
-body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn, .refract-cc-kind-btn) {
-    border-radius: 9px !important;
-    font-size: var(--fs-sm) !important;
-    font-weight: 600 !important;
-    letter-spacing: 0 !important;
-    color: var(--text-muted) !important;
-}
-/* The entity strips' one ruled deviation, and it is the concentric rule
-   doing its job rather than an exception to it. These strips stand free
-   on a hairline with no well to be concentric WITH, so their items keep
-   --radius-sm flat; 9px is only correct inside a 12px well with 3px of
-   padding. Same token, two geometries - the thing 6.23's proposed
-   wording exists to stop being read as drift.
-
-   They join the item and active rules above and NOT the well rule, which
-   is what keeps them free-standing.
-
-   The customiser's two segmented controls were briefly listed here and
-   are not: they DO have wells, so their items are concentric at 9px like
-   every other welled strip. Whether a strip has a well is the only
-   question this deviation asks, and it is worth asking of the markup
-   rather than of the handover note. */
-body.stash-liquid-glass
-:is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link {
-    border-radius: var(--radius-sm) !important;
-}
-
-/* Segments built from <button> need a reset that <a class="nav-link">
-   never did. The rules above were written for Stash's anchor tabs, which
-   have no UA background or border; a button brings both, so a joining
-   button paints the UA grey under the anatomy and looks like the join
-   failed. Caught on a screenshot rather than in any measurement, which
-   is the point - computed style said the anatomy had applied, and it
-   had. Every button-based joiner takes this; anchors are unaffected. */
-body.stash-liquid-glass .refract-list-sheet .refract-seg button,
-body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn, .refract-cc-kind-btn) {
-    background: none !important;
-    border: 1px solid transparent !important;
-    -webkit-appearance: none !important;
-            appearance: none !important;
-}
-
-body.stash-liquid-glass
-:is(.scene-tabs, .image-tabs) .nav-tabs .nav-link.active,
-body.stash-liquid-glass .refract-list-sheet .refract-seg button.is-on,
-body.stash-liquid-glass
-:is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs) .nav-tabs .nav-link.active,
-body.stash-liquid-glass :is(.refract-segmented-btn, .refract-cc-seg-btn, .refract-cc-kind-btn).is-active {
-    color: var(--accent-bright) !important;
-    background: var(--accent-tint) !important;
-    border-color: var(--accent-glow) !important;
-    box-shadow:
-        0 0 14px rgba(var(--accent-rgb), 0.35),
-        0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
-}
-
 /* ── .btn-primary: glass orange button ─────────────────────────────
-   No backdrop-filter - this rule hits every primary button on the page,
+   No backdrop-filter — this rule hits every primary button on the page,
    which can be 30-50+ on heavy pages. Each blurred button is a GPU
    compositor layer. Accent-tint background + accent-glow border is
    readable without blur. */
@@ -191,7 +9,7 @@ body.stash-liquid-glass .btn-primary {
     color: var(--accent-bright) !important;
     border-radius: var(--radius-sm) !important;
     font-weight: 600 !important;
-    transition: background var(--dur-move), box-shadow var(--dur-move), color var(--dur-move) !important;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s !important;
 }
 body.stash-liquid-glass .btn-primary:hover,
 body.stash-liquid-glass .btn-primary:focus {
@@ -200,7 +18,7 @@ body.stash-liquid-glass .btn-primary:focus {
     color: var(--text) !important;
     border-color: var(--accent-bright) !important;
 }
-/* Minimal icon-only buttons (e.g. favorite heart) - no square background */
+/* Minimal icon-only buttons (e.g. favorite heart) — no square background */
 body.stash-liquid-glass .btn.minimal.btn-primary,
 body.stash-liquid-glass button.minimal.btn-primary {
     background: transparent !important;
@@ -223,7 +41,7 @@ body.stash-liquid-glass button.minimal.btn-primary:focus {
    work regardless of Stash's internal component class names.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Container - no background; buttons float on the page like the navbar */
+/* Container — no background; buttons float on the page like the navbar */
 body.stash-liquid-glass [data-stash-filter] {
     background: transparent !important;
     border: none !important;
@@ -250,16 +68,16 @@ body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"] {
     padding: 0 14px !important;
     min-width: 140px !important;
     flex: 1 1 auto !important;
-    transition: border-color var(--dur-move), box-shadow var(--dur-move) !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
 }
 body.stash-liquid-glass [data-stash-filter] input[placeholder*="Search"]:focus {
     border-color: var(--accent-glow) !important;
     box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.15) !important;
     outline: none !important;
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.09) !important;
 }
 
-/* Secondary buttons - same base style as navbar buttons.
+/* Secondary buttons — same base style as navbar buttons.
    Excludes .sort-by-select children (sort dropdown + direction + shuffle)
    which need full glass styling, not the navbar-style transparent treatment. */
 body.stash-liquid-glass [data-stash-filter] .btn-secondary {
@@ -271,7 +89,7 @@ body.stash-liquid-glass [data-stash-filter] .btn-secondary {
     min-width: 30px !important;
     padding: 0 8px !important;
     font-size: var(--fs-sm) !important;
-    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast) !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -282,7 +100,7 @@ body.stash-liquid-glass [data-stash-filter] .btn-secondary:hover {
     border-color: var(--glass-border) !important;
     color: var(--text) !important;
 }
-/* Sort dropdown override - needs full glass styling like the page-size
+/* Sort dropdown override — needs full glass styling like the page-size
    selector, not the transparent navbar style applied to view-mode buttons. */
 body.stash-liquid-glass [data-stash-filter] .sort-by-select .btn.btn-secondary,
 body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .btn.btn-secondary {
@@ -302,7 +120,7 @@ body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .btn.btn-secondar
     color: #fff !important;
 }
 
-/* Active view-mode button - exact navbar glow pattern */
+/* Active view-mode button — exact navbar glow pattern */
 body.stash-liquid-glass [data-stash-filter] .btn-primary {
     background: var(--accent-tint) !important;
     border: 1px solid var(--accent-glow) !important;
@@ -339,7 +157,7 @@ body.stash-liquid-glass [data-stash-filter] select {
     padding: 0 8px !important;
 }
 
-/* ── Active filter chips - hidden by default (filter button badge shows
+/* ── Active filter chips — hidden by default (filter button badge shows
    the count); the refract-show-filter-tags body class (Suggestion Box
    toggle, forum request) re-shows them so filters can be dismissed
    without opening the menu. ── */
@@ -381,7 +199,7 @@ body.stash-liquid-glass [data-stash-filter] button[data-filter-active] svg {
         drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.45)) !important;
 }
 
-/* Badge inside filter button - small pill, no box */
+/* Badge inside filter button — small pill, no box */
 body.stash-liquid-glass [data-stash-filter] button .badge,
 body.stash-liquid-glass [data-stash-filter] button .badge-secondary {
     background: var(--accent) !important;
@@ -407,7 +225,7 @@ body.stash-liquid-glass .filter-tag button:hover {
 
 /* ── Pagination: minimal, clean ──────────────────────────────────── */
 
-/* Hide double-jump arrows (first/last page) - rarely useful */
+/* Hide double-jump arrows (first/last page) — rarely useful */
 body.stash-liquid-glass .pagination .page-item:first-child,
 body.stash-liquid-glass .pagination .page-item:last-child {
     display: none !important;
@@ -420,8 +238,8 @@ body.stash-liquid-glass .pagination {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     padding: 3px 6px !important;
-    backdrop-filter: var(--glass-blur-xl) !important;
-    -webkit-backdrop-filter: var(--glass-blur-xl) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 2px !important;
@@ -438,10 +256,10 @@ body.stash-liquid-glass .page-link {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    transition: background var(--dur-fast), color var(--dur-fast) !important;
+    transition: background 0.15s, color 0.15s !important;
 }
 body.stash-liquid-glass .page-link:hover {
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: var(--text) !important;
 }
 body.stash-liquid-glass .page-item.active .page-link {
@@ -454,14 +272,14 @@ body.stash-liquid-glass .page-item.disabled .page-link {
     pointer-events: none !important;
 }
 
-/* "1-40 of N" count - tiny muted label, no pill */
+/* "1-40 of N" count — tiny muted label, no pill */
 body.stash-liquid-glass .pagination-index,
 body.stash-liquid-glass .filter-container + * .text-muted,
 body.stash-liquid-glass [class*="list-count"],
 body.stash-liquid-glass [class*="total-count"] {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
-    letter-spacing: var(--track-eyebrow) !important;
+    letter-spacing: 0.07em !important;
     text-transform: uppercase !important;
     color: var(--text-muted) !important;
     opacity: 0.6 !important;
@@ -487,7 +305,7 @@ body.stash-liquid-glass .stash-view-wrap {
     position: static !important;
 }
 
-/* Chevron trigger - always visible at the right edge */
+/* Chevron trigger — always visible at the right edge */
 body.stash-liquid-glass .stash-view-trigger {
     background: transparent !important;
     border: 1px solid transparent !important;
@@ -501,12 +319,12 @@ body.stash-liquid-glass .stash-view-trigger {
     justify-content: center !important;
     cursor: pointer !important;
     flex-shrink: 0 !important;
-    transition: color var(--dur-fast) !important;
+    transition: color 0.15s !important;
 }
 body.stash-liquid-glass .stash-view-trigger svg {
     width: 14px !important;
     height: 14px !important;
-    transition: transform var(--dur-enter) var(--ease-glide) !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 /* Closed = › (right), open rotates to ‹ (left) */
 body.stash-liquid-glass .stash-view-trigger.open svg {
@@ -516,7 +334,7 @@ body.stash-liquid-glass .stash-view-trigger:hover {
     color: var(--text) !important;
 }
 
-/* Always-visible current view indicator - orange glow, same as active nav */
+/* Always-visible current view indicator — orange glow, same as active nav */
 body.stash-liquid-glass .stash-view-active-ind {
     background: var(--accent-tint) !important;
     border: 1px solid var(--accent-glow) !important;
@@ -533,7 +351,7 @@ body.stash-liquid-glass .stash-view-active-ind {
     box-shadow:
         0 0 18px rgba(var(--accent-rgb), 0.45),
         0 0 0 1px rgba(var(--accent-rgb), 0.18) inset !important;
-    transition: background var(--dur-fast) !important;
+    transition: background 0.15s !important;
 }
 body.stash-liquid-glass .stash-view-active-ind svg {
     width: 16px !important;
@@ -584,7 +402,7 @@ body.stash-liquid-glass .page-size-selector select {
     text-align: center !important;
     text-align-last: center !important;
     background-image: none !important;
-    transition: border-color var(--dur-fast), color var(--dur-fast), box-shadow var(--dur-fast) !important;
+    transition: border-color 0.15s, color 0.15s, box-shadow 0.15s !important;
 }
 body.stash-liquid-glass .page-size-selector select:hover,
 body.stash-liquid-glass .page-size-selector select:focus {
@@ -594,7 +412,7 @@ body.stash-liquid-glass .page-size-selector select:focus {
     box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.10) !important;
 }
 body.stash-liquid-glass .page-size-selector option {
-    background: rgba(var(--surface-rgb), 0.96) !important;
+    background: rgba(20, 20, 24, 0.96) !important;
     color: var(--text) !important;
 }
 
@@ -606,20 +424,20 @@ body.stash-liquid-glass .pagination[data-pager-role="hide"] {
     display: none !important;
 }
 
-/* Float the bottom pager row - fixed to viewport bottom center.
+/* Float the bottom pager row — fixed to viewport bottom center.
    `flex-direction: column` only applies when the float row is a WRAPPER
-   (e.g. .pagination-footer on /scenes - wraps the pill plus other items
+   (e.g. .pagination-footer on /scenes — wraps the pill plus other items
    stacked vertically). When the float row IS the .pagination/.btn-group
    itself (e.g. on /performers, /studios, /tags, /groups, where rowOf()
    returned the pagination directly), column-direction stacks the
-   individual page buttons vertically instead of horizontally - that's
+   individual page buttons vertically instead of horizontally — that's
    what produced the "pagination vertical on non-scene pages" report. */
 body.stash-liquid-glass [data-pager-row="float"] {
     position: fixed !important;
     bottom: 1.5rem !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    z-index: var(--z-pager) !important;
+    z-index: 400 !important;
     margin: 0 !important;
     display: flex !important;
     align-items: center !important;
@@ -650,7 +468,7 @@ body.stash-liquid-glass [data-pager-row="float"].btn-group {
     flex-direction: row !important;
 }
 
-/* Glass pill around the floated pagination - covers both the wrapper-row
+/* Glass pill around the floated pagination — covers both the wrapper-row
    case and the case where the pager itself is the floated element
    (happens when rowOf() declines to tag a toolbar-containing wrapper). */
 body.stash-liquid-glass [data-pager-row="float"] .pagination,
@@ -659,8 +477,8 @@ body.stash-liquid-glass [data-pager-row="float"].pagination {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     padding: 3px 8px !important;
-    backdrop-filter: var(--glass-blur-xl) !important;
-    -webkit-backdrop-filter: var(--glass-blur-xl) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
     box-shadow: var(--glass-shadow) !important;
 }
 
@@ -672,7 +490,7 @@ body.stash-liquid-glass:has([data-pager-row="float"]) .main.container-fluid {
     padding-bottom: 6rem !important;
 }
 
-/* Panel - slides out horizontally to the left of the chevron */
+/* Panel — slides out horizontally to the left of the chevron */
 body.stash-liquid-glass .stash-view-panel {
     display: inline-flex !important;
     align-items: center !important;
@@ -681,8 +499,8 @@ body.stash-liquid-glass .stash-view-panel {
     overflow: hidden !important;
     opacity: 0 !important;
     transition:
-        max-width var(--dur-settle) var(--ease-glide),
-        opacity var(--dur-move) ease !important;
+        max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.2s ease !important;
 }
 body.stash-liquid-glass .stash-view-panel.open {
     max-width: 220px !important;
@@ -703,7 +521,7 @@ body.stash-liquid-glass .stash-view-opt {
     justify-content: center !important;
     cursor: pointer !important;
     flex-shrink: 0 !important;
-    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast) !important;
+    transition: background 0.15s, color 0.15s, border-color 0.15s !important;
 }
 body.stash-liquid-glass .stash-view-opt:hover {
     background: var(--glass-bg) !important;
@@ -744,47 +562,26 @@ body.stash-liquid-glass [data-stash-filter] .badge {
 
 /* ── Performer Advanced Rating plugin ───────────────────────────────
    Styles the trigger button and modal injected by the plugin.
-   Safe to include without the plugin - selectors simply don't match.
+   Safe to include without the plugin — selectors simply don't match.
    ─────────────────────────────────────────────────────────────────── */
 
-/* The pill's RESTING MATERIAL is the chip recipe's (10), not this
-   file's. It is in the recipe's control list, so it takes the accent
-   tint, the accent rim and no resting shadow; the glass fill, the
-   --glass-border rim and the --shadow-sm drop that used to be declared
-   here were the last thing keeping it off the recipe (audit item 4).
-
-   Why it beat the recipe, since two other explanations were tried
-   first and neither holds. It is not !important: none of the three
-   declarations carried it. It is not the recipe loading earlier: both
-   rules are in the same concatenated sheet and the recipe is later.
-   It is the ID branch in the selector list below. A comma list is
-   evaluated per branch, and the element on the performer page is
-   `#perf-rating-trigger` carrying `.adv-rating-btn`, so THAT branch
-   matched it at (1,1,1) and outranked the recipe's (0,2,1). Per-branch
-   evaluation is not a reason the ID is harmless; it is the reason the
-   ID wins. Measured: the pill computed the glass fill 0.1, the 0.12
-   rim and the 0 2px 10px 0.25 shadow, all three this rule's.
-
-   So do not re-add material here, and do not "fix" it by wrapping the
-   list in :where() either - that would drop the ID branch's weight but
-   the declarations should not be in this file at all. Border WIDTH and
-   STYLE still come from the recipe's box rule, which the pill is also
-   in; only the colour is the control rule's. */
-/* Only what this file genuinely owns. Nine properties that the chip
-   recipe owns - display, align-items, padding, border-radius, colour,
-   font-size, font-weight, line-height and transition - used to be
-   declared here as well, four of them with !important. Seven of the nine
-   already agreed with the recipe or were already losing to it, and that
-   is exactly the danger: a redundant !important is where a conflicting
-   one hides, which is how this rule's font-size conflict went unnoticed
-   for an hour. Removed rather than left agreeing.
-   Kept: justify-content, gap, cursor and vertical-align, none of which
-   the recipe declares. */
 body.stash-liquid-glass .adv-rating-btn,
 body.stash-liquid-glass #perf-rating-trigger {
+    display: inline-flex !important;
+    align-items: center !important;
     justify-content: center !important;
-    gap: var(--gap-xs);
+    gap: 0.3rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    color: var(--text) !important;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: 1 !important;
     cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
     vertical-align: middle;
 }
 body.stash-liquid-glass .adv-rating-btn:hover,
@@ -799,7 +596,7 @@ body.stash-liquid-glass #perf-rating-trigger:hover {
 body.stash-liquid-glass .adv-rating-modal-overlay {
     position: fixed;
     inset: 0;
-    z-index: var(--z-top);
+    z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -827,7 +624,7 @@ body.stash-liquid-glass .adv-rating-modal-content {
     color: var(--text);
 }
 
-/* Header - same bg as card so it doesn't look like a separate box */
+/* Header — same bg as card so it doesn't look like a separate box */
 body.stash-liquid-glass .adv-rating-header {
     display: flex !important;
     align-items: center;
@@ -840,11 +637,11 @@ body.stash-liquid-glass .adv-rating-header h3 {
     margin: 0 !important;
     font-size: var(--fs-sm) !important;
     font-weight: 700 !important;
-    letter-spacing: var(--track-wide) !important;
+    letter-spacing: 0.1em !important;
     text-transform: uppercase !important;
     color: var(--text-muted) !important;
 }
-/* Close button - SVG × via pseudo-element, orange on hover */
+/* Close button — SVG × via pseudo-element, orange on hover */
 body.stash-liquid-glass .perf-rating-close {
     width: 1.75rem;
     height: 1.75rem;
@@ -852,16 +649,16 @@ body.stash-liquid-glass .perf-rating-close {
     align-items: center;
     justify-content: center;
     border-radius: 50% !important;
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.07) !important;
     border: 1px solid rgba(255, 255, 255, 0.09) !important;
     cursor: pointer;
     font-size: 0 !important;         /* hide × glyph */
     flex-shrink: 0;
-    transition: background var(--dur-fast), border-color var(--dur-fast);
+    transition: background 0.15s, border-color 0.15s;
 }
 /* Use mask-image so the × glyph color comes from background-color and
    tracks --accent-bright on hover. Stroke value inside the data URI is
-   ignored - only the rendered alpha matters. */
+   ignored — only the rendered alpha matters. */
 body.stash-liquid-glass .perf-rating-close::before {
     content: '';
     display: block;
@@ -870,7 +667,7 @@ body.stash-liquid-glass .perf-rating-close::before {
     background-color: rgba(255, 255, 255, 0.55);
     -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 6L6 18M6 6l12 12' stroke='%23000' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
             mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M18 6L6 18M6 6l12 12' stroke='%23000' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
-    transition: background-color var(--dur-fast);
+    transition: background-color 0.15s;
 }
 body.stash-liquid-glass .perf-rating-close:hover {
     background: rgba(var(--accent-rgb), 0.16) !important;
@@ -880,7 +677,7 @@ body.stash-liquid-glass .perf-rating-close:hover::before {
     background-color: var(--accent-bright);
 }
 
-/* Ratings list scroll container. */
+/* Ratings list scroll container */
 body.stash-liquid-glass .ratings-list {
     padding: 0.4rem 0 !important;
     overflow-y: auto;
@@ -895,21 +692,21 @@ body.stash-liquid-glass .rating-row {
     justify-content: space-between;
     padding: 0.6rem 1.25rem !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-    gap: var(--gap-xl);
-    transition: background var(--dur-instant);
+    gap: 1rem;
+    transition: background 0.12s;
 }
 body.stash-liquid-glass .rating-row:last-child {
     border-bottom: none !important;
 }
 body.stash-liquid-glass .rating-row:hover {
-    background: var(--fill-1) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
 }
 
 /* Category label */
 body.stash-liquid-glass .rating-label {
     display: flex !important;
     align-items: center;
-    gap: var(--gap-sm);
+    gap: 0.4rem;
     font-size: var(--fs-base);
     font-weight: 500;
     color: var(--text) !important;
@@ -917,7 +714,7 @@ body.stash-liquid-glass .rating-label {
     min-width: 0;
 }
 
-/* Info icon ⓘ - character already has circle built in, so no extra border */
+/* Info icon ⓘ — character already has circle built in, so no extra border */
 body.stash-liquid-glass .rating-info-icon {
     position: relative;
     display: inline-flex !important;
@@ -927,14 +724,14 @@ body.stash-liquid-glass .rating-info-icon {
     color: var(--text-muted) !important;
     cursor: help;
     flex-shrink: 0;
-    transition: color var(--dur-fast);
+    transition: color 0.15s;
     z-index: 1;
 }
 body.stash-liquid-glass .rating-info-icon:hover {
     color: var(--accent-bright) !important;
 }
 
-/* Tooltip - shown on hover */
+/* Tooltip — shown on hover */
 body.stash-liquid-glass .rating-tooltip {
     display: none;
     position: absolute;
@@ -944,7 +741,7 @@ body.stash-liquid-glass .rating-tooltip {
     z-index: 10001;
     width: 230px;
     padding: 0.6rem 0.75rem;
-    background: rgba(var(--surface-rgb), 0.98) !important;
+    background: rgba(18, 18, 22, 0.98) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 10px;
     font-size: 0.71rem;
@@ -967,14 +764,14 @@ body.stash-liquid-glass .rating-stars-modal {
     flex-shrink: 0;
 }
 
-/* Star glyphs - empty state */
+/* Star glyphs — empty state */
 body.stash-liquid-glass .rating-star {
     font-size: 1.35rem;
-    color: rgba(var(--fg-rgb), 0.42) !important;
+    color: rgba(255, 255, 255, 0.2) !important;
     cursor: pointer;
     line-height: 1;
     user-select: none;
-    transition: color var(--dur-instant), filter var(--dur-instant), transform var(--dur-instant);
+    transition: color 0.1s, filter 0.1s, transform 0.1s;
 }
 /* .filled is added by JS (plugin uses no class, just swaps ☆→★) */
 body.stash-liquid-glass .rating-star.filled,
@@ -989,13 +786,13 @@ body.stash-liquid-glass .rating-star:hover {
 /* Clear × */
 body.stash-liquid-glass .rating-clear {
     font-size: var(--fs-base);
-    color: rgba(var(--fg-rgb), 0.42) !important;
+    color: rgba(255, 255, 255, 0.2) !important;
     cursor: pointer;
     padding: 0.1rem 0.3rem;
     border-radius: 4px;
     margin-left: 0.2rem;
     user-select: none;
-    transition: color var(--dur-fast), background var(--dur-fast);
+    transition: color 0.15s, background 0.15s;
     line-height: 1;
 }
 body.stash-liquid-glass .rating-clear:hover {
@@ -1011,16 +808,11 @@ body.stash-liquid-glass .ratings-list::-webkit-scrollbar-track {
     background: transparent;
 }
 body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb {
-    /* Was a 0.12 white thumb with an accent only on hover, which is
-       under 6.10's house values. It mattered little while this list
-       scrolled only in the modal; the inline drawer now caps at 7.5
-       rows, so the thumb is the one thing telling you the rest of the
-       criteria are down there and it has to be legible at rest. */
-    background: rgba(var(--accent-rgb), 0.35);
-    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
 }
 body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb:hover {
-    background: rgba(var(--accent-rgb), 0.6);
+    background: rgba(var(--accent-rgb), 0.4);
 }
 
 /* ── Scene inline ratings panel ─────────────────────────────────────
@@ -1028,7 +820,7 @@ body.stash-liquid-glass .ratings-list::-webkit-scrollbar-thumb:hover {
    sidebar (instead of the overlay) so the video keeps playing while you
    rate. It reuses the same .rating-row / .rating-stars-modal / .rating-
    star / .rating-clear / .rating-tooltip / .adv-rating-* classes as the
-   modal, which are already themed above - here we only style the new
+   modal, which are already themed above — here we only style the new
    panel container + header and tighten horizontal padding to fit the
    narrow sidebar column. */
 body.stash-liquid-glass .adv-rating-inline-panel {
@@ -1042,8 +834,8 @@ body.stash-liquid-glass .adv-rating-inline-panel {
     padding: 0 !important;
     overflow: hidden;
     color: var(--text) !important;
-    -webkit-backdrop-filter: var(--glass-blur-xl-sat);
-    backdrop-filter: var(--glass-blur-xl-sat);
+    -webkit-backdrop-filter: var(--glass-blur-lg-sat);
+    backdrop-filter: var(--glass-blur-lg-sat);
     /* Soft dark drop for lift + a short-radius accent halo behind the panel
        for depth. The accent glow (not a fill) gives presence without the
        bright-band problem the white surface had. */
@@ -1053,13 +845,13 @@ body.stash-liquid-glass .adv-rating-inline-panel {
         inset 0 0 0 1px rgba(var(--accent-rgb), 0.10),
         inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
-/* Header - uppercase muted label (like the modal's .adv-rating-header h3)
+/* Header — uppercase muted label (like the modal's .adv-rating-header h3)
    with the "N criteria · M rated" summary aligned right. */
 body.stash-liquid-glass .adv-rating-inline-head {
     display: flex !important;
     align-items: baseline;
     justify-content: space-between;
-    gap: var(--gap-md);
+    gap: 0.6rem;
     padding: 0.7rem 1rem 0.6rem !important;
     margin-bottom: 0 !important;
     border-bottom: 1px solid var(--glass-border) !important;
@@ -1067,7 +859,7 @@ body.stash-liquid-glass .adv-rating-inline-head {
 body.stash-liquid-glass .adv-rating-inline-title {
     font-size: var(--fs-xs) !important;
     font-weight: 700 !important;
-    letter-spacing: var(--track-wide) !important;
+    letter-spacing: 0.1em !important;
     text-transform: uppercase !important;
     /* Accent the section title so the panel doesn't read flat. */
     color: var(--accent-bright) !important;
@@ -1085,6 +877,17 @@ body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-subhead {
     color: var(--text-muted) !important;
     opacity: 0.85;
 }
+/* Tighten the shared row / list / breakdown horizontal padding for the
+   sidebar (the overlay uses a roomier 1.25rem); drop the list scroll cap
+   since the sidebar already scrolls. */
+body.stash-liquid-glass .adv-rating-inline-panel .ratings-list {
+    padding: 0.25rem 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+body.stash-liquid-glass .adv-rating-inline-panel .rating-row {
+    padding: 0.5rem 1rem !important;
+}
 body.stash-liquid-glass .adv-rating-inline-panel .rating-star {
     font-size: 1.25rem;
 }
@@ -1093,7 +896,7 @@ body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown {
     margin-top: 0 !important;
     border-top: 1px solid var(--glass-border) !important;
 }
-/* Trigger pressed state while the panel is open - accent ring instead of
+/* Trigger pressed state while the panel is open — accent ring instead of
    the plugin's default yellow inset. */
 body.stash-liquid-glass .adv-rating-btn--active {
     background: rgba(var(--accent-rgb), 0.22) !important;
@@ -1103,354 +906,3 @@ body.stash-liquid-glass .adv-rating-btn--active {
                 inset 0 0 0 1px rgba(var(--accent-rgb), 0.5) !important;
 }
 
-/* ── Welded to the scene strip ────────────────────────────────────────
-   The rules below live here, next to the panel's existing styling,
-   because 09 loads after 07: written in the scene-details sheet they
-   were correct and lost every property this file already sets. One home
-   for one component.
-
-   The panel is the toolbar's NEXT SIBLING at the same width in the same
-   column, so when the strip's tier chip opens the drawer the two become
-   one 16px shell with a hairline seam. Nothing inside is rounded, which
-   is also why there is no concentric-radius problem to solve (3.4). */
-/* Both halves have to agree before the drawer paints.
-
-   The plugin owns the panel's open state and restores it on EVERY scene
-   load: restoreScenePanel() re-opens whenever localStorage asrInlineOpen
-   is "1", and that flag is written on every open and close. Refract only
-   learns about an open drawer through the tier chip's own click handler,
-   which is the one place `st-rating-open` is set. So a panel the plugin
-   reopened left the toolbar without the class, the weld rule below did
-   not match, and the panel painted as a loose bordered card between the
-   strip and the tab bar - reported from the thread, reproduced at 1600
-   and 1100 alike. Stacked, that card is a full-width slab that pushes
-   the tab strip and the whole Details tab below the fold.
-
-   Hiding the unreconciled state is the fix rather than a plaster,
-   because refract hides the plugin's own trigger in this strip
-   (07, .adv-rating-btn display:none), so the chip is the ONLY way a user
-   can open this drawer: an open panel the toolbar knows nothing about
-   can only have come from the restore, never from an action. The chip's
-   handler already reconciles the pair - it toggles `st-rating-open` and
-   then clicks the plugin's trigger ONLY when the two disagree - so the
-   first click on a restored-open panel reveals it welded instead of
-   re-closing it, and the second closes it properly.
-
-   Same sibling shape as the weld it guards, deliberately: the two rules
-   are one pair and should be read together. If the plugin ever stops
-   mounting the panel as the toolbar's next sibling, both break together
-   and visibly, rather than this one failing open and silently. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar):not(.st-rating-open) + .adv-rating-inline-panel.open {
-    display: none !important;
-}
-
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar).st-rating-open + .adv-rating-inline-panel.open {
-    /* The plugin insets the panel from the column; the strip bleeds out
-       of it by 10px. Both edges are stated here so the two boxes are the
-       same width whatever either of them started from. */
-    margin: 0 -10px !important;
-    margin-left: -10px !important;
-    margin-right: -10px !important;
-    width: auto !important;
-    border-radius: 0 0 var(--radius) var(--radius) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-    background: rgba(0, 0, 0, 0.16) !important;
-    box-shadow: none !important;
-    overflow: hidden !important;
-}
-
-/* ---- The panel's own contents, in the panel's language --------------
-   Mostly subtraction. Five amber "unrated" pills plus one in the header
-   are six objects saying what five empty stars already say, in a colour
-   that appears nowhere else in the theme. */
-body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-unrated-pill {
-    display: none !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-inline-head {
-    display: flex !important;
-    align-items: baseline !important;
-    gap: 8px !important;
-    padding: 9px 12px !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
-    background: none !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-inline-title {
-    font-size: var(--fs-xs) !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: var(--track-eyebrow) !important;
-    /* Was --accent-bright at 11.2px, which made it the loudest thing on
-       the surface and a second heading competing with the panel's own
-       eyebrows. It is a section label like the others now. */
-    color: rgba(var(--fg-rgb), 0.42) !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-subhead,
-body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-summary {
-    margin-left: auto !important;
-    font-size: var(--fs-xs) !important;
-    font-weight: 600 !important;
-    color: rgba(var(--fg-rgb), 0.42) !important;
-}
-/* The one rule that sets anything on the inline list. It used to be
-   three: this one, plus a block that zeroed the shared 72vh cap
-   because "the sidebar already scrolls", plus a row padding that a
-   later rule fully overrode. Only the first was doing anything a
-   reader could see (7.17).
-
-   The uncap is reversed. It was right when the panel was a second
-   disclosure in a scrolling sidebar; the panel is welded into the
-   strip now and opens ABOVE the tab bar, so an uncapped list pushes
-   the tabs and everything under them down by however many criteria
-   the user happens to have defined. Criteria are user-defined, so the
-   list has no natural length -- five is the common setup and reads
-   well at 148px, but nothing stops fifteen.
-
-   The cap is 7.5 rows at the measured 29.8px row: seven fit whole and
-   the eighth is cut in half, which says there is more below without
-   spending a row on saying so. Under eight criteria nothing engages
-   and the drawer is exactly as it was. overscroll-behavior keeps a
-   flick past the last criterion from carrying on into the page. */
-body.stash-liquid-glass .adv-rating-inline-panel .ratings-list {
-    padding: 0 !important;
-    background: none !important;
-    /* 7 x 29.8 + half a row */
-    max-height: 224px !important;
-    overflow-y: auto !important;
-    overscroll-behavior: contain !important;
-    /* Two lines of undo, and they are what makes 6.10's 4px bar above
-       actually appear. scrollbar-color and scrollbar-width are
-       INHERITED properties, .scene-tabs sets the colour for the whole
-       column, and Chrome discards every ::-webkit-scrollbar rule for
-       any element with either standard property in effect. So the list
-       inherited a colour it never asked for, lost the 4px rule to it,
-       and drew the 15px platform default in theme paint -- the one
-       width nobody chose, with Windows arrow buttons on both ends,
-       inside a 224px drawer.
-
-       Setting the standard properties instead only trades 15px for the
-       10px Chrome calls thin, buttons and all. Resetting them to auto
-       is what hands the element back to ::-webkit: measured 15 -> 10 ->
-       4. Firefox has no ::-webkit and keeps its platform bar, which is
-       what it drew here before any of this. */
-    scrollbar-width: auto !important;
-    scrollbar-color: auto !important;
-}
-/* A scrollable region is a keyboard stop (refract.js gives it the
-   tabindex older Chromium will not), so it needs the house ring --
-   inset, because at the +2px offset it would draw outside the drawer
-   it sits in. */
-body.stash-liquid-glass .adv-rating-inline-panel .ratings-list:focus-visible {
-    outline: 2px solid rgba(var(--accent-rgb), 0.9) !important;
-    outline-offset: -2px !important;
-}
-/* The scrollbar takes its width out of the list's content, which would
-   drag every star group left of the score and the criteria count they
-   were just aligned to. The rows give it back out of their own right
-   padding, so the star column holds its edge whether the list scrolls
-   or not.
-
-   The width is measured rather than assumed: refract.js writes the real
-   gutter to --st-sb, because "thin" is whatever the engine says it is
-   (4px here, 10 on a Chrome told to use the standard property, 15
-   unstyled) and a literal would be right on exactly one of them. The
-   floor keeps a star off the thumb when the gutter is wide. */
-body.stash-liquid-glass .adv-rating-inline-panel .ratings-list.st-crit-scroll .rating-row {
-    padding-right: max(4px, calc(12px - var(--st-sb, 4px))) !important;
-}
-/* The list carries its own status text as a BARE TEXT NODE -- no
-   element, nothing to select -- so "Loading..." landed at 14px hard
-   against the panel's inner edge, outside the 12px column every row
-   below it sits in, for the whole of the first open. There is no
-   child to style, so the state is selected on the parent instead:
-   no rows means the list is showing a message rather than criteria.
-   Uppercased and muted, it reads as the status it is instead of as
-   the panel's first line of content. Covers the genuinely empty list
-   too, which renders the same way. */
-body.stash-liquid-glass .adv-rating-inline-panel .ratings-list:not(:has(.rating-row)) {
-    padding: 11px 12px !important;
-    font-size: var(--fs-xs) !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(var(--fg-rgb), 0.42) !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .rating-row {
-    display: flex !important;
-    align-items: center !important;
-    gap: 9px !important;
-    padding: 6px 12px !important;
-    margin: 0 !important;
-    background: none !important;
-    border: 0 !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-    border-radius: 0 !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .rating-row:last-child {
-    border-bottom: 0 !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .rating-row:hover {
-    background: var(--fill-1) !important;
-}
-/* One line, with an ellipsis. "Production Quality" wrapped and made its
-   row 52px against every other row's 33px. */
-body.stash-liquid-glass .adv-rating-inline-panel .rating-label {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 7px !important;
-    font-size: var(--fs-sm) !important;
-    font-weight: 500 !important;
-    color: rgba(var(--fg-rgb), 0.72) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .rating-label > span:first-child {
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-/* The description carrier, and the only thing that says what a
-   criterion means, so it stays. The unicode circled-i renders
-   differently on every platform, so the glyph is drawn here (6.12):
-   font-size 0 hides the native character and the icon is painted as a
-   currentColor mask, which leaves the plugin's DOM and its hover
-   handlers untouched (P4). The mask inherits `color`, so both modes
-   and the hover state come free.
-
-   Glyph: svgrepo.com, "Warning / Info" set, supplied by the user.
-   Licence not verified.
-
-   The viewBox is cropped from `0 0 24 24` to `2 2 20 20`. The circle is
-   18 units across plus its stroke, so the artwork occupies 20 of the 24
-   and the crop makes it fill the box. Uncropped, the box would draw a
-   circle three quarters of its width and read as a smaller control than
-   the ring it replaces.
-
-   Size and weight were set by looking, not by arithmetic. The file is
-   drawn at 800px, where the 1-unit gap between the dot and the stem is
-   ample. The gap is (3 - stroke) units, so it scales with the glyph: at
-   the ring's old 13px box with the supplied stroke of 2 it came to
-   0.65px, the dot antialiased into the stem, and the "i" rendered as a
-   plain bar. Thinning the stroke to 1.4 opened it to 1.04px, which was
-   still a smudge rather than a tittle. 15px is where it resolves: a
-   1.2px gap between a 1.05px dot and the stem.
-
-   15px next to a 12px star is not oversized. An outlined circle carries
-   far less ink than a filled star, so it matches optically while
-   measuring larger, and at 0.45 alpha it stays quieter than the 0.72
-   label beside it - which is what a help affordance should do. */
-body.stash-liquid-glass .adv-rating-inline-panel .rating-info-icon {
-    flex: 0 0 auto !important;
-    width: 15px !important;
-    height: 15px !important;
-    font-size: 0 !important;
-    color: rgba(var(--fg-rgb), 0.45) !important;
-    cursor: help !important;
-    position: relative !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .rating-info-icon::before {
-    content: "";
-    display: block;
-    flex: 0 0 auto;
-    width: 100%;
-    height: 100%;
-    background-color: currentColor;
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='2 2 20 20' fill='none'%3E%3Cpath d='M12 11V16M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21ZM12.0498 8V8.1L11.9502 8.1002V8H12.0498Z' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='2 2 20 20' fill='none'%3E%3Cpath d='M12 11V16M12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21ZM12.0498 8V8.1L11.9502 8.1002V8H12.0498Z' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-            mask-position: center;
-    -webkit-mask-size: contain;
-            mask-size: contain;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .rating-info-icon:hover {
-    color: var(--accent-light) !important;
-}
-
-/* The criterion stars take the theme's star. refract.js marks the
-   filled ones, because the plugin carries that state in the glyph
-   itself and CSS cannot read text. */
-body.stash-liquid-glass .adv-rating-inline-panel .rating-stars-modal {
-    display: flex !important;
-    align-items: center !important;
-    gap: 2px !important;
-    flex: 0 0 auto !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .rating-star {
-    width: 12px !important;
-    height: 12px !important;
-    font-size: 0 !important;
-    background-color: var(--star-empty) !important;
-    /* Same sizing as the Overall band above, which 08 moved to
-       `100% auto`. Measured, the two agree today: the star's viewBox is
-       0 0 24 24 and both boxes are square, so `contain` and `100% auto`
-       resolve identically. The reason to match anyway is that they only
-       agree while the box stays square -- `100% auto` keeps drawing the
-       star the box's width whatever happens to it, where `contain`
-       silently starts meaning something else. Two stars 30px apart
-       should not be one box-resize away from disagreeing. */
-    -webkit-mask: var(--st-star-svg) left center / 100% auto no-repeat !important;
-            mask: var(--st-star-svg) left center / 100% auto no-repeat !important;
-    cursor: pointer !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .rating-star.st-crit-on {
-    background-color: var(--star) !important;
-}
-/* The clear control appears with the row it clears, and it is a CHILD
-   of the star group rather than a sibling -- which is what made the
-   criteria column look ragged against the two right-aligned readouts
-   above it. Every box in the panel ends at the same 373.5, stars
-   included, but the last 14.7px of the star group is this control
-   holding its slot at zero opacity, so the STARS ended at 358.8 and
-   only the text reached the margin. Geometrically aligned, visibly
-   not (6.7).
-
-   It keeps the slot -- giving it up means five stars jumping sideways
-   every time the pointer crosses a row -- and takes it at the front of
-   the group instead. The dead space moves into the gap after the
-   label, where nothing is aligned to anything, and the stars come out
-   flush with the score above them. */
-body.stash-liquid-glass .adv-rating-inline-panel .rating-clear {
-    order: -1 !important;
-    margin: 0 5px 0 0 !important;
-    font-size: var(--fs-sm) !important;
-    color: rgba(var(--fg-rgb), 0.42) !important;
-    opacity: 0 !important;
-    transition: opacity var(--dur-fast) ease, color var(--dur-fast) ease !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .rating-row:hover .rating-clear {
-    opacity: 1 !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .rating-clear:hover {
-    color: var(--danger-ink) !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown {
-    padding: 7px 12px !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
-    font-size: var(--fs-xs) !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: var(--track-eyebrow) !important;
-    color: rgba(var(--fg-rgb), 0.42) !important;
-}
-
-/* The breakdown heading and its caret lose the accent. With the panel
-   welded under the strip they were the only coloured text in the drawer,
-   competing with the tier chip that names the rating -- and a disclosure
-   for a subtotal is not the loudest thing here. */
-body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown-heading,
-body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown-caret {
-    color: rgba(var(--fg-rgb), 0.42) !important;
-    font-size: var(--fs-xs) !important;
-    font-weight: 700 !important;
-    letter-spacing: var(--track-eyebrow) !important;
-}
-body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown:hover
-    .adv-rating-breakdown-heading,
-body.stash-liquid-glass .adv-rating-inline-panel .adv-rating-breakdown:hover
-    .adv-rating-breakdown-caret {
-    color: var(--accent-light) !important;
-}

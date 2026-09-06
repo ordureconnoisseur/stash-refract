@@ -1,4 +1,4 @@
-/* Stash Theme - small JS layer.
+/* Stash Theme — small JS layer.
    - Adds body class for theme scope
    - Sweeps v1 DOM artifacts (orphaned label spans, fallback i tags, old Categories link)
    - Replaces the iconless "New" button text with a + SVG
@@ -21,7 +21,7 @@
 
     /* ── Early nav-order injection ───────────────────────────────────────
        Writes saved order as CSS rules into <head> immediately on script
-       execution - before React paints the nav - so items never appear in
+       execution — before React paints the nav — so items never appear in
        the wrong order on page load. setupNavbarReorder() later manages
        the same <style> tag for live drag updates. */
     (function earlyNavOrder() {
@@ -54,30 +54,6 @@
         } catch (e) { /* ignore */ }
     }());
 
-    /* ── Boot guard ──────────────────────────────────────────────────────
-       Every top-level initialiser in this file runs through here. The
-       consolidated mutation watcher at the foot already wraps each of its
-       handlers in try/catch; the FIRST call to each of them is at module
-       scope and was not wrapped, so one initialiser throwing aborted the
-       rest of the IIFE. On an older Stash that is the whole theme: no
-       watcher, no card injection, no settings panel, no navbar work, and
-       a single console error to explain it. A failed initialiser now
-       costs only its own feature. */
-    function refractInit(fn) {
-        try { fn(); } catch (e) {
-            try {
-                /* Name the initialiser from its own source: the wrapper is an
-                   anonymous expression, so fn.name is empty and a bare message
-                   would not say which feature went. */
-                var m = /\{\s*([A-Za-z_$][A-Za-z0-9_$]*)\s*\(/.exec(String(fn));
-                var nm = m ? m[1] : "init";
-                if (window.console && console.warn) {
-                    console.warn("[refract] " + nm + " failed at boot: " + ((e && e.message) || e));
-                }
-            } catch (e2) { /* ignore */ }
-        }
-    }
-
     var REFRACT_PRESETS = ["blue", "pink", "red", "yellow", "purple", "green", "teal"];
     var REFRACT_PRESETS_ALL = ["orange", "blue", "pink", "red", "yellow", "purple", "green", "teal"];
     var ACCENT_STORAGE_KEY = "refract.accent";
@@ -102,7 +78,7 @@
 
     function applyAccentClass(accent) {
         if (!document.body) { return; }
-        /* Only strip the 7 accent classes - not refract-light or
+        /* Only strip the 7 accent classes — not refract-light or
            refract-lite, which are orthogonal axes that the accent
            picker must not clobber. */
         REFRACT_PRESETS.forEach(function (p) {
@@ -132,7 +108,7 @@
                 var r = cs.getPropertyValue("--accent-rgb").trim();
                 /* On a cold load the bundled CSS may not have applied yet,
                    so the accent vars read empty. Retry a few frames before
-                   giving up - otherwise the multiview handoff keeps a stale
+                   giving up — otherwise the multiview handoff keeps a stale
                    accent with no recovery. */
                 if (!a && attempts < 10) {
                     attempts++;
@@ -174,7 +150,7 @@
     }
 
     function applyAccentPreset() { applyAccentClass(getStoredAccent()); }
-    refractInit(function () { applyAccentPreset(); });
+    applyAccentPreset();
 
     /* Refract's accent picker. Hooked into Stash's React tree via
        PluginApi.patch.instead("PluginSettings"), so the plugin panel for
@@ -221,7 +197,7 @@
         };
 
         /* Live preview: one real scene + one real performer rendered with
-           Stash's own card components - pixel-identical to the grid, and
+           Stash's own card components — pixel-identical to the grid, and
            every refract processor treats them as real cards. Falls back
            to the static mocks when the library is empty, the fetch
            fails, the components are unavailable, or a card crashes.
@@ -245,20 +221,8 @@
                 var held = document.querySelector("#plugin-refract-card-preview .refract-card-preview");
                 if (held && held.offsetWidth) { refractPreviewHeldSize = { w: held.offsetWidth, h: held.offsetHeight }; }
                 setPv({ loading: true, scene: null, performer: null, failed: false });
-                /* loadableComponents is a different list on every Stash:
-                   0.26 and 0.27 carry SceneCard and no PerformerCard at all.
-                   loadComponents maps fn() over whatever it is handed, so a
-                   missing entry threw inside it and rejected the whole load,
-                   which took the SceneCard half of the preview down with it.
-                   Ask only for what this server actually offers. */
-                var wanted = [];
-                var lc = PluginApi.loadableComponents;
-                if (lc) {
-                    if (lc.SceneCard) { wanted.push(lc.SceneCard); }
-                    if (lc.PerformerCard) { wanted.push(lc.PerformerCard); }
-                }
-                var componentsReady = (PluginApi.utils && PluginApi.utils.loadComponents && wanted.length)
-                    ? PluginApi.utils.loadComponents(wanted)
+                var componentsReady = (PluginApi.utils && PluginApi.utils.loadComponents && PluginApi.loadableComponents && PluginApi.loadableComponents.SceneCard)
+                    ? PluginApi.utils.loadComponents([PluginApi.loadableComponents.SceneCard, PluginApi.loadableComponents.PerformerCard])
                     : Promise.resolve();
                 Promise.all([componentsReady, refractFetchPreviewData(shuffle)])
                     .then(function (rs) {
@@ -283,13 +247,8 @@
             refractPreviewRefresh = function () { load(false); };
             R.useEffect(function () { load(false); }, []);
 
-            /* `components` is a plain object on every Stash we know of, but
-               reading a property off it happens INSIDE render: if a build
-               ever ships without it, the TypeError unmounts Stash's tree and
-               the page goes blank. The mocks are the answer to "no cards". */
-            var comps = PluginApi.components || {};
-            var SceneCard = comps.SceneCard;
-            var PerformerCard = comps.PerformerCard;
+            var SceneCard = PluginApi.components.SceneCard;
+            var PerformerCard = PluginApi.components.PerformerCard;
             var canReal = !pv.failed && SceneCard && PerformerCard && (pv.scene || pv.performer);
 
             if (pv.loading) {
@@ -301,31 +260,19 @@
                 }, R.createElement("div", { className: "sub-heading" }, "Loading preview…"));
             }
             if (!canReal) {
-                /* Static mock fallback (empty library / error). The fallback
-                   is the last thing standing between a preview problem and
-                   a blank Stash, so it may not throw: a failure here renders
-                   a plain notice instead of unmounting the app. */
+                /* Static mock fallback (empty library / error). It may not
+                   throw: a failure here renders a plain notice instead of
+                   unmounting the app. */
                 var mockHtml = null;
                 try { mockHtml = refractBuildPreviewHtml(); } catch (e) { mockHtml = null; }
                 if (!mockHtml) {
                     return R.createElement("div", { className: "refract-card-preview" },
                         R.createElement("div", { className: "sub-heading" }, "Preview unavailable. The card settings below still apply."));
                 }
-                /* The mocks go inside a `.refract-preview-cards` wrapper for
-                   the same reason the real cards do: every rule that decides
-                   which of the two cards is on stage is keyed on that class
-                   (`.refract-preview-kind-scene .refract-preview-cards
-                   .performer-card` and its mirror in 11_misc_tail.css).
-                   Without the wrapper the fallback matched none of them, so
-                   BOTH mocks drew, stacked, while the Scene card / Performer
-                   card control above them did nothing at all. Measured on a
-                   clean install with the preview query blocked: two cards,
-                   one segmented control that could not move either. */
-                return R.createElement("div", { className: "refract-card-preview" },
-                    R.createElement("div", {
-                        className: "refract-preview-cards",
-                        dangerouslySetInnerHTML: { __html: mockHtml }
-                    }));
+                return R.createElement("div", {
+                    className: "refract-card-preview",
+                    dangerouslySetInnerHTML: { __html: mockHtml }
+                });
             }
             function onCardError() {
                 setPv({ loading: false, scene: null, performer: null, failed: true });
@@ -1167,15 +1114,6 @@
             var studioModeState = R.useState(storedStudioMode);
             var studioMode = studioModeState[0];
             var setStudioModeState = studioModeState[1];
-            var countryModeState = R.useState(countryModePref);
-            var countryMode = countryModeState[0];
-            function pickCountryMode(v) {
-                if (countryMode === v) { return; }
-                try { localStorage.setItem(COUNTRY_MODE_KEY, v); } catch (e) { /* ignore */ }
-                scheduleServerSync();
-                applyCountryModeClass();
-                countryModeState[1](v);
-            }
             function pickStudioMode(v) {
                 if (studioMode === v) { return; }
                 try { localStorage.setItem(STUDIO_MODE_KEY, v); } catch (e) { /* ignore */ }
@@ -1194,7 +1132,7 @@
             var setCardSides = cardSidesState[1];
 
             /* Mirror of Stash's OWN rating system setting. Not a refract
-               setting and deliberately not in REFRACT_SYNC_KEYS - it is
+               setting and deliberately not in REFRACT_SYNC_KEYS — it is
                surfaced here only so you don't have to go and find it. */
             var ratingSysState = R.useState(function () {
                 return document.body.classList.contains("refract-rating-system-stars") ? "stars" : "decimal";
@@ -1217,21 +1155,14 @@
                         var opts = {};
                         Object.keys(cur).forEach(function (k) { opts[k] = cur[k]; });
                         opts.type = (v === "stars") ? "stars" : "decimal";
-                        /* Absent precision means the user never set one, so
-                           the only safe filler is Stash's own default. It
-                           filled "tenth" instead, which on a fresh install
-                           is every user: one click on this control and
-                           their stars became tenth-star, a setting they
-                           never chose and would have to find in Stash's
-                           own panel to undo. */
-                        if (!opts.starPrecision) { opts.starPrecision = "full"; }
+                        if (!opts.starPrecision) { opts.starPrecision = "tenth"; }
                         return gqlWithVars(
                             'mutation($v: Any){ configureUISetting(key: "ratingSystemOptions", value: $v) }',
                             { v: opts }
                         );
                     })
                     .then(function () { refractFetchRatingSystem(); })
-                    .catch(function () { /* no perms / offline - Stash keeps what it had */ });
+                    .catch(function () { /* no perms / offline — Stash keeps what it had */ });
             }
 
             /* Custom CSS Source state: { loaded, url } where url is
@@ -1526,7 +1457,7 @@
                 Object.keys(cardElems).forEach(function (k) { elemMap[k] = cardElems[k]; });
                 CARD_ELEMS.forEach(function (d) {
                     if (d.group !== elemGroup) { return; }
-                    var hidden = presetHidesElem(p, d);
+                    var hidden = p.hide.indexOf(d.key) !== -1;
                     try { localStorage.setItem(d.key, hidden ? "1" : "0"); } catch (e) { /* ignore */ }
                     elemMap[d.key] = hidden;
                 });
@@ -1558,7 +1489,7 @@
 
 
             /* The tier ribbon IS a tier flourish, so it only exists in
-               Extravagant - listing it under Minimal would be a dead row. */
+               Extravagant — listing it under Minimal would be a dead row. */
             /* TWO answers, not five. Either the element does not exist in this
                configuration at all -- a Classic-only element under Refract, a
                plugin you have not installed, the dossier's panels on a gallery
@@ -1663,17 +1594,11 @@
             function elemHasMenu(d) {
                 if (!d) { return false; }
                 if (d.key === "refract.scHideStudio") { return true; }
-                /* A form question counts as a menu, the same way the studio's
-                   does. Without this the country's Name/Flag pair was built
-                   and never reachable: the hit target refuses to open a menu
-                   for an element it thinks has none. */
-                if (d.key === "refract.pcHideCountry") { return true; }
                 return !!d.sideKey;
             }
             function elemActionMenu(d) {
                 var rows = [];
                 var isStudio = d.key === "refract.scHideStudio";
-                var isCountry = d.key === "refract.pcHideCountry";
                 /* Where it sits. This is the only place placement is asked,
                    and it asks about ONE element -- the old shared chip moved
                    every top-edge element at once and could not name what it
@@ -1715,26 +1640,6 @@
                                 ? "Set the studio's name before the scene title instead"
                                 : "Put the studio back in a corner as its logo",
                             onClick: function () { pickStudioMode(o[0]); elemMenuState[1](null); }
-                        }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]));
-                    });
-                }
-                /* The country has a form too: the name, or the flag. One
-                   choice rather than two switches, because they say the same
-                   thing and a card showing both says it twice. Off is still
-                   the element's own switch, so the caption is name, flag or
-                   nothing. */
-                if (isCountry) {
-                    [["name", "Name"], ["flag", "Flag"]].forEach(function (o) {
-                        formRows.push(R.createElement("button", {
-                            key: "cmode-" + o[0],
-                            type: "button",
-                            className: "refract-cc-chip" + (countryMode === o[0] ? " is-on" : ""),
-                            role: "radio",
-                            "aria-checked": countryMode === o[0] ? "true" : "false",
-                            title: o[0] === "flag"
-                                ? "Show the country as its flag instead of its name"
-                                : "Show the country as its name",
-                            onClick: function () { pickCountryMode(o[0]); elemMenuState[1](null); }
                         }, R.createElement("span", { className: "refract-cc-chip-box" }), o[1]));
                     });
                 }
@@ -2316,7 +2221,7 @@
                pictures of the card, drawn from each preset's own flags so a
                preset can never illustrate something it does not do. */
             function presetArt(p) {
-                var hid = function (k) { return presetHidesElem(p, CARD_ELEM_BY_KEY[k] || { key: k }); };
+                var hid = function (k) { return p.hide.indexOf(k) !== -1; };
                 var scene = previewKind === "scene";
                 var ext = (p.flourish || flourish) === "extravagant";
                 var side = function (k, dflt) { return p.sides[k] || dflt; };
@@ -2378,7 +2283,7 @@
                 var hasSides = false;
                 CARD_ELEMS.forEach(function (d) {
                     if (d.group !== elemGroup || d.noop) { return; }
-                    parts.push(d.key + (presetHidesElem(p, d) ? "0" : "1"));
+                    parts.push(d.key + (p.hide.indexOf(d.key) !== -1 ? "0" : "1"));
                     /* In text mode the studio has no corner, so its side and the
                        ribbon-over-logo layer decide nothing, and looks that
                        differ only by those become the same card. */
@@ -2529,7 +2434,7 @@
                 for (i = 0; i < CARD_ELEMS.length; i++) {
                     d = CARD_ELEMS[i];
                     if (d.group !== elemGroup || d.noop) { continue; }
-                    if (!!cardElems[d.key] !== presetHidesElem(p, d)) { return false; }
+                    if (!!cardElems[d.key] !== (p.hide.indexOf(d.key) !== -1)) { return false; }
                     if (d.sideKey && elemGroup === "scene") {
                         if ((cardSides[d.key] || d.sideDefault) !== (p.sides[d.key] || d.sideDefault)) { return false; }
                     }
@@ -2598,7 +2503,7 @@
             function toggleLight() {
                 var next = !lightOn;
                 /* Use View Transitions when supported (Chromium 111+,
-                   Safari 18+, Firefox 137+) - browser snapshots the
+                   Safari 18+, Firefox 137+) — browser snapshots the
                    current state, runs the DOM change, then crossfades.
                    Handles all the visual deltas (bg gradient, shadows,
                    accent glow, text colors) in one smooth fade rather
@@ -2667,7 +2572,7 @@
                     onClick: function () { pick(preset); }
                 });
             });
-            /* Light/dark mode toggle - sun (light on) / moon (light off)
+            /* Light/dark mode toggle — sun (light on) / moon (light off)
                glyph sitting alongside the accent swatches. Sun-gradient
                active state in 11_misc_tail.css makes the current mode
                obvious at a glance. View Transitions crossfade the flip
@@ -2855,9 +2760,8 @@
                                    the CARD, so an overlay pinned to it sits on the
                                    card's own edges. */
                                 R.createElement("div", { className: "refract-cc-cardbox" },
-                                    /* Boundary around the whole preview, not only the
-                                       real cards inside it: whatever fails in here must
-                                       cost the preview, never the page. */
+                                    /* Boundary around the whole preview: whatever fails in
+                                       here must cost the preview, never the page. */
                                     R.createElement(PreviewBoundary, { key: "preview-guard" },
                                         R.createElement(RefractCardPreview)),
                                     cornerLayer()
@@ -3025,7 +2929,7 @@
                         )
                     )
                 ),
-                /* Custom CSS Source setting - disabled for this release.
+                /* Custom CSS Source setting — disabled for this release.
                    Flip the flag to re-enable. Supporting code (cssSrc
                    state, getUiConfig/setCustomCssUrl helpers) stays in
                    place so the underlying flow is intact. */
@@ -3036,7 +2940,9 @@
                         R.createElement("div", null,
                             R.createElement("h3", null, "Theme on login + early load"),
                             R.createElement("div", { className: "sub-heading" },
-                                "Writes the plugin's CSS endpoint URL into Stash's Custom CSS Source so the theme loads BEFORE plugins - on the login page and the first-paint flash of every cold load. Toggle off to remove. ",
+                                "Writes the plugin's CSS endpoint URL into Stash's Custom CSS Source so the theme loads BEFORE plugins ",
+                                R.createElement("—", null),
+                                " on the login page and the first-paint flash of every cold load. Toggle off to remove. ",
                                 cssSrcState.loaded && cssSrcState.url
                                     ? R.createElement("div", { style: { marginTop: "0.4rem", opacity: 0.7, fontSize: "0.75rem", wordBreak: "break-all" } },
                                         "Current: ", cssSrcState.url)
@@ -3066,41 +2972,12 @@
         };
     }
 
-    /* The settings panel component and where it ended up mounted.
-       Published at module scope so the Interface-section injector can
-       mount it directly if the navbar portal host never arrives. */
-    var refractSettingsPanelComponent = null;
-    var refractSettingsMountMode = "none";
-
-    /* `instead` is not the same function on every Stash. Up to 0.26 the
-       registry held ONE function per component and a second registration
-       threw ("instead has already been called for X"); 0.27 made it a list
-       and chained them. So on a 0.26 server, any other plugin that claimed
-       one of our patch points first turned our registration into a throw at
-       module scope. Each registration is its own attempt now: losing one
-       point costs that point, not the file. */
-    function refractPatchInstead(point, fn) {
-        try {
-            PluginApi.patch.instead(point, fn);
-            return true;
-        } catch (e) {
-            try {
-                if (window.console && console.warn) {
-                    console.warn("[refract] could not patch " + point + ": " +
-                        ((e && e.message) || e));
-                }
-            } catch (e2) { /* ignore */ }
-            return false;
-        }
-    }
-
     function registerAccentPatch() {
-        if (typeof PluginApi === "undefined" || !PluginApi.patch ||
-                typeof PluginApi.patch.instead !== "function" || !PluginApi.React) {
+        if (typeof PluginApi === "undefined" || !PluginApi.patch || !PluginApi.React) {
             setTimeout(registerAccentPatch, 100);
             return;
         }
-        refractPatchInstead("PluginSettings", function () {
+        PluginApi.patch.instead("PluginSettings", function () {
             var args = Array.prototype.slice.call(arguments);
             var next = args.pop();
             var props = args[0];
@@ -3128,12 +3005,11 @@
            own SceneCard/PerformerCard, which need the app's
            ConfigurationProvider / IntlProvider / Router contexts.
            MainNavBar.UtilityItems is patchable and mounted on every
-           route; the host itself renders nothing in the navbar - it
+           route; the host itself renders nothing in the navbar — it
            only portals into the injected Interface section container
            whenever that exists. */
         var R3 = PluginApi.React;
         var RefractSettingsPanel = buildAccentSwatchPicker();
-        refractSettingsPanelComponent = RefractSettingsPanel;
         function RefractInterfacePortalHost() {
             var st = R3.useState(null);
             var container = st[0], setContainer = st[1];
@@ -3162,7 +3038,7 @@
                     }
                     /* Stash renders MainNavBar.UtilityItems TWICE (desktop
                        navbar + the collapsed-menu slot), so two hosts
-                       exist and both would portal the panel - duplicating
+                       exist and both would portal the panel — duplicating
                        every settings row. Claim-with-heartbeat on the
                        container: the first host to claim renders and
                        refreshes its claim each tick; the other idles. A
@@ -3172,14 +3048,6 @@
                     var now = Date.now();
                     if (!claim || claim.token === tokenRef.current || (now - claim.at) > 2000) {
                         c._refractHostClaim = { token: tokenRef.current, at: now };
-                        /* The watcher may have written its "could not attach"
-                           notice into this card. A host turning up later means
-                           it was wrong, so clear it before portalling in. */
-                        if (c._refractNoticeShown) {
-                            c.textContent = "";
-                            c._refractNoticeShown = false;
-                        }
-                        refractSettingsMountMode = "portal";
                         if (c !== container) { setContainer(c); }
                     } else if (container) {
                         setContainer(null);
@@ -3188,36 +3056,18 @@
                 return function () { clearInterval(t); };
             }, [container]);
             if (!container) { return null; }
-            /* No portal, no host. Rendering the panel inline in the navbar
-               instead would put the settings in the wrong place AND outside
-               the section they belong to, so an absent createPortal is a
-               reason to render nothing, not a reason to throw in a render
-               path (which unmounts Stash's tree and blanks the page). */
-            if (!PluginApi.ReactDOM || typeof PluginApi.ReactDOM.createPortal !== "function") {
-                return null;
-            }
             return PluginApi.ReactDOM.createPortal(
                 R3.createElement(RefractSettingsPanel, { key: "sync-" + epochSt[0] }), container);
         }
-        /* Registered on two independent patch points. Only one host ever
-           renders the panel -- the claim-with-heartbeat above settles that --
-           but if a plugin replaces one of these components with `instead` and
-           never chains to next, ours goes with it, and the settings become
-           unreachable with no error anywhere. Three points, one survivor --
-           and BooleanSetting is deliberately not in the navbar at all, since
-           it is Stash's own settings row and so renders on the very page the
-           panel belongs to, with the app's providers around it. */
-        ["MainNavBar.UtilityItems", "MainNavBar.MenuItems", "BooleanSetting"].forEach(function (point) {
-            refractPatchInstead(point, function () {
-                var args = Array.prototype.slice.call(arguments);
-                var next = args.pop();
-                var orig = next.apply(null, args);
-                return R3.createElement(R3.Fragment, null, orig,
-                    R3.createElement(RefractInterfacePortalHost, { key: "refract-settings-host" }));
-            });
+        PluginApi.patch.instead("MainNavBar.UtilityItems", function () {
+            var args = Array.prototype.slice.call(arguments);
+            var next = args.pop();
+            var orig = next.apply(null, args);
+            return R3.createElement(R3.Fragment, null, orig,
+                R3.createElement(RefractInterfacePortalHost, { key: "refract-settings-host" }));
         });
     }
-    refractInit(function () { registerAccentPatch(); });
+    registerAccentPatch();
 
     var CATEGORIES_PATH = "/categories";
     var STORAGE_KEY_API = "refract.apiKey";
@@ -3257,49 +3107,21 @@
        default off (overlay shown). */
     var HIDE_CENTER_CONTROLS_KEY = "refract.hideCenterControls";
     var SHOW_FILTER_TAGS_KEY = "refract.showFilterTags";
-    /* Phone card grid: "2" two-up (default) or "1" one card per row.
-       Toggled from the list toolbar's second tier; forum request #203. */
-    var MOBILE_COLS_KEY = "refract.mobileCols";
-    /* Declared here, not beside the dock code below, because
-       REFRACT_SYNC_KEYS is built at load time before that code runs:
-       hoisted but unassigned, the key went into the sync list as
-       undefined and the dock configuration never reached the server. */
-    var DOCK_ITEMS_KEY = "refract.dockItems";
 
-    /* Gender glyphs for banners Refract draws itself (the mock preview card
-       and the performer page's header card). The list card CLONES Stash's
-       own .gender-icon svg, so it always shows the right symbol; these
-       banners have no native icon to clone and used to carry one static
-       venus for every gender, which drew a transgender female performer as
-       female on her own page while her card showed the transgender symbol.
-       Paths are Font Awesome free-solid 7.2 (the set Stash ships), mapped
-       the way Stash's GenderIcon maps them: male mars, female venus,
-       non-binary its own glyph, everything else transgender. Each viewBox
-       is the path's measured bounding box, so every glyph fills the same
-       1.35rem slot at the same optical size. */
-    var REFRACT_GENDER_GLYPHS = {
-        FEMALE: ["16 0 352 544",
-            "M80 176a112 112 0 1 1 224 0 112 112 0 1 1 -224 0zM223.9 349.1C305.9 334.1 368 262.3 368 176 368 78.8 289.2 0 192 0S16 78.8 16 176c0 86.3 62.1 158.1 144.1 173.1-.1 1-.1 1.9-.1 2.9l0 64-32 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l32 0 0 32c0 17.7 14.3 32 32 32s32-14.3 32-32l0-32 32 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-32 0 0-64c0-1 0-1.9-.1-2.9z"],
-        MALE: ["32 0 480 480",
-            "M320 32c0-17.7 14.3-32 32-32L480 0c17.7 0 32 14.3 32 32l0 128c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-50.7-95 95c19.5 28.4 31 62.7 31 99.8 0 97.2-78.8 176-176 176S32 401.2 32 304 110.8 128 208 128c37 0 71.4 11.4 99.8 31l95-95-50.7 0c-17.7 0-32-14.3-32-32zM208 416a112 112 0 1 0 0-224 112 112 0 1 0 0 224z"],
-        NON_BINARY: ["16 -32 352 576",
-            "M192 544c-97.2 0-176-78.8-176-176 0-86.3 62.1-158 144-173l0-47.2-49.7 24.8-3 1.3c-15.2 5.7-32.5-.8-39.9-15.7-7.4-14.8-2.2-32.6 11.5-41.3l2.8-1.6 38.8-19.4-38.8-19.4c-15.8-7.9-22.2-27.1-14.3-42.9 7.4-14.8 24.8-21.4 40-15.6l3 1.3 49.7 24.8 0-44.2c0-17.7 14.3-32 32-32s32 14.3 32 32l0 44.2 49.7-24.8 3-1.3c15.2-5.8 32.5 .8 39.9 15.6s2.2 32.7-11.5 41.3l-2.8 1.6-38.7 19.4 38.7 19.3c15.8 7.9 22.2 27.1 14.3 42.9-7.4 14.8-24.7 21.4-39.9 15.6l-3-1.3-49.7-24.8 0 47.2c81.9 15.1 144 86.8 144 173 0 97.2-78.8 176-176 176zm0-64a112 112 0 1 0 0-224 112 112 0 1 0 0 224z"],
-        TRANSGENDER: ["0 -32 576 576",
-            "M128-32c17.7 0 32 14.3 32 32s-14.3 32-32 32L97.9 32 136 70.1 151 55c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-15 15 14.2 14.2c27.9-23.8 64.2-38.2 103.8-38.2 36.7 0 70.6 12.4 97.6 33.2L466.7 32 448 32c-17.7 0-32-14.3-32-32s14.3-32 32-32l96 0c17.7 0 32 14.3 32 32l0 96c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-18.7-84.4 84.4c13 23.1 20.4 49.9 20.4 78.3 0 77.4-55 142-128 156.8l0 35.2 32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-32 0 0 16c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-16-32 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l32 0 0-35.2c-73-14.8-128-79.4-128-156.8 0-31.4 9-60.7 24.7-85.4l-16.7-16.7-15 15c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l15-15-38.1-38.1 0 30.1c0 17.7-14.3 32-32 32S0 113.7 0 96L0 0C0-17.7 14.3-32 32-32l96 0zM288 336a96 96 0 1 0 0-192 96 96 0 1 0 0 192z"]
-    };
-    function refractGenderGlyphSvg(gender) {
-        var key = (gender === "MALE" || gender === "FEMALE" || gender === "NON_BINARY") ? gender : "TRANSGENDER";
-        var g = REFRACT_GENDER_GLYPHS[key];
-        return '<svg class="gender-icon" viewBox="' + g[0] + '" fill="currentColor" aria-hidden="true"' +
-            (gender ? ' data-gender="' + gender + '"' : '') + '><path d="' + g[1] + '"/></svg>';
-    }
-    /* The mock preview card has no gender data; it shows the female glyph. */
-    var REFRACT_PREVIEW_GENDER_SVG = refractGenderGlyphSvg("FEMALE");
+    /* Gender glyph for the mock name banner — the real banner CLONES the
+       native .gender-icon svg from the card title, which the mocks don't
+       have, so carry a static venus copy with the same class. */
+    var REFRACT_PREVIEW_GENDER_SVG =
+        '<svg class="gender-icon" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true">' +
+        '<path d="M80 176a112 112 0 1 1 224 0A112 112 0 1 1 80 176zM224 349.1c81.9-15 144-86.8 ' +
+        '144-173.1C368 78.8 289.2 0 192 0S16 78.8 16 176c0 86.3 62.1 158.1 144 173.1V384H128' +
+        'c-17.7 0-32 14.3-32 32s14.3 32 32 32h32v32c0 17.7 14.3 32 32 32s32-14.3 32-32V448h32' +
+        'c17.7 0 32-14.3 32-32s-14.3-32-32-32H224V349.1z"/></svg>';
 
     /* Built LAZILY (function, not a var) because it concatenates the shared
        pill icon constants (STAR_SVG, CAKE_SVG, O_ICON_SVG, PLAY_SVG,
        PEOPLE_ICON_SVG, TAG_ICON_SVG) which are declared further down the
-       file - by settings render time they're all assigned. Markup mirrors a
+       file — by settings render time they're all assigned. Markup mirrors a
        REAL processed card (dumped live 2026-07-26): name banner first child,
        circles/counts INSIDE .card-section after the title, icons inside
        every pill. --pc-badge-scale is JS-fitted on real cards; the mock
@@ -3307,11 +3129,8 @@
     /* Placeholder art for the mock cards: inline SVG data URIs, so the
        fallback never shows library content. These two were dropped in the
        customiser rework before 1.22.0 while the markup below kept using
-       them, so the fallback threw ReferenceError the moment it rendered.
-       Nobody saw it until 1.24.0 fixed the settings host: users whose
-       real-card preview fails (empty library, a query the server
-       rejects) then reached the fallback for the first time, and Stash
-       crashed to a blank page (forum #205). */
+       them, so the fallback threw ReferenceError the moment it rendered
+       and Stash unmounted to a blank page (forum #205). */
     var REFRACT_PREVIEW_ART_SCENE = "data:image/svg+xml;utf8," + encodeURIComponent(
         "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'>" +
         "<rect width='16' height='9' fill='#262230'/>" +
@@ -3336,7 +3155,7 @@
             '</div>' +
             /* DIRECT card child on purpose: 03_cards.css hides any banner
                nested deeper (`.scene-card .rating-banner`) and re-shows
-               only `.scene-card > .rating-banner` - refract.js's injected
+               only `.scene-card > .rating-banner` — refract.js's injected
                source-of-truth banner. The mock mirrors the injected one,
                not Stash's hidden native nested banner. */
             '<div class="rating-banner">8.6</div>' +
@@ -3399,24 +3218,14 @@
         " groups { group { id name front_image_path } scene_index }";
     var PREVIEW_SCENE_FIELDS_MOVIES = PREVIEW_SCENE_FIELDS_BASE +
         " movies { movie { id name front_image_path } scene_index }";
-    /* Performer.group_count is the same 0.27 rename as Scene.groups, and it
-       needs the same second answer: on 0.26 the field is movie_count and a
-       query naming group_count is rejected whole, which left the performer
-       half of the preview empty on every reload. */
-    var PREVIEW_PERF_FIELDS_BASE =
+    var PREVIEW_PERF_FIELDS =
         "id name disambiguation gender birthdate country image_path favorite " +
-        "rating100 o_counter scene_count image_count gallery_count " +
+        "rating100 o_counter scene_count image_count gallery_count group_count " +
         "performer_count tags { id name } stash_ids { endpoint stash_id } alias_list";
-    var PREVIEW_PERF_FIELDS = PREVIEW_PERF_FIELDS_BASE + " group_count";
-    var PREVIEW_PERF_FIELDS_MOVIES = PREVIEW_PERF_FIELDS_BASE + " movie_count";
     function refractGqlQuery(query) {
-        /* Same headers as the XHR transport, so a server reached with an API
-           key rather than a session cookie answers this one too. A 401 here
-           used to be indistinguishable from an empty library. */
         return fetch("/graphql", {
             method: "POST",
-            credentials: "same-origin",
-            headers: gqlHeaders(),
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ query: query })
         }).then(function (r) { return r.json(); });
     }
@@ -3433,18 +3242,6 @@
                     JSON.stringify(r.errors).indexOf("groups") !== -1) {
                 refractPreviewSceneFields = PREVIEW_SCENE_FIELDS_MOVIES;
                 return refractGqlQuery(buildQuery(refractPreviewSceneFields));
-            }
-            return r;
-        });
-    }
-    /* The performer half of the same answer, for the same reason. */
-    var refractPreviewPerfFields = PREVIEW_PERF_FIELDS;
-    function refractPerfQuery(buildQuery) {
-        return refractGqlQuery(buildQuery(refractPreviewPerfFields)).then(function (r) {
-            if (r.errors && refractPreviewPerfFields !== PREVIEW_PERF_FIELDS_MOVIES &&
-                    JSON.stringify(r.errors).indexOf("group_count") !== -1) {
-                refractPreviewPerfFields = PREVIEW_PERF_FIELDS_MOVIES;
-                return refractGqlQuery(buildQuery(refractPreviewPerfFields));
             }
             return r;
         });
@@ -3466,14 +3263,9 @@
             return refractSceneQuery(function (F) {
                 return "query { findScenes(filter: { per_page: 1, sort: \"random\" }" + f + ") { scenes { " + F + " } } }";
             }).then(function (r) {
-                    /* A nested resolver error nulls the field but still
-                       carries `data`, so this chain has to be walked, not
-                       assumed: reaching through it threw, and the throw took
-                       the performer half of the preview down with it. */
-                    var list = r.data && r.data.findScenes && r.data.findScenes.scenes;
-                    var s = (list && list[0]) || null;
+                    var s = r.data && r.data.findScenes.scenes[0];
                     if (!s && filtered) { return randomScene(false); }
-                    return s;
+                    return s || null;
                 });
         }
         function randomPerformer(filtered) {
@@ -3482,19 +3274,16 @@
                     ? ", performer_filter: { rating100: { value: 0, modifier: IS_NULL }, scene_count: { value: 0, modifier: GREATER_THAN } }"
                     : ", performer_filter: { rating100: { value: 74, modifier: GREATER_THAN }, scene_count: { value: 0, modifier: GREATER_THAN } }")
                 : "";
-            return refractPerfQuery(function (F) {
-                return "query { findPerformers(filter: { per_page: 1, sort: \"random\" }" + f + ") { performers { " + F + " } } }";
-            }).then(function (r) {
-                    var list = r.data && r.data.findPerformers && r.data.findPerformers.performers;
-                    var p = (list && list[0]) || null;
+            return refractGqlQuery("query { findPerformers(filter: { per_page: 1, sort: \"random\" }" + f + ") { performers { " + PREVIEW_PERF_FIELDS + " } } }")
+                .then(function (r) {
+                    var p = r.data && r.data.findPerformers.performers[0];
                     if (!p && filtered) { return randomPerformer(false); }
-                    return p;
+                    return p || null;
                 });
         }
-        function byId(kind, id2, build) {
-            return build(function (F) {
-                return "query { " + kind + "(id: \"" + id2 + "\") { " + F + " } }";
-            }).then(function (r) { return (r.data && r.data[kind]) || null; });
+        function byId(kind, id2, fields) {
+            return refractGqlQuery("query { " + kind + "(id: \"" + id2 + "\") { " + fields + " } }")
+                .then(function (r) { return (r.data && r.data[kind]) || null; });
         }
         var storedScene = null, storedPerf = null;
         try {
@@ -3510,7 +3299,7 @@
               })
             : randomScene(true);
         var perfP = (!shuffle && storedPerf)
-            ? byId("findPerformer", storedPerf, refractPerfQuery).then(function (p) { return p || randomPerformer(true); })
+            ? byId("findPerformer", storedPerf, PREVIEW_PERF_FIELDS).then(function (p) { return p || randomPerformer(true); })
             : randomPerformer(true);
         return Promise.all([sceneP, perfP]).then(function (rs) {
             try {
@@ -3612,19 +3401,6 @@
            country's. Only offered when Ascension is actually installed. */
         { key: "refract.pcHideRank",       cls: "refract-pc-hide-rank",       group: "performer", label: "Rank badge", plugin: "ascension",
           sel: ".hon-battle-rank-badge" },
-        /* Ascension's Ascended Score, the number it puts beside the rank.
-           The first element in this table that ships OFF, and the reason
-           `defaultHidden` exists. The card read-out is one number: two of
-           them in a 235px caption row is the density the rank badge was
-           moved out of the stat strip to escape, and the score is the one
-           that is not Refract's to lead with. Off it costs nothing; on, it
-           is drawn by refract.js so it wears the same gradient as the rank
-           rather than Ascension's tier colour, which would put a third
-           colour system on a single line. Offered only where Ascension is
-           installed, like the rank badge above. */
-        { key: "refract.pcHideScore",      cls: "refract-pc-hide-score",      group: "performer", label: "Ascended score",
-          plugin: "ascension", defaultHidden: true,
-          sel: ".refract-ascension-score" },
         /* The flip tab, and with it the whole back. Every OTHER thing about the
            back was configurable -- its face, its picture, its stats, its tray,
            each panel of the dossier -- except whether you wanted one. The back
@@ -3700,7 +3476,6 @@
            the front's. One band, one strip, one place to ask about it. */
         "refract.mbHideStats":      "bottom",
         "refract.pcHideRank":       "bottom",
-        "refract.pcHideScore":      "bottom",
         "refract.scHideTitle":      "bl",
         "refract.scHideDetails":    "bl",
         /* Measured on the preview: the flip tab is a 27x40 tab on the card's
@@ -3719,10 +3494,6 @@
        scene title. "text" moves it out of the corner entirely, which is why it
        is a mode rather than another on/off. */
     var STUDIO_MODE_KEY = "refract.scStudioMode";
-    /* The country is ONE thing the card can say, in one of two forms. Two
-       independent switches would have let a card carry "Czechia" and the
-       Czech flag side by side, which is the same fact told twice. */
-    var COUNTRY_MODE_KEY = "refract.pcCountryMode";
     /* The card back. One anatomy: which image it uses, whether the media tray
        is on, and where the rating is drawn. There is deliberately no "style"
        key any more -- Mirror is this same face with the tray off. */
@@ -3908,7 +3679,7 @@
     var RATING_DISP_KEY = "refract.cbRating";
     var CARD_SIDE_KEYS = CARD_ELEMS.filter(function (d) { return d.sideKey; })
         .map(function (d) { return d.sideKey; })
-        .concat([TIER_LAYER_KEY, STUDIO_MODE_KEY, COUNTRY_MODE_KEY, BACK_SRC_KEY, BACK_PILLS_KEY, FRONT_PILLS_KEY,
+        .concat([TIER_LAYER_KEY, STUDIO_MODE_KEY, BACK_SRC_KEY, BACK_PILLS_KEY, FRONT_PILLS_KEY,
             FOOT_PILLS_KEY, BACK_STYLE_KEY, TRAY_KEY, TRAY_PHOTOS_KEY, TRAY_ROWS_KEY,
             RATING_DISP_KEY, CARD_BACK_EXPLICIT_KEY]);
     /* What "Reset card customiser" clears: every element, side and back key.
@@ -3916,56 +3687,8 @@
        those reach past the cards. */
     var REFRACT_CARD_RESET_KEYS = CARD_ELEMS.map(function (d) { return d.key; }).concat(CARD_SIDE_KEYS);
 
-    /* key -> its row, for the readers that only have a key to go on. */
-    var CARD_ELEM_BY_KEY = {};
-    CARD_ELEMS.forEach(function (d) { CARD_ELEM_BY_KEY[d.key] = d; });
-
-    /* An unset key means "whatever this element ships as", not "shown".
-       Everything in the table shipped shown until the Ascended score, so
-       the two used to be the same statement and this could answer without
-       consulting the table at all. The score is another plugin's number on
-       Refract's card and it ships off, so the default lives in the table
-       beside the element, "0" and "1" are the only values that override
-       it, and a key that is merely ABSENT is no longer a key set off.
-
-       Reset comes out right for free: clearing the key returns each
-       element to its own default rather than to a hardcoded shown.
-
-       The performer lane reached this same conclusion independently for
-       the country flag chip (5887e00) and removed its consumer again when
-       the flag folded into Country as a form question (3b25c1f), leaving
-       the mechanism here with nothing using it. Both halves are kept: this
-       reader is the map version because presetHidesElem below calls it per
-       element per look, and the linear scan was the merge's other side. */
-    function cardElemDefaultHidden(key) {
-        var d = CARD_ELEM_BY_KEY[key];
-        return !!(d && d.defaultHidden);
-    }
     function isCardElemHidden(key) {
-        try {
-            var v = localStorage.getItem(key);
-            if (v === null) { return cardElemDefaultHidden(key); }
-            return v === "1";
-        } catch (e) { return cardElemDefaultHidden(key); }
-    }
-    /* A look lists what it HIDES, which quietly assumed every element
-       defaults to shown; four separate readers spelled that assumption
-       `p.hide.indexOf(d.key) !== -1`. A default-off element cannot be
-       expressed that way, and missing ONE of the four is a silent bug:
-       a look would switch the score on, or two looks would collapse to
-       the same signature and one of them would vanish from the row. One
-       function, four callers, so the assumption can only be changed in
-       one place. A look that wants a default-off element ON names it in
-       `show`; every existing look keeps its `hide` list untouched.
-
-       This is the half the other side of the merge did NOT have. Its
-       default-off element was gone by then, so its four raw readers were
-       latent rather than wrong; the Ascended score makes them live again,
-       which is why the fold comes back rather than the mechanism alone. */
-    function presetHidesElem(p, d) {
-        if (p.hide.indexOf(d.key) !== -1) { return true; }
-        if (d.defaultHidden) { return (p.show || []).indexOf(d.key) === -1; }
-        return false;
+        try { return localStorage.getItem(key) === "1"; } catch (e) { return false; }
     }
     function cardElemSide(d) {
         if (!d.sideKey) { return null; }
@@ -4009,16 +3732,6 @@
         try { return localStorage.getItem(STUDIO_MODE_KEY) === "text" ? "text" : "logo"; }
         catch (e) { return "logo"; }
     }
-    /* Name by default: it is what the card showed before the flag existed,
-       so an untouched library does not change. */
-    function countryModePref() {
-        try { return localStorage.getItem(COUNTRY_MODE_KEY) === "flag" ? "flag" : "name"; }
-        catch (e) { return "name"; }
-    }
-    function applyCountryModeClass() {
-        if (!document.body) { return; }
-        document.body.classList.toggle("refract-pc-country-flag", countryModePref() === "flag");
-    }
     function applyStudioModeClass() {
         if (!document.body) { return; }
         document.body.classList.toggle("refract-sc-studio-text", studioModePref() === "text");
@@ -4029,7 +3742,6 @@
     function applyBackClasses() {
         if (!document.body) { return; }
         document.body.classList.toggle("refract-cb-tray-off", !trayOnPref());
-        applyCountryModeClass();
     }
     /* Set the studio's NAME before the scene title. The name is only available
        where Stash rendered a `.studio-overlay` (measured: 13 of 40 cards on the
@@ -4275,9 +3987,9 @@
             localStorage.removeItem("refract.showSceneRes");
         } catch (e) { /* ignore */ }
     })();
-    refractInit(function () { applyCardElemClasses(); });
-    refractInit(function () { applyCardSideClasses(); });
-    refractInit(function () { applyStudioModeClass(); });
+    applyCardElemClasses();
+    applyCardSideClasses();
+    applyStudioModeClass();
 
     /* Settings mirrored to Stash's server-side UI config (see the
        settings-sync block below). RATING_SYSTEM is deliberately excluded:
@@ -4288,279 +4000,8 @@
         HELP_BUTTON_STORAGE_KEY, STUDIO_BANNER_STORAGE_KEY, PERFORMER_CARD_HOVER_KEY,
         MINIMAL_CARDS_STORAGE_KEY, PERF_CARD_STYLE_KEY, FLOURISH_KEY,
         PLUGIN_SORT_DISABLED_BOTTOM_KEY, HIDE_CENTER_CONTROLS_KEY,
-        SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY, COUNTRY_MODE_KEY, MOBILE_COLS_KEY
+        SHOW_FILTER_TAGS_KEY, DOCK_ITEMS_KEY
     ].concat(CARD_ELEMS.map(function (d) { return d.key; })).concat(CARD_SIDE_KEYS);
-
-    function isMobileOneCol() {
-        try { return localStorage.getItem(MOBILE_COLS_KEY) === "1"; } catch (e) { return false; }
-    }
-    function applyMobileColsClass(on) {
-        if (!document.body) { return; }
-        refractSetClass(document.body, "refract-mobile-onecol", !!on);
-        var toggles = document.querySelectorAll(".refract-cols-toggle");
-        for (var i = 0; i < toggles.length; i++) {
-            var pressed = on ? "true" : "false";
-            if (toggles[i].getAttribute("aria-pressed") !== pressed) { toggles[i].setAttribute("aria-pressed", pressed); }
-            var label = on ? "Two cards per row" : "One card per row";
-            if (toggles[i].getAttribute("aria-label") !== label) { toggles[i].setAttribute("aria-label", label); }
-        }
-    }
-    function setMobileOneCol(on) {
-        try { localStorage.setItem(MOBILE_COLS_KEY, on ? "1" : "2"); } catch (e) { /* ignore */ }
-        applyMobileColsClass(on);
-        scheduleServerSync();
-    }
-    /* ── List pages on phones: the sort sheet and the caption ──────────
-       The toolbar keeps ONE tier on phones (search, filter | sort); the
-       demoted controls live in a sheet that refract injects once at body
-       level and rebuilds from the LIVE toolbar each time it opens. Every
-       row is a proxy: sort field and saved filters open Stash's own
-       dropdowns (rendered as modals by the existing mobile rules), the
-       direction segment clicks Stash's direction button, per page sets
-       Stash's select through the native setter plus a change event, and
-       cards per row is refract's own setting. No Stash node moves.
-       Stash's menus are rendered lazily (empty until opened), so the sort
-       field list is one tap deeper than the board drew it. */
-    var refractListSheetBypass = false;
-    function refractListToolbar() {
-        return document.querySelector(".filtered-list-toolbar");
-    }
-    function refractInjectListSheet() {
-        if (document.querySelector(".refract-list-sheet")) { return true; }
-        if (!document.body) { return false; }
-        var sheet = document.createElement("div");
-        sheet.className = "refract-list-sheet";
-        sheet.setAttribute("role", "dialog");
-        sheet.setAttribute("aria-label", "Sort and view");
-        sheet.addEventListener("click", function (e) {
-            var t = e.target;
-            if (!t || !t.closest) { return; }
-            var act = t.closest("[data-sheet-action]");
-            if (!act) { return; }
-            e.preventDefault();
-            refractListSheetAction(act.getAttribute("data-sheet-action"), act.getAttribute("data-sheet-value"));
-        });
-        document.body.appendChild(sheet);
-        return true;
-    }
-    function refractSheetProxy(sel) {
-        var tb = refractListToolbar();
-        var el = tb && tb.querySelector(sel);
-        if (!el) { return false; }
-        refractListSheetBypass = true;
-        try { el.click(); } finally { refractListSheetBypass = false; }
-        return true;
-    }
-    function refractListSheetAction(action, value) {
-        var tb = refractListToolbar();
-        if (action === "close") { refractCloseListSheet(); return; }
-        if (action === "sort-field") { refractCloseListSheet(); refractSheetProxy(".sort-by-select .dropdown-toggle"); return; }
-        if (action === "sort-dir") {
-            var cur = refractSortDirection(tb);
-            if (cur && cur !== value) { refractSheetProxy(".sort-by-select .input-group-prepend + button, .sort-by-select > button:not(.dropdown-toggle)"); }
-            setTimeout(refractRenderListSheet, 80);
-            return;
-        }
-        if (action === "saved") { refractCloseListSheet(); refractSheetProxy(".saved-filter-dropdown .dropdown-toggle"); return; }
-        if (action === "ops") { refractCloseListSheet(); refractSheetProxy(".list-operations .dropdown-toggle"); return; }
-        if (action === "mv-add") { refractCloseListSheet(); refractSheetProxy("#mv-filter-add-btn, .mv-filter-add-btn"); return; }
-        if (action === "new" && value) {
-            refractCloseListSheet();
-            if (window.location.pathname !== value) {
-                window.history.pushState(null, "", value);
-                window.dispatchEvent(new PopStateEvent("popstate"));
-            }
-            return;
-        }
-        if (action === "per-page") {
-            var sel = tb && tb.querySelector(".page-size-selector select, select.form-control");
-            if (sel && sel.value !== value) {
-                try {
-                    var setter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, "value").set;
-                    setter.call(sel, value);
-                    sel.dispatchEvent(new Event("change", { bubbles: true }));
-                } catch (e) { sel.value = value; }
-            }
-            setTimeout(refractRenderListSheet, 80);
-            return;
-        }
-        if (action === "cols") { setMobileOneCol(value === "1"); refractRenderListSheet(); return; }
-    }
-    function refractSortDirection(tb) {
-        var b = tb && (tb.querySelector(".sort-by-select .input-group-prepend + button") || tb.querySelector(".sort-by-select > button:not(.dropdown-toggle)"));
-        var svg = b && b.querySelector("svg");
-        var icon = svg && (svg.getAttribute("data-icon") || "");
-        if (!icon) { return null; }
-        return /up/.test(icon) ? "asc" : "desc";
-    }
-    var REFRACT_SHEET_ICONS = {
-        close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
-        asc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
-        desc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>',
-        cols2: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/></svg>',
-        cols1: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/></svg>'
-    };
-    function refractRenderListSheet() {
-        var sheet = document.querySelector(".refract-list-sheet");
-        var tb = refractListToolbar();
-        if (!sheet || !tb) { return; }
-        var esc = refractAttrEscape;
-        var sortToggle = tb.querySelector(".sort-by-select .dropdown-toggle");
-        var sortLabel = sortToggle ? (sortToggle.textContent || "").trim() : "";
-        var dir = refractSortDirection(tb);
-        var sel = tb.querySelector(".page-size-selector select, select.form-control");
-        var perOpts = [];
-        if (sel) {
-            for (var o = 0; o < sel.options.length; o++) {
-                var v = sel.options[o].value;
-                if (/^\d+$/.test(v) && (perOpts.length < 4 || v === sel.value)) { perOpts.push(v); }
-            }
-            if (perOpts.indexOf(sel.value) === -1 && /^\d+$/.test(sel.value)) { perOpts.push(sel.value); }
-        }
-        var hasSaved = !!tb.querySelector(".saved-filter-dropdown .dropdown-toggle");
-        /* Stash's "New" lives in the top navbar, which phones retired on
-           2026-07-28, so creating a performer, studio, tag, group or
-           gallery had been impossible on a phone since then (P6). The
-           sheet's Actions group carries it as its first, primary row,
-           only when the live link exists and the route allows it (the
-           same two conditions the old navbar mirror used). */
-        var newLink = refractRouteAllowsNew() ? document.querySelector('nav.top-nav a[href$="/new"]') : null;
-        var newHref = newLink && newLink.getAttribute("href");
-        var newNoun = "";
-        if (newHref) {
-            var seg = newHref.replace(/\/new$/, "").split("/").filter(Boolean).pop() || "";
-            var nouns = { performers: "performer", studios: "studio", tags: "tag", groups: "group", movies: "group", galleries: "gallery", scenes: "scene", images: "image" };
-            newNoun = nouns[seg] || "";
-        }
-        var hasOps = !!tb.querySelector(".list-operations .dropdown-toggle");
-        var mvAdd = tb.querySelector("#mv-filter-add-btn, .mv-filter-add-btn");
-        var oneCol = isMobileOneCol();
-        var seg = function (items, current, action) {
-            var h = '<span class="refract-seg" role="group">';
-            for (var i = 0; i < items.length; i++) {
-                h += '<button type="button" class="' + (items[i].v === current ? "is-on" : "") + '" data-sheet-action="' + action + '" data-sheet-value="' + esc(items[i].v) + '" aria-pressed="' + (items[i].v === current ? "true" : "false") + '" aria-label="' + esc(items[i].l) + '">' + (items[i].icon || esc(items[i].l)) + '</button>';
-            }
-            return h + '</span>';
-        };
-        var html =
-            '<div class="refract-sheet-head"><span class="refract-sheet-title">Sort and view</span>' +
-            '<button type="button" class="refract-sheet-close" data-sheet-action="close" aria-label="Close">' + REFRACT_SHEET_ICONS.close + '</button></div>';
-        if (sortToggle) {
-            html += '<div class="refract-sheet-group">Sort by</div>' +
-                '<button type="button" class="refract-sheet-row" data-sheet-action="sort-field"><span class="refract-sheet-label">' + esc(sortLabel || "Sort") + '</span><span class="refract-sheet-value">Change</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
-            if (dir) {
-                html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Direction</span>' +
-                    seg([{ v: "asc", l: "Ascending", icon: REFRACT_SHEET_ICONS.asc }, { v: "desc", l: "Descending", icon: REFRACT_SHEET_ICONS.desc }], dir, "sort-dir") + '</div>';
-            }
-        }
-        if (hasSaved) {
-            html += '<div class="refract-sheet-group">Saved filters</div>' +
-                '<button type="button" class="refract-sheet-row" data-sheet-action="saved"><span class="refract-sheet-label">Saved filters</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
-        }
-        html += '<div class="refract-sheet-group">View</div>';
-        if (sel && perOpts.length) {
-            html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Per page</span>' +
-                seg(perOpts.map(function (v) { return { v: v, l: v }; }), sel.value, "per-page") + '</div>';
-        }
-        html += '<div class="refract-sheet-row"><span class="refract-sheet-label">Cards per row</span>' +
-            seg([{ v: "2", l: "Two cards per row", icon: REFRACT_SHEET_ICONS.cols2 }, { v: "1", l: "One card per row", icon: REFRACT_SHEET_ICONS.cols1 }], oneCol ? "1" : "2", "cols") + '</div>';
-        if (hasOps || mvAdd || newHref) {
-            html += '<div class="refract-sheet-group">Actions</div>';
-            if (newHref) {
-                html += '<button type="button" class="refract-sheet-row refract-sheet-primary" data-sheet-action="new" data-sheet-value="' + esc(newHref) + '"><span class="refract-sheet-label">New' + (newNoun ? " " + esc(newNoun) : "") + '</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
-            }
-            if (hasOps) {
-                html += '<button type="button" class="refract-sheet-row" data-sheet-action="ops"><span class="refract-sheet-label">Select, export, edit, delete</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
-            }
-            if (mvAdd) {
-                /* multiview picking mode's "+" (add this filter as a
-                   slot): a bare glyph in the bar on the user's phone; it
-                   is a demoted control like the rest. */
-                html += '<button type="button" class="refract-sheet-row" data-sheet-action="mv-add"><span class="refract-sheet-label">Add this filter to multiview</span><span class="refract-sheet-chev" aria-hidden="true"></span></button>';
-            }
-        }
-        if (sheet.innerHTML !== html) { sheet.innerHTML = html; }
-    }
-    function refractOpenListSheet() {
-        refractInjectListSheet();
-        refractCloseBurger();
-        refractRenderListSheet();
-        refractSetDockContracted(false);
-        refractSetClass(document.body, "refract-list-sheet-open", true);
-    }
-    function refractCloseListSheet() {
-        refractSetClass(document.body, "refract-list-sheet-open", false);
-    }
-    /* On phones the sort half of the group opens the sheet instead of
-       Stash's dropdown; the sheet's own "Change" row reaches the dropdown
-       through the bypass. Bound once, capture phase, so React never sees
-       the intercepted tap. */
-    function refractBindListSheet() {
-        if (window.__refractListSheetBound) { return; }
-        window.__refractListSheetBound = true;
-        document.addEventListener("click", function (e) {
-            var t = e.target;
-            if (!t || !t.closest) { return; }
-            if (!refractDockIsMobile()) { return; }
-            var open = document.body.classList.contains("refract-list-sheet-open");
-            if (open && !t.closest(".refract-list-sheet")) {
-                refractCloseListSheet();
-                if (t.closest(".refract-burger-scrim")) { e.preventDefault(); e.stopPropagation(); return; }
-            }
-            if (refractListSheetBypass) { return; }
-            if (t.closest(".filtered-list-toolbar .sort-by-select .dropdown-toggle")) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (open) { refractCloseListSheet(); } else { refractOpenListSheet(); }
-                return;
-            }
-            /* The caption is the link to the in-flow pager. */
-            var cap = t.closest(".pagination-index-container[data-pager-row=\"hide\"]");
-            if (cap) {
-                var pager = document.querySelector('[data-pager-row="float"]');
-                if (pager && pager.scrollIntoView) { pager.scrollIntoView({ block: "center", behavior: "smooth" }); }
-            }
-        }, true);
-        document.addEventListener("keydown", function (e) {
-            if (e.key === "Escape" && document.body.classList.contains("refract-list-sheet-open")) { refractCloseListSheet(); }
-        });
-    }
-    /* Per pass: the caption's "N per page" and the search placeholder's
-       noun. Both are attributes React does not own on those nodes (it
-       set placeholder once; it never changes the prop, so it never
-       rewrites it). Read before write. */
-    var REFRACT_SEARCH_NOUNS = { scenes: "scenes", performers: "performers", studios: "studios", tags: "tags", galleries: "galleries", images: "images", groups: "groups", movies: "movies", markers: "markers" };
-    function injectMobileColsToggle() {
-        refractInjectListSheet();
-        refractBindListSheet();
-        var tb = refractListToolbar();
-        if (!tb) { return true; }
-        var sel = tb.querySelector(".page-size-selector select, select.form-control");
-        /* The container, not its pager-row tag: initFloatingPager tags it on
-           nextTick AFTER this pass, so on a page whose last mutation is the
-           stats arriving (/images) the tagged selector never matched and
-           the caption carried no per-page. The container is only ever the
-           top pager's row. */
-        var cap = document.querySelector(".pagination-index-container");
-        if (cap && sel && /^\d+$/.test(sel.value)) {
-            var txt = sel.value + " per page";
-            if (cap.getAttribute("data-per-page") !== txt) { cap.setAttribute("data-per-page", txt); }
-        }
-        var input = tb.querySelector('input[placeholder*="Search"]');
-        if (input && refractDockIsMobile()) {
-            var seg = refractPathFromLocation().split("/").filter(Boolean);
-            var noun = REFRACT_SEARCH_NOUNS[seg[seg.length - 1]] || (seg.length === 1 ? REFRACT_SEARCH_NOUNS[seg[0]] : null);
-            if (noun) {
-                var ph = "Search " + noun;
-                if (input.getAttribute("placeholder") !== ph) { input.setAttribute("placeholder", ph); }
-            }
-        }
-        /* A re-rendered toolbar loses its stuck class between scroll
-           events; re-derive it every pass. */
-        if (refractDockIsMobile()) { refractSetToolbarStuck((window.scrollY || 0) >= REFRACT_DOCK_NEAR_TOP); }
-        if (document.body.classList.contains("refract-list-sheet-open")) { refractRenderListSheet(); }
-        return true;
-    }
 
     function isPluginSortDisabledBottom() {
         try {
@@ -4570,7 +4011,7 @@
 
     var GRAPHQL_URL = "/graphql";
 
-    /* Custom CSS Source (Stash interface config) - lets the theme load
+    /* Custom CSS Source (Stash interface config) — lets the theme load
        on login / pre-plugin screens. We expose an "Apply / Remove"
        button in the plugin settings panel that writes the plugin's
        CSS endpoint URL into Stash's `cSSURL` (a.k.a. Custom CSS Source
@@ -4606,7 +4047,7 @@
         });
     }
 
-    /* Lite mode - strips backdrop-blur (the heaviest GPU cost on
+    /* Lite mode — strips backdrop-blur (the heaviest GPU cost on
        Windows Chromium / D3D11), hover glow halos, and the 3D card
        tilt-glare. Animations, base shadows, transitions, and the
        performer carousel loop clones all stay on. CSS rules in
@@ -4622,9 +4063,9 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-lite", !!on);
     }
-    refractInit(function () { applyLiteModeClass(isLiteModeEnabled()); });
+    applyLiteModeClass(isLiteModeEnabled());
 
-    /* Engine flag - true for Blink/Chromium (Chrome/Edge/Opera/Brave), false
+    /* Engine flag — true for Blink/Chromium (Chrome/Edge/Opera/Brave), false
        for Gecko (Firefox) and WebKit (Safari). backdrop-filter raster behaves
        very differently across these, so a couple of perf mitigations branch on
        it. Detect by the "Chrome/" UA token (absent in Firefox and Safari). */
@@ -4636,11 +4077,11 @@
        mass-rebuilt hundreds of GPU compositing layers, FREEZING the home page
        for seconds on scroll. It was already gated off for Gecko/WebKit (only
        caused a pop-in flash there, no raster win) and its Chromium benefit was
-       marginal at best - net-negative. Static blur scrolls acceptably; the
+       marginal at best — net-negative. Static blur scrolls acceptably; the
        toggle cost far more than it saved. (The body.refract-scrolling CSS rules
        were removed from 17_scroll_perf.css in the same change.) */
 
-    /* Light mode - orthogonal to accents. Toggles a white/paper base
+    /* Light mode — orthogonal to accents. Toggles a white/paper base
        via the `refract-light` body class; CSS rules in css/14_light.css
        override tokens + hardcoded shadows. Pairs with any accent.
        Loads BEFORE 15_lite.css so lite's !important shadow-strip wins
@@ -4650,8 +4091,8 @@
             return localStorage.getItem(LIGHT_MODE_STORAGE_KEY) === "1";
         } catch (e) { return false; }
     }
-    /* Safari on iOS (and Chrome on Android) tint the browser chrome -
-       the status-bar strip above the page - from the theme-color meta,
+    /* Safari on iOS (and Chrome on Android) tint the browser chrome —
+       the status-bar strip above the page — from the theme-color meta,
        which Stash never sets, so it renders WHITE against the dark
        theme on phones. Maintain one matching the page's top-edge
        colour (the --bg-1 end of the body gradient), tracking light
@@ -4672,8 +4113,7 @@
         document.body.classList.toggle("refract-light", !!on);
         refractApplyThemeColorMeta(!!on);
     }
-    refractInit(function () { applyLightModeClass(isLightModeEnabled()); });
-    refractInit(function () { applyMobileColsClass(isMobileOneCol()); });
+    applyLightModeClass(isLightModeEnabled());
 
     /* Light-mode navbar toggle visibility. Defaults to ON so users can
        discover light mode without digging into plugin settings. Stash
@@ -4689,7 +4129,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-show-light-nav", !!on);
     }
-    refractInit(function () { applyLightToggleNavbarClass(isLightToggleNavbarVisible()); });
+    applyLightToggleNavbarClass(isLightToggleNavbarVisible());
 
     /* Help button visibility. Refract hides Stash's navbar Help (?) button
        by default; this opt-in toggle re-shows it via the `refract-show-help`
@@ -4704,7 +4144,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-show-help", !!on);
     }
-    refractInit(function () { applyHelpButtonClass(isHelpButtonVisible()); });
+    applyHelpButtonClass(isHelpButtonVisible());
 
     /* Studio banner visibility. Refract shows the studio NAME as a small
        muted label above the scene title by default (the logo image is
@@ -4721,7 +4161,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-studio-banner", !!on);
     }
-    refractInit(function () { applyStudioBannerClass(isStudioBannerVisible()); });
+    applyStudioBannerClass(isStudioBannerVisible());
 
     /* Performer-card-on-hover. By default hovering a performer circle on a
        scene card shows a small name-only tooltip; this opt-in toggle swaps
@@ -4737,7 +4177,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-performer-card-hover", !!on);
     }
-    refractInit(function () { applyPerformerCardHoverClass(isPerformerCardHover()); });
+    applyPerformerCardHoverClass(isPerformerCardHover());
 
     /* Scene-player center controls hide. Refract overlays back-10 /
        play / forward-10 buttons on the scene player; this opt-in toggle
@@ -4755,7 +4195,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-hide-center-controls", !!on);
     }
-    refractInit(function () { applyCenterControlsHiddenClass(isCenterControlsHidden()); });
+    applyCenterControlsHiddenClass(isCenterControlsHidden());
 
     /* Active-filter chips row. Theme hides it by default (the filter
        button badge shows the count); this opt-in re-shows it so filters
@@ -4771,14 +4211,14 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-show-filter-tags", !!on);
     }
-    refractInit(function () { applyFilterTagsShownClass(isFilterTagsShown()); });
+    applyFilterTagsShownClass(isFilterTagsShown());
 
-    /* Scene card style. "refract" (default) = tidier minimal layout -
+    /* Scene card style. "refract" (default) = tidier minimal layout —
        description block hidden so the grid stays consistent across
        scenes with and without descriptions. "classic" = Stash's
        original layout with description, file path, and details
        visible. Body class `refract-minimal-cards` is on the "refract"
-       branch - every selector in 08_misc_mid.css + 15_lite.css that
+       branch — every selector in 08_misc_mid.css + 15_lite.css that
        hides/restyles native card details is scoped to that class, so
        "classic" mode = absence of the class. Legacy boolean values
        ("1" / "0") mapped transparently for backwards-compat. */
@@ -4794,7 +4234,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-minimal-cards", style === "refract");
     }
-    refractInit(function () { applyCardStyleClass(getStoredCardStyle()); });
+    applyCardStyleClass(getStoredCardStyle());
 
     /* The old single "Card rating style" (intensity / tiers / playing-card)
        bundled two independent axes and is retired. It is now:
@@ -4862,9 +4302,9 @@
             localStorage.removeItem(RATING_STYLE_STORAGE_KEY);
         } catch (e) { /* ignore */ }
     })();
-    refractInit(function () { applyCardModeClasses(); });
+    applyCardModeClasses();
 
-    /* View-mode minimiser feature toggle. Default enabled - Refract
+    /* View-mode minimiser feature toggle. Default enabled — Refract
        collapses Stash's row of view-mode buttons into a single icon +
        expand chevron to reduce toolbar clutter. Users who prefer the
        original Stash btn-group can disable this in plugin settings. */
@@ -4887,18 +4327,11 @@
         return "";
     }
 
-    /* Tag.sort_name arrived in Stash 0.28. Naming it on an older server got
-       the whole query rejected, so the Categories page rendered a raw
-       GraphQL error instead of the grid. Without sort_name the grid falls
-       back to `name`, which is what it displays anyway. */
-    var QUERY_ROOT_TAGS_SN = { narrow: false };
-    function refractRootTagsQueryText(full) {
-        var sn = full ? " sort_name" : "";
-        return 'query StashThemeRootTags { findTags(' +
-            '  filter: { per_page: -1, sort: "name", direction: ASC },' +
-            '  tag_filter: { parents: { modifier: IS_NULL } }' +
-            ') { count tags { id name' + sn + ' scene_count children { id name' + sn + ' scene_count } } } }';
-    }
+    var QUERY_ROOT_TAGS =
+        'query StashThemeRootTags { findTags(' +
+        '  filter: { per_page: -1, sort: "name", direction: ASC },' +
+        '  tag_filter: { parents: { modifier: IS_NULL } }' +
+        ') { count tags { id name sort_name scene_count children { id name sort_name scene_count } } } }';
 
     var PLUS_SVG =
         '<svg class="stash-injected-icon svg-inline--fa fa-icon" viewBox="0 0 448 512" aria-hidden="true">' +
@@ -4921,7 +4354,7 @@
        OStats) monkey-patch window.fetch to inject their own per-response
        hooks. Those hooks assume a specific data shape (e.g. data.data.findScene)
        and throw synchronously inside their patched .then when refract's
-       responses don't match - which rejects refract's promise chain and
+       responses don't match — which rejects refract's promise chain and
        silently breaks scene-card badge injection (initSceneCards's catch
        swallows the error). XHR isn't typically intercepted, so this
        sidesteps the whole class of conflict. */
@@ -4942,7 +4375,7 @@
                    failures hit onerror). Without this guard an auth error
                    (401/403/422) with a parseable JSON body resolves with
                    res.data === undefined, which callers can't distinguish
-                   from a legitimately empty result - so enrichment silently
+                   from a legitimately empty result — so enrichment silently
                    no-ops with no retry signal. */
                 if (xhr.status < 200 || xhr.status >= 300) {
                     var httpMsg = (res && res.errors && res.errors.length &&
@@ -4952,7 +4385,7 @@
                 }
                 /* GraphQL total failure: errors present AND no data at all.
                    Partial success (some aliased findScene calls resolved,
-                   others errored - see initSceneCards) still carries `data`,
+                   others errored — see initSceneCards) still carries `data`,
                    so we resolve and let the caller use what it got. */
                 if (res && res.errors && res.errors.length && res.data == null) {
                     reject(new Error(res.errors[0].message || "GraphQL error"));
@@ -4973,37 +4406,9 @@
         return gqlXhr(JSON.stringify({ query: query, variables: variables }));
     }
 
-    /* ── Asking for a field the server may not have ─────────────────────
-       Refract runs on Stash 0.26 upwards and several fields it reads
-       arrived later: Scene.groups and Performer.group_count in 0.27,
-       Performer.custom_fields and Tag.sort_name in 0.28. GraphQL rejects a
-       query naming an unknown field OUTRIGHT - no partial data, no data at
-       all - so one field the server has never heard of used to cost the
-       whole feature it sat in, not the one line it feeds.
-
-       `build(full)` returns the query with the optional fields in (true) or
-       out (false). The first rejection that names one of them narrows the
-       query, and `state.narrow` remembers the answer for the session, so
-       the cost is one wasted request per feature per page load, not one per
-       call. Anything else still rejects: a permissions or network failure
-       must not be mistaken for an old schema. */
-    function refractQueryOptional(state, fields, build, variables) {
-        if (state.narrow) { return gqlWithVars(build(false), variables); }
-        return gqlWithVars(build(true), variables)["catch"](function (err) {
-            var msg = String((err && err.message) || err || "");
-            for (var i = 0; i < fields.length; i++) {
-                if (msg.indexOf(fields[i]) !== -1) {
-                    state.narrow = true;
-                    return gqlWithVars(build(false), variables);
-                }
-            }
-            throw err;
-        });
-    }
-
     /* ── Server-side settings sync ──────────────────────────────────────
        refract settings live in localStorage for an instant, flash-free
-       boot, but localStorage is per-origin and per-browser - so settings
+       boot, but localStorage is per-origin and per-browser — so settings
        "reset" when Stash is reached via a different URL/session/relaunch.
        Mirror them into Stash's server-side UI config
        (configuration.ui.refract) so they persist per-server everywhere.
@@ -5028,7 +4433,7 @@
             gqlWithVars(
                 'mutation($v: Any){ configureUISetting(key: "refract", value: $v) }',
                 { v: snapshotRefractSettings() }
-            ).catch(function () { /* offline / no perms - localStorage still holds it */ });
+            ).catch(function () { /* offline / no perms — localStorage still holds it */ });
         }, 400);
     }
 
@@ -5044,7 +4449,6 @@
             applyAccentClass(getStoredAccent());
             applyLiteModeClass(isLiteModeEnabled());
             applyLightModeClass(isLightModeEnabled());
-            applyMobileColsClass(isMobileOneCol());
             applyLightToggleNavbarClass(isLightToggleNavbarVisible());
             applyHelpButtonClass(isHelpButtonVisible());
             applyStudioBannerClass(isStudioBannerVisible());
@@ -5058,7 +4462,7 @@
         } catch (e) { /* ignore */ }
     }
 
-    /* Boot reconcile: pull the server copy. If present, it wins - write it
+    /* Boot reconcile: pull the server copy. If present, it wins — write it
        into localStorage and re-apply. If absent (first run after upgrade),
        migrate the current localStorage settings up to the server. */
     /* Server keys that were split or renamed live on in old server copies
@@ -5127,13 +4531,13 @@
                    converges instead of staying one change behind. */
                 if (editedInFlight) { scheduleServerSync(); }
             } else if (Object.keys(snapshotRefractSettings()).length) {
-                /* No server copy yet - migrate current localStorage up. */
+                /* No server copy yet — migrate current localStorage up. */
                 scheduleServerSync();
             }
             refractSettleSync();
-        }).catch(function () { refractSettleSync(); /* no server / no auth - stay on localStorage */ });
+        }).catch(function () { refractSettleSync(); /* no server / no auth — stay on localStorage */ });
     }
-    refractInit(function () { initSettingsSync(); });
+    initSettingsSync();
 
     /* Detect Stash's rating-system type (STARS vs DECIMAL). We can't read
        this from the rating-banner alone because Stash only writes the
@@ -5153,35 +4557,29 @@
             var cached = localStorage.getItem(RATING_SYSTEM_STORAGE_KEY);
             if (cached) { applyRatingSystemClass(cached); }
         } catch (e) { /* ignore */ }
-        /* `configuration.ui` is a Map! scalar in Stash's GraphQL schema -
+        /* `configuration.ui` is a Map! scalar in Stash's GraphQL schema —
            you can't subselect fields on it. Query the whole blob and
            read ratingSystemOptions.type from the deserialised object.
 
-           A MISSING `ratingSystemOptions` means the user has never
-           touched the setting, and Stash's own default for that case is
-           STARS (ui/v2.5/src/utils/rating.ts:
-           `defaultRatingSystemType = RatingSystemType.Stars`, read
-           through `config?.ui.ratingSystemOptions ?? default` by
-           RatingSystem, RatingBanner and the settings panel alike). We
-           used to read missing as decimal, which is the state of every
-           fresh install: measured on a clean 0.31.1 with 15 scenes, the
-           app drew five stars while refract's own settings row said
-           "Decimal" and the card banners kept the 0-10 scale. Stash
-           always writes an explicit type once the setting is changed,
-           so absent can only mean the default. */
+           If `ratingSystemOptions.type` is missing (Stash's default,
+           decimal mode, doesn't always serialise the field), treat as
+           non-stars and clear the cached value — otherwise a previous
+           "stars" cache would stick across a switch to decimal. */
         gql("query { configuration { ui } }")
             .then(function (res) {
                 var ui = res && res.data && res.data.configuration
                     && res.data.configuration.ui;
-                /* No usable config blob in a *successful* response - don't
-                   clobber the cached value. (An errored/auth-failed
+                /* No usable config blob in a *successful* response — don't
+                   clobber the cached value with "". (An errored/auth-failed
                    response now rejects in gqlXhr and lands in .catch below,
-                   so it never reaches here and the cache is preserved.) */
+                   so it never reaches here and the cache is preserved.)
+                   When ui IS present, an empty type legitimately means
+                   decimal mode, so writing "" is correct. */
                 if (!ui) { return; }
-                var t = (ui.ratingSystemOptions && ui.ratingSystemOptions.type) || "stars";
+                var t = (ui.ratingSystemOptions && ui.ratingSystemOptions.type) || "";
                 try { localStorage.setItem(RATING_SYSTEM_STORAGE_KEY, t); } catch (e) { /* ignore */ }
                 applyRatingSystemClass(t);
-            }).catch(function () { /* ignore - keep cached value */ });
+            }).catch(function () { /* ignore — keep cached value */ });
     }
 
     function escapeHtml(s) {
@@ -5204,7 +4602,7 @@
     }
 
     /* Insert newNode into parent before referenceNode. Falls back to
-       appendChild if referenceNode isn't actually a child of parent -
+       appendChild if referenceNode isn't actually a child of parent —
        React re-renders can detach references between query and call,
        causing "Child to insert before is not a child of this node"
        errors that break unrelated DOM work in the same cycle. */
@@ -5239,7 +4637,7 @@
             var num = m[1];
             if (starsMode) {
                 var parsed = parseFloat(num);
-                /* Only divide if the value is in the 0–10 range - if
+                /* Only divide if the value is in the 0–10 range — if
                    Stash is already showing a 0–5 number we leave it. */
                 if (isFinite(parsed) && parsed > 5) {
                     num = String(Math.round((parsed / 2) * 100) / 100);
@@ -5302,7 +4700,7 @@
         var logoUrl = getStoredLogoUrl();
         var existingLogo = btn.querySelector(".refract-custom-logo");
         if (logoUrl) {
-            /* Custom logo set - render a masked <span> tinted to the same
+            /* Custom logo set — render a masked <span> tinted to the same
                --text white as the rest of the navbar icons. The image is
                used as a CSS mask, not a foreground bitmap, so any
                opaque pixel paints in the accent-aware text colour. Skip
@@ -5322,7 +4720,7 @@
                 btn.appendChild(logo);
             }
         } else {
-            /* Default orb - strip any text/svg/img so Refract's CSS
+            /* Default orb — strip any text/svg/img so Refract's CSS
                renders the empty styled circle. */
             if (btn.tagName === "A") {
                 var aText = (btn.textContent || "").replace(/\s+/g, " ").trim();
@@ -5342,7 +4740,7 @@
             btn.setAttribute("aria-label", "Home");
             aria = "Home";
         }
-        if (btn.getAttribute("title") !== aria) { btn.setAttribute("title", aria); }
+        btn.setAttribute("title", aria);
         return true;
     }
 
@@ -5397,7 +4795,7 @@
         if (!fullLabel) {
             fullLabel = "Add directory";
         }
-        /* Avoid touching the DOM when already normalized - prevents MutationObserver feedback loops. */
+        /* Avoid touching the DOM when already normalized — prevents MutationObserver feedback loops. */
         if (
             btn.classList.contains("btn-primary") &&
             !btn.querySelector("svg.stash-injected-icon") &&
@@ -5416,7 +4814,7 @@
 
     /* Available Plugins page: Stash renders the "Add source" button at the
        bottom of the package-sources table, far from the disabled "Install"
-       button at the top - move it next to Install so they form one cluster. */
+       button at the top — move it next to Install so they form one cluster. */
     function relocateAddSourceButton() {
         if (!/^\/settings(\/|$)/.test(refractPathFromLocation())) return;
         var addBtn = null;
@@ -5445,7 +4843,7 @@
         return true;
     }
 
-    /* Custom mobile burger button - injected into the navbar via JS. CSS
+    /* Custom mobile burger button — injected into the navbar via JS. CSS
        (12_mobile.css) gates visibility on (pointer: coarse) so it only
        shows on touch devices. Toggles `refract-burger-open` on <body>;
        CSS re-styles `.navbar-collapse` as a dropdown panel in that state.
@@ -5562,7 +4960,7 @@
         return true;
     }
 
-    /* Body-level backdrop scrim - fades in/out with the drawer.
+    /* Body-level backdrop scrim — fades in/out with the drawer.
        Click closes. Injected once, idempotent. */
     function injectBurgerScrim() {
         if (document.querySelector(".refract-burger-scrim")) { return true; }
@@ -5612,7 +5010,7 @@
         return true;
     }
 
-    /* Open / close - toggles body class which animates the drawer. Both
+    /* Open / close — toggles body class which animates the drawer. Both
        burger instances (legacy top-nav one and the bottom dock's) get
        the is-open X morph so whichever is visible reads correctly. */
     function refractSetBurgerState(open) {
@@ -5626,30 +5024,18 @@
         document.body.classList.add("refract-burger-open");
         refractSetBurgerState(true);
         refractMarkActiveDrawerTile();
-        refractSetDockContracted(false);
-        refractMarkActiveDockItem();
     }
     function refractCloseBurger() {
         if (!document.body.classList.contains("refract-burger-open")) { return; }
         refractSetBurgerState(false);
         document.body.classList.remove("refract-burger-open");
-        refractMarkActiveDockItem();
     }
 
-    /* Mobile drawer - body-level overlay built from a hardcoded item
+    /* Mobile drawer — body-level overlay built from a hardcoded item
        list. Independent of Stash's navbar DOM (which we hide entirely
        on mobile). Each tile is an <a> whose click triggers SPA nav via
        pushState + popstate (Stash's React Router responds to popstate). */
-    /* Home is first and `always: true`. Stash's navbar carries no Home
-       LINK - only the brand, which the phone layout hides with the rest
-       of the navbar - so before this tile there was no way to reach the
-       home page on a phone at all (forum thread 7183, post 204). It is
-       also not one of Stash's menuItems, so it can never be "disabled in
-       Stash's interface settings"; `always` exempts it from the
-       disabled-route pass below, which would otherwise hide it whenever
-       the brand anchor is not an exact href="/" match. */
     var MOBILE_NAV_ITEMS = [
-        { href: "/",               label: "Home",       icon: "home",     always: true },
         { href: "/scenes",         label: "Scenes",     icon: "scenes" },
         { href: "/images",         label: "Images",     icon: "images" },
         { href: "/groups",         label: "Movies",     icon: "movies",   aliases: ["/movies"] },
@@ -5663,7 +5049,6 @@
     ];
 
     var MOBILE_NAV_ICONS = {
-        home:       '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.2L12 3l9 7.2"/><path d="M5.6 9V20.6H18.4V9"/><path d="M9.9 20.6v-5.4h4.2v5.4z" fill="currentColor" stroke="none"/></svg>',
         scenes:     '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z" fill="currentColor" stroke="none"/></svg>',
         images:     '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.6" fill="currentColor" stroke="none"/><path d="M21 16l-5-5-9 9"/></svg>',
         movies:     '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="9" r="5"/><circle cx="15.5" cy="9" r="5"/><circle cx="12" cy="15.5" r="5"/></svg>',
@@ -5676,7 +5061,7 @@
         settings:   '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>'
     };
 
-    /* Mobile bottom dock - iOS-style fixed pill bar with the essential
+    /* Mobile bottom dock — iOS-style fixed pill bar with the essential
        routes one tap away (Scenes, Performers, Studios, Tags, Settings)
        and a burger tile at the end that opens the full drawer for
        everything else (secondary pages + plugin tiles). Replaces the
@@ -5688,8 +5073,7 @@
        Refract -> Mobile dock): a click-to-select icon grid persisted as
        a JSON key array. Default: the four core routes + burger. */
     var MOBILE_DOCK_DEFAULT = ["/scenes", "/performers", "/studios", "/tags"];
-    /* DOCK_ITEMS_KEY is declared with the other storage keys near the top
-       of the file; see the note there. */
+    var DOCK_ITEMS_KEY = "refract.dockItems";
 
     function refractGetDockSelection() {
         try {
@@ -5704,7 +5088,7 @@
         return MOBILE_DOCK_DEFAULT.slice();
     }
 
-    /* Every dock candidate, harvested from the DRAWER's tiles - the
+    /* Every dock candidate, harvested from the DRAWER's tiles — the
        drawer is already the canonical registry of everything mirrorable
        (hardcoded routes, plugin route tiles, plugin ACTION tiles like
        DiceR / SFWSwitch / Ascension). Keys: the route href, or
@@ -5762,45 +5146,11 @@
         return items;
     }
 
-    /* The More sheet shows everything that is NOT in the dock. Stamp
-       data-in-dock on the drawer rows whose key the dock carries, then
-       hide any group label whose band has no visible row. Reads before
-       it writes; runs every dock pass (13-odd rows). */
-    function refractSyncDrawerRows(dockItems) {
-        var drawer = document.querySelector(".refract-mobile-drawer");
-        if (!drawer) { return; }
-        var inDock = {};
-        for (var i = 0; i < dockItems.length; i++) { inDock[dockItems[i].key] = true; }
-        var tiles = drawer.querySelectorAll(".refract-drawer-tile");
-        var counts = { library: 0, plugins: 0, stash: 0 };
-        for (var t = 0; t < tiles.length; t++) {
-            var tile = tiles[t];
-            var actionKey = tile.getAttribute("data-action");
-            var key = actionKey ? ("action:" + actionKey) : tile.getAttribute("data-href");
-            var on = !!(key && inDock[key]);
-            if (tile.hasAttribute("data-in-dock") !== on) {
-                if (on) { tile.setAttribute("data-in-dock", "1"); } else { tile.removeAttribute("data-in-dock"); }
-            }
-            if (!on && !tile.classList.contains("refract-drawer-tile-off")) {
-                var g = tile.getAttribute("data-group") || "plugins";
-                if (counts.hasOwnProperty(g)) { counts[g]++; }
-            }
-        }
-        var labels = drawer.querySelectorAll(".refract-drawer-group");
-        for (var l = 0; l < labels.length; l++) {
-            var empty = !counts[labels[l].getAttribute("data-group")];
-            if (labels[l].classList.contains("is-empty") !== empty) {
-                labels[l].classList.toggle("is-empty", empty);
-            }
-        }
-    }
-
     function injectMobileDock() {
         if (!document.body) { return false; }
         var items = refractDockItemsFromSelection();
         var sig = items.map(function (x) { return x.key; }).join("|");
         var existing = document.querySelector(".refract-mobile-dock");
-        refractSyncDrawerRows(items);
         if (existing) {
             /* Idempotent per configuration: rebuild only when the item
                set changed (selection edited, or plugin tiles arrived). */
@@ -5811,11 +5161,8 @@
         dock.className = "refract-mobile-dock";
         dock.setAttribute("aria-label", "Quick navigation");
         dock.setAttribute("data-sig", sig);
-        /* Slot count (items + More) drives the pill arithmetic in
-           12_mobile.css; the pill itself is ONE element that slides. */
-        dock.style.setProperty("--dock-count", String(items.length + 1));
 
-        var html = '<span class="refract-dock-pill" aria-hidden="true"></span>';
+        var html = "";
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
             if (item.actionSelector) {
@@ -5846,9 +5193,6 @@
 
         dock.addEventListener("click", function (e) {
             if (!e.target || !e.target.closest) { return; }
-            /* A tap on the capsule expands it (binge NavChrome: a tap is
-               one of the three ways back to the expanded state). */
-            refractSetDockContracted(false);
             var burger = e.target.closest(".refract-dock-burger");
             if (burger) {
                 if (document.body.classList.contains("refract-burger-open")) {
@@ -5902,7 +5246,6 @@
         if (!dock) { return; }
         var path = window.location.pathname;
         var tiles = dock.querySelectorAll(".refract-dock-item[data-href]");
-        var activeIdx = -1;
         for (var i = 0; i < tiles.length; i++) {
             var t = tiles[i];
             var routes = [t.getAttribute("data-href")]
@@ -5915,114 +5258,8 @@
                     break;
                 }
             }
-            if (t.classList.contains("is-active") !== active) { t.classList.toggle("is-active", active); }
-            if (active && activeIdx < 0) { activeIdx = refractDockSlotIndex(dock, t); }
+            t.classList.toggle("is-active", active);
         }
-        /* The pill: one element, positioned from the active slot index
-           (12_mobile.css does the arithmetic). While the drawer is open
-           the pill parks on More; with no matching route it fades out
-           rather than sitting on a wrong slot. Read-before-write, like
-           every class writer here (zero redundant writes per pass). */
-        if (document.body.classList.contains("refract-burger-open")) {
-            var burger = dock.querySelector(".refract-dock-burger");
-            if (burger) { activeIdx = refractDockSlotIndex(dock, burger); }
-        }
-        var has = activeIdx >= 0;
-        if (dock.classList.contains("refract-dock-has-active") !== has) {
-            dock.classList.toggle("refract-dock-has-active", has);
-        }
-        if (has && dock.style.getPropertyValue("--dock-active") !== String(activeIdx)) {
-            dock.style.setProperty("--dock-active", String(activeIdx));
-        }
-    }
-
-    /* Slot index of a dock item = its position among the .refract-dock-item
-       children (the pill span is not a slot). */
-    function refractDockSlotIndex(dock, el) {
-        var slots = dock.querySelectorAll(".refract-dock-item");
-        for (var i = 0; i < slots.length; i++) { if (slots[i] === el) { return i; } }
-        return -1;
-    }
-
-    /* Dock contraction (binge NavChrome, ported): direction, not activity.
-       Scrolling DOWN past a 5px deadzone contracts the capsule; scrolling
-       up, being within 80px of the top, a tap on the dock, or the drawer
-       opening expands it. The class goes on the dock (and on the floating
-       pager, which rides above it), never on body: a body class toggled on
-       scroll is the document-wide effect DESIGN_SYSTEM 3.7 rule 1 forbids.
-       Under prefers-reduced-motion the bar never resizes. Never contracts
-       while the drawer is open, the lightbox is up, or something is
-       fullscreen (those surfaces own the viewport). Desktop widths are a
-       no-op: the dock is display:none there and the class would be noise. */
-    var REFRACT_DOCK_DEADZONE = 5;
-    var REFRACT_DOCK_NEAR_TOP = 80;
-    var refractDockMq = null;
-    function refractDockIsMobile() {
-        if (!refractDockMq && window.matchMedia) {
-            refractDockMq = window.matchMedia("(max-width: 900px)");
-        }
-        return !!(refractDockMq && refractDockMq.matches);
-    }
-    /* The list toolbar takes the chrome material while stuck (past 80px);
-       the class lives on the toolbar element, never on body. */
-    function refractSetToolbarStuck(on) {
-        var bars = document.querySelectorAll(".filtered-list-toolbar");
-        for (var i = 0; i < bars.length; i++) { refractSetClass(bars[i], "refract-stuck", !!on); }
-    }
-    function refractSetDockContracted(on) {
-        var dock = document.querySelector(".refract-mobile-dock");
-        if (!dock) { return; }
-        if (dock.classList.contains("refract-dock-contracted") === on) { return; }
-        dock.classList.toggle("refract-dock-contracted", on);
-        var pagers = document.querySelectorAll('[data-pager-row="float"]');
-        for (var i = 0; i < pagers.length; i++) {
-            pagers[i].classList.toggle("refract-dock-contracted", on);
-        }
-    }
-    function refractBindDockScroll() {
-        if (window.__refractDockScrollBound) { return; }
-        window.__refractDockScrollBound = true;
-        var reduceMotion = window.matchMedia
-            && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (reduceMotion) {
-            window.addEventListener("scroll", function () {
-                if (refractDockIsMobile()) { refractSetToolbarStuck((window.scrollY || 0) >= REFRACT_DOCK_NEAR_TOP); }
-            }, { passive: true });
-            return;
-        }
-        var anchorY = window.scrollY || 0;
-        var pending = false;
-        function tick() {
-            pending = false;
-            if (!refractDockIsMobile()) { return; }
-            var y = window.scrollY || 0;
-            refractSetToolbarStuck(y >= REFRACT_DOCK_NEAR_TOP);
-            if (document.body.classList.contains("refract-burger-open")
-                    || document.fullscreenElement
-                    || document.querySelector(".Lightbox")) {
-                anchorY = y;
-                refractSetDockContracted(false);
-                return;
-            }
-            if (y < REFRACT_DOCK_NEAR_TOP) {
-                anchorY = y;
-                refractSetDockContracted(false);
-                return;
-            }
-            var dy = y - anchorY;
-            if (dy > REFRACT_DOCK_DEADZONE) {
-                anchorY = y;
-                refractSetDockContracted(true);
-            } else if (dy < -REFRACT_DOCK_DEADZONE) {
-                anchorY = y;
-                refractSetDockContracted(false);
-            }
-        }
-        window.addEventListener("scroll", function () {
-            if (pending) { return; }
-            pending = true;
-            window.requestAnimationFrame(tick);
-        }, { passive: true });
     }
 
     function injectMobileDrawer() {
@@ -6031,31 +5268,13 @@
         drawer.className = "refract-mobile-drawer";
         drawer.setAttribute("aria-label", "Mobile navigation");
 
-        /* The More sheet (12_mobile.css): a header with the sheet's name
-           and the one whole-sheet action, three group labels, then the
-           tiles as rows. Groups are flex order on data-group; plugin and
-           action tiles carry none and land in the Plugins band. Stats and
-           Settings are Stash's own, everything else hardcoded is Library. */
-        var html =
-            '<div class="refract-drawer-head">' +
-                '<span class="refract-drawer-title">More</span>' +
-                '<a class="refract-drawer-edit" href="/settings?tab=interface#plugin-refract-dock-config" aria-label="Edit dock">' +
-                    '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg>' +
-                    'Edit dock' +
-                '</a>' +
-            '</div>' +
-            '<div class="refract-drawer-group is-empty" data-group="library">Library</div>' +
-            '<div class="refract-drawer-group is-empty" data-group="plugins">Plugins</div>' +
-            '<div class="refract-drawer-group is-empty" data-group="stash">Stash</div>';
+        var html = "";
         for (var i = 0; i < MOBILE_NAV_ITEMS.length; i++) {
             var item = MOBILE_NAV_ITEMS[i];
             var icon = MOBILE_NAV_ICONS[item.icon] || "";
-            var group = (item.href === "/stats" || item.href === "/settings") ? "stash" : "library";
             html +=
                 '<a class="refract-drawer-tile" href="' + item.href + '" data-href="' + item.href + '"' +
                     ((item.aliases && item.aliases.length) ? ' data-aliases="' + item.aliases.join(" ") + '"' : '') +
-                    (item.always ? ' data-always-on="1"' : '') +
-                    ' data-group="' + group + '"' +
                     ' aria-label="' + item.label + '">' +
                     '<span class="refract-drawer-tile-icon">' + icon + '</span>' +
                 '</a>';
@@ -6065,37 +5284,6 @@
         drawer.addEventListener("click", function (e) {
             var t = e.target;
             if (!t || !t.closest) { return; }
-            if (t.closest(".refract-drawer-edit")) {
-                /* SPA-navigate to Settings > Interface and bring the Mobile
-                   dock setting into view once the portal has rendered it
-                   (the router ignores the hash; we scroll ourselves). */
-                e.preventDefault();
-                refractCloseBurger();
-                if (window.location.pathname !== "/settings" || window.location.search.indexOf("tab=interface") === -1) {
-                    window.history.pushState(null, "", "/settings?tab=interface");
-                    window.dispatchEvent(new PopStateEvent("popstate"));
-                }
-                var tries = 0;
-                (function seek() {
-                    var target = document.getElementById("plugin-refract-dock-config");
-                    if (target) {
-                        target.scrollIntoView({ block: "start" });
-                        /* The interface tab keeps rendering above the
-                           section after the first scroll (measured: the
-                           heading landed 58.8px above the viewport), so
-                           settle once more and leave 12px of air. */
-                        setTimeout(function () {
-                            var t2 = document.getElementById("plugin-refract-dock-config");
-                            if (!t2) { return; }
-                            var top = t2.getBoundingClientRect().top;
-                            if (Math.abs(top - 12) > 2) { window.scrollBy(0, top - 12); }
-                        }, 700);
-                        return;
-                    }
-                    if (++tries < 40) { setTimeout(seek, 100); }
-                })();
-                return;
-            }
             var tile = t.closest(".refract-drawer-tile");
             if (!tile) { return; }
             /* Action tiles (DiceR roll, SFWSwitch toggle) mirror a plugin's
@@ -6113,7 +5301,7 @@
             /* target="_blank" tiles (plugin launcher buttons like binge/
                desire/forage/Stash TV, which open a standalone app in a new
                tab rather than an in-app route) get the native anchor click
-               behaviour - no preventDefault, no fake SPA nav. Faking a
+               behaviour — no preventDefault, no fake SPA nav. Faking a
                pushState+popstate to a static plugin-asset path that no
                React Router route matches would just rewrite the URL bar
                and do nothing, silently breaking the tile. */
@@ -6206,13 +5394,13 @@
        (performer / scene / tag / gallery / studio) for refract's own
        navbar SVGs, so card footers match the nav. The FA <Icon> renders
        <svg data-icon="user|tag|play-circle|...">; we keep that element
-       (don't replaceWith - that detaches React's fiber) and rewrite its
+       (don't replaceWith — that detaches React's fiber) and rewrite its
        viewBox + inner paths + stroke styling in place. Re-keying data-icon
        to "<name>-refract" makes the next watcher pass skip it; a React
        re-render restores the FA glyph + original data-icon, which the
        watcher re-catches. */
     /* Keyed by the popover button's stable class (.performer-count etc.),
-       NOT FA's data-icon - FA7 renamed those (only "user" still matched,
+       NOT FA's data-icon — FA7 renamed those (only "user" still matched,
        which is why just the performer icon swapped first time round). */
     var CARD_POPOVER_BTN_ICON = {
         "performer-count": "performers",
@@ -6257,11 +5445,11 @@
 
     /* Normalize an arbitrary (plugin-authored) icon's color to currentColor
        so it always reads against refract's dark glass tiles. Plugins inject
-       icons in all sorts of ways - some inherit color via a CSS class (fine,
+       icons in all sorts of ways — some inherit color via a CSS class (fine,
        survives as currentColor already), but others bake a literal color
        into a fill/stroke attribute or inline style (e.g. a legacy FA4-style
        glyph, or an icon lib that hardcodes "#212529"). That literal color
-       clones verbatim and, if dark, is invisible on our dark background -
+       clones verbatim and, if dark, is invisible on our dark background —
        reads to the user as "the icon is missing" when the tile/link are
        actually fine. Root gets fill/stroke forced to currentColor so any
        child with NO explicit color inherits it normally; a child WITH an
@@ -6286,14 +5474,10 @@
        hardcoded MOBILE_NAV_ITEMS, then builds a tile in our style
        using the plugin's own SVG. Idempotent (skips tiles that exist),
        runs every watcher tick so plugins that mount late get caught.
-       Skips /new contextual buttons - those get mirrored next to the
+       Skips /new contextual buttons — those get mirrored next to the
        burger via injectMobileNewButton instead. */
     var NATIVE_NAV_SKIP = {
-        /* Home is a hardcoded MOBILE_NAV_ITEM now, so the `known` check
-           above catches the brand anchor first and this entry never
-           fires. Kept so a navbar that renders home some other way still
-           cannot produce a second, plugin-styled Home tile. */
-        "/": true,
+        "/": true,        // home — brand orb already covers it
         "/setup": true,
         "/migrate": true
     };
@@ -6326,7 +5510,7 @@
             if (!href) { continue; }
             if (known[href]) { knownPresent[href] = true; continue; }
             if (NATIVE_NAV_SKIP[href]) { continue; }
-            // /new contextual button - mirrored separately next to burger.
+            // /new contextual button — mirrored separately next to burger.
             if (/\/new$/.test(href)) { continue; }
             // External / system links we never want in the drawer.
             if (href.indexOf("logout") !== -1) { continue; }
@@ -6339,7 +5523,7 @@
                mirror, and the drawer's target="_blank" branch launches them
                correctly. */
             if (/^https?:/i.test(href) && href.indexOf(window.location.origin) !== 0) { continue; }
-            /* Not a real route - a "javascript:"/"#" href means the link is
+            /* Not a real route — a "javascript:"/"#" href means the link is
                actually a click-handler-driven action (e.g. a plugin's modal
                trigger styled as a nav pill, like Ascension's ranking button)
                rather than a page to navigate to. Faking SPA navigation to it
@@ -6349,7 +5533,7 @@
                get a proxy-click entry in PLUGIN_ACTION_TILES instead (as
                Ascension now does). */
             if (/^(javascript:|#)/i.test(href.replace(/^\s+/, ""))) { continue; }
-            // Already rendered - still mark present so reconcile keeps it.
+            // Already rendered — still mark present so reconcile keeps it.
             if (drawer.querySelector('.refract-drawer-tile[data-href="' + refractAttrEscape(href) + '"]')) { present[href] = true; continue; }
 
             var srcSvg = link.querySelector("svg");
@@ -6366,7 +5550,7 @@
             tile.setAttribute("aria-label", label);
             tile.setAttribute("data-plugin-tile", "1");
             // Carry target/rel so standalone-app launcher buttons (binge,
-            // desire, forage, Stash TV - real routes that open in a new
+            // desire, forage, Stash TV — real routes that open in a new
             // tab rather than an in-app page) keep that behaviour when
             // mirrored here; see the drawer's click handler above.
             var linkTarget = link.getAttribute("target");
@@ -6424,11 +5608,10 @@
         if (navReady) {
             /* Exclude action tiles (data-action-tile): they mirror plugin
                controls, not routes, so they have no data-href to match a live
-               navbar route - without this exclusion the "disabled route" pass
+               navbar route — without this exclusion the "disabled route" pass
                would stamp them refract-drawer-tile-off on every tick and hide
-               them. Exclude data-always-on too (Home): it mirrors no menu
-               item, so its absence from menuItems is not a signal. */
-            var htiles = drawer.querySelectorAll(".refract-drawer-tile:not([data-plugin-tile]):not([data-action-tile]):not([data-always-on])");
+               them. */
+            var htiles = drawer.querySelectorAll(".refract-drawer-tile:not([data-plugin-tile]):not([data-action-tile])");
             for (var h = 0; h < htiles.length; h++) {
                 var htile = htiles[h];
                 var hcands = [htile.getAttribute("data-href") || ""];
@@ -6438,7 +5621,11 @@
                 for (var hc = 0; hc < hcands.length; hc++) {
                     if (hcands[hc] && knownPresent[hcands[hc]]) { enabled = true; break; }
                 }
-                refractSetClass(htile, "refract-drawer-tile-off", !enabled);
+                if (enabled) {
+                    htile.classList.remove("refract-drawer-tile-off");
+                } else {
+                    htile.classList.add("refract-drawer-tile-off");
+                }
             }
         }
 
@@ -6450,7 +5637,7 @@
        the drawer. The route-mirror above can't reach these: DiceR's roll
        button has href="javascript:void(0)" and no <svg> (its icon is a CSS
        mask), and SFWSwitch's toggle is a <button> whose wrapping <a> has no
-       href - so neither is a real route with a clonable icon on an a[href].
+       href — so neither is a real route with a clonable icon on an a[href].
        For each registered control we find the live source button, build a
        tile with a matching icon (cloned from the source's own svg when it
        has one, else the spec's inline markup), and forward the tile's click
@@ -6477,7 +5664,7 @@
             label: "Ascension",
             /* Ascension's ranking button: href="javascript:void(0);" with a
                click handler (openRankingModal) bound to the anchor itself, so
-               the proxy-click pattern fires the modal. No spec icon - the
+               the proxy-click pattern fires the modal. No spec icon — the
                source button carries a clean currentColor flame svg that the
                clone fallback below mirrors faithfully. */
             selector: "#plugin_hon"
@@ -6488,22 +5675,12 @@
             /* multiView's floating picking launcher is BODY-level (not a
                navbar control) and hidden on mobile by 12_mobile.css; this
                tile mirrors its open button so launches work from the
-               drawer. Exists only while picking mode is on - the tile
+               drawer. Exists only while picking mode is on — the tile
                appears/disappears with it. Its two counters (scene picks +
                filter slots) collapse into ONE combined badge, painted by
                the badge pass below. */
             selector: "#mv-open-btn",
             scope: "body"
-        },
-        {
-            key: "xenith",
-            label: "Xenith",
-            /* Xenith's navbar control is a <button> that opens a modal (no
-               route), so the a[href] drawer mirror above can't reach it.
-               No spec icon - the source button carries a clean
-               currentColor volcano svg that the clone fallback below
-               mirrors faithfully, same as #plugin_hon above. */
-            selector: "#hon-floating-btn"
         }
     ];
     function refractAppendPluginActionTiles() {
@@ -6575,7 +5752,7 @@
             if (mvTotal > 0) {
                 if (!mvBadge) {
                     mvBadge = document.createElement("span");
-                    mvBadge.className = "refract-drawer-tile-badge refract-chip";
+                    mvBadge.className = "refract-drawer-tile-badge";
                     mvTile.appendChild(mvBadge);
                 }
                 if (mvBadge.textContent !== String(mvTotal)) {
@@ -6594,7 +5771,7 @@
         var tiles = drawer.querySelectorAll(".refract-drawer-tile");
         /* Hash-aware path (bare pathname is always "/" under hash routing);
            honour each tile's data-aliases; and light up the LONGEST matching
-           prefix so /scenes/markers lights Markers, not Scenes - mirrors
+           prefix so /scenes/markers lights Markers, not Scenes — mirrors
            markActiveUtilityButtons(). */
         var path = refractPathFromLocation();
         var best = null, bestLen = -1;
@@ -6642,11 +5819,7 @@
             refractCloseBurger();
             refractMarkActiveDrawerTile();
             refractMarkActiveDockItem();
-            refractSetDockContracted(false);
-            refractSetToolbarStuck(false);
-            refractCloseListSheet();
         }
-        refractBindDockScroll();
         if (typeof PluginApi !== "undefined" && PluginApi && PluginApi.Event && PluginApi.Event.addEventListener) {
             PluginApi.Event.addEventListener("stash:location", onLocationChange);
         }
@@ -6685,7 +5858,7 @@
     }
 
     /* Stash renders <div class="troubleshooting-mode-button"> as a direct child of .nav, not inside
-       <div class="nav-item"> like tab links - wrap it so layout matches Tools / About, etc. */
+       <div class="nav-item"> like tab links — wrap it so layout matches Tools / About, etc. */
     function normalizeSettingsSidebarNavItems() {
         if (!/^\/settings(\/|$)/.test(refractPathFromLocation())) return false;
         var allTb = document.querySelectorAll(".troubleshooting-mode-button");
@@ -6805,391 +5978,6 @@
             '<span>See All</span>';
         panel.appendChild(a);
         return true;
-    }
-
-    /* ── Entity pages: the scope control ──────────────────────────────
-       A studio or tag detail page hangs on one question: are you looking
-       at this entity, or at everything underneath it. Stash answers it
-       with an unlabelled switch sitting below the tab strip
-       (`#showSubContent`) whose two states differ, on Brazzers, by 12
-       scenes against 963.
-
-       This paints a two-segment readout into the header carrying BOTH
-       counts, so the choice states its own consequence before you make
-       it. Nothing is re-implemented and nothing is moved: the native
-       checkbox stays exactly where React put it, every click is
-       forwarded to it, and Stash keeps the state (P4). The native row
-       is hidden by CSS only while `body.refract-has-scope` says the
-       proxy is actually up, so if any of this fails the original
-       control is still there.
-
-       The counts are asked of the server, never summed from the
-       children. A scene carries both a parent tag and its child, so
-       summing Anal's 22 sub-tags gives 12,360 against a true 6,567.
-       `depth: -1` is the only honest source. Studios happen to be
-       summable (a scene has one studio) but go through the same path.
-       One query per entity, cached for the session. */
-    var REFRACT_EP_COUNTS = {};
-    var REFRACT_EP_KINDS = {
-        /* Studios ask for their children's names and counts because
-           nothing on a studio page lists them: Stash puts the
-           subsidiaries behind the last tab and the header never mentions
-           they exist. Tags ask only for ids, because a tag header
-           already renders every sub-tag as a chip and a second ranked
-           run would say the same thing twice. */
-        studios: {
-            kind: "studio", field: "studios", head: ".studio-head",
-            query: "findStudio", kids: "child_studios",
-            kidFields: "id name scene_count", childTab: "childstudios",
-            kinLabel: "The network, by what each site holds",
-            kinMore: "sites", kinHref: "/studios/"
-        },
-        tags: {
-            kind: "tag", field: "tags", head: ".tag-head",
-            query: "findTag", kids: "children", kidFields: "id"
-        }
-    };
-
-    function refractEpContext() {
-        var m = refractPathFromLocation().match(/^\/(studios|tags)\/(\d+)/);
-        if (!m) { return null; }
-        var spec = REFRACT_EP_KINDS[m[1]];
-        if (!spec) { return null; }
-        var head = document.querySelector(".detail-header " + spec.head);
-        if (!head) { return null; }
-        return { spec: spec, id: m[2], head: head, key: spec.kind + ":" + m[2] };
-    }
-
-    function refractEpFetchCounts(ctx) {
-        if (REFRACT_EP_COUNTS[ctx.key] !== undefined) { return; }
-        REFRACT_EP_COUNTS[ctx.key] = "pending";
-        var f = ctx.spec.field;
-        var sel = ':{value:["' + ctx.id + '"], modifier:INCLUDES, depth:';
-        var q = "{ own: findScenes(filter:{per_page:0}, scene_filter:{" + f + sel + '0}}){ count } ' +
-                "all: findScenes(filter:{per_page:0}, scene_filter:{" + f + sel + '-1}}){ count } ' +
-                'kids: ' + ctx.spec.query + '(id:"' + ctx.id + '"){ ' + ctx.spec.kids +
-                ' { ' + ctx.spec.kidFields + ' } } }';
-        refractGqlQuery(q).then(function (r) {
-            var d = r && r.data;
-            if (!d || !d.own || !d.all) { REFRACT_EP_COUNTS[ctx.key] = "failed"; return; }
-            var kids = (d.kids && d.kids[ctx.spec.kids]) || [];
-            /* Ranked by what each child holds, not alphabetically. On
-               Brazzers that is the difference between reading "Baby Got
-               Boobs" first and reading "Brazzers Exxtra 561", which is
-               58% of the network in one cell. */
-            var list = kids.slice().sort(function (a, b) {
-                return (b.scene_count || 0) - (a.scene_count || 0);
-            });
-            REFRACT_EP_COUNTS[ctx.key] = {
-                own: d.own.count,
-                all: d.all.count,
-                kids: kids.length,
-                list: list
-            };
-            try { injectEntityScope(); } catch (e) {}
-            try { injectEntityKin(); } catch (e) {}
-        }).catch(function () { REFRACT_EP_COUNTS[ctx.key] = "failed"; });
-    }
-
-    function refractEpNum(n) {
-        try { return Number(n).toLocaleString(); } catch (e) { return String(n); }
-    }
-
-    function refractEpLabels(ctx, counts) {
-        var n = counts.kids;
-        if (ctx.spec.kind === "studio") {
-            return ["This studio", n === 1 ? "With its 1 site" : "With all " + refractEpNum(n) + " sites"];
-        }
-        return ["This tag", n === 1 ? "With its 1 sub-tag" : "With all " + refractEpNum(n) + " sub-tags"];
-    }
-
-    /* Writing a class onto BODY is the most expensive write on the page:
-       every rule in the theme is keyed off a body class, so setting the
-       attribute invalidates style for the whole document even when the value
-       is identical. classList.add and .remove run the token list's update
-       steps unconditionally, so `remove` of an absent class costs exactly as
-       much as a real one. injectEntityScope early-returns on every page that
-       is not an entity page -- the home page included -- and used to pay that
-       toll on the way out, twice per observer tick, which a DOM breakpoint
-       caught during the carousel's shadow flash. Read first. */
-    function refractBodyClass(name, on) {
-        if (!document.body) { return; }
-        refractSetClass(document.body, name, on);
-    }
-    /* The same read-before-write for any element. Cheap enough to use
-       everywhere a pass re-asserts a class it has already asserted. */
-    function refractSetClass(el, name, on) {
-        if (!el || !el.classList) { return; }
-        if (el.classList.contains(name) !== !!on) {
-            el.classList.toggle(name, !!on);
-        }
-    }
-
-    function injectEntityScope() {
-        var ctx = refractEpContext();
-        var cb = document.querySelector("#showSubContent");
-        var existing = document.querySelector(".refract-scope");
-        /* No switch on this tab, or no children to widen to: a control
-           that cannot do anything is worse than no control, so it does
-           not draw and the body class comes off with it. */
-        if (!ctx || !cb) {
-            if (existing) { existing.parentNode.removeChild(existing); }
-            refractBodyClass("refract-has-scope", false);
-            return false;
-        }
-        if (REFRACT_EP_COUNTS[ctx.key] === undefined) { refractEpFetchCounts(ctx); }
-        var counts = REFRACT_EP_COUNTS[ctx.key];
-        /* `!counts.all` is the empty-library case, and it is the same rule
-           as the one above, applied to the other end. Measured on a clean
-           0.31.1: a tag with one sub-tag and no scenes anywhere drew a
-           two-segment control reading "This tag 0 scenes" beside "With its
-           1 sub-tag 0 scenes". Both segments were true, neither did
-           anything, and the widest thing on the page was a switch between
-           two views of nothing. `all` is never smaller than `own`, so this
-           only ever fires when both are zero. */
-        if (!counts || typeof counts !== "object" || !counts.kids || !counts.all) {
-            if (existing) { existing.parentNode.removeChild(existing); }
-            refractBodyClass("refract-has-scope", false);
-            return false;
-        }
-
-        var labels = refractEpLabels(ctx, counts);
-        var sig = labels[0] + "|" + labels[1] + "|" + counts.own + "|" + counts.all;
-        var wrap = existing;
-        if (!wrap || wrap.dataset.refractSig !== sig || !ctx.head.contains(wrap)) {
-            if (wrap && wrap.parentNode) { wrap.parentNode.removeChild(wrap); }
-            wrap = document.createElement("div");
-            wrap.className = "refract-scope";
-            wrap.dataset.refractSig = sig;
-            wrap.innerHTML =
-                '<button type="button" class="refract-scope-seg" data-seg="own">' +
-                    '<span class="refract-scope-label"></span>' +
-                    '<span class="refract-scope-value"></span>' +
-                '</button>' +
-                '<button type="button" class="refract-scope-seg" data-seg="all">' +
-                    '<span class="refract-scope-label"></span>' +
-                    '<span class="refract-scope-value"></span>' +
-                '</button>';
-            var segs = wrap.querySelectorAll(".refract-scope-seg");
-            segs[0].querySelector(".refract-scope-label").textContent = labels[0];
-            segs[0].querySelector(".refract-scope-value").textContent = refractEpNum(counts.own) + " scenes";
-            segs[1].querySelector(".refract-scope-label").textContent = labels[1];
-            segs[1].querySelector(".refract-scope-value").textContent = refractEpNum(counts.all) + " scenes";
-            /* The click goes to Stash's own input. It is never moved and
-               never mirrored: whatever it does with the state is what
-               the page shows. */
-            wrap.addEventListener("click", function (e) {
-                var seg = e.target.closest && e.target.closest(".refract-scope-seg");
-                if (!seg) { return; }
-                var live = document.querySelector("#showSubContent");
-                if (!live) { return; }
-                var want = seg.getAttribute("data-seg") === "all";
-                if (live.checked !== want) { live.click(); }
-            });
-            var group = ctx.head.querySelector(".detail-group");
-            if (group) { ctx.head.insertBefore(wrap, group); } else { ctx.head.appendChild(wrap); }
-        }
-
-        /* State is read from the live input every tick, so the readout
-           cannot drift from Stash. */
-        var on = !!cb.checked;
-        wrap.setAttribute("data-scope", on ? "all" : "own");
-        var all = wrap.querySelectorAll(".refract-scope-seg");
-        for (var i = 0; i < all.length; i++) {
-            var isOn = (all[i].getAttribute("data-seg") === "all") === on;
-            all[i].setAttribute("aria-pressed", isOn ? "true" : "false");
-        }
-        refractBodyClass("refract-has-scope", true);
-        return true;
-    }
-
-    /* ── Entity pages: the children, ranked, in the grid slot ─────────
-       A studio page never says what is under it. The subsidiaries live
-       behind the last tab, the header does not mention them, and the
-       bar left its right half empty: measured after the composition
-       pass, the content occupied the leftmost 450px of 1,546.
-
-       The performer header settles a slot for this: a six-track grid of
-       label-over-value cells, hairlines showing through a 1px gap. On a
-       performer it holds a body. A studio has no body and, measured,
-       almost no record either (1 of 2,378 rated, 1 with details), so
-       the same grid holds the network instead, ranked by what each site
-       carries and capped, with the rest one click away on the tab that
-       already exists.
-
-       Studios only. A tag header already renders its sub-tags, so a
-       ranked grid there would duplicate them; that row keeps its cap
-       and disclosure. */
-    var REFRACT_EP_KIN_CAP = 12;
-
-    function injectEntityKin() {
-        var ctx = refractEpContext();
-        var existing = document.querySelector(".refract-eh-kin");
-        /* Ask for the counts here too, not only from the scope control.
-           That one bails before fetching when there is no
-           `#showSubContent` on the active tab, and the tab Stash opens
-           for a network with no scenes of its own is exactly such a
-           tab. TeamSkeet (Network) lands on childstudios with 73
-           children, and the grid was silently absent on the one page
-           where the network is the whole point. */
-        if (ctx && REFRACT_EP_COUNTS[ctx.key] === undefined) { refractEpFetchCounts(ctx); }
-        var counts = ctx ? REFRACT_EP_COUNTS[ctx.key] : null;
-        if (!ctx || !ctx.spec.childTab || !counts || typeof counts !== "object" ||
-                !counts.list || !counts.list.length) {
-            if (existing && existing.parentNode) { existing.parentNode.removeChild(existing); }
-            return false;
-        }
-        var open = existing && existing.classList.contains("refract-eh-kin-open");
-        var shown = open ? counts.list : counts.list.slice(0, REFRACT_EP_KIN_CAP);
-        var sig = ctx.key + "|" + (open ? "all" : "cap") + "|" + counts.list.length + "|" +
-                  shown.map(function (k) { return k.id + ":" + k.scene_count; }).join(",");
-        if (existing && existing.dataset.refractSig === sig && ctx.head.contains(existing)) { return true; }
-        if (existing && existing.parentNode) { existing.parentNode.removeChild(existing); }
-
-        var wrap = document.createElement("div");
-        wrap.className = "refract-eh-kin" + (open ? " refract-eh-kin-open" : "");
-        wrap.dataset.refractSig = sig;
-        var html = '<div class="refract-eh-kin-head">' +
-                       '<span class="refract-eh-kin-label"></span>' +
-                       '<button type="button" class="refract-eh-kin-more"></button>' +
-                   '</div><div class="refract-eh-kin-grid">';
-        for (var i = 0; i < shown.length; i++) {
-            html += '<a class="refract-eh-kin-cell" href="' + ctx.spec.kinHref + shown[i].id + '">' +
-                        '<span class="refract-eh-kin-name"></span>' +
-                        '<span class="refract-eh-kin-count"></span>' +
-                    '</a>';
-        }
-        html += '</div>';
-        wrap.innerHTML = html;
-
-        /* textContent for anything the user named, never innerHTML. */
-        wrap.querySelector(".refract-eh-kin-label").textContent = ctx.spec.kinLabel;
-        var cells = wrap.querySelectorAll(".refract-eh-kin-cell");
-        for (var j = 0; j < cells.length; j++) {
-            cells[j].querySelector(".refract-eh-kin-name").textContent = shown[j].name || "Untitled";
-            cells[j].querySelector(".refract-eh-kin-count").textContent =
-                refractEpNum(shown[j].scene_count || 0);
-        }
-        var more = wrap.querySelector(".refract-eh-kin-more");
-        if (counts.list.length <= REFRACT_EP_KIN_CAP) {
-            more.parentNode.removeChild(more);
-        } else {
-            more.textContent = open
-                ? ("Show the top " + REFRACT_EP_KIN_CAP)
-                : ("All " + refractEpNum(counts.list.length) + " " + ctx.spec.kinMore);
-            more.setAttribute("aria-expanded", open ? "true" : "false");
-            more.addEventListener("click", function () {
-                wrap.classList.toggle("refract-eh-kin-open");
-                try { injectEntityKin(); } catch (e) {}
-            });
-        }
-
-        var group = ctx.head.querySelector(".detail-group");
-        if (group && group.parentNode === ctx.head) {
-            ctx.head.insertBefore(wrap, group.nextSibling);
-        } else {
-            var edit = ctx.head.querySelector(".details-edit");
-            if (edit) { ctx.head.insertBefore(wrap, edit); } else { ctx.head.appendChild(wrap); }
-        }
-        return true;
-    }
-
-    /* ── Entity pages: the band ───────────────────────────────────────
-       The performer header makes its band by blurring the entity's own
-       image under a veil, with a FLOOR between the two so the band
-       never depends on what the photograph happens to contain. That
-       floor is the whole reason this transfers: a studio logo is a
-       transparent wordmark measured between 1.9:1 and 5.3:1, so
-       blurring one yields a smear rather than a colour field. The floor
-       carries the band and the logo only tints it.
-
-       No element is created and nothing is moved. The image URL becomes
-       a custom property on the header and CSS paints the floor on the
-       header itself, the blurred image on ::before and the veil on
-       ::after. Neither pseudo-element was in use.
-
-       It draws only where there is a real image. 516 of the 2,378
-       studios resolve to `default=true` and get no band, which is the
-       same rule that already stops them getting an empty logo plate. */
-    function setupEntityBand() {
-        var header = document.querySelector(".detail-header");
-        if (!header) { return false; }
-        var ctx = refractEpContext();
-        var img = ctx ? header.querySelector(".detail-header-image img") : null;
-        var src = img ? (img.currentSrc || img.getAttribute("src") || "") : "";
-        if (!ctx || !src || src.indexOf("default=true") !== -1) {
-            if (header.classList.contains("refract-eh-banded")) {
-                header.classList.remove("refract-eh-banded");
-                header.style.removeProperty("--refract-eh-img");
-            }
-            return false;
-        }
-        var want = 'url("' + src.replace(/"/g, "%22") + '")';
-        if (header.style.getPropertyValue("--refract-eh-img") !== want) {
-            header.style.setProperty("--refract-eh-img", want);
-        }
-        header.classList.add("refract-eh-banded");
-        return true;
-    }
-
-    /* ── Entity pages: capping an unbounded relation row ──────────────
-       The sub-tag row has no budget. Measured on the Scene Descriptor
-       axis tag, its 1,328 chips render 4,731px tall, which puts the tab
-       strip at y=4,998 and every scene below the first 19% of the page.
-       That is the law in DESIGN_SYSTEM 6.4 (free user text never sets a
-       panel's height) broken by a field kind the law does not name: a
-       relation list is not user-entered text.
-
-       The clamp is CSS; this decides whether it is needed and supplies
-       the disclosure, because a cap without a way past it loses access
-       to the tags, and P6 says reachable beats visible. Overflow is
-       measured rather than counted, so it holds for any chip width and
-       any viewport. */
-    function capEntityRelationRows() {
-        if (!refractEpContext()) { return false; }
-        var row = document.querySelector(".detail-header .detail-item.sub_tags");
-        if (!row) { return false; }
-        var val = row.querySelector(".detail-item-value");
-        if (!val) { return false; }
-
-        var btn = row.querySelector(".refract-cap-toggle");
-        var open = row.classList.contains("refract-cap-open");
-        row.classList.add("refract-capped");
-        /* A row that spills by a few pixels does not want a disclosure:
-           the cap would hide nothing and cost a control. Only engage
-           when the overflow is worth a click. Measured on tag 67, whose
-           22 chips run 110px against a 140px budget and are therefore
-           left alone. */
-        var overflowing = open || val.scrollHeight > val.clientHeight + 12;
-        if (!overflowing) {
-            row.classList.remove("refract-capped");
-            if (btn) { btn.parentNode.removeChild(btn); }
-            return true;
-        }
-
-        var total = val.querySelectorAll(".tag-item").length;
-        if (!btn) {
-            btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "refract-cap-toggle";
-            btn.addEventListener("click", function () {
-                var nowOpen = row.classList.toggle("refract-cap-open");
-                btn.setAttribute("aria-expanded", nowOpen ? "true" : "false");
-                refractEpCapLabel(btn, row, nowOpen);
-            });
-            row.appendChild(btn);
-        }
-        btn.dataset.refractTotal = String(total);
-        refractEpCapLabel(btn, row, row.classList.contains("refract-cap-open"));
-        return true;
-    }
-
-    function refractEpCapLabel(btn, row, open) {
-        var total = btn.dataset.refractTotal || "0";
-        var n = Number(total);
-        btn.textContent = open
-            ? "Show fewer"
-            : (n === 1 ? "Show the 1 sub-tag" : "All " + refractEpNum(n) + " sub-tags");
     }
 
     /* ── Performer card flip (playing-card mode) ──────────────────────
@@ -7383,23 +6171,12 @@
     /* One query, shared by both back styles. Everything either face needs is
        already here, which is why a scene-sourced image or a different stat
        selection costs no extra request. */
-    /* custom_fields is the per-performer back-image override, and it landed
-       in Stash 0.28. Before that this whole query was rejected for naming
-       it, so on 0.26 and 0.27 every card back lost its stats, its scene
-       strip and its photo strip over one optional line. */
-    var REFRACT_FLIP_CF = { narrow: false };
-    function refractFlipQueryText(full) {
-        return 'query RefractFlip($id: ID!) {' +
-            '  findPerformer(id: $id) { id rating100 favorite o_counter scene_count measurements height_cm weight career_length birthdate' +
-            (full ? ' custom_fields' : '') + ' tags { id name } }' +
-            '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count scenes { id title rating100 paths { screenshot } } }' +
-            '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count images { id paths { thumbnail } } }' +
-            '}';
-    }
-    function refractFlipFetch(pid) {
-        return refractQueryOptional(REFRACT_FLIP_CF, ["custom_fields"],
-            refractFlipQueryText, { id: pid });
-    }
+    var REFRACT_FLIP_QUERY =
+        'query RefractFlip($id: ID!) {' +
+        '  findPerformer(id: $id) { id rating100 favorite o_counter scene_count measurements height_cm weight career_length birthdate custom_fields tags { id name } }' +
+        '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count scenes { id title rating100 paths { screenshot } } }' +
+        '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count images { id paths { thumbnail } } }' +
+        '}';
     /* The customiser previews the back by building it onto the preview's real
        performer card and showing that face directly. No flip animation: this
        is a preview, and a card that spins every time you toggle a chip is
@@ -7478,16 +6255,6 @@
     }
 
     function refractSetBackOverride(pid, val) {
-        /* Custom fields are a Stash 0.28 feature and there is no older
-           equivalent, so the per-performer override genuinely cannot be
-           saved on 0.26 or 0.27. If the read already told us the server has
-           no custom_fields, say what is wrong in plain words rather than
-           letting the toolbar report a GraphQL type name. */
-        if (REFRACT_PB_CF.narrow || REFRACT_FLIP_CF.narrow) {
-            return Promise.reject(new Error(
-                "This Stash has no custom fields, so a per-performer back image cannot be saved. " +
-                "Stash 0.28 or newer supports it; the global back-image rule works on every version."));
-        }
         var m = "mutation RefractBackOverride($id: ID!, $cf: CustomFieldsInput!) {" +
                 "  performerUpdate(input: { id: $id, custom_fields: $cf }) { id }" +
                 "}";
@@ -7529,36 +6296,16 @@
        and, once built, the back. The stage tracks the image's box through a
        ResizeObserver, so the collapsed header and window resizes keep it in
        register. */
-    /* Same custom_fields story as the flip query: without the narrow form,
-       a Stash older than 0.28 answered nothing here, so the photo flip on
-       the performer page never appeared at all. It appears now, reading the
-       global rule; only the per-performer override is genuinely unavailable
-       on those servers, and the toolbar says so when a write fails. */
-    var REFRACT_PB_CF = { narrow: false };
-    function refractPbQueryText(full) {
-        return 'query RefractPerformerBack($id: ID!) {' +
-            '  findPerformer(id: $id) { id name gender rating100' + (full ? ' custom_fields' : '') + ' }' +
-            '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 12, sort: "rating", direction: DESC }) { scenes { id title paths { screenshot } } }' +
-            '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 12, sort: "rating", direction: DESC }) { images { id title paths { thumbnail } } }' +
-            '}';
-    }
+    var REFRACT_PB_QUERY =
+        'query RefractPerformerBack($id: ID!) {' +
+        '  findPerformer(id: $id) { id name gender rating100 custom_fields }' +
+        '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 12, sort: "rating", direction: DESC }) { scenes { id title paths { screenshot } } }' +
+        '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 12, sort: "rating", direction: DESC }) { images { id title paths { thumbnail } } }' +
+        '}';
 
     function refractPerformerIdFromUrl() {
         var m = String(location.pathname).match(/^\/performers\/(\d+)/);
         return m ? m[1] : null;
-    }
-
-    /* The placeholder recolour in 03_cards.css matches on the img's src, and
-       the front face of this stage is not an img: it is a div carrying the
-       same URL as a background, with the real img left visibility:hidden
-       underneath it. So the attribute selector could never see it, and on a
-       performer with no picture the page painted Stash's raw white
-       silhouette while every card in the library painted the accent one.
-       Measured on a clean install, light mode: the white shape on the white
-       header plate read 255,255,255 against a 255,255,255 ground. The class
-       is what CSS can match; the src question is answered here. */
-    function refractMarkDefaultFace(el, src) {
-        refractSetClass(el, "refract-pp-default", /[?&]default=true/.test(String(src || "")));
     }
 
     function applyPerformerBackControl() {
@@ -7599,19 +6346,16 @@
             '</div>';
         host.appendChild(root);
 
-        /* The stage sits on the photo's box, on BOTH faces. It used to take
-           the back photo's own aspect while turned over, on the argument that
-           the back was its own picture at its own shape. On a card that is a
-           fixed 2:3 frame that meant a 944x2048 portrait ran 228px past the
-           bottom and started at its own top edge instead of the front's crop,
-           and a 16:9 scene screenshot stopped 228px down with the chin and
-           pills floating over nothing. The frame is the front's; the back is
-           cropped and anchored exactly as the front is, so a flip moves
-           nothing but the picture's content. */
+        /* The stage sits on the photo's box. Showing the front, it IS the
+           photo's box. Showing the back, it keeps the width and takes the BACK
+           photo's own height -- the back is not cropped to the front's shape,
+           it is its own picture at its own aspect. The frame changes shape at
+           the edge-on moment of the flip, where nothing is visible. */
         var stage = root.querySelector(".refract-pp-stage");
         var frontCopy = root.querySelector(".refract-pp-front");
+        var backRatio = null;   /* height / width of the back photo, once known */
+        var showingBack = false;
         var lastSrc = img.getAttribute("src") || "";
-        refractMarkDefaultFace(frontCopy, lastSrc);
         /* React owns the <img> and replaces it -- Stash's own "Set image
            (front)" swaps the node. fit() re-resolves it every pass instead of
            closing over a node that may be detached, and the front copy
@@ -7634,16 +6378,14 @@
             if (src && src !== lastSrc) {
                 lastSrc = src;
                 frontCopy.style.backgroundImage = "url('" + src.replace(/'/g, "%27") + "')";
-                refractMarkDefaultFace(frontCopy, src);
             }
-            /* The anchor travels with the box: the front copy and the back
-               read it from the stage. */
-            refractPublishFaceAnchor(stage, im);
+            var h = (showingBack && backRatio) ? Math.round(ib.width * backRatio) : ib.height;
             stage.style.left = (ib.left - hb.left) + "px";
             stage.style.top = (ib.top - hb.top) + "px";
             stage.style.width = ib.width + "px";
-            stage.style.height = ib.height + "px";
+            stage.style.height = h + "px";
         };
+        root._rfxSetBack = function (on, ratio) { showingBack = on; if (ratio) { backRatio = ratio; } fit(); };
         var ro = null;
         fit();
         requestAnimationFrame(fit);
@@ -7660,7 +6402,7 @@
             if (b) { b.click(); }
         });
 
-        refractQueryOptional(REFRACT_PB_CF, ["custom_fields"], refractPbQueryText, { id: pid }).then(function (res) {
+        gqlWithVars(REFRACT_PB_QUERY, { id: pid }).then(function (res) {
             var d = res && res.data;
             if (!d) { return; }
             refractRenderPageCard(root, host, img, pid, d);
@@ -7686,6 +6428,7 @@
         function backPhotoUrl() {
             return refractBackImageUrl(img.getAttribute("src") || "", d);
         }
+        var backRatioKnown = null;
         function buildBack(done) {
             var el = stage.querySelector(".refract-pp-backimg");
             if (!el) {
@@ -7695,20 +6438,22 @@
             }
             var url = String(backPhotoUrl());
             el.style.backgroundImage = "url('" + url.replace(/'/g, "%27") + "')";
-            /* The photo is fetched before the turn starts, so the back does
-               not land blank and fill in. Bounded: a request that neither
-               loads nor errors used to leave busy=true forever, a dead flip
-               button. */
+            /* Its natural shape decides the frame's height on the back. The
+               probe is bounded: a request that neither loads nor errors used
+               to leave busy=true forever, a dead flip button. */
             var settled = false;
-            var finish = function () {
+            var finish = function (ratio) {
                 if (settled) { return; }
                 settled = true;
+                backRatioKnown = ratio;
                 if (done) { done(); }
             };
             var probe = new Image();
-            probe.onload = finish;
-            probe.onerror = finish;
-            setTimeout(finish, 5000);
+            probe.onload = function () {
+                finish(probe.naturalWidth ? (probe.naturalHeight / probe.naturalWidth) : null);
+            };
+            probe.onerror = function () { finish(null); };
+            setTimeout(function () { finish(backRatioKnown); }, 5000);
             probe.src = url;
         }
         function labelFlip() {
@@ -7725,6 +6470,7 @@
                 if (refractPrefersReducedMotion()) {
                     face = toBack ? "back" : "front";
                     stage.classList.toggle("is-back", toBack);
+                    root._rfxSetBack(toBack, backRatioKnown);
                     busy = false;
                     labelFlip();
                     return;
@@ -7734,6 +6480,8 @@
                 setTimeout(function () {
                     face = toBack ? "back" : "front";
                     stage.classList.toggle("is-back", toBack);
+                    /* Edge-on: the frame takes the new photo's shape unseen. */
+                    root._rfxSetBack(toBack, backRatioKnown);
                     labelFlip();
                     stage.style.transition = "none";
                     stage.style.transform = "perspective(1200px) rotateY(90deg)";
@@ -7747,8 +6495,8 @@
                     }, 250);
                 }, 235);
             };
-            /* Going to the back, the photo is fetched before the turn starts,
-               or the back would land blank and fill in. */
+            /* Going to the back, the photo's shape must be known before the
+               turn starts, or the frame would resize after landing. */
             if (toBack) { buildBack(go); } else { go(); }
         }
         flipBtn.addEventListener("click", function (e) {
@@ -7768,7 +6516,7 @@
                 var b = c && c.querySelector(".refract-card-back");
                 if (b && b.parentNode) { b.parentNode.removeChild(b); }
             }
-            if (face === "back") { buildBack(); }
+            if (face === "back") { buildBack(function () { root._rfxSetBack(true, backRatioKnown); }); }
             return p;
         }
 
@@ -7781,9 +6529,6 @@
             wrap.className = "refract-pb-backdrop";
             var pick = document.createElement("div");
             pick.className = "refract-pb-picker";
-            /* The cells crop as the card does: the front's anchor, so what
-               you pick is what you get. */
-            refractPublishFaceAnchor(pick, host.querySelector("img.performer") || img);
             pick.setAttribute("role", "dialog");
             pick.setAttribute("aria-label", "Pick this performer’s back photo");
             var cells = "";
@@ -7930,12 +6675,12 @@
                 if (own && own.parentNode) { own.parentNode.removeChild(own); }
                 continue;
             }
-            /* Stash's own button is left exactly as Stash rendered it. It
-               used to be relabelled "Set image (front)…" by writing to its
-               text node -- React's text node, in React's subtree. Rewriting
-               a framework's DOM under it is the same class of fault as
-               moving its nodes, and this one sat in the subtree that
-               crashed. The clarification is not worth a crash. */
+            if (stashBtn.firstChild.nodeValue !== "Set image (front)…") {
+                stashBtn.firstChild.nodeValue = "Set image (front)…";
+            }
+            if (own && own.previousElementSibling !== stashBtn) {
+                own.parentNode.removeChild(own); own = null;
+            }
             if (!own) {
                 own = document.createElement("button");
                 own.type = "button";
@@ -7949,11 +6694,7 @@
                     var r2 = document.querySelector(".refract-pp[data-pid]");
                     if (r2 && r2._rfx) { refractOpenBackPopover(me, r2._rfx); }
                 });
-                /* Appended to the end of the bar rather than dropped in
-                   beside Stash's button, for the same reason as the state
-                   pill above: nothing of ours goes between React's children.
-                   CSS puts it back beside the button it belongs to. */
-                toolbars[i].appendChild(own);
+                stashBtn.parentNode.insertBefore(own, stashBtn.nextSibling);
             }
         }
     }
@@ -8032,20 +6773,7 @@
             var t = e.target.closest ? e.target.closest("[data-act]") : null;
             if (!t) { return; }
             var act = t.getAttribute("data-act");
-            if (act === "file") { return; }   /* the input's own change handler has it */
-            if (act === "filebtn") {
-                /* The button sits inside the <label> that owns the file input,
-                   on the assumption that the label would forward the click.
-                   It does not: a label runs its activation behaviour only when
-                   the click did NOT land on an interactive descendant, and a
-                   <button> is exactly that. So the picker never opened and the
-                   entry did nothing at all (reported against 1.22.0). Open the
-                   input directly. */
-                e.preventDefault();
-                var inp = pop.querySelector('input[data-act="file"]');
-                if (inp) { inp.click(); }
-                return;
-            }
+            if (act === "filebtn" || act === "file") { return; }   /* the label opens the input */
             e.preventDefault();
             if (act === "media") { close(); rfx.openPicker(report); return; }
             if (act === "default") { close(); report(rfx.chooseBack(null)); return; }
@@ -8155,7 +6883,6 @@
         var back = document.createElement("div");
         back.className = "refract-card-back refract-mirror-back";
         var img = card.querySelector("img.performer-card-image");
-        refractPublishFaceAnchor(back, img);
         var portrait = img ? (img.getAttribute("src") || "") : "";
         var nameEl = card.querySelector(".performer-name");
         var name = nameEl ? (nameEl.textContent || "").trim() : "";
@@ -8238,7 +6965,7 @@
         card.appendChild(back);
         refractPaintBack(back, portrait, null);
 
-        refractFlipFetch(pid).then(function (res) {
+        gqlWithVars(REFRACT_FLIP_QUERY, { id: pid }).then(function (res) {
             var d = res && res.data;
             refractPaintBack(back, portrait, d);
         }).catch(function () { /* the portrait fallback is already painted */ });
@@ -8292,30 +7019,6 @@
         /* Asked for a scene by a performer with none, or a photo from an empty
            library: the portrait, which is the one picture that always exists. */
         return portrait;
-    }
-    /* WHERE THE PICTURE SITS. One answer, read off the front.
-
-       The front is an <img>, cropped by object-fit and object-position.
-       Every other picture on the card -- the page's front copy, the mirror
-       back, the dossier's wash and portrait cell, the picker's cells -- is a
-       background div, and each one anchored itself at centre. Measured on
-       Anna Beggion's page card (944x2048 in a 340x510 frame): the front
-       <img> painted its top at 72.67, the copy the reader actually sees at
-       8.94, and the back at 122.75, so one photo sat at three heights and
-       the flip read as a jump. Rather than a fourth literal, the anchor is
-       PUBLISHED from the front's computed style as a custom property and the
-       CSS carries no number of its own: whoever moves the front's crop moves
-       every face with it. The property lives on the element passed in, so a
-       card, a stage or a dialog each carry their own. */
-    var REFRACT_FACE_ANCHOR = "--refract-face-anchor";
-    function refractPublishFaceAnchor(target, img) {
-        if (!target) { return; }
-        var pos = "";
-        if (img) {
-            try { pos = window.getComputedStyle(img).objectPosition || ""; } catch (e) { pos = ""; }
-        }
-        if (pos) { target.style.setProperty(REFRACT_FACE_ANCHOR, pos); }
-        else { target.style.removeProperty(REFRACT_FACE_ANCHOR); }
     }
     function refractCssBgUrl(url) {
         return "url('" + String(url).replace(/'/g, "%27") + "')";
@@ -8470,7 +7173,6 @@
         var back = document.createElement("div");
         back.className = "refract-card-back";
         var img = card.querySelector("img.performer-card-image");
-        refractPublishFaceAnchor(back, img);
         var imgSrc = img ? (img.getAttribute("src") || "") : "";
         var nameEl = card.querySelector(".performer-name");
         var name = nameEl ? (nameEl.textContent || "").trim() : "";
@@ -8519,7 +7221,7 @@
             titleEl2.insertBefore(gIcon, nameEl2);
         }
 
-        refractFlipFetch(pid).then(function (res) {
+        gqlWithVars(REFRACT_FLIP_QUERY, { id: pid }).then(function (res) {
             var d = res && res.data;
             var p = d && d.findPerformer;
             var scenes = d && d.findScenes && d.findScenes.scenes;
@@ -8873,7 +7575,7 @@
     function markActiveUtilityButtons() {
         var currentPath = refractPathFromLocation();
         /* Right-side utility links (exact match) + left-side route links (prefix match).
-           Left nav items have no .nav-link class - select all <a href> inside .navbar-nav,
+           Left nav items have no .nav-link class — select all <a href> inside .navbar-nav,
            excluding javascript: pseudo-links. */
         var links = document.querySelectorAll(
             "nav.top-nav .navbar-buttons a.nav-utility[href], nav.top-nav .navbar-nav a[href]:not([href^='javascript'])"
@@ -8888,24 +7590,18 @@
             var p = refractPathFromHref(link.getAttribute("href") || "");
             if (p && p !== "/") { leftNavHrefs.push(p); }
         });
-        /* Every branch below goes through refractSetClass, because this
-           function runs on every pass over the document and there are
-           fifty-two links between the nav and the drawer. Re-asserting a
-           class that is already there sets the attribute, and setting the
-           attribute invalidates the element's style: measured at 54
-           redundant writes per pass, which was all of them. */
         links.forEach(function (link) {
             var rawHref = link.getAttribute("href") || "";
-            if (!rawHref) { refractSetClass(link, "stash-nav-active", false); return; }
+            if (!rawHref) { link.classList.remove("stash-nav-active"); return; }
             if (rawHref.indexOf("http://") === 0 || rawHref.indexOf("https://") === 0 || rawHref.indexOf("//") === 0) {
                 try {
                     var abs = rawHref.indexOf("//") === 0 ? "https:" + rawHref : rawHref;
                     var u = new URL(abs, window.location.href);
-                    if (u.origin !== window.location.origin) { refractSetClass(link, "stash-nav-active", false); return; }
-                } catch (e) { refractSetClass(link, "stash-nav-active", false); return; }
+                    if (u.origin !== window.location.origin) { link.classList.remove("stash-nav-active"); return; }
+                } catch (e) { link.classList.remove("stash-nav-active"); return; }
             }
             var hrefPath = refractPathFromHref(rawHref);
-            if (!hrefPath || hrefPath === "/") { refractSetClass(link, "stash-nav-active", false); return; }
+            if (!hrefPath || hrefPath === "/") { link.classList.remove("stash-nav-active"); return; }
             /* Left-side route links use prefix match (e.g. /scenes active on /scenes/123).
                Utility links (.nav-utility) use exact match. */
             var isLeftNav = !link.classList.contains("nav-utility");
@@ -8914,7 +7610,7 @@
                 if (currentPath === hrefPath) {
                     isActive = true;
                 } else if (currentPath.indexOf(hrefPath + "/") === 0) {
-                    /* Prefix match - but only if no longer-prefix nav item
+                    /* Prefix match — but only if no longer-prefix nav item
                        also matches. Prevents /scenes lighting up on
                        /scenes/markers (Markers owns the longer prefix). */
                     isActive = !leftNavHrefs.some(function (other) {
@@ -8928,7 +7624,8 @@
             } else {
                 isActive = (currentPath === hrefPath);
             }
-            refractSetClass(link, "stash-nav-active", isActive);
+            if (isActive) { link.classList.add("stash-nav-active"); }
+            else { link.classList.remove("stash-nav-active"); }
         });
     }
 
@@ -9079,7 +7776,7 @@
 
     function loadAndShow() {
         renderLoading();
-        refractQueryOptional(QUERY_ROOT_TAGS_SN, ["sort_name"], refractRootTagsQueryText)
+        gql(QUERY_ROOT_TAGS)
             .then(function (data) {
                 if (data.errors && data.errors.length) {
                     renderError(data.errors[0].message || "GraphQL error");
@@ -9138,1386 +7835,8 @@
     /* Run an init in isolation so one throw doesn't skip the rest of the
        cycle (e.g. a stale-reference NotFoundError from one init breaking
        sibling initializers running in the same MutationObserver callback). */
-
-    /* ── Scrape results: the line-up ──────────────────────────────────
-       05_list_views.css turns the two scrape result lists -- performers
-       and scenes -- into contact sheets. Three things it cannot know
-       from CSS alone: which records in the result set collide with each
-       other, whether a card has a picture worth showing, and how to
-       reach a card from the keyboard, since Stash's cards are plain
-       divs with an onClick and no tab stop. All three decide what the
-       card says or does, so they are settled here and expressed as
-       classes, attributes and one injected node.
-
-       The two modals differ only in where each field lives, so the
-       differences are a table and the logic below is written once. */
-    var SCRAPE_KINDS = [{
-        list: ".PerformerScrapeModal-list",
-        row: ".performer-result > .row",
-        /* The name may be wrapped in a span with the disambiguation as
-           a sibling; the first span is the name alone. */
-        name: function (item) {
-            var h = item.querySelector(".performer-name");
-            if (!h) { return ""; }
-            var first = h.querySelector("span");
-            return String((first ? first.textContent : h.textContent) || "").trim();
-        },
-        /* What the empty well should carry: the field that decides. */
-        key: function (item) {
-            var dis = item.querySelector(".performer-disambiguation");
-            return dis ? String(dis.textContent || "").replace(/^\s*\(|\)\s*$/g, "").trim() : "";
-        },
-        keyEmpty: "nothing else on record",
-        absent: "NO PHOTO",
-        /* The mockup put a scene count here. ScrapedPerformer has no
-           such field -- that number was invented for the drawing -- so
-           the slot takes the bio instead, which is real, is already in
-           the DOM, and is hidden everywhere else on the card. */
-        note: function (item) {
-            var bio = item.querySelector(".performer-result > .row:nth-of-type(2)");
-            return bio ? String(bio.textContent || "").trim() : "";
-        },
-        tell: "The line under each name is what tells them apart.",
-        noun: "name",
-        emptyHint: "Try fewer words, or the name they are credited under.",
-        modal: ".PerformerScrapeModal",
-        /* Stash drops the list entirely here and writes its own heading
-           instead, so this modal already has an empty state and only
-           needs dressing. The scene one renders an empty <ul> and says
-           nothing, so that one is built from scratch below. */
-        stashEmpty: "h5.text-center"
-    }, {
-        list: ".SceneScrapeModal-list",
-        row: ".scene-details > .row",
-        name: function (item) {
-            var h = item.querySelector(".scene-details h4");
-            return h ? String(h.textContent || "").trim() : "";
-        },
-        /* Stash renders studio and date as one string joined by a
-           bullet. The studio is the half that belongs in an empty well;
-           the date is already on the card underneath it. */
-        key: function (item) {
-            var h = item.querySelector(".scene-details h5");
-            var txt = h ? String(h.textContent || "").trim() : "";
-            var parts = txt.split("•");
-            return (parts.length > 1 ? parts[0] : txt).trim();
-        },
-        keyEmpty: "no studio listed",
-        absent: "NO STILL",
-        note: function (item) {
-            var syn = item.querySelector(".scene-details > .row:nth-of-type(2)");
-            return syn ? String(syn.textContent || "").trim() : "";
-        },
-        tell: "The studio and the date are what tell them apart.",
-        noun: "title",
-        emptyHint: "Try fewer words, or the studio instead of the title.",
-        modal: ".SceneScrapeModal",
-        stashEmpty: null
-    }];
-
-    /* A result has no usable picture in two different ways, and they are
-       not the same news: the source has none (permanent), or it named
-       one and fetching it failed (not). An <img> that has finished
-       loading with no intrinsic width is the second case -- worth
-       distinguishing, since every StashDB image failed to load on a
-       cold cache while this was being built. */
-    function scrapeResultPlate(item, kind) {
-        var row = item.querySelector(kind.row);
-        if (!row) { return; }
-        var holder = row.querySelector(".scene-image-container");
-        var img = holder ? holder.querySelector("img") : null;
-        var state = "";
-        if (!holder || !img) {
-            state = kind.absent;
-        } else if (img.complete && !img.naturalWidth) {
-            state = "WOULD NOT LOAD";
-        } else if (!img.complete && !img.getAttribute("data-refract-sr-watch")) {
-            /* Still in flight. Re-run once it settles rather than guess. */
-            img.setAttribute("data-refract-sr-watch", "1");
-            var again = function () { safeRun(initScrapeResults); };
-            img.addEventListener("load", again);
-            img.addEventListener("error", again);
-        }
-        var plate = row.querySelector(".refract-sr-plate");
-        if (!state) {
-            if (plate) { plate.parentNode.removeChild(plate); }
-            if (holder) { holder.style.removeProperty("display"); }
-            return;
-        }
-        if (holder) { holder.style.display = "none"; }
-        if (!plate) {
-            plate = document.createElement("div");
-            plate.className = "refract-sr-plate";
-            plate.appendChild(document.createElement("span"))
-                .className = "refract-sr-plate__label";
-            /* Label at the top, everything else in one foot, so the key
-               sits on the same line whether or not there is a note under
-               it. Three loose children would move it. */
-            var foot = document.createElement("div");
-            foot.className = "refract-sr-plate__foot";
-            foot.appendChild(document.createElement("span"))
-                .className = "refract-sr-plate__key";
-            foot.appendChild(document.createElement("span"))
-                .className = "refract-sr-plate__note";
-            plate.appendChild(foot);
-            row.insertBefore(plate, row.firstChild);
-        }
-        var label = plate.querySelector(".refract-sr-plate__label");
-        var key = plate.querySelector(".refract-sr-plate__key");
-        var note = plate.querySelector(".refract-sr-plate__note");
-        var noteTxt = kind.note(item);
-        if (note && note.textContent !== noteTxt) { note.textContent = noteTxt; }
-        if (label && label.textContent !== state) { label.textContent = state; }
-        /* The slot carries the field that decides. When the record has
-           not got that either, the CSS says so in the modal's own terms
-           rather than leaving a hole. */
-        var want = kind.key(item);
-        if (key && key.textContent !== want) { key.textContent = want; }
-        if (key && key.getAttribute("data-refract-sr-empty") !== kind.keyEmpty) {
-            key.setAttribute("data-refract-sr-empty", kind.keyEmpty);
-        }
-    }
-
-    /* Stash's result cards are divs carrying an onClick, so a keyboard
-       cannot reach them at all. Giving them a tab stop and Enter/Space
-       adds a way in; it takes nothing away, and every click still lands
-       on Stash's own element. */
-    function scrapeResultReachable(item) {
-        if (item.getAttribute("data-refract-sr-key")) { return; }
-        item.setAttribute("data-refract-sr-key", "1");
-        item.setAttribute("tabindex", "0");
-        item.setAttribute("role", "button");
-        item.addEventListener("keydown", function (e) {
-            if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
-                e.preventDefault();
-                item.click();
-            }
-        });
-    }
-
-    function scrapeCollisionNote(list, kind, name, count, groups) {
-        var host = list.parentElement;
-        if (!host) { return; }
-        var note = host.querySelector(".refract-sr-collide-note");
-        if (!count) {
-            if (note) { note.parentNode.removeChild(note); }
-            return;
-        }
-        if (!note) {
-            note = document.createElement("div");
-            note.className = "refract-sr-collide-note";
-            host.insertBefore(note, list);
-        }
-        /* One group can be named; several cannot without listing them,
-           and a real search throws up several -- "Julia James" returns
-           four bare Julias, two Jameses and two Julia Jameses, in three
-           separate groups. Naming only the largest would report a third
-           of the problem and imply the rest were unique. */
-        var txt = (groups === 1)
-            ? count + " of these are called " + name + ". " + kind.tell
-            : count + " of these share a " + kind.noun + " with another result. " + kind.tell;
-        if (note.textContent !== txt) { note.textContent = txt; }
-    }
-
-    /* A search that returns nothing leaves the body of this dialog
-       completely blank, because the one string Stash puts there -- the
-       count -- is the string 05_list_views lifts into the search field.
-       An empty screen says what would fill it and offers the next move
-       (6.22.3); before the sheet, "0 scenes found" at least sat where
-       the results would have been. */
-    function scrapeEmptyState(list, kind, count) {
-        var host = list.parentElement;
-        if (!host) { return; }
-        var box = host.querySelector(".refract-sr-empty");
-        if (count) {
-            if (box) { box.parentNode.removeChild(box); }
-            return;
-        }
-        if (!box) {
-            box = document.createElement("div");
-            box.className = "refract-sr-empty";
-            box.appendChild(document.createElement("span"))
-                .className = "refract-sr-empty__lead";
-            box.appendChild(document.createElement("span"))
-                .className = "refract-sr-empty__hint";
-            host.insertBefore(box, list);
-        }
-        var lead = box.querySelector(".refract-sr-empty__lead");
-        var hint = box.querySelector(".refract-sr-empty__hint");
-        if (lead && lead.textContent !== "Nothing came back.") { lead.textContent = "Nothing came back."; }
-        if (hint && hint.textContent !== kind.emptyHint) { hint.textContent = kind.emptyHint; }
-    }
-
-    /* The same nothing, where Stash already supplies the words. Its
-       heading becomes the block and keeps its own string, localised,
-       with the hint added under it. */
-    function scrapeStashEmpty(kind) {
-        if (!kind.stashEmpty) { return; }
-        var modal = document.querySelector(kind.modal);
-        if (!modal) { return; }
-        var lead = modal.querySelector(":scope > " + kind.stashEmpty);
-        if (!lead) { return; }
-        lead.classList.add("refract-sr-empty", "refract-sr-empty--stash");
-        var hint = lead.querySelector(".refract-sr-empty__hint");
-        if (!hint) {
-            hint = document.createElement("span");
-            hint.className = "refract-sr-empty__hint";
-            lead.appendChild(hint);
-        }
-        if (hint.textContent !== kind.emptyHint) { hint.textContent = kind.emptyHint; }
-    }
-
-    function initScrapeResults() {
-        for (var k = 0; k < SCRAPE_KINDS.length; k++) {
-            var kind = SCRAPE_KINDS[k];
-            scrapeStashEmpty(kind);
-            var lists = document.querySelectorAll(kind.list);
-            for (var i = 0; i < lists.length; i++) {
-                var list = lists[i];
-                var items = list.querySelectorAll(".search-item");
-                if (!items.length) {
-                    scrapeCollisionNote(list, kind, "", 0, 0);
-                    scrapeEmptyState(list, kind, 0);
-                    continue;
-                }
-                scrapeEmptyState(list, kind, items.length);
-                var names = [];
-                var counts = {};
-                var j;
-                for (j = 0; j < items.length; j++) {
-                    var n = kind.name(items[j]);
-                    names.push(n);
-                    var c = n.toLowerCase();
-                    counts[c] = (counts[c] || 0) + 1;
-                }
-                var biggest = "";
-                var biggestN = 0;
-                var colliding = 0;
-                var groups = 0;
-                var seen = {};
-                for (j = 0; j < items.length; j++) {
-                    var key = names[j].toLowerCase();
-                    var dup = counts[key] > 1;
-                    if (dup) { items[j].classList.add("refract-sr-collide"); }
-                    else { items[j].classList.remove("refract-sr-collide"); }
-                    if (dup) {
-                        colliding += 1;
-                        if (!seen[key]) { seen[key] = 1; groups += 1; }
-                        if (counts[key] > biggestN) { biggestN = counts[key]; biggest = names[j]; }
-                    }
-                    scrapeResultPlate(items[j], kind);
-                    scrapeResultReachable(items[j]);
-                }
-                scrapeCollisionNote(list, kind, biggest, colliding, groups);
-            }
-        }
-    }
-
-    /* ── Performer page: the marquee ──────────────────────────────────
-       08_misc_mid.css turns the performer header into a band. Four
-       things it cannot do from CSS alone, so they are settled here:
-
-       the blurred backdrop needs the photograph's URL, which only the
-       <img> knows; the aliases arrive as one comma run and a list of
-       unknown length needs a budget; the three standing numbers exist
-       nowhere as a single element (the scene count is on a tab, the
-       rank inside a plugin badge, the career in a detail row); and the
-       category scores are hidden inside the tag run, where Advanced
-       Ratings writes them as chips reading "Breasts * : 5".
-
-       Nothing is moved. The alias run and the tag chips are hidden and
-       proxied, everything else is appended. */
-    /* ── The performer page's own card ────────────────────────────────
-       The header shows the same object the grid showed, at the size the
-       grid never gives it. Not a second drawing of the card: 16_playing
-       _card.css accepts `.refract-ph-card` beside `.performer-card` on
-       all 88 of its rules, so what is built here IS the card -- the
-       name floating over the image with no strip behind it, the gender
-       glyph as a type symbol, the tier ribbon across the corner, the
-       neon strip across the foot.
-
-       The stats come from one query rather than from the star DOM. The
-       rating is the tier, and reading a tenth-precision star row back
-       out of button classes is guesswork where `rating100` is a number. */
-    var REFRACT_PH_CARD_QUERY =
-        "query($id: ID!) { findPerformer(id: $id) { rating100 o_counter scene_count birthdate gender country } }";
-    /* No Ascension, no rank -- so Refract works one out from the rating
-       instead, exactly rather than approximately: everyone rated higher,
-       plus one, out of everyone rated at all. It is a different question
-       from Ascension's (which ranks by its own battles), so it carries a
-       different label and never pretends to be the same number. */
-    var REFRACT_PH_RANK_QUERY =
-        "query($v: Int!) {" +
-        " above: findPerformers(filter: {per_page: 0}, performer_filter: {rating100: {value: $v, modifier: GREATER_THAN}}) { count }" +
-        " rated: findPerformers(filter: {per_page: 0}, performer_filter: {rating100: {value: 0, modifier: GREATER_THAN}}) { count } }";
-    var refractPhCardCache = {};
-
-    function refractPhOrdinal(n) {
-        var t = n % 100;
-        if (t >= 11 && t <= 13) { return n + "th"; }
-        var l = n % 10;
-        return n + (l === 1 ? "st" : l === 2 ? "nd" : l === 3 ? "rd" : "th");
-    }
-
-    function refractPhAge(birthdate) {
-        if (!birthdate) { return null; }
-        var b = String(birthdate).split("-");
-        if (b.length < 3) { return null; }
-        var now = new Date();
-        var age = now.getFullYear() - parseInt(b[0], 10);
-        var m = (now.getMonth() + 1) - parseInt(b[1], 10);
-        if (m < 0 || (m === 0 && now.getDate() < parseInt(b[2], 10))) { age -= 1; }
-        return (age > 0 && age < 130) ? age : null;
-    }
-
-    function refractPhPill(cls, icon, label, value) {
-        var el = document.createElement("span");
-        el.className = cls + (value == null ? " stash-perf-empty" : "");
-        el.innerHTML = icon +
-            '<span class="stash-perf-label">' + escapeHtml(label) + "</span>" +
-            "<span>" + (value == null ? "-" : escapeHtml(String(value))) + "</span>";
-        return el;
-    }
-
-    /* The performer's tier colour, lifted off the card and published on
-       `#performer-page` so surfaces OUTSIDE the card can read it.
-
-       It has to be lifted rather than referenced. `--tier-color` is
-       declared by rules scoped to the card itself
-       (`:is(.performer-card, .refract-ph-card).refract-card-tier-*`), so
-       it resolves on the card and nowhere else; the Custom Fields panel
-       is a cousin, not a descendant, and `var(--tier-color)` there is
-       simply undefined, which per DESIGN_SYSTEM 7.13 drops the whole
-       declaration rather than falling back. Reading the computed value
-       and republishing it is the same move `--refract-hon-tier` makes on
-       the Ascension badge.
-
-       Untiered (rating below the 5.0 floor, or none) publishes NOTHING,
-       so consumers fall back to the accent through their own `var()`
-       fallback rather than to a stale colour from the last performer. */
-    function refractPhPublishTier(host) {
-        var page = document.getElementById("performer-page");
-        if (!page) { return; }
-        var tier = "";
-        try { tier = getComputedStyle(host).getPropertyValue("--tier-color").trim(); } catch (e) { tier = ""; }
-        var tiered = /refract-card-tier-/.test(host.className || "");
-        if (tiered && tier) {
-            if (page.style.getPropertyValue("--refract-ph-tier") !== tier) {
-                page.style.setProperty("--refract-ph-tier", tier);
-            }
-        } else if (page.style.getPropertyValue("--refract-ph-tier")) {
-            page.style.removeProperty("--refract-ph-tier");
-        }
-    }
-
-    function refractPhBuildCard(header, host, d) {
-        /* Tier first: the ribbon, the halo and every --badge-color in the
-           strip below read off the class this sets. */
-        var r10 = (d.rating100 != null) ? d.rating100 / 10 : 0;
-        applyCardTier(host, r10);
-        refractPhPublishTier(host);
-
-        var nameEl = header.querySelector(".performer-head .performer-name");
-        var name = nameEl ? (nameEl.textContent || "").trim() : "";
-        var banner = host.querySelector(".refract-pc-name-banner");
-        if (!banner) {
-            banner = document.createElement("div");
-            banner.className = "refract-pc-name-banner";
-            host.insertBefore(banner, host.firstChild);
-        }
-        /* Same glyph the list card shows for this gender (Stash's own
-           mapping), redrawn whenever the gender changes so an edit is
-           reflected. A performer with no gender gets no icon; the banner
-           reserves the slot either way (16_playing_card), so their name
-           does not start 25px left of everyone else's. */
-        var wantGender = !!d.gender;
-        var curGender = banner.querySelector(".gender-icon");
-        if (wantGender && (!curGender || curGender.getAttribute("data-gender") !== d.gender)) {
-            if (curGender) { curGender.remove(); }
-            banner.insertAdjacentHTML("afterbegin", refractGenderGlyphSvg(d.gender));
-        } else if (!wantGender && curGender) {
-            curGender.remove();
-        }
-        var nameSpan = banner.querySelector(".refract-pc-name-text");
-        if (!nameSpan) {
-            nameSpan = document.createElement("span");
-            nameSpan.className = "refract-pc-name-text";
-            banner.appendChild(nameSpan);
-        }
-        if (nameSpan.textContent !== name) { nameSpan.textContent = name; }
-
-        /* The ribbon is an empty div; per-tier ::after rules fill it. */
-        if (!host.querySelector(".refract-pc-tier-label")) {
-            var ribbon = document.createElement("div");
-            ribbon.className = "refract-pc-tier-label";
-            host.appendChild(ribbon);
-        }
-
-        /* The chin: country caption with the rank pushed to the right
-           edge, then the neon strip. */
-        var chin = host.querySelector(".refract-ph-chin");
-        if (!chin) {
-            chin = document.createElement("div");
-            chin.className = "refract-ph-chin card-section";
-            host.appendChild(chin);
-        }
-        var country = chin.querySelector(".stash-perf-country");
-        if (!country) {
-            country = document.createElement("span");
-            country.className = "stash-perf-country";
-            country.innerHTML = '<span class="stash-perf-country-name"></span>';
-            chin.appendChild(country);
-        }
-        var cname = country.querySelector(".stash-perf-country-name");
-        var cval = "";
-        var cItem = header.querySelector(".detail-item.country .detail-item-value");
-        if (cItem) { cval = (cItem.textContent || "").trim(); }
-        if (cname.textContent !== cval) { cname.textContent = cval; }
-
-        /* The flag chip, so this card is the same card as the ones in the
-           grid. It was not here at first, and the gap only showed in flag
-           mode: every card in the library turned over to a flag and the
-           performer's own page still read out the name. The code comes
-           off the band's flag element, which Stash renders whether or not
-           the band draws it. */
-        var phFlag = header.querySelector(".detail-item.country .fi, .detail-item.country .flag-icon");
-        var phCode = "";
-        if (phFlag && phFlag.classList) {
-            for (var fi = 0; fi < phFlag.classList.length; fi++) {
-                var fc = phFlag.classList[fi];
-                if (fc.length === 5 && fc.slice(0, 3) === "fi-") { phCode = fc.slice(3); break; }
-            }
-        }
-        var phChip = country.querySelector(".refract-flag-chip");
-        if (phCode) {
-            if (!phChip) {
-                phChip = document.createElement("span");
-                country.insertBefore(phChip, cname);
-            }
-            var phCls = "fi fi-" + phCode + " refract-flag-chip";
-            if (phChip.className !== phCls) { phChip.className = phCls; }
-            if (cval && phChip.getAttribute("title") !== cval) {
-                phChip.setAttribute("title", cval);
-                phChip.setAttribute("aria-label", cval);
-            }
-        } else if (phChip) {
-            phChip.parentNode.removeChild(phChip);
-        }
-
-        var strip = chin.querySelector(".stash-perf-stats");
-        if (!strip) {
-            strip = document.createElement("div");
-            strip.className = "stash-perf-stats";
-            chin.appendChild(strip);
-        }
-        var age = refractPhAge(d.birthdate);
-        var ratingTxt = null;
-        if (d.rating100 != null && d.rating100 > 0) {
-            ratingTxt = refractStarsMode() ? (Math.round(d.rating100 / 2) / 10).toFixed(1)
-                                           : String(Math.round(d.rating100 / 10 * 10) / 10);
-        }
-        var sig = [ratingTxt, age, d.scene_count, d.o_counter].join("|");
-        if (strip.getAttribute("data-sig") !== sig) {
-            strip.setAttribute("data-sig", sig);
-            strip.innerHTML = "";
-            strip.appendChild(refractPhPill("stash-perf-rating", STAR_SVG, "Rating", ratingTxt));
-            strip.appendChild(refractPhPill("stash-perf-age", CAKE_SVG, "Age", age));
-            strip.appendChild(refractPhPill("stash-perf-scenes", PLAY_SVG, "Scenes",
-                d.scene_count ? refractPhShort(d.scene_count) : null));
-            strip.appendChild(refractPhPill("stash-perf-ocount", O_ICON_SVG, "O Count",
-                d.o_counter ? d.o_counter : null));
-        }
-    }
-
-    /* Four digits do not fit a pill beside three others. */
-    function refractPhShort(n) {
-        return n >= 1000 ? (Math.round(n / 100) / 10) + "K" : String(n);
-    }
-
-    /* Stash's rating system is a setting: five stars or a ten-point
-       number. The pill says whichever the user reads everywhere else. */
-    function refractStarsMode() {
-        return !!document.querySelector(".rating-stars");
-    }
-
-    /* Which side sets the band's height, measured rather than assumed.
-
-       The card overhangs the band's foot by 96px when the CARD is the
-       taller of the two columns -- that is the composition, and 08 spells
-       out what it costs and buys. When the HEAD is taller the same
-       instruction sinks the picture below the plate and leaves a void
-       above it: Kitty Lynn at 1095 had a 780px band with the card
-       starting 385px down, its top level with the Height row.
-
-       CSS cannot compare two siblings' heights, and a breakpoint would
-       be a guess about content rather than a fact about it: the same
-       1095 flips between the two cases depending on whether a performer
-       carries an Ascension section. So the two boxes are measured and
-       the band gets a class.
-
-       Neither measurement depends on the class, so this cannot oscillate:
-       the card's own height is its picture's and the head's is its
-       content's; only the CONTAINER's height and the card's margin change
-       when the class flips. The 8px margin is for the case where they
-       are within a pixel of each other, so a fractional layout change
-       cannot flap the composition. */
-    /* The head's BOX is no answer: it is a flex item that stretches to
-       the container, so once the card is the taller side the head's
-       offsetHeight simply equals the card's and the comparison always
-       ties. Its CONTENT height is the question, and with a 1fr row in
-       the grid absorbing the slack (08's F7 composition) the box tells
-       you nothing about it.
-
-       So the rows are measured instead: group the children by the top
-       they sit at, take the tallest in each row, and add the gaps and
-       the padding back. Every item is `align-items: start`, so a row
-       inflated by the 1fr still reports its own content height -- the
-       inflation moves the rows apart, it does not make any of them
-       taller. */
-    function refractPhHeadContent(headEl) {
-        var cs = window.getComputedStyle(headEl);
-        var gap = parseFloat(cs.rowGap) || 0;
-        var rows = {};
-        var kids = headEl.children;
-        for (var i = 0; i < kids.length; i++) {
-            var r = kids[i].getBoundingClientRect();
-            if (r.height < 1) { continue; }
-            var key = Math.round(r.top);
-            rows[key] = Math.max(rows[key] || 0, r.height);
-        }
-        var total = 0;
-        var n = 0;
-        for (var k in rows) {
-            if (Object.prototype.hasOwnProperty.call(rows, k)) { total += rows[k]; n++; }
-        }
-        if (n > 1) { total += gap * (n - 1); }
-        return total + (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
-    }
-
-    function refractPhAnchorCard(header) {
-        if (!header) { return; }
-        var host = header.querySelector(".detail-header-image");
-        var headEl = header.querySelector(".performer-head");
-        if (!host || !headEl) { return; }
-        /* The head is not the only other claimant on the band's height:
-           the container carries a min-height (480 at desktop, 380 below
-           1200) so the band never collapses on a sparse performer, and
-           that floor can be the tallest thing in the room. Kesha at 1200
-           is the case -- a 360px card against a 284px head and a 380px
-           floor -- where comparing only the two columns said "the card is
-           taller, hang it" and the floor then pushed a 75px void above
-           it anyway. The card hangs when it beats BOTH. */
-        var cont = host.parentElement;
-        var floor = cont ? (parseFloat(window.getComputedStyle(cont).minHeight) || 0) : 0;
-        var others = Math.max(refractPhHeadContent(headEl), floor);
-        var hangs = host.offsetHeight > others + 8;
-        if (header.classList.contains("refract-ph-hang") !== hangs) {
-            header.classList.toggle("refract-ph-hang", hangs);
-        }
-    }
-
-    /* The head's height moves with the window and with what the page has
-       finished loading, so the question is asked again whenever either
-       box changes rather than once at build time. */
-    function refractPhWatchAnchor(header) {
-        if (!header || header._rfxAnchorRo || !window.ResizeObserver) { return; }
-        var host = header.querySelector(".detail-header-image");
-        var headEl = header.querySelector(".performer-head");
-        if (!host || !headEl) { return; }
-        var ro = new ResizeObserver(function () {
-            safeRun(function () { refractPhAnchorCard(header); });
-        });
-        ro.observe(host);
-        ro.observe(headEl);
-        header._rfxAnchorRo = ro;
-    }
-
-    /* HOW REFRACT TOUCHES THE PERFORMER HEADER. This is React's subtree,
-       and two blockers came out of forgetting it in one day.
-
-       1. Refract's own nodes are APPENDED after React's children. Never
-          inserted first, never between them. React reconciles by inserting
-          before its own next child, so a stranger in the middle of that
-          list makes the reference stale and the header dies with
-          "insertBefore: Child to insert before is not a child of this
-          node". Visual order is CSS -- `order` on a flex parent -- which
-          moves nothing in the tree.
-       2. Refract inserts into REFRACT-OWNED containers wherever it can.
-          A container we built is ours to arrange however we like.
-       3. Refract never MOVES a React-managed node. Re-parenting one
-          desyncs its fiber: entering edit mode destroyed the rating
-          control and React never rebuilt it, because it still believed it
-          owned a node that was somewhere else.
-       4. Refract never rewrites a React text node. Relabelling Stash's
-          "Set image…" button in place was the same fault wearing a
-          smaller hat, in the same subtree that crashed.
-
-       When a native control has to appear somewhere else, the pattern is
-       the one CLAUDE.md gives: leave it where it is, hide it, and proxy
-       it from a container of ours. */
-    function refractPhCard(header, head, page) {
-        var host = header.querySelector(".detail-header-image");
-        if (!host) { return; }
-        var pidEl = header.querySelector(".refract-pp[data-pid]");
-        var pid = pidEl ? pidEl.getAttribute("data-pid") : null;
-        if (!pid) {
-            var m = String(location.pathname).match(/\/performers\/(\d+)/);
-            pid = m ? m[1] : null;
-        }
-        if (!pid) { return; }
-        /* The page shows YOUR card in YOUR style. With the playing-card
-           layout off, 16_playing_card.css styles none of this and the
-           injected chin would show as unstyled text over the portrait,
-           so it is torn down rather than merely unstyled. */
-        if (!document.body.classList.contains("refract-perf-layout-card")) {
-            host.classList.remove("refract-ph-card");
-            ["bronze", "silver", "gold", "diamond", "legendary", "perfect"].forEach(function (t) {
-                host.classList.remove("refract-card-tier-" + t);
-            });
-            [".refract-pc-name-banner", ".refract-pc-tier-label", ".refract-ph-chin"].forEach(function (sel) {
-                var n = host.querySelector(sel);
-                if (n) { n.parentNode.removeChild(n); }
-            });
-            return;
-        }
-        host.classList.add("refract-ph-card");
-        var cached = refractPhCardCache[pid];
-        if (cached && cached.data) {
-            refractPhBuildCard(header, host, cached.data);
-            refractPhStandingRank(head, cached);
-            return;
-        }
-        if (cached) { return; }
-        refractPhCardCache[pid] = { data: null, rank: null };
-        gqlWithVars(REFRACT_PH_CARD_QUERY, { id: pid }).then(function (res) {
-            var d = res && res.data && res.data.findPerformer;
-            if (!d) { return; }
-            refractPhCardCache[pid].data = d;
-            safeRun(function () { refractPhBuildCard(header, host, d); });
-            if (d.rating100 == null || d.rating100 <= 0) { return; }
-            return gqlWithVars(REFRACT_PH_RANK_QUERY, { v: d.rating100 }).then(function (r2) {
-                var a = r2 && r2.data && r2.data.above;
-                var t = r2 && r2.data && r2.data.rated;
-                if (!a || !t || !t.count) { return; }
-                refractPhCardCache[pid].rank = { place: a.count + 1, total: t.count };
-                safeRun(function () { refractPhStandingRank(head, refractPhCardCache[pid]); });
-            });
-        }).catch(function () { /* offline or an expired key: the header
-            simply keeps the plain portrait, which is what it had */ });
-    }
-
-    /* Ascension's badge wins when it is there: it ranks by its own
-       battles and that is a different, richer question than "who is
-       rated higher". Refract's answer only fills the hole. */
-    function refractPhStandingRank(head, cache) {
-        if (!cache || !cache.rank) { return; }
-        var standing = refractPerfHeadChild(head, "refract-ph-standing");
-        if (!standing) { return; }
-        if (standing.querySelector('[data-ph-rank]')) { return; }
-        for (var i = 0; i < standing.children.length; i++) {
-            var lab = standing.children[i].querySelector(".refract-ph-standing__label");
-            if (lab && (lab.textContent === "Ranked" || lab.textContent === "Ranking")) { return; }
-        }
-        var cell = document.createElement("div");
-        cell.className = "refract-ph-standing__cell";
-        cell.setAttribute("data-ph-rank", "1");
-        cell.innerHTML =
-            '<span class="refract-ph-standing__label">By rating</span>' +
-            '<span class="refract-ph-standing__value">' + escapeHtml(refractPhOrdinal(cache.rank.place)) +
-            '<span class="refract-ph-standing__tail"> of ' + escapeHtml(String(cache.rank.total)) + "</span></span>";
-        /* Second, where Ascension's would have been. */
-        if (standing.children.length > 1) { standing.insertBefore(cell, standing.children[1]); }
-        else { standing.appendChild(cell); }
-    }
-
-    /* Everything initPerformerHeader adds, removed. Called when the
-       header switches to edit mode, and when the playing-card layout is
-       off for the card half of it. */
-    /* ── Performer page: the edit form ────────────────────────────────
-       08_misc_mid.css turns the flat form into a twelve-column grid in
-       named sections. It cannot do that alone: CSS can place a row but
-       it cannot tell which row is which, since Stash ships 26 identical
-       `.form-group.row` siblings whose only distinguishing mark is the
-       text of a label. So the label is read here and left on the row as
-       a slug; every placement in CSS keys off that.
-
-       Nothing is moved. The rows keep their parent and their order in
-       the DOM; `order` does the grouping, which is what makes the
-       sections safe. */
-    var REFRACT_PE_SECTIONS = [
-        { key: "identity", label: "Identity" },
-        { key: "appearance", label: "Appearance" },
-        { key: "marks", label: "Marks and notes" },
-        { key: "career", label: "Career" },
-        { key: "links", label: "Links and identifiers" },
-        { key: "tags", label: "Tags" },
-        { key: "options", label: "Options" }
-    ];
-
-    function refractPeSlug(text) {
-        return String(text || "")
-            .toLowerCase()
-            .replace(/\(.*?\)/g, function (m) { return " " + m.replace(/[()]/g, "") + " "; })
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "");
-    }
-
-    function initPerformerEdit() {
-        var page = document.querySelector("#performer-page");
-        if (!page) { return; }
-        var header = page.querySelector(".detail-header");
-        if (!header) { return; }
-        if (!header.classList.contains("edit")) {
-            header.classList.remove("refract-pe");
-            /* The crop guide is built into the CARD, not into the form, so
-               leaving edit mode does not take it with it. It was appended
-               and never removed: measured, closing edit left .refract-pe-crop
-               in the DOM, visible, z-index 5 over the whole card, with its
-               label sitting on the pill band -- which is the ghost text a
-               user asked about ("the card says card keeps front or
-               something"). Its side panels were also still painting black
-               at 0.55 over 6.6% of each edge of the card.
-
-               Removed rather than hidden, because a hidden node here is a
-               node that comes back the moment a rule moves. */
-            var stale = header.querySelectorAll(".refract-pe-crop, .refract-pe-shot");
-            for (var q = 0; q < stale.length; q++) { stale[q].parentNode.removeChild(stale[q]); }
-            return;
-        }
-        var form = header.querySelector("form");
-        if (!form) { return; }
-        header.classList.add("refract-pe");
-
-        /* 1. Name every row from its label. */
-        for (var i = 0; i < form.children.length; i++) {
-            var row = form.children[i];
-            if (!row.classList || !row.classList.contains("form-group")) { continue; }
-            if (row.hasAttribute("data-refract-pe")) { continue; }
-            var lab = row.querySelector("label");
-            var slug = refractPeSlug(lab ? lab.textContent : "");
-            if (slug) { row.setAttribute("data-refract-pe", slug); }
-        }
-
-        /* 2. Section headings, placed by order beside the rows they
-           introduce. Appended once; the grid does the rest. */
-        if (!form.querySelector(".refract-pe-sec")) {
-            for (var s = 0; s < REFRACT_PE_SECTIONS.length; s++) {
-                var sec = document.createElement("div");
-                sec.className = "refract-pe-sec is-" + REFRACT_PE_SECTIONS[s].key;
-                sec.innerHTML =
-                    '<span class="refract-pe-sec__label">' + escapeHtml(REFRACT_PE_SECTIONS[s].label) + "</span>" +
-                    '<span class="refract-pe-sec__rule"></span>';
-                form.appendChild(sec);
-            }
-        }
-
-        /* 3. Fields that do not apply to the gender. Agreed and settled:
-           Penis Length and Circumcised were both rendered at 34px on a
-           female performer. They drop out, and the escape hatch stays
-           because gender can be wrong and the fields are still real. */
-        var genderRow = form.querySelector('[data-refract-pe="gender"]');
-        var genderSel = genderRow ? genderRow.querySelector("select") : null;
-        var na = form.querySelector(".refract-pe-na");
-        if (!na) {
-            na = document.createElement("div");
-            na.className = "refract-pe-na";
-            na.innerHTML =
-                "<span>Penis length and circumcised do not apply to this gender</span>" +
-                '<button type="button" class="refract-pe-na__show">Show anyway</button>';
-            na.querySelector(".refract-pe-na__show").addEventListener("click", function () {
-                form.classList.remove("refract-pe-hide-male");
-                form.setAttribute("data-refract-pe-forced", "1");
-            });
-            form.appendChild(na);
-        }
-        var applyGender = function () {
-            if (form.getAttribute("data-refract-pe-forced")) { return; }
-            var v = genderSel ? String(genderSel.value || "") : "";
-            var male = /MALE/.test(v) && !/FEMALE/.test(v);
-            form.classList.toggle("refract-pe-hide-male", !!v && !male);
-        };
-        if (genderSel && !genderSel.getAttribute("data-refract-pe-watch")) {
-            genderSel.setAttribute("data-refract-pe-watch", "1");
-            genderSel.addEventListener("change", applyGender);
-        }
-        applyGender();
-
-        /* 4. The crop guide. The card shows 2:3; this shows the whole
-           frame with the part the card keeps marked on it, computed
-           from the file's own dimensions rather than assumed. */
-        var host = header.querySelector(".detail-header-image");
-        var img = host ? host.querySelector("img.performer") : null;
-        if (host && img) {
-            var crop = host.querySelector(".refract-pe-crop");
-            if (!crop) {
-                crop = document.createElement("div");
-                crop.className = "refract-pe-crop";
-                crop.innerHTML =
-                    '<div class="refract-pe-crop__side is-left"></div>' +
-                    '<div class="refract-pe-crop__side is-right"></div>' +
-                    '<div class="refract-pe-crop__label"></div>';
-                host.appendChild(crop);
-            }
-            var shot = host.parentNode.querySelector(".refract-pe-shot");
-            if (!shot) {
-                shot = document.createElement("div");
-                shot.className = "refract-pe-shot";
-                host.appendChild(shot);
-            }
-            var paint = function () {
-                var w = img.naturalWidth, h = img.naturalHeight;
-                if (!w || !h) { return; }
-                var ratio = w / h;
-                var target = 2 / 3;
-                var gutter = 0;
-                var note;
-                if (ratio > target) {
-                    gutter = (1 - target / ratio) / 2 * 100;
-                    note = "the card keeps the middle";
-                } else {
-                    note = ratio === target ? "already 2:3, nothing cropped" : "the card keeps the top";
-                }
-                host.style.setProperty("--refract-pe-gutter", gutter.toFixed(2) + "%");
-                var lab = crop.querySelector(".refract-pe-crop__label");
-                if (lab && lab.textContent !== note) { lab.textContent = note; }
-                var g = Math.round(gutter * 10) / 10;
-                var line = w + " x " + h + "   ·   " +
-                    (g > 0 ? g + "% off each side" : "no crop");
-                if (shot.textContent !== line) { shot.textContent = line; }
-            };
-            if (img.complete) { paint(); }
-            if (!img.getAttribute("data-refract-pe-watch")) {
-                img.setAttribute("data-refract-pe-watch", "1");
-                img.addEventListener("load", function () { safeRun(paint); });
-            }
-        }
-
-        /* 5. What is waiting on Save. Stash disables the button until
-           something changes, so that flag is the truth about the form
-           and the bar reports it rather than inventing a count it
-           cannot derive. */
-        var saveBtn = null;
-        var bar = header.querySelector(".details-edit");
-        if (bar) {
-            var bb = bar.querySelectorAll("button");
-            for (var b = 0; b < bb.length; b++) {
-                if (/^save$/i.test((bb[b].textContent || "").trim())) { saveBtn = bb[b]; break; }
-            }
-            var state = bar.querySelector(".refract-pe-state");
-            if (!state) {
-                state = document.createElement("div");
-                state.className = "refract-pe-state";
-                state.innerHTML =
-                    '<span class="refract-pe-state__eyebrow">Editing</span>' +
-                    '<span class="refract-pe-state__line"></span>';
-                /* Appended, NEVER inserted at the front. This bar is React's,
-                   and a foreign node placed between its children is how the
-                   header crashed on save: React reconciles by inserting
-                   before its own next child, and a stranger in the middle of
-                   that list makes the reference stale --
-                   "insertBefore: Child to insert before is not a child of
-                   this node". Trailing is safe because React's own nodes stay
-                   contiguous. It is put back in visual order with order: -1,
-                   which is CSS and touches nobody's tree. */
-                bar.appendChild(state);
-            }
-            var nameEl = form.querySelector('[data-refract-pe="name"] input');
-            var who = nameEl ? (nameEl.value || "").trim() : "";
-            var dirty = !!(saveBtn && !saveBtn.disabled);
-            var line = dirty ? "Unsaved changes" : (who || "No changes yet");
-            var lineEl = state.querySelector(".refract-pe-state__line");
-            if (lineEl.textContent !== line) { lineEl.textContent = line; }
-            state.classList.toggle("is-dirty", dirty);
-            var eyeb = state.querySelector(".refract-pe-state__eyebrow");
-            var eyeText = dirty ? "Editing " + (who || "this performer") : "Editing";
-            if (eyeb.textContent !== eyeText) { eyeb.textContent = eyeText; }
-        }
-    }
-
-    function refractPhTeardown(header) {
-        header.classList.remove("refract-ph");
-        header.style.removeProperty("--refract-ph-shot");
-        var host = header.querySelector(".detail-header-image");
-        if (host) {
-            host.classList.remove("refract-ph-card");
-            ["bronze", "silver", "gold", "diamond", "legendary", "perfect"].forEach(function (t) {
-                host.classList.remove("refract-card-tier-" + t);
-            });
-        }
-        [".refract-ph-fill", ".refract-ph-standing", ".refract-ph-cats",
-         ".refract-ph-tags", ".refract-ph-alias", ".refract-pc-name-banner",
-         ".refract-pc-tier-label", ".refract-ph-chin"].forEach(function (sel) {
-            var n = header.querySelectorAll(sel);
-            for (var i = 0; i < n.length; i++) {
-                if (n[i].parentNode) { n[i].parentNode.removeChild(n[i]); }
-            }
-        });
-    }
-
-    function refractPerfHeadChild(head, cls) {
-        for (var i = 0; i < head.children.length; i++) {
-            if (head.children[i].classList.contains(cls)) { return head.children[i]; }
-        }
-        return null;
-    }
-
-    function initPerformerHeader() {
-        var page = document.querySelector("#performer-page");
-        if (!page) { return; }
-        var header = page.querySelector(".detail-header");
-        if (!header) { return; }
-        var head = header.querySelector(".performer-head");
-        if (!head) { return; }
-
-        /* Edit mode reuses this header: same .detail-header, same
-           .performer-head, entirely different children -- 28 form groups
-           where the read-outs were. Left alone the band applied to it,
-           and the result was a 2528px header with the blurred backdrop
-           behind the whole form and two of the grid's four columns
-           resolved to 0px, pushing the fields off the right edge.
-
-           Every rule in 08_misc_mid is scoped under .refract-ph, so
-           dropping the class is the whole gate; the injected nodes go
-           with it so nothing stale survives the mode change. */
-        if (header.classList.contains("edit")) {
-            refractPhTeardown(header);
-            return;
-        }
-        header.classList.add("refract-ph");
-
-        /* 1. The backdrop. Same file the card shows, blurred and scaled
-           behind it, so the band is always in the photograph's colours. */
-        var fill = null;
-        for (var f = 0; f < header.children.length; f++) {
-            if (header.children[f].classList.contains("refract-ph-fill")) { fill = header.children[f]; break; }
-        }
-        if (!fill) {
-            fill = document.createElement("div");
-            fill.className = "refract-ph-fill";
-            fill.innerHTML = '<div class="refract-ph-blur"></div><div class="refract-ph-veil"></div>';
-            /* Appended, not put first. The header is React's; nothing of
-               ours belongs between its children (see the state pill). The
-               layering does not depend on DOM order anyway -- the fill is
-               z-index 0 and .detail-container is an explicit z-index 1, so
-               it paints behind wherever it sits in the list. */
-            header.appendChild(fill);
-        }
-        var pimg = header.querySelector(".detail-header-image img.performer");
-        var psrc = pimg ? (pimg.getAttribute("src") || "") : "";
-        if (psrc && fill.getAttribute("data-shot") !== psrc) {
-            fill.setAttribute("data-shot", psrc);
-            header.style.setProperty("--refract-ph-shot", 'url("' + psrc.replace(/"/g, "%22") + '")');
-        } else if (!psrc && fill.hasAttribute("data-shot")) {
-            fill.removeAttribute("data-shot");
-            header.style.removeProperty("--refract-ph-shot");
-        }
-
-        /* The read-out labels lose their colon. Stash writes "Height:"
-           because its label sits beside the value; here it sits above it
-           as an eyebrow, and an eyebrow does not introduce itself with
-           punctuation. The colon is stripped from the text node rather
-           than hidden, so it cannot come back as a stray glyph when the
-           label wraps. */
-        var titles = header.querySelectorAll(".detail-group .detail-item-title");
-        for (var ti = 0; ti < titles.length; ti++) {
-            var raw0 = titles[ti].textContent || "";
-            var cut = raw0.replace(/\s*:\s*$/, "");
-            if (cut !== raw0) { titles[ti].textContent = cut; }
-        }
-
-        /* 1b. Every tile is one line, so a value too long for its cell
-           truncates. Nothing is lost: the whole of it goes on the tile's
-           tooltip. Set on the TILE rather than the value, because the
-           value is the thing being clipped and a tooltip you can only
-           reach by hovering the visible half is not one. */
-        var longOnes = header.querySelectorAll(
-            ".detail-group .detail-item.tattoos, .detail-group .detail-item.piercings," +
-            " .detail-group .detail-item.details, .detail-group .detail-item.description");
-        for (var li = 0; li < longOnes.length; li++) {
-            var lv = longOnes[li].querySelector(".detail-item-value");
-            var full = lv ? (lv.textContent || "").trim() : "";
-            if (full && longOnes[li].getAttribute("title") !== full) {
-                longOnes[li].setAttribute("title", full);
-            }
-        }
-
-        /* 1c. Country: the short form people actually say. Stash renders
-           the official name ("United States of America", 24 characters),
-           which does not fit a sixth of the band and pushed its flag onto
-           a second line. `Intl.DisplayNames` is the browser's own
-           common-usage name for the same ISO code -- United States,
-           United Kingdom, Czechia, Russia, South Korea -- so there is no
-           hand-kept list of exceptions to fall out of date. Static, not
-           measured: the same name at every width, so nothing reflows on
-           resize. Only ever shortens; if the browser's name is longer, or
-           it has none, Stash's own text stands. The official name goes on
-           the tooltip. */
-        var ctile = header.querySelector(".detail-group .detail-item.country");
-        if (ctile) {
-            var cval = ctile.querySelector(".detail-item-value");
-            var cflag = cval ? cval.querySelector(".fi, .flag-icon") : null;
-            /* Remember the official name on the first pass. Read fresh
-               every tick it would be the SHORT one from the tick before,
-               and the tooltip would decay to whatever is already on
-               screen: a tooltip repeating its own label. */
-            var official = ctile.getAttribute("data-refract-country")
-                || (cval ? (cval.textContent || "").trim() : "");
-            if (cval && official) {
-                if (ctile.getAttribute("data-refract-country") !== official) {
-                    ctile.setAttribute("data-refract-country", official);
-                }
-                var shortName = official;
-                /* classList rather than a regex on className: this line
-                   held a literal backspace for one deploy, because the
-                   \b that writes a word boundary is also the escape for
-                   one, and nothing about a silently non-matching regex
-                   says so. There is no boundary to assert here anyway --
-                   a class IS the token. */
-                var ccode = "";
-                if (cflag && cflag.classList) {
-                    for (var ci = 0; ci < cflag.classList.length; ci++) {
-                        var cc = cflag.classList[ci];
-                        if (cc.length === 5 && cc.slice(0, 3) === "fi-") {
-                            ccode = cc.slice(3).toUpperCase(); break;
-                        }
-                    }
-                }
-                if (ccode) {
-                    try {
-                        var dn = new Intl.DisplayNames(["en"], { type: "region" })
-                            .of(ccode);
-                        if (dn && dn.length < official.length) { shortName = dn; }
-                    } catch (e) { /* keep Stash's name */ }
-                }
-                /* The name is a bare text node beside the flag span, so it
-                   is rewritten in place rather than replaced. */
-                for (var cn = 0; cn < cval.childNodes.length; cn++) {
-                    var node = cval.childNodes[cn];
-                    if (node.nodeType === 3 && node.nodeValue.trim()) {
-                        if (node.nodeValue !== shortName) { node.nodeValue = shortName; }
-                        break;
-                    }
-                }
-                if (ctile.getAttribute("title") !== official) {
-                    ctile.setAttribute("title", official);
-                }
-            }
-        }
-
-        /* 1d. Stash IDs: that this performer HAS one, not what it is. A
-           36-character UUID is not something anyone reads off a page, and
-           it cost the widest tile in the band to print. The endpoint name
-           becomes the link text, so the pill says StashDB and goes there;
-           the id itself rides the tooltip and is still in the edit form,
-           which is where Stash puts it to be copied. One pill per
-           endpoint, so a second box does not disappear behind the first. */
-        var pills = header.querySelectorAll(".detail-group .detail-item.stash_ids .stash-id-pill");
-        for (var pi = 0; pi < pills.length; pi++) {
-            var pill = pills[pi];
-            var a = pill.querySelector("a");
-            if (!a) { continue; }
-            var endpoint = pill.getAttribute("data-endpoint") || "";
-            var lbl = pill.querySelector("span");
-            if (!endpoint && lbl) { endpoint = (lbl.textContent || "").trim(); }
-            if (!endpoint) { continue; }
-            /* Same trap as the country name: after the first pass the
-               anchor says "StashDB", so re-reading it would put that on
-               the tooltip in place of the id. */
-            var sid = a.getAttribute("data-refract-sid") || (a.textContent || "").trim();
-            if (sid && sid !== endpoint) {
-                if (a.getAttribute("data-refract-sid") !== sid) { a.setAttribute("data-refract-sid", sid); }
-                if (a.getAttribute("title") !== sid) { a.setAttribute("title", sid); }
-                a.textContent = endpoint;
-            }
-            /* The pill's own label would repeat the endpoint beside it.
-               Marked for CSS rather than hidden here: `[hidden]` is a
-               display:none of the lowest possible weight, and the pill's
-               own layout rule sets display on its children, so the label
-               went on painting and the chip read "StashDB StashDB". */
-            if (lbl && lbl !== a) { lbl.classList.add("refract-sid-endpoint"); }
-        }
-
-        /* 2. Aliases. One line of chips and a count that opens the rest;
-           the comma run stays in the DOM, hidden, so nothing Stash
-           renders is lost. */
-        var aliasSrc = head.querySelector(".alias-head");
-        if (aliasSrc) {
-            var aliasHost = aliasSrc.parentNode;
-            var chips = aliasHost.querySelector(".refract-ph-alias");
-            var raw = (aliasSrc.textContent || "").trim();
-            if (!chips) {
-                chips = document.createElement("div");
-                chips.className = "refract-ph-alias";
-                aliasHost.appendChild(chips);
-            }
-            if (chips.getAttribute("data-raw") !== raw) {
-                chips.setAttribute("data-raw", raw);
-                chips.classList.remove("is-open");
-                chips.innerHTML = "";
-                /* The names are clipped to one line; the control that
-                   un-clips them is NOT in the clipped box. It was, and
-                   with nine aliases it wrapped to the second line and
-                   sat at top=31 inside a 22px window: the only way to
-                   see the hidden names was itself hidden. Three aliases
-                   never showed the bug, because three do not overflow. */
-                var list = document.createElement("div");
-                list.className = "refract-ph-alias__list";
-                chips.appendChild(list);
-                var names = raw ? raw.split(",") : [];
-                var shown = 0;
-                for (var a = 0; a < names.length; a++) {
-                    var nm = names[a].trim();
-                    if (!nm) { continue; }
-                    var chip = document.createElement("span");
-                    chip.className = "refract-ph-alias__n";
-                    chip.textContent = nm;
-                    list.appendChild(chip);
-                    shown += 1;
-                }
-                if (shown > 3) {
-                    var more = document.createElement("button");
-                    more.type = "button";
-                    more.className = "refract-ph-alias__more";
-                    more.textContent = "all " + shown;
-                    more.setAttribute("data-refract-count", String(shown));
-                    more.addEventListener("click", function () {
-                        var box = this.parentNode;
-                        var open = box.classList.toggle("is-open");
-                        this.textContent = open ? "fewer" : "all " + this.getAttribute("data-refract-count");
-                    });
-                    chips.appendChild(more);
-                }
-            }
-        }
-
-        /* 3. What she is in this library. Each of the three is read from
-           wherever Stash happens to keep it, and a cell is skipped
-           rather than shown empty when its source is absent. */
-        var standing = refractPerfHeadChild(head, "refract-ph-standing");
-        if (!standing) {
-            standing = document.createElement("div");
-            standing.className = "refract-ph-standing";
-            head.appendChild(standing);
-        }
-        var cells = [];
-        var tabs = page.querySelectorAll(".performer-tabs .nav-link, .performer-tabs [role='tab']");
-        for (var t = 0; t < tabs.length; t++) {
-            var tt = (tabs[t].textContent || "").trim();
-            if (tt.indexOf("Scene") === 0) {
-                var sc = tt.replace(/^Scenes?/, "").trim();
-                if (sc) { cells.push({ label: "Scenes", value: sc, tail: "" }); }
-                break;
-            }
-        }
-        /* The rank is Ascension's number, read off its badge and reprinted
-           in Refract's voice -- which means an incoherent one becomes ours.
-           It said "Ranked 493 of 492": the place and the total are counted
-           over different populations, because an unrated performer is
-           sorted after all 492 rated ones and then numbered from the
-           whole library. Refract cannot fix that arithmetic, it is a
-           plugin's, but it can decline to repeat a position past the end
-           of the set it names. Past the end IS the fact -- not ranked -- so
-           that is what the cell says, and the label becomes RANKING so
-           the pair reads in both states rather than announcing "Ranked:
-           Unranked". */
-        var rankEl = header.querySelector(".hon-battle-rank-badge");
-        if (rankEl) {
-            var rk = (rankEl.textContent || "").replace(/\s+/g, " ");
-            var rm = rk.match(/#\s*(\d+)\s*(?:of\s*([\d,]+))?/i);
-            if (rm && rm[1] !== "0") {
-                var rkPlace = parseInt(rm[1], 10);
-                var rkTotal = rm[2] ? parseInt(String(rm[2]).replace(/,/g, ""), 10) : 0;
-                if (rkTotal && rkPlace > rkTotal) {
-                    cells.push({ label: "Ranking", value: "Unranked", tail: "" });
-                } else {
-                    cells.push({ label: "Ranking", value: rm[1], tail: rm[2] ? " of " + rm[2] : "" });
-                }
-            }
-        }
-        var career = header.querySelector(".detail-item.career_length .detail-item-value");
-        if (career) {
-            var cv = (career.textContent || "").trim();
-            var cm = cv.match(/(\d{4})/);
-            if (cm) {
-                cells.push({ label: "Active", value: cm[1], tail: /-\s*$/.test(cv) ? " to now" : cv.replace(/^\d{4}\s*-?\s*/, " to ") });
-            }
-        }
-        /* The rating is the same class of fact as the three above -- what
-           she is in this library -- and it was the only one of them
-           rendered at chip scale, right-ragged away from its peers, which
-           is what made it read as chrome rather than data. It joins them
-           as a cell.
-
-           Its value is Stash's own number, and a dash when there is none,
-           so the pair reads in both states the way RANKING does rather
-           than leaving the cell blank. The stars and the advanced-rating
-           pill are Stash's live controls and are NOT redrawn here: the
-           group is re-parented into the cell below, so what the user
-           clicks is the same element it always was. */
-        /* The rating does NOT become a cell of this row, and the reason
-           is worth keeping so nobody tries it again the same way.
-
-           It was one, briefly, by re-parenting Stash's own .quality-group
-           into a cell built here. That is moving a React-managed node out
-           of its parent, which CLAUDE.md warns about and which broke
-           exactly as described: entering edit mode tears down the view
-           head, destroying the control inside our row, and React never
-           rebuilds it because its fiber still points at the node it
-           believes it owns. Measured after Edit then Cancel -- zero
-           .quality-group, zero stars, zero pill, and the rating gone
-           until a reload.
-
-           Putting it in the row needs the control to STAY in Stash's
-           tree: either a proxy that forwards clicks to a hidden native
-           control, or absolute placement driven by a measured offset.
-           Until one of those is built, the group keeps its own place. */
-        var sig = cells.map(function (c) { return c.label + c.value + c.tail; }).join("|");
-        if (standing.getAttribute("data-sig") !== sig) {
-            standing.setAttribute("data-sig", sig);
-            standing.innerHTML = "";
-            for (var c2 = 0; c2 < cells.length; c2++) {
-                var cell = document.createElement("div");
-                cell.className = "refract-ph-standing__cell";
-                var lab = document.createElement("span");
-                lab.className = "refract-ph-standing__label";
-                lab.textContent = cells[c2].label;
-                var val = document.createElement("span");
-                val.className = "refract-ph-standing__value";
-                val.textContent = cells[c2].value;
-                if (cells[c2].tail) {
-                    var tl = document.createElement("span");
-                    tl.className = "refract-ph-standing__tail";
-                    tl.textContent = cells[c2].tail;
-                    val.appendChild(tl);
-                }
-                cell.appendChild(lab);
-                cell.appendChild(val);
-                standing.appendChild(cell);
-            }
-        }
-
-        /* 4. How wide the read-out grid should run. CSS cannot count
-           children, so the count comes from here: balanced to ceil(n/2)
-           and capped at six, which leaves a full performer on six and
-           stops a sparse one drawing six cells and then three with a
-           blank half-band beside the short row. */
-        var dgroup = header.querySelector(".detail-group");
-        if (dgroup) {
-            var nItems = dgroup.querySelectorAll(".detail-item").length;
-            /* clamp(3, ceil(n/2), 6). The ceiling stops a full performer
-               drawing six then three; the FLOOR of three stops a very
-               sparse one drawing two slabs 760px wide holding one word
-               each, which is what four items did. */
-            var wanted = nItems ? String(Math.min(6, Math.max(3, Math.ceil(nItems / 2)))) : "";
-            if (wanted && dgroup.getAttribute("data-refract-cols") !== wanted) {
-                dgroup.setAttribute("data-refract-cols", wanted);
-            }
-        }
-
-        /* 5. The card itself. Last, because the rank cell it may add
-           slots into the standing row built just above. */
-        refractPhCard(header, head, page);
-
-        /* 6. Which of the two columns sets the band's height, which
-           decides whether the card hangs off its foot or sits at its
-           top. Asked after everything above has been built, because it
-           is the head's finished height that answers it, and watched
-           from then on because the window can change the answer. */
-        safeRun(function () { refractPhAnchorCard(header); });
-        safeRun(function () { refractPhWatchAnchor(header); });
-
-        /* 4. The category scores, and the tag run they were buried in.
-           Advanced Ratings writes each category as a tag whose name ends
-           in a star and a number, so seven of thirty-one chips on this
-           page are scores wearing a description's clothes. They come out
-           and read as scores; the rest stay a tag run, behind a count,
-           because thirty-one chips is the one thing the band cannot
-           size. */
-        var tagItem = header.querySelector(".detail-item.tags");
-        var cats = refractPerfHeadChild(head, "refract-ph-cats");
-        var run = null;
-        for (var r = 0; r < header.children.length; r++) {
-            if (header.children[r].classList.contains("refract-ph-tags")) { run = header.children[r]; break; }
-        }
-        if (!tagItem) {
-            if (cats) { cats.parentNode.removeChild(cats); }
-            if (run) { run.parentNode.removeChild(run); }
-            return;
-        }
-        var chipsAll = tagItem.querySelectorAll(".tag-item");
-        var scored = [];
-        var plain = [];
-        for (var i2 = 0; i2 < chipsAll.length; i2++) {
-            var txt = (chipsAll[i2].getAttribute("data-sort-name") || chipsAll[i2].textContent || "").trim();
-            var sm = txt.match(/^(.+?)\s*★\s*:\s*(\d+(?:\.\d+)?)\s*$/);
-            if (sm) { scored.push({ label: sm[1].trim(), value: parseFloat(sm[2]) }); }
-            else if (txt) { plain.push(chipsAll[i2]); }
-        }
-        var csig = scored.map(function (s) { return s.label + s.value; }).join("|") + "::" + plain.length;
-        if (!cats) {
-            cats = document.createElement("div");
-            cats.className = "refract-ph-cats";
-            head.appendChild(cats);
-        }
-        if (!run) {
-            run = document.createElement("div");
-            run.className = "refract-ph-tags";
-            header.appendChild(run);
-        }
-        if (cats.getAttribute("data-sig") === csig) { return; }
-        cats.setAttribute("data-sig", csig);
-        cats.innerHTML = "";
-        run.innerHTML = "";
-        /* Advanced Ratings is a five-point scale; anything above that is
-           somebody else's tag that happens to end in a number, so the
-           bar is drawn against the largest score present rather than
-           against an assumed maximum. */
-        var top = 5;
-        for (var s2 = 0; s2 < scored.length; s2++) { if (scored[s2].value > top) { top = scored[s2].value; } }
-        for (var s3 = 0; s3 < scored.length; s3++) {
-            var cc = document.createElement("div");
-            cc.className = "refract-ph-cats__cell" + (scored[s3].value >= top ? " is-full" : "");
-            var hd = document.createElement("div");
-            hd.className = "refract-ph-cats__head";
-            var cl = document.createElement("span");
-            cl.className = "refract-ph-cats__label";
-            cl.textContent = scored[s3].label;
-            cl.title = scored[s3].label;
-            var cvv = document.createElement("span");
-            cvv.className = "refract-ph-cats__value";
-            cvv.textContent = scored[s3].value + " of " + top;
-            hd.appendChild(cl);
-            hd.appendChild(cvv);
-            var tr = document.createElement("div");
-            tr.className = "refract-ph-cats__track";
-            var fl = document.createElement("div");
-            fl.className = "refract-ph-cats__fill";
-            fl.style.width = Math.round(scored[s3].value / top * 100) + "%";
-            tr.appendChild(fl);
-            cc.appendChild(hd);
-            cc.appendChild(tr);
-            cats.appendChild(cc);
-        }
-        if (plain.length) {
-            for (var p2 = 0; p2 < plain.length; p2++) {
-                run.appendChild(plain[p2].cloneNode(true));
-            }
-            var tog = document.createElement("button");
-            tog.type = "button";
-            tog.className = "refract-ph-tags-toggle";
-            tog.textContent = plain.length + " tags";
-            tog.addEventListener("click", function () {
-                var box = document.querySelector("#performer-page .refract-ph-tags");
-                if (!box) { return; }
-                var open = box.classList.toggle("is-open");
-                this.textContent = open ? "hide tags" : plain.length + " tags";
-            });
-            cats.appendChild(tog);
-        }
-    }
-
     function safeRun(fn) {
-        try { fn(); } catch (e) { /* swallow - Stash re-renders will trigger another cycle */ }
+        try { fn(); } catch (e) { /* swallow — Stash re-renders will trigger another cycle */ }
     }
 
     /* ── The player's source menu, as two questions ──────────────────────
@@ -10813,65 +8132,8 @@
         list.classList.add("refract-src-hidden");
     }
 
-    /* Does this batch of mutations consist of nothing but nodes Refract
-       put there itself?
-
-       It matters because the observer below re-runs thirty-five passes over
-       the whole document on ANY childList change under body, and several of
-       those passes write class attributes unconditionally. Measured on the
-       home page: hovering ONE carousel card builds its flip back, that single
-       append wakes the observer, and 1,133 attribute writes follow -- 1,131 of
-       them setting a value identical to the one already there, across every
-       performer card, every Ascension badge, every country caption and the
-       whole nav. Chromium invalidates style for each of those elements
-       whether or not the value changed, and on this page each one carries
-       drop-shadow chains, multi-layer box-shadows and backdrop-filter. That
-       is the reported symptom exactly: every shadow and neon effect drops out
-       for a beat on hover and snaps back. Sweeping five cards cost 4,534
-       writes.
-
-       So a batch that is only ours does not wake the passes. Conservative on
-       every edge: an unrecognised element, a node removed from a parent we no
-       longer have, a bare text node whose parent is not ours -- any of those
-       and the batch runs as before. Nothing here changes WHAT the passes do,
-       only whether an insertion Refract made itself is a reason to redo them,
-       and it cannot be: they all run in one sequence, so a pass that needs to
-       see a node another pass created already saw it in the run that created
-       it.
-
-       This is a guard on the trigger, not a cure for the writes. The passes
-       still storm whenever Stash itself re-renders, which is often. The
-       standing fix is for each pass to read before it writes, the way
-       syncPerformerCardHearts does below. */
-    var REFRACT_OWN_CLASS = /(^|\s)(refract-|stash-perf-|stash-tilt-)/;
-    function refractOwnNode(n) {
-        if (!n) { return false; }
-        if (n.nodeType !== 1) {
-            var par = n.parentNode;
-            return !!(par && par.nodeType === 1 && par.getAttribute
-                && REFRACT_OWN_CLASS.test(par.getAttribute("class") || ""));
-        }
-        if (!n.getAttribute) { return false; }
-        return REFRACT_OWN_CLASS.test(n.getAttribute("class") || "");
-    }
-    function refractOwnsBatch(records) {
-        if (!records || !records.length) { return false; }
-        for (var i = 0; i < records.length; i++) {
-            var r = records[i];
-            if (r.type !== "childList") { return false; }
-            for (var a = 0; a < r.addedNodes.length; a++) {
-                if (!refractOwnNode(r.addedNodes[a])) { return false; }
-            }
-            for (var d = 0; d < r.removedNodes.length; d++) {
-                if (!refractOwnNode(r.removedNodes[d])) { return false; }
-            }
-        }
-        return true;
-    }
-
     function watchForReinjection() {
-        var observer = new MutationObserver(function (records) {
-            if (refractOwnsBatch(records)) { return; }
+        var observer = new MutationObserver(function () {
             /* Disconnect while mutating so our DOM updates do not synchronously re-trigger this observer
                (can freeze the tab / block Stash from finishing load). */
             observer.disconnect();
@@ -10886,7 +8148,6 @@
                 safeRun(injectToolbarDropdownScrim);
                 safeRun(injectMobileDrawer);
                 safeRun(injectMobileDock);
-                safeRun(injectMobileColsToggle);
                 safeRun(refractApplyNavIcons);
                 safeRun(refractifyCardPopoverIcons);
                 safeRun(refractAppendPluginDrawerTiles);
@@ -10911,9 +8172,6 @@
                 safeRun(enhanceDuplicateChecker);
                 safeRun(initPerformerNameTooltip);
                 safeRun(initTagCountPopover);
-                safeRun(initScrapeResults);
-                safeRun(initPerformerHeader);
-                safeRun(initPerformerEdit);
             } finally {
                 observer.observe(document.body, { childList: true, subtree: true });
             }
@@ -10939,12 +8197,12 @@
            glow-shadow re-raster every frame against a blur-dense home page,
            dropping hover to ~2fps on Chrome. CSS in 03_cards.css also
            flattens their :hover (no scale/glow). The effect stays on the
-           real list/grid views. Not marked _stashTilt - the closest() check
+           real list/grid views. Not marked _stashTilt — the closest() check
            is cheap and keeps SPA re-binds correct. */
         if (card.closest && card.closest(".slick-slider")) { return; }
         card._stashTilt = true;
 
-        /* Skip the glare overlay on image-cards - it paints above Stash's
+        /* Skip the glare overlay on image-cards — it paints above Stash's
            native hover lightbox-trigger icon and hides it from view. */
         var withGlare = !card.classList.contains("image-card");
         var glareInner = null;
@@ -11039,7 +8297,7 @@
            v1.13.13 lazy-bound these via IntersectionObserver (bind only when a
            card neared the viewport) to shave boot cost ~80→~20 cards, but that
            appended the .stash-tilt-glare overlay div mid-scroll as cards came
-           into view - a DOM mutation during scroll that flashed a visible
+           into view — a DOM mutation during scroll that flashed a visible
            pop-in (worst on Firefox during fast scroll). Binding all present
            cards directly costs only a few listeners + one tiny div each, and
            the _stashTilt idempotence guard in cardTiltBind keeps repeat
@@ -11063,7 +8321,7 @@
         '<path fill="currentColor" d="M32.5 96l0 149.5c0 17 6.7 33.3 18.7 45.3l192 192c25 25 65.5 25 90.5 0L483.2 333.3c25-25 25-65.5 0-90.5l-192-192C279.2 38.7 263 32 246 32L96.5 32c-35.3 0-64 28.7-64 64zm112 16a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>' +
         '</svg>';
 
-    /* O count icon - stylized rotated O glyph matching Stash native.
+    /* O count icon — stylized rotated O glyph matching Stash native.
        Fill attribute lives on the <svg> root (not the inner <path>) to
        match STAR/CAKE/PLAY structure. Path-level fill would shadow the
        CSS `fill: --badge-color-bright` override used by playing-card
@@ -11074,7 +8332,7 @@
         '<path d="M22.855.758L7.875 7.024l12.537 9.733c2.633 2.224 6.377 2.937 9.77 1.518c4.826-2.018 7.096-7.576 5.072-12.413C33.232 1.024 27.68-1.261 22.855.758zm-9.962 17.924L2.05 10.284L.137 23.529a7.993 7.993 0 0 0 2.958 7.803a8.001 8.001 0 0 0 9.798-12.65zm15.339 7.015l-8.156-4.69l-.033 9.223c-.088 2 .904 3.98 2.75 5.041a5.462 5.462 0 0 0 7.479-2.051c1.499-2.644.589-6.013-2.04-7.523z"/>' +
         '</svg>';
 
-    /* Light-mode toggle glyphs - sun (light on) / moon (light off). User-
+    /* Light-mode toggle glyphs — sun (light on) / moon (light off). User-
        supplied svgrepo icons, normalised to currentColor so they inherit the
        toggle button's color (incl. the warm-gradient active state). Sun is
        stroke-based, moon is fill-based. */
@@ -11087,7 +8345,7 @@
         '<path d="M21.0672 11.8568L20.4253 11.469L21.0672 11.8568ZM12.1432 2.93276L11.7553 2.29085V2.29085L12.1432 2.93276ZM21.25 12C21.25 17.1086 17.1086 21.25 12 21.25V22.75C17.9371 22.75 22.75 17.9371 22.75 12H21.25ZM12 21.25C6.89137 21.25 2.75 17.1086 2.75 12H1.25C1.25 17.9371 6.06294 22.75 12 22.75V21.25ZM2.75 12C2.75 6.89137 6.89137 2.75 12 2.75V1.25C6.06294 1.25 1.25 6.06294 1.25 12H2.75ZM15.5 14.25C12.3244 14.25 9.75 11.6756 9.75 8.5H8.25C8.25 12.5041 11.4959 15.75 15.5 15.75V14.25ZM20.4253 11.469C19.4172 13.1373 17.5882 14.25 15.5 14.25V15.75C18.1349 15.75 20.4407 14.3439 21.7092 12.2447L20.4253 11.469ZM9.75 8.5C9.75 6.41182 10.8627 4.5828 12.531 3.57467L11.7553 2.29085C9.65609 3.5593 8.25 5.86509 8.25 8.5H9.75ZM12 2.75C11.9115 2.75 11.8077 2.71008 11.7324 2.63168C11.6686 2.56527 11.6538 2.50244 11.6503 2.47703C11.6461 2.44587 11.6482 2.35557 11.7553 2.29085L12.531 3.57467C13.0342 3.27065 13.196 2.71398 13.1368 2.27627C13.0754 1.82126 12.7166 1.25 12 1.25V2.75ZM21.7092 12.2447C21.6444 12.3518 21.5541 12.3539 21.523 12.3497C21.4976 12.3462 21.4347 12.3314 21.3683 12.2676C21.2899 12.1923 21.25 12.0885 21.25 12H22.75C22.75 11.2834 22.1787 10.9246 21.7237 10.8632C21.286 10.804 20.7293 10.9658 20.4253 11.469L21.7092 12.2447Z" fill="currentColor"/>' +
         '</svg>';
 
-    /* People / group icon - used on the minimal-mode performer pill that
+    /* People / group icon — used on the minimal-mode performer pill that
        replaces the avatar circle row. */
     var PEOPLE_ICON_SVG =
         '<svg class="stash-performer-icon" viewBox="0 0 640 512" aria-hidden="true">' +
@@ -11150,12 +8408,12 @@
 
         row.appendChild(avatarWrap);
 
-        /* Right-side count cluster - holds duration / O count / tag count
+        /* Right-side count cluster — holds duration / O count / tag count
            badges so they share consistent spacing when present. */
         var counts = document.createElement("div");
         counts.className = "stash-card-counts";
 
-        /* Duration pill - mirrors Stash's native .overlay-duration text
+        /* Duration pill — mirrors Stash's native .overlay-duration text
            into the counts cluster. In minimal mode this is the leftmost
            pill in the right cluster (replacing the performer pill); the
            original .overlay-duration on the thumbnail is hidden via CSS.
@@ -11170,7 +8428,7 @@
             counts.appendChild(dPill);
         }
 
-        /* Performer pill - alternative compact representation that lives
+        /* Performer pill — alternative compact representation that lives
            ALONGSIDE the avatar circles. CSS gates which one is visible:
            default mode shows circles, minimal mode shows the pill.
            Pill markup mirrors .stash-tag-count: clickable anchor to the
@@ -11223,7 +8481,7 @@
             badge.href = sceneId ? "/scenes/" + sceneId : "/tags";
             badge.addEventListener("click", stopProp);
             badge.innerHTML = TAG_ICON_SVG + "<span>" + tagCount + "</span>";
-            /* Hover popup - clickable tag chips, each linking to /tags/:id.
+            /* Hover popup — clickable tag chips, each linking to /tags/:id.
                Built as a sibling-anchored sibling node (not via attr()) so
                we can attach event handlers and per-chip hover states. */
             if (tagInfo && tagInfo.length) {
@@ -11265,12 +8523,12 @@
         }
 
         /* Tag portrait thumbnails so the minimal-mode cover-fill CSS can
-           opt them out - for vertical scenes the cover behaviour would
+           opt them out — for vertical scenes the cover behaviour would
            crop heavily. The image often isn't loaded yet, so check
            complete + naturalWidth, else listen for load once. */
         tagOrientation(card);
 
-        /* Heart-halo effect for "Favourite" scenes - driven by the
+        /* Heart-halo effect for "Favourite" scenes — driven by the
            "Favourite ★" tag injected by the Advanced Rating plugin. We
            detect via the tagInfo array (case-insensitive match on
            "favourite" / "favorite" so it works for either spelling and
@@ -11294,7 +8552,7 @@
     /* Add .refract-portrait to a scene-card whose preview image is taller
        than wide. CSS uses this to swap object-fit: cover (landscape) for
        object-fit: contain (portrait) so vertical scenes letterbox instead
-       of cropping. Idempotent - early-exits once tagged. */
+       of cropping. Idempotent — early-exits once tagged. */
     function tagOrientation(card) {
         if (card.classList.contains("refract-portrait") ||
             card.classList.contains("refract-landscape-checked")) { return; }
@@ -11312,7 +8570,7 @@
     }
 
     /* Strip trailing file extensions from scene-card titles for a tidier
-       grid. NO dataset marker - that previously caused a stick where my
+       grid. NO dataset marker — that previously caused a stick where my
        "already stripped" flag survived a React re-render that restored
        the extension, so the strip never re-fired. The regex test is
        cheap and idempotent (already-clean text doesn't match), so
@@ -11338,7 +8596,7 @@
             var id = extractSceneId(card);
             if (id !== null) {
                 card.setAttribute("data-stash-sc", "1");
-                /* Tier label placeholder - empty <div> always present;
+                /* Tier label placeholder — empty <div> always present;
                    CSS reads the card's `refract-card-tier-*` class (set
                    by tagFilledRatings) and fills the visible text via
                    `::after { content: "BRONZE"/...PERFECT }`. Hidden in
@@ -11351,7 +8609,7 @@
                 }
                 ids.push(id);
                 cardMap[id] = card;         /* int key */
-                cardMap[String(id)] = card; /* string key - GQL returns id as string */
+                cardMap[String(id)] = card; /* string key — GQL returns id as string */
             }
         });
 
@@ -11359,7 +8617,7 @@
 
         /* Use aliased findScene (singular) calls instead of findScenes
            (plural) with scene_ids. Stash's findScenes(scene_ids:) errors
-           the entire batch if ANY id in the list doesn't exist - and on
+           the entire batch if ANY id in the list doesn't exist — and on
            a home page with stale/deleted recommendations that's common
            enough to silently break every card in the page. findScene(id:)
            returns null for missing ids, so other aliases in the same
@@ -11383,7 +8641,7 @@
                     /* Re-query the live DOM by scene-id href instead of
                        trusting cardMap. On the home page, React + slick
                        reshuffle/clone scene-card nodes between when we
-                       fire the query and when it resolves - cardMap
+                       fire the query and when it resolves — cardMap
                        refs point to detached originals while the visible
                        cards (including slick clones) are new nodes that
                        cardMap doesn't know about. Querying by href
@@ -11413,7 +8671,7 @@
             .catch(function () {
                 /* Query failed (expired ApiKey, network blip, Stash
                    restart). Un-mark the cards we claimed so the next
-                   MutationObserver pass retries them - otherwise
+                   MutationObserver pass retries them — otherwise
                    :not([data-stash-sc]) excludes them forever and they show
                    no badges until a full reload. Re-query live by href since
                    React may have swapped the nodes while in flight; a
@@ -11433,7 +8691,7 @@
     }
 
     /* Inject a .rating-banner inside a scene card (mirrors the badge
-       Stash renders on performer cards). Idempotent - if a banner is
+       Stash renders on performer cards). Idempotent — if a banner is
        already there we just refresh its text (so a user switching
        between stars and decimal rating systems sees the new value on
        the next initSceneCards pass). Rating is 0-100 in Stash;
@@ -11467,7 +8725,7 @@
         's16.8 4.1 24.3-.5l144-88c7.1-4.4 11.5-12.1 11.5-20.5s-4.4-16.1-11.5-20.5l-144-88' +
         'c-7.4-4.5-16.7-4.7-24.3-.5z"/></svg>';
 
-    /* Solid five-point star - used by the playing-card stats strip rating
+    /* Solid five-point star — used by the playing-card stats strip rating
        badge. Matches Stash's general star iconography. */
     var STAR_SVG =
         '<svg viewBox="0 0 576 512" width="10" height="10" fill="currentColor" aria-hidden="true">' +
@@ -11477,7 +8735,7 @@
         's14.9-19.3 12.9-31.3L438.6 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7' +
         's-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/></svg>';
 
-    /* Cake-with-candles - used by the playing-card stats strip age
+    /* Cake-with-candles — used by the playing-card stats strip age
        badge. Disambiguates the age number (e.g. "27") from any other
        stat. Simplified FontAwesome cake-candles path. */
     var CAKE_SVG =
@@ -11553,7 +8811,7 @@
     /* Apply the Bronze→Perfect card-frame tier class (drives the playing-
        card name-banner glow + tiers-mode card frame) directly from a
        0–10 rating. tagFilledRatings normally does this, but it reads the
-       native `.rating-banner` from the debounced runAll pass - and on
+       native `.rating-banner` from the debounced runAll pass — and on
        performer cards Ascension deletes that banner (ratingBanner.replace
        With) on a 300ms timer, which beats the debounce on navigation and
        leaves the card untiered. initPerformerCards already parses the
@@ -11646,44 +8904,6 @@
         }).catch(function () { /* the placeholders stay as dashes */ });
     }
 
-    /* Re-fit every built card once Concert One resolves.
-
-       The face is `font-display: swap` (16_playing_card.css says why: with
-       `block` the name painted NOTHING for the browser's three-second block
-       period, and since a performer card is the only thing that uses the
-       face, the fetch begins when you first reach a card view and every name
-       on screen is blank until it lands). Swap fixes the blank, and creates
-       a smaller problem in its place: refit()'s size ladder measures the
-       name, so a card built before the face arrives is measured in the Segoe
-       UI fallback, which is narrower than Concert One. Left alone the swap
-       would silently push long names past the banner and into the card's
-       overflow clip.
-
-       So the cards re-fit when the face is ready. Asking for it also FETCHES
-       it, at boot, on every page rather than at the first card -- 14KB, and
-       it is most of the cure: by the time a card view is reached the face is
-       usually already in memory and there is nothing to swap. The flush is
-       the backstop for the slow case, and it is a walk rather than a list of
-       callbacks because `_rfxRefit` is already on every card for the batched
-       stat fill, so nothing is retained after it runs. Failure is fine: the
-       fallback stays, which is the state swap already put on screen. */
-    var pcFaceFlushed = false;
-    function pcFlushFaceRefits() {
-        if (pcFaceFlushed) { return; }
-        pcFaceFlushed = true;
-        var cards = document.querySelectorAll(".performer-card[data-stash-pc], .refract-ph-card");
-        for (var i = 0; i < cards.length; i++) {
-            if (cards[i]._rfxRefit) {
-                try { cards[i]._rfxRefit(); } catch (e) { /* one card is not the pass */ }
-            }
-        }
-    }
-    if (document.fonts && document.fonts.load) {
-        document.fonts.load('1rem "Concert One"').then(pcFlushFaceRefits, pcFlushFaceRefits);
-    } else {
-        pcFaceFlushed = true;
-    }
-
     function initPerformerCards() {
         document.querySelectorAll(".performer-card:not([data-stash-pc])").forEach(function (card) {
             card.setAttribute("data-stash-pc", "1");
@@ -11715,7 +8935,7 @@
                an unrated/blank performer doesn't get a row of empty pills. */
             var anyStat = false;
 
-            /* Rating badge - gated to playing-card mode via CSS. The number
+            /* Rating badge — gated to playing-card mode via CSS. The number
                comes from the same parse path as tagFilledRatings (className
                > textContent). Real value only when v > 0; otherwise "-". */
             var ratingValue = null;
@@ -11737,7 +8957,7 @@
                     }
                 }
                 if (ratingNum && ratingNum > 0) {
-                    /* Tier the card now, from the banner we just read -
+                    /* Tier the card now, from the banner we just read —
                        before Ascension can delete it (see applyCardTier).
                        Keep the value: this is the ONLY moment the rating is
                        readable, and the tier has to be recomputable later
@@ -11771,7 +8991,7 @@
             row.appendChild(rEl);
             if (ratingValue != null) { anyStat = true; }
 
-            /* Age - adds a cake icon + "Age" label so the bare number
+            /* Age — adds a cake icon + "Age" label so the bare number
                (e.g. "27") isn't ambiguous in the playing-card stats
                strip. The icon and label are CSS-hidden in Minimal /
                Extravagant modes so those modes keep the compact
@@ -11804,7 +9024,7 @@
             row.appendChild(ageSpan);
             if (ageValue != null) { anyStat = true; }
 
-            /* O count - Stash renders it as a two-button group:
+            /* O count — Stash renders it as a two-button group:
                  .count-button > [button title="O Count"] + [button.count-value > span]
                Find the title="O Count" button, walk to its parent group,
                read the .count-value span. Real value only when non-zero. */
@@ -11825,7 +9045,7 @@
             row.appendChild(oEl);
             if (oValue != null) { anyStat = true; }
 
-            /* Scene count - wrap the number in an inner <span> for the
+            /* Scene count — wrap the number in an inner <span> for the
                same reason as age (lets playing-card mode target an inner
                element for gradient text-clip without clipping the chip).
                Real value only when non-zero; the pill is a live link only
@@ -11850,13 +9070,13 @@
             row.appendChild(scenesA);
             if (sceneValue != null) { anyStat = true; }
 
-            /* Country flag - kept around; clone is injected INSIDE the
+            /* Country flag — kept around; clone is injected INSIDE the
                name banner (alongside the gender icon) in playing-card
                mode. This frees the top-right corner for the diagonal
                tier banner. The flag clone is added below when we
                build the name banner. */
 
-            /* Tier label placeholder - empty in DOM. In playing-card
+            /* Tier label placeholder — empty in DOM. In playing-card
                mode, CSS reads the card's `refract-card-tier-*` class
                (applied later by tagFilledRatings) and fills this
                element via `::after { content: ... }`. Always injected
@@ -11915,10 +9135,10 @@
 
             /* Combined shrink-to-fit for the stat strip + name banner.
                Both passes need to re-run on card resize (window zoom,
-               grid reflow, etc.) - the one-shot rAF that fired only on
+               grid reflow, etc.) — the one-shot rAF that fired only on
                first inject left the badges cut off after `cmd+`/`cmd-`.
                `var bannerInner` is hoisted to the forEach scope and is
-               assigned later in the if(titleEl) block - by the time
+               assigned later in the if(titleEl) block — by the time
                refit() actually runs (rAF / ResizeObserver callback),
                that assignment has happened or `bannerInner` is
                undefined and we skip the name pass. */
@@ -11931,7 +9151,7 @@
                 requestAnimationFrame(function () {
                     refitPending = false;
                     if (!document.body.classList.contains("refract-perf-layout-card")) { return; }
-                    /* Stat strip - high scene counts (3 digits) push chips
+                    /* Stat strip — high scene counts (3 digits) push chips
                        off the right edge, so shrink to fit.
 
                        DISCRETE steps, matching refractFitBackStats and the
@@ -11962,7 +9182,7 @@
                             if (row.scrollWidth <= pcAvail + 1) { break; }
                         }
                     }
-                    /* Name banner - Concert One is moderately wide;
+                    /* Name banner — Concert One is moderately wide;
                        step font-size down through the ladder until the
                        text fits the left 3/4 of the banner. */
                     if (bannerInner) {
@@ -11975,13 +9195,13 @@
                 });
             }
 
-            /* Playing-card mode name banner - Pokemon-style header:
+            /* Playing-card mode name banner — Pokemon-style header:
                  [gender icon (type)]  Name        ← left-aligned
                Inject a copy of the gender icon (cloned from native
                .gender-icon under the title) PLUS just the performer name
                text (from .TruncatedText so we exclude the hidden country
                string). Display is CSS-gated to playing-card mode. */
-            /* Country indicator - extract the ISO-2 code from the
+            /* Country indicator — extract the ISO-2 code from the
                flag-icons class (`fi fi-XX`) and convert it to the
                full localized country name via `Intl.DisplayNames`
                (built-in browser API). Inserted into the chin above
@@ -12004,19 +9224,6 @@
                        read-out can sit on the SAME line, pushed to the
                        right edge, while the name still ellipsis-truncates
                        if it's long (see integrateAscensionBadges). */
-                    /* The flag chip leads the caption. Drawn on every
-                       card whether or not it is switched on, the way the
-                       rest of this table works: CSS gates it, so the
-                       customiser always has something to point its hit
-                       target at. `fi fi-XX` carries the artwork as a
-                       background image; the chip class makes it a disc. */
-                    var chip = document.createElement("span");
-                    chip.className = "fi fi-" + code.toLowerCase() + " refract-flag-chip";
-                    /* A flag alone does not separate Slovenia from
-                       Slovakia, or Chad from Romania. */
-                    chip.setAttribute("title", countryName);
-                    chip.setAttribute("aria-label", countryName);
-                    countryWrap.appendChild(chip);
                     var countryNameSpan = document.createElement("span");
                     countryNameSpan.className = "stash-perf-country-name";
                     countryNameSpan.textContent = countryName;
@@ -12028,12 +9235,12 @@
             if (titleEl) {
                 var banner = document.createElement("div");
                 banner.className = "refract-pc-name-banner";
-                /* Gender - corner "type" slot before the name */
+                /* Gender — corner "type" slot before the name */
                 var genderEl = titleEl.querySelector(".gender-icon");
                 if (genderEl) {
                     banner.appendChild(genderEl.cloneNode(true));
                 }
-                /* Name - prefer .TruncatedText child; falls back to title
+                /* Name — prefer .TruncatedText child; falls back to title
                    textContent. Avoid grabbing titleEl.textContent directly
                    since Stash also renders .performer-card__country-string
                    inside the title (display:none but textContent-visible).
@@ -12082,10 +9289,10 @@
        particles layer holding TWO sub-layers; CSS shows whichever fits
        the current mode (so toggling lite at runtime switches instantly
        with no rebuild):
-         • .refract-heart-float-layer - an animated vignette ring of live
+         • .refract-heart-float-layer — an animated vignette ring of live
            hearts that twinkle (staggered opacity + scale pulse), full
            mode. Transform + opacity animation only.
-         • .refract-heart-halo-layer - a static photographic-vignette ring
+         • .refract-heart-halo-layer — a static photographic-vignette ring
            of hearts (lite mode + reduced motion): one of five baked SVGs
            (crowding the corners, thinning inward, centre clear) applied as
            a background-image. One node + one cached blit per card. Zero
@@ -12097,7 +9304,7 @@
         particles.className = "refract-heart-particles";
         particles.setAttribute("aria-hidden", "true");
 
-        /* ── Full-mode layer - an ANIMATED vignette ring. Same edge-
+        /* ── Full-mode layer — an ANIMATED vignette ring. Same edge-
            crowding distribution as the lite halo, but built as live spans
            so each heart can twinkle (a staggered opacity + scale pulse)
            for a shimmering halo. Full mode only; lite swaps to the static
@@ -12147,7 +9354,7 @@
         }
         particles.appendChild(floatLayer);
 
-        /* ── Halo layer (lite mode / reduced motion) - static vignette. ──
+        /* ── Halo layer (lite mode / reduced motion) — static vignette. ──
            The ring of hearts is a baked SVG (img/heart-halo-N.svg) applied
            as a background-image in CSS, NOT ~36 live spans. One node per
            card instead of 36 keeps style-recalc cheap on big favourite
@@ -12164,7 +9371,7 @@
         return particles;
     }
 
-    /* Heart-halo sync for favourited PERFORMER cards - only in playing-
+    /* Heart-halo sync for favourited PERFORMER cards — only in playing-
        card rating-style mode. The source of "is this favourited?" is the
        native Stash `.favorite-button.favorite` class rather than a tag
        lookup, so we re-sync on every mutation cycle (Stash toggles the
@@ -12174,24 +9381,14 @@
         document.querySelectorAll(".performer-card").forEach(function (card) {
             var isFav = !!card.querySelector(".favorite-button.favorite");
             var existing = card.querySelector(":scope > .refract-heart-particles");
-            var want = inPlayingCard && isFav;
-            /* Read before writing. classList.add and .remove run the token
-               list's update steps whether or not the set changed, which sets
-               the attribute, which invalidates the element's style -- so the
-               unconditional pair this replaces cost one style invalidation per
-               card per pass on cards that were not favourited and never would
-               be. 195 cards on the home page, twice per observer cycle: 390 of
-               the 1,131 needless writes that made the shadows flash. contains()
-               touches nothing. */
-            if (card.classList.contains("refract-favourite") !== want) {
-                card.classList.toggle("refract-favourite", want);
-            }
-            if (want) {
+            if (inPlayingCard && isFav) {
+                card.classList.add("refract-favourite");
                 if (!existing) {
                     card.appendChild(refractBuildHearts());
                 }
-            } else if (existing) {
-                existing.remove();
+            } else {
+                card.classList.remove("refract-favourite");
+                if (existing) { existing.remove(); }
             }
         });
     }
@@ -12224,137 +9421,17 @@
        (which disconnects before mutating), so our move doesn't re-fire
        the observer. Inert on installs without Ascension; the selector
        matches no DOM. */
-    /* Set a class only when it is not already in the state asked for.
-
-       This is not a micro-optimisation, it is a correctness fix for a
-       document-wide repaint. Chromium invalidates style when the class
-       ATTRIBUTE IS SET, not when its value changes, and classList.add and
-       .remove run the token list's update steps unconditionally - so
-       adding a class an element already carries costs exactly what a real
-       change costs. On a home page of cards with shadow chains and
-       backdrop-filter that is a full re-raster: the shadows drop for a
-       frame and snap back, on every pass, for writes that changed
-       nothing.
-
-       Measured before this guard: one hover produced 1,133 attribute
-       writes across the document, 1,131 of them redundant, and 684 of
-       those were this file re-asserting three classes that were already
-       there on every badge, caption and chin it had already processed.
-
-       Not findable by patching className or setAttribute or DOMTokenList,
-       because the cost is in the token list's internal update step; a
-       DOMDebugger attribute-modified breakpoint on a card the pointer is
-       nowhere near is what shows it. */
-    function setClassIfChanged(el, name, on) {
-        if (!el) { return; }
-        var has = el.classList.contains(name);
-        if (on && !has) { el.classList.add(name); }
-        else if (!on && has) { el.classList.remove(name); }
-    }
-
-    /* ── Which Ascension is this? ─────────────────────────────────────
-       The double flame of Discourse #190 happened because the flame was
-       prepended unconditionally. 1.3.0 shipped an icon of its own, the
-       rule set knew nothing about it, and the card drew both. Hiding
-       "any svg that is not ours" cures that one, but it cures it by
-       asserting that Refract understands every badge it will ever be
-       shown, and the NEXT shape gets whatever that assertion happens to
-       do to it.
-
-       So the test runs the other way round: a badge is CLAIMED only when
-       every part of it can be named. It must carry the rank text we
-       read, its direct children must all come from the set the shipped
-       versions use, and the only icons anywhere in it may be ours and
-       the one inside Ascension's own score wrapper. Anything else is
-       left as its author drew it -- no marker class, so not one rule in
-       13_plugins.css applies, no flame, no hides -- with one console
-       note naming the unfamiliar part. Unstyled and correct beats
-       styled and wrong, and it is the one outcome that cannot repeat
-       #190 on a version nobody here has seen.
-
-       Read off both real builds rather than guessed: 1.2.6 draws
-       emoji + rank (+ total, + match stats), 1.3.1 draws score + separator
-       + rank (+ total, + match stats), each of those optional parts
-       genuinely absent on some performers, and the compact form on
-       /performers differs from the full form everywhere else. The parts
-       list is the union, so a missing part is not a strange badge. */
-    var ASCENSION_KNOWN_PARTS = {
-        "hon-rank-emoji": 1,        /* 1.2.x tier emoji, gone in 1.3 */
-        "hon-asc-score-display": 1, /* 1.3.x Ascended score, only when scored */
-        "hon-asc-separator": 1,     /* 1.3.x, rides with the score */
-        "hon-rank-text": 1,         /* every version, and the one we read */
-        "hon-rank-total": 1,        /* "of N", full badge only */
-        "hon-match-stats": 1        /* both versions, only once a match exists */
-    };
-    /* The one place an icon that is not ours is allowed to be. */
-    var ASCENSION_ICON_HOST = ".hon-asc-score-display";
-    var ascensionUnknownLogged = {};
-
-    /* Returns null when the badge is understood, else a short phrase
-       naming what was not. `class` is read with getAttribute because on
-       an SVG element `className` is an SVGAnimatedString and stringifies
-       to "[object SVGAnimatedString]", which would make the one message
-       whose whole job is to say what changed say nothing at all. */
-    function ascensionBadgeUnknownPart(badge) {
-        if (!badge.querySelector(".hon-rank-text")) { return "no .hon-rank-text to read"; }
-        var kids = badge.children;
-        for (var i = 0; i < kids.length; i++) {
-            var k = kids[i];
-            if (k.classList.contains("refract-ascension-icon")
-                || k.classList.contains("refract-ascension-score")) { continue; }
-            var named = false;
-            for (var c = 0; c < k.classList.length; c++) {
-                if (ASCENSION_KNOWN_PARTS[k.classList[c]]) { named = true; break; }
-            }
-            if (!named) {
-                return "unfamiliar child <" + k.tagName.toLowerCase()
-                    + ' class="' + (k.getAttribute("class") || "") + '">';
-            }
-        }
-        var svgs = badge.querySelectorAll("svg");
-        for (var s = 0; s < svgs.length; s++) {
-            if (svgs[s].classList.contains("refract-ascension-icon")) { continue; }
-            if (svgs[s].closest(ASCENSION_ICON_HOST)) { continue; }
-            return "an icon outside " + ASCENSION_ICON_HOST
-                + ' (class="' + (svgs[s].getAttribute("class") || "") + '")';
-        }
-        return null;
-    }
-
     function integrateAscensionBadges() {
         var badges = document.querySelectorAll(".performer-card .hon-battle-rank-badge");
         if (badges.length) {
-            setClassIfChanged(document.body, "refract-has-ascension", true);
+            document.body.classList.add("refract-has-ascension");
         }
         /* Only playing-card mode shows the `.stash-perf-country` caption;
            in other rating styles it's CSS-hidden, so nesting the rank
            into it would hide it too, so fall back to the chin there. */
         var pcMode = document.body.classList.contains("refract-perf-layout-card");
         badges.forEach(function (badge) {
-            /* Unclaimed: strip anything a previous shape earned, say so
-               once per distinct surprise, and stop. It is still PARKED
-               below, because where the badge sits is Refract's own chin
-               layout rather than Ascension's paint -- left where the
-               plugin dropped it, it lands on the injected stat pills,
-               which is the clash the integration was written to solve.
-               Position it, do not dress it. */
-            var unknownPart = ascensionBadgeUnknownPart(badge);
-            if (unknownPart) {
-                setClassIfChanged(badge, "refract-ascension-badge", false);
-                setClassIfChanged(badge, "refract-ascension-unknown", true);
-                var ours = badge.querySelector(".refract-ascension-icon");
-                if (ours) { ours.remove(); }
-                if (!ascensionUnknownLogged[unknownPart]) {
-                    ascensionUnknownLogged[unknownPart] = 1;
-                    console.warn("[Refract] Ascension's rank badge is a shape this build does not"
-                        + " know (" + unknownPart + "), so it has been left unstyled rather than"
-                        + " guessed at. See docs/ascension-integration.md.");
-                }
-                parkAscensionBadge(badge, pcMode);
-                return;
-            }
-            setClassIfChanged(badge, "refract-ascension-unknown", false);
-            setClassIfChanged(badge, "refract-ascension-badge", true);
+            badge.classList.add("refract-ascension-badge");
             /* Ascension renders "undefinedW/L/D" when a performer has no
                recorded record yet, so sanitise so the line reads cleanly.
                Re-runs each cycle, so it self-heals if Ascension rebuilds
@@ -12364,17 +9441,6 @@
                     s.textContent = s.textContent.replace(/undefined/gi, "0");
                 }
             });
-            /* The same defect in the badge's TOOLTIP, which the span sweep
-               above never reaches. Ascension writes the record into `title`
-               at build time, so a missing draw count hovers as "Record: 0W -
-               1L - undefinedD" -- measured on two live badges under 1.3.1.
-               Rewrite the attribute the same way the spans are rewritten,
-               and only when it needs it, so this is a no-op on every badge
-               that is already clean. */
-            var badgeTitle = badge.getAttribute("title");
-            if (badgeTitle && /undefined/i.test(badgeTitle)) {
-                badge.setAttribute("title", badgeTitle.replace(/undefined/gi, "0"));
-            }
             /* Drop both the literal "Rank " word and the "#" so the
                read-out is a bare number after the flame glyph. Only write
                when it actually changes, to avoid needless mutations. */
@@ -12395,138 +9461,42 @@
             if (!badge.querySelector(".refract-ascension-icon")) {
                 badge.insertAdjacentHTML("afterbegin", ASCENSION_FLAME_SVG);
             }
-            /* Ascension's tier colour, lifted onto the badge as a custom
-               property. Read from the INLINE style rather than the computed
-               one, because the computed colour is whatever our own rules
-               resolved to. `.hon-rank-text` is the source because it is the
-               one element every version has carried and the only one whose
-               inline colour is NOT !important; the score wrapper carries the
-               same value where it exists. Nothing Refract ships paints with
-               this. It is here because it is real data the theme would
-               otherwise throw away, and because a user's custom CSS has no
-               other way to reach it: the tier palette in DESIGN_SYSTEM 4 is
-               Refract's own, and a third colour system on one line is half
-               of what #190 actually looked like. */
-            if (rankText && rankText.style && rankText.style.color) {
-                if (badge.style.getPropertyValue("--refract-hon-tier") !== rankText.style.color) {
-                    badge.style.setProperty("--refract-hon-tier", rankText.style.color);
+            var card = badge.closest(".performer-card");
+            if (!card) { return; }
+            var section = card.querySelector(".card-section");
+            /* Playing-card mode: ride the country caption's line, pushed to
+               the RIGHT edge of the card. The marker class turns the caption
+               into a space-between flex row (name left, rank right), and we
+               append the badge as its last child. */
+            /* A country the user has HIDDEN is no host: the badge would die
+               with it, its visibility a side effect of an unrelated chip. */
+            var country = (pcMode && section && !document.body.classList.contains("refract-pc-hide-country"))
+                ? section.querySelector(":scope > .stash-perf-country")
+                : null;
+            if (country) {
+                country.classList.add("refract-country-with-rank");
+                if (badge.parentElement === country && country.lastElementChild === badge) {
+                    return;
                 }
-            }
-            /* The Ascended Score, drawn as OURS rather than restyled as
-               theirs. Their wrapper, its value span and its icon all ship
-               inline `!important`, which no stylesheet can beat, so the
-               choice is to strip their attributes or to render the number
-               ourselves. Stripping works today (they never read those
-               elements back) and stops working the first time they add a
-               property nobody here has anticipated; this does not, and it
-               is the same move already made for the flame glyph and the
-               one DESIGN_SYSTEM 6.12 prescribes for a control we do not
-               own. Their elements stay untouched and out of flow.
-
-               Injected whether or not the element is switched on, because
-               the customiser hides it by a body class the way it hides
-               every other card element, and because the roster chip needs
-               something on the card to name. Absent entirely when the
-               performer has no score: Ascension omits the wrapper then, and
-               a divider with nothing after it is worse than no read-out. */
-            var theirScore = badge.querySelector(".hon-asc-score-value");
-            var scoreVal = theirScore ? (theirScore.textContent || "").trim() : "";
-            var ourScore = badge.querySelector(".refract-ascension-score");
-            if (scoreVal && rankText) {
-                if (!ourScore) {
-                    rankText.insertAdjacentHTML("afterend",
-                        '<span class="refract-ascension-score">' + escapeHtml(scoreVal) + "</span>");
-                } else if (ourScore.textContent !== scoreVal) {
-                    /* Self-heals if Ascension rewrites the number in place
-                       instead of rebuilding the badge. Only on a real
-                       change, so the common cycle mutates nothing. */
-                    ourScore.textContent = scoreVal;
-                }
-            } else if (ourScore) {
-                ourScore.remove();
-            }
-            parkAscensionBadge(badge, pcMode);
-        });
-        sanitiseAscensionHeadRank();
-    }
-
-    /* Ascension's own pill in the performer page's EDIT head prints a rank
-       for a performer who has none. Its rank is a position in a sorted
-       list, so an unrated performer lands one past the end and the pill
-       reads "Rank #493 of 492" - a number larger than the set it claims
-       to be a position in, which is not a rank at all.
-
-       Refract's band already says "Unranked" for the same performer
-       (the F10 ruling), so the page states two different things about one
-       fact, and the wrong one is the plugin's. P8 is the rule: the theme
-       does not claim knowledge it does not have, and here it is removing
-       a claim rather than adding one. The test is theirs and needs no
-       list of versions - a rank past the total is self-evidently not a
-       rank, whatever the markup is called.
-
-       Only the two nodes' text changes; the badge, its handlers and its
-       tooltip are untouched. Idempotent, and re-run every cycle so it
-       survives Ascension rebuilding the pill. */
-    function sanitiseAscensionHeadRank() {
-        var badges = document.querySelectorAll("#performer-page .quality-group .hon-battle-rank-badge");
-        badges.forEach(function (badge) {
-            var rankEl = badge.querySelector(".hon-rank-text");
-            var totalEl = badge.querySelector(".hon-rank-total");
-            if (!rankEl || !totalEl) { return; }
-            var rank = (rankEl.textContent || "").match(/(\d[\d,]*)/);
-            var total = (totalEl.textContent || "").match(/(\d[\d,]*)/);
-            if (!rank || !total) { return; }
-            var r = parseInt(rank[1].replace(/,/g, ""), 10);
-            var t = parseInt(total[1].replace(/,/g, ""), 10);
-            if (!isFinite(r) || !isFinite(t) || r <= t) { return; }
-            if (rankEl.textContent !== "Unranked") { rankEl.textContent = "Unranked"; }
-            setClassIfChanged(badge, "refract-ascension-unranked", true);
-        });
-    }
-
-    /* WHERE the badge sits, split out from what it is dressed in, because
-       an unrecognised badge still needs somewhere to sit. Left where
-       Ascension drops it (in place of the native rating banner) it lands
-       on the injected stat-pill row, which is the clash this integration
-       was written to fix -- and that clash is caused by Refract's own
-       pills, so declining to place it is not neutrality, it is a mess of
-       our making. Position it; the caller decides whether to dress it. */
-    function parkAscensionBadge(badge, pcMode) {
-        var card = badge.closest(".performer-card");
-        if (!card) { return; }
-        var section = card.querySelector(".card-section");
-        /* Playing-card mode: ride the country caption's line, pushed to
-           the RIGHT edge of the card. The marker class turns the caption
-           into a space-between flex row (name left, rank right), and we
-           append the badge as its last child. */
-        /* A country the user has HIDDEN is no host: the badge would die
-           with it, its visibility a side effect of an unrelated chip. */
-        var country = (pcMode && section && !document.body.classList.contains("refract-pc-hide-country"))
-            ? section.querySelector(":scope > .stash-perf-country")
-            : null;
-        if (country) {
-            setClassIfChanged(country, "refract-country-with-rank", true);
-            if (badge.parentElement === country && country.lastElementChild === badge) {
+                country.appendChild(badge);
                 return;
             }
-            country.appendChild(badge);
-            return;
-        }
-        /* Fallback (no country caption / non-playing-card): sit on the
-           NAME's line, at the right edge.
+            /* Fallback (no country caption / non-playing-card): sit on the
+               NAME's line, at the right edge.
 
-           It stays a CHILD OF THE CHIN and is positioned there by CSS
-           rather than being appended into the name element, for two
-           reasons: the chin is a flex COLUMN, so any in-flow child costs a
-           whole extra line and makes the chin taller; and the name is
-           wrapped in an <a> to the performer, so nesting the rank inside
-           it would swallow the rank's own click target. */
-        if (!section) { return; }
-        setClassIfChanged(section, "refract-chin-with-rank", true);
-        if (badge.parentElement === section && badge === section.lastElementChild) {
-            return;
-        }
-        section.appendChild(badge);
+               It stays a CHILD OF THE CHIN and is positioned there by CSS
+               rather than being appended into the name element, for two
+               reasons: the chin is a flex COLUMN, so any in-flow child costs a
+               whole extra line and makes the chin taller; and the name is
+               wrapped in an <a> to the performer, so nesting the rank inside
+               it would swallow the rank's own click target. */
+            if (!section) { return; }
+            section.classList.add("refract-chin-with-rank");
+            if (badge.parentElement === section && badge === section.lastElementChild) {
+                return;
+            }
+            section.appendChild(badge);
+        });
     }
 
     function onKey(e) {
@@ -12556,7 +9526,7 @@
                 if (!el || el === document.body) { break; }
                 var tag = el.tagName;
                 if (tag !== "NAV" && tag !== "UL" && tag !== "LI") {
-                    /* Don't tag a wrapper that also contains the filter toolbar -
+                    /* Don't tag a wrapper that also contains the filter toolbar —
                        otherwise the whole toolbar gets position:fixed'd to the
                        viewport bottom on pages where the pager is embedded in
                        the toolbar row. Float just the pager itself in that case. */
@@ -12572,7 +9542,7 @@
 
         /* Scene Duplicate Checker has its own dedicated pager treatment
            (data-refract-pager rows tagged by enhanceDuplicateChecker +
-           styling in 08_misc_mid.css) - skip it here so the two systems
+           styling in 08_misc_mid.css) — skip it here so the two systems
            don't fight over the same elements. */
         if (document.querySelector("#scene-duplicate-checker")) {
             return;
@@ -12596,7 +9566,7 @@
        Popper recomputes the popover's document coords a frame late, so the
        pill visibly stutters as it chases the bar. It's a transient type-a-page
        input, so the clean fix is to just close it on scroll (clicking the
-       trigger toggles it shut) - nothing left to stutter. Bound once. */
+       trigger toggles it shut) — nothing left to stutter. Bound once. */
     var refractPageJumpDismissBound = false;
     function bindPageJumpScrollDismiss() {
         if (refractPageJumpDismissBound) { return; }
@@ -12609,7 +9579,7 @@
             if (trigger) { trigger.click(); }
         }, { passive: true, capture: true });
     }
-    refractInit(function () { bindPageJumpScrollDismiss(); });
+    bindPageJumpScrollDismiss();
 
     /* ── Table list view: strip overflowable so hover-popup never fires ── */
 
@@ -12644,7 +9614,7 @@
        The kmv details-tags-overhaul plugin renders its panel with
        `.is-open` already on the section root, so the tag groups are
        visible by default. Refract paired CSS hides everything below
-       the panel header when `.is-open` is absent - here we strip it
+       the panel header when `.is-open` is absent — here we strip it
        once on first render so the panel starts collapsed. A marker on
        the section keeps us from re-stripping after the user opens it
        manually (the plugin's own JS owns toggle behavior). */
@@ -12664,9 +9634,9 @@
 
        Targets two wrapper variants Stash uses:
          .count-button (scene detail toolbar + scene-card popovers)
-           - two buttons inside: .count-icon[title="O Count"] + .count-value
+           — two buttons inside: .count-icon[title="O Count"] + .count-value
          .o-counter (image detail toolbar + Lightbox-footer + image-card popovers)
-           - single button title="O Count" with count as last inner span
+           — single button title="O Count" with count as last inner span
 
        Entity ID is resolved from context:
          • scene/image detail toolbar → URL match
@@ -12719,7 +9689,7 @@
 
             wrapper.addEventListener("pointerdown", function (e) {
                 if (e.button !== 0) { return; }
-                /* Only react to pointerdowns on an actual button - clicking
+                /* Only react to pointerdowns on an actual button — clicking
                    the wrapper border/padding shouldn't fire. */
                 if (!e.target.closest("button")) { return; }
                 longPressed = false;
@@ -12739,7 +9709,7 @@
             wrapper.addEventListener("pointerleave", cancelTimer);
             wrapper.addEventListener("pointercancel", cancelTimer);
 
-            /* Capture-phase click suppression - fires before Stash's own
+            /* Capture-phase click suppression — fires before Stash's own
                click handler. Reset the flag after suppressing so the next
                normal click still increments. */
             wrapper.addEventListener("click", function (e) {
@@ -12766,7 +9736,7 @@
             if (im) { return { type: "image", id: im[1] }; }
         }
 
-        /* 2. Lightbox - pull the ID out of the currently-visible image src. */
+        /* 2. Lightbox — pull the ID out of the currently-visible image src. */
         var lb = el.closest(".Lightbox") || (el.closest(".Lightbox-footer") && document.querySelector(".Lightbox"));
         if (lb) {
             var imgEl = lb.querySelector('img[src*="/image/"]');
@@ -12776,7 +9746,7 @@
             }
         }
 
-        /* 3. Card popovers - find the card type and pull the ID from its link.
+        /* 3. Card popovers — find the card type and pull the ID from its link.
               Skip performer cards entirely: the O count there is an aggregate
               across all the performer's scenes, not a single entity. */
         var performerCard = el.closest(".performer-card");
@@ -12817,7 +9787,7 @@
            and inherit all the filter-bar styling). */
         if (search.closest && search.closest('.modal, .modal-dialog, .modal-content, .sidebar, form, .edit-tags-overhaul, #tag-manager-host, .tag-manager')) { return; }
 
-        /* Walk up until we find a div containing ≥ 4 buttons - that is the
+        /* Walk up until we find a div containing ≥ 4 buttons — that is the
            filter toolbar wrapper, whatever Stash names the class. */
         var el = search.parentElement;
         for (var i = 0; i < 7; i++) {
@@ -12835,7 +9805,7 @@
     /* ── Filter button: orange glow when filters are active ─────────── */
 
     function initFilterButtonBadge() {
-        /* Find buttons inside [data-stash-filter] that contain a .badge child -
+        /* Find buttons inside [data-stash-filter] that contain a .badge child —
            those are the Stash filter/sort buttons with an active-count overlay. */
         document.querySelectorAll("[data-stash-filter] button").forEach(function (btn) {
             var badge = btn.querySelector(".badge");
@@ -12876,7 +9846,7 @@
                 if (n >= 2 && n >= maxBtns) { group = g; maxBtns = n; }
             });
             if (!group) { return; }
-            /* Exclude multiview plugin's picking toggle - it lives in this group
+            /* Exclude multiview plugin's picking toggle — it lives in this group
                but is not a view mode and must stay as a standalone button. */
             var btns = Array.from(group.querySelectorAll(".btn")).filter(function (b) {
                 return !b.classList.contains("mv-picking-toggle-btn");
@@ -12944,7 +9914,7 @@
                 var current = liveBtns();
                 var activeBtn = getActiveBtn(current);
 
-                /* Update active indicator - show current view's icon */
+                /* Update active indicator — show current view's icon */
                 if (activeBtn) {
                     var svg = activeBtn.querySelector("svg");
                     activeInd.innerHTML = svg ? svg.outerHTML : "";
@@ -12964,7 +9934,7 @@
                 var current = liveBtns();
                 var activeBtn = getActiveBtn(current);
                 current.forEach(function (btn) {
-                    /* Skip the currently active view - it's shown in the indicator */
+                    /* Skip the currently active view — it's shown in the indicator */
                     if (btn === activeBtn) { return; }
                     var label = btn.getAttribute("aria-label") || btn.getAttribute("title") || "";
                     var svg   = btn.querySelector("svg");
@@ -13165,8 +10135,8 @@
 
                 /* Try Slick jQuery API first, fall back to clicking nav buttons */
                 try {
-                    if (window.$ && window.$(slider).slick) {
-                        window.$(slider).slick(dir > 0 ? "slickNext" : "slickPrev");
+                    if (window.$ && $(slider).slick) {
+                        $(slider).slick(dir > 0 ? "slickNext" : "slickPrev");
                         return;
                     }
                 } catch (err) { /* no jQuery slick */ }
@@ -13195,7 +10165,7 @@
                     });
                     document.body.classList.toggle("refract-tasks-running", active);
                 })
-                .catch(function () { /* Stash restarting or offline - leave class as-is */ });
+                .catch(function () { /* Stash restarting or offline — leave class as-is */ });
         }
         check();
         setInterval(check, 4000);
@@ -13231,7 +10201,6 @@
                 injectToolbarDropdownScrim();
                 injectMobileDrawer();
                 injectMobileDock();
-                injectMobileColsToggle();
                 refractApplyNavIcons();
                 refractAppendPluginDrawerTiles();
                 normalizeSettingsSidebarNavItems();
@@ -13267,7 +10236,6 @@
         injectToolbarDropdownScrim();
         injectMobileDrawer();
         injectMobileDock();
-        injectMobileColsToggle();
         refractApplyNavIcons();
         refractAppendPluginDrawerTiles();
         normalizeSettingsSidebarNavItems();
@@ -13332,7 +10300,7 @@
             el.style.setProperty("min-width", "0", "important");
         });
 
-        /* optional-field: flex row, left-aligned - must set display too or
+        /* optional-field: flex row, left-aligned — must set display too or
            justify-content has no effect if Stash overrides display to block   */
         r.querySelectorAll(".search-result .optional-field").forEach(function(el) {
             el.style.setProperty("background", "transparent", "important");
@@ -13371,9 +10339,9 @@
         });
     }
 
-    /* Initial fixSceneTaggerDetails pass - subsequent passes run via the
+    /* Initial fixSceneTaggerDetails pass — subsequent passes run via the
        consolidated mutation watcher at the end of this file. */
-    refractInit(function () { fixSceneTaggerDetails(); });
+    fixSceneTaggerDetails();
 
     /* ── Performer Tagger: relocate batch buttons into header ──────────
        The PerformerTagger page renders three action buttons (Batch Add,
@@ -13403,9 +10371,9 @@
             header.dataset.refractBatchMoved = "1";
         });
     }
-    refractInit(function () { relocateTaggerBatchButtons(); });
+    relocateTaggerBatchButtons();
 
-    /* PerformerTagger search results - inject a close X button so the
+    /* PerformerTagger search results — inject a close X button so the
        user can dismiss the result overlay without picking a match.
        The close handler HIDES via class rather than removing the
        element, because removing a React-managed element corrupts
@@ -13433,7 +10401,7 @@
             results.appendChild(btn);
         });
     }
-    refractInit(function () { injectTaggerSearchClose(); });
+    injectTaggerSearchClose();
 
     /* Global capture-phase listener: when the user clicks the
        "Search" button inside a PerformerTagger card, un-hide any
@@ -13462,7 +10430,7 @@
        the attribute) so neither a `change` event nor a MutationObserver
        picks up state changes coming from Stash's bulk-select dropdown.
        A 250ms poll syncs our card's visual checked state to the
-       underlying input - cheap, robust, scoped to the route. */
+       underlying input — cheap, robust, scoped to the route. */
 
     var refractDupSync = [];
     /* null = pre-action default (largest-file heuristic); otherwise one of
@@ -13473,7 +10441,7 @@
 
     function refractParseBytes(text) {
         /* Unit prefix is optional so a plain-bytes value like "512 B" parses
-           as 512 rather than 0 - a 0 would corrupt group totals, the
+           as 512 rather than 0 — a 0 would corrupt group totals, the
            "largest" winner pick, and the reclaim estimate. */
         var m = (text || "").match(/([\d.]+)\s*([KMGT]?)i?B/i);
         if (!m) { return 0; }
@@ -13504,8 +10472,8 @@
         var actionButtons = cells[9].querySelectorAll(".edit-button");
         /* Identify Delete vs Merge by their label (title / aria-label /
            text), NOT by column position. A positional [0]=delete/[1]=merge
-           mapping silently fires the WRONG action - merging scenes the user
-           meant to delete - if Stash ever reorders the action column or adds
+           mapping silently fires the WRONG action — merging scenes the user
+           meant to delete — if Stash ever reorders the action column or adds
            another .edit-button. Fall back to positional only when no label
            disambiguates (preserves behavior on unlabelled buttons). */
         function dupBtnLabel(b) {
@@ -13572,7 +10540,7 @@
             (isWarn ? " refract-dup-spec--warn" : "");
         pill.innerHTML =
             '<span class="refract-dup-spec__icon" aria-hidden="true">' + iconChar + '</span>' +
-            '<span class="refract-dup-spec__text">' + escapeHtml(text || "-") + '</span>';
+            '<span class="refract-dup-spec__text">' + escapeHtml(text || "—") + '</span>';
         return pill;
     }
 
@@ -13598,7 +10566,7 @@
         img.alt = "";
         img.loading = "lazy";
         spriteLink.appendChild(img);
-        /* Pure-CSS hover preview - sibling <span> with a 2x sprite that
+        /* Pure-CSS hover preview — sibling <span> with a 2x sprite that
            fades in on :hover. Avoids touching Stash's React HoverPopover
            (moving React-managed nodes corrupts virtual DOM tracking). */
         var pop = document.createElement("span");
@@ -13776,7 +10744,7 @@
                     chipText = "Suggested · lower res";
                     break;
                 case "oldest":
-                    /* mod_time isn't rendered in the table - we can't compute
+                    /* mod_time isn't rendered in the table — we can't compute
                        it ourselves. Mirror whatever Stash just checked. */
                     suggested = isChecked;
                     chipText = "Suggested · oldest";
@@ -13786,7 +10754,7 @@
                     chipText = "Suggested · youngest";
                     break;
                 case "largestFile":
-                default: /* null - pre-action default heuristic */
+                default: /* null — pre-action default heuristic */
                     suggested = !isLargest;
                     chipText = "Suggested · smaller file";
                     break;
@@ -13842,7 +10810,7 @@
        boxes. "Select None" is allowed through (it still clears checked
        state natively, which is what users expect). For the four positive
        strategies we stopImmediatePropagation so React's onClick handler
-       never sees the event - the boxes don't auto-check. A separate
+       never sees the event — the boxes don't auto-check. A separate
        "Select N suggested" button in the summary lets the user commit
        the recommendation when they're ready. */
     document.addEventListener("click", function (e) {
@@ -13871,7 +10839,7 @@
            strategy. For largestFile/largestRes we can compute ourselves,
            so block native and just update chips. */
         if (refractDupStrategy === "oldest" || refractDupStrategy === "youngest") {
-            /* Let native fire - sync poll will reflect checked state and
+            /* Let native fire — sync poll will reflect checked state and
                trigger refractApplyDupSuggestions to flag the right cards. */
             setTimeout(refractApplyDupSuggestions, 50);
             return;
@@ -13936,7 +10904,7 @@
         }
         var card = document.querySelector("#scene-duplicate-checker");
         if (!card) { return; }
-        /* Operate on the inner <div class="duplicate-checker"> - the outer
+        /* Operate on the inner <div class="duplicate-checker"> — the outer
            Card's className is rewritten by React on every re-render, which
            would strip a class flag here. The inner div's className is set
            statically once by the React component, so we can stash our
@@ -13950,7 +10918,7 @@
 
         /* Label both pagination rows so CSS can hide the top one and
            pin the bottom one to the viewport. Data attribute survives
-           React re-renders. Idempotent - safe to call on every cycle. */
+           React re-renders. Idempotent — safe to call on every cycle. */
         var pagers = dc.querySelectorAll(":scope > .d-flex.mt-2.mb-2");
         pagers.forEach(function (p, i) {
             p.setAttribute("data-refract-pager", i === pagers.length - 1 ? "bottom" : "top");
@@ -14072,7 +11040,7 @@
             var summary = document.createElement("div");
             summary.className = "refract-dup-summary";
             /* Total-duplicates count: read from the (already trimmed) React
-               pager h6 - it's the page-independent total, which refract's
+               pager h6 — it's the page-independent total, which refract's
                per-page group math can't reproduce. */
             var topH6 = dc.querySelector('[data-refract-pager] > h6');
             var countMatch = topH6 ? (topH6.textContent || "").match(/[\d,]+/) : null;
@@ -14107,7 +11075,7 @@
         refractStartDupSyncTimer();
     }
 
-    /* ── Performer Edit Tags Tab - native hierarchical taxonomy editor ────
+    /* ── Performer Edit Tags Tab — native hierarchical taxonomy editor ────
        Injects an "Edit Tags" tab into #performer-tabs. When clicked, hides
        the native .tab-content via a body class and renders our own pane:
          • GraphQL fetch of the full tag taxonomy + this performer's tags
@@ -14119,7 +11087,7 @@
            children fall under an "Ungrouped" trailing section.
          • Click a leaf to toggle on/off. aria-pressed drives the
            selected style. Group/subgroup chevrons collapse sections.
-         • Search filter - auto-expands groups containing matches.
+         • Search filter — auto-expands groups containing matches.
          • Save → performerUpdate mutation; Discard reverts to
            original. No plugin dependency. */
 
@@ -14267,10 +11235,10 @@
     var refractTagPopupTimer = null;
 
     /* ────────────────────────────────────────────────────────────────
-       Performer-name tooltip - portaled to document.body so it can
+       Performer-name tooltip — portaled to document.body so it can
        render outside the scene card's bounding box. The earlier
        ::after-on-link approach was always at risk of being clipped by
-       ancestor overflow / the grid edge - the leftmost avatar's
+       ancestor overflow / the grid edge — the leftmost avatar's
        centered tooltip pushed past the card's left edge and got cut
        off. Portaling sidesteps the whole class of clipping problems
        since the tooltip's only ancestor is body.
@@ -14351,7 +11319,7 @@
             if (e.relatedTarget && link.contains(e.relatedTarget)) { return; }
             refractHidePerfTip();
         });
-        /* Hide on scroll - tooltip is fixed-positioned so it would
+        /* Hide on scroll — tooltip is fixed-positioned so it would
            drift away from its anchor as the page scrolls. */
         window.addEventListener("scroll", function () {
             if (refractPerfTipEl && refractPerfTipEl.classList.contains("refract-performer-name-tooltip-portal--show")) {
@@ -14439,7 +11407,7 @@
             var badge = e.target.closest && e.target.closest(".stash-tag-count");
             if (!badge) { return; }
             /* Don't hide if the cursor is moving into the badge or onto the
-               portal - the portal's own mouseleave will close it. */
+               portal — the portal's own mouseleave will close it. */
             if (e.relatedTarget && (badge.contains(e.relatedTarget) ||
                 (refractTagPopupEl && refractTagPopupEl.contains(e.relatedTarget)))) {
                 return;
@@ -14448,7 +11416,7 @@
         });
         window.addEventListener("scroll", function (e) {
             /* Scrolling INSIDE the popup (it's overflow-y:auto) also fires
-               here via capture - don't dismiss in that case. Only page/
+               here via capture — don't dismiss in that case. Only page/
                ancestor scroll (which would drift the fixed popup off its
                anchor) should close it. */
             if (e.target === refractTagPopupEl) { return; }
@@ -14559,7 +11527,7 @@
             if (related && btn.contains(related)) { return; }
             refractHideTagTip();
         });
-        /* Hide on scroll too - otherwise the tooltip would float in place
+        /* Hide on scroll too — otherwise the tooltip would float in place
            while the button moves under it. */
         window.addEventListener("scroll", refractHideTagTip, { passive: true, capture: true });
 
@@ -14583,7 +11551,7 @@
                 }
                 return;
             }
-            /* Subgroup header click - anywhere on the header toggles
+            /* Subgroup header click — anywhere on the header toggles
                the section (excluding the static "General"/"Tags"
                root pseudo-headers). */
             var sgHeader = e.target.closest(".refract-tag-editor__subgroup-header");
@@ -14597,7 +11565,7 @@
                 }
                 return;
             }
-            /* Group header click - anywhere on the header toggles. */
+            /* Group header click — anywhere on the header toggles. */
             var gHeader = e.target.closest(".refract-tag-editor__group-header");
             if (gHeader) {
                 var gSection = gHeader.closest(".refract-tag-editor__group");
@@ -14624,7 +11592,6 @@
         });
     }
 
-    var REFRACT_TAGEDIT_SN = { narrow: false };
     function refractLoadTagEditorData(pid) {
         if (refractTagEditorState.loaded || refractTagEditorState.loading) return;
         refractTagEditorState.loading = true;
@@ -14633,19 +11600,15 @@
             'query FindPerformerForTagEditor($id: ID!) {' +
             '  findPerformer(id: $id) { id tags { id name } }' +
             '}';
-        /* sort_name again (Stash 0.28). The editor already falls back to
-           `name` for every tag that has no sort name, so the narrow form
-           costs nothing but the grouping order on an older server. */
-        function tagsQ(full) {
-            return 'query FindAllTagsForTagEditor {' +
-                '  findTags(filter: { per_page: -1, sort: "name", direction: ASC }) {' +
-                '    tags { id name' + (full ? ' sort_name' : '') + ' description image_path parents { id name } children { id } }' +
-                '  }' +
-                '}';
-        }
+        var tagsQ =
+            'query FindAllTagsForTagEditor {' +
+            '  findTags(filter: { per_page: -1, sort: "name", direction: ASC }) {' +
+            '    tags { id name sort_name description image_path parents { id name } children { id } }' +
+            '  }' +
+            '}';
         Promise.all([
             gqlWithVars(perfQ, { id: pid }),
-            refractQueryOptional(REFRACT_TAGEDIT_SN, ["sort_name"], tagsQ),
+            gql(tagsQ),
         ]).then(function (results) {
             var pdata = results[0] && results[0].data && results[0].data.findPerformer;
             var tdata = results[1] && results[1].data && results[1].data.findTags;
@@ -14972,7 +11935,7 @@
        which yanks the tab strip itself off the top of the viewport.
        We snapshot the scroll position synchronously on click and
        restore it for two frames afterwards (one frame is often too
-       early - the focus-induced scroll fires on the next layout). */
+       early — the focus-induced scroll fires on the next layout). */
     document.addEventListener("click", function (e) {
         if (!e.target.closest) return;
         var tab = e.target.closest(".performer-tabs .nav-tabs .nav-link");
@@ -15033,7 +11996,7 @@
             /* Sync the overlay play/pause icon with VideoJS state.
                Use the affirmative `.vjs-playing` class so the default
                (no class set yet, e.g. before the player initialises)
-               shows the play icon - checking `.vjs-paused` instead made
+               shows the play icon — checking `.vjs-paused` instead made
                the icon flip to pause on initial load before the paused
                class had been applied. */
             function syncPlayIcon() {
@@ -15061,13 +12024,13 @@
                complaint; worst on short clips). But running our own
                stillness TIMER (the first fix) made the overlay hide on a
                different clock than the control bar, which hides on vjs's
-               inactivity timer - the two faded out at visibly different
+               inactivity timer — the two faded out at visibly different
                moments. So `refract-pointer-active` now only answers "was
                the latest activity pointer-born, over the player?": set on
                mouse/touch activity, cleared on mouseleave or keydown, NO
                timer of its own. The CSS show gate requires it AND
                `.vjs-user-active`, so the hide moment (and the 1s fade,
-               matched in 06_scene_player.css) is vjs's own - overlay and
+               matched in 06_scene_player.css) is vjs's own — overlay and
                control bar leave together. Keyboard input still never
                shows the overlay: it clears the flag before vjs marks
                activity. Listeners live on the videojs node and die with
@@ -15083,7 +12046,7 @@
             videojs.addEventListener("touchstart", pointerShow, { passive: true });
             /* mouseleave doesn't bubble, and it's bound directly on the
                videojs node (not capture), so it only fires when the
-               cursor leaves the player as a whole - no flicker when
+               cursor leaves the player as a whole — no flicker when
                moving between child controls. */
             videojs.addEventListener("mouseleave", pointerClear);
             videojs.addEventListener("keydown", pointerClear, true);
@@ -15099,7 +12062,7 @@
         if (!/^\/scenes\/[^/]/.test(refractPathFromLocation())) return;
         document.querySelectorAll(".scene-performers-row:not([data-stash-perf-arrows])").forEach(function (wrap) {
             /* Sidebar wrappers use the adaptive setupSceneTabsPerformers()
-               instead - no chevrons there, dots + keyboard nav. */
+               instead — no chevrons there, dots + keyboard nav. */
             if (wrap.closest(".scene-tabs")) return;
             var row = wrap.querySelector(".scene-performers");
             if (!row) { return; }
@@ -15146,16 +12109,16 @@
             } else {
                 window.addEventListener("resize", syncChevronVisibility, { passive: true });
             }
-            /* React may still be inserting cards - re-sync once after a beat. */
+            /* React may still be inserting cards — re-sync once after a beat. */
             syncChevronVisibility();
             setTimeout(syncChevronVisibility, 200);
             setTimeout(syncChevronVisibility, 800);
         });
     }
 
-    /* Sidebar performer carousel - count-adaptive layout.
+    /* Sidebar performer carousel — count-adaptive layout.
        (1) Marks the .col-12 that directly contains .scene-performers with the
-           class scene-performers-row so CSS can target it. No node is moved -
+           class scene-performers-row so CSS can target it. No node is moved —
            moving a React-managed child out of its tracked parent causes a
            NotFoundError on removeChild when React reconciles after a scene save.
        (2) Counts cards, tags wrapper with data-perf-count="1|2|3|4|many".
@@ -15163,7 +12126,7 @@
        (3) For count >= 5: appends pagination dots, IntersectionObserver tracks
            which card is in view, scoped MutationObserver watches for card
            count changes, single delegated keydown listener for arrow keys.
-       Fully idempotent - guards via class presence and wrap.__refractPerf state. */
+       Fully idempotent — guards via class presence and wrap.__refractPerf state. */
     function setupSceneTabsPerformers() {
         /* Galleries render performers in `.gallery-performers` instead of
            scenes' `.scene-performers` (identical card layout + structure,
@@ -15175,7 +12138,7 @@
             el.classList.add("scene-performers");
         });
 
-        /* Step 1 - mark the col-12 that contains .scene-performers as our wrapper.
+        /* Step 1 — mark the col-12 that contains .scene-performers as our wrapper.
            classList.add is a non-childList mutation so it does not retrigger the
            MutationObserver (which watches childList only). */
         document.querySelectorAll(":is(.scene-tabs, .image-tabs, .gallery-tabs) .tab-pane .col-12 > .scene-performers").forEach(function (el) {
@@ -15186,7 +12149,7 @@
             }
         });
 
-        /* Step 2-6 - apply adaptive layout per wrapper. */
+        /* Step 2-6 — apply adaptive layout per wrapper. */
         document.querySelectorAll(":is(.scene-tabs, .image-tabs, .gallery-tabs) .col-12.scene-performers-row").forEach(function (wrap) {
             applyAdaptiveLayout(wrap);
         });
@@ -15315,7 +12278,7 @@
             state.dots = dotsEl;
         }
 
-        /* (Re)wire IntersectionObserver - observes REAL cards only and
+        /* (Re)wire IntersectionObserver — observes REAL cards only and
            uses their stored realIdx for dot mapping (so the active dot
            reflects the underlying performer, not a clone). */
         if (state.io) state.io.disconnect();
@@ -15352,7 +12315,7 @@
             state.initialized = true;
         }
 
-        /* Scroll handler - silent jump when user lands on a clone.
+        /* Scroll handler — silent jump when user lands on a clone.
            Hysteresis: only jump when scrollLeft is essentially AT the
            clone center (within 1px to avoid mid-scroll false positives). */
         if (state.onScroll) row.removeEventListener("scroll", state.onScroll);
@@ -15392,7 +12355,7 @@
             state.dots.children[0].classList.add("active");
         }
 
-        /* Keyboard arrows - wrap around at boundaries. */
+        /* Keyboard arrows — wrap around at boundaries. */
         if (state.onKey) document.removeEventListener("keydown", state.onKey);
         state.onKey = function (e) {
             if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
@@ -15471,7 +12434,7 @@
        can constrain it to a 5-row column-wrap strip with horizontal
        overflow scroll (mirrors the performer-card strip below it).
        Tag items are CLONED into the wrapper (originals hidden in-place) rather
-       than moved - moving React-managed nodes causes a NotFoundError on
+       than moved — moving React-managed nodes causes a NotFoundError on
        removeChild when React reconciles after a scene save. Rebuild is
        triggered whenever any tag-item in the col lacks data-sth-tag-origin,
        meaning React has re-rendered fresh nodes. */
@@ -15506,512 +12469,16 @@
             tagsHeading.insertAdjacentElement("afterend", wrapper);
             /* Mark originals and hide them in-place so React can removeChild
                them normally (parent unchanged). Clone into wrapper for display.
-               IMPORTANT: clone BEFORE modifying the original - cloneNode(true)
+               IMPORTANT: clone BEFORE modifying the original — cloneNode(true)
                copies inline styles and dataset, so cloning after hiding would
                give us invisible clones too. */
-            var chips = [];
-            var crits = [];
             tagNodes.forEach(function (t) {
                 var clone = t.cloneNode(true);
                 t.setAttribute("data-sth-tag-origin", "1");
                 t.style.setProperty("display", "none", "important");
-                var name = stTagName(t);
-                var label = (t.textContent || "").trim();
-                var m = ST_CRIT_RE.exec(label) ||
-                        ST_CRIT_SORT_RE.exec(t.getAttribute("data-sort-name") || "");
-                if (m) {
-                    crits.push({ label: m[1], value: m[2], node: clone });
-                    return;
-                }
-                clone.classList.add("st-tag-chip");
-                clone.__stId = stTagIdFromNode(clone);
-                clone.__stName = name;
-                chips.push(clone);
-            });
-
-            stRenderScored(col, tagsHeading, crits);
-
-            if (!chips.length) {
-                /* Every tag on this scene was a rating criterion. Drop the
-                   empty list rather than drawing a bare "Tags" label over
-                   nothing (CSS hides the heading off .st-tags-empty). */
-                wrapper.remove();
-                tagsHeading.classList.add("st-tags-empty");
-                return;
-            }
-            tagsHeading.classList.remove("st-tags-empty");
-
-            var caption = document.createElement("div");
-            caption.className = "st-tag-caption";
-            var leadRow = document.createElement("div");
-            leadRow.className = "st-tag-lead-row";
-            /* The remainder gets its OWN block container. Putting inline
-               children into the flex list is what defeated the earlier
-               keyword-line attempt: the list's flex and centring rules
-               fight an inline layout and every tag landed centred on a
-               line of its own. A separate block parent has no such rules. */
-            var restRun = document.createElement("div");
-            restRun.className = "st-tag-rest-run";
-            var more = document.createElement("button");
-            more.type = "button";
-            more.className = "st-tag-more";
-            more.hidden = true;
-            more.addEventListener("click", function (ev) {
-                ev.preventDefault();
-                wrapper.classList.toggle("st-tags-expanded");
-                stSyncMoreLabel(wrapper);
-            });
-            wrapper.appendChild(caption);
-            wrapper.appendChild(leadRow);
-            wrapper.appendChild(restRun);
-            wrapper.appendChild(more);
-            wrapper.__stChips = chips;
-
-            stApplyTagOrder(wrapper);
-            stFetchTagCounts(chips.map(function (c) { return c.__stId; }), function () {
-                if (wrapper.parentNode) { stApplyTagOrder(wrapper); }
+                wrapper.appendChild(clone);
             });
         });
-    }
-
-    /* Scene-panel description: clamp it.
-
-       Stash renders the scene's details as a <p class="pre"> in the
-       Details pane. Measured on scene 135947 it is 1,838px tall, which
-       pushed the tag list down to y=2246 in a panel that is 890px tall --
-       so every piece of the redesign below it was off the panel entirely
-       and the description WAS the panel. Four lines, with the rest one
-       button away, on the same pattern as the tags. */
-    function stClampDescription() {
-        document.querySelectorAll(":is(.scene-tabs, .image-tabs) .tab-pane p.pre").forEach(function (p) {
-            if (!p.classList.contains("st-desc")) { p.classList.add("st-desc"); }
-            var btn = p.nextElementSibling;
-            if (!btn || !btn.classList || !btn.classList.contains("st-desc-more")) {
-                btn = document.createElement("button");
-                btn.type = "button";
-                btn.className = "st-desc-more";
-                btn.addEventListener("click", function (ev) {
-                    ev.preventDefault();
-                    var open = p.classList.toggle("st-desc-open");
-                    btn.textContent = open ? "Show less" : "Read more";
-                    btn.setAttribute("aria-expanded", open ? "true" : "false");
-                });
-                btn.textContent = "Read more";
-                btn.setAttribute("aria-expanded", "false");
-                p.insertAdjacentElement("afterend", btn);
-            }
-            /* Only offer the control when there is something folded away.
-               scrollHeight beats clientHeight by more than a rounding
-               error only when the clamp actually bit. */
-            var clipped = p.scrollHeight > p.clientHeight + 2 ||
-                          p.classList.contains("st-desc-open");
-            btn.hidden = !clipped;
-        });
-    }
-
-    /* Scene-panel performers: a credit row that opens into the cards.
-
-       One performer card in this panel measures 280x419, which is 47% of
-       the panel's height spent on the least dense thing in it. Collapsed,
-       each card becomes a 34px circle in an overlapping stack, the names
-       run underneath as text, and a chevron restores the cards exactly as
-       they were. That is what frees the room the tag work spends.
-
-       Nothing is moved. The cards stay where React put them and are
-       resized by CSS; the only new nodes are the chevron and the names
-       line, both injected as siblings and both rebuilt if React drops
-       them. Open state lives on the wrapper as a JS property rather than
-       a class, because a re-render would take a class with it. */
-    var ST_PERF_STACK = 5;
-
-    function stPerformerName(card) {
-        var el = card.querySelector(".performer-name") ||
-                 card.querySelector(".refract-pc-name-text") ||
-                 card.querySelector(".card-section-title .TruncatedText");
-        return (el && el.textContent || "").trim();
-    }
-
-    function stPerformerCredit() {
-        document.querySelectorAll(":is(.scene-tabs, .image-tabs) .col-12.scene-performers-row").forEach(function (wrap) {
-            var row = wrap.querySelector(":scope > .scene-performers");
-            if (!row) { return; }
-            var cards = Array.prototype.slice.call(
-                row.querySelectorAll(":scope > .performer-card:not(.refract-clone)"));
-            if (!cards.length) {
-                var deadNames = wrap.querySelector(".st-perf-names");
-                if (deadNames) { deadNames.remove(); }
-                return;
-            }
-
-            var extra = row.querySelector(":scope > .st-perf-extra");
-            var toggle = row.querySelector(":scope > .st-perf-toggle");
-            var names = wrap.querySelector(".st-perf-names");
-
-            if (!extra) {
-                extra = document.createElement("span");
-                extra.className = "st-perf-extra";
-            }
-            if (!toggle) {
-                toggle = document.createElement("button");
-                toggle.type = "button";
-                toggle.className = "st-perf-toggle";
-                toggle.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" ' +
-                    'fill="none" stroke="currentColor" stroke-width="2.2" ' +
-                    'stroke-linecap="round" stroke-linejoin="round">' +
-                    '<path d="M6 9l6 6 6-6"></path></svg>';
-                toggle.addEventListener("click", function (ev) {
-                    ev.preventDefault();
-                    ev.stopPropagation();
-                    wrap.__stPerfOpen = !wrap.__stPerfOpen;
-                    stSyncPerfOpen(wrap, row, toggle);
-                });
-            }
-            if (!names) {
-                names = document.createElement("div");
-                names.className = "st-perf-names";
-            }
-
-            /* Re-append every cycle: cheap, and it restores the order and
-               the nodes themselves if React rebuilt the row underneath us.
-               appendChild on an element already last is a no-op move. */
-            /* All three ride INSIDE the row, in this order, so the credit
-               reads as one line: avatars, +N, names, chevron. Measured on
-               scene 189289 the previous shape put the avatar at x=38.5,
-               the chevron at x=354.5 behind a 282px auto margin, and the
-               name on its own line below -- three fragments that looked
-               scattered rather than composed. Re-appended only when the
-               sequence is actually wrong, so this is a no-op most cycles. */
-            if (extra.nextElementSibling !== names ||
-                names.nextElementSibling !== toggle ||
-                toggle.nextElementSibling) {
-                row.appendChild(extra);
-                row.appendChild(names);
-                row.appendChild(toggle);
-            }
-
-            var joined = cards.map(stPerformerName).filter(Boolean).join(", ");
-            if (names.textContent !== joined) { names.textContent = joined; }
-
-            var over = cards.length - ST_PERF_STACK;
-            cards.forEach(function (c, i) {
-                c.classList.toggle("st-perf-stacked", i < ST_PERF_STACK);
-                c.classList.toggle("st-perf-beyond", i >= ST_PERF_STACK);
-                /* :first-child is no good here: in the 5+ carousel the row's
-                   first child is a hidden .refract-clone, so the first VISIBLE
-                   avatar kept the -9px stack offset and hung 9px outside the
-                   column. Mark the first real card instead. */
-                c.classList.toggle("st-perf-first", i === 0);
-            });
-            extra.textContent = over > 0 ? ("+" + over) : "";
-            extra.hidden = over <= 0;
-
-            stSyncPerfOpen(wrap, row, toggle);
-        });
-    }
-
-    function stSyncPerfOpen(wrap, row, toggle) {
-        var open = !!wrap.__stPerfOpen;
-        row.classList.toggle("st-perf-open", open);
-        wrap.classList.toggle("st-perf-is-open", open);
-        if (toggle) {
-            toggle.setAttribute("aria-expanded", open ? "true" : "false");
-            toggle.setAttribute("aria-label", open ? "Collapse performers" : "Expand performers");
-        }
-    }
-
-    /* Scene-panel tags: split, rank, fold.
-       Three things happen to the flat alphabetical run Stash renders.
-
-       1. Advanced Rating criterion tags ("Creativity <BLACKSTAR>: 4") are
-          scores, not descriptors, so they lift into their own Scored row
-          above the list. This matters more than it sounds: the ranking
-          below is rarest-first, and a criterion tag sits on a handful of
-          scenes by construction, so left in place they take EVERY lead
-          slot. Measured on scene 135947 - its five criterion tags carry
-          library counts of 8/9/14/21/27 against a median in the hundreds,
-          so all five sorted ahead of every real descriptor. They stay real
-          tag links, so filtering by one is still possible.
-       2. The rest sort by how many scenes in the library carry them,
-          rarest first, so the tags that distinguish THIS scene lead.
-          Checked against the densest scene in the library (61948, 107
-          tags): the lead becomes Fivesome (BBBBG) at 2 scenes, Blowjob
-          (DVP) at 3, Spooning Blowjob at 15.
-       3. As many as the panel has room for draw as chips; the remainder
-          is a comma run behind one button. A hundred chips behind a click
-          is still a hundred chips, but so is blank space below eight.
-
-       scene_count comes from one aliased GraphQL call, cached for the life
-       of the page, so the second scene you open only asks about ids it has
-       not seen. Until it answers the list renders alphabetically, so the
-       panel is never empty waiting on a fetch. */
-    /* Two spellings. The visible label is "Aesthetics ★: 5", but
-       data-sort-name is "#Aesthetics: 5" -- no star, a leading hash, and
-       it is what the first version matched against, so the split silently
-       never fired and all five criterion tags kept their lead slots. */
-    var ST_CRIT_RE = /^(.+?)\s*★\s*:\s*(\d+)\s*$/;
-    var ST_CRIT_SORT_RE = /^#\s*(.+?)\s*:\s*(\d+)\s*$/;
-    var stTagCountCache = Object.create(null);
-    var stTagCountPending = Object.create(null);
-
-    function stTagName(node) {
-        return (node.getAttribute("data-sort-name") || node.textContent || "").trim();
-    }
-
-    /* Stash encodes the tag id in the chip's own filter href, as a URL-
-       encoded criterion object: ...("id":"67","label":"Anal")... */
-    function stTagIdFromNode(node) {
-        var a = node.querySelector("a[href]");
-        if (!a) { return null; }
-        var href = a.getAttribute("href") || "";
-        var decoded;
-        try { decoded = decodeURIComponent(href); } catch (e) { decoded = href; }
-        var m = /"id"\s*:\s*"?(\d+)"?/.exec(decoded);
-        return m ? m[1] : null;
-    }
-
-    function stGroupDigits(n) {
-        return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
-    function stFetchTagCounts(ids, done) {
-        var want = [];
-        ids.forEach(function (id) {
-            if (id && !(id in stTagCountCache) && !stTagCountPending[id] &&
-                want.indexOf(id) === -1) {
-                want.push(id);
-            }
-        });
-        if (!want.length) { done(); return; }
-        want.forEach(function (id) { stTagCountPending[id] = 1; });
-        var parts = want.map(function (id) {
-            return "t" + id + ": findTag(id: " + id + ") { scene_count }";
-        }).join(" ");
-        gql("query { " + parts + " }").then(function (res) {
-            var d = (res && res.data) || {};
-            want.forEach(function (id) {
-                var row = d["t" + id];
-                stTagCountCache[id] =
-                    (row && typeof row.scene_count === "number") ? row.scene_count : null;
-                delete stTagCountPending[id];
-            });
-            done();
-        })["catch"](function () {
-            /* Leave the cache alone so a later scene can retry. The list
-               stays alphabetical, which is what it was before. */
-            want.forEach(function (id) { delete stTagCountPending[id]; });
-            done();
-        });
-    }
-
-    function stSyncMoreLabel(wrapper) {
-        var more = wrapper.querySelector(":scope > .st-tag-more");
-        if (!more) { return; }
-        var expanded = wrapper.classList.contains("st-tags-expanded");
-        more.textContent = expanded ? "Show fewer" : ("+" + more.__stHidden + " more");
-        more.setAttribute("aria-expanded", expanded ? "true" : "false");
-    }
-
-    /* How many chips get to stay chips. The old answer was the constant 8,
-       and 8 is a count standing in for a constraint it cannot see. Chip
-       width follows the tag name, measured 64px to 138px in the same
-       panel, so eight chips is three rows on one scene and four on the
-       next; and neither filled the space. Measured with the fold at 8:
-       the pane did not scroll on either scene, leaving 333px unused below
-       a 24-tag scene and 400px below a 107-tag one. The panel was hiding
-       tags it had room to show.
-
-       The fold's only real job is to stop the tag block overrunning the
-       panel, so it now happens exactly where the panel runs out and not
-       before. Tags are the last section, so growing costs nothing below
-       them. A scene whose tags all fit loses the fold and the button
-       entirely, which is most of them.
-
-       The row budget is an ESTIMATE and is then checked against the
-       outcome. Predicting it outright needs every margin and padding
-       between the chips and the bottom of the scrollport to be known, and
-       the first attempt at that overshot by 17px on the dense scene while
-       reserving 48px for a tail that measured 27. So the estimate places,
-       asks the scrollport whether it now scrolls, and gives back a row at
-       a time until it does not. Removing trailing chips never moves the
-       ones before them, so the recorded row indices stay valid and each
-       retry is a re-place, not a re-measure.
-
-       Falls back to the old constant whenever the measurement cannot be
-       trusted -- no scrollport, zero-height chips, a hidden tab -- because
-       a wrong count is recoverable and a collapsed list is not. */
-    var ST_TAG_LEAD_FALLBACK = 8;
-    var ST_TAG_MIN_ROWS = 2;
-    var ST_TAG_TAIL_RESERVE = 32;
-    var ST_TAG_FIT_TRIES = 6;
-
-    function stTagPane(wrapper) {
-        return (wrapper.closest && wrapper.closest(".tab-content")) ||
-            document.querySelector(":is(.scene-tabs, .image-tabs) .tab-content");
-    }
-
-    /* Row index per chip, read off the layout the flex row already did.
-       Reading it back is exact where predicting the wrap is not. */
-    function stTagRowIndex(sorted) {
-        var tops = [];
-        var out = [];
-        for (var i = 0; i < sorted.length; i++) {
-            var t = Math.round(sorted[i].getBoundingClientRect().top);
-            var at = tops.indexOf(t);
-            if (at === -1) { at = tops.push(t) - 1; }
-            out.push(at);
-        }
-        return out;
-    }
-
-    function stTagRowBudget(wrapper, leadRow, sorted) {
-        var pane = stTagPane(wrapper);
-        if (!pane) { return 0; }
-        var paneBottom = pane.getBoundingClientRect().bottom;
-        var top = leadRow.getBoundingClientRect().top;
-        var chipH = sorted[0].getBoundingClientRect().height;
-        if (!chipH || !paneBottom || paneBottom <= top) { return 0; }
-        var gap = parseFloat(getComputedStyle(leadRow).rowGap) || 6;
-        var rows = Math.floor(
-            (paneBottom - top - ST_TAG_TAIL_RESERVE + gap) / (chipH + gap));
-        return rows < ST_TAG_MIN_ROWS ? ST_TAG_MIN_ROWS : rows;
-    }
-
-    function stTagCountForRows(rowOf, rows) {
-        var n = 0;
-        while (n < rowOf.length && rowOf[n] < rows) { n++; }
-        return n;
-    }
-
-    function stTagPlace(leadRow, restRun, sorted, lead) {
-        restRun.textContent = "";
-        for (var i = 0; i < sorted.length; i++) {
-            var chip = sorted[i];
-            var badge = chip.querySelector(":scope > .st-tag-n");
-            if (i < lead) {
-                chip.classList.add("st-tag-is-lead");
-                chip.classList.remove("st-tag-is-rest");
-                var count = stTagCountCache[chip.__stId];
-                if (count !== undefined && count !== null) {
-                    if (!badge) {
-                        badge = document.createElement("span");
-                        badge.className = "st-tag-n";
-                        chip.appendChild(badge);
-                    }
-                    badge.textContent = stGroupDigits(count);
-                } else if (badge) {
-                    badge.remove();
-                }
-                leadRow.appendChild(chip);
-            } else {
-                chip.classList.remove("st-tag-is-lead");
-                chip.classList.add("st-tag-is-rest");
-                if (badge) { badge.remove(); }
-                if (restRun.childNodes.length) {
-                    restRun.appendChild(document.createTextNode(", "));
-                }
-                restRun.appendChild(chip);
-            }
-        }
-    }
-
-    function stApplyTagOrder(wrapper) {
-        var chips = wrapper.__stChips || [];
-        var leadRow = wrapper.querySelector(":scope > .st-tag-lead-row");
-        var restRun = wrapper.querySelector(":scope > .st-tag-rest-run");
-        var caption = wrapper.querySelector(":scope > .st-tag-caption");
-        var more = wrapper.querySelector(":scope > .st-tag-more");
-        if (!chips.length || !leadRow || !restRun) { return; }
-
-        var counted = 0;
-        chips.forEach(function (c) {
-            var v = stTagCountCache[c.__stId];
-            if (v !== undefined && v !== null) { counted++; }
-        });
-        var sorted = chips.slice().sort(function (a, b) {
-            var ca = stTagCountCache[a.__stId];
-            var cb = stTagCountCache[b.__stId];
-            var na = (ca === undefined || ca === null);
-            var nb = (cb === undefined || cb === null);
-            /* Unknown counts sort LAST, so a partial answer still puts the
-               tags we do know about in front rather than burying them
-               behind the ones we do not. */
-            if (na && nb) { return a.__stName.localeCompare(b.__stName); }
-            if (na) { return 1; }
-            if (nb) { return -1; }
-            if (ca !== cb) { return ca - cb; }
-            return a.__stName.localeCompare(b.__stName);
-        });
-
-        leadRow.textContent = "";
-        restRun.textContent = "";
-        /* Every chip goes in as a chip first: where the fold falls depends
-           on where the chips land, and nothing knows that until the flex
-           row has wrapped them. */
-        stTagPlace(leadRow, restRun, sorted, sorted.length);
-
-        var pane = stTagPane(wrapper);
-        var rows = stTagRowBudget(wrapper, leadRow, sorted);
-        var lead = sorted.length;
-        if (rows > 0) {
-            var rowOf = stTagRowIndex(sorted);
-            lead = stTagCountForRows(rowOf, rows);
-            stTagPlace(leadRow, restRun, sorted, lead);
-            /* The estimate places; the scrollport rules on it. */
-            var tries = 0;
-            while (pane && rows > ST_TAG_MIN_ROWS && tries < ST_TAG_FIT_TRIES &&
-                   pane.scrollHeight - pane.clientHeight > 1) {
-                rows--;
-                tries++;
-                lead = stTagCountForRows(rowOf, rows);
-                stTagPlace(leadRow, restRun, sorted, lead);
-            }
-        }
-
-        if (caption) {
-            /* Just the count. It used to read "24, rarest first", which
-               explained the ordering in words next to a list whose
-               ordering is already visible: the counts beside the chips
-               ascend. A caption that narrates what the reader can see
-               is filler, and this one sat in the tightest line on the
-               surface. */
-            caption.textContent = String(sorted.length);
-        }
-        var hidden = sorted.length - lead;
-        if (more) {
-            more.__stHidden = hidden;
-            more.hidden = (hidden <= 0);
-            if (hidden <= 0) { wrapper.classList.remove("st-tags-expanded"); }
-            stSyncMoreLabel(wrapper);
-        }
-    }
-
-    /* The criterion tags, lifted above the Tags heading as a compact
-       readout. Each stays the cloned tag link it always was. */
-    function stRenderScored(col, tagsHeading, crits) {
-        ["st-scored", "st-scored-head"].forEach(function (cls) {
-            var old = col.querySelector(":scope > ." + cls);
-            if (old) { old.remove(); }
-        });
-        if (!crits.length) { return; }
-        crits.sort(function (a, b) { return a.label.localeCompare(b.label); });
-        var head = document.createElement("div");
-        head.className = "st-scored-head";
-        head.textContent = "Scored";
-        var box = document.createElement("div");
-        box.className = "st-scored";
-        crits.forEach(function (c) {
-            var node = c.node;
-            node.classList.add("st-scored-item");
-            var inner = node.querySelector("a > div") || node.querySelector("a") || node;
-            inner.textContent = c.label;
-            var val = document.createElement("span");
-            val.className = "st-scored-value";
-            val.textContent = c.value;
-            node.appendChild(val);
-            box.appendChild(node);
-        });
-        tagsHeading.insertAdjacentElement("beforebegin", head);
-        head.insertAdjacentElement("afterend", box);
     }
 
     /* ── Gallery image card: click image → open lightbox ─────────────
@@ -16019,7 +12486,7 @@
        theme card styling on these builds. Route the image click to
        whichever underlying trigger Stash renders for that card. */
     function findImageLightboxTrigger(card) {
-        /* querySelector matches by document order, not selector order - so we
+        /* querySelector matches by document order, not selector order — so we
            query for the most specific actual <button> first, then fall back
            to wrapper elements. Otherwise the wrapping DIV.preview-button is
            returned instead of the BUTTON inside (the latter has the React
@@ -16032,13 +12499,13 @@
                card.querySelector("a[title*='preview' i]");
     }
 
-    /* Delegated handler - one body-level click listener catches every
+    /* Delegated handler — one body-level click listener catches every
        .image-card image click regardless of when React re-renders the
        cards. Replaces the previous per-card binding which relied on the
        MutationObserver scheduler firing in time after every re-render. */
     /* Pause-idle controls hide.
        Stash's video.js keeps controls visible whenever the video is
-       paused - annoying when you want to screenshot a frame. After 2.5s
+       paused — annoying when you want to screenshot a frame. After 2.5s
        of cursor inactivity (or mouse leaving the player), fade the
        control bar + big play button + cursor away. Any mouse motion or
        resume brings them back. */
@@ -16079,14 +12546,14 @@
             var v = c.querySelector("video");
             if (v && v.paused) { schedule(c); }
         }, { passive: true });
-        /* Cursor leaving the player while paused - go idle immediately.
+        /* Cursor leaving the player while paused — go idle immediately.
            IMPORTANT: capture-phase `mouseleave` fires for every
            descendant's mouseleave (it doesn't bubble, but the capture
            phase still hits ancestor listeners). So a mouse moving
            BETWEEN control-bar buttons or seek-bar segments would
            previously trigger this handler and immediately re-add
            `.refract-video-idle`, while the next micro-mousemove would
-           clear it - rapid flicker, especially noticeable around the
+           clear it — rapid flicker, especially noticeable around the
            seekbar. Only treat it as a real player-leave when
            e.target IS the .video-js itself AND relatedTarget (where
            the cursor went next) is outside it. */
@@ -16122,7 +12589,7 @@
        Stash's <input type="number" min="0" step="0.1" max="10"> is wired
        to a React controlled-value handler that re-parses every keystroke
        through the step engine, making it impossible to type multi-char
-       values like "5.5" or "10" - React rewrites the value back to a
+       values like "5.5" or "10" — React rewrites the value back to a
        clamped/rounded snapshot on every keypress. The shim detaches React
        while the user is typing and commits the parsed final value on
        blur / Enter / Tab:
@@ -16134,7 +12601,7 @@
             0.1, write back via the native value setter, and dispatch
             input + change so React picks up the FINAL value (just once). */
     /* Toggle .refract-overflow on .st-tag-list whenever it has more
-       content than fits in its max-height - CSS gates the bottom fade
+       content than fits in its max-height — CSS gates the bottom fade
        mask on this class, so lists that fit cleanly don't get the
        half-faded last row. */
     function syncTagListFade() {
@@ -16146,7 +12613,7 @@
 
     /* Tag .rating-number pills with `.refract-rated` when the numeric
        value in their span isn't 0/empty. We can't rely on Stash's own
-       `.disabled` class to indicate "no rating" - it sometimes stays on
+       `.disabled` class to indicate "no rating" — it sometimes stays on
        the element even after a value is set. Re-runs via the body-wide
        mutation watcher so React re-renders are caught.
        Also tags `.rating-banner` (the small badge on performer cards)
@@ -16162,7 +12629,7 @@
             el.classList.toggle("refract-rated", rated);
         });
         /* Some plugins (e.g. stash-multiview, alternate-scale displays)
-           inject a SECOND `.rating-banner` element on the same card -
+           inject a SECOND `.rating-banner` element on the same card —
            often with a different value scale (5/5 stars rendered as a
            "10/10 decimal" equivalent). Iterating all banners would let
            the second banner overwrite the first's tier classes,
@@ -16176,7 +12643,7 @@
             var dupeCard = el.closest(".performer-card, .scene-card");
             if (dupeCard && tieredCards.has(dupeCard)) { return; }
             if (dupeCard) { tieredCards.add(dupeCard); }
-            /* Read rating100 from the banner's className, not text - Stash's
+            /* Read rating100 from the banner's className, not text — Stash's
                RatingBanner.tsx writes one of:
                  • `rating-100-N`   (N = trunc(rating100 / 5), 0–20)
                    used for decimal mode + 5-star half/quarter precision
@@ -16189,7 +12656,7 @@
                 /* Stash has shipped multiple `rating-100-N` formats:
                      • Old: N = floor(rating100/5), range 0-20
                      • New: N IS rating100 directly, range 0-100
-                   Detect by magnitude - anything > 20 has to be the
+                   Detect by magnitude — anything > 20 has to be the
                    new format (since the old format maxes at 20). */
                 var n = parseInt(mCls[1], 10);
                 rating100 = n > 20 ? Math.min(100, n) : n * 5;
@@ -16201,7 +12668,7 @@
                changes or a 3rd-party plugin injects a banner without
                the `rating-100-N` / `rating-N` class. Use the configured
                rating system (`body.refract-rating-system-stars`, set
-               by refractFetchRatingSystem) to pick the scale -
+               by refractFetchRatingSystem) to pick the scale —
                otherwise a decimal-mode 5/10 would be parsed as 5/5
                (Perfect) and 4.9/10 as 4.9/5 (Legendary), since the
                old `rawV <= 5 ? * 20 : * 10` heuristic always assumed
@@ -16225,7 +12692,7 @@
                     }
                 }
             }
-            /* Diagnostic logging - temporary. Enable by running
+            /* Diagnostic logging — temporary. Enable by running
                `window._refractTierDebug = true` in DevTools, then
                reload. Logs one line per scene-card rating banner so
                we can see what classes + text it has + how the parser
@@ -16321,7 +12788,7 @@
                         return;
                     }
                 }
-                /* Reject - restore caret to end of last valid value. */
+                /* Reject — restore caret to end of last valid value. */
                 t.value = lastValid;
             }
             t.addEventListener("input", validate, true);
@@ -16373,7 +12840,7 @@
     }
 
     /* Clear leftover inline style overrides from older versions of the
-       theme - back when image-list toolbars were force-pinned to
+       theme — back when image-list toolbars were force-pinned to
        position:static and sidebars were mistakenly tagged data-stash-filter.
        Image lists now use the same sticky pill design as everywhere else. */
     function unstickyGalleryToolbar() {
@@ -16388,14 +12855,14 @@
                 el.style.removeProperty(p);
             });
         });
-        /* Strip data-stash-filter off form columns - older builds (or any
+        /* Strip data-stash-filter off form columns — older builds (or any
            run where a third-party plugin's "Search…" input snuck into the
            scene edit form) would tag the column as a filter toolbar and
            inherit the wrong styling. Forms aren't toolbars. */
         document.querySelectorAll("form [data-stash-filter], form[data-stash-filter]").forEach(function (el) {
             el.removeAttribute("data-stash-filter");
         });
-        /* Same problem with CustomTagsManager - its sidebar holds a search
+        /* Same problem with CustomTagsManager — its sidebar holds a search
            input + many buttons, which made older builds tag the whole
            layout as a filter toolbar. The plugin owns its own styling. */
         document.querySelectorAll("#tag-manager-host [data-stash-filter], .tag-manager [data-stash-filter]").forEach(function (el) {
@@ -16403,7 +12870,7 @@
         });
     }
 
-    /* Operation-menu modal - when the 3-dots #operation-menu button is
+    /* Operation-menu modal — when the 3-dots #operation-menu button is
        clicked, we intercept BEFORE Bootstrap opens its dropdown and
        instead render a custom overlay panel centered in the details
        panel. The native dropdown's items are cloned (preserving their
@@ -16458,7 +12925,7 @@
         document.body.addEventListener("click", function (e) {
             var btn = e.target.closest && e.target.closest("#operation-menu");
             if (!btn) { return; }
-            /* Don't intercept - let Bootstrap open the dropdown first so the
+            /* Don't intercept — let Bootstrap open the dropdown first so the
                .dropdown-menu element actually renders. Then capture it. */
             var panel = document.querySelector(".scene-tabs, .image-tabs, .gallery-tabs");
             if (!panel) { return; }
@@ -16474,7 +12941,7 @@
                 if (!nativeMenu) { return; }
                 var items = Array.from(nativeMenu.querySelectorAll(".dropdown-item, a, button"));
                 if (!items.length) { return; }
-                /* Hide the native menu - our overlay is the visible UI now. */
+                /* Hide the native menu — our overlay is the visible UI now. */
                 nativeMenu.style.setProperty("display", "none", "important");
                 var overlay = buildOperationMenuOverlay(items);
                 /* Override the default close handler so dismissing the
@@ -16491,313 +12958,10 @@
         }, false);
     }
 
-    /* ── Activity badge on the History tab ────────────────────────────
-       The play and O counts used to sit in the control strip as two
-       chips. They were the only text in a row of glyphs and the only
-       readouts among controls, and giving them a label wide enough to
-       say which was which did not fit the 338px strip.
-
-       So the number moves to the tab that already owns it. Stash puts a
-       badge on the File Info tab for its file count, so the idiom is on
-       the strip already; History gets the same badge carrying the play
-       count, sitting next to the word that explains it. Hovering shows
-       the full breakdown, and the badge pulses when either count goes
-       up, so an increment is visible from wherever you are in the panel.
-
-       This READS Stash's own counters (still in the DOM, hidden by CSS)
-       and never writes them: the badge is a mirror, not a second source
-       of truth (P4). */
-    function stSceneActivityBadge() {
-        var tabs = document.querySelector(
-            ":is(.scene-tabs, .image-tabs) .nav-tabs");
-        if (!tabs) { return; }
-        var links = tabs.querySelectorAll(".nav-link");
-        var link = null;
-        for (var i = 0; i < links.length; i++) {
-            if (/history/i.test(links[i].textContent || "")) {
-                link = links[i];
-                break;
-            }
-        }
-        if (!link) { return; }
-
-        var plays = null;
-        var os = null;
-        var buttons = document.querySelectorAll(
-            ":is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar) .count-button");
-        for (var j = 0; j < buttons.length; j++) {
-            var titled = buttons[j].querySelector("[title]");
-            var title = titled ? (titled.getAttribute("title") || "") : "";
-            var value = buttons[j].querySelector(".count-value");
-            if (!value) { continue; }
-            var n = parseInt((value.textContent || "").replace(/[^0-9]/g, ""), 10);
-            if (isNaN(n)) { continue; }
-            if (/play/i.test(title)) { plays = n; }
-            else if (/o count/i.test(title)) { os = n; }
-        }
-        if (plays === null && os === null) { return; }
-
-        var badge = link.querySelector(".st-activity");
-        if (!badge) {
-            badge = document.createElement("span");
-            badge.className = "st-activity";
-            link.appendChild(badge);
-        }
-        /* The badge carries the play count and appears only when there
-           is one. A "0" on a tab reads as a broken counter rather than
-           as an absence, and an unwatched scene has nothing to report. */
-        var total = (plays || 0);
-        var next = String(total);
-        var had = badge.__stPrev;
-        if (badge.textContent !== next) { badge.textContent = next; }
-        badge.hidden = !total;
-
-        /* The hover readout. Written as a custom property so the CSS can
-           put it in `content:` -- one tooltip, themed like the panel,
-           instead of the browser's own. */
-        var parts = [];
-        if (plays !== null) {
-            parts.push(plays + (plays === 1 ? " play" : " plays"));
-        }
-        if (os !== null) { parts.push(os + " O"); }
-        /* Built from a char code rather than a literal: the source stays
-           ASCII, which the deploy checks for. */
-        var sep = "  " + String.fromCharCode(183) + "  ";
-        link.style.setProperty("--st-activity-tip", JSON.stringify(parts.join(sep)));
-
-        /* Pulse only on a real increase, and only after a first read, so
-           opening a scene does not animate every badge on the way in. */
-        if (had !== undefined && total > had) {
-            badge.classList.remove("st-activity-bump");
-            /* reflow, or the class re-add does not restart the animation */
-            void badge.offsetWidth;
-            badge.classList.add("st-activity-bump");
-        }
-        badge.__stPrev = total;
-    }
-
-    /* ── The rating tier chip ─────────────────────────────────────────
-       The scene panel showed a rating the way every other application
-       shows one: five stars. Refract has its own idea about ratings --
-       the tier ladder in section 4, which is the loudest thing the theme
-       does and the one thing a user remembers about it -- and the rating
-       control was the single place that idea was not being used.
-
-       So the rating reads as its tier: GOLD 8.2, DIAMOND 9.1, PERFECT
-       10. The stars do not disappear, they move behind the chip: click
-       it and the star row unfolds inside the strip, still Stash's own
-       control, still where React put it (physics 1). 6.6 permits exactly
-       this -- a disclosure is a legitimate place for a control, losing it
-       is not.
-
-       Below 5.0 there is deliberately NO tier (section 4 rule 1: the
-       floor is real, and if everything is a collectible nothing is), so
-       the chip carries the bare score on default glass. Unrated, it says
-       so and invites the click.
-
-       The rating is summed off Stash's own star-fill-N classes rather
-       than read from a label: those classes are how the control encodes
-       the value, they are precision-independent (five stars, hundredths
-       of a star each, so the sum IS the rating), and they are present
-       whether or not the numeric readout is being rendered. */
-    var ST_TIERS = [
-        [10,  "perfect"],
-        [9.5, "legendary"],
-        [8.5, "diamond"],
-        [7.5, "gold"],
-        [6.5, "silver"],
-        [5,   "bronze"]
-    ];
-
-    function stRatingFromStars(row) {
-        var buttons = row.querySelectorAll("button");
-        if (!buttons.length) { return null; }
-        var total = 0;
-        var sawFill = false;
-        for (var i = 0; i < buttons.length; i++) {
-            var m = (buttons[i].className || "").match(/star-fill-(\d+)/);
-            if (!m) { continue; }
-            sawFill = true;
-            total += parseInt(m[1], 10);
-        }
-        if (!sawFill) { return null; }
-        /* Five stars, hundredths of a star each, so the sum is stars x
-           100 -- and the tier ladder in section 4 is stated on the 0-10
-           scale the cards use. Dividing by 50 converts: five full stars
-           is 10, and a scene rated 100/100 lands on Perfect instead of
-           the Bronze that /100 gave it. Every tier was reading one or
-           two rungs low until this was measured against scenes queried
-           by their known rating. */
-        return Math.round(total) / 50;
-    }
-
-    /* Stash can be set to show ratings as five stars or as a decimal out
-       of ten, and refract mirrors that on the body. The chip states the
-       score in whichever the user chose, so it never disagrees with the
-       stars it hides; the TIER is always computed on the 0-10 scale,
-       because that is what section 4 is written in. */
-    function stRatingDisplay(v10) {
-        var stars = document.body.classList.contains("refract-rating-system-stars");
-        var v = stars ? (v10 / 2) : v10;
-        return (Math.round(v * 10) % 10 === 0) ? String(Math.round(v)) : v.toFixed(1);
-    }
-
-    function stTierFor(v) {
-        for (var i = 0; i < ST_TIERS.length; i++) {
-            if (v >= ST_TIERS[i][0]) { return ST_TIERS[i][1]; }
-        }
-        return "";
-    }
-
-    function stRatingTierChip() {
-        var bar = document.querySelector(
-            ":is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image-toolbar)");
-        if (!bar) { return; }
-        var row = bar.querySelector(".rating-stars");
-        if (!row) { return; }
-
-        var chip = bar.querySelector(":scope > .st-tier-chip");
-        if (!chip) {
-            chip = document.createElement("button");
-            chip.type = "button";
-            chip.className = "st-tier-chip";
-            chip.setAttribute("aria-expanded", "false");
-            chip.addEventListener("click", function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                var open = bar.classList.toggle("st-rating-open");
-                chip.setAttribute("aria-expanded", open ? "true" : "false");
-                /* One control, one drawer. The advanced-rating plugin ships
-                   its own inline panel as the toolbar's next sibling, so
-                   the two used to be separate disclosures for one subject.
-                   The chip drives both: its own second line carries the
-                   overall rating, the plugin's panel carries the criteria,
-                   and CSS welds them into a single shell. Driving the
-                   plugin's own trigger rather than its classes keeps the
-                   panel's state its own (P4). */
-                var trigger = bar.querySelector(".adv-rating-btn");
-                if (trigger) {
-                    var panel = document.querySelector(".adv-rating-inline-panel");
-                    var panelOpen = !!(panel && panel.classList.contains("open"));
-                    if (panelOpen !== open) { trigger.click(); }
-                }
-            }, false);
-            bar.insertBefore(chip, bar.firstChild);
-        }
-
-        var v = stRatingFromStars(row);
-        var tier = (v === null || v <= 0) ? "" : stTierFor(v);
-        var label, value;
-        if (v === null || v <= 0) {
-            label = "Unrated";
-            value = "";
-        } else {
-            label = tier ? tier : "Rated";
-            value = stRatingDisplay(v);
-        }
-        chip.setAttribute("data-tier", tier);
-        chip.setAttribute("data-rated", v && v > 0 ? "1" : "0");
-        var outOf = document.body.classList.contains("refract-rating-system-stars")
-            ? " of 5" : " of 10";
-        chip.title = v && v > 0
-            ? ("Rated " + value + outOf + (tier ? ", " + label : "") +
-               ". Click to change.")
-            : "Not rated. Click to rate.";
-
-        var lab = chip.querySelector(".st-tier-name");
-        var val = chip.querySelector(".st-tier-value");
-        if (!lab) {
-            lab = document.createElement("span");
-            lab.className = "st-tier-name";
-            chip.appendChild(lab);
-        }
-        if (!val) {
-            val = document.createElement("span");
-            val.className = "st-tier-value";
-            chip.appendChild(val);
-        }
-        if (lab.textContent !== label) { lab.textContent = label; }
-        if (val.textContent !== value) { val.textContent = value; }
-        val.hidden = !value;
-    }
-
-    /* ── Advanced-rating criterion stars ──────────────────────────────
-       The plugin carries each criterion star's fill in the CHARACTER --
-       a filled star is the glyph U+2605 and an empty one U+2606, same
-       class, same colour, so the two are told apart by shape alone at
-       0.2 alpha. CSS cannot select on text content, so the state is
-       mirrored onto a class here and the stylesheet does the rest: the
-       criterion stars then draw the same badge star, in the same gold,
-       as the overall rating directly above them.
-
-       A mirror, never a write: the plugin owns the value, this only
-       reads what it rendered (P4). */
-    var ST_STAR_FILLED = String.fromCharCode(0x2605);
-
-    function stAdvCriterionStars() {
-        var stars = document.querySelectorAll(
-            ".adv-rating-inline-panel .rating-star");
-        for (var i = 0; i < stars.length; i++) {
-            var on = (stars[i].textContent || "").indexOf(ST_STAR_FILLED) !== -1;
-            stars[i].classList.toggle("st-crit-on", on);
-        }
-        stAdvCriteriaOverflow();
-    }
-
-    /* ── The capped criteria list ─────────────────────────────────────
-       CSS caps the list at 7.5 rows, which the stylesheet cannot then
-       react to: whether the cap actually bit depends on how many
-       criteria this user defined, and no selector can ask that.
-
-       Two things follow from it and both need the answer. The scrollbar
-       takes its 4px out of the content width, so the rows have to give
-       4px back or the star column slides off the edge the score above
-       it is aligned to. And a scrollable region is a keyboard stop --
-       Chromium only makes one focusable on its own from 127, so older
-       builds strand the criteria for anyone not using a mouse.
-
-       Attributes are set only when they are not already right: this
-       runs from the shared mutation observer, and writing on every
-       pass would feed it its own changes. */
-    function stAdvCriteriaOverflow() {
-        var list = document.querySelector(
-            ".adv-rating-inline-panel .ratings-list");
-        if (!list) { return; }
-        var over = list.scrollHeight - list.clientHeight > 1;
-        list.classList.toggle("st-crit-scroll", over);
-        /* The real gutter, not an assumed one: "thin" is whatever the
-           engine decides, so the stylesheet is told what it actually
-           got and does its padding arithmetic from that. */
-        var gutter = list.offsetWidth - list.clientWidth;
-        var want = (over && gutter > 0) ? gutter + "px" : "";
-        if (list.style.getPropertyValue("--st-sb") !== want) {
-            if (want) {
-                list.style.setProperty("--st-sb", want);
-            } else {
-                list.style.removeProperty("--st-sb");
-            }
-        }
-        if (over === list.hasAttribute("tabindex")) { return; }
-        if (over) {
-            list.setAttribute("tabindex", "0");
-            list.setAttribute("role", "group");
-            list.setAttribute("aria-label", "Rating criteria");
-        } else {
-            list.removeAttribute("tabindex");
-            list.removeAttribute("role");
-            list.removeAttribute("aria-label");
-        }
-    }
-
     function applyScenePlayerFixes() {
         injectScenePlayerOverlay();
         setupSceneTabsPerformers();
         wrapSceneTagList();
-        stPerformerCredit();
-        stClampDescription();
-        stSceneActivityBadge();
-        stRatingTierChip();
-        stAdvCriterionStars();
         initImageCardLightbox();
         initRatingInputSelectAll();
         tagFilledRatings();
@@ -16809,7 +12973,7 @@
         injectPerformerCarouselChevrons();
     }
 
-    refractInit(function () { applyScenePlayerFixes(); }); /* initial pass; re-runs via consolidated watcher */
+    applyScenePlayerFixes(); /* initial pass; re-runs via consolidated watcher */
 
     // Replace home-page "View All" anchor text with an empty content so CSS can
     // overlay a chevron via ::after without fighting other rules' specificity.
@@ -16831,14 +12995,14 @@
             a.textContent = "";
         }
     }
-    refractInit(function () { tagViewAllLinks(); }); /* initial pass; re-runs via consolidated watcher */
+    tagViewAllLinks(); /* initial pass; re-runs via consolidated watcher */
 
     // Lightbox consolidation: move the page indicator + header buttons (gear,
     // slideshow, fullscreen, close) from the top header bar into the bottom
     // footer so the lightbox shows ONE floating glass bar instead of two.
     // CSS hides the now-empty .Lightbox-header.
     function consolidateLightbox() {
-        /* DOM-MOVING consolidation is DISABLED - moving header content
+        /* DOM-MOVING consolidation is DISABLED — moving header content
            into footer breaks Stash's React lightbox during scroll-wheel
            zoom on Chromium/Windows (page goes blank, requires reload).
            Instead this function only sets up a one-way text bridge: read
@@ -16878,7 +13042,7 @@
             indicator.__refractCountObs = obs;
         }
     }
-    refractInit(function () { consolidateLightbox(); }); /* initial pass - bridge runs idempotently */
+    consolidateLightbox(); /* initial pass — bridge runs idempotently */
 
     // Scene header studio name: Stash renders only the studio logo as an
     // <img> inside <h1.studio-logo><a><img alt="…"></a></h1>; the visible
@@ -16888,7 +13052,7 @@
     // text, so it becomes visible (CSS styles it like a label).
     /* Remove orphan .gs-trigger buttons left over from an earlier
        JS-relocation experiment that competed with React reconciliation.
-       Idempotent - only deletes buttons that were detached from the
+       Idempotent — only deletes buttons that were detached from the
        React tree (no React fiber, no parent navbar-nav).
        After the JS approach was abandoned, leftover DOM may stick
        around once on the user's open tab; this cleans it up.
@@ -16979,12 +13143,12 @@
        "1-40 of 1234" with a `<br>` and a `.scenes-stats` span holding
        "(duration - total size)". Refract repositions this span to the
        top-right of the grid (CSS) and reformats the text to a single line:
-       "<total> scenes · <duration> · <size>" - dropping the per-page
+       "<total> scenes · <duration> · <size>" — dropping the per-page
        "1-40 of" range and flattening the two lines into one.
 
        IMPORTANT: PaginationIndex is a React function component that
        re-renders `{indexText}<br/>{metadataByline}` IN PLACE whenever the
-       filtered total changes. So we must NOT destroy its children - doing
+       filtered total changes. So we must NOT destroy its children — doing
        that desyncs React's fiber (it keeps updating now-detached text nodes
        while our replacement stays frozen at the first value, which is why
        the count used to be stuck at the unfiltered library total). Instead
@@ -16993,17 +13157,17 @@
        overlay` child holding the reformatted line. We re-read Stash's live,
        localized count/duration/size each pass and refresh the overlay from a
        signature, so a filter re-render flows straight through. We only read
-       Stash's "X of N" text to recover N (the one coupling - that format is
+       Stash's "X of N" text to recover N (the one coupling — that format is
        hardcoded, not localized, in PaginationIndex). */
     function reformatSceneStats() {
         document.querySelectorAll(".pagination-index-container span.paginationIndex").forEach(function (idx) {
             var statsSpan = idx.querySelector(".scenes-stats");
-            if (!statsSpan) { return; } /* scenes view only - gallery/perf lists have no .scenes-stats */
+            if (!statsSpan) { return; } /* scenes view only — gallery/perf lists have no .scenes-stats */
             var dur = statsSpan.querySelector(".scenes-duration");
             var size = statsSpan.querySelector(".scenes-size");
             /* Recover the total count from the leading "first-last of N"
                text. The count text is the first text node of the span,
-               before the <br> - our overlay is appended AFTER the <br>, so
+               before the <br> — our overlay is appended AFTER the <br>, so
                this loop never sees it. */
             var head = "";
             for (var i = 0; i < idx.childNodes.length; i++) {
@@ -17017,7 +13181,7 @@
                 : (m ? m[1].trim() : "");
             var durTxt = dur ? dur.textContent.trim() : "";
             var sizeTxt = size ? size.textContent.trim() : "";
-            if (!total) { return; } /* totals unknown - leave Stash's text */
+            if (!total) { return; } /* totals unknown — leave Stash's text */
 
             /* Build "<N> scenes · <dur> · <size>" from the parts present. */
             var parts = [total + (total === "1" ? " scene" : " scenes")];
@@ -17066,13 +13230,13 @@
             a.dataset.stStudioInjected = "1";
         }
     }
-    refractInit(function () { injectStudioName(); }); /* initial pass; re-runs via consolidated watcher */
+    injectStudioName(); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Plugins page: replace each plugin's native
     // [Enable]/[Disable] btn-sm with a Bootstrap custom-switch toggle so
     // every row's action column reads the same. The original button stays
     // in the DOM (CSS hides it) and our toggle dispatches a click on it
-    // when flipped - Stash's own handler runs unchanged. Also relocates
+    // when flipped — Stash's own handler runs unchanged. Also relocates
     // the project-link icon out of the action column into the title row
     // so the right column stays compact and consistent.
     function injectPluginToggles() {
@@ -17094,7 +13258,7 @@
             }
 
             // The Enable/Disable btn is the btn-sm one. Skip rows w/o it.
-            /* Exclude our own injected chevron IN the selector - matching it
+            /* Exclude our own injected chevron IN the selector — matching it
                then `continue`-ing skipped the whole row, so the plugin got
                no toggle at all when the chevron sorted first. */
             var nativeBtn = rightSide.querySelector("button.btn.btn-primary.btn-sm:not(.st-plugin-chevron)");
@@ -17144,7 +13308,7 @@
             safeInsertBefore(rightSide, wrap, rightSide.firstChild);
         }
     }
-    refractInit(function () { injectPluginToggles(); }); /* initial pass; re-runs via consolidated watcher */
+    injectPluginToggles(); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Plugins page: sort the installed-plugin list alphabetically
     // (A→Z), regardless of enabled/disabled state. This matches the native
@@ -17153,7 +13317,7 @@
     // Stash renders the plugins as one .setting-group per plugin inside a
     // bare <div>; we flag that <div> as a flex column (refract-plugin-list,
     // styled in css/13_plugins.css) and assign each row a CSS `order`. Nothing
-    // is moved in the DOM - relocating a React-managed node desyncs its fiber
+    // is moved in the DOM — relocating a React-managed node desyncs its fiber
     // (NotFoundError on the next reconcile), so order-only is the safe play.
     // Re-runs via the consolidated watcher, so it re-sorts after a plugin is
     // toggled (which re-renders the list and resets our inline order).
@@ -17219,7 +13383,7 @@
                 return 0;
             });
 
-            /* FIRST - each row's prior layout position (from the cache; empty
+            /* FIRST — each row's prior layout position (from the cache; empty
                on the very first pass, so first render never animates). */
             var firsts = {};
             var fr;
@@ -17229,7 +13393,7 @@
                 }
             }
 
-            /* Apply the new order (CSS `order` only - never move the nodes). */
+            /* Apply the new order (CSS `order` only — never move the nodes). */
             var changed = false;
             var r;
             for (r = 0; r < rows.length; r++) {
@@ -17237,7 +13401,7 @@
                 if (rows[r].el.style.order !== ord) { rows[r].el.style.order = ord; changed = true; }
             }
 
-            /* LAST - read each row's new layout position (one reflow) and
+            /* LAST — read each row's new layout position (one reflow) and
                refresh the cache for next time. Skip hidden rows (offsetParent
                null, e.g. filtered out by search) so they don't poison the FLIP. */
             var lasts = {};
@@ -17252,7 +13416,7 @@
 
             if (!animate || !changed) { continue; }
 
-            /* PLAY - invert each moved row back to where it visually was, then
+            /* PLAY — invert each moved row back to where it visually was, then
                transition the transform away so the reorder glides into place. */
             var moved = [];
             var p;
@@ -17285,7 +13449,7 @@
             })(moved);
         }
     }
-    refractInit(function () { sortPluginList(); }); /* initial pass; re-runs via consolidated watcher */
+    sortPluginList(); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Plugins page: each plugin renders its inline settings,
     // hooks, etc. always-expanded, which makes the list very long. Inject
@@ -17345,10 +13509,10 @@
             group.dataset.stCollapsibleInjected = "1";
         }
     }
-    refractInit(function () { makePluginSettingsCollapsible(); }); /* initial pass; re-runs via consolidated watcher */
+    makePluginSettingsCollapsible(); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Plugins page: take over the "Reload plugins" .setting
-    // row - replace its h3 title with a live search input, and strip
+    // row — replace its h3 title with a live search input, and strip
     // the reload button down to an icon-only affordance. That row is
     // wasted vertical space otherwise (one button + redundant text),
     // and putting the search there keeps the page's vertical rhythm.
@@ -17370,14 +13534,14 @@
         // glass-bg + accent-focus look used by the package-manager filter
         // and search-term rows) apply automatically. Adds a "clear" (×)
         // button alongside since the rest of those clearable rows have
-        // one - keeps the family consistent.
+        // one — keeps the family consistent.
         var wrap = document.createElement("div");
         wrap.className = "clearable-input-group st-plugin-search";
         wrap.innerHTML =
             "<input type='text' class='clearable-text-field form-control st-plugin-search-input' " +
                 "placeholder='Filter…' aria-label='Search plugins' " +
                 "autocomplete='off' spellcheck='false'>" +
-            /* Intentionally NOT applying `btn btn-secondary` here -
+            /* Intentionally NOT applying `btn btn-secondary` here —
                those classes would pull in the settings-scoped
                `.btn.btn-secondary` rule (a glass border + bg) that
                competes with the bare-icon `.clearable-text-field-clear`
@@ -17397,14 +13561,14 @@
         function applyFilter() {
             var q = input.value.trim().toLowerCase();
             clearBtn.style.display = q ? "" : "none";
-            // Use descendant combinator - plugin groups aren't always
+            // Use descendant combinator — plugin groups aren't always
             // direct children of .setting-section depending on Stash
             // version. Mirror what makePluginSettingsCollapsible uses.
             var groups = document.querySelectorAll(".setting-section .setting-group");
             for (var i = 0; i < groups.length; i++) {
                 var g = groups[i];
                 // Find the title h3 anywhere in the header row, not at
-                // a strict 2-level depth - guards against React render
+                // a strict 2-level depth — guards against React render
                 // changes.
                 var header = g.querySelector(":scope > .setting");
                 var titleH3 = header ? header.querySelector("h3") : null;
@@ -17426,7 +13590,7 @@
             titleDiv.appendChild(wrap);
         }
 
-        // Reduce the reload button to icon-only - drop the inner text
+        // Reduce the reload button to icon-only — drop the inner text
         // span, keep the .fa-icon span (which holds the rotate SVG).
         var reloadBtn = reloadRow.querySelector(":scope > div:last-child button");
         if (reloadBtn) {
@@ -17442,7 +13606,7 @@
         reloadRow.classList.add("st-plugin-reload-row");
         reloadRow.dataset.stSearchInjected = "1";
     }
-    refractInit(function () { injectPluginSearch(); }); /* initial pass; re-runs via consolidated watcher */
+    injectPluginSearch(); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Tasks page: mirrors makePluginSettingsCollapsible + injectPluginSearch
     // for the Plugin Tasks card. Identical chevron (st-plugin-chevron) and collapse
@@ -17468,7 +13632,7 @@
             pluginCard.classList.add("st-task-plugin-card");
         }
 
-        // Inject search bar once - wrapped in a .setting row so the
+        // Inject search bar once — wrapped in a .setting row so the
         // clearable-input-group layout matches the Plugins page search.
         if (!pluginCard.dataset.stTaskSearchDone) {
             var searchRow = document.createElement("div");
@@ -17515,7 +13679,7 @@
         }
 
         // Inject identical st-plugin-chevron into each group header and default
-        // to collapsed - exactly as makePluginSettingsCollapsible does it so all
+        // to collapsed — exactly as makePluginSettingsCollapsible does it so all
         // existing chevron CSS (.st-plugin-chevron, .st-plugin-collapsed) applies.
         var groups = pluginCard.querySelectorAll(".setting-group.collapsible");
         for (var i = 0; i < groups.length; i++) {
@@ -17565,7 +13729,7 @@
             group.dataset.stTaskChevronDone = "1";
         }
     }
-    refractInit(function () { setupTaskPluginGroups(); }); /* initial pass; re-runs via consolidated watcher */
+    setupTaskPluginGroups(); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Tasks page: native task groups (Scan / Auto Tag / Generate /
     // Clean / Identify / Migrate). Mirrors setupTaskPluginGroups but anchored
@@ -17586,7 +13750,7 @@
             var section = group.querySelector(":scope > .collapsible-section");
             if (!section) continue; // no body to collapse
 
-            // Skip plugin task groups - those have .btn.btn-secondary.btn-sm
+            // Skip plugin task groups — those have .btn.btn-secondary.btn-sm
             // triggers in their collapsible-section. Native task groups (Scan,
             // Generate…) have checkbox toggles instead.
             if (section.querySelector(".btn.btn-secondary.btn-sm")) continue;
@@ -17625,9 +13789,9 @@
             group.dataset.stTaskChevronDone = "1";
         }
     }
-    refractInit(function () { setupNativeTaskGroups(); }); /* initial pass; re-runs via consolidated watcher */
+    setupNativeTaskGroups(); /* initial pass; re-runs via consolidated watcher */
 
-    /* Task Queue progress - inline percentage next to the title.
+    /* Task Queue progress — inline percentage next to the title.
        Bootstrap renders the percentage as text INSIDE .progress-bar; the
        bar is 4 px tall in our theme (08_misc_mid.css L5846) so the text
        overflows vertically as a faded blur. CSS hides the inner text;
@@ -17666,7 +13830,7 @@
             }
         }
     }
-    refractInit(function () { setupTaskQueuePercent(); }); /* initial pass; re-runs via consolidated watcher */
+    setupTaskQueuePercent(); /* initial pass; re-runs via consolidated watcher */
 
     /* Task Queue per-row expand: each job row is fixed at 110px so
        the card grows with job count not subtask churn. A chevron in
@@ -17678,7 +13842,7 @@
        were wrong: when a job completes and drops out, every later job
        shifts down one index, so the next job at that index would
        inherit the expanded state. Description text is stable across
-       that shift. (Two jobs with identical descriptions share state -
+       that shift. (Two jobs with identical descriptions share state —
        a rare, harmless edge vs. the index-bleed it replaces.) */
     /* Use the same chevron path as st-plugin-chevron (refract.js:5969)
        for visual consistency. CSS rotates it 90° to point down in the
@@ -17750,17 +13914,17 @@
         }, true);
     }
 
-    refractInit(function () { setupTaskJobChevrons(); });
+    setupTaskJobChevrons();
 
     /* Inject a sun/moon light-mode toggle into the navbar utility cluster
-       (right side, next to the burger / settings cog). Idempotent -
+       (right side, next to the burger / settings cog). Idempotent —
        skip if already injected. Visibility is gated by CSS via the
        refract-show-light-nav body class (see applyLightToggleNavbarClass). */
     function injectNavLightToggle() {
         var buttons = document.querySelector("nav.top-nav .navbar-buttons");
         if (!buttons) return;
         if (buttons.querySelector(":scope > .st-light-toggle-nav")) {
-            /* Already injected - keep the glyph in sync with current state */
+            /* Already injected — keep the glyph in sync with current state */
             var existing = buttons.querySelector(":scope > .st-light-toggle-nav");
             var nowLight = isLightModeEnabled();
             /* Only mutate when the state actually changed. The global
@@ -17803,7 +13967,7 @@
         });
         buttons.appendChild(btn);
     }
-    refractInit(function () { injectNavLightToggle(); });
+    injectNavLightToggle();
 
     /* Inject a "Show light-mode toggle in navbar" switch row into Stash's
        Interface tab, alongside the other menu-item visibility toggles.
@@ -17857,7 +14021,7 @@
 
         target.appendChild(row);
     }
-    refractInit(function () { injectInterfaceLightToggleSetting(); });
+    injectInterfaceLightToggleSetting();
 
     /* Inject a "Help button" switch row into Stash's Interface tab Menu
        Items section, alongside the other menu-item visibility toggles.
@@ -17911,7 +14075,7 @@
 
         target.appendChild(row);
     }
-    refractInit(function () { injectInterfaceHelpToggleSetting(); });
+    injectInterfaceHelpToggleSetting();
 
     /* Relocated Refract settings: a full "Refract" section appended to
        Settings -> Interface, so theme settings live with the rest of the
@@ -17921,86 +14085,6 @@
        pointer note instead (see the PluginSettings patch). The settings
        component is built once and mounted with PluginApi.ReactDOM.render;
        if the SPA rebuilds the pane, the consolidated watcher re-injects. */
-    /* Fallback mount for the settings panel.
-
-       The panel normally arrives by portal from the host patched onto
-       MainNavBar.UtilityItems. On some installs that host never renders
-       -- another plugin replacing the same component with `instead`
-       without chaining to next, or a build that does not apply the
-       patch -- and the symptom is brutal and silent: the Interface tab
-       shows the "Refract" heading with an empty box under it, so every
-       theme setting is unreachable while the theme itself looks fine
-       (reported against 1.22.0, where the card customiser lives behind
-       exactly that box).
-
-       This has to be a poller rather than a one-shot check. Stash
-       re-renders the Interface pane, which discards our injected section
-       (React does not know about it), and the watcher then injects a
-       fresh empty one -- so each card needs its own grace period.
-
-       What it does NOT do is render the panel itself. That was tried and
-       does not work: a root outside Stash's tree has no
-       ConfigurationProvider and no Router, and the panel's own children
-       throw for want of them on a later pass, which takes the whole root
-       down again and leaves the same empty box. Rather than fake a fix,
-       say what happened, so an empty box is at worst a legible one. */
-    var REFRACT_SETTINGS_GRACE_MS = 2500;
-    var refractSettingsWatch = null;
-    function refractMountSettingsFallback() {
-        if (refractSettingsWatch) { return; }
-        var misses = 0;
-        refractSettingsWatch = setInterval(function () {
-            var card = document.querySelector("#refract-settings-section > .card");
-            if (!card) {
-                /* Off the settings page. Stand down rather than poll for
-                   ever; the injector re-arms this when the tab comes back. */
-                misses += 1;
-                if (misses > 20) { clearInterval(refractSettingsWatch); refractSettingsWatch = null; }
-                return;
-            }
-            misses = 0;
-            if (card.firstChild) { card._refractEmptySince = 0; return; }
-            if (!card._refractEmptySince) { card._refractEmptySince = Date.now(); return; }
-            if (Date.now() - card._refractEmptySince < REFRACT_SETTINGS_GRACE_MS) { return; }
-            if (card._refractNoticeShown) { return; }
-            card._refractNoticeShown = true;
-            refractSettingsMountMode = "notice";
-            var note = document.createElement("div");
-            note.className = "refract-settings-unreachable";
-            note.innerHTML =
-                '<div class="refract-su-head">' +
-                '  <span class="refract-su-mark" aria-hidden="true"></span>' +
-                '  <span class="refract-su-title">Refract could not attach its settings to this page</span>' +
-                '</div>' +
-                '<p class="refract-su-body">Another plugin has most likely replaced one of Stash&rsquo;s ' +
-                'navbar or settings components without passing the original through, which takes ' +
-                'Refract&rsquo;s panel down with it. Turning other UI plugins off one at a time will ' +
-                'find which one.</p>' +
-                '<p class="refract-su-body">For the specifics, run <code class="refract-su-code">' +
-                '__refractSettingsDiag()</code> in the browser console. It reports what Refract ' +
-                'could and could not reach.</p>';
-            card.appendChild(note);
-        }, 600);
-    }
-
-    /* Why the settings panel is or is not on screen, in one call, so a
-       report of an empty box can be answered without guesswork. */
-    window.__refractSettingsDiag = function () {
-        var section = document.querySelector("#refract-settings-section");
-        var card = section ? section.querySelector(".card") : null;
-        return {
-            interfacePane: !!document.querySelector("[id$='-tabpane-interface']"),
-            section: !!section,
-            card: !!card,
-            cardChildren: card ? card.childNodes.length : 0,
-            mount: refractSettingsMountMode,
-            panelBuilt: !!refractSettingsPanelComponent,
-            pluginApi: typeof PluginApi !== "undefined",
-            canPatch: typeof PluginApi !== "undefined" && !!(PluginApi.patch && PluginApi.patch.instead),
-            canRender: typeof PluginApi !== "undefined" && !!(PluginApi.ReactDOM && PluginApi.ReactDOM.render)
-        };
-    };
-
     function injectInterfaceRefractSection() {
         if (typeof PluginApi === "undefined" || !PluginApi.React || !PluginApi.ReactDOM) { return; }
         var pane = document.querySelector("[id$='-tabpane-interface']");
@@ -18022,22 +14106,21 @@
         /* TOP of the Interface tab (user request 2026-07-26): theme
            settings are the most-touched thing on this page. */
         pane.insertBefore(section, pane.firstChild);
-        refractMountSettingsFallback();
 
         /* The panel itself is mounted into this .card by the portal host
-           registered in registerAccentPatch - NOT a standalone
+           registered in registerAccentPatch — NOT a standalone
            ReactDOM.render root. The portal keeps the panel inside
            Stash's React tree so the real-card preview can render the
            app's SceneCard/PerformerCard (they need ConfigurationProvider
            / IntlProvider / Router context, which a standalone root
-           lacks - verified by crash 2026-07-26). */
+           lacks — verified by crash 2026-07-26). */
 
         /* Deep link from the old plugin-panel note. */
         if (location.hash === "#refract") {
             setTimeout(function () { section.scrollIntoView({ block: "start" }); }, 60);
         }
     }
-    refractInit(function () { injectInterfaceRefractSection(); });
+    injectInterfaceRefractSection();
 
     /* ── Navbar drag-to-reorder (iOS-style) ─────────────────────────────
        Pointer-events + FLIP animation so icons slide out of the way live.
@@ -18100,7 +14183,7 @@
             var navSel = "body.stash-liquid-glass nav.top-nav .navbar-nav";
             var css = "";
             saved.forEach(function (key, i) {
-                /* Skip non-string entries - a legacy/corrupted numeric entry
+                /* Skip non-string entries — a legacy/corrupted numeric entry
                    would throw on .slice and, caught by the outer try, drop
                    the entire saved nav order. */
                 if (typeof key !== "string") { return; }
@@ -18152,7 +14235,7 @@
             var sorted   = getVisualOrder();
             var dragRect = el.getBoundingClientRect();
 
-            /* Capture inner-element metrics NOW - before display:none makes
+            /* Capture inner-element metrics NOW — before display:none makes
                getBoundingClientRect() return zeros on all descendants. */
             var innerSvgs    = Array.from(el.querySelectorAll("svg"));
             var svgRects     = innerSvgs.map(function (s) { return s.getBoundingClientRect(); });
@@ -18207,7 +14290,7 @@
                 x.style.transform  = "translateX(0)";
             });
 
-            /* 6. Floating clone - the "lifted" icon following the cursor.
+            /* 6. Floating clone — the "lifted" icon following the cursor.
                Lives in <body>, so nav-scoped CSS doesn't apply; we fix each
                inner element using metrics captured before display:none.
                Initial left uses currentX (where cursor is NOW) not dragRect.left
@@ -18230,7 +14313,7 @@
                 "border-radius:var(--radius-sm);" +
                 "box-shadow:0 8px 28px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.1);";
 
-            /* Inner <a>: add only the centering/sizing props we need - don't
+            /* Inner <a>: add only the centering/sizing props we need — don't
                wipe cssText so React-managed inline styles are preserved. */
             var cloneA = clone.querySelector("a");
             if (cloneA) {
@@ -18311,7 +14394,7 @@
                 return x.getBoundingClientRect().left;
             });
 
-            /* 2. Snap transforms off instantly - no transition. */
+            /* 2. Snap transforms off instantly — no transition. */
             otherItems.forEach(function (x) {
                 x.style.transition = "none";
                 x.style.transform  = "";
@@ -18356,7 +14439,7 @@
             /* 8. Cleanup. Guard the removeChild: if the floating clone was
                already detached (a pointercancel/pointerup race, or React
                reconciled <body>), an unguarded removeChild throws and skips
-               the listener teardown + `drag = null` below - permanently
+               the listener teardown + `drag = null` below — permanently
                jamming drag-reorder (the next pointerdown is rejected by
                `|| drag`). */
             if (drag.clone && drag.clone.parentNode) {
@@ -18413,7 +14496,7 @@
 
         Array.from(navRow.children).forEach(attachDrag);
 
-        /* One observer per navRow lifetime - catches late-injected plugin items. */
+        /* One observer per navRow lifetime — catches late-injected plugin items. */
         if (!navRow.dataset.stNavReorderInit) {
             navRow.dataset.stNavReorderInit = "1";
             new MutationObserver(function () {
@@ -18422,13 +14505,13 @@
             }).observe(navRow, { childList: true });
         }
     }
-    refractInit(function () { setupNavbarReorder(); }); /* initial pass; re-runs via consolidated watcher */
+    setupNavbarReorder(); /* initial pass; re-runs via consolidated watcher */
 
     /* ── Scene video-filter swatches ─────────────────────────────────────
        Replace the numeric read-out at the end of each colour/tonal filter
        slider (Brightness/Contrast/Gamma/Saturation/Hue/Warmth/R/G/B/Blur)
        with a round chip whose colour is that slider's OWN spectrum sampled
-       at the current value - the same gradients Stash paints on the vanilla
+       at the current value — the same gradients Stash paints on the vanilla
        slider tracks (see stash-fork Scenes/styles.scss). So the Hue chip
        shows the current hue, Saturation goes grey→red, Brightness dark→light,
        Warmth cool→warm, R/G/B dark→channel, etc. Pure colour maths, updated
@@ -18479,7 +14562,7 @@
         }
         return "rgb(128,128,128)";
     }
-    /* WIP - held back from public release (user call 2026-07-28): the
+    /* WIP — held back from public release (user call 2026-07-28): the
        swatch treatment isn't finished. Flip to true to resume; all the
        code below and the .refract-has-swatch CSS stay in place. */
     var REFRACT_FILTER_SWATCHES_ENABLED = false;
@@ -18525,7 +14608,7 @@
 
     /* ── Consolidated mutation watcher ──────────────────────────────────
        Single global MutationObserver feeding all body-wide DOM watchers.
-       Replaces 7 separate body-subtree observers - each used to fire on
+       Replaces 7 separate body-subtree observers — each used to fire on
        every DOM mutation, triggering 7 separate setTimeouts and 7 separate
        full-document scans. Now one observer, one debounce, one pass. */
     (function consolidatedMutationWatcher() {
@@ -18575,10 +14658,6 @@
             try { injectPerformerCardFlip(); } catch (e) {}
             try { tagBulkDateInputGroups(); } catch (e) {}
             try { setupVideoFilterSwatches(); } catch (e) {}
-            try { injectEntityScope(); } catch (e) {}
-            try { capEntityRelationRows(); } catch (e) {}
-            try { injectEntityKin(); } catch (e) {}
-            try { setupEntityBand(); } catch (e) {}
         }
         function sched() {
             clearTimeout(_t);
@@ -18589,7 +14668,7 @@
 
     // Bootstrap's Collapse uses the same `.collapsing` class for opening AND closing,
     // so CSS can't tell direction. On click we tag the header:
-    //   - `.st-collapse-opening`: about to open - CSS pre-applies the orange/flat state
+    //   - `.st-collapse-opening`: about to open — CSS pre-applies the orange/flat state
     //     immediately so the button transition syncs with the panel slide.
     //   - `.st-collapse-transitioning`: present during BOTH directions for ~400ms so
     //     CSS can keep the bottom border transparent during the animation, avoiding
@@ -18613,14 +14692,14 @@
 
     // ── Card-control hover markers (":has(:hover)" perf replacement) ──
     // Chrome re-evaluates `:has(...:hover)` rule subjects across the whole
-    // grid as elements pass under the cursor during scroll - profiled as the
+    // grid as elements pass under the cursor during scroll — profiled as the
     // playing-card home-page jank (style recalc, not paint; see CLAUDE.md).
     // Instead, delegated pointer events toggle plain marker classes on the
     // owning card: `.refract-check-hover` while its .card-check select
     // circle is hovered, `.refract-fav-hover` while its favourite heart is.
     // CSS consumers: 03_cards.css (rating-banner fade), 16_playing_card.css
     // (name-banner + tier-ribbon fades). The `:has(...:checked)` variants
-    // stay in CSS - they only invalidate on click, not on scroll.
+    // stay in CSS — they only invalidate on click, not on scroll.
     (function () {
         var HOVER_SEL = ".card-check, .favorite-button";
         function classFor(hit) {

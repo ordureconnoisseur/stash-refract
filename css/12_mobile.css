@@ -5,7 +5,7 @@
    fade) live in their topic partials, scoped by their own @media.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Navbar - library row becomes horizontally scrollable so every icon
+/* Navbar — library row becomes horizontally scrollable so every icon
    is reachable via touch swipe. Scrollbar hidden visually; the
    narrow-width fade in 02_navbar.css doubles as a "more content →"
    hint. */
@@ -22,7 +22,7 @@
     }
 }
 
-/* Narrow viewports - bump top padding on the main content container
+/* Narrow viewports — bump top padding on the main content container
    so content (especially settings-page sidebar tabs that collapse to
    the top of the column on narrow widths) doesn't slide under the
    floating navbar. The navbar's effective bottom is ~56px from the
@@ -34,7 +34,7 @@
     }
 }
 
-/* Narrow-width settings page - sidebar collapses to top; hide the
+/* Narrow-width settings page — sidebar collapses to top; hide the
    Bootstrap-native divider hr that appears at narrow widths and add
    breathing room above the content panel. */
 @media (max-width: 767.98px) {
@@ -49,7 +49,7 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Mobile navigation - touch-only, built ground-up.
+   Mobile navigation — touch-only, built ground-up.
 
    Refract replaces Stash's navbar contents entirely on mobile:
    - Stash's nav children are hidden (except .navbar-brand which stays
@@ -61,11 +61,11 @@
 
    Width-driven (not touch-gated): any narrow viewport gets this layout,
    so iPad Split View and desktop snap/split windows get the compact UI
-   too - not just touch devices. The burger/drawer DOM is injected
+   too — not just touch devices. The burger/drawer DOM is injected
    unconditionally by refract.js, so width alone is enough to show it.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Defaults - hidden on wide viewports. */
+/* Defaults — hidden on wide viewports. */
 body.stash-liquid-glass nav.top-nav .refract-burger,
 body.stash-liquid-glass nav.top-nav .refract-mobile-new,
 body.stash-liquid-glass .refract-burger-scrim,
@@ -105,7 +105,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .filtered-list-toolbar {
         top: 0.5rem !important;
     }
-    /* TagSidebar plugin panel: same story - its desktop offset clears
+    /* TagSidebar plugin panel: same story — its desktop offset clears
        the navbar; on mobile start at the top and stop above the dock. */
     body.stash-liquid-glass .tag-sidebar__panel {
         top: 12px !important;
@@ -193,9 +193,9 @@ body.stash-liquid-glass .refract-mobile-drawer {
         transform-origin: center;
         display: block !important;
         transition:
-            top var(--dur-enter) var(--ease-glide),
-            transform var(--dur-enter) var(--ease-spring) var(--dur-instant),
-            opacity var(--dur-instant) ease;
+            top 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.22s cubic-bezier(0.34, 1.2, 0.64, 1) 0.12s,
+            opacity 0.12s ease;
     }
     body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger).is-open .refract-burger-line {
         opacity: 1;
@@ -204,7 +204,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger) .refract-burger-line:nth-child(2) { top: 6px; }
     body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger) .refract-burger-line:nth-child(3) { top: 12px; }
 
-    /* X morph - top + bottom lines slide to middle then rotate */
+    /* X morph — top + bottom lines slide to middle then rotate */
     body.stash-liquid-glass :is(.refract-burger, .refract-dock-burger).is-open .refract-burger-line:nth-child(1) {
         top: 6px;
         transform: rotate(45deg);
@@ -219,307 +219,111 @@ body.stash-liquid-glass .refract-mobile-drawer {
         transform: rotate(-45deg);
     }
 
-    /* ── Bottom dock: the desktop navbar's floating glass, in capsule form ──
-       Slice 1 of the 2026-09-03 mobile overhaul (brief: scratchpad
-       mobile-overhaul/BRIEF.md, board "Dock: states"). This replaces the
-       edge-to-edge opaque tab bar that DESIGN_SYSTEM 6.11 settled as
-       "imitate the platform's chrome"; the user re-opened that trade on
-       the strength of binge-ios, whose geometry and scroll rule are
-       lifted here exactly. One visual language for chrome on every width.
-
-       Geometry (binge-ios BingeBottomNav, measured at 3px/pt then rounded):
-                     expanded   contracted
-         side inset     23         44
-         height         58         49
-         above bottom   23         28
-         icon           26         22
-         active pill  74 x 50    63 x 41
-         end padding     9          8
-
-       The capsule FLOATS over content. Content pads by a FIXED footprint
-       (23 + 58 = 81, plus the safe area) so the bar shrinking can never
-       reflow a feed. The capsule sits IN the home-indicator zone:
-       bottom is max(23px, safe-area-inset-bottom), never 23 + inset.
-
-       State classes live on the DOCK ELEMENT, not on body: a body class
-       toggled on scroll is exactly the document-wide effect 3.7 rule 1
-       forbids. refract.js toggles .refract-dock-contracted on the dock
-       (and on the floating pager, which rides with it) from a passive
-       scroll listener: down past a 5px deadzone contracts; up, y < 80,
-       a tap on the dock, or the drawer opening expands. Reduced motion
-       never contracts.
-
-       PROPOSED TOKENS (defined locally, flagged for promotion to
-       01_tokens.css by the foundations lane):
-         --refract-dock-bottom     max(23px, env(safe-area-inset-bottom))
-         --refract-dock-footprint  calc(var(--refract-dock-bottom) + 58px)
-       Everything below the dock's own box reads the footprint, never 58
-       or 81 literally. */
-    body.stash-liquid-glass {
-        --refract-dock-bottom: max(23px, env(safe-area-inset-bottom, 0px));
-        --refract-dock-footprint: calc(var(--refract-dock-bottom) + 58px);
-    }
+    /* ── Bottom dock — iOS-style pill bar with the essential routes ──
+       Scenes / Performers / Studios / Tags / Settings one tap away,
+       burger tile at the end opening the full drawer. Sits above the
+       scrim (z 110 > 99) so the burger doubles as the close control
+       while the drawer is open. */
+    /* Edge-to-edge native tab bar, sized like binge mobile's bottom
+       nav (3.5rem content height, near-black, hairline top border,
+       12px blur, safe-area folded INSIDE the bar so it reads as part
+       of the device chrome rather than a floating element). */
     body.stash-liquid-glass .refract-mobile-dock {
-        /* Per-state geometry as custom properties so the contracted
-           rule changes six numbers and nothing else. */
-        --dock-inset: 23px;
-        --dock-h: 58px;
-        --dock-lift: 0px;
-        --dock-pad: 9px;
-        --dock-icon: 26px;
-        --dock-pill-w: 74px;
-        --dock-pill-h: 50px;
-        /* Slot pitch: the padding box minus the end padding, split by the
-           slot count refract.js writes as --dock-count (items + More). */
-        --dock-slot: calc((100% - 2 * var(--dock-pad)) / var(--dock-count, 5));
-
         display: flex !important;
         position: fixed;
-        left: var(--dock-inset);
-        right: var(--dock-inset);
-        bottom: calc(var(--refract-dock-bottom) + var(--dock-lift));
-        height: var(--dock-h);
-        z-index: var(--z-dock);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 110;
+        height: calc(4.6rem + env(safe-area-inset-bottom, 0px));
         box-sizing: border-box;
-        align-items: stretch;
-        justify-content: space-between;
+        align-items: center;
+        justify-content: space-around;
         gap: 0;
-        padding: 0 var(--dock-pad);
-        /* Rim, radius, shadow and blur are the canonical glass recipe
-           (3.2) and the navbar's shadow (6.3). The FILL is not --glass-bg:
-           the board drew the desktop navbar's 0.06 white, and measured on
-           the rendered ground it failed. The dock is the one piece of
-           chrome that sits permanently over artwork, and 0.06 over the
-           performer grid left the capsule at rgb(196,148,136) with the
-           icons at 1.69 to 2.71:1 (390, dark). So the fill is the surface
-           family (3.2: near-opaque overlays, floating overlay chrome) at
-           0.72, the drawer's colour at a lower alpha: worst case pure
-           white behind it composites to rgb(86) and the 0.80 icon reads
-           at 5.9:1; light flips the channels to white and black ink reads
-           at 7.5:1 over black artwork. Proposed ledger row; see the
-           BUILD_LOG. */
-        --refract-dock-fill: rgba(var(--surface-rgb), 0.72);
-        background: var(--refract-dock-fill);
-        border: 1px solid var(--glass-border);
-        border-radius: var(--radius-pill);
-        box-shadow: var(--shadow-navbar);
-        -webkit-backdrop-filter: var(--glass-blur-xl-sat);
-        backdrop-filter: var(--glass-blur-xl-sat);
-        /* Resize: binge's spring 0.34 / 0.82 (near-critical damping)
-           maps onto --dur-settle with the glide curve. Contracting is a
-           thing leaving, so no overshoot (3.7). */
-        transition:
-            left var(--dur-settle) var(--ease-glide),
-            right var(--dur-settle) var(--ease-glide),
-            bottom var(--dur-settle) var(--ease-glide),
-            height var(--dur-settle) var(--ease-glide),
-            padding var(--dur-settle) var(--ease-glide);
+        padding: 0 0.5rem env(safe-area-inset-bottom, 0px);
+        border-radius: 0;
+        /* Refract's own tab-bar material (the approved variant-A look);
+           only the SIZE comes from binge mobile. */
+        background: rgb(28, 26, 33);
+        border: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.09);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
     }
-    /* Contracted: the same object seen smaller, rising 5px toward its
-       own centre. */
-    body.stash-liquid-glass .refract-mobile-dock.refract-dock-contracted {
-        --dock-inset: 44px;
-        --dock-h: 49px;
-        --dock-lift: 5px;
-        --dock-pad: 8px;
-        --dock-icon: 22px;
-        --dock-pill-w: 63px;
-        --dock-pill-h: 41px;
-    }
-    /* Expanding is a thing arriving: it may spring. */
-    body.stash-liquid-glass .refract-mobile-dock:not(.refract-dock-contracted) {
-        transition:
-            left var(--dur-settle) var(--ease-spring),
-            right var(--dur-settle) var(--ease-spring),
-            bottom var(--dur-settle) var(--ease-spring),
-            height var(--dur-settle) var(--ease-spring),
-            padding var(--dur-settle) var(--ease-spring);
-    }
-
-    /* The active pill: ONE element that slides between slots. Five (or
-       seven) conditional highlights never animated; a single element
-       whose left changes cannot fail. Position is pure arithmetic on
-       --dock-active (the slot index refract.js writes) so the CSS never
-       needs to know which item is current. Pill = --accent-tint with a
-       1px accent inner rim and the 14px glow the old dock already had. */
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-pill {
-        position: absolute;
-        top: 50%;
-        /* binge's pill (74) is 9px WIDER than its slot (65.2): it laps
-           the neighbours. A 6- or 7-slot dock keeps that same 9px lap
-           over its narrower slot instead of a fixed 74. One expression
-           for width and for the centring term, so they cannot disagree. */
-        --dock-pw: min(var(--dock-pill-w), calc(var(--dock-slot) + 9px));
-        left: calc(
-            var(--dock-pad)
-            + var(--dock-slot) * var(--dock-active, 0)
-            + (var(--dock-slot) - var(--dock-pw)) / 2
-        );
-        width: var(--dock-pw);
-        height: var(--dock-pill-h);
-        transform: translateY(-50%);
-        border-radius: var(--radius-pill);
-        background: var(--accent-tint);
-        box-shadow:
-            inset 0 0 0 1px rgba(var(--accent-rgb), 0.22),
-            0 0 14px rgba(var(--accent-rgb), 0.30);
-        pointer-events: none;
-        opacity: 1;
-        /* Travel: binge's 0.42 / 0.78 spring is --dur-slow + --ease-spring
-           (the System board's motion table). Size settles with the bar. */
-        transition:
-            left var(--dur-slow) var(--ease-spring),
-            width var(--dur-settle) var(--ease-glide),
-            height var(--dur-settle) var(--ease-glide),
-            opacity var(--dur-fast) ease;
-    }
-    /* No route in the dock matches the page (home, a plugin page): the
-       pill fades rather than parking on a wrong slot. */
-    body.stash-liquid-glass .refract-mobile-dock:not(.refract-dock-has-active) .refract-dock-pill {
-        opacity: 0;
-    }
-
-    /* Slots: icons only, no labels; each slot is the full capsule height
-       so the whole 65 x 58 column is the tap target (44px floor met on
-       both axes even contracted: 60 x 49). */
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item {
         flex: 1 1 0;
-        min-width: 0;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        align-self: stretch;
-        height: auto;
-        margin: 0;
+        height: 3.1rem;
+        min-width: 3.1rem;
+        align-self: center;
+        /* Nudge the icons slightly ABOVE true centre — the bar reads
+           better with the visual weight sitting a touch high (margin
+           trick rather than transform, which :active's press-scale
+           would overwrite). */
+        margin-bottom: 10px;
         border: none;
         background: transparent;
-        /* !important: 04_filters' global anchor rule is (0,6,1) and
-           painted every route slot rgba(255,255,255,0.85) in BOTH modes
-           (white on the white light capsule, measured 1.3:1), and its
-           :hover twin would leave a tapped slot accent-coloured until
-           the next tap on touch. The slot's colour is the dock's, not
-           the page's. */
-        color: rgba(var(--fg-rgb), 0.80) !important;
+        color: var(--text-muted);
         padding: 0;
         cursor: pointer;
         text-decoration: none;
         position: relative;
-        z-index: 1;
-        -webkit-tap-highlight-color: transparent;
-        transition: color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-spring);
+        isolation: isolate;
+        transition: color 0.16s ease, transform 0.14s cubic-bezier(0.34, 1.2, 0.64, 1);
     }
-    /* The old circle highlight behind each item is retired; the pill
-       carries the active state alone. */
+    /* Active/open highlight lives on a fixed-size CIRCLE centred behind
+       the icon — the item box itself is flex-stretched wide, so painting
+       the tint/glow on it produced a stretched rectangle pill. */
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item::before {
-        content: none;
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 3.1rem;
+        height: 3.1rem;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        z-index: -1;
+        background: transparent;
+        transition: background 0.16s ease, box-shadow 0.16s ease;
     }
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item svg {
-        width: var(--dock-icon);
-        height: var(--dock-icon);
-        transition: width var(--dur-settle) var(--ease-glide), height var(--dur-settle) var(--ease-glide);
+        width: 1.3rem;
+        height: 1.3rem;
     }
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-item:active {
-        transform: scale(0.92);
+        transform: scale(0.9);
     }
-    /* Active icon takes --accent-ink so the light board passes too
-       (light re-points it to the deeper mix). */
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item.is-active,
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item.is-active {
+        color: var(--accent-bright);
+    }
+    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item.is-active::before {
+        background: var(--accent-tint);
+        box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.3);
+    }
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger.is-open {
-        color: var(--accent-ink) !important;
+        color: var(--accent);
     }
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-item.is-active::before,
     body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger.is-open::before {
-        content: none;
-        background: transparent;
-        box-shadow: none;
-    }
-    /* Focus: the one house ring is 09_buttons' global :focus-visible
-       rule (cohesion audit item 1). The slot only pulls it inside the
-       capsule (the rim would clip it) and shapes it to the pill; tripled
-       body class because the rule's own offset is !important. */
-    body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass .refract-mobile-dock .refract-dock-item:focus-visible {
-        outline-offset: -6px !important;
-        border-radius: var(--radius-pill);
-    }
-    /* The More glyph: the shared three-line burger scaled to the 26px
-       icon grid (22 wide, 2px lines at 0 / 7 / 14) so it carries the
-       same weight as the stroke-2 route glyphs; contracted it follows
-       the icon down to 18 x 13. Its X morph is the existing shared rule. */
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-icon {
-        width: calc(var(--dock-icon) - 4px);
-        height: calc(var(--dock-icon) * 0.62);
-        transition: width var(--dur-settle) var(--ease-glide), height var(--dur-settle) var(--ease-glide);
-    }
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-line {
-        height: 2px;
-        opacity: 1;
-    }
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-line:nth-child(1) { top: 0; }
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-line:nth-child(2) { top: calc(50% - 1px); }
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-line:nth-child(3) { top: calc(100% - 2px); }
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger.is-open .refract-burger-line:nth-child(1),
-    body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger.is-open .refract-burger-line:nth-child(3) {
-        top: calc(50% - 1px);
+        background: var(--accent-tint);
+        box-shadow:
+            0 0 18px rgba(var(--accent-rgb), 0.45),
+            inset 0 0 0 1px rgba(var(--accent-rgb), 0.18);
     }
 
-    /* Reduced motion: the bar never resizes (refract.js does not toggle
-       the class at all); the pill jumps and cross-fades instead of
-       travelling. */
-    @media (prefers-reduced-motion: reduce) {
-        body.stash-liquid-glass .refract-mobile-dock,
-        body.stash-liquid-glass .refract-mobile-dock .refract-dock-item svg,
-        body.stash-liquid-glass .refract-mobile-dock .refract-dock-burger .refract-burger-icon {
-            transition: none;
-        }
-        body.stash-liquid-glass .refract-mobile-dock .refract-dock-pill {
-            transition: opacity var(--dur-fast) ease;
-        }
-    }
-    /* Reduced transparency: the fill goes opaque and the blur drops, the
-       same way 01_tokens treats the named glass surfaces. */
-    @media (prefers-reduced-transparency: reduce) {
-        body.stash-liquid-glass .refract-mobile-dock {
-            --refract-dock-fill: rgba(var(--surface-rgb), 0.97);
-            -webkit-backdrop-filter: none;
-            backdrop-filter: none;
-        }
-    }
-    /* Lite mode pins every floating glass platform opaque (15_lite
-       section 4, which has no mobile section, so the phone chrome pins
-       here): the dock, the sort sheet, the stuck toolbar plate, the
-       scrim's blur; the More sheet is already in 15's list. */
-    body.stash-liquid-glass.refract-lite .refract-mobile-dock,
-    body.stash-liquid-glass.refract-lite .refract-list-sheet,
-    body.stash-liquid-glass.refract-lite .filtered-list-toolbar::before {
-        background: rgb(35, 35, 35) !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-    }
-    body.stash-liquid-glass.refract-lite.refract-burger-open .refract-burger-scrim,
-    body.stash-liquid-glass.refract-lite.refract-list-sheet-open .refract-burger-scrim {
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-    }
-
-    /* Content runs UNDER the dock and pads by the fixed footprint plus
-       one --gap-md of air so a last row's bottom rim never kisses the
-       capsule. The :has() twin outranks the pager reservation in
-       09_buttons (0,4,1), which otherwise wins on specificity and leaves
-       the last row under the glass. */
+    /* Clear the dock: give the app's scroll content bottom breathing
+       room so the last row of cards isn't parked under the pill. */
     body.stash-liquid-glass .main.container-fluid,
-    body.stash-liquid-glass main.container-fluid,
-    body.stash-liquid-glass:has([data-pager-row="float"]) .main.container-fluid {
-        padding-bottom: calc(var(--refract-dock-footprint) + var(--gap-md)) !important;
+    body.stash-liquid-glass main.container-fluid {
+        padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
     }
-    /* Floating pager (09_buttons.css pins it at bottom: 1.5rem) rides
-       above the dock and follows its contraction; slice 6 folds it into
-       the dock on list pages. */
+    /* Floating pager (09_buttons.css pins it at bottom: 1.5rem) would
+       sit behind the dock; lift it above the bar. */
     body.stash-liquid-glass [data-pager-row="float"] {
-        bottom: calc(var(--refract-dock-footprint) + 10px) !important;
-        transition: bottom var(--dur-settle) var(--ease-glide), opacity var(--dur-fast) ease;
-    }
-    body.stash-liquid-glass [data-pager-row="float"].refract-dock-contracted {
-        bottom: calc(var(--refract-dock-footprint) + 1px) !important;
+        bottom: calc(5.3rem + env(safe-area-inset-bottom, 0px)) !important;
     }
     /* multiView's floating picking launcher: hidden on mobile for now
        (fights the dock for the bottom edge; a proper mobile placement
@@ -536,13 +340,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
         background: rgba(0, 0, 0, 0.42);
         opacity: 0;
         pointer-events: none;
-        z-index: var(--z-scrim);
+        z-index: 99;
         -webkit-backdrop-filter: blur(0px);
         backdrop-filter: blur(0px);
         transition:
-            opacity var(--dur-enter) ease,
-            backdrop-filter var(--dur-settle) ease,
-            -webkit-backdrop-filter var(--dur-settle) ease;
+            opacity 0.22s ease,
+            backdrop-filter 0.28s ease,
+            -webkit-backdrop-filter 0.28s ease;
     }
     body.stash-liquid-glass.refract-burger-open .refract-burger-scrim {
         opacity: 1;
@@ -557,13 +361,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
        (A drawer opt-out was tried 2026-07-28 and pulled the same day:
        an inline icon navbar overflows as soon as a few plugins add nav
        items, and the drawer IS the overflow strategy. Needs a real
-       design - e.g. inline icons + overflow-only drawer - before it
+       design — e.g. inline icons + overflow-only drawer — before it
        comes back; see VersGeek's forum request.) */
     body.stash-liquid-glass nav.top-nav > *:not(.navbar-brand):not(.refract-burger):not(.refract-mobile-new) {
         display: none !important;
     }
 
-    /* ── Mobile "New" button - mirror of Stash's /new contextual btn ─ */
+    /* ── Mobile "New" button — mirror of Stash's /new contextual btn ─ */
     body.stash-liquid-glass nav.top-nav .refract-mobile-new {
         display: inline-flex !important;
         align-items: center;
@@ -571,7 +375,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         width: var(--nav-btn-size);
         height: var(--nav-btn-size);
         flex: 0 0 auto;
-        background: var(--fill-1);
+        background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: var(--radius-sm);
         color: var(--text);
@@ -583,10 +387,10 @@ body.stash-liquid-glass .refract-mobile-drawer {
         margin-right: 0.4rem;
         text-decoration: none;
         transition:
-            background var(--dur-move) ease,
-            border-color var(--dur-move) ease,
-            color var(--dur-move) ease,
-            transform var(--dur-fast) var(--ease-spring);
+            background 0.18s ease,
+            border-color 0.18s ease,
+            color 0.18s ease,
+            transform 0.16s cubic-bezier(0.34, 1.2, 0.64, 1);
     }
     body.stash-liquid-glass nav.top-nav .refract-mobile-new + .refract-burger {
         /* When New button is present it owns margin-left:auto, so reset
@@ -594,7 +398,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         margin-left: 0 !important;
     }
     body.stash-liquid-glass nav.top-nav .refract-mobile-new:hover {
-        background: var(--fill-4);
+        background: rgba(255, 255, 255, 0.08);
         border-color: rgba(255, 255, 255, 0.20);
     }
     body.stash-liquid-glass nav.top-nav .refract-mobile-new:active {
@@ -608,47 +412,24 @@ body.stash-liquid-glass .refract-mobile-drawer {
         height: 1.1rem;
     }
 
-    /* ── The More sheet (slice 2 of the mobile overhaul; board "Dock: More
-       sheet"). The body-level .refract-mobile-drawer keeps its DOM (the
-       tiles are the registry the dock is configured from, P4: no new
-       state) and becomes a sheet of LABELLED ROWS in three groups, rising
-       from the dock over the scrimmed page:
-
-         More                                   [pencil] Edit dock
-         LIBRARY
-         [icon]  Images                                        >
-         [icon]  Galleries                                     >
-         PLUGINS
-         [icon]  Forage                                        >
-         STASH
-         [icon]  Stats                                         >
-
-       Rows whose route already sits in the dock are hidden (refract.js
-       stamps data-in-dock from the same selection the dock is built
-       from), so the sheet is "everything else", never a duplicate. The
-       label is the tile's own aria-label painted by ::after, the chevron
-       is a masked ::before; nothing about a row exists twice. Groups are
-       flex order on data-group (hardcoded routes carry it; plugin and
-       action tiles default to the Plugins band); a group label whose
-       band is empty hides via .is-empty, toggled by refract.js.
-
-       Material: the surface family at 0.92 (3.2), the accent inset rim
-       the drawer already carried, md-sat blur. Type: title --fs-lg 600,
-       rows --fs-body 600, group labels the house eyebrow (6.13). Rows are
-       48px, the icon tile 36 (a 44 hit area is the row itself). */
+    /* ── Mobile drawer (body-level overlay, built ground-up) ───────── */
     body.stash-liquid-glass .refract-mobile-drawer {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        /* px, not rem: iOS Larger Text inflates rem and the sheet's
-           rhythm must not drift with it. */
-        padding: 6px 6px 8px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        /* Fixed px values for gap + padding — iOS "Larger Text"
+           accessibility scaling inflates rem-based values, causing the
+           tile spacing to look wildly different on real phones vs
+           desktop RDM. px decouples from root font-size drift. */
+        gap: 9px;
+        padding: 13px;
         position: fixed;
+        /* Anchored ABOVE the bottom dock (the drawer's opener) and
+           rising from it — not dropping from the retired top bar. */
         top: auto;
-        bottom: calc(var(--refract-dock-footprint) + 10px);
+        bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px));
         left: 12px;
         right: 12px;
-        background: rgba(var(--surface-rgb), 0.92);
+        background: rgba(20, 20, 24, 0.92);
         -webkit-backdrop-filter: var(--glass-blur-md-sat);
         backdrop-filter: var(--glass-blur-md-sat);
         border: 1px solid var(--glass-border);
@@ -657,19 +438,17 @@ body.stash-liquid-glass .refract-mobile-drawer {
             var(--shadow-xl),
             inset 0 0 0 1px rgba(var(--accent-rgb), 0.08);
         z-index: 100;
-        box-sizing: border-box;
-        max-height: calc(100vh - var(--refract-dock-footprint) - 22px - env(safe-area-inset-top, 0px));
+        max-height: calc(100vh - 7rem);
         overflow-y: auto;
-        overscroll-behavior: contain;
-        /* Closed: invisible and inert; opens by rising from the dock as
-           ONE surface (no per-row stagger: one orchestrated entrance). */
+        /* Closed state — invisible, non-interactive; slides UP from the
+           dock on open. */
         opacity: 0;
         transform: translateY(12px) scale(0.96);
         transform-origin: bottom center;
         pointer-events: none;
         transition:
-            opacity var(--dur-enter) ease,
-            transform var(--dur-enter) var(--ease-spring);
+            opacity 0.22s ease,
+            transform 0.22s cubic-bezier(0.34, 1.2, 0.64, 1);
     }
     body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer {
         opacity: 1;
@@ -677,189 +456,115 @@ body.stash-liquid-glass .refract-mobile-drawer {
         pointer-events: auto;
     }
 
-    /* Header: the sheet's name and the one action that belongs to the
-       whole sheet. "Edit dock" is where people are when they want a row
-       in the bar (P8), and it opens the existing setting. */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-head {
-        order: -1;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 44px;
-        flex: 0 0 44px;
-        padding: 0 6px 0 12px;
-    }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-title {
-        font-size: var(--fs-lg);
-        font-weight: 600;
-        letter-spacing: -0.005em;
-        color: var(--text);
-    }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-edit {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        height: 44px;
-        padding: 0 8px;
-        border-radius: var(--radius-sm);
-        font-size: var(--fs-base);
-        font-weight: 600;
-        color: var(--accent-ink) !important;
-        text-decoration: none;
-    }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-edit svg {
-        width: 14px;
-        height: 14px;
-    }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-edit:active {
-        background: var(--accent-tint);
-    }
-
-    /* Group labels: the house eyebrow, never brighter than the rows. */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-group {
-        font-size: var(--fs-xs);
-        font-weight: 600;
-        letter-spacing: var(--track-eyebrow);
-        text-transform: uppercase;
-        color: var(--text-muted);
-        padding: 10px 12px 4px;
-        flex: 0 0 auto;
-    }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-group[data-group="library"] { order: 0; }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-group[data-group="plugins"] { order: 10; }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-group[data-group="stash"]   { order: 20; }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-group.is-empty {
-        display: none;
-    }
-
-    /* Rows. Plugin and action tiles carry no data-group and land in the
-       Plugins band by default; the hardcoded routes are stamped. */
+    /* ── Drawer tiles ─────────────────────────────────────────────── */
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile {
-        order: 11;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 12px;
-        flex: 0 0 48px;
-        height: 48px;
-        aspect-ratio: auto;
-        padding: 0 8px 0 6px;
-        background: transparent;
-        border: none;
-        border-radius: var(--radius-sm);
-        color: var(--text) !important;
-        text-decoration: none;
-        position: relative;
-        overflow: visible;
-        box-shadow: none;
-        transition:
-            background var(--dur-move) ease,
-            color var(--dur-move) ease;
-    }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile[data-group="library"] { order: 1; }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile[data-group="stash"]   { order: 21; }
-    /* Already in the dock, or disabled in Stash's menu settings. */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile[data-in-dock],
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.refract-drawer-tile-off {
-        display: none !important;
-    }
-    /* The label: the tile's own accessible name, painted once. */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile::after {
-        content: attr(aria-label);
-        order: 2;
-        flex: 1 1 auto;
-        min-width: 0;
-        font-size: var(--fs-body);
-        font-weight: 600;
-        line-height: 1.2;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    /* The chevron: a masked box painted in the muted ink, at the row end. */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile::before {
-        content: "";
-        order: 4;
-        flex: 0 0 18px;
-        width: 18px;
-        height: 18px;
-        background: var(--text-muted);
-        -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
-        mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
-    }
-    /* Launchers that open a new tab say so: the chevron becomes an
-       outward arrow. */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile[target="_blank"]::before {
-        -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M7 17L17 7M9 7h8v8'/></svg>") center / contain no-repeat;
-        mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M7 17L17 7M9 7h8v8'/></svg>") center / contain no-repeat;
-    }
-    /* Icon tile: 36px, the resting fill, hairline rim, 10px radius (the
-       12px row radius minus the 2px it sits inside). */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-icon {
-        order: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex: 0 0 36px;
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: var(--fill-2);
+        aspect-ratio: 1 / 1;
+        background: var(--glass-bg);
         border: 1px solid var(--glass-border);
-        box-sizing: border-box;
+        border-radius: var(--radius);
         color: var(--text);
-        transition: background var(--dur-move) ease, border-color var(--dur-move) ease;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        transition:
+            background 0.18s ease,
+            border-color 0.18s ease,
+            color 0.18s ease,
+            transform 0.16s cubic-bezier(0.34, 1.2, 0.64, 1),
+            box-shadow 0.2s ease;
+    }
+    /* Count badge on drawer tiles (currently the multiview tile's
+       combined picks+filters number). Accent dot, top-right corner. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        min-width: 16px;
+        height: 16px;
+        padding: 0 4px;
+        border-radius: 999px;
+        background: rgb(var(--accent-rgb));
+        color: #fff;
+        font-size: 0.6rem;
+        font-weight: 700;
+        line-height: 16px;
+        text-align: center;
+    }
+
+    /* Hardcoded tile for a menu item the user disabled in Stash's
+       Interface settings. refract.js adds this class when the route is
+       absent from the live navbar (Stash omits disabled items from the
+       navbar DOM). Hidden, not removed, so re-enabling restores it. */
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.refract-drawer-tile-off {
+        display: none !important;
+    }
+    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* px-pinned so icon size doesn't drift with iOS font scaling. */
+        width: 28px;
+        height: 28px;
     }
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-icon svg {
-        width: 20px !important;
-        height: 20px !important;
+        width: 100% !important;
+        height: 100% !important;
         max-width: none !important;
         max-height: none !important;
         display: block;
     }
-    /* Count badge (multiview's combined picks): sits before the chevron
-       instead of on a tile corner. */
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile-badge {
-        position: static;
-        order: 3;
-        flex: 0 0 auto;
-        /* A read-out chip: it carries .refract-chip and takes the ONE
-           recipe in 10_pills_badges (6.7); nothing about its material is
-           restated here, only its place in the row. */
-        min-width: 24px;
-        box-sizing: border-box;
-        font-variant-numeric: tabular-nums;
-        text-align: center;
-    }
-    /* Press and current-route states: the fill ramp and the accent tint;
-       no glow, no drop-shadow on a repeated element (10.3). */
+    /* :active tap feedback */
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile:active {
-        background: var(--fill-4);
+        background: var(--accent-tint);
+        border-color: var(--accent-glow);
+        color: var(--accent);
+        transform: scale(0.94);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 0 18px rgba(var(--accent-rgb), 0.3),
+            inset 0 0 0 1px rgba(var(--accent-rgb), 0.18);
     }
+    /* Active route halo */
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.is-active {
         background: var(--accent-tint);
-        color: var(--accent-ink) !important;
-    }
-    body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.is-active .refract-drawer-tile-icon {
-        color: var(--accent-ink);
-        border-color: rgba(var(--accent-rgb), 0.22);
+        border-color: var(--accent-glow);
+        color: var(--accent);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.06),
+            0 0 16px rgba(var(--accent-rgb), 0.32),
+            inset 0 0 0 1px rgba(var(--accent-rgb), 0.18);
     }
     body.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile.is-active svg {
-        filter: none;
+        filter:
+            drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.55))
+            drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.4));
     }
-    /* Focus: 09's ring; inset because the sheet scrolls (the audit's
-       one allowed exception). */
-    body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass .refract-mobile-drawer .refract-drawer-tile:focus-visible,
-    body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass .refract-mobile-drawer .refract-drawer-edit:focus-visible {
-        outline-offset: -2px !important;
+
+    /* Stagger fade-in on open */
+    body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer .refract-drawer-tile {
+        animation: refract-drawer-tile-in 0.32s cubic-bezier(0.34, 1.2, 0.64, 1) both;
+    }
+    body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer .refract-drawer-tile:nth-child(3n+2) {
+        animation-delay: 30ms;
+    }
+    body.stash-liquid-glass.refract-burger-open .refract-mobile-drawer .refract-drawer-tile:nth-child(3n+3) {
+        animation-delay: 60ms;
+    }
+    @keyframes refract-drawer-tile-in {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Mobile scene-detail layout - player + compact details stacked.
+   Mobile scene-detail layout — player + compact details stacked.
 
    Default narrow-window behavior (07_scene_details.css @media max-width
-   1199.98) locks the row to 100vh and hides the details panel - great
+   1199.98) locks the row to 100vh and hides the details panel — great
    on a desktop browser shrunk down (player-only focus mode), but on a
    real phone the user has no way to access scene details and the video
    gets massive top/bottom letterboxing inside the tall portrait row.
@@ -869,7 +574,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
    100vh focus-mode lock.
    ─────────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-    /* Scene-page container - zero out the global mobile padding-top
+    /* Scene-page container — zero out the global mobile padding-top
        (5rem from earlier in this file) so the row owns navbar clearance.
        Without this, container 80 + row top stack and create a huge gap. */
     body.stash-liquid-glass .main.container-fluid:has(:is(.scene-tabs, .image-tabs)) {
@@ -895,7 +600,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         max-height: none !important;
     }
 
-    /* Video wrapper: natural 16:9 instead of flex-fill - kills the
+    /* Video wrapper: natural 16:9 instead of flex-fill — kills the
        black letterbox bands inside an over-tall flex column. */
     body.stash-liquid-glass .video-wrapper,
     body.stash-liquid-glass div.video-wrapper {
@@ -916,14 +621,14 @@ body.stash-liquid-glass .refract-mobile-drawer {
         padding: 0.9rem !important;
     }
     /* Inner tab-content was a flex column expecting a fixed-height
-       parent - relax it so content sizes naturally. */
+       parent — relax it so content sizes naturally. */
     body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-content,
     body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .tab-pane.active.show {
         display: block !important;
         min-height: 0 !important;
         flex: initial !important;
     }
-    /* Performer row inside the panel - kill the 56px chevron gutters
+    /* Performer row inside the panel — kill the 56px chevron gutters
        (no room for the chevrons on a phone; the row scrolls by touch). */
     body.stash-liquid-glass :is(.scene-tabs, .image-tabs, .gallery-tabs) .scene-performers-row {
         padding: 0 !important;
@@ -939,7 +644,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
          Row 1: progress bar (full width)
          Row 2: prev / play / next | current-time | volume | rate |
                 source | fullscreen
-       Duration + time-divider hidden - current time alone is enough.
+       Duration + time-divider hidden — current time alone is enough.
     */
     body.stash-liquid-glass .video-js .vjs-control-bar {
         flex-wrap: wrap !important;
@@ -958,7 +663,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         height: 10px !important;
         margin: 0 !important;
     }
-    /* Hide duration + divider - current time alone is enough on mobile. */
+    /* Hide duration + divider — current time alone is enough on mobile. */
     body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-duration,
     body.stash-liquid-glass .video-js .vjs-control-bar > .vjs-time-divider {
         display: none !important;
@@ -996,7 +701,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
     /* Match icon-glyph line-height to mobile button height. Default
        (36px from 06_scene_player.css L381) is taller than the 32px
-       button and shifts the icon baseline down - out of sync with the
+       button and shifts the icon baseline down — out of sync with the
        time-text baseline. */
     body.stash-liquid-glass .video-js .vjs-icon-placeholder::before,
     body.stash-liquid-glass .video-js .vjs-icon-placeholder:before,
@@ -1006,7 +711,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     body.stash-liquid-glass .video-js [class*=" vjs-icon-"]:before {
         line-height: 32px !important;
     }
-    /* Source-selector / playback-rate dropdowns - anchor to RIGHT of
+    /* Source-selector / playback-rate dropdowns — anchor to RIGHT of
        their button so they open leftward (toward viewport center)
        instead of overflowing off the right edge. Cap width to viewport. */
     body.stash-liquid-glass .video-js .vjs-menu .vjs-menu-content {
@@ -1014,7 +719,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         left: auto !important;
         max-width: calc(100vw - 32px) !important;
     }
-    /* Volume panel - auto-hide the slider on mobile (tap toggles mute);
+    /* Volume panel — auto-hide the slider on mobile (tap toggles mute);
        slider expansion is fiddly on touch and the slider eats horizontal
        space the buttons need. */
     body.stash-liquid-glass .video-js .vjs-volume-panel .vjs-volume-control {
@@ -1034,13 +739,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
        viewport this looks crammed. Hide controls that have ergonomic
        mobile replacements or are niche enough to live in settings. */
 
-    /* Zoom slider - has no mobile use (cards size to viewport anyway). */
+    /* Zoom slider — has no mobile use (cards size to viewport anyway). */
     body.stash-liquid-glass .filtered-list-toolbar .zoom-slider-container,
     body.stash-liquid-glass .filtered-list-toolbar input[type="range"].zoom-slider {
         display: none !important;
     }
 
-    /* Play / autoplay button - niche cycling feature, rarely used on phone. */
+    /* Play / autoplay button — niche cycling feature, rarely used on phone. */
     body.stash-liquid-glass .filtered-list-toolbar .play-button {
         display: none !important;
     }
@@ -1049,7 +754,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
        re-roll a random order on a phone) and the space is better spent on
        the multiview filter-slot add button. Hide it unconditionally. DOM:
        .sort-by-select > [.input-group-prepend (sort-by toggle)] [.dropdown-menu]
-       [direction caret <button>] [reshuffle <button> - only when sort=random].
+       [direction caret <button>] [reshuffle <button> — only when sort=random].
        The toggle is wrapped in .input-group-prepend, so the two bare buttons
        (direction, reshuffle) are the only adjacent button siblings; `button +
        button` therefore uniquely targets the reshuffle and never the caret
@@ -1092,7 +797,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
 
     /* Page-size selector (per-page count) stays visible in the mobile
-       toolbar - users need to change how many scenes load per page (it
+       toolbar — users need to change how many scenes load per page (it
        was previously hidden, which locked narrow/split views at the
        default 40). Shrunk to a tiny number-only tile (no chevron) so it
        barely costs any toolbar space. Base look from 09_buttons.css. */
@@ -1125,13 +830,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
         display: none !important;
     }
 
-    /* Plus (+) button in toolbar - already mirrored next to burger in
+    /* Plus (+) button in toolbar — already mirrored next to burger in
        the navbar via .refract-mobile-new. */
     body.stash-liquid-glass .filtered-list-toolbar a[href$="/new"] {
         display: none !important;
     }
 
-    /* ── Toolbar layout - full-width with gutters, fixed height ─────
+    /* ── Toolbar layout — full-width with gutters, fixed height ─────
        Refract's default `width: fit-content` sizes the toolbar to its
        contents, which means hiding everything except the search makes
        the toolbar collapse to a tiny strip. Force a near-full width with
@@ -1158,13 +863,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
         overflow: clip !important;
         overflow-clip-margin: 24px !important;
         box-sizing: border-box !important;
-        gap: var(--gap-sm) !important;
+        gap: 0.35rem !important;
         flex-wrap: nowrap !important;
     }
     /* Reset the ::before pill's negative inset so the painted background
        matches toolbar bounds (the desktop -0.6rem extension is what was
        pushing it past the viewport edge). Also drop the heavy elevation
-       shadow - it gets visible past the overflow-clip-margin and reads
+       shadow — it gets visible past the overflow-clip-margin and reads
        as a harsh outer shadow on mobile. Inner highlight only. */
     body.stash-liquid-glass .filtered-list-toolbar::before {
         left: 0 !important;
@@ -1173,7 +878,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         bottom: 0 !important;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
     }
-    /* Wrapper around search input - square 30×30 collapsed (matches the
+    /* Wrapper around search input — square 30×30 collapsed (matches the
        other toolbar icon buttons). Stretches to flex: 1 100% on focus. */
     body.stash-liquid-glass .filtered-list-toolbar .search-term-input,
     body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group {
@@ -1182,13 +887,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
         height: 30px !important;
         min-width: 0 !important;
         position: relative !important;
-        transition: flex-basis var(--dur-enter) var(--ease-glide) !important;
+        transition: flex-basis 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
     body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within {
         flex: 1 1 100% !important;
         width: 100% !important;
     }
-    /* Magnifier icon overlay - painted via mask-image so we can color it
+    /* Magnifier icon overlay — painted via mask-image so we can color it
        with currentColor / background-color. mask-image is more reliable
        than background-image (which was getting wiped by the `background:`
        shorthand on the input in 09_buttons.css). Fades out on focus. */
@@ -1205,18 +910,18 @@ body.stash-liquid-glass .refract-mobile-drawer {
         mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='7'/><path d='m21 21-4.3-4.3'/></svg>") center / contain no-repeat;
         pointer-events: none;
         opacity: 1;
-        transition: opacity var(--dur-move) ease;
+        transition: opacity 0.18s ease;
     }
     body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within::after {
         opacity: 0;
     }
     /* Hide the × clear button while the search bar is collapsed (no
-       focus) - otherwise it overlaps the magnifier icon when there's
+       focus) — otherwise it overlaps the magnifier icon when there's
        still a term applied. */
     body.stash-liquid-glass .filtered-list-toolbar .search-term-input:not(:focus-within) .clearable-text-field-clear {
         display: none !important;
     }
-    /* The input itself - collapsed = transparent text (icon shows
+    /* The input itself — collapsed = transparent text (icon shows
        through), open = normal text input */
     body.stash-liquid-glass .filtered-list-toolbar .search-term-input input,
     body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group input,
@@ -1231,8 +936,8 @@ body.stash-liquid-glass .refract-mobile-drawer {
         caret-color: transparent !important;
         cursor: pointer;
         transition:
-            padding var(--dur-enter) var(--ease-glide),
-            color var(--dur-instant) ease 0.08s !important;
+            padding 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            color 0.12s ease 0.08s !important;
     }
     body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within input,
     body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group:focus-within input,
@@ -1246,24 +951,24 @@ body.stash-liquid-glass .refract-mobile-drawer {
         cursor: text;
     }
 
-    /* Other toolbar items - animate width AND inner buttons to zero
+    /* Other toolbar items — animate width AND inner buttons to zero
        when search opens. Using width-collapse instead of display:none
        keeps items in flow so transitions stay smooth. max-height clamps
        the collapsed items to a single row's worth so they can't push
        the toolbar taller via their own internal wrap behavior. */
     body.stash-liquid-glass .filtered-list-toolbar > *:not(.search-term-input) {
         /* Override refract's min-width: 30px on .btn-secondary in BASE
-           state so max-width: 0 can actually shrink items to zero -
+           state so max-width: 0 can actually shrink items to zero —
            otherwise CSS resolves used width = min(max-width, max(min-width, ...))
            which clamps to 30px and we never get a smooth collapse. */
         min-width: 0 !important;
         transition:
-            max-width var(--dur-enter) var(--ease-glide),
-            max-height var(--dur-enter) var(--ease-glide),
-            opacity var(--dur-move) ease,
-            margin var(--dur-enter) var(--ease-glide),
-            padding var(--dur-enter) var(--ease-glide),
-            transform var(--dur-enter) var(--ease-glide);
+            max-width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            max-height 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 0.18s ease,
+            margin 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            padding 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         max-width: 200px;
         max-height: 30px;
         overflow: clip;
@@ -1283,13 +988,13 @@ body.stash-liquid-glass .refract-mobile-drawer {
         transform: scale(0.9);
         pointer-events: none;
     }
-    /* Also collapse the toolbar's gap when search is open - otherwise
+    /* Also collapse the toolbar's gap when search is open — otherwise
        the gaps between hidden items still reserve horizontal space. */
     body.stash-liquid-glass .filtered-list-toolbar:has(.search-term-input:focus-within) {
         gap: 0 !important;
     }
 
-    /* Hide the "Search..." placeholder text when input isn't focused -
+    /* Hide the "Search..." placeholder text when input isn't focused —
        the magnifier background icon is the only thing visible in
        collapsed state. */
     body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"]:not(:focus)::placeholder {
@@ -1335,7 +1040,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         min-width: 0 !important;
         max-height: 70vh !important;
         overflow-y: auto !important;
-        /* Prevent scroll chain to body - without this, scrolling past
+        /* Prevent scroll chain to body — without this, scrolling past
            the menu's end propagates to the page on iOS, which then
            recomputes the scrim's backdrop-filter every frame and the
            blur visibly flickers/clears. */
@@ -1344,7 +1049,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         z-index: 1050 !important;
         padding: 0.5rem !important;
         border-radius: var(--radius) !important;
-        /* Opaque modal - the scrim already provides the blurred page
+        /* Opaque modal — the scrim already provides the blurred page
            backdrop, so the menu itself should be solid (otherwise the
            menu's own backdrop-filter blurs the scrim through its
            translucent fill and the contents read as hazy). */
@@ -1358,7 +1063,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         font-size: 1rem !important;
     }
 
-    /* Backdrop scrim - fades in / out, blurs the page behind. Same
+    /* Backdrop scrim — fades in / out, blurs the page behind. Same
        pattern as .refract-burger-scrim. */
     body.stash-liquid-glass .refract-toolbar-dropdown-scrim {
         display: block;
@@ -1370,7 +1075,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
         z-index: 1040;
         -webkit-backdrop-filter: blur(0px);
         backdrop-filter: blur(0px);
-        /* Promote to its own GPU layer - iOS Safari otherwise drops
+        /* Promote to its own GPU layer — iOS Safari otherwise drops
            backdrop-filter rendering when a scrolling element (the modal)
            sits over the scrim. translateZ + will-change + isolation
            together pin the scrim onto a compositor layer that survives
@@ -1379,9 +1084,9 @@ body.stash-liquid-glass .refract-mobile-drawer {
         will-change: backdrop-filter, transform;
         isolation: isolate;
         transition:
-            opacity var(--dur-enter) ease,
-            backdrop-filter var(--dur-settle) ease,
-            -webkit-backdrop-filter var(--dur-settle) ease;
+            opacity 0.22s ease,
+            backdrop-filter 0.28s ease,
+            -webkit-backdrop-filter 0.28s ease;
     }
     body.stash-liquid-glass.refract-toolbar-dropdown-open .refract-toolbar-dropdown-scrim {
         opacity: 1;
@@ -1392,12 +1097,12 @@ body.stash-liquid-glass .refract-mobile-drawer {
     /* Lift the toolbar's stacking context above the scrim while the
        modal is open. Without this, the menu's `z-index: 1050` is local
        to the toolbar's `z-index: 90` stacking context, so at root the
-       menu effectively renders below the scrim (1040) - and the scrim's
+       menu effectively renders below the scrim (1040) — and the scrim's
        backdrop-filter blurs over the menu. */
     body.stash-liquid-glass.refract-toolbar-dropdown-open .filtered-list-toolbar {
-        z-index: var(--z-overlay) !important;
+        z-index: 1060 !important;
     }
-    /* Lock the page behind the modal - stops the scrim's backdrop-filter
+    /* Lock the page behind the modal — stops the scrim's backdrop-filter
        from flickering as scroll events propagate to the body. */
     body.stash-liquid-glass.refract-toolbar-dropdown-open {
         overflow: hidden !important;
@@ -1407,17 +1112,17 @@ body.stash-liquid-glass .refract-mobile-drawer {
 
 @media (max-width: 768px) {
     /* ── 2-column card grid on mobile list pages ─────────────────────
-       Use CSS Grid on the card row - more deterministic than flex for
+       Use CSS Grid on the card row — more deterministic than flex for
        forcing a fixed column count, and not affected by inherited
        width/zoom rules on cards. */
     body.stash-liquid-glass .row.justify-content-center {
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: var(--gap-md) !important;
+        gap: 0.6rem !important;
         margin: 0.9rem 0 0 !important;
         padding: 0 0.6rem !important;
     }
-    /* Cards fill their grid cell - defeat Stash's .zoom-1 width rules */
+    /* Cards fill their grid cell — defeat Stash's .zoom-1 width rules */
     body.stash-liquid-glass .row.justify-content-center > .grid-card,
     body.stash-liquid-glass .row.justify-content-center > .card,
     body.stash-liquid-glass .row.justify-content-center > .performer-card,
@@ -1432,7 +1137,7 @@ body.stash-liquid-glass .refract-mobile-drawer {
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   B2 - the 769-1199.98px band: give the metadata back, stacked.
+   B2 — the 769-1199.98px band: give the metadata back, stacked.
 
    07_scene_details.css hides .scene-tabs / .image-tabs / .gallery-tabs
    below 1200px, for a stated and correct reason: below that width the
@@ -1519,782 +1224,5 @@ body.stash-liquid-glass .refract-mobile-drawer {
     }
     body.stash-liquid-glass:has(.main.container-fluid > .row > .gallery-container) .main.container-fluid {
         padding-bottom: 6rem !important;
-    }
-}
-
-
-/* ───────────────────────────────────────────────────────────────────
-   Home on phones (slice 3 of the mobile overhaul; boards "Home" and
-   "Home, light"). Only the carousels' SURROUNDINGS change here: the
-   cards themselves are today's cards (03_cards / 16_playing_card are
-   out of scope for this lane), so card widths, the description clamp
-   and the stat footer the board drew are NOT built; see the BUILD_LOG.
-
-   What changes: the section head drops the desktop eyebrow treatment
-   (--fs-sm 700 uppercase tracked muted, under a hairline) for a
-   44px row at --fs-lg 600 in the text ink with a 44px chevron, the
-   head text aligned to the card edge (the slide's 5px inner pad); rows
-   are separated by one --gap-lg instead of the head's 15px top pad;
-   and on TOUCH devices the slick arrows go, because the next card's
-   peek is the scroll affordance and two 32px circles over the artwork
-   were noise. Pointer devices at phone width (a narrow desktop window,
-   iPad with a trackpad) keep their arrows: the layout is width-driven,
-   the arrows are input-driven.
-   ─────────────────────────────────────────────────────────────────── */
-@media (max-width: 600px) {
-    body.stash-liquid-glass .recommendation-row-head {
-        min-height: 44px;
-        padding: 0 0 0 5px !important;
-        border-bottom: none !important;
-        margin-bottom: var(--gap-xs) !important;
-        gap: var(--gap-md);
-    }
-    body.stash-liquid-glass .recommendation-row-head h2 {
-        font-size: var(--fs-lg) !important;
-        font-weight: 600 !important;
-        letter-spacing: -0.005em !important;
-        text-transform: none !important;
-        color: var(--text) !important;
-        min-width: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    /* The view-all chevron: a 44px hit area, no plate; the glyph alone
-       (18px, muted) is the affordance, like the More sheet's rows. */
-    body.stash-liquid-glass .recommendation-row-head a.st-view-all.st-view-all,
-    body.stash-liquid-glass .recommendation-row-head a[href*="?sortby="][href*="perPage=25"]:not([href*="page="]) {
-        width: 44px !important;
-        height: 44px !important;
-        flex: 0 0 44px;
-        background: transparent !important;
-        border-color: transparent !important;
-    }
-    body.stash-liquid-glass .recommendation-row-head a.st-view-all.st-view-all::after,
-    body.stash-liquid-glass .recommendation-row-head a[href*="?sortby="][href*="perPage=25"]:not([href*="page="])::after {
-        width: 18px;
-        height: 18px;
-    }
-    body.stash-liquid-glass .recommendation-row-head a.st-view-all.st-view-all:active,
-    body.stash-liquid-glass .recommendation-row-head a[href*="?sortby="][href*="perPage=25"]:not([href*="page="]):active {
-        background: var(--accent-tint) !important;
-    }
-    body.stash-liquid-glass .recommendations-container .recommendation-row + .recommendation-row {
-        margin-top: var(--gap-lg);
-    }
-    @media (hover: none) and (pointer: coarse) {
-        body.stash-liquid-glass .recommendation-row .slick-arrow,
-        body.stash-liquid-glass .recommendation-row .slick-prev,
-        body.stash-liquid-glass .recommendation-row .slick-next {
-            display: none !important;
-        }
-    }
-}
-
-
-/* ───────────────────────────────────────────────────────────────────
-   Detail-page tab strips on phones (slices 4 and 5 of the mobile
-   overhaul; boards "Performer page, scrolled" and "Scene page"): ONE
-   scrolling row, never two.
-
-   The 2026-07 forum fix above lets every .nav-tabs wrap, which on the
-   performer page at 390 measured six tabs on two rows (y 1302.8 and
-   1342.7) with no visible current-tab logic across the break. 6.23 rules
-   a tab strip is a row of rounded-rect doors; a row scrolls. This rule
-   is scoped to the entity and scene strips (08 and 07 own their tabs'
-   type, height and radius; this is placement only). Settings' sidebar
-   tabs keep the generic wrap. Left-aligned so the first tab is always
-   reachable when the row overflows; the peek of a clipped tab is the
-   scroll affordance, as on the home carousels.
-   ─────────────────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-    body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs, .scene-tabs, .gallery-tabs, .image-tabs) .nav-tabs {
-        flex-wrap: nowrap !important;
-        justify-content: flex-start !important;
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
-        scrollbar-width: none !important;
-        -ms-overflow-style: none !important;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x proximity;
-        scroll-padding-inline: 12px;
-    }
-    body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs, .scene-tabs, .gallery-tabs, .image-tabs) .nav-tabs::-webkit-scrollbar {
-        display: none !important;
-    }
-    body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs, .scene-tabs, .gallery-tabs, .image-tabs) .nav-tabs > .nav-item,
-    body.stash-liquid-glass :is(.performer-tabs, .studio-tabs, .tag-tabs, .group-tabs, .movie-tabs, .scene-tabs, .gallery-tabs, .image-tabs) .nav-tabs .nav-link {
-        flex: 0 0 auto !important;
-        white-space: nowrap !important;
-        scroll-snap-align: start;
-    }
-}
-
-/* ───────────────────────────────────────────────────────────────────
-   Scene page on phones (slice 5): the player goes edge to edge and the
-   details run in the page, not in a glass box.
-
-   Measured at 390 before this block: the stacked row padded 52px at the
-   top for a navbar that has been display:none on phones since
-   2026-07-28, so the player started at y80; the player sat inside the
-   12px gutter with 16px corners (24px of picture lost for nothing on a
-   366px-wide frame); and the details panel kept its desktop glass
-   (border, blur, 16px radius, 12.6px padding) as a box inside a box,
-   costing another 25px of measure on every line of the description.
-
-   What the panel's CONTENT does (title type, meta row, rating row) is
-   07_scene_details.css's and is proposed there, not overridden here.
-   ─────────────────────────────────────────────────────────────────── */
-@media (max-width: 768px) {
-    body.stash-liquid-glass .main.container-fluid > .row:has(> :is(.scene-tabs, .image-tabs)) {
-        padding: 0 0 12px !important;
-        gap: 0 !important;
-    }
-    /* Same :has() shape as 01_tokens' scene-page rule (> .row > ...), so
-       this ties its (0,5,1) and wins on order; the shorter :has() lost
-       and the page kept 21px of navbar clearance for a navbar that is
-       not there. */
-    body.stash-liquid-glass .main.container-fluid:has(> .row > :is(.scene-tabs, .image-tabs)) {
-        padding: 0 !important;
-    }
-    body.stash-liquid-glass .scene-player-container,
-    body.stash-liquid-glass .scene-player-container .VideoPlayer,
-    body.stash-liquid-glass .scene-player-container .video-wrapper,
-    body.stash-liquid-glass .scene-player-container .video-js {
-        border-radius: 0 !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
-    body.stash-liquid-glass .scene-player-container .video-js {
-        width: 100% !important;
-    }
-    body.stash-liquid-glass :is(.scene-tabs, .image-tabs) {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-        border-radius: 0 !important;
-        padding: var(--gap-xl) 12px 0 !important;
-        margin: 0 !important;
-    }
-}
-
-
-/* ───────────────────────────────────────────────────────────────────
-   List pages on phones (the 2026-09-03 list-page ruling: canvas option
-   B for the pager, IN FLOW, and H1 for the toolbar; board I is the
-   whole-page reference). Replaces the two-tier toolbar, the floating
-   pager tier and the welded capsule of the earlier passes, all of which
-   the user rejected.
-
-   The page reads as one system: CHROME (the stuck tier, the capsule) is
-   the dock's material; IN-PAGE CONTROLS (the search field, the filter
-   and sort group, the pager's buttons, the sheet's rows) are fill-2
-   pills with a glass-border rim, no blur, no shadow; content runs under
-   the chrome at both ends.
-
-   Toolbar (H1): ONE 44px tier, the search field (flex 1) and one grouped
-   pill holding filter and sort split by a hairline. Under it, one
-   caption line at --fs-sm muted: the range on the left, "N per page" on
-   the right (written by refract.js as data-per-page). Saved filters, per
-   page, cards per row and list operations are demoted into the sort
-   sheet, which the sort half opens; the filter half opens Stash's own
-   filter editor. Rhythm: 44 tier, --gap-md, 20 caption, --gap-lg to the
-   first row. Scrolling past 80px the caption goes with the page and the
-   tier (sticky) takes the chrome material as a 56px pill with 6px of
-   padding around the controls (.refract-stuck, set by the dock's scroll
-   controller on the toolbar element, never on body); under 80 it drops
-   back into the page.
-
-   Pager (option B): the live pagination row stays where Stash renders
-   it, after the last cards, as a 44px row in the control material:
-   prev and next as 44px fill-2 circles with 20px chevrons, the page-jump
-   label content-sized (min 112 for "999 of 9,999") at --fs-md 600, first
-   and last hidden (nodes kept). It is content, so it sits above the
-   footprint like any last row and never meets the capsule in either
-   dock state. The caption is a link that scrolls to it.
-   ─────────────────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
-    /* ── The tier ─────────────────────────────────────────────────── */
-    body.stash-liquid-glass .filtered-list-toolbar {
-        height: auto !important;
-        min-height: 44px !important;
-        max-height: none !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        padding: 0 !important;
-        gap: 0 !important;
-        margin: 4px auto 0 !important;
-        overflow: visible !important;
-        /* Stuck, the controls sit 12px below the viewport top (plus the
-           safe area on notched phones); the plate's 6px padding is inside
-           that. The user's phone showed the pills hard against the edge. */
-        top: calc(12px + env(safe-area-inset-top, 0px)) !important;
-        transition: none !important;
-    }
-    /* The plate: the chrome material, painted only while stuck, 6px
-       around the 44px controls (56 tall), pill. */
-    body.stash-liquid-glass .filtered-list-toolbar::before {
-        top: -6px !important;
-        bottom: -6px !important;
-        left: -6px !important;
-        right: -6px !important;
-        height: auto !important;
-        border-radius: var(--radius-pill) !important;
-        background: rgba(var(--surface-rgb), 0.72) !important;
-        border: 1px solid var(--glass-border) !important;
-        box-shadow: var(--shadow-lg) !important;
-        -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
-        backdrop-filter: var(--glass-blur-xl-sat) !important;
-        opacity: 0;
-        transition: opacity var(--dur-fast) ease !important;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar.refract-stuck::before {
-        opacity: 1;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar::after {
-        content: none !important;
-    }
-    /* Search: the field. */
-    body.stash-liquid-glass .filtered-list-toolbar .search-term-input,
-    body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group {
-        order: 1;
-        flex: 1 1 120px !important;
-        width: auto !important;
-        min-width: 120px !important;
-        height: 44px !important;
-        max-height: 44px !important;
-        margin: 0 8px 0 0 !important;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar .search-term-input input.form-control.clearable-text-field,
-    body.stash-liquid-glass .filtered-list-toolbar .search-term-input input,
-    body.stash-liquid-glass .filtered-list-toolbar .clearable-input-group input {
-        height: 44px !important;
-        padding: 0 14px 0 40px !important;
-        color: var(--text) !important;
-        -webkit-text-fill-color: var(--text) !important;
-        caret-color: var(--text) !important;
-        cursor: text !important;
-        font-size: var(--fs-body) !important;
-        background: var(--fill-2) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: var(--radius-pill) !important;
-        box-shadow: none !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar .search-term-input::after {
-        left: 14px !important;
-        transform: translateY(-50%) !important;
-        width: 18px !important;
-        height: 18px !important;
-        opacity: 1 !important;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:focus-within::after {
-        opacity: 1 !important;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar input[placeholder*="Search"]:not(:focus)::placeholder {
-        color: var(--text-muted) !important;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar .search-term-input:not(:focus-within) .clearable-text-field-clear {
-        display: flex !important;
-    }
-    /* The group: filter is the left half, sort the right half, one
-       hairline between. Two Stash elements, one silhouette. */
-    body.stash-liquid-glass .filtered-list-toolbar > .btn-group:has(> .saved-filter-dropdown) {
-        display: flex !important;
-        order: 2;
-        flex: 0 0 auto !important;
-        max-width: none !important;
-        max-height: 44px !important;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar .filter-button,
-    body.stash-liquid-glass .filtered-list-toolbar > .btn-group .filter-button.btn.btn-secondary {
-        order: 2;
-        flex: 0 0 44px !important;
-        width: 44px !important;
-        min-width: 44px !important;
-        height: 44px !important;
-        padding: 0 !important;
-        background: var(--fill-2) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-right: none !important;
-        border-radius: 22px 0 0 22px !important;
-        box-shadow: none !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-        color: var(--text) !important;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar > .sort-by-select {
-        order: 3;
-        display: flex !important;
-        flex: 0 0 auto !important;
-        max-width: none !important;
-        max-height: 44px !important;
-        margin: 0 !important;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .input-group-prepend {
-        display: flex !important;
-        margin: 0 !important;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .dropdown-toggle,
-    body.stash-liquid-glass .filtered-list-toolbar > .sort-by-select .input-group-prepend .dropdown-toggle.btn.btn-secondary {
-        position: relative !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 6px !important;
-        height: 44px !important;
-        min-width: 0 !important;
-        max-width: 132px !important;
-        padding: 0 32px 0 12px !important;
-        font-size: var(--fs-base) !important;
-        font-weight: 600 !important;
-        color: var(--text) !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        background: var(--fill-2) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-left: 1px solid var(--glass-border) !important;
-        border-radius: 0 22px 22px 0 !important;
-        box-shadow: none !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-    }
-    body.stash-liquid-glass .filtered-list-toolbar .sort-by-select .dropdown-toggle::after {
-        content: "" !important;
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        width: 14px;
-        height: 14px;
-        margin: -7px 0 0 !important;
-        border: none !important;
-        background: var(--text-muted);
-        -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>") center / contain no-repeat;
-        mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>") center / contain no-repeat;
-        vertical-align: 0 !important;
-    }
-    /* Demoted into the sheet: the direction toggle, saved filters, per
-       page, list operations, the view group, multiview's toggle. */
-    body.stash-liquid-glass .filtered-list-toolbar .sort-by-select > button,
-    body.stash-liquid-glass .filtered-list-toolbar .saved-filter-dropdown,
-    body.stash-liquid-glass .filtered-list-toolbar > .page-size-selector,
-    body.stash-liquid-glass .filtered-list-toolbar > select.form-control,
-    body.stash-liquid-glass .filtered-list-toolbar > .list-operations,
-    body.stash-liquid-glass .filtered-list-toolbar > .btn-group:not(:has(> .saved-filter-dropdown)):not(.sort-by-select),
-    body.stash-liquid-glass .filtered-list-toolbar .mv-picking-toggle-btn,
-    body.stash-liquid-glass.mv-picking-mode .filtered-list-toolbar #mv-filter-add-btn,
-    body.stash-liquid-glass.mv-picking-mode .filtered-list-toolbar .mv-filter-add-btn,
-    body.stash-liquid-glass .filtered-list-toolbar .mv-filter-add-btn,
-    body.stash-liquid-glass .filtered-list-toolbar .refract-cols-toggle {
-        display: none !important;
-    }
-    /* Typing still collapses the group (the existing focus-within rule
-       zeroes the other items); nothing else remains to collapse. */
-
-    /* ── The caption ──────────────────────────────────────────────── */
-    /* One caption rule for every list: the range left, "N per page" right,
-       on ONE line; a list that carries a stats string (/images: megapixels
-       and size; /scenes: 04's overlay) gets it as a second quiet line under
-       the range, left-anchored to the search field. Measured before this
-       rule on /images at 390: two centred lines, "1-40 of 393,981" over
-       "(3,500,322 Megapixels - 614.7 GiB)", no per-page. */
-    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] {
-        display: flex !important;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: var(--gap-md);
-        min-height: 20px;
-        margin: var(--gap-md) 0 0 !important;
-        padding: 0 14px !important;
-        cursor: pointer;
-    }
-    body.stash-liquid-glass:not(.stash-route-scenes) .pagination-index-container[data-pager-row="hide"] .paginationIndex,
-    body.stash-liquid-glass:not(.stash-route-scenes) .pagination-index-container[data-pager-row="hide"] .filter-container.text-muted.paginationIndex.center-text {
-        display: inline-block !important;
-        font-size: var(--fs-sm) !important;
-        color: var(--text-muted) !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        font-variant-numeric: tabular-nums;
-        text-align: left !important;
-        line-height: 14px !important;
-    }
-    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"][data-per-page]::after {
-        content: attr(data-per-page);
-        font-size: var(--fs-sm);
-        line-height: 14px;
-        color: var(--text-muted);
-        font-variant-numeric: tabular-nums;
-        white-space: nowrap;
-        flex: 0 0 auto;
-    }
-    /* /images: Stash's "(N Megapixels - S GiB)" becomes a second line
-       without its parentheses and dash: the wrapper's own text nodes
-       collapse to size 0 (the trick 04 uses for /scenes), the two values
-       keep the caption size and a middle dot joins them. */
-    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] .paginationIndex .images-stats {
-        display: block;
-        font-size: 0 !important;
-        line-height: 14px;
-        margin-top: 2px;
-    }
-    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] .paginationIndex .images-stats .images-megapixels,
-    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] .paginationIndex .images-stats .images-size {
-        font-size: var(--fs-sm) !important;
-        color: var(--text-muted);
-        font-variant-numeric: tabular-nums;
-    }
-    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] .paginationIndex .images-stats .images-size::before {
-        content: "\00a0\00b7\00a0";
-        white-space: pre;
-    }
-    /* The grid follows the caption by one --gap-lg. */
-    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] + .row.justify-content-center,
-    body.stash-liquid-glass .pagination-index-container[data-pager-row="hide"] ~ .row.justify-content-center {
-        margin-top: var(--gap-lg) !important;
-    }
-
-    /* ── The pager, in flow ───────────────────────────────────────── */
-    /* Stash gives .pagination-footer-container position:relative and a
-       48.75px bottom offset, which lifted the row 39px into the last
-       cards once it was in flow. Static: it follows the grid. */
-    body.stash-liquid-glass .pagination-footer-container {
-        position: static !important;
-        bottom: auto !important;
-        top: auto !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    body.stash-liquid-glass [data-pager-row="float"] {
-        position: static !important;
-        left: auto !important;
-        right: auto !important;
-        bottom: auto !important;
-        width: 100% !important;
-        max-width: none !important;
-        height: auto !important;
-        margin: var(--gap-lg) 0 0 !important;
-        padding: 0 !important;
-        transform: none !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
-        z-index: auto !important;
-        display: flex !important;
-        flex-direction: row !important;
-        justify-content: center !important;
-        align-items: center !important;
-        transition: none !important;
-    }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination,
-    body.stash-liquid-glass [data-pager-row="float"] .pagination.btn-group,
-    body.stash-liquid-glass [data-pager-row="float"].pagination {
-        display: inline-flex !important;
-        flex: 0 0 auto !important;
-        width: auto !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 8px !important;
-        height: 44px !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: transparent !important;
-        border: none !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        -webkit-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-    }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="First"],
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Last"] {
-        display: none !important;
-    }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Previous"],
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"],
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Previous"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle),
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Next"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle) {
-        position: relative !important;
-        flex: 0 0 44px !important;
-        width: 44px !important;
-        height: 44px !important;
-        min-width: 44px !important;
-        min-height: 44px !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        font-size: 0 !important;
-        color: transparent !important;
-        background: var(--fill-2) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: 50% !important;
-        box-shadow: none !important;
-        -webkit-tap-highlight-color: transparent;
-    }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Previous"]::before,
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"]::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        margin: auto;
-        width: 20px;
-        height: 20px;
-        background: var(--text);
-        -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M15 6l-6 6 6 6'/></svg>") center / contain no-repeat;
-        mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M15 6l-6 6 6 6'/></svg>") center / contain no-repeat;
-    }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn[title="Next"]::before {
-        -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
-        mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
-    }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn:disabled {
-        opacity: 0.35 !important;
-    }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Previous"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle):active,
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .btn.btn-secondary[title="Next"]:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle):active {
-        background: var(--fill-4) !important;
-    }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .page-count-container,
-    body.stash-liquid-glass [data-pager-row="float"] .pagination > .page-count-container > .btn-group {
-        flex: 0 1 auto !important;
-        display: flex !important;
-        align-items: center !important;
-        height: 44px !important;
-        min-height: 44px !important;
-        min-width: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: auto !important;
-    }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count,
-    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count.btn.btn-secondary:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle) {
-        height: 44px !important;
-        min-height: 44px !important;
-        width: auto !important;
-        min-width: 112px !important;
-        max-width: none !important;
-        flex: 0 1 auto !important;
-        margin: 0 !important;
-        padding: 0 18px !important;
-        white-space: nowrap !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        font-size: var(--fs-md) !important;
-        font-weight: 600 !important;
-        font-variant-numeric: tabular-nums;
-        line-height: 1 !important;
-        color: var(--text) !important;
-        background: var(--fill-2) !important;
-        border: 1px solid var(--glass-border) !important;
-        border-radius: var(--radius-pill) !important;
-        box-shadow: none !important;
-    }
-    body.stash-liquid-glass [data-pager-row="float"] .pagination button.page-count.btn.btn-secondary:not(.minimal):not(.page-link):not(.page-count-dropdown):not(.dropdown-toggle):active {
-        background: var(--fill-4) !important;
-    }
-    /* Stash's page-jump popover: a tappable field on phones. */
-    body.stash-liquid-glass #select_page_popover input,
-    body.stash-liquid-glass #select_page_popover .btn {
-        min-height: 44px !important;
-        font-size: var(--fs-body) !important;
-    }
-
-    /* ── The sort sheet ───────────────────────────────────────────── */
-    body.stash-liquid-glass .refract-list-sheet {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        padding: 6px 6px 8px;
-        position: fixed;
-        top: auto;
-        bottom: calc(var(--refract-dock-footprint) + 10px);
-        left: 12px;
-        right: 12px;
-        background: rgba(var(--surface-rgb), 0.92);
-        -webkit-backdrop-filter: var(--glass-blur-md-sat);
-        backdrop-filter: var(--glass-blur-md-sat);
-        border: 1px solid var(--glass-border);
-        border-radius: var(--radius);
-        box-shadow:
-            var(--shadow-xl),
-            inset 0 0 0 1px rgba(var(--accent-rgb), 0.08);
-        z-index: 100;
-        box-sizing: border-box;
-        max-height: calc(100vh - var(--refract-dock-footprint) - 22px - env(safe-area-inset-top, 0px));
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        opacity: 0;
-        transform: translateY(12px) scale(0.96);
-        transform-origin: bottom center;
-        pointer-events: none;
-        transition:
-            opacity var(--dur-enter) ease,
-            transform var(--dur-enter) var(--ease-spring);
-    }
-    body.stash-liquid-glass.refract-list-sheet-open .refract-list-sheet {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        pointer-events: auto;
-    }
-    body.stash-liquid-glass.refract-list-sheet-open .refract-burger-scrim {
-        opacity: 1;
-        pointer-events: auto;
-        -webkit-backdrop-filter: var(--glass-blur-xs);
-        backdrop-filter: var(--glass-blur-xs);
-    }
-    body.stash-liquid-glass .refract-list-sheet .refract-sheet-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: 44px;
-        flex: 0 0 44px;
-        padding: 0 0 0 12px;
-    }
-    body.stash-liquid-glass .refract-list-sheet .refract-sheet-title {
-        font-size: var(--fs-lg);
-        font-weight: 600;
-        letter-spacing: -0.005em;
-        color: var(--text);
-    }
-    body.stash-liquid-glass .refract-list-sheet .refract-sheet-close {
-        width: 44px;
-        height: 44px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: transparent;
-        border: none;
-        color: var(--text-muted);
-        padding: 0;
-    }
-    body.stash-liquid-glass .refract-list-sheet .refract-sheet-close svg {
-        width: 20px;
-        height: 20px;
-    }
-    body.stash-liquid-glass .refract-list-sheet .refract-sheet-group {
-        font-size: var(--fs-xs);
-        font-weight: 600;
-        letter-spacing: var(--track-eyebrow);
-        text-transform: uppercase;
-        color: var(--text-muted);
-        padding: 10px 12px 4px;
-    }
-    body.stash-liquid-glass .refract-list-sheet .refract-sheet-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        min-height: 48px;
-        padding: 0 8px 0 12px;
-        border-radius: var(--radius-sm);
-        background: transparent;
-        border: none;
-        color: var(--text);
-        text-align: left;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    body.stash-liquid-glass .refract-list-sheet button.refract-sheet-row:active {
-        background: var(--fill-4);
-    }
-    /* The one row that creates rather than sorts wears the control
-       language (accent tint, --accent-glow rim), so it reads as
-       pressable beside the read-out rows. */
-    body.stash-liquid-glass .refract-list-sheet button.refract-sheet-row.refract-sheet-primary {
-        background: var(--accent-tint);
-        box-shadow: inset 0 0 0 1px var(--accent-glow);
-        color: var(--accent-ink);
-    }
-    body.stash-liquid-glass .refract-list-sheet button.refract-sheet-row.refract-sheet-primary .refract-sheet-chev {
-        background: var(--accent-ink);
-    }
-    body.stash-liquid-glass .refract-list-sheet button.refract-sheet-row.refract-sheet-primary:active {
-        background: rgba(var(--accent-rgb), 0.2);
-    }
-    body.stash-liquid-glass .refract-list-sheet .refract-sheet-label {
-        flex: 1 1 auto;
-        min-width: 0;
-        font-size: var(--fs-body);
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    body.stash-liquid-glass .refract-list-sheet .refract-sheet-value {
-        font-size: var(--fs-body);
-        font-weight: 500;
-        color: var(--text-muted);
-        white-space: nowrap;
-    }
-    body.stash-liquid-glass .refract-list-sheet .refract-sheet-chev {
-        flex: 0 0 18px;
-        width: 18px;
-        height: 18px;
-        background: var(--text-muted);
-        -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
-        mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center / contain no-repeat;
-    }
-    /* Segmented control: the anatomy (well fill and rim, item radius and
-       type, the active state, the 3px vertical padding and 3px gap) is
-       09_buttons' canonical tab rule, which lists these selectors.
-       Only GEOMETRY lives here: 36 tall in the 48 row, 3px side padding,
-       items 40 min x 28 with 0 10 padding. The transparent base on the
-       item is a button reset, not material. */
-    body.stash-liquid-glass .refract-list-sheet .refract-seg {
-        display: inline-flex;
-        height: 36px;
-        padding: 0 3px;
-        box-sizing: border-box;
-        flex: 0 0 auto;
-    }
-    body.stash-liquid-glass .refract-list-sheet .refract-seg button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 40px;
-        height: 28px;
-        padding: 0 10px;
-        box-sizing: border-box;
-        font-variant-numeric: tabular-nums;
-        border: 1px solid transparent;
-        background: transparent;
-    }
-    body.stash-liquid-glass .refract-list-sheet .refract-seg button svg {
-        width: 16px;
-        height: 16px;
-    }
-    /* Focus: 09's ring; inset because the sheet scrolls. */
-    body.stash-liquid-glass.stash-liquid-glass.stash-liquid-glass .refract-list-sheet button:focus-visible {
-        outline-offset: -2px !important;
-    }
-}
-/* The sheet does not exist above phone width; the 900 rule above is the
-   only one that ever shows it. */
-body.stash-liquid-glass .refract-list-sheet {
-    display: none;
-}
-@media (max-width: 900px) {
-    body.stash-liquid-glass .refract-list-sheet { display: flex; }
-}
-
-/* ───────────────────────────────────────────────────────────────────
-   One card per row (forum request #203). Set from the sort sheet's
-   View group ("Cards per row"), persisted as refract.mobileCols through
-   the settings mirror, applied as body.refract-mobile-onecol; the only
-   thing that changes is the grid's track count. Cards untouched.
-   ─────────────────────────────────────────────────────────────────── */
-body.stash-liquid-glass .refract-cols-toggle {
-    display: none !important;
-}
-@media (max-width: 768px) {
-    body.stash-liquid-glass.refract-mobile-onecol .row.justify-content-center {
-        grid-template-columns: minmax(0, 1fr) !important;
     }
 }

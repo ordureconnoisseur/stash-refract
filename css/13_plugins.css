@@ -4,7 +4,7 @@
    These rules style DOM created by other Stash plugins (stash-multiview,
    url-switcher, Ascension/Desire, etc.). On a vanilla Stash install with
    none of these plugins active, every selector below matches no DOM and
-   the file is inert - Refract works without them.
+   the file is inert — Refract works without them.
 
    Loaded last in the cascade (after 12_mobile.css) so plugin-specific
    overrides win over generic theme rules.
@@ -15,23 +15,6 @@
    extracting them would require triplicating the rule bodies.
    ─────────────────────────────────────────────────────────────────── */
 
-
-/* Eyebrows in this file answer to ONE spec: --fs-xs, weight 600,
-   --track-eyebrow. The cohesion audit of 2026-09-04 measured eight
-   specs across the theme and eleven uppercase labels in this file
-   alone, at four tracking steps, three weights and one size
-   (0.66rem) that is on no ladder at all. 6.13 gives a RANGE, which is
-   how eight of them happened: every lane picked a different point in
-   it and each was locally defensible.
-
-   Folded here rather than argued per label. Two of these are
-   arguably control labels rather than section eyebrows - the tag
-   sidebar's segmented label and the tags-overhaul panel button - and
-   a case could be made for keeping their weight. The case is not
-   worth a second spec: a reader moving between a datepicker, a tag
-   sidebar and a performer band should meet one label voice, and an
-   exception that is genuinely wanted belongs in the ledger with a
-   date rather than in eight files as a difference nobody chose. */
 
 /* ═══════════════════════════════════════════════════════════════════
    stash-multiview
@@ -49,7 +32,7 @@ body.stash-liquid-glass #mv-filter-add-btn.mv-filter-has-slots {
         0 0 0 1px rgba(var(--accent-rgb), 0.22) inset !important;
 }
 /* Position the badge so the slot count sits as an orange pill on the
-   button corner - match `.filter-button .badge` exactly. */
+   button corner — match `.filter-button .badge` exactly. */
 body.stash-liquid-glass .mv-filter-add-btn {
     position: relative !important;
 }
@@ -80,7 +63,7 @@ body.stash-liquid-glass .mv-filter-badge {
     box-shadow: none !important;
 }
 
-/* Picking toggle button - active glow matched to .stash-view-active-ind.
+/* Picking toggle button — active glow matched to .stash-view-active-ind.
    Class doubled (`.mv-picking-toggle-btn.mv-picking-toggle-btn`) to bump
    specificity above my new toolbar `:has(> svg:only-child)` rule at
    (0,5,2), which would otherwise strip the active state. */
@@ -99,7 +82,7 @@ body.stash-liquid-glass .btn.btn-secondary.mv-picking-toggle-btn.mv-picking-togg
         drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.45)) !important;
 }
 
-/* Scene card add buttons - only shown when multiview picking mode is active */
+/* Scene card add buttons — only shown when multiview picking mode is active */
 body.stash-liquid-glass:not(.mv-picking-mode) .mv-add-btn {
     display: none !important;
 }
@@ -131,7 +114,7 @@ body.stash-liquid-glass .mv-add-btn.mv-queued {
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.38) !important;
 }
 
-/* Scene-page queue toggle button - when the current scene is in the
+/* Scene-page queue toggle button — when the current scene is in the
    multiview queue. The scene-toolbar has `overflow-x: auto` so any
    outer box-shadow extending past the button gets clipped at the
    toolbar bounds. We rely on a strong inset glow + bright accent
@@ -154,14 +137,14 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(.scene-toolbar, .image
         drop-shadow(0 0 3px rgba(var(--accent-rgb), 0.5)) !important;
 }
 
-/* Floating launcher widget - themed pill shell */
+/* Floating launcher widget — themed pill shell */
 body.stash-liquid-glass #mv-launcher {
     background: var(--glass-bg-strong) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     box-shadow: var(--shadow-lg) !important;
-    -webkit-backdrop-filter: var(--glass-blur-xl) !important;
-    backdrop-filter: var(--glass-blur-xl) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    backdrop-filter: var(--glass-blur) !important;
     padding: 5px 6px !important;
     gap: 5px !important;
 }
@@ -173,7 +156,7 @@ body.stash-liquid-glass #mv-open-btn {
     color: var(--accent-bright) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.28) !important;
-    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 body.stash-liquid-glass #mv-open-btn:hover {
     background: rgba(var(--accent-rgb), 0.22) !important;
@@ -182,7 +165,7 @@ body.stash-liquid-glass #mv-open-btn:hover {
     box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.46) !important;
 }
 
-/* Count badges - neutral glass with optional accent text for filter count.
+/* Count badges — neutral glass with optional accent text for filter count.
    Reserves the orange visual weight for the primary action (open button). */
 body.stash-liquid-glass .mv-launcher-count {
     background: rgba(255, 255, 255, 0.06) !important;
@@ -199,7 +182,7 @@ body.stash-liquid-glass .mv-launcher-filter-count {
     color: var(--accent-bright) !important;
 }
 
-/* Clear queue × button - replace the × text with a pseudo so we can
+/* Clear queue × button — replace the × text with a pseudo so we can
    position the glyph optically (the U+00D7 character sits below the line-box
    midline in most fonts, which is why the original looked bottom-aligned). */
 body.stash-liquid-glass #mv-clear-queue {
@@ -213,7 +196,7 @@ body.stash-liquid-glass #mv-clear-queue {
     font-size: 0 !important;
     line-height: 1 !important;
     padding: 0 !important;
-    transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+    transition: background 0.15s ease, color 0.15s ease;
 }
 body.stash-liquid-glass #mv-clear-queue::before {
     content: "×";
@@ -223,7 +206,7 @@ body.stash-liquid-glass #mv-clear-queue::before {
     margin-top: -1px;
 }
 body.stash-liquid-glass #mv-clear-queue:hover {
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: #fff !important;
 }
 
@@ -232,11 +215,11 @@ body.stash-liquid-glass #mv-clear-queue:hover {
    url-switcher
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Navbar order - slot the URL switcher into the right-side cluster. */
+/* Navbar order — slot the URL switcher into the right-side cluster. */
 body.stash-liquid-glass nav.top-nav .navbar-buttons > #url-switcher-btn,
 body.stash-liquid-glass nav.top-nav .navbar-buttons > .url-switcher-link      { order: 80; }
 
-/* URL switcher: always a full nav icon square (don’t rely on h-100 / % sizing - breaks when “off”). */
+/* URL switcher: always a full nav icon square (don’t rely on h-100 / % sizing — breaks when “off”). */
 body.stash-liquid-glass nav.top-nav a#url-switcher-btn,
 body.stash-liquid-glass nav.top-nav #url-switcher-btn.url-switcher-link {
     display: inline-flex !important;
@@ -295,19 +278,15 @@ body.stash-liquid-glass nav.top-nav button#url-switcher-btn.mode-tunnel svg {
    Other plugin navbar slot ordering
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Ascension/Desire plugin nav item - sits at the end of the library row. */
+/* Ascension/Desire plugin nav item — sits at the end of the library row. */
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #desire-nav-container                 { order: 90; }
-/* Generic plugin nav element (#plugin_hon) - slotted just after Desire. */
+/* Generic plugin nav element (#plugin_hon) — slotted just after Desire. */
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > :has(> #plugin_hon)                   { order: 91; }
-/* StashGifs launcher - same DOM shape as binge/desire/forage (an icon
+/* StashGifs launcher — same DOM shape as binge/desire/forage (an icon
    nav-link that opens its own app). Slot it into the launcher cluster at
    the end of the library row; with no explicit order it defaults to 0 and
    jumps in front of Scenes. */
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #StashGifsButton                      { order: 93; }
-/* Xenith (Elo head-to-head ranking) - modal launcher, same shape as the
-   other launcher nav-links. Slot it at the end of the launcher cluster;
-   with no explicit order it defaults to 0 and jumps in front of Scenes. */
-body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #hon-floating-btn-wrapper              { order: 94; }
 /* SFWSwitch + DiceR live in the right-hand .navbar-buttons cluster. Both
    default to order 0 (ahead of Stats); slot them just after Stats(1) and
    ahead of url-switcher(80)/Settings(90). :has() picks each out by its
@@ -316,12 +295,12 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(#plugin_sfw)         
 body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(.random-btn)                                   { order: 11 !important; }
 
 /* ═══════════════════════════════════════════════════════════════════
-   DiceR - random-entity navbar button icon
+   DiceR — random-entity navbar button icon
    The plugin injects:
      <div class="mr-2"><a href="javascript:void(0)">
        <button class="btn btn-primary random-btn">[die]Roll</button></a></div>
    The master nav rule sizes button.btn to an icon square, and the navbar's
-   font-size:0 zeroes the emoji+label - so out of the box it renders as a
+   font-size:0 zeroes the emoji+label — so out of the box it renders as a
    BLANK square. Draw a proper dice glyph via a masked SVG (so it inherits
    the nav's currentColor like every other icon) and keep the text off.
    NOTE: the master button rule (02_navbar.css) already owns this button's
@@ -348,7 +327,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons .random-btn::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   SFWSwitch - navbar toggle icon
+   SFWSwitch — navbar toggle icon
    The plugin injects <button id="plugin_sfw" class="btn btn-primary">
    holding an odd FontAwesome "screen" glyph. Hide it and draw the same
    clean eye-off used by the mobile drawer tile, via a ::after mask (the
@@ -369,7 +348,7 @@ body.stash-liquid-glass nav.top-nav #plugin_sfw::after {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   ThumbPreviews plugin (CommunityScripts) - keep the card box stable
+   ThumbPreviews plugin (CommunityScripts) — keep the card box stable
    On hover the plugin appends a scene-preview <video> into a performer
    card's image link and crossfades the still image and the video via
    inline opacity. The video is in-flow, and scene previews are landscape
@@ -410,7 +389,7 @@ body.stash-liquid-glass .performer-card .thumbnail-section > a:has(> video) > im
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Ascension (Sakoto's HotorNot fork) - performer-card battle-rank badge
+   Ascension (Sakoto's HotorNot fork) — performer-card battle-rank badge
    Ascension swaps a performer card's native .rating-banner for its
    `.hon-battle-rank-badge.hon-battle-rank-badge-compact`. Left to the
    plugin it lands wherever the banner sat and overlaps Refract's
@@ -442,7 +421,7 @@ body.stash-liquid-glass .performer-card .hon-battle-rank-badge.hon-battle-rank-b
     /* Measured 1.75px of daylight between the flame and the number -- the
        nominal gap is eaten by the glyph's own box. Widened until the two read
        as an icon and a number rather than as one smudge. */
-    gap: var(--gap-md) !important;
+    gap: 0.5rem !important;
     flex: 0 0 auto !important;
     width: auto !important;
     max-width: 100% !important;
@@ -483,7 +462,7 @@ body.stash-liquid-glass .performer-card .hon-battle-rank-badge.hon-battle-rank-b
 /* Fallback case (performer with no country caption, or a non-playing-
    card rating mode): refract.js drops the badge straight into the chin
    (a stretch flex-column). Right-align it so the rank stays pinned to the
-   card's right edge - the same side it sits on when a country caption IS
+   card's right edge — the same side it sits on when a country caption IS
    present (pushed right in a space-between row). Direct-child selector so
    it only targets the fallback, never the country-nested case.
 
@@ -516,56 +495,17 @@ body.stash-liquid-glass .performer-card .refract-ascension-icon {
         drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55)) !important;
 }
 
-/* Inside a badge Refract has CLAIMED, the read-out is the flame and the
-   rank, and nothing else. That used to be four hides written by class
-   name (`.hon-rank-emoji` from 1.2.x, `.hon-asc-score-display` and
-   `.hon-asc-separator` from 1.3.x, `.hon-rank-total`, `.hon-match-stats`)
-   which is a list somebody has to extend every time Ascension renames or
-   adds a part, and #190 is what it costs when nobody does. Stated
-   structurally, the same intent survives a rename: the badge shows the
-   rank text and the elements refract.js injects, and takes everything
-   else out of the row.
-
-   It has to be more than `display: none`. Ascension's score wrapper
-   ships `display: inline-flex !important` INLINE, and an inline
-   !important cannot be beaten from a stylesheet, so a plain hide lands
-   on the separator and slides straight off the wrapper. Out of flow
-   instead, with properties their inline style does not set: at width 0
-   alone it still sat in the flex row and earned a gap of its own, which
-   widened the read-out by 6.9px against a badge that had no score.
-   Absolute, hidden and zero-sized it costs nothing, and the same recipe
-   covers whatever the next version puts there.
-
-   This is only safe because of the classifier in refract.js
-   (`ascensionBadgeUnknownPart`). A shape this build cannot name never
-   gets the marker class, so this rule never reaches it: a future part is
-   left visible rather than swept away by a rule written before it
-   existed. Widen this selector and you are relying on that gate; do not
-   let the two drift apart. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge > *:not(.hon-rank-text):not(.refract-ascension-icon):not(.refract-ascension-score) {
-    display: none !important;
-    position: absolute !important;
-    width: 0 !important;
-    height: 0 !important;
-    gap: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    visibility: hidden !important;
-}
-/* Their children too, in case a future part plays the same inline trick
-   one level down. The wrapper above is already zero-sized and clipped,
-   so this is belt to that rule's braces - it is here because the
-   wrapper's inline style is precisely the thing that has beaten us
-   once. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge > *:not(.hon-rank-text):not(.refract-ascension-icon):not(.refract-ascension-score) * {
+/* Hide the plugin's tier emoji: the flame glyph already marks the line
+   as Ascension, and the number carries its own warm gradient. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-emoji {
     display: none !important;
 }
-/* And the promise that made #190 a bug rather than a preference: inside
-   a claimed badge, the only icon that paints is ours. Its own rule
-   rather than folded above, because it is the one guarantee that holds
-   wherever in the badge an icon turns up. */
-body.stash-liquid-glass .performer-card .refract-ascension-badge svg:not(.refract-ascension-icon) {
+
+/* Hide the "of <total>" suffix (.hon-rank-total): the read-out is a bare
+   rank number ("[flame] N"), not "N of 492". On narrow grid cards it got
+   clipped, but wider contexts (e.g. the gallery details panel) revealed
+   it trailing the badge. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-total {
     display: none !important;
 }
 
@@ -590,727 +530,19 @@ body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-rank-text 
     filter: none !important;
 }
 
-/* The Ascended Score, when the customiser turns it on. Refract's own
-   span (refract.js injects it from Ascension's number), which is the
-   whole reason it can be styled at all: their wrapper, its value and its
-   icon each carry inline `!important`, and an inline !important cannot
-   be beaten from a stylesheet.
-
-   It does NOT wear the flame gradient, and that is the second decision
-   this rule made. Painting both numbers in it left them separated by
-   weight alone, and DESIGN_SYSTEM 3.5 rule 3 is explicit that three
-   weights at one size is not a hierarchy while muted text at the same
-   size is: two identically-coloured numbers on one line read as one
-   number with a gap in it. So the rank keeps the gradient and leads,
-   and the score is quiet ink at 600 against the rank's 800 - colour and
-   weight together, which is what a level actually costs. It also leaves
-   one bold object on the line instead of three, beside a flame that is
-   already carrying an ember halo.
-
-   The ink is INHERITED from the badge rather than declared. The badge
-   sits on the card photograph in playing-card mode and on a solid chin
-   in Classic, and those are different grounds (DESIGN_SYSTEM 3.1 rule
-   4); the badge already resolves that once for its whole read-out, and
-   a hardcoded white here would be a second answer to a question already
-   settled one element up.
-
-   Nor is Ascension's tier colour used. The tier palette in
-   DESIGN_SYSTEM 4 is Refract's one sanctioned second colour system, so
-   theirs would be a third, and two numbers in two colour languages on
-   one line is half of what #190 actually looked like. The value is
-   still lifted onto the badge as `--refract-hon-tier` for custom CSS;
-   nothing shipped reads it. */
-body.stash-liquid-glass .performer-card .refract-ascension-score {
-    flex: 0 0 auto !important;
-    font-weight: 600 !important;
-    font-size: var(--fs-sm) !important;
-    line-height: 1 !important;
-    letter-spacing: 0.01em !important;
-    /* The country caption this badge is nested inside sets a text-shadow,
-       which inherits. The badge grounds its whole read-out with one
-       container drop-shadow instead, and the rank already opts out for
-       the same reason; a second shadow here would make the score the one
-       element on the line wearing two. */
-    text-shadow: none !important;
-    /* Room for the divider drawn below, and the anchor it hangs off.
-       Padding matches the flex `gap` on the badge (--gap-md) so the rule
-       has the same air on both sides. Measured across four live badges:
-       7.22 to 7.82px from the rank's ink on the left against 7.00px to
-       the score's on the right, the difference being the rank's own
-       trailing letter-spacing. */
-    position: relative !important;
-    padding-left: var(--gap-md) !important;
-}
-
-/* The divider. A hairline rather than Ascension's "|" glyph, which is a
-   character competing with two numbers for the same row, and it earns
-   its place: the two numbers answer different questions (a position in a
-   ranking, and a score) and unseparated they read as one value.
-
-   Drawn as a pseudo-element rather than a `border-left` because a border
-   is the height of the line box, and the line box is not where the ink
-   is. Measured on the live read-out: Albert Sans at 11.2px reports 8px
-   of ascent and ZERO descent for digits inside an 11.2px line box, so
-   the digits occupy 1.6px to 9.6px and a full-height border overshot
-   them at both ends. The band is exactly centred in the box (its centre
-   and the box centre are both 5.6px), which is what makes the plain
-   50%-and-translate honest here rather than a guess.
-
-   Quieter than either number it separates, at 0.5 against the read-out's
-   0.92: a divider that competes with its own content has stopped being
-   structure. Literal white rather than `rgba(var(--fg-rgb), A)` because
-   in playing-card mode this line sits on the card PHOTOGRAPH, the third
-   ground of DESIGN_SYSTEM 3.1 rule 4, which does not flip with the mode.
-
-   And it carries its own dark halo, which is the part that took a
-   measurement to find. At 0.3 with no halo the hairline measured 1.93:1
-   against a dark card image and 1.18:1 against a bright skin tone: a
-   white line over a photograph is at the mercy of the photograph, and no
-   single alpha serves both ends, because raising it enough to survive
-   the bright card makes it shout on the dark one. The halo supplies the
-   divider's own ground, which is exactly what the badge's drop-shadow
-   does for the numbers and what the country caption's text-shadow does
-   beside it, so the mark reads on artwork of any brightness instead of
-   on the average one. This is 3.9's rule doing real work: the ground is
-   the rendered pixel, not the surface the element nominally sits on.
-
-   A `box-shadow` rather than a `filter`, deliberately: the badge already
-   carries a container filter, and DESIGN_SYSTEM 3.3 forbids per-element
-   drop-shadow on anything repeated, which a divider on every card is. */
-body.stash-liquid-glass .performer-card .refract-ascension-score::before {
-    content: "" !important;
-    position: absolute !important;
-    left: 0 !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    width: 1px !important;
-    /* 8px of digit ink at 11.2px. Recompute if --fs-sm moves. */
-    height: 0.714em !important;
-    background: rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 0 1.5px rgba(0, 0, 0, 0.85) !important;
-}
-
-/* Off unless the customiser says otherwise: this is the one card element
-   that ships hidden (CARD_ELEMS `defaultHidden`). Class doubled for
-   specificity per DESIGN_SYSTEM 5 rule 4. */
-body.stash-liquid-glass.refract-pc-hide-score.refract-pc-hide-score .performer-card .refract-ascension-score {
-    display: none !important;
-}
-
-/* ── An Ascension whose badge we do not recognise ────────────────────
-   refract.js claims a badge only when it can name every part of it
-   (ascensionBadgeUnknownPart). A shape it cannot name gets NO
-   `.refract-ascension-badge` marker, so not one rule above applies: no
-   flame, no hides, no gradient, no capsule strip. It renders as its
-   author drew it, which is the only treatment that cannot repeat the
-   #190 double icon on a version nobody here has seen.
-
-   What it does still get is somewhere to sit, because the thing it
-   would otherwise sit on is OURS. Left where Ascension drops it, in
-   place of the native rating banner, it lands on the injected
-   `.stash-perf-stats` row. Declining to place it is not neutrality when
-   the collision is caused by an element Refract injected.
-
-   So these three rules are the whole treatment, and every one of them
-   is geometry. Nothing here sets a colour, a fill, a border, a shadow
-   or a font. If a future rule in this block needs to paint an
-   unrecognised badge, the classifier was the thing that should have
-   changed.
-   ─────────────────────────────────────────────────────────────────── */
-/* Nested in the country caption's space-between row: let it shrink, and
-   cap it so a capsule of unknown width cannot push the nationality out
-   of the card. `min-width: 0` because a flex item refuses to shrink
-   below its content otherwise. */
-body.stash-liquid-glass .performer-card .stash-perf-country > .refract-ascension-unknown {
-    flex: 0 1 auto !important;
-    min-width: 0 !important;
-    max-width: 60% !important;
-}
-/* Dropped into the chin instead (no country, or a non playing-card
-   rating style). In flow, not pinned: the pinned variant above works
-   because the badge's height is known, and here it is not. The chin is
-   content-sized and bottom-anchored, so it grows upward to fit rather
-   than pushing anything off the card. */
-body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank > .refract-ascension-unknown {
-    order: -1 !important;
-    align-self: flex-end !important;
-    margin: 0 0 0 auto !important;
-    max-width: 100% !important;
-}
-/* The one thing that is not negotiable whichever way it parked: it may
-   not paint outside the card. */
-body.stash-liquid-glass .performer-card .refract-ascension-unknown {
-    box-sizing: border-box !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   Ascension's rank pill in the performer page's EDIT head
-   ═══════════════════════════════════════════════════════════════════
-
-   The view band hides this pill entirely (08_misc_mid) because the
-   standing row states the rank in words. Edit mode has no standing
-   row, so the pill is the only place the rank appears and it stays -
-   which means its ink has to answer for itself.
-
-   It is a DARK ISLAND: a near-black pill that does not change with the
-   mode, so 3.1 rule 4 says its ink is re-pinned locally rather than
-   taken from the flipping token. Ascension paints it in its own tier
-   colour, which measured 1.78:1 for the rank and 1.71:1 for the score
-   on a bronze performer, identical in light because the pill stays
-   dark; untiered it is a flat grey at 4.08 and 3.83, under the 4.5 the
-   rank owes as the sole carrier of that number.
-
-   The ink is plain bright, NOT a tier colour, and that is the one real
-   decision here. Refract has a tier palette of its own and it would be
-   easy to reach for - --refract-ph-tier is published on this very
-   page. But Refract's tier comes from the RATING and Ascension's comes
-   from its BATTLES: two different facts that happen to share a word.
-   Painting their rank in our tier would assert they are the same. The
-   card's read-out makes the same choice, wearing Refract's own flame
-   rather than either palette.
-
-   AFTER, measured stamped against the pill's real ground. The fill is
-   linear-gradient(135deg, #2a2a2a, #1a1a1a) and it is byte-identical in
-   both modes, so one set of numbers covers both: the rank reads 12.37:1
-   on the light stop and 14.82:1 on the dark one, and the count that
-   follows it 5.43:1 and 6.03:1. Note the ground: a first pass walked
-   background-COLOR up the tree, found the pill transparent, landed on
-   the white page and reported 1.00:1 - a fully readable pill scored as
-   invisible ink, because the fill is a background-IMAGE. A ground walk
-   that reads only background-color will do that to any gradient, and it
-   fails toward the alarming answer rather than the reassuring one,
-   which is the only reason it was caught.
-   ═══════════════════════════════════════════════════════════════════ */
-body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-rank-text {
-    color: rgba(255, 255, 255, 0.92) !important;
-}
-/* The Ascended score cannot be recoloured here and is therefore not kept.
-   Its span ships `style="color: TIER !important"` INLINE, and an inline
-   !important beats an author one, so the 1.71:1 it measured is not a
-   number any stylesheet can move - the same wall the card read-out hit,
-   where the answer was to render our own copy of the number. Doing that
-   again for a surface someone passes through on the way to an edit form
-   would be machinery for its own sake, so here the unreadable thing goes
-   instead of being reprinted. The score is still on the badge's own
-   tooltip, and on the card as an element the customiser can switch on.
-
-   The separator goes with it: a divider with one thing left to divide is
-   just a stray glyph.
-
-   The five declarations below are NOT a belt-and-braces list, and the
-   four that look redundant are the ones doing the work. Measured, the
-   score display computes to display: flex, because Ascension ships
-   display:flex INLINE and an inline !important beats an author one -
-   the same wall as the colour. What actually hides it is visibility,
-   the zero box, the absolute position and the overflow, none of which
-   Ascension sets inline. Delete the ones that look redundant and the
-   score comes back. */
-body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-asc-score-display,
-body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-asc-separator {
-    display: none !important;
-    position: absolute !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
-    visibility: hidden !important;
-}
-/* The count that follows it is support, not the number: muted, and on
-   the ladder. It arrived at 10.41px, a size reached by multiplication
-   that belongs to no scale (3.5 rule 1). */
-body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge .hon-rank-total {
-    color: rgba(255, 255, 255, 0.55) !important;
-    font-size: var(--fs-xs) !important;
-}
-/* An unranked performer has no total to be out of, so the "of 492"
-   goes with the number refract.js just replaced. What is left reads
-   "Unranked", which is what the band says one row away. */
-body.stash-liquid-glass #performer-page .quality-group .hon-battle-rank-badge.refract-ascension-unranked .hon-rank-total {
+/* Declutter for the grid: the full W/L/D record, win-rate and streak
+   belong on the performer page, not a dense card. Hiding the entire
+   `.hon-match-stats` cluster keeps every read-out uniform ("flame #N")
+   regardless of how many stats a performer has. */
+body.stash-liquid-glass .performer-card .refract-ascension-badge .hon-match-stats {
     display: none !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Ascension in the performer page's Custom Fields panel
-   ═══════════════════════════════════════════════════════════════════
-
-   Custom Fields is for the fields the USER wrote. Today it is mostly
-   not: Ascension keeps its match record in two Stash custom fields and
-   ascen-stats.js renders them in place, so on a library where 320
-   performers carry those fields and 28 carry one of the user's own, the
-   panel reads as another plugin's storage with the user's own note
-   buried on top of it.
-
-   Nothing here moves a node. Ascension's rows stay exactly where it put
-   them and are PRESENTED in place: re-parenting them would be the
-   coupling this whole reconcile exists to remove, and it would break the
-   day Ascension renders its own section instead (which is the ask filed
-   in docs/ascension-integration.md).
-
-   Detection keys on STASH's class, not Ascension's. Stash gives every
-   custom field a `.custom-field-<key>` container named from the field
-   key, and that is what ascen-stats.js hangs its own rendering off too.
-   So the hook is the DATA KEY, which only moves if Ascension changes
-   where it stores things - a far steadier thing to depend on than the
-   markup, which has already moved once (#190). Not one selector below
-   mentions a `hon-` or `timeline-` class.
-
-   The shape, measured: .custom-fields > div > (.collapse-header with the
-   button, then .collapse holding one .detail-item per field).
+   flexibleDateInput plugin — react-datepicker theming
    ═══════════════════════════════════════════════════════════════════ */
 
-/* The section's colour is the performer's TIER, published on
-   #performer-page by refract.js (refractPhPublishTier) because
-   --tier-color is declared on the card and resolves nowhere else. An
-   untiered performer publishes nothing and the var() fallback takes the
-   accent, so the section is never uncoloured.
-
-   The ink shade is separate from the fill channel for the reason 3.1
-   rule 5 gives: a token can flip its JOB between modes. Diamond's
-   165,223,219 measures about 1.4:1 on the light panel and cannot be text
-   there. Light re-points the ink to 55% of the tier mixed toward black
-   (about 5.4:1 on that ground) exactly as --accent-ink does, and the
-   plain value is declared FIRST so an engine without color-mix keeps a
-   legible colour instead of dropping the declaration. */
-body.stash-liquid-glass #performer-page {
-    --refract-ph-tier-ink: rgb(var(--refract-ph-tier, var(--accent-rgb)));
-    /* Win and loss ink for the Ascension stats. Ascension's own #22c55e
-       measures 8.55:1 on the dark plate and passes, so dark keeps it and
-       only light is re-pointed; the same for the loss red. Measured
-       against the plate they actually sit on, not the surface behind it:
-       light values are 4.88:1 and 6.36:1, both over the 4.5 floor that
-       Ascension's originals miss at 2.23:1. */
-    --refract-asc-win: #22c55e;
-    --refract-asc-loss: #f87171;
-}
-body.stash-liquid-glass.refract-light #performer-page {
-    /* Measured against the CHIP's own fill, not the plate behind it: the
-       chip lays --fill-2 over the panel, so light's real ground is 238
-       and not 252. #15803d clears 4.5 on the plate and misses it on the
-       chip at 4.34, which is the whole reason 3.9 says to measure the
-       ground the element actually sits on. #116534 is 6.17 there; the
-       red already passed at 5.58. */
-    --refract-asc-win: #116534;
-    --refract-asc-loss: #b91c1c;
-}
-@supports (color: color-mix(in srgb, red 50%, black)) {
-    body.stash-liquid-glass.refract-light #performer-page {
-        --refract-ph-tier-ink: color-mix(in srgb, rgb(var(--refract-ph-tier, var(--accent-rgb))) 55%, #000);
-    }
-}
-
-/* Machine storage is not user content. `refract_back` is Refract's own
-   per-performer card-back override and it is a JSON blob; nobody should
-   meet it on a performer page. Listed here rather than in 08 because it
-   is the same rule as the plugin fields beside it: this panel shows what
-   a person wrote. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-refract_back {
-    display: none !important;
-}
-
-/* ---- The Ascension section --------------------------------------- */
-
-/* The section is a ROW OF THE BAND, not a widget hung off it. That is the
-   whole correction: the first build gave it a 14px sentence-case header
-   floating in a 23.8px gap at the plate's outer edge, its own pill
-   language inside, and its own spacing scheme, so it read as a stray
-   thing between two plates. Everything below puts it back on the band's
-   plate, in the band's type, on the band's track, with one accent.
-
-   Every value here is lifted off the band's own rows rather than chosen:
-   label 10.08px/500 tracked 0.6048px caps at 55%, value 12.88px/400 at
-   92%, plate padding 8.4px 11.2px, rows separated by 1px gaps that show
-   the backdrop through (the band's hairlines are the gaps, not borders -
-   sampled live at rgb(74,72,71) against a rgb(15,14,16) plate). */
-
-/* The rows stack like the band's, with the same 1px hairline between
-   them. No margins: the gap IS the separation, everywhere in this band.
-
-   Scoped to the OPEN state, and that .show is load-bearing. Without it
-   this matched a collapsed panel too and beat Bootstrap's own
-   `.collapse:not(.show) { display: none }` with !important, so Stash's
-   collapse stopped working: measured on a performer with one field, the
-   panel went 34px to 81px and could not be shut again. Making something
-   Stash could do impossible is the P6 failure, and it was mine for one
-   build. */
-body.stash-liquid-glass #performer-page .custom-fields .collapse.show {
-    display: grid !important;
-    gap: 1px !important;
-    background: transparent !important;
-}
-
-/* The header, inside the plate now and in the band's label style, so the
-   section has ONE label tier rather than three. That style is 6.13's
-   eyebrow - 600 with --track-eyebrow - since F9 fixed the band at its
-   source: the generic rule that pinned every band label to 500
-   !important is gone, so the band renders the spec it always declared.
-   This header copied the 500 deliberately while that was live, and
-   copies 600 now for the same reason: what matters is that the section
-   and the rows above it are one spec, not which spec. It is the eyebrow with a
-   hairline underline, which is the house pattern 6.13 already prescribes
-   for a column label; the rule is the tier at low alpha and it is the
-   section's single accent. Static flow, not absolute: an absolutely
-   positioned header cannot be part of a stack. */
-body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats::before,
-body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-performer_record::before {
-    content: "Ascension";
-    position: static;
-    display: block;
-    margin: 0 0 0.4rem 0;
-    padding-bottom: 0.3rem;
-    font-size: var(--fs-xs) !important;
-    font-weight: 600;
-    letter-spacing: var(--track-eyebrow);
-    line-height: 12.096px;
-    text-transform: uppercase;
-    color: var(--refract-ph-tier-ink);
-    border-bottom: 1px solid rgba(var(--refract-ph-tier, var(--accent-rgb)), 0.35);
-    pointer-events: none;
-}
-/* One header per section: the second field of the pair does not repeat
-   it. Its own override rather than a :not() so the rule above stays
-   readable; grep both before adding a third (7.20). */
-body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats ~ .detail-item.custom-field-performer_record::before {
-    content: none;
-}
-/* The 23.8px hanging gap the absolute header needed is gone with it. */
-body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats,
-body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-performer_record {
-    position: relative;
-    margin-top: 0 !important;
-}
-/* The stats row spans the plate edge to edge, because its tiles carry the
-   band's padding themselves. Left as it was, the row's 11.2px and each
-   tile's 11.2px stacked: the stat keys sat at 448.9 while every other
-   label in the stack - the tiles above, ASCENSION, PAST MATCHUPS - sat at
-   437.7, and the row had 1106.6px to divide instead of 1129, which put
-   the pitch at 184.6 against the band's 188.3. Two rows of six drifting
-   apart by 3.7px a column, so the sixth stat started 18px left of the
-   tile directly above it.
-
-   Zeroing the ROW rather than the tiles is what fixes both at once: the
-   tiles keep the padding that puts their labels on the band's line, and
-   the track gets the band's own width to divide. The header below adds
-   the inset back for itself, since it is the one thing in here that is
-   not inside a tile. */
-body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    /* The row is a column flex that inherits align-items: baseline, and in
-       a column container that aligns the children on their INLINE start
-       rather than stretching them. A margin on the header was enough to
-       carry the whole group with it: the track came out 1129 wide but
-       starting at 437.7, so it overhung the plate by 11.2px instead of
-       filling it. Stretch is what a column of blocks wants, and it is
-       declared rather than inherited so the next rule that touches this
-       item cannot move the track by accident. */
-    align-items: stretch !important;
-}
-body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats::before {
-    padding-left: 0.8rem !important;
-    padding-right: 0.8rem !important;
-}
-/* Two stacked eyebrows with nothing between them - ASCENSION in the tier
-   colour, then MATCH HISTORY muted - were one label tier too many for a
-   row that labels itself: every tile under it already says TOTAL MATCHES,
-   WINS, LOSSES. The section header names the section and the tiles name
-   their own numbers, so Stash's field title goes. PAST MATCHUPS stays,
-   because the chips below it do NOT say what they are. */
-body.stash-liquid-glass #performer-page .custom-fields .collapse > .detail-item.custom-field-hotornot_stats > .detail-item-title {
-    display: none !important;
-}
-
-/* ---- The stats, as the band's tiles ------------------------------- */
-
-/* Reached STRUCTURALLY, never by Ascension's class names: inside this
-   field, the value's only child is the row, its children are the tiles,
-   and each tile's first and last child are the label and the number.
-   That holds whatever they call them, and if the structure ever changes
-   the tiles simply fall back to Ascension's own pills - visible, and
-   safe. The fixed prefix plus !important outranks their stylesheet. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value {
-    overflow: visible !important;
-}
-/* The band's own 6-up track, so the eighth stat lands beside the seventh
-   instead of alone on a ragged second row.
-
-   The band changes that count at three widths and this row follows it at
-   the same three, because a stats row on six columns inside a band on
-   two is not the same object as the rows above it: measured at 420 the
-   tiles came out 55px wide with the streak labels cut and 28px of
-   overflow. The breakpoints are duplicated from
-   `08_misc_mid.css` (.refract-ph .detail-group, 6 / 4 at 1400 / 3 at
-   1200 / 2 at 820) and they have to move together, because the two grids
-   cannot share a track: this one is nested two levels inside a cell of
-   that one.
-
-   THESE FOUR RULES ARE MEANT TO BE DELETED. DESIGN_SYSTEM section 9,
-   "Nested tracks", prescribes the remedy: the band publishes
-   `--refract-band-cols` at its own breakpoints and every nested grid
-   reads it, since custom properties inherit where tracks do not. When
-   that lands in the band, this block becomes
-   `repeat(var(--refract-band-cols, 6), minmax(0, 1fr))` on the base rule
-   alone and the three media queries go. Left duplicated until then
-   rather than half-built, because a fallback that reads a property
-   nobody publishes yet is just this code with a longer name. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
-    display: grid !important;
-    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-    gap: 1px !important;
-    background: transparent !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-@media (max-width: 1400px) {
-    body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    }
-}
-@media (max-width: 1200px) {
-    body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    }
-}
-@media (max-width: 820px) {
-    body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-}
-/* Ascension's pill chrome off. The tiles take NO ground of their own:
-   the row they sit in is already the band's plate, so a background here
-   would be a second plate on top of it - and the first attempt proved
-   why that matters, by hardcoding rgba(14,13,16,0.74) and shipping six
-   dark slabs onto the light panel. The ground is the parent's, which
-   flips because the band's does. 3.1 rule 4, learned twice in one
-   surface. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * > * {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 2px !important;
-    min-width: 0 !important;
-    padding: 0.6rem 0.8rem !important;
-    margin: 0 !important;
-    background: transparent !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-}
-/* The label: the band's, exactly. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * > * > *:first-child {
-    /* --text-muted and --text, not a hand-rolled rgba(var(--fg-rgb), A).
-       The channel flips either way, but the ALPHA does not: light raises
-       muted from 0.55 to 0.65 and lowers primary from 0.92 to 0.88, so a
-       hand-written alpha tracked the band in dark and drifted from it in
-       light. Measured before this: these keys sat at 0.55 beside band
-       labels at 0.65 on the same row. The token is the only thing that
-       carries both halves of the flip. */
-    font-size: var(--fs-xs) !important;
-    font-weight: 600 !important;
-    letter-spacing: var(--track-eyebrow) !important;
-    line-height: 12.096px !important;
-    text-transform: uppercase !important;
-    text-align: left !important;
-    color: var(--text-muted) !important;
-}
-/* The number: the band's value. This is also what fixes the light-mode
-   legibility finding without a per-release colour list - Ascension's
-   hardcoded #e5e7eb measured 1.21:1 on the light panel, and the band's
-   ink is a token that flips. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-hotornot_stats .detail-item-value > * > * > *:last-child {
-    font-size: var(--fs-md) !important;
-    font-weight: 400 !important;
-    letter-spacing: 0.07px !important;
-    text-align: left !important;
-    color: var(--text) !important;
-}
-/* A stat NUMBER is plain ink, deliberately. Two rules painting
-   .stat-positive and .stat-negative used to sit here and never applied:
-   the structural rule above carries one more class of specificity and
-   both were !important, so every value already rendered on the band's
-   ink and Wins measured white. The outcome is the right one, so it is
-   ruled rather than repaired - the label beside the number already says
-   which stat it is, and Ascension paints EVERY positive number green,
-   which makes green mean "not zero" rather than anything about the
-   performer. Semantic colour lives in the timeline, where win or loss
-   is the datum rather than a property of the count. Deleted rather than
-   left in with the specificity nudged, because a rule that fires would
-   have changed the design, not fixed it (7.20: delete the dead rule,
-   never outvote it). */
-
-/* ---- The timeline ------------------------------------------------- */
-
-/* Ascension sets `.match-timeline { width: 650% !important }` above
-   1200px, with five equal columns. That is correct for the layout it was
-   written against, where a custom field's value is a narrow column and
-   650% of it is a sane row of five. Refract gives the value the full
-   1092px, so the same rule computes to a 7,193px grid with 1,434px
-   columns, and a single match renders as one green bar with 160px of
-   text and 1,250px of empty. Refract changed the context, so Refract
-   neutralises it here rather than asking upstream to care.
-
-   Reached structurally again: the value's child is Stash's TruncatedText
-   wrapper, and ITS child is the track. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * {
-    width: 100% !important;
-    grid-template-columns: none !important;
-    grid-auto-flow: column !important;
-    grid-auto-columns: minmax(0, max-content) !important;
-    justify-content: start !important;
-}
-/* The track's own `padding: 8px 0` goes, so the item's 2px gap carries
-   the space under PAST MATCHUPS exactly as it does under MATCH HISTORY.
-   They were 8px and 2px, which is why the two sub-rows breathed
-   differently. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * {
-    padding: 0 !important;
-}
-
-/* The match chip, on the house chip law (6.7) instead of Ascension's.
-   It arrived as a green slab: a tinted fill, a 3px left border, a 4px
-   radius, and FIVE type sizes in one object - 9.1px date, 12.88 dot,
-   11.9/700 status, 14px "vs", 13.3 name, 9.8/700 rating - so the word
-   "vs" was larger than the name it joined. Glass fill, hairline rim,
-   pill radius, and the state carried by INK rather than by a coloured
-   plate, which is also what stops a row of wins reading as a bar chart
-   of nothing.
-
-   Reached structurally, same depth discipline as the stats: the entry is
-   the track's child, and its own children are date, marker, content and
-   rating in that order. The only class read is win or loss on the entry
-   itself, which is the datum. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * {
-    --refract-asc-ink: var(--text-muted);
-    /* The silhouette is the chip recipe's (10_pills_badges), where this
-       selector is listed by name. Only what the recipe does not say is
-       stated here, and the declarations it DOES say were removed rather
-       than left agreeing with it: 10 loads after 13, but these carried
-       !important, which beats source order, so leaving them would have
-       kept 13 winning and joining the list would have changed nothing.
-       Joining means giving the properties up. */
-    align-items: baseline !important;
-    gap: var(--gap-sm) !important;
-    min-width: 0 !important;
-    /* Ascension sets min-height: 45px on the entry, which is right for
-       the tall bar it draws by default and wrong for a chip. A min-height
-       beats the recipe's height whatever the order, so it is released
-       here or the chip stays 45px inside a 24px recipe. */
-    min-height: 0 !important;
-    /* The SIZE is the recipe's, and it was not until this was measured:
-       this rule kept font-size: var(--fs-md) with !important through an
-       ID-weighted selector, so the chip rendered 12.88px beside
-       reference chips at 11.2 and the recipe's own !important lost.
-       Joining a recipe means giving up the size as well as the fill; a
-       deviation nobody declared is drift wearing the word deviation.
-       The two quiet ends keep --fs-xs below, which is a stated caption
-       step rather than a second body size. */
-    color: var(--text) !important;
-}
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * * {
-    font-size: inherit !important;
-    font-weight: inherit !important;
-}
-/* The date and the rating are the chip's captions: the second size, and
-   muted. `:first-child` and `:last-child` carry a pseudo-class each, so
-   they outrank the descendant rule above without an arms race. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:first-child,
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:first-child *,
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:last-child,
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:last-child * {
-    font-size: var(--fs-xs) !important;
-    color: var(--text-muted) !important;
-    background: none !important;
-    padding: 0 !important;
-    border: 0 !important;
-}
-/* The state, and the only place in this section where a colour means
-   something: the marker dot, plus a rim tint so the chip reads at a
-   glance without becoming a coloured plate. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.win {
-    --refract-asc-ink: var(--refract-asc-win);
-}
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > *.loss {
-    --refract-asc-ink: var(--refract-asc-loss);
-}
-/* The rim used to carry win and loss as well as the ink. It takes the
-   recipe's hairline now: a chip whose rim changes colour is a sixth rim
-   in a theme that has just agreed on one. The state is not lost, it is
-   in the marker dot and the status word, measured at 7.6:1 dark and
-   6.4:1 light against the chip's own fill. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:nth-child(2),
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value > * > * > * > *:nth-child(3) > *:first-child {
-    color: var(--refract-asc-ink) !important;
-}
-
-/* The scroll, which now only engages when there are more matches than
-   the row holds. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value {
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    /* 6.10: these two INHERIT, and Chrome discards every ::-webkit rule
-       for an element with a standard scrollbar property in effect. An
-       ancestor sets them for this column, so they are handed back
-       explicitly or the bar below is never drawn. */
-    scrollbar-width: auto !important;
-    scrollbar-color: auto !important;
-    padding-bottom: 0.25rem !important;
-}
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar {
-    height: 8px;
-}
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar-track {
-    background: transparent;
-}
-/* Thumbed in the TIER rather than the accent, because it belongs to this
-   section rather than to the theme. The fill channel, not the ink one:
-   this is a mark on a surface, not text. */
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar-thumb {
-    background: rgba(var(--refract-ph-tier, var(--accent-rgb)), 0.35);
-    border-radius: var(--radius-pill);
-}
-body.stash-liquid-glass #performer-page .custom-fields .detail-item.custom-field-performer_record .detail-item-value::-webkit-scrollbar-thumb:hover {
-    background: rgba(var(--refract-ph-tier, var(--accent-rgb)), 0.6);
-}
-/* No fade edge. The first build had one, and with the track neutralised
-   it stopped earning its place: CSS cannot ask whether a scroller
-   actually overflows, so the gradient painted over empty plate on the
-   two-match performers that are most of this library. The tier-thumbed
-   bar already says "there is more" and only appears when there is. One
-   accessory removed rather than kept for the case it was drawn for. */
-/* ---- What is left of Custom Fields -------------------------------- */
-
-/* "A field of the user's own" is any custom field that is not one of the
-   keys above. Stated as a subtraction because that is what it is: the
-   panel belongs to the user, and these three are the exceptions the
-   theme knows about. A fourth plugin storing a fourth key shows through,
-   which is the correct failure - it is visible, and someone can add it.
-
-   :has() is fine here per 7.2: one instance, three rows. It is the card
-   GRID where its budget is spent. */
-body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .detail-item:not(.custom-field-hotornot_stats):not(.custom-field-performer_record):not(.custom-field-refract_back))) .collapse-header {
-    display: none !important;
-}
-/* Hiding that header takes the only way to REOPEN the panel with it, so
-   the collapse is forced open in exactly the same condition. Ascension
-   force-expands it too when its own fields are present, which covers the
-   common case, but not the one where a performer has only refract_back:
-   without this, that panel could be shut with no handle. */
-body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .detail-item:not(.custom-field-hotornot_stats):not(.custom-field-performer_record):not(.custom-field-refract_back))) .collapse {
-    display: grid !important;
-    gap: 1px !important;
-    background: transparent !important;
-    height: auto !important;
-    visibility: visible !important;
-}
-/* Nothing of the user's AND nothing of Ascension's: the panel is a
-   heading over hidden storage, so it goes entirely. */
-body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .detail-item:not(.custom-field-refract_back))) {
-    display: none !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   flexibleDateInput plugin - react-datepicker theming
-   ═══════════════════════════════════════════════════════════════════ */
-
-/* Outer calendar pop - opaque dark glass card. Originally used
+/* Outer calendar pop — opaque dark glass card. Originally used
    var(--glass-bg-strong) (rgba 255,255,255,0.10) which was too see-
    through over content. Switched to a near-opaque dark base plus a
    heavy backdrop blur so it reads cleanly against any background.
@@ -1318,9 +550,9 @@ body.stash-liquid-glass #performer-page .custom-fields:not(:has(.collapse > .det
    that open from the header can extend below the calendar boundary
    without being clipped. */
 body.stash-liquid-glass .react-datepicker {
-    background: rgba(var(--surface-rgb), 0.88) !important;
-    -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
-    backdrop-filter: var(--glass-blur-xl-sat) !important;
+    background: rgba(18, 18, 22, 0.88) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg-sat) !important;
+    backdrop-filter: var(--glass-blur-lg-sat) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     box-shadow:
@@ -1331,7 +563,7 @@ body.stash-liquid-glass .react-datepicker {
     overflow: visible !important;
     padding: 0.25rem;
 }
-/* Pointer triangle - hide; the floating card stands on its own. */
+/* Pointer triangle — hide; the floating card stands on its own. */
 body.stash-liquid-glass .react-datepicker__triangle {
     display: none !important;
 }
@@ -1351,13 +583,13 @@ body.stash-liquid-glass .react-datepicker__current-month {
 }
 body.stash-liquid-glass .react-datepicker__header__dropdown {
     display: flex;
-    gap: var(--gap-sm);
+    gap: 0.35rem;
     justify-content: center;
     margin-bottom: 0.4rem;
 }
 body.stash-liquid-glass .react-datepicker__month-read-view,
 body.stash-liquid-glass .react-datepicker__year-read-view {
-    background: var(--fill-3) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     padding: 0.18rem 0.6rem !important;
@@ -1366,8 +598,8 @@ body.stash-liquid-glass .react-datepicker__year-read-view {
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: var(--gap-2xs);
-    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
+    gap: 0.25rem;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 body.stash-liquid-glass .react-datepicker__month-read-view:hover,
 body.stash-liquid-glass .react-datepicker__year-read-view:hover {
@@ -1400,7 +632,7 @@ body.stash-liquid-glass .react-datepicker__day-name {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase;
-    letter-spacing: var(--track-eyebrow) !important;
+    letter-spacing: 0.04em;
     width: 2rem !important;
     line-height: 2rem !important;
     text-align: center;
@@ -1428,10 +660,10 @@ body.stash-liquid-glass .react-datepicker__day {
     font-size: var(--fs-sm) !important;
     font-weight: 500 !important;
     cursor: pointer;
-    transition: background var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-instant) ease;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
 }
 body.stash-liquid-glass .react-datepicker__day:hover {
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: #fff !important;
 }
 body.stash-liquid-glass .react-datepicker__day--outside-month {
@@ -1474,7 +706,7 @@ body.stash-liquid-glass .react-datepicker__navigation {
     border-radius: 50% !important;
     background: transparent !important;
     border: 1px solid transparent !important;
-    transition: background var(--dur-fast), border-color var(--dur-fast);
+    transition: background 0.15s, border-color 0.15s;
 }
 body.stash-liquid-glass .react-datepicker__navigation:hover {
     background: var(--accent-tint) !important;
@@ -1494,23 +726,15 @@ body.stash-liquid-glass .react-datepicker__navigation:hover .react-datepicker__n
     border-color: var(--accent-bright) !important;
 }
 
-/* The plate is the surface token, not a hand-written near-black. That is
-   the cohesion fix (3.2 allows two surface colours and the source carried
-   29 families), but it also repairs something: the options inside are
-   `color: var(--text)`, which FLIPS, over a plate that did not. Computed
-   from the token values as 10.3 prescribes for light, black ink at 0.88
-   on rgb(14,14,18) is about 1.05:1 - this dropdown has been unreadable in
-   light mode, not merely off-palette. 14,14,18 to 20,20,24 is invisible
-   in dark. */
 /* Month + year dropdown panels (when user clicks the read-view pills).
    Opaque dark background so options are readable; max-height + scroll
    so a 100-year list doesn't extend off-screen; high z-index so it
    sits over the rest of the calendar. */
 body.stash-liquid-glass .react-datepicker__month-dropdown,
 body.stash-liquid-glass .react-datepicker__year-dropdown {
-    background: rgba(var(--surface-rgb), 0.98) !important;
-    -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
-    backdrop-filter: var(--glass-blur-xl-sat) !important;
+    background: rgba(14, 14, 18, 0.98) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg-sat) !important;
+    backdrop-filter: var(--glass-blur-lg-sat) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: var(--shadow-xl) !important;
@@ -1537,7 +761,7 @@ body.stash-liquid-glass .react-datepicker__year-option {
     padding: 0.3rem 0.6rem !important;
     border-radius: var(--radius-sm) !important;
     cursor: pointer;
-    transition: background var(--dur-fast), color var(--dur-fast);
+    transition: background 0.15s, color 0.15s;
 }
 body.stash-liquid-glass .react-datepicker__month-option:hover,
 body.stash-liquid-glass .react-datepicker__year-option:hover {
@@ -1555,7 +779,7 @@ body.stash-liquid-glass .react-datepicker__year-option--selected {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   stashGlobalSearch plugin - minimal compat tweak only
+   stashGlobalSearch plugin — minimal compat tweak only
    ═══════════════════════════════════════════════════════════════════ */
 
 /* The plugin's `.gs-input.form-control` is intentionally borderless so
@@ -1586,7 +810,7 @@ body.stash-liquid-glass .gs-input-row > input {
     vertical-align: middle !important;
 }
 
-/* Subtle accent glow behind the modal panel - ties the search modal
+/* Subtle accent glow behind the modal panel — ties the search modal
    into Refract's accent system without overriding the plugin's dark
    background. */
 body.stash-liquid-glass .gs-modal .modal-content {
@@ -1613,7 +837,7 @@ body.stash-liquid-glass .gs-chip.gs-focused {
 }
 body.stash-liquid-glass .gs-see-all {
     color: var(--accent-bright) !important;
-    transition: color var(--dur-fast) ease;
+    transition: color 0.15s ease;
 }
 body.stash-liquid-glass .gs-see-all:hover {
     color: var(--accent) !important;
@@ -1624,51 +848,37 @@ body.stash-liquid-glass .gs-see-all:hover {
    stash-advanced-rating
    Sister plugin that injects two buttons next to the scene toolbar
    rating control (and the analogous controls on the performer toolbar):
-     • `.adv-rating-btn` - the ★+ trigger that opens the per-criterion
+     • `.adv-rating-btn` — the ★+ trigger that opens the per-criterion
        rating modal. Ships with a yellow palette by default; we re-skin
        it in accent-glass to match Refract's toolbar language.
-     • `.adv-favourite-btn` - the heart toggle that adds/removes the
+     • `.adv-favourite-btn` — the heart toggle that adds/removes the
        "Favourite ★" tag. Keeps the red identity (favourites are
-       universally red - Stash's own performer-favourite uses red too)
+       universally red — Stash's own performer-favourite uses red too)
        but adopts Refract's glass surface + halo style.
    ═══════════════════════════════════════════════════════════════════ */
 
 /* ── Rating ★+ trigger ─────────────────────────────────────────── */
-/* Silhouette and accent both come from the chip recipe, where this
-   selector is in both lists: a read-out shape that mutates something.
-   Fill, rim, radius, height, padding and the resting glow were removed
-   here rather than left restating the recipe, because they carried
-   !important and would have kept winning from the earlier file. */
 body.stash-liquid-glass .adv-rating-btn {
+    background: var(--accent-tint) !important;
+    border: 1px solid var(--accent-glow) !important;
     color: var(--accent-bright) !important;
-    /* display, align-items, line-height and font-size used to be here,
-       to centre the star glyph: it sits below the visual line centre
-       because its bottom points hang at the baseline while the top
-       point pokes up. The recipe supplies all four now, and the -1px
-       nudge that finishes the job is on the star's own rule below;
-       measured, the star centres at 0.00px offset without them.
-
-       font-size was the one of the four that CONFLICTED: --fs-base
-       with !important at equal specificity, in a file loading after
-       the recipe's, so the pill measured 12.25 beside chips at 11.2
-       and the recipe's own !important lost. The other three merely
-       agreed, which is worse than it sounds - a redundant !important
-       is how a conflicting one hides. This was attributed to the band
-       override in 08 for an hour, because the sweep of this rule
-       filtered on paint properties and never looked at the type.
-
-       What stays below is NOT "what the recipe does not say", which is
-       what this comment claimed until the audit checked it. The recipe
-       declares both colour and transition. Both are kept here on
-       purpose: the accent ink is this control's identity, and the
-       transition is longer than the recipe's because more than two
-       properties move when the drawer opens. They are deliberate
-       overrides, and calling them anything else is how the next reader
-       deletes them. */
+    border-radius: var(--radius-pill) !important;
+    height: 26px !important;
+    padding: 0 10px !important;
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
+    /* Force explicit flex centering — the ★ glyph in most fonts sits
+       below the visual line center because the star's bottom points
+       hang at the baseline while the top point pokes up. Flex centering
+       + line-height:1 + a tiny -1px nudge on the star puts it on the
+       true geometric centre of the pill. */
+    display: inline-flex !important;
+    align-items: center !important;
     justify-content: center !important;
     gap: 8px;
-    transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
-                color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
+    line-height: 1 !important;
+    font-size: var(--fs-base) !important;
+    transition: background 0.18s ease, border-color 0.18s ease,
+                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
 }
 /* Render the ★ as the same FontAwesome star SVG the rating badges use, via
    mask-image (so the glyph colour comes from background-color and tracks the
@@ -1706,25 +916,11 @@ body.stash-liquid-glass .adv-rating-btn:hover > span[style*="color"] {
     background-color: #fff !important;
 }
 /* Unrated-count: instead of a detached chunky pill, render it inline after
-   the ★ behind a hairline divider - "★ | 4" - so the button reads as one
+   the ★ behind a hairline divider — "★ | 4" — so the button reads as one
    cohesive unit, matching the toolbar's other icon+number controls. */
-/* The number is the ONLY carrier of that rating, so it answers to the
-   4.5 reading floor rather than the 3.0 one. On --accent-bright it
-   measured 4.03 against a gold-tier band and 5.37 against a cooler one:
-   the ink was fine and the GROUND was the variable, because the badge is
-   transparent by design (it reads as "star | 4", not as a detached pill)
-   and its ground is therefore whatever the portrait and the tier veil
-   happen to be.
-
-   So the ink takes the lift rather than the badge taking a plate, which
-   would undo that decision. --accent-light is what 3.1 rule 5 calls the
-   high-key TEXT shade in dark - the same token that is a pale FILL tint
-   in light, which is why the light half of this lives in 14_light on
-   --accent-ink instead. Two tokens, each doing the job its own mode
-   gives it, and no new colour. */
 body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge {
     background: transparent !important;
-    color: var(--accent-light) !important;
+    color: var(--accent-bright) !important;
     border: 0 !important;
     border-radius: 0 !important;
     display: inline-flex !important;
@@ -1740,7 +936,7 @@ body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge {
     font-variant-numeric: tabular-nums;
 }
 /* The divider as its own centred element (not a border-left), so the gap
-   before and after it is symmetric - the container gap (star -> divider)
+   before and after it is symmetric — the container gap (star -> divider)
    equals the badge gap (divider -> number). */
 body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge::before {
     content: "" !important;
@@ -1749,7 +945,7 @@ body.stash-liquid-glass .adv-rating-btn .adv-rating-btn-badge::before {
     height: 14px !important;
     background: rgba(var(--accent-rgb), 0.6) !important;
 }
-/* No state-based fill - the count is always the inline accent number. */
+/* No state-based fill — the count is always the inline accent number. */
 body.stash-liquid-glass .adv-rating-btn--partial .adv-rating-btn-badge {
     background: transparent !important;
     color: var(--accent-bright) !important;
@@ -1764,42 +960,25 @@ body.stash-liquid-glass .adv-rating-btn:hover .adv-rating-btn-badge::before {
 
 /* ── Favourite heart toggle ─────────────────────────────────────── */
 /* Empty state: same muted-glass language as every other Refract
-   toolbar button - neutral grey heart on the standard glass surface.
+   toolbar button — neutral grey heart on the standard glass surface.
    Hover gives a subtle pink "preview" (just a colour shift on the
    heart + a hairline pink border tint), no bg change. The activated
-   state is the glass-pink look - pink-tinted glass surface with a
+   state is the glass-pink look — pink-tinted glass surface with a
    solid pink heart, no heavy gradient fill. */
-/* GEOMETRY comes from the chip recipe, which lists this selector: height
-   24, pill radius, margin 0. It used to force 26px, radius-sm and a 6px
-   left margin from here, so a control the recipe claims as a sibling of
-   the rating pill stood beside it at a different height and a different
-   corner. Found by audit rather than by looking: tools/measure/recipe-
-   audit.py, the third instance of one bug after the rating pill's
-   font-size and the count button's glass plate.
-
-   MATERIAL deliberately does not. The recipe gives a control chip the
-   accent tint, and that is wrong for this one: it is a two-state toggle
-   whose COLOUR is the datum, red when favourited, so an accent tint at
-   rest would compete with the only colour on it that carries meaning.
-   Glass at rest, red when on. Ruling of 2026-09-05; the deviation and
-   its reason are recorded in the recipe's own deviations block, because
-   an exception that lives only here is indistinguishable from drift.
-
-   Width is not a recipe property, so the fixed 30px stays and is not an
-   override of anything. */
 body.stash-liquid-glass .adv-favourite-btn {
     background: var(--glass-bg) !important;
     border: 1px solid var(--glass-border) !important;
     color: var(--text-muted) !important;
+    border-radius: var(--radius-sm) !important;
+    height: 26px !important;
     width: 30px !important;
-    /* Longer and slower than the recipe's two-property transition, and
-       deliberately so: this control changes colour, fill and shadow
-       together when it activates. */
-    transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
-                color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
+    margin-left: 6px !important;
+    box-shadow: none !important;
+    transition: background 0.18s ease, border-color 0.18s ease,
+                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
 }
 /* Empty + hover: just a subtle pink preview on the heart and a barely
-   visible pink in the border. No background fill, no lift - keeps it
+   visible pink in the border. No background fill, no lift — keeps it
    quiet so it doesn't pre-empt the activated state visually. */
 body.stash-liquid-glass .adv-favourite-btn:hover {
     color: rgba(244, 114, 182, 0.85) !important;
@@ -1807,7 +986,7 @@ body.stash-liquid-glass .adv-favourite-btn:hover {
 }
 /* Activated: pink-tinted glass surface, solid pink heart inside.
    The button itself stays "glassy" (translucent pink bg, pink-tinted
-   border, soft pink glow) - only the heart glyph reads as solid pink.
+   border, soft pink glow) — only the heart glyph reads as solid pink.
    Heart is `currentColor` so the button text colour drives the fill;
    we set it to a strong pink while keeping the surface translucent. */
 body.stash-liquid-glass .adv-favourite-btn.adv-favourite-btn--on {
@@ -1833,27 +1012,7 @@ body.stash-liquid-glass .adv-favourite-btn.adv-favourite-btn--on:hover {
    glass-overlay language of stash-multiview's .mv-add-btn so the two
    read as a consistent pair when both are present on the same card.
    Empty state: dark glass + white heart. Favourited: pink-tinted
-   glass + solid pink heart (same palette as the toolbar variant).
-
-   WHY THE SCRIM IS A BLACK LITERAL AND NOT A FLIPPING TOKEN, which is
-   the question this comment failed to answer and which cost an audit
-   round: this button is positioned over the card's THUMBNAIL, not over
-   the card's panel. 3.1 rule 4 makes artwork a third ground that does
-   not change with the mode, so its scrim must not either. A white heart
-   on dark glass reads on a bright photograph and on a dark one;
-   swapping the plate to --glass-bg would make it near-invisible on pale
-   artwork in light mode, which is a regression that only shows on some
-   images and so survives review.
-
-   The toolbar variant twenty lines above is the opposite case and takes
-   the flipping token, because it sits on a panel. Two hearts, two
-   grounds. Measure this one against the pixels of the thumbnail beneath
-   it, never against the card: the gate does exactly that and prints the
-   panel figure beside it labelled as the wrong reference.
-
-   A non-flipping scrim token would say all this in one word, but it
-   belongs in 01_tokens and is a foundations decision; it is on the
-   post-ship list rather than invented here. */
+   glass + solid pink heart (same palette as the toolbar variant). */
 body.stash-liquid-glass .adv-favourite-card-btn {
     /* Position aligned to .mv-add-btn (top:6/right:6 + 28x28) so when
        both buttons are visible they sit on the same line. The plugin
@@ -1872,8 +1031,8 @@ body.stash-liquid-glass .adv-favourite-card-btn {
     height: 28px !important;
     margin: 0 !important;
     padding: 0 !important;
-    transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
-                color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
+    transition: background 0.18s ease, border-color 0.18s ease,
+                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
 }
 /* Picking-mode shift: when multiview's add button takes top:6/right:6,
    slide the favourite to right:40 (28 width + 6 gap). Overrides the
@@ -1886,7 +1045,7 @@ body.stash-liquid-glass .adv-favourite-card-btn svg {
     height: 14px !important;
 }
 body.stash-liquid-glass .adv-favourite-card-btn:hover {
-    /* Clearer glass on hover instead of darker - translucent white
+    /* Clearer glass on hover instead of darker — translucent white
        tint reads as the surface "lighting up" rather than dimming. */
     background: rgba(255, 255, 255, 0.1) !important;
     color: #f472b6 !important;
@@ -1910,7 +1069,7 @@ body.stash-liquid-glass .adv-favourite-card-btn.adv-favourite-btn--on:hover {
 }
 /* Refract-only: hide the favourite button even when the scene is
    already favourited unless the card is hovered. Keeps the grid
-   visually clean - favourited state is still discoverable by hovering
+   visually clean — favourited state is still discoverable by hovering
    the card. Overrides the plugin's default `--on` opacity rule on
    higher specificity (body.stash-liquid-glass adds one class to the
    selector). */
@@ -1931,7 +1090,7 @@ body.stash-liquid-glass .scene-card:hover .adv-favourite-card-btn {
       visible }`, so the menu gets cut at the card's rounded bottom
       corner. Override unconditionally.
    2. When FastTagger renders inside Stash's `.scrape-dialog` modal,
-      `.modal-content` ALSO has overflow:hidden - which clips the
+      `.modal-content` ALSO has overflow:hidden — which clips the
       menu again at the modal boundary if it extends past the card.
       Only flip that one when a FastTagger dropdown is actually open
       so we don't change modal layout when it's not needed.
@@ -1944,7 +1103,7 @@ body.stash-liquid-glass .card.fast-tagger-card {
        adds implicit `contain: layout paint style` even when the
        card IS in the viewport, and the paint containment clips the
        absolutely-positioned "Move to" dropdown menu at the card's
-       rounded-corner boundary. Defeat both for FastTagger cards -
+       rounded-corner boundary. Defeat both for FastTagger cards —
        the perf saving doesn't matter here (no images, ~70px rows). */
     content-visibility: visible !important;
     contain: none !important;
@@ -1954,10 +1113,10 @@ body.stash-liquid-glass .modal-content:has(.fast-tagger-card .dropdown.show) {
     overflow: visible !important;
 }
 
-/* Menu surface - glass language to match other Refract dropdowns,
+/* Menu surface — glass language to match other Refract dropdowns,
    instead of Bootstrap's flat white default. */
 body.stash-liquid-glass .fast-tagger-card .dropdown-menu.show {
-    background: rgba(var(--surface-rgb), 0.97) !important;
+    background: rgba(20, 20, 24, 0.97) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: var(--shadow-lg) !important;
@@ -1966,7 +1125,7 @@ body.stash-liquid-glass .fast-tagger-card .dropdown-menu.show {
 }
 body.stash-liquid-glass .fast-tagger-card .dropdown-menu .dropdown-item {
     color: var(--text) !important;
-    transition: background var(--dur-instant) ease, color var(--dur-instant) ease;
+    transition: background 0.12s ease, color 0.12s ease;
 }
 body.stash-liquid-glass .fast-tagger-card .dropdown-menu .dropdown-item:hover,
 body.stash-liquid-glass .fast-tagger-card .dropdown-menu .dropdown-item:focus {
@@ -1986,7 +1145,7 @@ body.stash-liquid-glass .adv-favourite-btn svg {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   stash-scribe - LLM-driven scene-review assistant
+   stash-scribe — LLM-driven scene-review assistant
    Sibling plugin that ships its own `--scribe-*` token system (mirrors
    stash-multiview's pattern). The accent family already auto-retints
    because the plugin defaults to `var(--accent, …)`. Refract only
@@ -2019,8 +1178,8 @@ body.stash-liquid-glass .stash-scribe-trigger-btn {
     height: 26px !important;
     width: 30px !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
-    transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
-                color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
+    transition: background 0.18s ease, border-color 0.18s ease,
+                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
 }
 body.stash-liquid-glass .stash-scribe-trigger-btn:hover {
     background: rgba(var(--accent-rgb), 0.22) !important;
@@ -2044,13 +1203,10 @@ body.stash-liquid-glass .stash-scribe-modal-overlay {
 }
 body.stash-liquid-glass .stash-scribe-modal {
     /* Match the ASR/APR modal opacity recipe (.adv-rating-modal-content
-       at 09_buttons.css:559) - near-opaque dark base + heavy blur so the
+       at 09_buttons.css:559) — near-opaque dark base + heavy blur so the
        card reads as solid glass, not see-through. */
-    background: rgba(var(--surface-rgb), 0.97) !important;
-    /* The rim was a hardcoded white alpha, which is the same defect one
-       property along: it cannot flip, so in light it drew a white line on
-       a white plate. --glass-border is the token that does. */
-    border: 1px solid var(--glass-border) !important;
+    background: rgba(28, 28, 28, 0.97) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
     border-radius: var(--radius) !important;
     -webkit-backdrop-filter: var(--glass-blur-2xl) !important;
     backdrop-filter: var(--glass-blur-2xl) !important;
@@ -2062,7 +1218,7 @@ body.stash-liquid-glass .stash-scribe-modal {
         0 0 100px 24px rgba(var(--accent-rgb), 0.08) !important;
 }
 
-/* Header + context + result divider - let Refract's glass border show
+/* Header + context + result divider — let Refract's glass border show
    through instead of Scribe's hard #333 line. */
 body.stash-liquid-glass .stash-scribe-header,
 body.stash-liquid-glass .stash-scribe-context,
@@ -2072,7 +1228,7 @@ body.stash-liquid-glass .stash-scribe-result {
 }
 
 /* ── Inputs / textareas ─────────────────────────────────────────────
-   Standard Refract glass field language - translucent surface, glass
+   Standard Refract glass field language — translucent surface, glass
    border, accent focus glow. */
 body.stash-liquid-glass .stash-scribe-input,
 body.stash-liquid-glass .stash-scribe-review {
@@ -2090,7 +1246,7 @@ body.stash-liquid-glass .stash-scribe-review:focus {
 
 /* ── Buttons ────────────────────────────────────────────────────────
    Primary action (Send / Save review+scores / active mode tab) uses
-   accent-glass - same recipe as #mv-open-btn / .adv-rating-btn so the
+   accent-glass — same recipe as #mv-open-btn / .adv-rating-btn so the
    three plugins read as siblings. Secondary buttons are neutral
    glass. */
 body.stash-liquid-glass .stash-scribe-send,
@@ -2101,8 +1257,8 @@ body.stash-liquid-glass .stash-scribe-mode-tabs .btn.active {
     color: var(--accent-bright) !important;
     border-radius: var(--radius-sm) !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
-    transition: background var(--dur-move) ease, border-color var(--dur-move) ease,
-                color var(--dur-move) ease, box-shadow var(--dur-move) ease, transform var(--dur-move) ease !important;
+    transition: background 0.18s ease, border-color 0.18s ease,
+                color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
 }
 body.stash-liquid-glass .stash-scribe-send:hover,
 body.stash-liquid-glass .stash-scribe-primary:hover,
@@ -2128,7 +1284,7 @@ body.stash-liquid-glass .stash-scribe-restart:hover {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Binge (Stash TV) plugin - navbar button
+   Binge (Stash TV) plugin — navbar button
    The plugin patches MainNavBar.MenuItems and creates div#BingeNavButton
    containing only <span>BINGE</span> (no SVG). Refract hides all
    nav.top-nav spans globally, so we un-hide just this one and re-skin
@@ -2138,7 +1294,7 @@ body.stash-liquid-glass .stash-scribe-restart:hover {
 /* Slot after the native library items (order 1-8) but before Desire (90). */
 body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav > #BingeNavButton { order: 89; }
 
-/* Un-hide the text label - it's the only content in this button. */
+/* Un-hide the text label — it's the only content in this button. */
 body.stash-liquid-glass nav.top-nav #BingeNavButton span {
     display: inline !important;
 }
@@ -2159,13 +1315,13 @@ body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn {
     border-radius: var(--radius-pill) !important;
     color: var(--accent-bright) !important;
     font-size: var(--fs-xs) !important;
-    font-weight: 600 !important;
-    letter-spacing: var(--track-eyebrow) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.06em !important;
     text-transform: uppercase !important;
     text-decoration: none !important;
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.18) !important;
-    transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease,
-                color var(--dur-fast) ease, box-shadow var(--dur-fast) ease !important;
+    transition: background 0.15s ease, border-color 0.15s ease,
+                color 0.15s ease, box-shadow 0.15s ease !important;
 }
 body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn:hover {
     background: rgba(var(--accent-rgb), 0.22) !important;
@@ -2175,7 +1331,7 @@ body.stash-liquid-glass nav.top-nav #BingeNavButton > a.btn:hover {
 }
 
 
-/* "Ready to generate" hint - keep the green accent (success colour
+/* "Ready to generate" hint — keep the green accent (success colour
    convention) but soften the border so it's a hint, not a primary. */
 body.stash-liquid-glass .stash-scribe-secondary.is-ready {
     border-color: rgba(74, 222, 128, 0.55) !important;
@@ -2191,7 +1347,7 @@ body.stash-liquid-glass .stash-scribe-secondary.is-ready {
    declarations for the nested case so the heading + body look
    indistinguishable from native Details/Tags. */
 
-/* Scene page - re-apply 07_scene_details.css:761 (uppercase muted
+/* Scene page — re-apply 07_scene_details.css:761 (uppercase muted
    label) for our heading. The section now wraps in its own row/col
    for React-safety, so we target the heading inside .col-12 inside
    .stash-scribe-review-section. */
@@ -2200,11 +1356,11 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-secti
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: var(--track-eyebrow) !important;
+    letter-spacing: 0.08em !important;
     color: var(--text-muted) !important;
 }
 
-/* Scene page - re-apply 07_scene_details.css:783 (description prose)
+/* Scene page — re-apply 07_scene_details.css:783 (description prose)
    for our p.pre. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-section p.pre {
     color: var(--text) !important;
@@ -2215,7 +1371,7 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-secti
     font-family: inherit !important;
 }
 
-/* Performer-page review section - inherits `.detail-header .detail-item`
+/* Performer-page review section — inherits `.detail-header .detail-item`
    layout (narrow title column / wide value column) from native Stash.
    No flex override on the title; the Edit button lives at the end of
    the value column instead via .stash-scribe-review-edit-row. */
@@ -2225,15 +1381,15 @@ body.stash-liquid-glass .stash-scribe-review-edit-row {
     justify-content: flex-end !important;
 }
 
-/* Scene-page heading row - h6 spans full width, so flex the title
+/* Scene-page heading row — h6 spans full width, so flex the title
    + Edit button onto a single line with Edit pushed right. */
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) .stash-scribe-review-heading {
     display: flex !important;
     align-items: center !important;
-    gap: var(--gap-md) !important;
+    gap: 0.5rem !important;
 }
 
-/* Edit affordance - small, muted, accent on hover so it stays
+/* Edit affordance — small, muted, accent on hover so it stays
    discoverable without competing with the native section labels. */
 body.stash-liquid-glass .stash-scribe-review-edit {
     margin-left: auto !important;
@@ -2273,14 +1429,14 @@ body.stash-liquid-glass .stash-scribe-msg-assistant .stash-scribe-msg-body.stash
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Edit Tags Overhaul (kmv plugin) - grouped/searchable tag picker
+   Edit Tags Overhaul (kmv plugin) — grouped/searchable tag picker
    ═══════════════════════════════════════════════════════════════════
 
    Third-party plugin that injects a `<section id="kmv-edit-tags-overhaul">`
    into the scene edit form (replaces the multi-select tag picker). It
    uses its own BEM classes (`.edit-tags-overhaul__*`) and its own JS
    to toggle group expand/collapse via an `is-open` class. We only
-   re-skin its visible elements - never override `display` for
+   re-skin its visible elements — never override `display` for
    collapsible bodies, since the plugin's JS owns that state. */
 
 body.stash-liquid-glass #kmv-edit-tags-overhaul.edit-tags-overhaul {
@@ -2288,8 +1444,8 @@ body.stash-liquid-glass #kmv-edit-tags-overhaul.edit-tags-overhaul {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
-    -webkit-backdrop-filter: var(--glass-blur-xl);
-    backdrop-filter: var(--glass-blur-xl);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
     padding: 0.9rem 1rem 1rem;
     margin: 0.5rem 0 1rem;
     color: var(--text);
@@ -2301,23 +1457,23 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--gap-lg);
+    gap: 0.75rem;
     margin-bottom: 0.85rem;
     flex-wrap: wrap;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-header-info {
     display: flex;
     align-items: baseline;
-    gap: var(--gap-md);
+    gap: 0.6rem;
     min-width: 0;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-title {
-    font-size: var(--fs-xs) !important;
+    font-size: var(--fs-sm) !important;
     text-transform: uppercase;
-    letter-spacing: var(--track-eyebrow) !important;
+    letter-spacing: 0.06em;
     color: var(--text-muted) !important;
     margin: 0 !important;
-    font-weight: 600 !important;
+    font-weight: 600;
     font-family: var(--theme-font-stack) !important;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-summary {
@@ -2327,7 +1483,7 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-summary {
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-actions {
     display: inline-flex;
-    gap: var(--gap-sm);
+    gap: 0.4rem;
     flex-wrap: wrap;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-btn {
@@ -2338,11 +1494,11 @@ body.stash-liquid-glass .edit-tags-overhaul__panel-btn {
     padding: 0.22rem 0.7rem;
     font-size: var(--fs-xs);
     text-transform: uppercase;
-    letter-spacing: var(--track-eyebrow);
+    letter-spacing: 0.04em;
     font-weight: 600;
     line-height: 1.2;
     cursor: pointer;
-    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 body.stash-liquid-glass .edit-tags-overhaul__panel-btn:hover:not([disabled]) {
     background: var(--accent-tint);
@@ -2370,7 +1526,7 @@ body.stash-liquid-glass .edit-tags-overhaul__search-input {
     line-height: 1.2;
     outline: none;
     box-shadow: none;
-    transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 body.stash-liquid-glass .edit-tags-overhaul__search-input::placeholder {
     color: var(--text-muted);
@@ -2387,18 +1543,18 @@ body.stash-liquid-glass .edit-tags-overhaul__search-empty {
     opacity: 0.75;
 }
 
-/* Groups list - vertical stack of glass cards */
+/* Groups list — vertical stack of glass cards */
 body.stash-liquid-glass .edit-tags-overhaul__groups {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-md);
+    gap: 0.55rem;
 }
 body.stash-liquid-glass .edit-tags-overhaul__group {
     background: var(--glass-bg-strong);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    transition: border-color var(--dur-move), box-shadow var(--dur-move);
+    transition: border-color 0.18s, box-shadow 0.18s;
 }
 body.stash-liquid-glass .edit-tags-overhaul__group:hover {
     border-color: rgba(var(--accent-rgb), 0.22);
@@ -2416,19 +1572,19 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-header {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: var(--gap-md);
+    gap: 0.55rem;
     padding: 0.4rem 0.75rem;
     text-align: left;
     cursor: pointer;
     user-select: none;
-    transition: background var(--dur-fast);
+    transition: background 0.15s;
 }
 body.stash-liquid-glass .edit-tags-overhaul__header-main,
 body.stash-liquid-glass .edit-tags-overhaul__subgroup-header-main {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-start !important;
-    gap: var(--gap-md);
+    gap: 0.5rem;
     min-width: 0;
     flex: 0 1 auto;
     text-align: left;
@@ -2438,7 +1594,7 @@ body.stash-liquid-glass .edit-tags-overhaul__header-actions {
     flex-shrink: 0;
 }
 
-/* Collapse chevron - matches refract's native `.collapse-icon`:
+/* Collapse chevron — matches refract's native `.collapse-icon`:
    FontAwesome chevron-right SVG, small (0.55rem), low opacity, rotates
    90° when the section opens. Implemented as a mask so colour flows
    through `background-color` (currentColor doesn't work on backgrounds). */
@@ -2460,7 +1616,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-header-main::before {
     opacity: 0.35;
     flex-shrink: 0;
     transform: rotate(0deg);
-    transition: transform var(--dur-move) ease, opacity var(--dur-fast), background-color var(--dur-fast);
+    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
 }
 body.stash-liquid-glass .edit-tags-overhaul__header:hover .edit-tags-overhaul__header-main::before,
 body.stash-liquid-glass .edit-tags-overhaul__subgroup-header:hover .edit-tags-overhaul__subgroup-header-main::before {
@@ -2480,7 +1636,7 @@ body.stash-liquid-glass .edit-tags-overhaul__header-main,
 body.stash-liquid-glass .edit-tags-overhaul__subgroup-header-main {
     display: flex;
     align-items: baseline;
-    gap: var(--gap-md);
+    gap: 0.55rem;
     min-width: 0;
     flex: 1 1 auto;
 }
@@ -2504,7 +1660,7 @@ body.stash-liquid-glass .edit-tags-overhaul__meta,
 body.stash-liquid-glass .edit-tags-overhaul__subgroup-meta {
     display: inline-flex;
     align-items: baseline;
-    gap: var(--gap-2xs);
+    gap: 0.25rem;
     font-size: var(--fs-xs);
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
@@ -2530,7 +1686,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-total-count {
 body.stash-liquid-glass .edit-tags-overhaul__header-actions {
     display: inline-flex;
     align-items: center;
-    gap: var(--gap-xs);
+    gap: 0.3rem;
     flex-shrink: 0;
 }
 body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn {
@@ -2548,7 +1704,7 @@ body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn {
     justify-content: center;
     padding: 0;
     cursor: pointer;
-    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn:hover {
     background: var(--accent-tint);
@@ -2561,7 +1717,7 @@ body.stash-liquid-glass .edit-tags-overhaul__parent-toggle-btn[aria-pressed="tru
     color: var(--accent-bright);
 }
 
-/* Collapsible bodies - hidden by default, shown when the parent group /
+/* Collapsible bodies — hidden by default, shown when the parent group /
    subgroup has `.is-open` (toggled by plugin JS). Without this, the
    plugin renders everything expanded since its own CSS only flips a
    class, not `display`.
@@ -2576,7 +1732,7 @@ body.stash-liquid-glass .edit-tags-overhaul__body {
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: var(--gap-sm);
+    gap: 0.4rem;
     border-top: 1px solid var(--glass-border);
     background: rgba(0, 0, 0, 0.18);
 }
@@ -2602,7 +1758,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup-body {
     display: none;
     padding: 0.45rem 0.6rem 0.6rem;
     flex-wrap: wrap;
-    gap: var(--gap-sm);
+    gap: 0.35rem;
     border-top: 1px solid var(--glass-border);
     background: rgba(0, 0, 0, 0.12);
 }
@@ -2610,7 +1766,7 @@ body.stash-liquid-glass .edit-tags-overhaul__subgroup.is-open > .edit-tags-overh
     display: flex;
 }
 
-/* Tag button - refract pill, accent glow when pressed. Explicit
+/* Tag button — refract pill, accent glow when pressed. Explicit
    left-align + flex-start so the label sits flush-left even if a
    parent flex stretches the pill. */
 body.stash-liquid-glass .edit-tags-overhaul__tag {
@@ -2628,7 +1784,7 @@ body.stash-liquid-glass .edit-tags-overhaul__tag {
     font-weight: 500;
     line-height: 1.2;
     cursor: pointer;
-    transition: background var(--dur-instant), color var(--dur-instant), border-color var(--dur-instant), transform var(--dur-instant), box-shadow var(--dur-instant);
+    transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.12s, box-shadow 0.12s;
     white-space: nowrap;
     box-shadow: none;
 }
@@ -2664,7 +1820,7 @@ body.stash-liquid-glass .edit-tags-overhaul__tag-label {
    overflow: visible`, so the FLEX intrinsic size of the name column
    equals the full text width. The flex algorithm shrinks row-left to
    fit, but because the inner span has overflow:visible, its rendered
-   content overflows visually past its allocated box - and on some
+   content overflows visually past its allocated box — and on some
    viewport widths the row's own grid track is narrower than the
    row's computed width, pushing row-actions out.
 
@@ -2715,7 +1871,7 @@ body.stash-liquid-glass #tag-manager-host .tag-manager__tree-panel-scroll {
 /* Pin the row itself to 100% of its parent's box. Without this the
    flex layout uses the row's intrinsic min-content (which includes
    the full nowrap text + drag handle), making the row wider than the
-   sidebar - pushing the drag handle past the right edge. */
+   sidebar — pushing the drag handle past the right edge. */
 body.stash-liquid-glass #tag-manager-host .tag-manager__group-header,
 body.stash-liquid-glass #tag-manager-host .tag-manager__subgroup-header,
 body.stash-liquid-glass #tag-manager-host .tag-manager__tree-item {
@@ -2741,7 +1897,7 @@ body.stash-liquid-glass #tag-manager-host .tag-manager__subgroup-header {
    popup width and switch image fit to cover so the preview reads as a
    tight card.
 
-   Multi-image previews still work - the inner grid uses auto-fit with
+   Multi-image previews still work — the inner grid uses auto-fit with
    minmax(8rem, 1fr) (ETO) or minmax(6.9rem, 1fr) (CTM), so 1-3 images
    flow naturally within the narrower width. */
 body.stash-liquid-glass #edit-tags-overhaul-hover-preview.edit-tags-overhaul-hover-preview,
@@ -2764,10 +1920,10 @@ body.stash-liquid-glass #custom-tags-manager-hover-preview .tag-manager-hover-pr
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Details Tags Overhaul (kmv plugin) - grouped read-only tag display
+   Details Tags Overhaul (kmv plugin) — grouped read-only tag display
    ═══════════════════════════════════════════════════════════════════
 
-   Sister plugin to edit-tags-overhaul, but read-only - appears on the
+   Sister plugin to edit-tags-overhaul, but read-only — appears on the
    scene detail page to show applied tags grouped by parent. Each tag
    is an `<a>` with an image + label, not a button. The plugin toggles
    `.is-open` on the section root (panel), each `__group`, and each
@@ -2781,28 +1937,28 @@ body.stash-liquid-glass #kmv-details-tags-overhaul.details-tags-overhaul {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
-    -webkit-backdrop-filter: var(--glass-blur-xl);
-    backdrop-filter: var(--glass-blur-xl);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
     padding: 0.6rem 0.9rem;
     margin: 0.5rem 0 1rem;
     color: var(--text);
     font-family: var(--theme-font-stack);
 }
 
-/* Panel header (title + summary + ▾ toggle) - full row is clickable */
+/* Panel header (title + summary + ▾ toggle) — full row is clickable */
 body.stash-liquid-glass .details-tags-overhaul__panel-header {
     display: flex;
     align-items: center;
-    gap: var(--gap-lg);
+    gap: 0.75rem;
     flex-wrap: wrap;
 }
 body.stash-liquid-glass .details-tags-overhaul__panel-title {
-    font-size: var(--fs-xs) !important;
+    font-size: var(--fs-sm) !important;
     text-transform: uppercase;
-    letter-spacing: var(--track-eyebrow) !important;
+    letter-spacing: 0.06em;
     color: var(--text-muted) !important;
     margin: 0 !important;
-    font-weight: 600 !important;
+    font-weight: 600;
     font-family: var(--theme-font-stack) !important;
 }
 body.stash-liquid-glass .details-tags-overhaul__panel-summary {
@@ -2811,7 +1967,7 @@ body.stash-liquid-glass .details-tags-overhaul__panel-summary {
     opacity: 0.75;
     flex: 1 1 auto;
 }
-/* Panel toggle - hide the plugin's `▾` text and overlay the refract
+/* Panel toggle — hide the plugin's `▾` text and overlay the refract
    chevron SVG via mask. Rotates 90° when panel is open. */
 body.stash-liquid-glass .details-tags-overhaul__panel-toggle {
     background: transparent;
@@ -2840,7 +1996,7 @@ body.stash-liquid-glass .details-tags-overhaul__panel-toggle::before {
     mask-size: contain;
     opacity: 0.5;
     transform: rotate(0deg);
-    transition: transform var(--dur-move) ease, opacity var(--dur-fast), background-color var(--dur-fast);
+    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
 }
 body.stash-liquid-glass .details-tags-overhaul__panel-header:hover .details-tags-overhaul__panel-toggle::before {
     opacity: 0.8;
@@ -2851,14 +2007,14 @@ body.stash-liquid-glass .details-tags-overhaul.is-open .details-tags-overhaul__p
     background-color: var(--accent-bright);
 }
 
-/* Panel body - show only when .is-open on the section root */
+/* Panel body — show only when .is-open on the section root */
 body.stash-liquid-glass .details-tags-overhaul__groups {
     display: none;
 }
 body.stash-liquid-glass .details-tags-overhaul.is-open > .details-tags-overhaul__groups {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-md);
+    gap: 0.55rem;
     margin-top: 0.75rem;
 }
 
@@ -2868,7 +2024,7 @@ body.stash-liquid-glass .details-tags-overhaul__group {
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     overflow: hidden;
-    transition: border-color var(--dur-move), box-shadow var(--dur-move);
+    transition: border-color 0.18s, box-shadow 0.18s;
 }
 body.stash-liquid-glass .details-tags-overhaul__group:hover {
     border-color: rgba(var(--accent-rgb), 0.22);
@@ -2886,7 +2042,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup-header {
     justify-content: space-between;
     padding: 0.5rem 0.8rem;
     user-select: none;
-    transition: background var(--dur-fast);
+    transition: background 0.15s;
 }
 body.stash-liquid-glass .details-tags-overhaul__header:hover,
 body.stash-liquid-glass .details-tags-overhaul__subgroup-header:hover {
@@ -2896,7 +2052,7 @@ body.stash-liquid-glass .details-tags-overhaul__header-main,
 body.stash-liquid-glass .details-tags-overhaul__subgroup-header-main {
     display: flex;
     align-items: baseline;
-    gap: var(--gap-md);
+    gap: 0.55rem;
     min-width: 0;
     flex: 1 1 auto;
 }
@@ -2916,7 +2072,7 @@ body.stash-liquid-glass .details-tags-overhaul__meta,
 body.stash-liquid-glass .details-tags-overhaul__subgroup-meta {
     display: inline-flex;
     align-items: baseline;
-    gap: var(--gap-2xs);
+    gap: 0.25rem;
     font-size: var(--fs-xs);
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
@@ -2926,7 +2082,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup-total-count {
     opacity: 0.75;
 }
 
-/* Group / subgroup toggle chevrons - same SVG mask treatment.
+/* Group / subgroup toggle chevrons — same SVG mask treatment.
    The plugin renders these as `<button>▾</button>`; we hide the text
    and overlay the refract chevron-right via mask. Rotates 90° on open. */
 body.stash-liquid-glass .details-tags-overhaul__toggle,
@@ -2958,7 +2114,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup-toggle::before {
     mask-size: contain;
     opacity: 0.35;
     transform: rotate(0deg);
-    transition: transform var(--dur-move) ease, opacity var(--dur-fast), background-color var(--dur-fast);
+    transition: transform 0.18s ease, opacity 0.15s, background-color 0.15s;
 }
 body.stash-liquid-glass .details-tags-overhaul__header:hover .details-tags-overhaul__toggle::before,
 body.stash-liquid-glass .details-tags-overhaul__subgroup-header:hover .details-tags-overhaul__subgroup-toggle::before {
@@ -2976,7 +2132,7 @@ body.stash-liquid-glass .details-tags-overhaul__body {
     display: none;
     padding: 0.5rem 0.7rem 0.7rem;
     flex-direction: column;
-    gap: var(--gap-md);
+    gap: 0.55rem;
     border-top: 1px solid var(--glass-border);
     background: rgba(0, 0, 0, 0.18);
 }
@@ -3001,7 +2157,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup-body {
     display: none;
     padding: 0.45rem 0.6rem 0.6rem;
     flex-wrap: wrap;
-    gap: var(--gap-sm);
+    gap: 0.35rem;
     border-top: 1px solid var(--glass-border);
     background: rgba(0, 0, 0, 0.12);
 }
@@ -3009,7 +2165,7 @@ body.stash-liquid-glass .details-tags-overhaul__subgroup.is-open > .details-tags
     display: flex;
 }
 
-/* Tag link - card with thumbnail above label. The plugin sets
+/* Tag link — card with thumbnail above label. The plugin sets
    `--dto-image-size` (default 100px from its inline style on the section),
    so we use that so user-configured sizes flow through. */
 body.stash-liquid-glass .details-tags-overhaul__tag {
@@ -3017,7 +2173,7 @@ body.stash-liquid-glass .details-tags-overhaul__tag {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    gap: var(--gap-sm);
+    gap: 0.4rem;
     background: var(--glass-bg-strong);
     border: 1px solid var(--glass-border);
     color: var(--text) !important;
@@ -3028,7 +2184,7 @@ body.stash-liquid-glass .details-tags-overhaul__tag {
     line-height: 1.25;
     text-decoration: none !important;
     text-align: center;
-    transition: background var(--dur-instant), color var(--dur-instant), border-color var(--dur-instant), transform var(--dur-instant), box-shadow var(--dur-instant);
+    transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.12s, box-shadow 0.12s;
 }
 body.stash-liquid-glass .details-tags-overhaul__tag:hover {
     background: var(--accent-tint);
@@ -3060,7 +2216,7 @@ body.stash-liquid-glass .details-tags-overhaul__tag-label {
     white-space: nowrap;
 }
 
-/* Image-only variant (no label) - bigger square */
+/* Image-only variant (no label) — bigger square */
 body.stash-liquid-glass .details-tags-overhaul__tag--image-only {
     width: calc(var(--dto-image-only-size, 120px) + 0.8rem);
     padding: 0.4rem;
@@ -3089,27 +2245,27 @@ body.stash-liquid-glass .refract-plugin-list {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Tag Sidebar (tag-sidebar plugin) - docked tag-tree filter panel
+   Tag Sidebar (tag-sidebar plugin) — docked tag-tree filter panel
    BEM `tag-sidebar__*`. Root `.tag-sidebar__panel` is position:absolute
    top:0 left:0 (360px, full height), so it slid UNDER refract's floating
    navbar (fixed, top:12px, height ~nav-btn-size + padding). Push the panel
    down to clear the nav and re-skin the whole thing in glass.
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Panel shell - clear the navbar (~its top:12px + height + padding + gap,
+/* Panel shell — clear the navbar (~its top:12px + height + padding + gap,
    which the existing scene-page calc treats as nav-btn-size + 1.6rem) and
    shrink the height to match so the bottom doesn't overflow the viewport. */
 body.stash-liquid-glass .tag-sidebar__panel {
     top: calc(var(--nav-btn-size) + 2.6rem) !important;
     /* Float it off the left edge. margin-left (not left) so we don't fight
-       the plugin's open/close which animates `left`/transform - margin just
+       the plugin's open/close which animates `left`/transform — margin just
        shifts the resting position; the closed state still tucks off-screen. */
     margin-left: 12px !important;
     height: calc(100vh - var(--nav-btn-size) - 2.6rem - 12px) !important;
     max-height: calc(100vh - var(--nav-btn-size) - 2.6rem - 12px) !important;
-    background: rgba(var(--surface-rgb), 0.92) !important;
-    -webkit-backdrop-filter: var(--glass-blur-xl-sat) !important;
-            backdrop-filter: var(--glass-blur-xl-sat) !important;
+    background: rgba(16, 16, 20, 0.92) !important;
+    -webkit-backdrop-filter: var(--glass-blur-lg-sat) !important;
+            backdrop-filter: var(--glass-blur-lg-sat) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     box-shadow: var(--shadow-lg) !important;
@@ -3119,7 +2275,7 @@ body.stash-liquid-glass .tag-sidebar__panel {
 
 /* Inner = scroll host (panel itself is overflow:hidden). The plugin makes
    this a flex container, and its content was measured at 472px wide inside a
-   359px panel - the children weren't stretching to the panel width on the
+   359px panel — the children weren't stretching to the panel width on the
    flex cross-axis. Force a proper vertical column with stretched, full-width,
    shrinkable children so nothing can exceed the sidebar. */
 body.stash-liquid-glass .tag-sidebar__inner {
@@ -3138,7 +2294,7 @@ body.stash-liquid-glass .tag-sidebar__inner {
     align-items: stretch !important;
     flex-wrap: nowrap !important;
 }
-/* Every descendant container stretches to full width and may shrink - kills
+/* Every descendant container stretches to full width and may shrink — kills
    the content-sized overflow at whatever nested flex level it occurs (the
    inner [data-stash-filter] wrapper, sections, tree, branches, children). */
 body.stash-liquid-glass .tag-sidebar__inner > *,
@@ -3160,7 +2316,7 @@ body.stash-liquid-glass .tag-sidebar__header {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: var(--gap-md) !important;
+    gap: 0.5rem !important;
     margin-bottom: 0.7rem !important;
 }
 body.stash-liquid-glass .tag-sidebar__eyebrow {
@@ -3177,7 +2333,7 @@ body.stash-liquid-glass .tag-sidebar__clear {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
     padding: 0.2rem 0.7rem !important;
-    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast) !important;
+    transition: background 0.15s, border-color 0.15s, color 0.15s !important;
 }
 body.stash-liquid-glass .tag-sidebar__clear:not(:disabled):hover {
     background: var(--accent-tint) !important;
@@ -3193,19 +2349,19 @@ body.stash-liquid-glass .tag-sidebar__clear:disabled {
 body.stash-liquid-glass .tag-sidebar__segmented {
     display: flex !important;
     align-items: center !important;
-    gap: var(--gap-md) !important;
+    gap: 0.5rem !important;
     margin-bottom: 0.7rem !important;
 }
 body.stash-liquid-glass .tag-sidebar__segmented-label {
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
-    letter-spacing: var(--track-eyebrow) !important;
+    letter-spacing: 0.06em !important;
     color: var(--text-muted) !important;
     font-weight: 600 !important;
 }
 body.stash-liquid-glass .tag-sidebar__segmented-buttons {
     display: inline-flex !important;
-    background: var(--fill-2) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius-pill) !important;
     padding: 2px !important;
@@ -3218,9 +2374,9 @@ body.stash-liquid-glass .tag-sidebar__segmented-button {
     border-radius: var(--radius-pill) !important;
     font-size: var(--fs-xs) !important;
     font-weight: 700 !important;
-    letter-spacing: var(--track-tight) !important;
+    letter-spacing: 0.04em !important;
     padding: 0.2rem 0.7rem !important;
-    transition: background var(--dur-fast), color var(--dur-fast) !important;
+    transition: background 0.15s, color 0.15s !important;
 }
 body.stash-liquid-glass .tag-sidebar__segmented-button.is-active {
     background: var(--accent) !important;
@@ -3228,7 +2384,7 @@ body.stash-liquid-glass .tag-sidebar__segmented-button.is-active {
     box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.4) !important;
 }
 
-/* Search field - glass pill */
+/* Search field — glass pill */
 body.stash-liquid-glass .tag-sidebar__search-input {
     width: 100% !important;
     background: var(--glass-bg) !important;
@@ -3238,7 +2394,7 @@ body.stash-liquid-glass .tag-sidebar__search-input {
     font-size: var(--fs-sm) !important;
     padding: 0.4rem 0.85rem !important;
     margin-bottom: 0.8rem !important;
-    transition: border-color var(--dur-fast), box-shadow var(--dur-fast) !important;
+    transition: border-color 0.15s, box-shadow 0.15s !important;
 }
 body.stash-liquid-glass .tag-sidebar__search-input:focus {
     outline: none !important;
@@ -3257,8 +2413,8 @@ body.stash-liquid-glass .tag-sidebar__section {
 body.stash-liquid-glass .tag-sidebar__section-label {
     font-size: var(--fs-xs) !important;
     text-transform: uppercase !important;
-    letter-spacing: var(--track-eyebrow) !important;
-    font-weight: 600 !important;
+    letter-spacing: 0.08em !important;
+    font-weight: 700 !important;
     color: var(--text-muted) !important;
     margin: 0 0 0.5rem !important;
 }
@@ -3285,14 +2441,14 @@ body.stash-liquid-glass .tag-sidebar__children {
     box-sizing: border-box !important;
 }
 /* Clip stray horizontal overflow only at the tree root (the inner scroll
-   host already does its own overflow-x:hidden). Not on every nested level -
+   host already does its own overflow-x:hidden). Not on every nested level —
    overflow-x:hidden + overflow-y:visible would force nested y-scrollers. */
 body.stash-liquid-glass .tag-sidebar__tree {
     overflow-x: hidden !important;
 }
 
 /* Tree rows. NOTE: indentation is the plugin's own `padding-left`, computed
-   from the row's `--tag-sidebar-depth` custom property - so DON'T set the
+   from the row's `--tag-sidebar-depth` custom property — so DON'T set the
    `padding` shorthand (it would wipe padding-left and flatten the tree) and
    DON'T force `width:100%` (it fights any margin indent). width:auto fills
    the parent content box; max-width:100% + min-width:0 keep it inside the
@@ -3305,16 +2461,16 @@ body.stash-liquid-glass .tag-sidebar__row {
     padding-bottom: 0.13rem !important;
     padding-right: 0.35rem !important;
     border-radius: var(--radius-sm) !important;
-    transition: background var(--dur-instant) ease !important;
+    transition: background 0.12s ease !important;
     max-width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
 }
 body.stash-liquid-glass .tag-sidebar__row:hover {
-    background: var(--fill-2) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
 }
 
-/* Action buttons - small square; expand ▸ neutral, include + accent,
+/* Action buttons — small square; expand ▸ neutral, include + accent,
    exclude − red. Active states fill solid. */
 body.stash-liquid-glass .tag-sidebar__action {
     background: transparent !important;
@@ -3330,10 +2486,10 @@ body.stash-liquid-glass .tag-sidebar__action {
     justify-content: center !important;
     font-size: var(--fs-sm) !important;
     line-height: 1 !important;
-    transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast) !important;
+    transition: background 0.13s, border-color 0.13s, color 0.13s !important;
 }
 body.stash-liquid-glass .tag-sidebar__action--expand:hover {
-    background: var(--fill-4) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: var(--text) !important;
 }
 body.stash-liquid-glass .tag-sidebar__action--include:hover {
@@ -3348,15 +2504,15 @@ body.stash-liquid-glass .tag-sidebar__action--include.is-active {
     box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.45) !important;
 }
 body.stash-liquid-glass .tag-sidebar__action--exclude:hover {
-    background: rgba(var(--danger-rgb), 0.16) !important;
-    border-color: rgba(var(--danger-rgb), 0.45) !important;
-    color: var(--danger-bright) !important;
+    background: rgba(239, 68, 68, 0.16) !important;
+    border-color: rgba(239, 68, 68, 0.45) !important;
+    color: #f87171 !important;
 }
 body.stash-liquid-glass .tag-sidebar__action--exclude.is-active {
-    background: rgba(var(--danger-rgb), 0.85) !important;
-    border-color: rgba(var(--danger-rgb), 0.9) !important;
+    background: rgba(239, 68, 68, 0.85) !important;
+    border-color: rgba(239, 68, 68, 0.9) !important;
     color: #fff !important;
-    box-shadow: 0 0 8px rgba(var(--danger-rgb), 0.45) !important;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.45) !important;
 }
 
 /* Tag-name button */
@@ -3375,13 +2531,13 @@ body.stash-liquid-glass .tag-sidebar__label {
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     cursor: pointer !important;
-    transition: color var(--dur-fast) !important;
+    transition: color 0.13s !important;
 }
 body.stash-liquid-glass .tag-sidebar__label:hover {
     color: var(--accent-bright) !important;
 }
 
-/* Count pill - soft accent, right-aligned, tabular */
+/* Count pill — soft accent, right-aligned, tabular */
 body.stash-liquid-glass .tag-sidebar__count {
     font-size: var(--fs-xs) !important;
     font-weight: 600 !important;
@@ -3392,7 +2548,7 @@ body.stash-liquid-glass .tag-sidebar__count {
     padding-left: 0.4rem !important;
 }
 
-/* Toggle tab - rotate the "TAGS" label to vertical text so the tab is a thin
+/* Toggle tab — rotate the "TAGS" label to vertical text so the tab is a thin
    strip on the screen edge instead of a wide horizontal box. Glass styling to
    match the panel + navbar. Position is left to the plugin (don't fight its
    open/close), we only change the content orientation + skin. */
@@ -3403,26 +2559,26 @@ body.stash-liquid-glass .tag-sidebar__toggle {
     min-width: 0 !important;
     /* Slim vertical strip */
     padding: 0.7rem 0.28rem !important;
-    font-size: var(--fs-xs) !important;
-    font-weight: 600 !important;
-    letter-spacing: var(--track-eyebrow) !important;
+    font-size: 0.66rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.14em !important;
     text-transform: uppercase !important;
     line-height: 1 !important;
-    background: rgba(var(--surface-rgb), 0.92) !important;
+    background: rgba(16, 16, 20, 0.92) !important;
     border: 1px solid var(--glass-border) !important;
-    /* Attach flush to the panel's flat right edge - no left border, round
+    /* Attach flush to the panel's flat right edge — no left border, round
        only the right corners, drop the shadow on the right side. */
     border-left: none !important;
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
     color: var(--text-muted) !important;
-    -webkit-backdrop-filter: var(--glass-blur-xl) !important;
-            backdrop-filter: var(--glass-blur-xl) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+            backdrop-filter: var(--glass-blur) !important;
     box-shadow: 4px 0 16px rgba(0, 0, 0, 0.35) !important;
     /* The plugin slides the toggle via `transition: left 180ms ease`. Our
        override MUST keep `left` (and the same 180ms) or the toggle teleports
        while the panel slides. */
-    transition: left 180ms ease, background var(--dur-fast) ease,
-                border-color var(--dur-fast) ease, color var(--dur-fast) ease !important;
+    transition: left 180ms ease, background 0.15s ease,
+                border-color 0.15s ease, color 0.15s ease !important;
 }
 body.stash-liquid-glass .tag-sidebar__toggle:hover {
     background: var(--accent-tint) !important;
@@ -3432,7 +2588,7 @@ body.stash-liquid-glass .tag-sidebar__toggle:hover {
 /* Open: the plugin slides the toggle to left:var(--tag-sidebar-panel-width)
    (the un-floated panel edge). We floated the panel +12px, so target +12px
    more. Driving it through `left` lets the plugin's native 180ms left-slide
-   animate it in sync with the panel - no separate margin to desync. Closed
+   animate it in sync with the panel — no separate margin to desync. Closed
    state (left:0, screen edge) is untouched. */
 body.stash-liquid-glass .tag-sidebar--open .tag-sidebar__toggle {
     left: calc(var(--tag-sidebar-panel-width, 360px) + 12px) !important;
@@ -3440,7 +2596,7 @@ body.stash-liquid-glass .tag-sidebar--open .tag-sidebar__toggle {
 }
 
 /* ── Ascension rank on the chin (non playing-card modes) ─────────────
-   Sits on the NAME's line, pinned to the right edge - the same side and
+   Sits on the NAME's line, pinned to the right edge — the same side and
    relationship it has in playing-card mode, where it rides the country
    caption.
 
@@ -3473,7 +2629,7 @@ body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank > .
    In the Refract playing-card layout the name is the banner at the TOP of
    the card and this chin holds the STAT STRIP instead, so `top: 0.48rem`
    pinned the rank onto the pills. Measured on a performer with no country:
-   badge 324-336, strip 329-371 - 7px into the pills, straight through their
+   badge 324-336, strip 329-371 — 7px into the pills, straight through their
    labels. It only shows on performers with no country, which is why it
    looked like it broke "in some places".
 
@@ -3505,7 +2661,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .card-section.r
     font-size: var(--fs-sm) !important;
     filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.62)) !important;
 }
-/* Match the country-nested variant's ember halo too - this case had a
+/* Match the country-nested variant's ember halo too — this case had a
    wider 1.5px/5px glow against 1.2px/3.5px, so the same badge glowed
    differently depending only on whether a country was set. */
 body.stash-liquid-glass.refract-perf-layout-card .performer-card .card-section.refract-chin-with-rank > .refract-ascension-badge .refract-ascension-icon {
@@ -3516,7 +2672,7 @@ body.stash-liquid-glass.refract-perf-layout-card .performer-card .card-section.r
 }
 /* The chin's first child is Stash's title link, whose h5 is display:none
    in this layout. It is a 0px-tall flex item that still consumes one
-   2.8px column gap - and because the badge takes `order: -1`, that dead
+   2.8px column gap — and because the badge takes `order: -1`, that dead
    gap lands ABOVE the content on a card with a country and BELOW it on a
    card without one. Nothing is lost by removing it: the h5 inside is
    already hidden, so the link has no height and no hit area, and the
@@ -3532,7 +2688,7 @@ body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank > .
 /* Keep a long name clear of the rank instead of running under it. The
    margin goes on the TITLE, not on the link that wraps it: the title is
    `overflow: hidden` + `nowrap`, and overflow clips at the padding edge,
-   so padding on the wrapper would not actually reserve the space -
+   so padding on the wrapper would not actually reserve the space —
    shrinking the title's own box does. */
 body.stash-liquid-glass .performer-card .card-section.refract-chin-with-rank h5.card-section-title {
     margin-right: 3.4rem !important;

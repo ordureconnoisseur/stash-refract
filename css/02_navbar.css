@@ -1,15 +1,15 @@
 /* ───────────────────────────────────────────────────────────────────
-   Navbar - glass bar, icons-only mode (UI Tweaks behavior built in)
+   Navbar — glass bar, icons-only mode (UI Tweaks behavior built in)
    ─────────────────────────────────────────────────────────────────── */
 
-/* Floating glass navbar - detached from screen edges with soft shadow,
+/* Floating glass navbar — detached from screen edges with soft shadow,
    rounded on all sides. Height (~52px content + 12px top margin) gives
    an effective top offset of ~64px which the scene-page row's calc()
    already accounts for. Layout lockdown lives in the same block: every
    viewport width reads the same way and rightmost icons clip first as
    the window narrows. Stash's DOM puts navbar children in this order
    (collapse, brand, buttons) and Bootstrap's responsive `order-*`
-   classes shuffle them at breakpoints - explicit `order:` rules below
+   classes shuffle them at breakpoints — explicit `order:` rules below
    defeat that. */
 body.stash-liquid-glass nav.top-nav.navbar {
     position: fixed !important;
@@ -22,8 +22,8 @@ body.stash-liquid-glass nav.top-nav.navbar {
     border: 1px solid var(--glass-border) !important;
     border-radius: var(--radius) !important;
     box-shadow: var(--shadow-navbar) !important;
-    -webkit-backdrop-filter: var(--glass-blur-xl);
-    backdrop-filter: var(--glass-blur-xl);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
     padding: 0.4rem 0.85rem;
     display: flex !important;
     flex-direction: row !important;
@@ -127,7 +127,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons > :has([title="Help"]),
 body.stash-liquid-glass nav.top-nav .navbar-buttons > button.nav-utility[title="Help"] { order: 60; }
 body.stash-liquid-glass nav.top-nav .navbar-buttons > :has(.donate),
 body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href*="opencollective"] { order: 70; }
-/* url-switcher order: 80 - see 13_plugins.css */
+/* url-switcher order: 80 — see 13_plugins.css */
 body.stash-liquid-glass nav.top-nav .navbar-buttons > a[href="/settings"]    { order: 90; }
 
 /* Strip Stash's solid backgrounds on the nav containers. */
@@ -140,7 +140,7 @@ body.stash-liquid-glass nav.top-nav .navbar-nav {
 
 /* The second .navbar-nav inside .navbar-collapse is Stash's
    MainNavBar.UtilityItems slot. Stash duplicates utility links there
-   (Stats/Settings/Logout/etc.) which we don't want - but plugins like
+   (Stats/Settings/Logout/etc.) which we don't want — but plugins like
    stashGlobalSearch ALSO inject trigger buttons here. Show the nav
    container, hide every direct child by default, and unhide ONLY
    known plugin-trigger classes. Adding new plugin triggers later is
@@ -165,7 +165,7 @@ body.stash-liquid-glass nav.top-nav .navbar-collapse > .navbar-nav:nth-of-type(2
    The main `nav.top-nav button.btn:where(... :not(.nav-utility) ...)`
    rule above explicitly EXCLUDES `.nav-utility` buttons (because
    Stash's stock .nav-utility entries are theme-hidden). The gs-trigger
-   carries .nav-utility too - but we WANT this one shown + themed, so
+   carries .nav-utility too — but we WANT this one shown + themed, so
    give it the same glass-button look here. */
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn,
 body.stash-liquid-glass nav.top-nav button.gs-trigger {
@@ -181,7 +181,7 @@ body.stash-liquid-glass nav.top-nav button.gs-trigger {
     /* Match the horizontal margin every other navbar button gets via the
        `.navbar-buttons > *` and `.navbar-nav > *` rules above (margin:
        0 var(--nav-gap)). The gs-trigger lives in the SECOND .navbar-nav
-       which only gets a flex `gap` from its parent - and because the
+       which only gets a flex `gap` from its parent — and because the
        trigger is the only visible child there, the gap can't separate
        it from .navbar-buttons sibling icons. Explicit margin re-anchors
        the spacing. */
@@ -193,9 +193,9 @@ body.stash-liquid-glass nav.top-nav button.gs-trigger {
     box-shadow: none !important;
     line-height: 1 !important;
     overflow: visible !important;
-    transition: background var(--dur-enter) ease, color var(--dur-enter) ease;
+    transition: background 0.22s ease, color 0.22s ease;
 }
-/* Glare-overlay sheen on hover - matches the ::before pattern the
+/* Glare-overlay sheen on hover — matches the ::before pattern the
    main nav-button rule uses (lines ~229-243) for the icons whose
    selector excludes .nav-utility. */
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn::before,
@@ -212,7 +212,7 @@ body.stash-liquid-glass nav.top-nav button.gs-trigger::before {
         rgba(255, 255, 255, 0) 100%
     ) !important;
     opacity: 0 !important;
-    transition: opacity var(--dur-enter) ease !important;
+    transition: opacity 0.22s ease !important;
 }
 body.stash-liquid-glass nav.top-nav .gs-trigger.btn:hover,
 body.stash-liquid-glass nav.top-nav button.gs-trigger:hover {
@@ -257,7 +257,7 @@ body.stash-liquid-glass nav.top-nav .notification-btn.dropdown-toggle::after {
     background-color: currentColor !important;
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M19 8C20.6569 8 22 6.65685 22 5C22 3.34315 20.6569 2 19 2C17.3431 2 16 3.34315 16 5C16 6.65685 17.3431 8 19 8Z' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14.02 2.2C13.36 2.07 12.69 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 11.32 21.93 10.65 21.8 10.01' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain !important;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M19 8C20.6569 8 22 6.65685 22 5C22 3.34315 20.6569 2 19 2C17.3431 2 16 3.34315 16 5C16 6.65685 17.3431 8 19 8Z' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M14.02 2.2C13.36 2.07 12.69 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 11.32 21.93 10.65 21.8 10.01' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / contain !important;
-    transition: transform var(--dur-settle) var(--ease-spring-hard), filter var(--dur-enter) ease !important;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease !important;
 }
 /* When the count badge is showing, drop the icon's engraved dot from
    the mask (arc-only variant): the translucent badge sits where the
@@ -366,7 +366,7 @@ body.stash-liquid-glass nav.top-nav .navbar-nav .nav-item > .nav-link {
 body.stash-liquid-glass.refract-show-help nav.top-nav .navbar-buttons > button.nav-utility[title="Help"],
 /* stashNotifications bell: a button.nav-utility (normally theme-hidden,
    hence excluded from the button.btn line below) that we keep and want
-   IDENTICAL to its siblings - same square, hover lift, glare. The 4-class
+   IDENTICAL to its siblings — same square, hover lift, glare. The 4-class
    specificity also outranks the generic .btn-primary:hover accent-tint
    from the later button files. */
 body.stash-liquid-glass nav.top-nav button.btn.notification-btn,
@@ -386,7 +386,7 @@ body.stash-liquid-glass nav.top-nav .navbar-toggler {
     padding: 0 !important;
     margin: 0 !important;
     border-radius: var(--radius-sm) !important;
-    background: var(--fill-1) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid rgba(255, 255, 255, 0.06) !important;
     color: var(--text) !important;
     box-shadow: none !important;
@@ -394,12 +394,12 @@ body.stash-liquid-glass nav.top-nav .navbar-toggler {
     overflow: visible !important;
     transform: translateZ(0);
     transition:
-        transform var(--dur-settle) var(--ease-spring-hard),
-        background var(--dur-enter) ease,
-        border-color var(--dur-enter) ease,
-        color var(--dur-enter) ease,
-        box-shadow var(--dur-enter) ease,
-        backdrop-filter var(--dur-enter) ease;
+        transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background 0.22s ease,
+        border-color 0.22s ease,
+        color 0.22s ease,
+        box-shadow 0.22s ease,
+        backdrop-filter 0.22s ease;
 
     &::before {
         content: "" !important;
@@ -414,7 +414,7 @@ body.stash-liquid-glass nav.top-nav .navbar-toggler {
             rgba(255, 255, 255, 0) 100%
         ) !important;
         opacity: 0 !important;
-        transition: opacity var(--dur-enter) ease !important;
+        transition: opacity 0.22s ease !important;
     }
 
     &:hover {
@@ -452,7 +452,7 @@ body.stash-liquid-glass nav.top-nav .stash-interactive-tools-utility-item button
     border-color: transparent !important;
 }
 
-/* Library column: some Stash builds use <a.nav-link><button> without .btn - match utility icon tiles. */
+/* Library column: some Stash builds use <a.nav-link><button> without .btn — match utility icon tiles. */
 body.stash-liquid-glass nav.top-nav .navbar-nav a.nav-link > button:where(:not(.brand-link):not(.navbar-brand button)) {
     display: inline-flex !important;
     align-items: center !important;
@@ -464,12 +464,12 @@ body.stash-liquid-glass nav.top-nav .navbar-nav a.nav-link > button:where(:not(.
     padding: 0 !important;
     margin: 0 !important;
     border-radius: var(--radius-sm) !important;
-    background: var(--fill-1) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid rgba(255, 255, 255, 0.06) !important;
     color: var(--text) !important;
     box-shadow: none !important;
     line-height: 1 !important;
-    transition: background var(--dur-move) ease, border-color var(--dur-move) ease, color var(--dur-move) ease;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
 
     &:hover {
         background: var(--glass-bg) !important;
@@ -478,7 +478,7 @@ body.stash-liquid-glass nav.top-nav .navbar-nav a.nav-link > button:where(:not(.
     }
 }
 
-/* Hamburger toggle is dead UI - the navbar is icon-only and small enough
+/* Hamburger toggle is dead UI — the navbar is icon-only and small enough
    that icons fit inline at almost every width; in the rare case they
    don't, we silently clip via overflow:hidden on the navbar (see narrow
    viewports block). Hidden at every breakpoint. */
@@ -500,22 +500,22 @@ body.stash-liquid-glass nav.top-nav svg {
     font-size: var(--nav-icon-size);
 }
 
-/* Icon shimmer on hover - subtle scale + crisper white. */
+/* Icon shimmer on hover — subtle scale + crisper white. */
 body.stash-liquid-glass nav.top-nav a.btn:hover svg,
 body.stash-liquid-glass nav.top-nav button.btn:hover svg,
 body.stash-liquid-glass nav.top-nav .navbar-toggler:hover svg {
     transform: scale(1.04);
-    transition: transform var(--dur-settle) var(--ease-spring-hard), filter var(--dur-enter) ease;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease;
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.18));
 }
 body.stash-liquid-glass nav.top-nav a.btn svg,
 body.stash-liquid-glass nav.top-nav button.btn svg,
 body.stash-liquid-glass nav.top-nav .navbar-toggler svg {
-    transition: transform var(--dur-settle) var(--ease-spring-hard), filter var(--dur-enter) ease;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease;
 }
 
-/* Active route - orange glow halo. JS adds .stash-nav-active to both left and right nav links.
-   Utilities may be `<a class="nav-utility btn">` (no inner button) - include `.btn` on the anchor.
+/* Active route — orange glow halo. JS adds .stash-nav-active to both left and right nav links.
+   Utilities may be `<a class="nav-utility btn">` (no inner button) — include `.btn` on the anchor.
    `:is()` takes the highest specificity of its arguments (all class-level here, so 0,1,0
    per token), preserving cascade behavior of the original 12 selectors. */
 body.stash-liquid-glass nav.top-nav :is(a.nav-link, a.nav-utility):is(.stash-nav-active, .active) > :is(button, .btn),
@@ -553,7 +553,7 @@ body.stash-liquid-glass nav.top-nav .navbar-buttons a[href$="/new"] svg {
 
 /* url-switcher styling (sizing + mode-tunnel glow) lives in 13_plugins.css. */
 
-/* Brand - orange glass orb (text cleared in refract.js; aria-label = Home).
+/* Brand — orange glass orb (text cleared in refract.js; aria-label = Home).
    Stash / react-router variants: optional .top-nav; .brand-link on button or anchor; HashRouter. */
 body.stash-liquid-glass nav.navbar.navbar-dark .navbar-brand,
 body.stash-liquid-glass nav.top-nav .navbar-brand,
@@ -603,12 +603,12 @@ html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button {
     align-items: center !important;
     justify-content: center !important;
     transition:
-        transform var(--dur-move) var(--ease-spring),
-        box-shadow var(--dur-enter) ease,
-        border-color var(--dur-enter) ease,
-        filter var(--dur-enter) ease;
+        transform 0.2s cubic-bezier(0.34, 1.2, 0.64, 1),
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        filter 0.22s ease;
 }
-/* Custom logo (refract.customLogoUrl) - masked span tinted to --text so
+/* Custom logo (refract.customLogoUrl) — masked span tinted to --text so
    the logo matches the soft-white tone of the surrounding navbar icons.
    65% of the brand button leaves visible padding around it. */
 body.stash-liquid-glass nav .navbar-brand .refract-custom-logo {
@@ -741,11 +741,11 @@ html.stash-liquid-glass nav.navbar.fixed-top .navbar-brand > a > button:focus-vi
 }
 
 /* Hide help, logout, donate, sidebar toggle (keep scoped to top nav; avoids beating .btn rule).
-   :not(.notification-btn) exempts stashNotifications' bell - a Dropdown
+   :not(.notification-btn) exempts stashNotifications' bell — a Dropdown
    toggle that carries .nav-utility too but is a real control we keep
    (themed with the gs-trigger rules above). The :where() exempts
    StashInteractiveTools' Handy button (forum report user037951) at
-   ZERO added specificity - never add exemptions via bare :not() here,
+   ZERO added specificity — never add exemptions via bare :not() here,
    that specificity bump is what broke the mobile burger in 1.19.0. */
 body.stash-liquid-glass nav.top-nav button.btn.nav-utility:not(.notification-btn):where(:not(.stash-interactive-tools-utility-item button)),
 body.stash-liquid-glass nav.top-nav a[href="/logout"],
@@ -767,8 +767,8 @@ body.stash-liquid-glass nav.top-nav .sidebar-toggle-button {
 }
 
 /* Help button opt-in (body.refract-show-help, toggled from Interface > Menu
-   Items). Stash renders the utility buttons TWICE - once in the collapsed
-   menu and once in the persistent .navbar-buttons cluster - so we re-show
+   Items). Stash renders the utility buttons TWICE — once in the collapsed
+   menu and once in the persistent .navbar-buttons cluster — so we re-show
    ONLY the .navbar-buttons instance to avoid a duplicate. The actual show +
    styling is handled by adding this same instance to the icon-button restyle
    rule above (so it gets identical sizing + hover box as Stats/Settings).
@@ -786,7 +786,7 @@ body.stash-liquid-glass.refract-show-help nav.top-nav .navbar-buttons > button.n
 /* Icon: swap Stash's solid FontAwesome question-circle for a stroke-style
    glyph that matches the theme's line icons. Native SVG hidden; the glyph is
    painted as a currentColor mask on ::after so it inherits the button's text
-   colour (and the hover brighten). CSS-only - React can't clobber it. */
+   colour (and the hover brighten). CSS-only — React can't clobber it. */
 body.stash-liquid-glass.refract-show-help nav.top-nav .navbar-buttons > button.nav-utility[title="Help"] svg {
     display: none !important;
 }
@@ -806,7 +806,7 @@ body.stash-liquid-glass nav.top-nav .stash-nav-fallback-icon {
 
 /* ── Navbar drag-to-reorder ──────────────────────────────────────── */
 /* Items animate via JS transforms; only a grab cursor needed here.
-   No drop-target highlight - the live sliding gap shows the landing. */
+   No drop-target highlight — the live sliding gap shows the landing. */
 body.stash-liquid-glass nav.top-nav .navbar-nav > .st-nav-draggable {
     cursor: grab;
     -webkit-user-select: none;
@@ -814,7 +814,7 @@ body.stash-liquid-glass nav.top-nav .navbar-nav > .st-nav-draggable {
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Library row right-edge fade - applied to .navbar-collapse only
+   Library row right-edge fade — applied to .navbar-collapse only
    (NOT .navbar-nav). The collapse fills the flex space between brand
    and buttons; icons inside it overflow when the row is too wide. The
    fade catches just those overflow icons because they reach the right
@@ -828,7 +828,7 @@ body.stash-liquid-glass nav.top-nav .navbar-nav > .st-nav-draggable {
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Active-task spinner - slowly rotate the settings cog whenever a
+   Active-task spinner — slowly rotate the settings cog whenever a
    background job is running. JS in refract.js (refractActiveTaskPoll)
    polls jobQueue every 4s and toggles `refract-tasks-running` on
    <body>. 3s linear rotation matches the unhurried pace of native

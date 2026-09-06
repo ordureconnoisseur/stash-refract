@@ -16,7 +16,7 @@
    ─────────────────────────────────────────────────────────────────── */
 
 
-/* ── Topbar - dark tinted glass ─────────────────────────────────────────── */
+/* ── Topbar — dark tinted glass ─────────────────────────────────────────── */
 
 #mv-topbar {
     background: rgba(20, 20, 24, 0.78) !important;
@@ -54,7 +54,7 @@
     color: #fff !important;
 }
 
-/* Selected/active state - focus button (.active class), settings button
+/* Selected/active state — focus button (.active class), settings button
    when modal open (:has detection), and roulette button when menu panel
    open. All get the same accent halo as Refract's active navbar buttons. */
 #mv-focus-btn.active,
@@ -134,7 +134,7 @@ body:has(#mv-menu-panel) #mv-roulette-btn:hover {
     color: rgba(255, 255, 255, 0.78) !important;
 }
 
-/* Toggle - Refract's gradient track + glassy thumb pattern, adapted from
+/* Toggle — Refract's gradient track + glassy thumb pattern, adapted from
    .custom-switch in 08_misc_mid.css. Sized to multiview's 36×20 slot. */
 .mv-toggle {
     width: 36px !important;
@@ -187,7 +187,7 @@ body:has(#mv-menu-panel) #mv-roulette-btn:hover {
         0 0 0 1px rgba(255, 255, 255, 0.35) inset !important;
 }
 
-/* Quality select dropdowns - match Refract's form-control language */
+/* Quality select dropdowns — match Refract's form-control language */
 .mv-quality-select {
     background: rgba(255, 255, 255, 0.06) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;

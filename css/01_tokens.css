@@ -1,15 +1,15 @@
 /* ───────────────────────────────────────────────────────────────────
-   Stash Theme - iOS Liquid Glass
+   Stash Theme — iOS Liquid Glass
    Minimalist dark theme, glass surfaces, orange accent only.
    Targets Stash + Bootstrap 5.
    ─────────────────────────────────────────────────────────────────── */
 
-/* Albert Sans Variable - self-hosted from /fonts/. Single variable
+/* Albert Sans Variable — self-hosted from /fonts/. Single variable
    file covers weights 100–900 (and italic counterpart). Stash exposes
    plugin static files under `/plugin/refract/assets/<path>` (the
-   `ui.assets./: .` mapping in refract.yml - the `/assets/` segment is
+   `ui.assets./: .` mapping in refract.yml — the `/assets/` segment is
    added by Stash, not us). The plain `/plugin/refract/<path>` route
-   only serves the CSS/JS files listed in the manifest - everything else
+   only serves the CSS/JS files listed in the manifest — everything else
    404s, which is why the original v1.10.2 was silently falling back to
    system-ui until we tested with Moirai One on 2026-05-20. */
 @font-face {
@@ -30,52 +30,35 @@
 body.stash-liquid-glass {
     --theme-font-stack: "Albert Sans", system-ui, sans-serif;
     --bg-0: #0a0a0a;
-    --bg-0-rgb: 10, 10, 10;   /* channel form; 14_light re-points it */
     --bg-1: #111;
     --text: rgba(255, 255, 255, 0.92);
     --text-muted: rgba(255, 255, 255, 0.55);
-    /* Foreground CHANNELS, not a colour. Everything that used to write
-       rgba(255, 255, 255, a) for text writes rgba(var(--fg-rgb), a)
-       instead, so the alpha stays the component's decision while the ink
-       follows the mode. Dark resolves to exactly the value it replaced.
-
-       This exists because the old arrangement made light mode opt-in per
-       declaration: a hardcoded white needed a hand-written counterpart in
-       14_light, and 44 of the theme's 76 white text declarations never
-       got one. Two of them shipped as white-on-white in the rating drawer
-       on 2026-08-29. A token that flips cannot be forgotten (3.1). */
-    --fg-rgb: 255, 255, 255;
 
     --glass-bg: rgba(255, 255, 255, 0.06);
     --glass-bg-strong: rgba(255, 255, 255, 0.10);
     --glass-border: rgba(255, 255, 255, 0.12);
     --glass-border-bright: rgba(255, 255, 255, 0.22);
-    --glass-blur: blur(24px);             /* legacy alias - equals --glass-blur-xl */
+    --glass-blur: blur(24px);             /* legacy alias — equals --glass-blur-xl */
 
     /* Backdrop blur tiers. Each unique backdrop-filter expression compiles
        to its own HLSL shader on Windows Chromium / D3D11; consolidating
-       to a fixed token set caps the shader count (22 originally, 11 at
-       the first consolidation, 9 since 2026-08-28: the lg rung was folded
-       into xl because a 4px delta at 20-24px is imperceptible behind
-       glass). --glass-blur-lg/-lg-sat stay DEFINED as aliases of the xl
-       values so users' custom CSS keeps working, but internal code uses
-       the xl names; identical values compile to one shader either way. */
+       to a fixed token set caps the shader count (was 22, now 11) and
+       stops the HLSLCompiler recompile churn on home-page navigation. */
     --glass-blur-xs:      blur(6px);
     --glass-blur-sm:      blur(10px);
     --glass-blur-md:      blur(14px);
+    --glass-blur-lg:      blur(20px);
     --glass-blur-xl:      blur(24px);
     --glass-blur-2xl:     blur(32px);
     --glass-blur-sm-sat:  blur(10px) saturate(140%);
     --glass-blur-md-sat:  blur(14px) saturate(140%);
+    --glass-blur-lg-sat:  blur(20px) saturate(140%);
     --glass-blur-xl-sat:  blur(24px) saturate(140%);
     --glass-blur-2xl-sat: blur(32px) saturate(140%);
-    /* Deprecated aliases - do not use in new code. */
-    --glass-blur-lg:      blur(24px);
-    --glass-blur-lg-sat:  blur(24px) saturate(140%);
 
     --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
 
-    /* Depth shadows - graduated single-layer drop shadows. Tokenized
+    /* Depth shadows — graduated single-layer drop shadows. Tokenized
        so light-mode (14_light.css) can swap to soft light variants in
        one place rather than per-selector. Composites that include
        accent halos compose `var(--shadow-X)` with inline accent layers. */
@@ -86,13 +69,13 @@ body.stash-liquid-glass {
     --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.55);
     --shadow-2xl: 0 24px 60px rgba(0, 0, 0, 0.55);
 
-    /* Inset track shadow - used on player/scrubber grooves where a
+    /* Inset track shadow — used on player/scrubber grooves where a
        dark dent + bright top-rim creates the "carved" look. */
     --shadow-inset-track:
         inset 0 1px 2px rgba(0, 0, 0, 0.45),
         0 1px 0 rgba(255, 255, 255, 0.05);
 
-    /* Navbar composite - depth drop + hairline + inner highlight, plus
+    /* Navbar composite — depth drop + hairline + inner highlight, plus
        a tighter accent glow halo so it doesn't extend past the
        viewport's left/right edges (where Stash's main wrapper / body
        overflow-x clipping cuts the wide far-halo layer off
@@ -114,124 +97,16 @@ body.stash-liquid-glass {
        0.875rem, 0.86rem = 12.6 / 12.25 / 12.04px) sat inside half a
        pixel of each other while claiming to be different steps. Six more
        clustered between 9.2 and 10.8px. Anything picking a size should
-       reach for one of these rather than inventing another.
-
-       The top of the ladder was retuned 2026-08-28. --fs-lg and --fs-xl
-       had ZERO consumers theme-wide while 14 literal sizes sat above
-       --fs-body, none of them at 17.5 or 28px, and the scene panel had
-       invented its own 21px step locally because the scale had a hole
-       between 17.5 and 28. Retuning two dead tokens is cheaper than
-       adding an eighth beside them, so --fs-xl became the 21px rung the
-       panel needed and the old 28px moved up to --fs-2xl. Nothing
-       referenced either name, so nothing changed on screen. */
-    --fs-xs:   0.72rem;   /* 10.08px  counters, eyebrows, captions    */
-    --fs-sm:   0.8rem;    /* 11.2px   pills, chips, badges, dense tabs*/
+       reach for one of these six rather than inventing a seventh. */
+    --fs-xs:   0.72rem;   /* 10.08px  counters, overlay metadata      */
+    --fs-sm:   0.8rem;    /* 11.2px   pills, chips, badges            */
     --fs-base: 0.875rem;  /* 12.25px  controls: buttons, tabs, inputs */
-    --fs-md:   0.92rem;   /* 12.88px  card titles, dense headings     */
+    --fs-md:   0.92rem;   /* 12.88px  card titles, dense headings   */
     --fs-body: 1rem;      /* 14px     body copy, detail values        */
     --fs-lg:   1.25rem;   /* 17.5px   sub-headings                    */
-    --fs-xl:   1.5rem;    /* 21px     panel and section titles        */
-    --fs-2xl:  2rem;      /* 28px     page title                      */
+    --fs-xl:   2rem;      /* 28px     page title                      */
 
-    /* Motion scale - tokenized 2026-08-28 from the measured de-facto
-       scale (0.15s appeared 373 times as a literal before this), then
-       the near-duplicate and residue literals folded onto it the same
-       day. Only 0.08s and a couple of deliberate outliers (the player's
-       1s idle fade) remain literal - see DESIGN_SYSTEM.md 3.7 and 9. */
-    --dur-instant: 0.12s;   /* press feedback, checks              */
-    --dur-fast:    0.15s;   /* the default: hover, colour, borders */
-    --dur-move:    0.18s;   /* transforms, small movement          */
-    --dur-enter:   0.22s;   /* panel + popover entrances           */
-    --dur-settle:  0.3s;    /* multi-property settles, reveals     */
-    --dur-slow:    0.4s;    /* large surfaces: drawer, flip, modal */
-    --ease-glide:       cubic-bezier(0.4, 0, 0.2, 1);    /* defined start + end   */
-    --ease-spring:      cubic-bezier(0.34, 1.2, 0.64, 1);  /* physical entrance   */
-    --ease-spring-hard: cubic-bezier(0.34, 1.56, 0.64, 1); /* stiffer entrance    */
-
-    /* Surface fill ramp - tokenized 2026-08-28 from the measured
-       white-alpha background histogram (values 0.02-0.12 had drifted
-       nearly continuous; these four carry ~130 of the uses, with folds
-       of at most 0.01 alpha). Light mode does NOT redefine these yet -
-       14_light.css still overrides surfaces per-selector - so this is
-       purely vocabulary today and becomes the one-scope light flip
-       later. --glass-bg (0.06) / --glass-bg-strong (0.10) stay the
-       named glass fills; do not alias them to this ramp, they retheme
-       in light mode and the ramp deliberately does not. */
-    --fill-1: rgba(255, 255, 255, 0.03);   /* hairline tint: rows, wells      */
-    --fill-2: rgba(255, 255, 255, 0.04);   /* resting fill: inputs, tiles     */
-    --fill-3: rgba(255, 255, 255, 0.05);   /* raised fill: chips, list items  */
-    --fill-4: rgba(255, 255, 255, 0.08);   /* hover / active fill             */
-
-    /* Rating stars. Gold is a THIRD colour system beside the accent and
-       the tier palette, which 3.1 rule 2 does not permit, but Stash's
-       star control is a convention older than this theme and the tiers
-       already override the accent for the same reason: it encodes data.
-       So it stays gold and becomes a token, because what 3.1 rule 1
-       actually forbids is the raw hex, and the raw hex is what broke it:
-       #fbbf24 is written literally in nine places and light mode could
-       only ever reach one of them.
-       Measured on the panel: filled 9.47:1, empty 2.70:1, and 3.51:1
-       between the two, which is the number that carries the rating. The
-       empty star cannot also clear 3:1 against the panel without pushing
-       that separation under 3, so the data distinction wins and the
-       track sits just below. */
-    /* One star shape for the whole theme: the soft-lobed star the
-       performer rating badge draws. Stash's own control ships Font
-       Awesome's sharp star, and the theme was drawing a third shape of
-       its own on the advanced-rating trigger, so a scene page could show
-       three different stars at once. Masked rather than swapped, because
-       the control belongs to Stash (6.12, 6.20). */
-    --st-star-svg: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z' fill='black' stroke='black' stroke-width='0.4' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
-    --star: #fbbf24;
-    --star-empty: rgba(255, 255, 255, 0.30);
-
-    /* Dark surface family - the near-opaque neutral behind popovers,
-       menus and floating overlays. One RGB triplet, alpha per use
-       (rgba(var(--surface-rgb), A)); 16,16,20 and 18,18,22 were folded
-       in (deltas of 4/255 or less, invisible). The MODAL is the other
-       sanctioned surface: exactly neutral, because an (n,n,n+4) mix
-       reads blue next to --bg-0 at modal size (see DESIGN_SYSTEM 6.14).
-       Both may be re-pointed wholesale by a future light-mode pass. */
-    --surface-rgb: 20, 20, 24;
-    --surface-solid: rgba(11, 11, 11, 0.94);
-    /* Artwork scrim - the dark film under pills/chevrons that sit ON
-       IMAGERY (duration pill, carousel chevrons, lite card pills).
-       Deliberately MODE-FIXED: artwork is the third ground (3.1) and
-       does not change with the mode, so neither does its scrim.
-       14_light must never re-point this. */
-    --scrim-rgb: 20, 20, 24;
-
-    /* Gap scale - tokenized 2026-08-28 from the measured gap histogram.
-       Folds of at most 0.1rem (1.4px). Pixel-unit gaps (2/4/5px icon
-       and glyph spacing) stay literal; padding/margins are NOT in
-       scope yet (see DESIGN_SYSTEM section 9). */
-    --gap-2xs: 0.25rem;   /* 3.5px  glyph-adjacent            */
-    --gap-xs:  0.3rem;    /* 4.2px  inside a chip or pill     */
-    --gap-sm:  0.4rem;    /* 5.6px  control clusters          */
-    --gap-md:  0.5rem;    /* 7px    the default between items */
-    --gap-lg:  0.75rem;   /* 10.5px between groups            */
-    --gap-xl:  1rem;      /* 14px   between sections          */
-
-    /* Tracking ladder - the eyebrow / label letter-spacing steps
-       (DESIGN_SYSTEM 6.13). Micro letterfit on display text (0.005 to
-       0.02em) is a different job and stays literal. */
-    --track-tight:   0.04em;
-    --track-label:   0.06em;
-    --track-eyebrow: 0.08em;
-    --track-wide:    0.1em;
-    --track-display: 0.14em;
-
-    /* Named z layers - the cross-file singletons from the elevation
-       band map (DESIGN_SYSTEM 3.8). In-component stacking (0-9) and
-       the tier ladder (20-70) stay literal by design. */
-    --z-scrim:    99;     /* mobile drawer scrim                  */
-    --z-dock:     110;    /* mobile bottom dock, above the scrim  */
-    --z-pager:    400;    /* floating pagination                  */
-    --z-overlay:  1060;   /* above Bootstrap's modal layer        */
-    --z-lightbox: 1100;   /* lightbox chrome                      */
-    --z-top:      9999;   /* last resort: drag ghosts, top toasts */
-
-    /* Accent palette - orange by default. Override the four `--accent`
+    /* Accent palette — orange by default. Override the four `--accent`
        vars on `body.stash-liquid-glass.refract-<preset>` to retheme the
        entire UI; the preset classes at the bottom of this file ship
        seven alternates (blue / pink / red / yellow / purple / green /
@@ -243,28 +118,6 @@ body.stash-liquid-glass {
     --accent-rgb: 249, 115, 22;
     --accent-glow: rgba(var(--accent-rgb), 0.28);
     --accent-tint: rgba(var(--accent-rgb), 0.12);
-    /* The accent shade that is safe as TEXT, per 3.1 rule 4. In dark
-       that is --accent-bright, which measures 6.60 to 11.92:1 on a card
-       fill over the modal surface across the eight accents. Light needs
-       a different value entirely and redefines this in 14_light: there
-       --accent-bright reaches only 1.39 to 2.51 and --accent only 1.74
-       to 3.60, so neither can carry a label on a light panel. Use this
-       wherever the accent is the ink; keep --accent and
-       --accent-bright for fills, rims and marks. */
-    --accent-ink: var(--accent-bright);
-
-    /* Danger family - sanctioned 2026-08-30, amending the old "semantic
-       colour is Bootstrap's" rule for this one role: destructive state
-       had already converged on Tailwind red de facto (the same base as
-       the refract-red accent preset), with one stray crimson toast.
-       Success and warning remain Bootstrap's until ruled. */
-    --danger: #ef4444;
-    --danger-bright: #f87171;   /* ink on danger tints            */
-    --danger-light: #fca5a5;    /* ink on strong danger fills     */
-    --danger-rgb: 239, 68, 68;
-    /* Mode-flipping danger ink, per the --accent-ink pattern: readable
-       red TEXT on the current ground. 14_light re-points it darker. */
-    --danger-ink: var(--danger-bright);
 
     --nav-btn-size: 2.4rem;
     --nav-icon-size: 1rem;
@@ -316,7 +169,7 @@ body.stash-liquid-glass {
 }
 
 /* ROOT element background. Stash leaves <html> white and only darkens
-   body/.main - iOS Safari exposes the html background in the strip
+   body/.main — iOS Safari exposes the html background in the strip
    under the expanded URL bar and on rubber-band overscroll, painting a
    white band above/below the dark theme on phones. Match the theme's
    top-edge colour (and the light variant). */
@@ -372,7 +225,7 @@ body.stash-liquid-glass .main.container-fluid:has(> .row > :is(.scene-tabs, .ima
 }
 
 /* ───────────────────────────────────────────────────────────────────
-   Navbar scaling - bumps icon + button size on larger viewports so
+   Navbar scaling — bumps icon + button size on larger viewports so
    the navbar doesn't feel cramped on 1440p / 4K / ultrawide displays.
    Defaults (above) are tuned for 13-15" laptops at 100% scaling.
    ─────────────────────────────────────────────────────────────────── */
