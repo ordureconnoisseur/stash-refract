@@ -270,10 +270,21 @@
                     return R.createElement("div", { className: "refract-card-preview" },
                         R.createElement("div", { className: "sub-heading" }, "Preview unavailable. The card settings below still apply."));
                 }
-                return R.createElement("div", {
-                    className: "refract-card-preview",
-                    dangerouslySetInnerHTML: { __html: mockHtml }
-                });
+                /* The mocks go inside a `.refract-preview-cards` wrapper for
+                   the same reason the real cards do: every rule that decides
+                   which of the two cards is on stage is keyed on that class
+                   (`.refract-preview-kind-scene .refract-preview-cards
+                   .performer-card` and its mirror in 11_misc_tail.css).
+                   Without the wrapper the fallback matched none of them, so
+                   BOTH mocks drew, stacked, while the Scene card / Performer
+                   card control above them did nothing at all. Measured on a
+                   clean install with the preview query blocked: two cards,
+                   one segmented control that could not move either. */
+                return R.createElement("div", { className: "refract-card-preview" },
+                    R.createElement("div", {
+                        className: "refract-preview-cards",
+                        dangerouslySetInnerHTML: { __html: mockHtml }
+                    }));
             }
             function onCardError() {
                 setPv({ loading: false, scene: null, performer: null, failed: true });
