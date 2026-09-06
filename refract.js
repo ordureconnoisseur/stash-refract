@@ -3381,14 +3381,24 @@
         " groups { group { id name front_image_path } scene_index }";
     var PREVIEW_SCENE_FIELDS_MOVIES = PREVIEW_SCENE_FIELDS_BASE +
         " movies { movie { id name front_image_path } scene_index }";
-    var PREVIEW_PERF_FIELDS =
+    /* Performer.group_count is the same 0.27 rename as Scene.groups, and it
+       needs the same second answer: on 0.26 the field is movie_count and a
+       query naming group_count is rejected whole, which left the performer
+       half of the preview empty on every reload. */
+    var PREVIEW_PERF_FIELDS_BASE =
         "id name disambiguation gender birthdate country image_path favorite " +
-        "rating100 o_counter scene_count image_count gallery_count group_count " +
+        "rating100 o_counter scene_count image_count gallery_count " +
         "performer_count tags { id name } stash_ids { endpoint stash_id } alias_list";
+    var PREVIEW_PERF_FIELDS = PREVIEW_PERF_FIELDS_BASE + " group_count";
+    var PREVIEW_PERF_FIELDS_MOVIES = PREVIEW_PERF_FIELDS_BASE + " movie_count";
     function refractGqlQuery(query) {
+        /* Same headers as the XHR transport, so a server reached with an API
+           key rather than a session cookie answers this one too. A 401 here
+           used to be indistinguishable from an empty library. */
         return fetch("/graphql", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            headers: gqlHeaders(),
             body: JSON.stringify({ query: query })
         }).then(function (r) { return r.json(); });
     }
@@ -3405,6 +3415,18 @@
                     JSON.stringify(r.errors).indexOf("groups") !== -1) {
                 refractPreviewSceneFields = PREVIEW_SCENE_FIELDS_MOVIES;
                 return refractGqlQuery(buildQuery(refractPreviewSceneFields));
+            }
+            return r;
+        });
+    }
+    /* The performer half of the same answer, for the same reason. */
+    var refractPreviewPerfFields = PREVIEW_PERF_FIELDS;
+    function refractPerfQuery(buildQuery) {
+        return refractGqlQuery(buildQuery(refractPreviewPerfFields)).then(function (r) {
+            if (r.errors && refractPreviewPerfFields !== PREVIEW_PERF_FIELDS_MOVIES &&
+                    JSON.stringify(r.errors).indexOf("group_count") !== -1) {
+                refractPreviewPerfFields = PREVIEW_PERF_FIELDS_MOVIES;
+                return refractGqlQuery(buildQuery(refractPreviewPerfFields));
             }
             return r;
         });
@@ -3426,9 +3448,14 @@
             return refractSceneQuery(function (F) {
                 return "query { findScenes(filter: { per_page: 1, sort: \"random\" }" + f + ") { scenes { " + F + " } } }";
             }).then(function (r) {
-                    var s = r.data && r.data.findScenes.scenes[0];
+                    /* A nested resolver error nulls the field but still
+                       carries `data`, so this chain has to be walked, not
+                       assumed: reaching through it threw, and the throw took
+                       the performer half of the preview down with it. */
+                    var list = r.data && r.data.findScenes && r.data.findScenes.scenes;
+                    var s = (list && list[0]) || null;
                     if (!s && filtered) { return randomScene(false); }
-                    return s || null;
+                    return s;
                 });
         }
         function randomPerformer(filtered) {
@@ -3437,16 +3464,19 @@
                     ? ", performer_filter: { rating100: { value: 0, modifier: IS_NULL }, scene_count: { value: 0, modifier: GREATER_THAN } }"
                     : ", performer_filter: { rating100: { value: 74, modifier: GREATER_THAN }, scene_count: { value: 0, modifier: GREATER_THAN } }")
                 : "";
-            return refractGqlQuery("query { findPerformers(filter: { per_page: 1, sort: \"random\" }" + f + ") { performers { " + PREVIEW_PERF_FIELDS + " } } }")
-                .then(function (r) {
-                    var p = r.data && r.data.findPerformers.performers[0];
+            return refractPerfQuery(function (F) {
+                return "query { findPerformers(filter: { per_page: 1, sort: \"random\" }" + f + ") { performers { " + F + " } } }";
+            }).then(function (r) {
+                    var list = r.data && r.data.findPerformers && r.data.findPerformers.performers;
+                    var p = (list && list[0]) || null;
                     if (!p && filtered) { return randomPerformer(false); }
-                    return p || null;
+                    return p;
                 });
         }
-        function byId(kind, id2, fields) {
-            return refractGqlQuery("query { " + kind + "(id: \"" + id2 + "\") { " + fields + " } }")
-                .then(function (r) { return (r.data && r.data[kind]) || null; });
+        function byId(kind, id2, build) {
+            return build(function (F) {
+                return "query { " + kind + "(id: \"" + id2 + "\") { " + F + " } }";
+            }).then(function (r) { return (r.data && r.data[kind]) || null; });
         }
         var storedScene = null, storedPerf = null;
         try {
@@ -3462,7 +3492,7 @@
               })
             : randomScene(true);
         var perfP = (!shuffle && storedPerf)
-            ? byId("findPerformer", storedPerf, PREVIEW_PERF_FIELDS).then(function (p) { return p || randomPerformer(true); })
+            ? byId("findPerformer", storedPerf, refractPerfQuery).then(function (p) { return p || randomPerformer(true); })
             : randomPerformer(true);
         return Promise.all([sceneP, perfP]).then(function (rs) {
             try {
@@ -4839,11 +4869,18 @@
         return "";
     }
 
-    var QUERY_ROOT_TAGS =
-        'query StashThemeRootTags { findTags(' +
-        '  filter: { per_page: -1, sort: "name", direction: ASC },' +
-        '  tag_filter: { parents: { modifier: IS_NULL } }' +
-        ') { count tags { id name sort_name scene_count children { id name sort_name scene_count } } } }';
+    /* Tag.sort_name arrived in Stash 0.28. Naming it on an older server got
+       the whole query rejected, so the Categories page rendered a raw
+       GraphQL error instead of the grid. Without sort_name the grid falls
+       back to `name`, which is what it displays anyway. */
+    var QUERY_ROOT_TAGS_SN = { narrow: false };
+    function refractRootTagsQueryText(full) {
+        var sn = full ? " sort_name" : "";
+        return 'query StashThemeRootTags { findTags(' +
+            '  filter: { per_page: -1, sort: "name", direction: ASC },' +
+            '  tag_filter: { parents: { modifier: IS_NULL } }' +
+            ') { count tags { id name' + sn + ' scene_count children { id name' + sn + ' scene_count } } } }';
+    }
 
     var PLUS_SVG =
         '<svg class="stash-injected-icon svg-inline--fa fa-icon" viewBox="0 0 448 512" aria-hidden="true">' +
@@ -4916,6 +4953,34 @@
 
     function gqlWithVars(query, variables) {
         return gqlXhr(JSON.stringify({ query: query, variables: variables }));
+    }
+
+    /* ── Asking for a field the server may not have ─────────────────────
+       Refract runs on Stash 0.26 upwards and several fields it reads
+       arrived later: Scene.groups and Performer.group_count in 0.27,
+       Performer.custom_fields and Tag.sort_name in 0.28. GraphQL rejects a
+       query naming an unknown field OUTRIGHT - no partial data, no data at
+       all - so one field the server has never heard of used to cost the
+       whole feature it sat in, not the one line it feeds.
+
+       `build(full)` returns the query with the optional fields in (true) or
+       out (false). The first rejection that names one of them narrows the
+       query, and `state.narrow` remembers the answer for the session, so
+       the cost is one wasted request per feature per page load, not one per
+       call. Anything else still rejects: a permissions or network failure
+       must not be mistaken for an old schema. */
+    function refractQueryOptional(state, fields, build, variables) {
+        if (state.narrow) { return gqlWithVars(build(false), variables); }
+        return gqlWithVars(build(true), variables)["catch"](function (err) {
+            var msg = String((err && err.message) || err || "");
+            for (var i = 0; i < fields.length; i++) {
+                if (msg.indexOf(fields[i]) !== -1) {
+                    state.narrow = true;
+                    return gqlWithVars(build(false), variables);
+                }
+            }
+            throw err;
+        });
     }
 
     /* ── Server-side settings sync ──────────────────────────────────────
@@ -7270,12 +7335,23 @@
     /* One query, shared by both back styles. Everything either face needs is
        already here, which is why a scene-sourced image or a different stat
        selection costs no extra request. */
-    var REFRACT_FLIP_QUERY =
-        'query RefractFlip($id: ID!) {' +
-        '  findPerformer(id: $id) { id rating100 favorite o_counter scene_count measurements height_cm weight career_length birthdate custom_fields tags { id name } }' +
-        '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count scenes { id title rating100 paths { screenshot } } }' +
-        '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count images { id paths { thumbnail } } }' +
-        '}';
+    /* custom_fields is the per-performer back-image override, and it landed
+       in Stash 0.28. Before that this whole query was rejected for naming
+       it, so on 0.26 and 0.27 every card back lost its stats, its scene
+       strip and its photo strip over one optional line. */
+    var REFRACT_FLIP_CF = { narrow: false };
+    function refractFlipQueryText(full) {
+        return 'query RefractFlip($id: ID!) {' +
+            '  findPerformer(id: $id) { id rating100 favorite o_counter scene_count measurements height_cm weight career_length birthdate' +
+            (full ? ' custom_fields' : '') + ' tags { id name } }' +
+            '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count scenes { id title rating100 paths { screenshot } } }' +
+            '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 9, sort: "rating", direction: DESC }) { count images { id paths { thumbnail } } }' +
+            '}';
+    }
+    function refractFlipFetch(pid) {
+        return refractQueryOptional(REFRACT_FLIP_CF, ["custom_fields"],
+            refractFlipQueryText, { id: pid });
+    }
     /* The customiser previews the back by building it onto the preview's real
        performer card and showing that face directly. No flip animation: this
        is a preview, and a card that spins every time you toggle a chip is
@@ -7395,12 +7471,19 @@
        and, once built, the back. The stage tracks the image's box through a
        ResizeObserver, so the collapsed header and window resizes keep it in
        register. */
-    var REFRACT_PB_QUERY =
-        'query RefractPerformerBack($id: ID!) {' +
-        '  findPerformer(id: $id) { id name gender rating100 custom_fields }' +
-        '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 12, sort: "rating", direction: DESC }) { scenes { id title paths { screenshot } } }' +
-        '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 12, sort: "rating", direction: DESC }) { images { id title paths { thumbnail } } }' +
-        '}';
+    /* Same custom_fields story as the flip query: without the narrow form,
+       a Stash older than 0.28 answered nothing here, so the photo flip on
+       the performer page never appeared at all. It appears now, reading the
+       global rule; only the per-performer override is genuinely unavailable
+       on those servers, and the toolbar says so when a write fails. */
+    var REFRACT_PB_CF = { narrow: false };
+    function refractPbQueryText(full) {
+        return 'query RefractPerformerBack($id: ID!) {' +
+            '  findPerformer(id: $id) { id name gender rating100' + (full ? ' custom_fields' : '') + ' }' +
+            '  findScenes(scene_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 12, sort: "rating", direction: DESC }) { scenes { id title paths { screenshot } } }' +
+            '  findImages(image_filter: { performers: { value: [$id], modifier: INCLUDES } }, filter: { per_page: 12, sort: "rating", direction: DESC }) { images { id title paths { thumbnail } } }' +
+            '}';
+    }
 
     function refractPerformerIdFromUrl() {
         var m = String(location.pathname).match(/^\/performers\/(\d+)/);
@@ -7504,7 +7587,7 @@
             if (b) { b.click(); }
         });
 
-        gqlWithVars(REFRACT_PB_QUERY, { id: pid }).then(function (res) {
+        refractQueryOptional(REFRACT_PB_CF, ["custom_fields"], refractPbQueryText, { id: pid }).then(function (res) {
             var d = res && res.data;
             if (!d) { return; }
             refractRenderPageCard(root, host, img, pid, d);
@@ -8082,7 +8165,7 @@
         card.appendChild(back);
         refractPaintBack(back, portrait, null);
 
-        gqlWithVars(REFRACT_FLIP_QUERY, { id: pid }).then(function (res) {
+        refractFlipFetch(pid).then(function (res) {
             var d = res && res.data;
             refractPaintBack(back, portrait, d);
         }).catch(function () { /* the portrait fallback is already painted */ });
@@ -8363,7 +8446,7 @@
             titleEl2.insertBefore(gIcon, nameEl2);
         }
 
-        gqlWithVars(REFRACT_FLIP_QUERY, { id: pid }).then(function (res) {
+        refractFlipFetch(pid).then(function (res) {
             var d = res && res.data;
             var p = d && d.findPerformer;
             var scenes = d && d.findScenes && d.findScenes.scenes;
@@ -8923,7 +9006,7 @@
 
     function loadAndShow() {
         renderLoading();
-        gql(QUERY_ROOT_TAGS)
+        refractQueryOptional(QUERY_ROOT_TAGS_SN, ["sort_name"], refractRootTagsQueryText)
             .then(function (data) {
                 if (data.errors && data.errors.length) {
                     renderError(data.errors[0].message || "GraphQL error");
@@ -14468,6 +14551,7 @@
         });
     }
 
+    var REFRACT_TAGEDIT_SN = { narrow: false };
     function refractLoadTagEditorData(pid) {
         if (refractTagEditorState.loaded || refractTagEditorState.loading) return;
         refractTagEditorState.loading = true;
@@ -14476,15 +14560,19 @@
             'query FindPerformerForTagEditor($id: ID!) {' +
             '  findPerformer(id: $id) { id tags { id name } }' +
             '}';
-        var tagsQ =
-            'query FindAllTagsForTagEditor {' +
-            '  findTags(filter: { per_page: -1, sort: "name", direction: ASC }) {' +
-            '    tags { id name sort_name description image_path parents { id name } children { id } }' +
-            '  }' +
-            '}';
+        /* sort_name again (Stash 0.28). The editor already falls back to
+           `name` for every tag that has no sort name, so the narrow form
+           costs nothing but the grouping order on an older server. */
+        function tagsQ(full) {
+            return 'query FindAllTagsForTagEditor {' +
+                '  findTags(filter: { per_page: -1, sort: "name", direction: ASC }) {' +
+                '    tags { id name' + (full ? ' sort_name' : '') + ' description image_path parents { id name } children { id } }' +
+                '  }' +
+                '}';
+        }
         Promise.all([
             gqlWithVars(perfQ, { id: pid }),
-            gql(tagsQ),
+            refractQueryOptional(REFRACT_TAGEDIT_SN, ["sort_name"], tagsQ),
         ]).then(function (results) {
             var pdata = results[0] && results[0].data && results[0].data.findPerformer;
             var tdata = results[1] && results[1].data && results[1].data.findTags;
