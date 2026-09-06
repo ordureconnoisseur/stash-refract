@@ -311,10 +311,21 @@
                     return R.createElement("div", { className: "refract-card-preview" },
                         R.createElement("div", { className: "sub-heading" }, "Preview unavailable. The card settings below still apply."));
                 }
-                return R.createElement("div", {
-                    className: "refract-card-preview",
-                    dangerouslySetInnerHTML: { __html: mockHtml }
-                });
+                /* The mocks go inside a `.refract-preview-cards` wrapper for
+                   the same reason the real cards do: every rule that decides
+                   which of the two cards is on stage is keyed on that class
+                   (`.refract-preview-kind-scene .refract-preview-cards
+                   .performer-card` and its mirror in 11_misc_tail.css).
+                   Without the wrapper the fallback matched none of them, so
+                   BOTH mocks drew, stacked, while the Scene card / Performer
+                   card control above them did nothing at all. Measured on a
+                   clean install with the preview query blocked: two cards,
+                   one segmented control that could not move either. */
+                return R.createElement("div", { className: "refract-card-preview" },
+                    R.createElement("div", {
+                        className: "refract-preview-cards",
+                        dangerouslySetInnerHTML: { __html: mockHtml }
+                    }));
             }
             function onCardError() {
                 setPv({ loading: false, scene: null, performer: null, failed: true });
@@ -1206,7 +1217,14 @@
                         var opts = {};
                         Object.keys(cur).forEach(function (k) { opts[k] = cur[k]; });
                         opts.type = (v === "stars") ? "stars" : "decimal";
-                        if (!opts.starPrecision) { opts.starPrecision = "tenth"; }
+                        /* Absent precision means the user never set one, so
+                           the only safe filler is Stash's own default. It
+                           filled "tenth" instead, which on a fresh install
+                           is every user: one click on this control and
+                           their stars became tenth-star, a setting they
+                           never chose and would have to find in Stash's
+                           own panel to undo. */
+                        if (!opts.starPrecision) { opts.starPrecision = "full"; }
                         return gqlWithVars(
                             'mutation($v: Any){ configureUISetting(key: "ratingSystemOptions", value: $v) }',
                             { v: opts }
@@ -5139,22 +5157,28 @@
            you can't subselect fields on it. Query the whole blob and
            read ratingSystemOptions.type from the deserialised object.
 
-           If `ratingSystemOptions.type` is missing (Stash's default,
-           decimal mode, doesn't always serialise the field), treat as
-           non-stars and clear the cached value - otherwise a previous
-           "stars" cache would stick across a switch to decimal. */
+           A MISSING `ratingSystemOptions` means the user has never
+           touched the setting, and Stash's own default for that case is
+           STARS (ui/v2.5/src/utils/rating.ts:
+           `defaultRatingSystemType = RatingSystemType.Stars`, read
+           through `config?.ui.ratingSystemOptions ?? default` by
+           RatingSystem, RatingBanner and the settings panel alike). We
+           used to read missing as decimal, which is the state of every
+           fresh install: measured on a clean 0.31.1 with 15 scenes, the
+           app drew five stars while refract's own settings row said
+           "Decimal" and the card banners kept the 0-10 scale. Stash
+           always writes an explicit type once the setting is changed,
+           so absent can only mean the default. */
         gql("query { configuration { ui } }")
             .then(function (res) {
                 var ui = res && res.data && res.data.configuration
                     && res.data.configuration.ui;
                 /* No usable config blob in a *successful* response - don't
-                   clobber the cached value with "". (An errored/auth-failed
+                   clobber the cached value. (An errored/auth-failed
                    response now rejects in gqlXhr and lands in .catch below,
-                   so it never reaches here and the cache is preserved.)
-                   When ui IS present, an empty type legitimately means
-                   decimal mode, so writing "" is correct. */
+                   so it never reaches here and the cache is preserved.) */
                 if (!ui) { return; }
-                var t = (ui.ratingSystemOptions && ui.ratingSystemOptions.type) || "";
+                var t = (ui.ratingSystemOptions && ui.ratingSystemOptions.type) || "stars";
                 try { localStorage.setItem(RATING_SYSTEM_STORAGE_KEY, t); } catch (e) { /* ignore */ }
                 applyRatingSystemClass(t);
             }).catch(function () { /* ignore - keep cached value */ });
@@ -6915,7 +6939,15 @@
         }
         if (REFRACT_EP_COUNTS[ctx.key] === undefined) { refractEpFetchCounts(ctx); }
         var counts = REFRACT_EP_COUNTS[ctx.key];
-        if (!counts || typeof counts !== "object" || !counts.kids) {
+        /* `!counts.all` is the empty-library case, and it is the same rule
+           as the one above, applied to the other end. Measured on a clean
+           0.31.1: a tag with one sub-tag and no scenes anywhere drew a
+           two-segment control reading "This tag 0 scenes" beside "With its
+           1 sub-tag 0 scenes". Both segments were true, neither did
+           anything, and the widest thing on the page was a switch between
+           two views of nothing. `all` is never smaller than `own`, so this
+           only ever fires when both are zero. */
+        if (!counts || typeof counts !== "object" || !counts.kids || !counts.all) {
             if (existing) { existing.parentNode.removeChild(existing); }
             refractBodyClass("refract-has-scope", false);
             return false;
@@ -7516,6 +7548,19 @@
         return m ? m[1] : null;
     }
 
+    /* The placeholder recolour in 03_cards.css matches on the img's src, and
+       the front face of this stage is not an img: it is a div carrying the
+       same URL as a background, with the real img left visibility:hidden
+       underneath it. So the attribute selector could never see it, and on a
+       performer with no picture the page painted Stash's raw white
+       silhouette while every card in the library painted the accent one.
+       Measured on a clean install, light mode: the white shape on the white
+       header plate read 255,255,255 against a 255,255,255 ground. The class
+       is what CSS can match; the src question is answered here. */
+    function refractMarkDefaultFace(el, src) {
+        refractSetClass(el, "refract-pp-default", /[?&]default=true/.test(String(src || "")));
+    }
+
     function applyPerformerBackControl() {
         var pid = refractPerformerIdFromUrl();
         var host = document.querySelector(".detail-header-image");
@@ -7566,6 +7611,7 @@
         var stage = root.querySelector(".refract-pp-stage");
         var frontCopy = root.querySelector(".refract-pp-front");
         var lastSrc = img.getAttribute("src") || "";
+        refractMarkDefaultFace(frontCopy, lastSrc);
         /* React owns the <img> and replaces it -- Stash's own "Set image
            (front)" swaps the node. fit() re-resolves it every pass instead of
            closing over a node that may be detached, and the front copy
@@ -7588,6 +7634,7 @@
             if (src && src !== lastSrc) {
                 lastSrc = src;
                 frontCopy.style.backgroundImage = "url('" + src.replace(/'/g, "%27") + "')";
+                refractMarkDefaultFace(frontCopy, src);
             }
             /* The anchor travels with the box: the front copy and the back
                read it from the stage. */

@@ -173,28 +173,52 @@ body.stash-liquid-glass .scene-marker-card .thumbnail-section {
    per swatch; the base rule is the default orange. */
 body.stash-liquid-glass img.performer-card-image[src*="default=true"],
 body.stash-liquid-glass img[src*="default=true"].performer-card-image,
-body.stash-liquid-glass .performer-card img[src*="default=true"] {
+body.stash-liquid-glass .performer-card img[src*="default=true"],
+body.stash-liquid-glass .refract-ph-card img[src*="default=true"],
+body.stash-liquid-glass #performer-page .detail-header-image img[src*="default=true"],
+body.stash-liquid-glass .refract-pp-front.refract-pp-default {
     filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%23f97316' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
 }
-body.stash-liquid-glass.refract-blue .performer-card img[src*="default=true"] {
+body.stash-liquid-glass.refract-blue .performer-card img[src*="default=true"],
+body.stash-liquid-glass.refract-blue .refract-ph-card img[src*="default=true"],
+body.stash-liquid-glass.refract-blue #performer-page .detail-header-image img[src*="default=true"],
+body.stash-liquid-glass.refract-blue .refract-pp-front.refract-pp-default {
     filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%233b82f6' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
 }
-body.stash-liquid-glass.refract-pink .performer-card img[src*="default=true"] {
+body.stash-liquid-glass.refract-pink .performer-card img[src*="default=true"],
+body.stash-liquid-glass.refract-pink .refract-ph-card img[src*="default=true"],
+body.stash-liquid-glass.refract-pink #performer-page .detail-header-image img[src*="default=true"],
+body.stash-liquid-glass.refract-pink .refract-pp-front.refract-pp-default {
     filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%23ec4899' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
 }
-body.stash-liquid-glass.refract-red .performer-card img[src*="default=true"] {
+body.stash-liquid-glass.refract-red .performer-card img[src*="default=true"],
+body.stash-liquid-glass.refract-red .refract-ph-card img[src*="default=true"],
+body.stash-liquid-glass.refract-red #performer-page .detail-header-image img[src*="default=true"],
+body.stash-liquid-glass.refract-red .refract-pp-front.refract-pp-default {
     filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%23ef4444' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
 }
-body.stash-liquid-glass.refract-yellow .performer-card img[src*="default=true"] {
+body.stash-liquid-glass.refract-yellow .performer-card img[src*="default=true"],
+body.stash-liquid-glass.refract-yellow .refract-ph-card img[src*="default=true"],
+body.stash-liquid-glass.refract-yellow #performer-page .detail-header-image img[src*="default=true"],
+body.stash-liquid-glass.refract-yellow .refract-pp-front.refract-pp-default {
     filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%23eab308' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
 }
-body.stash-liquid-glass.refract-purple .performer-card img[src*="default=true"] {
+body.stash-liquid-glass.refract-purple .performer-card img[src*="default=true"],
+body.stash-liquid-glass.refract-purple .refract-ph-card img[src*="default=true"],
+body.stash-liquid-glass.refract-purple #performer-page .detail-header-image img[src*="default=true"],
+body.stash-liquid-glass.refract-purple .refract-pp-front.refract-pp-default {
     filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%23a855f7' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
 }
-body.stash-liquid-glass.refract-green .performer-card img[src*="default=true"] {
+body.stash-liquid-glass.refract-green .performer-card img[src*="default=true"],
+body.stash-liquid-glass.refract-green .refract-ph-card img[src*="default=true"],
+body.stash-liquid-glass.refract-green #performer-page .detail-header-image img[src*="default=true"],
+body.stash-liquid-glass.refract-green .refract-pp-front.refract-pp-default {
     filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%2322c55e' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
 }
-body.stash-liquid-glass.refract-teal .performer-card img[src*="default=true"] {
+body.stash-liquid-glass.refract-teal .performer-card img[src*="default=true"],
+body.stash-liquid-glass.refract-teal .refract-ph-card img[src*="default=true"],
+body.stash-liquid-glass.refract-teal #performer-page .detail-header-image img[src*="default=true"],
+body.stash-liquid-glass.refract-teal .refract-pp-front.refract-pp-default {
     filter: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><filter id='rp' color-interpolation-filters='sRGB'><feFlood flood-color='%2314b8a6' flood-opacity='0.55'/><feComposite operator='in' in2='SourceGraphic'/></filter></svg>#rp") !important;
 }
 

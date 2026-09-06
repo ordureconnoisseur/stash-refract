@@ -221,8 +221,16 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
    into the bar rather than popping under a hard edge. `--glass-bg-strong`
    is overridden in 14_light.css, so this tracks light/dark automatically.
    Selector sits later than the `.form-container` rule at equal
-   specificity, so its background wins. */
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .edit-buttons-container {
+   specificity, so its background wins.
+
+   The second selector drops the tab wrapper. Stash reuses this same panel
+   for /scenes/new, where there is no `.scene-tabs` around it, so the
+   scoped selector matched nothing and the create page kept Stash's raw
+   `#202b33` bar: measured on a clean install, one unthemed blue-grey
+   strip across an otherwise themed page, on the surface a new user
+   reaches first. */
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .edit-buttons-container,
+body.stash-liquid-glass :is(#scene-edit-details, #image-edit-details) .edit-buttons-container {
     /* Keep Stash's `position: sticky; top: 0` (do NOT override position) -
        the Save/Scrape bar stays pinned while the form scrolls. To occlude
        fields scrolling up behind it WITHOUT reading as a band, replicate
@@ -250,14 +258,17 @@ body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #
     flex-wrap: wrap !important;
     gap: var(--gap-sm) !important;
 }
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .edit-buttons {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .edit-buttons,
+body.stash-liquid-glass :is(#scene-edit-details, #image-edit-details) .edit-buttons {
     margin: 0 !important;
     padding: 0 !important;
     display: flex !important;
     gap: var(--gap-sm) !important;
 }
 body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .edit-buttons .edit-button,
-body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .scraper-group .btn:not(.reload-button) {
+body.stash-liquid-glass :is(.scene-tabs, .image-tabs) :is(#scene-edit-details, #image-edit-details) .scraper-group .btn:not(.reload-button),
+body.stash-liquid-glass :is(#scene-edit-details, #image-edit-details) .edit-buttons .edit-button,
+body.stash-liquid-glass :is(#scene-edit-details, #image-edit-details) .scraper-group .btn:not(.reload-button) {
     font-size: var(--fs-sm) !important;
     padding: 0.35rem 0.7rem !important;
     border-radius: var(--radius-sm) !important;
