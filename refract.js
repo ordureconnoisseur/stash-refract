@@ -7430,6 +7430,16 @@
     }
 
     function refractSetBackOverride(pid, val) {
+        /* Custom fields are a Stash 0.28 feature and there is no older
+           equivalent, so the per-performer override genuinely cannot be
+           saved on 0.26 or 0.27. If the read already told us the server has
+           no custom_fields, say what is wrong in plain words rather than
+           letting the toolbar report a GraphQL type name. */
+        if (REFRACT_PB_CF.narrow || REFRACT_FLIP_CF.narrow) {
+            return Promise.reject(new Error(
+                "This Stash has no custom fields, so a per-performer back image cannot be saved. " +
+                "Stash 0.28 or newer supports it; the global back-image rule works on every version."));
+        }
         var m = "mutation RefractBackOverride($id: ID!, $cf: CustomFieldsInput!) {" +
                 "  performerUpdate(input: { id: $id, custom_fields: $cf }) { id }" +
                 "}";
