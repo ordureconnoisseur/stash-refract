@@ -5479,7 +5479,16 @@
        list. Independent of Stash's navbar DOM (which we hide entirely
        on mobile). Each tile is an <a> whose click triggers SPA nav via
        pushState + popstate (Stash's React Router responds to popstate). */
+    /* Home is first and `always: true`. Stash's navbar carries no Home
+       LINK - only the brand, which the phone layout hides with the rest
+       of the navbar - so before this tile there was no way to reach the
+       home page on a phone at all (forum thread 7183, post 204). It is
+       also not one of Stash's menuItems, so it can never be "disabled in
+       Stash's interface settings"; `always` exempts it from the
+       disabled-route pass below, which would otherwise hide it whenever
+       the brand anchor is not an exact href="/" match. */
     var MOBILE_NAV_ITEMS = [
+        { href: "/",               label: "Home",       icon: "home",     always: true },
         { href: "/scenes",         label: "Scenes",     icon: "scenes" },
         { href: "/images",         label: "Images",     icon: "images" },
         { href: "/groups",         label: "Movies",     icon: "movies",   aliases: ["/movies"] },
@@ -5493,6 +5502,7 @@
     ];
 
     var MOBILE_NAV_ICONS = {
+        home:       '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.2L12 3l9 7.2"/><path d="M5.6 9V20.6H18.4V9"/><path d="M9.9 20.6v-5.4h4.2v5.4z" fill="currentColor" stroke="none"/></svg>',
         scenes:     '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4z" fill="currentColor" stroke="none"/></svg>',
         images:     '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.6" fill="currentColor" stroke="none"/><path d="M21 16l-5-5-9 9"/></svg>',
         movies:     '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="9" r="5"/><circle cx="15.5" cy="9" r="5"/><circle cx="12" cy="15.5" r="5"/></svg>',
@@ -5883,6 +5893,7 @@
             html +=
                 '<a class="refract-drawer-tile" href="' + item.href + '" data-href="' + item.href + '"' +
                     ((item.aliases && item.aliases.length) ? ' data-aliases="' + item.aliases.join(" ") + '"' : '') +
+                    (item.always ? ' data-always-on="1"' : '') +
                     ' data-group="' + group + '"' +
                     ' aria-label="' + item.label + '">' +
                     '<span class="refract-drawer-tile-icon">' + icon + '</span>' +
@@ -6117,7 +6128,11 @@
        Skips /new contextual buttons - those get mirrored next to the
        burger via injectMobileNewButton instead. */
     var NATIVE_NAV_SKIP = {
-        "/": true,        // home - brand orb already covers it
+        /* Home is a hardcoded MOBILE_NAV_ITEM now, so the `known` check
+           above catches the brand anchor first and this entry never
+           fires. Kept so a navbar that renders home some other way still
+           cannot produce a second, plugin-styled Home tile. */
+        "/": true,
         "/setup": true,
         "/migrate": true
     };
@@ -6250,8 +6265,9 @@
                controls, not routes, so they have no data-href to match a live
                navbar route - without this exclusion the "disabled route" pass
                would stamp them refract-drawer-tile-off on every tick and hide
-               them. */
-            var htiles = drawer.querySelectorAll(".refract-drawer-tile:not([data-plugin-tile]):not([data-action-tile])");
+               them. Exclude data-always-on too (Home): it mirrors no menu
+               item, so its absence from menuItems is not a signal. */
+            var htiles = drawer.querySelectorAll(".refract-drawer-tile:not([data-plugin-tile]):not([data-action-tile]):not([data-always-on])");
             for (var h = 0; h < htiles.length; h++) {
                 var htile = htiles[h];
                 var hcands = [htile.getAttribute("data-href") || ""];
