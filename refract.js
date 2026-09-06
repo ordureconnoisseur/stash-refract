@@ -1165,7 +1165,14 @@
                         var opts = {};
                         Object.keys(cur).forEach(function (k) { opts[k] = cur[k]; });
                         opts.type = (v === "stars") ? "stars" : "decimal";
-                        if (!opts.starPrecision) { opts.starPrecision = "tenth"; }
+                        /* Absent precision means the user never set one, so
+                           the only safe filler is Stash's own default. It
+                           filled "tenth" instead, which on a fresh install
+                           is every user: one click on this control and
+                           their stars became tenth-star, a setting they
+                           never chose and would have to find in Stash's
+                           own panel to undo. */
+                        if (!opts.starPrecision) { opts.starPrecision = "full"; }
                         return gqlWithVars(
                             'mutation($v: Any){ configureUISetting(key: "ratingSystemOptions", value: $v) }',
                             { v: opts }
@@ -5002,22 +5009,28 @@
            you can't subselect fields on it. Query the whole blob and
            read ratingSystemOptions.type from the deserialised object.
 
-           If `ratingSystemOptions.type` is missing (Stash's default,
-           decimal mode, doesn't always serialise the field), treat as
-           non-stars and clear the cached value - otherwise a previous
-           "stars" cache would stick across a switch to decimal. */
+           A MISSING `ratingSystemOptions` means the user has never
+           touched the setting, and Stash's own default for that case is
+           STARS (ui/v2.5/src/utils/rating.ts:
+           `defaultRatingSystemType = RatingSystemType.Stars`, read
+           through `config?.ui.ratingSystemOptions ?? default` by
+           RatingSystem, RatingBanner and the settings panel alike). We
+           used to read missing as decimal, which is the state of every
+           fresh install: measured on a clean 0.31.1 with 15 scenes, the
+           app drew five stars while refract's own settings row said
+           "Decimal" and the card banners kept the 0-10 scale. Stash
+           always writes an explicit type once the setting is changed,
+           so absent can only mean the default. */
         gql("query { configuration { ui } }")
             .then(function (res) {
                 var ui = res && res.data && res.data.configuration
                     && res.data.configuration.ui;
                 /* No usable config blob in a *successful* response - don't
-                   clobber the cached value with "". (An errored/auth-failed
+                   clobber the cached value. (An errored/auth-failed
                    response now rejects in gqlXhr and lands in .catch below,
-                   so it never reaches here and the cache is preserved.)
-                   When ui IS present, an empty type legitimately means
-                   decimal mode, so writing "" is correct. */
+                   so it never reaches here and the cache is preserved.) */
                 if (!ui) { return; }
-                var t = (ui.ratingSystemOptions && ui.ratingSystemOptions.type) || "";
+                var t = (ui.ratingSystemOptions && ui.ratingSystemOptions.type) || "stars";
                 try { localStorage.setItem(RATING_SYSTEM_STORAGE_KEY, t); } catch (e) { /* ignore */ }
                 applyRatingSystemClass(t);
             }).catch(function () { /* ignore - keep cached value */ });
