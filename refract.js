@@ -3170,6 +3170,11 @@
     /* Phone card grid: "2" two-up (default) or "1" one card per row.
        Toggled from the list toolbar's second tier; forum request #203. */
     var MOBILE_COLS_KEY = "refract.mobileCols";
+    /* Declared here, not beside the dock code below, because
+       REFRACT_SYNC_KEYS is built at load time before that code runs:
+       hoisted but unassigned, the key went into the sync list as
+       undefined and the dock configuration never reached the server. */
+    var DOCK_ITEMS_KEY = "refract.dockItems";
 
     /* Gender glyphs for banners Refract draws itself (the mock preview card
        and the performer page's header card). The list card CLONES Stash's
@@ -5512,7 +5517,8 @@
        Refract -> Mobile dock): a click-to-select icon grid persisted as
        a JSON key array. Default: the four core routes + burger. */
     var MOBILE_DOCK_DEFAULT = ["/scenes", "/performers", "/studios", "/tags"];
-    var DOCK_ITEMS_KEY = "refract.dockItems";
+    /* DOCK_ITEMS_KEY is declared with the other storage keys near the top
+       of the file; see the note there. */
 
     function refractGetDockSelection() {
         try {
