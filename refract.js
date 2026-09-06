@@ -245,8 +245,20 @@
                 var held = document.querySelector("#plugin-refract-card-preview .refract-card-preview");
                 if (held && held.offsetWidth) { refractPreviewHeldSize = { w: held.offsetWidth, h: held.offsetHeight }; }
                 setPv({ loading: true, scene: null, performer: null, failed: false });
-                var componentsReady = (PluginApi.utils && PluginApi.utils.loadComponents && PluginApi.loadableComponents && PluginApi.loadableComponents.SceneCard)
-                    ? PluginApi.utils.loadComponents([PluginApi.loadableComponents.SceneCard, PluginApi.loadableComponents.PerformerCard])
+                /* loadableComponents is a different list on every Stash:
+                   0.26 and 0.27 carry SceneCard and no PerformerCard at all.
+                   loadComponents maps fn() over whatever it is handed, so a
+                   missing entry threw inside it and rejected the whole load,
+                   which took the SceneCard half of the preview down with it.
+                   Ask only for what this server actually offers. */
+                var wanted = [];
+                var lc = PluginApi.loadableComponents;
+                if (lc) {
+                    if (lc.SceneCard) { wanted.push(lc.SceneCard); }
+                    if (lc.PerformerCard) { wanted.push(lc.PerformerCard); }
+                }
+                var componentsReady = (PluginApi.utils && PluginApi.utils.loadComponents && wanted.length)
+                    ? PluginApi.utils.loadComponents(wanted)
                     : Promise.resolve();
                 Promise.all([componentsReady, refractFetchPreviewData(shuffle)])
                     .then(function (rs) {
@@ -271,8 +283,13 @@
             refractPreviewRefresh = function () { load(false); };
             R.useEffect(function () { load(false); }, []);
 
-            var SceneCard = PluginApi.components.SceneCard;
-            var PerformerCard = PluginApi.components.PerformerCard;
+            /* `components` is a plain object on every Stash we know of, but
+               reading a property off it happens INSIDE render: if a build
+               ever ships without it, the TypeError unmounts Stash's tree and
+               the page goes blank. The mocks are the answer to "no cards". */
+            var comps = PluginApi.components || {};
+            var SceneCard = comps.SceneCard;
+            var PerformerCard = comps.PerformerCard;
             var canReal = !pv.failed && SceneCard && PerformerCard && (pv.scene || pv.performer);
 
             if (pv.loading) {
@@ -3037,12 +3054,35 @@
     var refractSettingsPanelComponent = null;
     var refractSettingsMountMode = "none";
 
+    /* `instead` is not the same function on every Stash. Up to 0.26 the
+       registry held ONE function per component and a second registration
+       threw ("instead has already been called for X"); 0.27 made it a list
+       and chained them. So on a 0.26 server, any other plugin that claimed
+       one of our patch points first turned our registration into a throw at
+       module scope. Each registration is its own attempt now: losing one
+       point costs that point, not the file. */
+    function refractPatchInstead(point, fn) {
+        try {
+            PluginApi.patch.instead(point, fn);
+            return true;
+        } catch (e) {
+            try {
+                if (window.console && console.warn) {
+                    console.warn("[refract] could not patch " + point + ": " +
+                        ((e && e.message) || e));
+                }
+            } catch (e2) { /* ignore */ }
+            return false;
+        }
+    }
+
     function registerAccentPatch() {
-        if (typeof PluginApi === "undefined" || !PluginApi.patch || !PluginApi.React) {
+        if (typeof PluginApi === "undefined" || !PluginApi.patch ||
+                typeof PluginApi.patch.instead !== "function" || !PluginApi.React) {
             setTimeout(registerAccentPatch, 100);
             return;
         }
-        PluginApi.patch.instead("PluginSettings", function () {
+        refractPatchInstead("PluginSettings", function () {
             var args = Array.prototype.slice.call(arguments);
             var next = args.pop();
             var props = args[0];
@@ -3130,6 +3170,14 @@
                 return function () { clearInterval(t); };
             }, [container]);
             if (!container) { return null; }
+            /* No portal, no host. Rendering the panel inline in the navbar
+               instead would put the settings in the wrong place AND outside
+               the section they belong to, so an absent createPortal is a
+               reason to render nothing, not a reason to throw in a render
+               path (which unmounts Stash's tree and blanks the page). */
+            if (!PluginApi.ReactDOM || typeof PluginApi.ReactDOM.createPortal !== "function") {
+                return null;
+            }
             return PluginApi.ReactDOM.createPortal(
                 R3.createElement(RefractSettingsPanel, { key: "sync-" + epochSt[0] }), container);
         }
@@ -3142,7 +3190,7 @@
            it is Stash's own settings row and so renders on the very page the
            panel belongs to, with the app's providers around it. */
         ["MainNavBar.UtilityItems", "MainNavBar.MenuItems", "BooleanSetting"].forEach(function (point) {
-            PluginApi.patch.instead(point, function () {
+            refractPatchInstead(point, function () {
                 var args = Array.prototype.slice.call(arguments);
                 var next = args.pop();
                 var orig = next.apply(null, args);
