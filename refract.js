@@ -54,6 +54,30 @@
         } catch (e) { /* ignore */ }
     }());
 
+    /* ── Boot guard ──────────────────────────────────────────────────────
+       Every top-level initialiser in this file runs through here. The
+       consolidated mutation watcher at the foot already wraps each of its
+       handlers in try/catch; the FIRST call to each of them is at module
+       scope and was not wrapped, so one initialiser throwing aborted the
+       rest of the IIFE. On an older Stash that is the whole theme: no
+       watcher, no card injection, no settings panel, no navbar work, and
+       a single console error to explain it. A failed initialiser now
+       costs only its own feature. */
+    function refractInit(fn) {
+        try { fn(); } catch (e) {
+            try {
+                /* Name the initialiser from its own source: the wrapper is an
+                   anonymous expression, so fn.name is empty and a bare message
+                   would not say which feature went. */
+                var m = /\{\s*([A-Za-z_$][A-Za-z0-9_$]*)\s*\(/.exec(String(fn));
+                var nm = m ? m[1] : "init";
+                if (window.console && console.warn) {
+                    console.warn("[refract] " + nm + " failed at boot: " + ((e && e.message) || e));
+                }
+            } catch (e2) { /* ignore */ }
+        }
+    }
+
     var REFRACT_PRESETS = ["blue", "pink", "red", "yellow", "purple", "green", "teal"];
     var REFRACT_PRESETS_ALL = ["orange", "blue", "pink", "red", "yellow", "purple", "green", "teal"];
     var ACCENT_STORAGE_KEY = "refract.accent";
@@ -150,7 +174,7 @@
     }
 
     function applyAccentPreset() { applyAccentClass(getStoredAccent()); }
-    applyAccentPreset();
+    refractInit(function () { applyAccentPreset(); });
 
     /* Refract's accent picker. Hooked into Stash's React tree via
        PluginApi.patch.instead("PluginSettings"), so the plugin panel for
@@ -3127,7 +3151,7 @@
             });
         });
     }
-    registerAccentPatch();
+    refractInit(function () { registerAccentPatch(); });
 
     var CATEGORIES_PATH = "/categories";
     var STORAGE_KEY_API = "refract.apiKey";
@@ -4155,9 +4179,9 @@
             localStorage.removeItem("refract.showSceneRes");
         } catch (e) { /* ignore */ }
     })();
-    applyCardElemClasses();
-    applyCardSideClasses();
-    applyStudioModeClass();
+    refractInit(function () { applyCardElemClasses(); });
+    refractInit(function () { applyCardSideClasses(); });
+    refractInit(function () { applyStudioModeClass(); });
 
     /* Settings mirrored to Stash's server-side UI config (see the
        settings-sync block below). RATING_SYSTEM is deliberately excluded:
@@ -4502,7 +4526,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-lite", !!on);
     }
-    applyLiteModeClass(isLiteModeEnabled());
+    refractInit(function () { applyLiteModeClass(isLiteModeEnabled()); });
 
     /* Engine flag - true for Blink/Chromium (Chrome/Edge/Opera/Brave), false
        for Gecko (Firefox) and WebKit (Safari). backdrop-filter raster behaves
@@ -4552,8 +4576,8 @@
         document.body.classList.toggle("refract-light", !!on);
         refractApplyThemeColorMeta(!!on);
     }
-    applyLightModeClass(isLightModeEnabled());
-    applyMobileColsClass(isMobileOneCol());
+    refractInit(function () { applyLightModeClass(isLightModeEnabled()); });
+    refractInit(function () { applyMobileColsClass(isMobileOneCol()); });
 
     /* Light-mode navbar toggle visibility. Defaults to ON so users can
        discover light mode without digging into plugin settings. Stash
@@ -4569,7 +4593,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-show-light-nav", !!on);
     }
-    applyLightToggleNavbarClass(isLightToggleNavbarVisible());
+    refractInit(function () { applyLightToggleNavbarClass(isLightToggleNavbarVisible()); });
 
     /* Help button visibility. Refract hides Stash's navbar Help (?) button
        by default; this opt-in toggle re-shows it via the `refract-show-help`
@@ -4584,7 +4608,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-show-help", !!on);
     }
-    applyHelpButtonClass(isHelpButtonVisible());
+    refractInit(function () { applyHelpButtonClass(isHelpButtonVisible()); });
 
     /* Studio banner visibility. Refract shows the studio NAME as a small
        muted label above the scene title by default (the logo image is
@@ -4601,7 +4625,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-studio-banner", !!on);
     }
-    applyStudioBannerClass(isStudioBannerVisible());
+    refractInit(function () { applyStudioBannerClass(isStudioBannerVisible()); });
 
     /* Performer-card-on-hover. By default hovering a performer circle on a
        scene card shows a small name-only tooltip; this opt-in toggle swaps
@@ -4617,7 +4641,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-performer-card-hover", !!on);
     }
-    applyPerformerCardHoverClass(isPerformerCardHover());
+    refractInit(function () { applyPerformerCardHoverClass(isPerformerCardHover()); });
 
     /* Scene-player center controls hide. Refract overlays back-10 /
        play / forward-10 buttons on the scene player; this opt-in toggle
@@ -4635,7 +4659,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-hide-center-controls", !!on);
     }
-    applyCenterControlsHiddenClass(isCenterControlsHidden());
+    refractInit(function () { applyCenterControlsHiddenClass(isCenterControlsHidden()); });
 
     /* Active-filter chips row. Theme hides it by default (the filter
        button badge shows the count); this opt-in re-shows it so filters
@@ -4651,7 +4675,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-show-filter-tags", !!on);
     }
-    applyFilterTagsShownClass(isFilterTagsShown());
+    refractInit(function () { applyFilterTagsShownClass(isFilterTagsShown()); });
 
     /* Scene card style. "refract" (default) = tidier minimal layout -
        description block hidden so the grid stays consistent across
@@ -4674,7 +4698,7 @@
         if (!document.body) { return; }
         document.body.classList.toggle("refract-minimal-cards", style === "refract");
     }
-    applyCardStyleClass(getStoredCardStyle());
+    refractInit(function () { applyCardStyleClass(getStoredCardStyle()); });
 
     /* The old single "Card rating style" (intensity / tiers / playing-card)
        bundled two independent axes and is retired. It is now:
@@ -4742,7 +4766,7 @@
             localStorage.removeItem(RATING_STYLE_STORAGE_KEY);
         } catch (e) { /* ignore */ }
     })();
-    applyCardModeClasses();
+    refractInit(function () { applyCardModeClasses(); });
 
     /* View-mode minimiser feature toggle. Default enabled - Refract
        collapses Stash's row of view-mode buttons into a single icon +
@@ -4978,7 +5002,7 @@
             refractSettleSync();
         }).catch(function () { refractSettleSync(); /* no server / no auth - stay on localStorage */ });
     }
-    initSettingsSync();
+    refractInit(function () { initSettingsSync(); });
 
     /* Detect Stash's rating-system type (STARS vs DECIMAL). We can't read
        this from the rating-banner alone because Stash only writes the
@@ -12381,7 +12405,7 @@
             if (trigger) { trigger.click(); }
         }, { passive: true, capture: true });
     }
-    bindPageJumpScrollDismiss();
+    refractInit(function () { bindPageJumpScrollDismiss(); });
 
     /* ── Table list view: strip overflowable so hover-popup never fires ── */
 
@@ -13145,7 +13169,7 @@
 
     /* Initial fixSceneTaggerDetails pass - subsequent passes run via the
        consolidated mutation watcher at the end of this file. */
-    fixSceneTaggerDetails();
+    refractInit(function () { fixSceneTaggerDetails(); });
 
     /* ── Performer Tagger: relocate batch buttons into header ──────────
        The PerformerTagger page renders three action buttons (Batch Add,
@@ -13175,7 +13199,7 @@
             header.dataset.refractBatchMoved = "1";
         });
     }
-    relocateTaggerBatchButtons();
+    refractInit(function () { relocateTaggerBatchButtons(); });
 
     /* PerformerTagger search results - inject a close X button so the
        user can dismiss the result overlay without picking a match.
@@ -13205,7 +13229,7 @@
             results.appendChild(btn);
         });
     }
-    injectTaggerSearchClose();
+    refractInit(function () { injectTaggerSearchClose(); });
 
     /* Global capture-phase listener: when the user clicks the
        "Search" button inside a PerformerTagger card, un-hide any
@@ -16576,7 +16600,7 @@
         injectPerformerCarouselChevrons();
     }
 
-    applyScenePlayerFixes(); /* initial pass; re-runs via consolidated watcher */
+    refractInit(function () { applyScenePlayerFixes(); }); /* initial pass; re-runs via consolidated watcher */
 
     // Replace home-page "View All" anchor text with an empty content so CSS can
     // overlay a chevron via ::after without fighting other rules' specificity.
@@ -16598,7 +16622,7 @@
             a.textContent = "";
         }
     }
-    tagViewAllLinks(); /* initial pass; re-runs via consolidated watcher */
+    refractInit(function () { tagViewAllLinks(); }); /* initial pass; re-runs via consolidated watcher */
 
     // Lightbox consolidation: move the page indicator + header buttons (gear,
     // slideshow, fullscreen, close) from the top header bar into the bottom
@@ -16645,7 +16669,7 @@
             indicator.__refractCountObs = obs;
         }
     }
-    consolidateLightbox(); /* initial pass - bridge runs idempotently */
+    refractInit(function () { consolidateLightbox(); }); /* initial pass - bridge runs idempotently */
 
     // Scene header studio name: Stash renders only the studio logo as an
     // <img> inside <h1.studio-logo><a><img alt="…"></a></h1>; the visible
@@ -16833,7 +16857,7 @@
             a.dataset.stStudioInjected = "1";
         }
     }
-    injectStudioName(); /* initial pass; re-runs via consolidated watcher */
+    refractInit(function () { injectStudioName(); }); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Plugins page: replace each plugin's native
     // [Enable]/[Disable] btn-sm with a Bootstrap custom-switch toggle so
@@ -16911,7 +16935,7 @@
             safeInsertBefore(rightSide, wrap, rightSide.firstChild);
         }
     }
-    injectPluginToggles(); /* initial pass; re-runs via consolidated watcher */
+    refractInit(function () { injectPluginToggles(); }); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Plugins page: sort the installed-plugin list alphabetically
     // (A→Z), regardless of enabled/disabled state. This matches the native
@@ -17052,7 +17076,7 @@
             })(moved);
         }
     }
-    sortPluginList(); /* initial pass; re-runs via consolidated watcher */
+    refractInit(function () { sortPluginList(); }); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Plugins page: each plugin renders its inline settings,
     // hooks, etc. always-expanded, which makes the list very long. Inject
@@ -17112,7 +17136,7 @@
             group.dataset.stCollapsibleInjected = "1";
         }
     }
-    makePluginSettingsCollapsible(); /* initial pass; re-runs via consolidated watcher */
+    refractInit(function () { makePluginSettingsCollapsible(); }); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Plugins page: take over the "Reload plugins" .setting
     // row - replace its h3 title with a live search input, and strip
@@ -17209,7 +17233,7 @@
         reloadRow.classList.add("st-plugin-reload-row");
         reloadRow.dataset.stSearchInjected = "1";
     }
-    injectPluginSearch(); /* initial pass; re-runs via consolidated watcher */
+    refractInit(function () { injectPluginSearch(); }); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Tasks page: mirrors makePluginSettingsCollapsible + injectPluginSearch
     // for the Plugin Tasks card. Identical chevron (st-plugin-chevron) and collapse
@@ -17332,7 +17356,7 @@
             group.dataset.stTaskChevronDone = "1";
         }
     }
-    setupTaskPluginGroups(); /* initial pass; re-runs via consolidated watcher */
+    refractInit(function () { setupTaskPluginGroups(); }); /* initial pass; re-runs via consolidated watcher */
 
     // Settings → Tasks page: native task groups (Scan / Auto Tag / Generate /
     // Clean / Identify / Migrate). Mirrors setupTaskPluginGroups but anchored
@@ -17392,7 +17416,7 @@
             group.dataset.stTaskChevronDone = "1";
         }
     }
-    setupNativeTaskGroups(); /* initial pass; re-runs via consolidated watcher */
+    refractInit(function () { setupNativeTaskGroups(); }); /* initial pass; re-runs via consolidated watcher */
 
     /* Task Queue progress - inline percentage next to the title.
        Bootstrap renders the percentage as text INSIDE .progress-bar; the
@@ -17433,7 +17457,7 @@
             }
         }
     }
-    setupTaskQueuePercent(); /* initial pass; re-runs via consolidated watcher */
+    refractInit(function () { setupTaskQueuePercent(); }); /* initial pass; re-runs via consolidated watcher */
 
     /* Task Queue per-row expand: each job row is fixed at 110px so
        the card grows with job count not subtask churn. A chevron in
@@ -17517,7 +17541,7 @@
         }, true);
     }
 
-    setupTaskJobChevrons();
+    refractInit(function () { setupTaskJobChevrons(); });
 
     /* Inject a sun/moon light-mode toggle into the navbar utility cluster
        (right side, next to the burger / settings cog). Idempotent -
@@ -17570,7 +17594,7 @@
         });
         buttons.appendChild(btn);
     }
-    injectNavLightToggle();
+    refractInit(function () { injectNavLightToggle(); });
 
     /* Inject a "Show light-mode toggle in navbar" switch row into Stash's
        Interface tab, alongside the other menu-item visibility toggles.
@@ -17624,7 +17648,7 @@
 
         target.appendChild(row);
     }
-    injectInterfaceLightToggleSetting();
+    refractInit(function () { injectInterfaceLightToggleSetting(); });
 
     /* Inject a "Help button" switch row into Stash's Interface tab Menu
        Items section, alongside the other menu-item visibility toggles.
@@ -17678,7 +17702,7 @@
 
         target.appendChild(row);
     }
-    injectInterfaceHelpToggleSetting();
+    refractInit(function () { injectInterfaceHelpToggleSetting(); });
 
     /* Relocated Refract settings: a full "Refract" section appended to
        Settings -> Interface, so theme settings live with the rest of the
@@ -17804,7 +17828,7 @@
             setTimeout(function () { section.scrollIntoView({ block: "start" }); }, 60);
         }
     }
-    injectInterfaceRefractSection();
+    refractInit(function () { injectInterfaceRefractSection(); });
 
     /* ── Navbar drag-to-reorder (iOS-style) ─────────────────────────────
        Pointer-events + FLIP animation so icons slide out of the way live.
@@ -18189,7 +18213,7 @@
             }).observe(navRow, { childList: true });
         }
     }
-    setupNavbarReorder(); /* initial pass; re-runs via consolidated watcher */
+    refractInit(function () { setupNavbarReorder(); }); /* initial pass; re-runs via consolidated watcher */
 
     /* ── Scene video-filter swatches ─────────────────────────────────────
        Replace the numeric read-out at the end of each colour/tonal filter
