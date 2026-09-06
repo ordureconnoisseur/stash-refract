@@ -6775,7 +6775,15 @@
         }
         if (REFRACT_EP_COUNTS[ctx.key] === undefined) { refractEpFetchCounts(ctx); }
         var counts = REFRACT_EP_COUNTS[ctx.key];
-        if (!counts || typeof counts !== "object" || !counts.kids) {
+        /* `!counts.all` is the empty-library case, and it is the same rule
+           as the one above, applied to the other end. Measured on a clean
+           0.31.1: a tag with one sub-tag and no scenes anywhere drew a
+           two-segment control reading "This tag 0 scenes" beside "With its
+           1 sub-tag 0 scenes". Both segments were true, neither did
+           anything, and the widest thing on the page was a switch between
+           two views of nothing. `all` is never smaller than `own`, so this
+           only ever fires when both are zero. */
+        if (!counts || typeof counts !== "object" || !counts.kids || !counts.all) {
             if (existing) { existing.parentNode.removeChild(existing); }
             refractBodyClass("refract-has-scope", false);
             return false;
