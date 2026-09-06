@@ -12937,8 +12937,8 @@
 
                 /* Try Slick jQuery API first, fall back to clicking nav buttons */
                 try {
-                    if (window.$ && $(slider).slick) {
-                        $(slider).slick(dir > 0 ? "slickNext" : "slickPrev");
+                    if (window.$ && window.$(slider).slick) {
+                        window.$(slider).slick(dir > 0 ? "slickNext" : "slickPrev");
                         return;
                     }
                 } catch (err) { /* no jQuery slick */ }
