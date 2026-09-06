@@ -260,10 +260,19 @@
                 }, R.createElement("div", { className: "sub-heading" }, "Loading preview…"));
             }
             if (!canReal) {
-                /* Static mock fallback (empty library / error). */
+                /* Static mock fallback (empty library / error). The fallback
+                   is the last thing standing between a preview problem and
+                   a blank Stash, so it may not throw: a failure here renders
+                   a plain notice instead of unmounting the app. */
+                var mockHtml = null;
+                try { mockHtml = refractBuildPreviewHtml(); } catch (e) { mockHtml = null; }
+                if (!mockHtml) {
+                    return R.createElement("div", { className: "refract-card-preview" },
+                        R.createElement("div", { className: "sub-heading" }, "Preview unavailable. The card settings below still apply."));
+                }
                 return R.createElement("div", {
                     className: "refract-card-preview",
-                    dangerouslySetInnerHTML: { __html: refractBuildPreviewHtml() }
+                    dangerouslySetInnerHTML: { __html: mockHtml }
                 });
             }
             function onCardError() {
@@ -2787,7 +2796,11 @@
                                    the CARD, so an overlay pinned to it sits on the
                                    card's own edges. */
                                 R.createElement("div", { className: "refract-cc-cardbox" },
-                                    R.createElement(RefractCardPreview),
+                                    /* Boundary around the whole preview, not only the
+                                       real cards inside it: whatever fails in here must
+                                       cost the preview, never the page. */
+                                    R.createElement(PreviewBoundary, { key: "preview-guard" },
+                                        R.createElement(RefractCardPreview)),
                                     cornerLayer()
                                 )
                             )
@@ -3196,6 +3209,25 @@
        circles/counts INSIDE .card-section after the title, icons inside
        every pill. --pc-badge-scale is JS-fitted on real cards; the mock
        hardcodes a value tuned to its fixed 190px width. */
+    /* Placeholder art for the mock cards: inline SVG data URIs, so the
+       fallback never shows library content. These two were dropped in the
+       customiser rework before 1.22.0 while the markup below kept using
+       them, so the fallback threw ReferenceError the moment it rendered.
+       Nobody saw it until 1.24.0 fixed the settings host: users whose
+       real-card preview fails (empty library, a query the server
+       rejects) then reached the fallback for the first time, and Stash
+       crashed to a blank page (forum #205). */
+    var REFRACT_PREVIEW_ART_SCENE = "data:image/svg+xml;utf8," + encodeURIComponent(
+        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'>" +
+        "<rect width='16' height='9' fill='#262230'/>" +
+        "<circle cx='12.5' cy='2.6' r='1.1' fill='#4a3f63'/>" +
+        "<path d='M0 9 5.5 4.5 9 7l4-3 3 2.5V9z' fill='#383049'/>" +
+        "<path d='M0 9 4 6.5 7.5 9z' fill='#453a5c'/></svg>");
+    var REFRACT_PREVIEW_ART_PERF = "data:image/svg+xml;utf8," + encodeURIComponent(
+        "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 3'>" +
+        "<rect width='2' height='3' fill='#2a2436'/>" +
+        "<circle cx='1' cy='1.05' r='0.42' fill='#4a3f63'/>" +
+        "<path d='M0.25 3a0.75 0.62 0 0 1 1.5 0z' fill='#4a3f63'/></svg>");
     function refractBuildPreviewHtml() {
         return '<div class="scene-card grid-card card refract-preview-card" data-stash-sc="1">' +
             '<div class="thumbnail-section">' +
