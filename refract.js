@@ -7367,6 +7367,19 @@
         return m ? m[1] : null;
     }
 
+    /* The placeholder recolour in 03_cards.css matches on the img's src, and
+       the front face of this stage is not an img: it is a div carrying the
+       same URL as a background, with the real img left visibility:hidden
+       underneath it. So the attribute selector could never see it, and on a
+       performer with no picture the page painted Stash's raw white
+       silhouette while every card in the library painted the accent one.
+       Measured on a clean install, light mode: the white shape on the white
+       header plate read 255,255,255 against a 255,255,255 ground. The class
+       is what CSS can match; the src question is answered here. */
+    function refractMarkDefaultFace(el, src) {
+        refractSetClass(el, "refract-pp-default", /[?&]default=true/.test(String(src || "")));
+    }
+
     function applyPerformerBackControl() {
         var pid = refractPerformerIdFromUrl();
         var host = document.querySelector(".detail-header-image");
@@ -7417,6 +7430,7 @@
         var stage = root.querySelector(".refract-pp-stage");
         var frontCopy = root.querySelector(".refract-pp-front");
         var lastSrc = img.getAttribute("src") || "";
+        refractMarkDefaultFace(frontCopy, lastSrc);
         /* React owns the <img> and replaces it -- Stash's own "Set image
            (front)" swaps the node. fit() re-resolves it every pass instead of
            closing over a node that may be detached, and the front copy
@@ -7439,6 +7453,7 @@
             if (src && src !== lastSrc) {
                 lastSrc = src;
                 frontCopy.style.backgroundImage = "url('" + src.replace(/'/g, "%27") + "')";
+                refractMarkDefaultFace(frontCopy, src);
             }
             /* The anchor travels with the box: the front copy and the back
                read it from the stage. */
